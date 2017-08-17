@@ -29,3 +29,5 @@ Keep in mind this version of my timer is a older version and has a lot of issues
 * <a href="http://steamcommunity.com/id/fluffystko/">fluffys</a>
 * Jakeey802
 * Grandpa Goose
+
+Checkout <a href="http://kpsurf.xyz">KP Surf</a> if you want to see the latest version in action.
