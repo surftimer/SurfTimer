@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS `ck_mapsettings` (
   `announcerecord` float NOT NULL DEFAULT '0',
   `gravityfix` int(11) NOT NULL DEFAULT '1',
   `antibhopmap` int (11) NOT NULL DEFAULT '0',
-  `antibhopbonus` int (11) NOT NULL DEFAULT'0'
+  `antibhopbonus` int (11) NOT NULL DEFAULT'0',
   PRIMARY KEY (`mapname`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
