@@ -271,18 +271,8 @@ public int PrMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 
 public void db_CheckVIPAdmin(int client, char[] szSteamID)
 {
-	char szID[32][2];
-	if (StrContains(szSteamID, "1:0:") != -1)
-		ExplodeString(szSteamID, "1:0:", szID, 2, 32);
-	else if (StrContains(szSteamID, "0:0:") != -1)
-		ExplodeString(szSteamID, "0:0:", szID, 2, 32);
-	else if (StrContains(szSteamID, "1:1:") != -1)
-		ExplodeString(szSteamID, "1:1:", szID, 2, 32);
-	else if (StrContains(szSteamID, "0:1:") != -1)
-		ExplodeString(szSteamID, "0:1:", szID, 2, 32);
-
 	char szQuery[1024];
-	Format(szQuery, 1024, "SELECT a.steamid, a.vip, a.admin, a.zoner, b.authid, b.srv_group FROM ck_vipadmins a LEFT JOIN sb_admins b ON a.steamid = b.authid  WHERE a.steamid = '%s' OR b.authid = '%s' OR b.authid = 'STEAM_0:0:%s' OR b.authid = 'STEAM_0:1:%s' UNION ALL select a.steamid, a.vip, a.admin, a.zoner, b.authid, b.srv_group FROM ck_vipadmins a RIGHT JOIN sb_admins b ON a.steamid = b.authid WHERE a.steamid = '%s' OR b.authid = '%s' OR b.authid = 'STEAM_0:0:%s' OR b.authid = 'STEAM_0:1:%s';", szSteamID, szSteamID, szID[1], szID[1], szSteamID, szSteamID, szID[1], szID[1]);
+	Format(szQuery, 1024, "SELECT steamid, title, namecolour, textcolour, inuse FROM ck_vipadmins WHERER steamid = '%s';", szSteamID);
 	SQL_TQuery(g_hDb, SQL_CheckVIPAdminCallback, szQuery, client, DBPrio_Low);
 }
 
@@ -308,91 +298,19 @@ public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] er
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-		if (!SQL_IsFieldNull(hndl, 0) && !SQL_IsFieldNull(hndl, 4)) // If in both ck_vipsadmins & sb_admins
-		{
-			g_iVipLvl[client] = SQL_FetchInt(hndl, 1);
-			g_iAdminLvl[client] = SQL_FetchInt(hndl, 2);
-			g_bZoner[client] = view_as<bool>(SQL_FetchInt(hndl, 3));
-			if (g_bZoner[client] && g_iVipLvl[client] < 1) // zoner but no vip
-				g_iVipLvl[client] = 1;
-			else if (g_iAdminLvl[client] > 0) // admins
-				g_iVipLvl[client] = 2;
-		}
-		else if (SQL_IsFieldNull(hndl, 0) && !SQL_IsFieldNull(hndl, 4)) // If only sb_admins
-		{
-			int vip = 0, admin = 0;
-			char type[128], szTitle[128];
-			SQL_FetchString(hndl, 5, type, 128);
-
-			if (StrEqual(type, "VIP"))
-			{
-				Format(szTitle, 128, "VIP |");
-				vip = 1;
-			}
-			else if (StrEqual(type, "SuperVIP"))
-			{
-				Format(szTitle, 128, "SuperVIP |");
-				vip = 2;
-			}
-			else if (StrEqual(type, "BDC"))
-			{
-				Format(szTitle, 128, "BDC |");
-				vip = 3;
-			}
-			else if (StrEqual(type, "Moderator"))
-			{
-				Format(szTitle, 128, "Moderator |");
-				admin = 1;
-			}
-			else if (StrEqual(type, "Admin"))
-			{
-				Format(szTitle, 128, "Admin |");
-				admin = 2;
-			}
-			else if (StrEqual(type, "Head Admin"))
-			{
-				Format(szTitle, 128, "Head Admin |");
-				admin = 3;
-			}
-			else if (StrEqual(type, "ServerOwner"))
-			{
-				Format(szTitle, 128, "Owner |");
-				admin = 99;
-			}
-
-			char szQuery[512];
-			Format(szQuery, 512, "INSERT INTO ck_vipadmins (steamid, title, inuse, vip, admin) VALUES ('%s', '%s', 1, %i, %i);", szSteamId, szTitle, vip, admin);
-			SQL_TQuery(g_hDb, SQL_InsertVipFromSourcebansCallback, szQuery, client, DBPrio_Low);
-			return;
-		}
-		else if (!SQL_IsFieldNull(hndl, 0) && SQL_IsFieldNull(hndl, 4)) // If only ck_vipsadmins
-		{
-			g_iVipLvl[client] = SQL_FetchInt(hndl, 1);
-			g_iAdminLvl[client] = SQL_FetchInt(hndl, 2);
-			g_bZoner[client] = view_as<bool>(SQL_FetchInt(hndl, 3));
-			if (g_bZoner[client] && g_iVipLvl[client] < 1) // zoner but no vip
-				g_iVipLvl[client] = 1;
-			else if (g_iAdminLvl[client] > 0 && g_iVipLvl[client] != 3) // admins
-				g_iVipLvl[client] = 2;
-		}
+		g_iVipLvl[client] = SQL_FetchInt(hndl, 1);
+		g_iAdminLvl[client] = SQL_FetchInt(hndl, 2);
+		g_bZoner[client] = view_as<bool>(SQL_FetchInt(hndl, 3));
+		if (g_bZoner[client] && g_iVipLvl[client] < 1) // zoner but no vip
+			g_iVipLvl[client] = 1;
+		else if (g_iAdminLvl[client] > 0) // admins
+			g_iVipLvl[client] = 2;
 	}
 
 	if (!g_bSettingsLoaded[client])
 	{
 		db_viewCustomTitles(client, szSteamId);
 	}
-}
-
-public void SQL_InsertVipFromSourcebansCallback(Handle owner, Handle hndl, const char[] error, any client)
-{
-	if (hndl == null)
-	{
-		LogError("[SurfTimer] SQL Error (SQL_InsertVipFromSourcebansCallback): %s", error);
-	}
-
-	char szSteamId[32];
-	getSteamIDFromClient(client, szSteamId, 32);
-	db_CheckVIPAdmin(client, szSteamId);
 }
 
 public void db_checkCustomPlayerTitle(int client, char[] szSteamID, char[] arg)
