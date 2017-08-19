@@ -239,6 +239,9 @@ CREATE TABLE IF NOT EXISTS `ck_vipadmins` (
   `namecolour` int(11) DEFAULT '0',
   `textcolour` int(11) NOT NULL DEFAULT '0',
   `inuse` int(11) DEFAULT '0',
+  `vip` int(11) DEFAULT '0',
+  `admin` int(11) DEFAULT '0',
+  `zoner` int(11) DEFAULT '0',
   PRIMARY KEY (`steamid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
