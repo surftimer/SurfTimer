@@ -2,11 +2,7 @@
 
 ## Backstory
 
-This is a CS:GO timer which is heavily modified from ckSurf, the original developer (Jonitaikaponi) has quit working on it, I decided to use this a opportunity to learn SourcePawn, I didn't want to release this yet as a lot of things are hard coded and very messy, but you know.. 
-
-<img src="http://puu.sh/xcmcw/c992a82578.png"/>
-
-*sigh* oh well.
+This is a CS:GO timer which is heavily modified from ckSurf, the original developer (Jonitaikaponi) has quit working on it, I decided to use this a opportunity to learn SourcePawn, I didn't want to release this yet as a lot of things are hard coded and very messy, but events occurred and well, here it is.
 
 Keep in mind this version of my timer is a older version and has a lot of issues, so perhaps you should look to <a href="https://github.com/nikooo777/ckSurf">Nikos</a> or <a href="https://github.com/marcowmadeira/ckSurf">Marcos</a> fork of ckSurf instead. I may look into releasing the updated version once I feel like it's ready to be released.
 
