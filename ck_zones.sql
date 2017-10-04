@@ -1,4 +1,4 @@
-CREATE TABLE `ck_zones` (
+CREATE TABLE IF NOT EXISTS `ck_zones` (
   `mapname` varchar(54) NOT NULL,
   `zoneid` int(12) NOT NULL DEFAULT '-1',
   `zonetype` int(12) DEFAULT '-1',
