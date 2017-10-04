@@ -109,7 +109,7 @@ CREATE TABLE `ck_mapsettings` (
  `stageprespeed35` float NOT NULL DEFAULT '350',
  `maxvelocity` float NOT NULL DEFAULT '3500',
  `announcerecord` float NOT NULL DEFAULT '0',
- `gravityfix` int(11) NOT NULL DEFAULT '1'
+ `gravityfix` int(11) NOT NULL DEFAULT '1',
  PRIMARY KEY (`mapname`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
