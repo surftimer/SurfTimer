@@ -21,6 +21,7 @@ Keep in mind this is my own version of ckSurf, a lot of things are hard coded so
 * The timer does auto-create some tables, but they will most likely have the wrong schema, use the create-tables.sql file instead.
 * Upload all the files to your csgo server directory
 * Add a MySQL database called `surftimer` to `csgo/addons/sourcemod/configs/databases.cfg`
+* (Optional) Import the ck_zones.sql file if you want to use my pre-made zones
 
 ## Stripper
 * I have uploaded my stripper files <a href="https://github.com/fluffyst/skillsurf-csgo">here</a>
