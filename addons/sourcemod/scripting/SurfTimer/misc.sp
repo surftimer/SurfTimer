@@ -4,7 +4,7 @@ void disableServerHibernate()
 	g_iServerHibernationValue = GetConVarInt(hServerHibernate);
 	if (g_iServerHibernationValue > 0)
 	{
-		PrintToServer("[SurfTimer] Disabling server hibernation.");
+		PrintToServer("[surftimer] Disabling server hibernation.");
 		SetConVarInt(hServerHibernate, 0, false, false);
 	}
 	CloseHandle(hServerHibernate);
@@ -16,7 +16,7 @@ void revertServerHibernateSettings()
 	Handle hServerHibernate = FindConVar("sv_hibernate_when_empty");
 	if (GetConVarInt(hServerHibernate) != g_iServerHibernationValue)
 	{
-		PrintToServer("[SurfTimer] Resetting Server Hibernation CVar");
+		PrintToServer("[surftimer] Resetting Server Hibernation CVar");
 		SetConVarInt(hServerHibernate, g_iServerHibernationValue, false, false);
 	}
 	CloseHandle(hServerHibernate);
@@ -38,11 +38,16 @@ void setBotQuota()
 		count++;
 	if (g_BonusBotCount > 0)
 		count++;
+	if (GetConVarBool(g_hWrcpBot) && g_bhasStages && g_bFirstStageReplay)
+		count++;
 
 	if (count == 0)
 		SetConVarInt(hBotQuota, 0, false, false);
 	else
+	{
+		//count = count + 1;
 		SetConVarInt(hBotQuota, count, false, false);
+	}
 
 	CloseHandle(hBotQuota);
 
@@ -89,7 +94,8 @@ public void loadAllClientSettings()
 	{
 		if (IsValidClient(i) && !IsFakeClient(i) && !g_bSettingsLoaded[i] && !g_bLoadingSettings[i])
 		{
-			db_viewPersonalRecords(i, g_szSteamID[i], g_szMapName);
+			g_iSettingToLoad[i] = 0;
+			LoadClientSetting(i, 0);
 			g_bLoadingSettings[i] = true;
 			break;
 		}
@@ -97,6 +103,34 @@ public void loadAllClientSettings()
 
 	g_bServerDataLoaded = true;
 }
+
+public void LoadClientSetting(int client, int setting)
+{
+	if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		switch (setting)
+		{
+			case 0: db_viewPersonalRecords(client, g_szSteamID[client], g_szMapName);
+			// db_viewMapRankPro(client);
+			// db_viewStyleMapRank(client, style);
+			case 1: db_viewPersonalBonusRecords(client, g_szSteamID[client]);
+			// db_viewMapRankBonus(client, zgroup, 0);
+			// db_viewMapRankBonusStyle(client, zgroup, 0, style);
+			case 2: db_viewPersonalStageRecords(client, g_szSteamID[client]);
+			// db_viewStageRanks(client, stage);
+			// db_viewStyleStageRanks(client, stage, style);
+			case 3: db_viewPlayerPoints(client);
+			// db_GetPlayerRank(client);
+			case 4: db_viewPlayerOptions(client, g_szSteamID[client]);
+			case 5: db_CheckVIPAdmin(client, g_szSteamID[client]);
+			case 6: db_viewCustomTitles(client, g_szSteamID[client]);
+			case 7: db_viewCheckpoints(client, g_szSteamID[client], g_szMapName);
+			default: db_viewPersonalRecords(client, g_szSteamID[client], g_szMapName);
+		}
+		g_iSettingToLoad[client]++;
+	}
+}
+
 public void getSteamIDFromClient(int client, char[] buffer, int length)
 {
 	// Get steamid - Points are being recalculated by an admin (pretty much going through top 20k players)
@@ -124,18 +158,24 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 {
 	if (!IsValidClient(client))
 		return;
+
 	if (!IsValidZonegroup(zonegroup))
 	{
-		PrintToChat(client, " %cSurfTimer %c| Zonegroup not found.", LIMEGREEN, WHITE);
+		PrintToChat(client, " %cSurftimer %c| Zonegroup not found.", LIMEGREEN, WHITE);
 		return;
 	}
 
-	//fluffys gravity
-	if(g_iInitalStyle[client] != 4) //lowgrav
-		ResetGravity(client);
+	// Set Defaults
 
-	if(g_iInitalStyle[client] != 5 && g_iInitalStyle[client] != 6)
+	//fluffys gravity
+	ResetGravity(client);
+
+	if (g_iInitalStyle[client] != 5 && g_iInitalStyle[client] != 6)
 	 	SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
+		
+	// Hack fix for b1 of surf_aircontrol_ksf
+	if (StrEqual(g_szMapName, "surf_aircontrol_ksf_123") && zonegroup == 1)
+		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 2.0);
 
 	if (g_bPracticeMode[client])
 		Command_normalMode(client, 1);
@@ -144,14 +184,20 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	g_bInJump[client] = false;
 
 	// Check for spawn locations
-	if (zone == 1 && g_bGotSpawnLocation[zonegroup])
+	int realZone;
+	if (zone == -1)
+		realZone = 0;
+	else
+		realZone = zone;
+
+	if (g_bStartposUsed[client][realZone])
 	{
 		if (GetClientTeam(client) == 1 || GetClientTeam(client) == 0) // Spectating
 		{
 			if (stopTime)
 				Client_Stop(client, 0);
 
-			Array_Copy(g_fSpawnLocation[zonegroup], g_fTeleLocation[client], 3);
+			Array_Copy(g_fSpawnLocation[zonegroup][realZone], g_fStartposLocation[client][realZone], 3);
 
 			g_specToStage[client] = true;
 			g_bRespawnPosition[client] = false;
@@ -163,7 +209,60 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 		{
 			SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, 0.0 } ));
 
-			teleportEntitySafe(client, g_fSpawnLocation[zonegroup], g_fSpawnAngle[zonegroup], g_fSpawnVelocity[zonegroup], stopTime);
+			// Hack fix for zoneid not being set with hooked zones
+			int zId = getZoneID(zonegroup, zone);
+			if (!StrEqual(g_mapZones[zId][hookName], "None"))
+				g_iTeleportingZoneId[client] = zId;
+
+			teleportEntitySafe(client, g_fStartposLocation[client][zone], g_fStartposAngle[client][zone], view_as<float>( { 0.0, 0.0, 0.0 } ), stopTime);
+
+			return;
+		}
+	}
+	else if (g_bGotSpawnLocation[zonegroup][realZone])
+	{
+		// Check if teleporting to bonus
+		if (zonegroup > 0)
+		{
+			// Set a bool to allow bonus zones to sit on top of start zones, e.g surf_aircontrol_ksf bonus 1
+			g_bInBonus[client] = true;
+			g_iInBonus[client] = zonegroup;
+		}
+		else
+		{
+			// Not teleporting to a bonus
+			g_bInBonus[client] = false;
+		}
+
+		if (GetClientTeam(client) == 1 || GetClientTeam(client) == 0) // Spectating
+		{
+			if (stopTime)
+				Client_Stop(client, 0);
+
+			Array_Copy(g_fSpawnLocation[zonegroup][realZone], g_fTeleLocation[client], 3);
+
+			g_specToStage[client] = true;
+			g_bRespawnPosition[client] = false;
+
+			TeamChangeActual(client, 0);
+			return;
+		}
+		else
+		{
+			SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, 0.0 } ));
+
+			// Hack fix for zoneid not being set with hooked zones
+			int zId = getZoneID(zonegroup, zone);
+			if (!StrEqual(g_mapZones[zId][hookName], "None"))
+				g_iTeleportingZoneId[client] = zId;
+
+			if (realZone == 0)
+			{
+				g_bInStartZone[client] = false;
+				g_bInStageZone[client] = false;
+			}
+
+			teleportEntitySafe(client, g_fSpawnLocation[zonegroup][realZone], g_fSpawnAngle[zonegroup][realZone], g_fSpawnVelocity[zonegroup][realZone], stopTime);
 
 			return;
 		}
@@ -175,14 +274,26 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 		{
 			// Search for the zoneid we're teleporting to:
 			int destinationZoneId = getZoneID(zonegroup, zone);
+			g_iTeleportingZoneId[client] = destinationZoneId;
 
 			// Check if zone was found
 			if (destinationZoneId > -1)
 			{
+				// Check if teleporting to bonus
+				if (zonegroup > 0)
+				{
+					// Set a bool to allow bonus zones to sit on top of start zones, e.g surf_aircontrol_ksf bonus 1
+					g_bInBonus[client] = true;
+					g_iInBonus[client] = zonegroup;
+				}
+				else
+				{
+					// Not teleporting to a bonus
+					g_bInBonus[client] = false;
+				}
 				// Check if client is spectating, or not chosen a team yet
 				if (GetClientTeam(client) == 1 || GetClientTeam(client) == 0)
 				{
-
 					if (stopTime)
 						Client_Stop(client, 0);
 
@@ -195,26 +306,86 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 
 					// Spawn player
 					TeamChangeActual(client, 0);
+
+					if (realZone == 0)
+					{
+						g_bInStartZone[client] =  false;
+						g_bInStageZone[client] = false;
+					}
 				}
 				else // Teleport normally
 				{
+					bool destinationFound = false;
+					int entity;
+					float origin[3];
+					float ang[3];
+					for (int i = 0; i < GetArraySize(g_hDestinations); i++)
+					{
+						entity = GetArrayCell(g_hDestinations, i);
+						GetEntPropVector(entity, Prop_Send, "m_vecOrigin", origin);
+						/**
+						*	Checks if coordinates are inside a zone
+						* 	Return: zone id where location is in, or -1 if not inside a zone
+						**/
+						if (zonegroup > 0 && StrEqual(g_szMapName, "surf_mudkip_fix"))
+						{
+							char szBuffer[128];
+							char szTargetName[128];
+							GetEntPropString(entity, Prop_Send, "m_iName", szBuffer, sizeof(szBuffer));
+							Format(szTargetName, 128, "bonus%i", zonegroup);
+							if (zonegroup == 5)
+								Format(szTargetName, 128, "%s_1", szTargetName);
+
+							if (StrEqual(szBuffer, szTargetName))
+							{
+								destinationFound = true;
+								GetEntPropVector(entity, Prop_Send, "m_angRotation", ang);
+								break;
+							}
+						}
+						else
+						{
+							if (IsInsideZone(origin) == destinationZoneId)
+							{
+								destinationFound = true;
+								GetEntPropVector(entity, Prop_Send, "m_angRotation", ang);
+								break;
+							}
+						}
+					}
+					
 					// Set client speed to 0
 					SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, -100.0 } ));
 
 					float fLocation[3];
-					Array_Copy(g_mapZones[destinationZoneId][CenterPoint], fLocation, 3);
+					if (destinationFound)
+						Array_Copy(origin, fLocation, 3);
+					else
+						Array_Copy(g_mapZones[destinationZoneId][CenterPoint], fLocation, 3);
+
 					//fluffys dont cheat wrcps!
 					g_bWrcpTimeractivated[client] = false;
+
+					if (realZone == 0)
+					{
+						g_bInStartZone[client] =  false;
+						g_bInStageZone[client] = false;
+					}
+
 					// Teleport
-					teleportEntitySafe(client, fLocation, NULL_VECTOR, view_as<float>( { 0.0, 0.0, -100.0 } ), stopTime);
+					if (destinationFound)
+						teleportEntitySafe(client, fLocation, ang, view_as<float>( { 0.0, 0.0, -100.0 } ), stopTime);
+					else
+						teleportEntitySafe(client, fLocation, NULL_VECTOR, view_as<float>( { 0.0, 0.0, -100.0 } ), stopTime);
 				}
 			}
 			else
-				PrintToChat(client, " %cSurfTimer %c| Destination zone not found!", LIMEGREEN, WHITE);
+				PrintToChat(client, " %cSurftimer %c| Destination zone not found!", LIMEGREEN, WHITE);
 		}
 		else
-			PrintToChat(client, " %cSurfTimer %c| No zones found in the map.", LIMEGREEN, WHITE);
+			PrintToChat(client, " %cSurftimer %c| No zones found in the map.", LIMEGREEN, WHITE);
 	}
+	g_bNotTeleporting[client] = true;
 	return;
 }
 
@@ -235,6 +406,13 @@ void teleportEntitySafe(int client, float fDestination[3], float fAngles[3], flo
 int setClientLocation(int client, float fDestination[3])
 {
 	int zId = IsInsideZone(fDestination);
+
+	// Hack fix for hooked zones setting the clients zone id to -1
+	if (!StrEqual(g_mapZones[g_iTeleportingZoneId[client]][hookName], "None"))
+	{
+		// Any side effects from doing this? Not sure, I assume joni is getting a new zone id for a reason but I don't understand why when he gets the new zone id in the teleportClient function
+		zId = g_iTeleportingZoneId[client];
+	}
 
 	if (zId != g_iClientInZone[client][3]) // Ignore location changes, if teleporting to the same zone they are already in
 	{
@@ -509,7 +687,7 @@ public void readMultiServerMapcycle()
 		}
 	}
 	else
-		SetFailState("[SurfTimer] %s is empty or does not exist.", MULTI_SERVER_MAPCYCLE);
+		SetFailState("[surftimer] %s is empty or does not exist.", MULTI_SERVER_MAPCYCLE);
 
 	if (fileHandle != null)
 		CloseHandle(fileHandle);
@@ -531,7 +709,7 @@ public void readMapycycle()
 	{
 		if (mapListSerial == -1)
 		{
-			SetFailState("[SurfTimer] mapcycle.txt is empty or does not exist.");
+			SetFailState("[surftimer] mapcycle.txt is empty or does not exist.");
 		}
 	}
 	for (int i = 0; i < GetArraySize(g_MapList); i++)
@@ -575,7 +753,7 @@ public bool loadHiddenChatCommands()
 		}
 	}
 	else
-		LogError("[SurfTimer] %s is empty or does not exist.", BLOCKED_LIST_PATH);
+		LogError("[surftimer] %s is empty or does not exist.", BLOCKED_LIST_PATH);
 
 	if (fileHandle != null)
 		CloseHandle(fileHandle);
@@ -789,7 +967,7 @@ public void checkSpawnPoints()
 
 		if (f_spawnLocation[0] == 0.0 && f_spawnLocation[1] == 0.0 && f_spawnLocation[2] == 0.0) // No spawnpoint added to map with !addspawn, try to find spawns from map
 		{
-			PrintToServer("SurfTimer | No valid spawns found in the map.");
+			PrintToServer("surftimer | No valid spawns found in the map.");
 			int zoneEnt = -1;
 			zoneEnt = FindEntityByClassname(zoneEnt, "info_player_teamspawn"); // CSS/TF spawn found
 
@@ -798,7 +976,7 @@ public void checkSpawnPoints()
 				GetEntPropVector(zoneEnt, Prop_Data, "m_angRotation", f_spawnAngle);
 				GetEntPropVector(zoneEnt, Prop_Send, "m_vecOrigin", f_spawnLocation);
 
-				PrintToServer("SurfTimer | Found info_player_teamspawn in location %f, %f, %f", f_spawnLocation[0], f_spawnLocation[1], f_spawnLocation[2]);
+				PrintToServer("surftimer | Found info_player_teamspawn in location %f, %f, %f", f_spawnLocation[0], f_spawnLocation[1], f_spawnLocation[2]);
 			}
 			else
 			{
@@ -808,7 +986,7 @@ public void checkSpawnPoints()
 					GetEntPropVector(zoneEnt, Prop_Data, "m_angRotation", f_spawnAngle);
 					GetEntPropVector(zoneEnt, Prop_Send, "m_vecOrigin", f_spawnLocation);
 
-					PrintToServer("SurfTimer | Found info_player_start in location %f, %f, %f", f_spawnLocation[0], f_spawnLocation[1], f_spawnLocation[2]);
+					PrintToServer("surftimer | Found info_player_start in location %f, %f, %f", f_spawnLocation[0], f_spawnLocation[1], f_spawnLocation[2]);
 				}
 				else
 				{
@@ -930,7 +1108,7 @@ public bool checkSpam(int client)
 
 
 	if (4 < g_messages[client] < 8)
-		PrintToChat(client, " %cSurfTimer %c| %cStop spamming or you will get kicked!", LIMEGREEN, WHITE, RED);
+		PrintToChat(client, " %cSurftimer %c| %cStop spamming or you will get kicked!", LIMEGREEN, WHITE, RED);
 	else
 		if (g_messages[client] >= 8)
 	{
@@ -971,7 +1149,7 @@ public void PrintConsoleInfo(int client)
 		return;
 
 	PrintToConsole(client, "-----------------------------------------------------------------------------------------------------------");
-	PrintToConsole(client, "SurfTimer v%s - Author: Fluffys & Jakeey802 - Server tickrate: %i", VERSION, RoundToNearest(fltickrate));
+	PrintToConsole(client, "Surftimer v%s - Server tickrate: %i", VERSION, RoundToNearest(fltickrate));
 	PrintToConsole(client, " ");
 	PrintToConsole(client, "-----------------------------------------------------------------------------------------------------------");
 	PrintToConsole(client, " ");
@@ -1196,15 +1374,51 @@ public void LimitSpeed(int client)
 		CurVelVec[2] = 1.0;
 
 	float currentspeed = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0));
+	// float xy = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0));
+	// float z = SquareRoot(Pow(CurVelVec[2], 2.0));
 
 	if (currentspeed > speedCap)
 	{
 		NormalizeVector(CurVelVec, CurVelVec);
 		ScaleVector(CurVelVec, speedCap);
-		//PrintToChat(client, "%f", CurVelVec);
-		//PrintToChat(client, "%f %f %f", CurVelVec[0], CurVelVec[1], CurVelVec[2]);
+		// PrintToChat(client, "XY: %f Z: %f XYZ: %f", xy, z, currentspeed);
+		// PrintToChat(client, "%f", CurVelVec);
+		// PrintToChat(client, "%f %f %f", CurVelVec[0], CurVelVec[1], CurVelVec[2]);
+		// PrintToChat(client, "Limited speed");
 		TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
 		//TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
+	}
+}
+
+public void LimitMaxSpeed(int client, float fMaxSpeed)
+{
+	if (!IsValidClient(client) || !IsPlayerAlive(client) || IsFakeClient(client))
+		return;
+
+	float CurVelVec[3];
+	GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
+
+	if (CurVelVec[0] == 0.0)
+		CurVelVec[0] = 1.0;
+	if (CurVelVec[1] == 0.0)
+		CurVelVec[1] = 1.0;
+	if (CurVelVec[2] == 0.0)
+		CurVelVec[2] = 1.0;
+
+	float currentspeed = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0));
+
+	if (currentspeed > fMaxSpeed)
+	{
+		if (CurVelVec[0] > fMaxSpeed)
+			CurVelVec[0] = fMaxSpeed;
+		if (CurVelVec[1] > fMaxSpeed)
+			CurVelVec[1] = fMaxSpeed;
+		if (CurVelVec[2] > fMaxSpeed)
+			CurVelVec[2] = fMaxSpeed;
+
+		NormalizeVector(CurVelVec, CurVelVec);
+		ScaleVector(CurVelVec, fMaxSpeed);
+		TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
 	}
 }
 
@@ -1222,6 +1436,7 @@ public void SetClientDefaults(int client)
 	g_fLastCommandBack[client] = GameTime;
 	g_ClientSelectedZone[client] = -1;
 	g_Editing[client] = 0;
+	g_iSelectedTrigger[client] = -1;
 
 	g_bClientRestarting[client] = false;
 	g_fClientRestarting[client] = GameTime;
@@ -1259,7 +1474,6 @@ public void SetClientDefaults(int client)
 	g_bOverlay[client] = false;
 	g_bClientOwnReason[client] = false;
 	g_AdminMenuLastPage[client] = 0;
-	g_OptionsMenuLastPage[client] = 0;
 	g_MenuLevel[client] = -1;
 	g_AttackCounter[client] = 0;
 	g_SpecTarget[client] = -1;
@@ -1287,16 +1501,16 @@ public void SetClientDefaults(int client)
 
 
 	// Player Checkpoints
-	for (int x = 0; x < 3; x++)
-	{
-		g_fCheckpointLocation[client][x] = 0.0;
-		g_fCheckpointVelocity[client][x] = 0.0;
-		g_fCheckpointAngle[client][x] = 0.0;
+	// for (int x = 0; x < 3; x++)
+	// {
+	// 	g_fCheckpointLocation[client][x] = 0.0;
+	// 	g_fCheckpointVelocity[client][x] = 0.0;
+	// 	g_fCheckpointAngle[client][x] = 0.0;
 
-		g_fCheckpointLocation_undo[client][x] = 0.0;
-		g_fCheckpointVelocity_undo[client][x] = 0.0;
-		g_fCheckpointAngle_undo[client][x] = 0.0;
-	}
+	// 	g_fCheckpointLocation_undo[client][x] = 0.0;
+	// 	g_fCheckpointVelocity_undo[client][x] = 0.0;
+	// 	g_fCheckpointAngle_undo[client][x] = 0.0;
+	// }
 
 	for (int x = 0; x < MAXZONEGROUPS; x++)
 	{
@@ -1311,25 +1525,19 @@ public void SetClientDefaults(int client)
 		}
 	}
 
-	g_fLastPlayerCheckpoint[client] = GameTime;
+	// /g_fLastPlayerCheckpoint[client] = GameTime;
 	g_bCreatedTeleport[client] = false;
 	g_bPracticeMode[client] = false;
 
 	// client options
-	g_bInfoPanel[client] = true;
-	g_bShowNames[client] = true;
-	g_bGoToClient[client] = true;
-	g_bShowTime[client] = false;
 	g_bHide[client] = false;
-	g_bStartWithUsp[client] = false;
 	g_bShowSpecs[client] = true;
 	g_bAutoBhopClient[client] = true;
 	g_bHideChat[client] = false;
 	g_bViewModel[client] = true;
 	g_bCheckpointsEnabled[client] = true;
 	g_bEnableQuakeSounds[client] = true;
-	g_bSurfTimerEnabled[client] = true;
-	bPaintMode[client] = false;
+	g_bTimerEnabled[client] = true;
 
 	// style defaults
 	g_iCurrentStyle[client] = 0;
@@ -1341,23 +1549,58 @@ public void SetClientDefaults(int client)
 
 	// text colour
 	g_bHasCustomTextColour[client] = false;
+
+	// VIP
+	g_bCheckCustomTitle[client] = false;
+
+	// WRCP Replays
+	g_bSavingWrcpReplay[client] = false;
+
+	// Reset bonus bool
+	g_bInBonus[client] = false;
+
+	// surf_summer credits targetname
+	if (StrEqual(g_szMapName, "surf_summer"))
+		DispatchKeyValue(client, "targetname", "_m5_");
+	
+	g_iCenterSpeedEnt[client] = -1;
+
+	g_iPlayTimeAliveSession[client] = 0;
+	g_iPlayTimeSpecSession[client] = 0;
+
+	// Show Triggers
+	g_bShowTriggers[client] = false;
+
+	// Goose Start Pos
+	for (int i = 0; i < MAXZONES; i++)
+		g_bStartposUsed[client][i] = false;
+	
+	// Save loc
+	g_iLastSaveLocIdClient[client] = 0;
+	g_fLastCheckpointMade[client] = 0.0;
+
+	// Discord
+	g_bWaitingForBugMsg[client] = false;
+
+	// surf_christmas2
+	g_bUsingStageTeleport[client] = false;
 }
 
-public void clearPlayerCheckPoints(int client)
-{
-	for (int x = 0; x < 3; x++)
-	{
-		g_fCheckpointLocation[client][x] = 0.0;
-		g_fCheckpointVelocity[client][x] = 0.0;
-		g_fCheckpointAngle[client][x] = 0.0;
+// public void clearPlayerCheckPoints(int client)
+// {
+// 	for (int x = 0; x < 3; x++)
+// 	{
+// 		g_fCheckpointLocation[client][x] = 0.0;
+// 		g_fCheckpointVelocity[client][x] = 0.0;
+// 		g_fCheckpointAngle[client][x] = 0.0;
 
-		g_fCheckpointLocation_undo[client][x] = 0.0;
-		g_fCheckpointVelocity_undo[client][x] = 0.0;
-		g_fCheckpointAngle_undo[client][x] = 0.0;
-	}
-	g_fLastPlayerCheckpoint[client] = GetGameTime();
-	g_bCreatedTeleport[client] = false;
-}
+// 		g_fCheckpointLocation_undo[client][x] = 0.0;
+// 		g_fCheckpointVelocity_undo[client][x] = 0.0;
+// 		g_fCheckpointAngle_undo[client][x] = 0.0;
+// 	}
+// 	g_fLastPlayerCheckpoint[client] = GetGameTime();
+// 	g_bCreatedTeleport[client] = false;
+// }
 
 // - Get Runtime -
 public void GetcurrentRunTime(int client)
@@ -1366,14 +1609,24 @@ public void GetcurrentRunTime(int client)
 	g_fCurrentRunTime[client] = fGetGameTime - g_fStartTime[client] - g_fPauseTime[client];
 
 	if (g_bWrcpTimeractivated[client])
-		g_fCurrentWrcpRunTime[client] = fGetGameTime - g_fStartWrcpTime[client] - g_fPauseTime[client];
+		g_fCurrentWrcpRunTime[client] = fGetGameTime - g_fStartWrcpTime[client];
 }
 
 public float GetSpeed(int client)
 {
 	float fVelocity[3];
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
-	float speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0));
+	float speed;
+
+	if (g_SpeedMode[client] == 0) // XY
+		speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0));
+	else if (g_SpeedMode[client] == 1) // XYZ
+		speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0));
+	else if (g_SpeedMode[client] == 2) // Z
+		speed = fVelocity[2];
+	else // XY default
+		speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0));
+
 	return speed;
 }
 
@@ -1478,6 +1731,8 @@ public void PlayWRCPRecord(int iRecordtype)
 
 public void InitPrecache()
 {
+	// db_precacheCustomSounds();
+
 	AddFileToDownloadsTable(UNSTOPPABLE_SOUND_PATH);
 	FakePrecacheSound(UNSTOPPABLE_RELATIVE_SOUND_PATH);
 	AddFileToDownloadsTable(PRO_FULL_SOUND_PATH);
@@ -1510,9 +1765,9 @@ public void InitPrecache()
 	AddFileToDownloadsTable(szBuffer);
 	PrecacheModel(szBuffer, true);
 	// Player Arm Model
-	GetConVarString(g_hArmModel, szBuffer, 256);
-	AddFileToDownloadsTable(szBuffer);
-	PrecacheModel(szBuffer, true);
+	// GetConVarString(g_hArmModel, szBuffer, 256);
+	// AddFileToDownloadsTable(szBuffer);
+	// PrecacheModel(szBuffer, true);
 	// Player Model
 	GetConVarString(g_hPlayerModel, szBuffer, 256);
 	AddFileToDownloadsTable(szBuffer);
@@ -1557,7 +1812,7 @@ public void PrintMapRecords(int client, int type)
 	{
 		if (g_fRecordMapTime != 9999999.0)
 			{
-				PrintToChat(client, "  %cSurfTimer %c| %c%s %cholds the record with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, DARKBLUE, g_szRecordPlayer, WHITE, LIMEGREEN, g_szRecordMapTime, WHITE, BLUE, g_szMapName, WHITE);
+				PrintToChat(client, "  %cSurftimer %c| %c%s %cholds the record with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, DARKBLUE, g_szRecordPlayer, WHITE, LIMEGREEN, g_szRecordMapTime, WHITE, BLUE, g_szMapName, WHITE);
 			}
 	}
 	else if(type == 99)
@@ -1566,7 +1821,7 @@ public void PrintMapRecords(int client, int type)
 		{
 			if (g_fBonusFastest[i] != 9999999.0) // BONUS
 			{
-				PrintToChat(client, " %cSurfTimer %c| %c%s %cholds the %c%s %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, ORANGE, g_szBonusFastest[i], WHITE, ORANGE, g_szZoneGroupName[i], WHITE, LIMEGREEN, g_szBonusFastestTime[i], WHITE, BLUE, g_szMapName, WHITE);
+				PrintToChat(client, " %cSurftimer %c| %c%s %cholds the %c%s %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, ORANGE, g_szBonusFastest[i], WHITE, ORANGE, g_szZoneGroupName[i], WHITE, LIMEGREEN, g_szBonusFastestTime[i], WHITE, BLUE, g_szMapName, WHITE);
 			}
 		}
 	}
@@ -1574,42 +1829,42 @@ public void PrintMapRecords(int client, int type)
 	{
 		if(g_fRecordStyleMapTime[type] != 9999999.0)
 		{
-			PrintToChat(client, " %cSurfTimer %c| %c%s %cholds the %csideways %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, DARKBLUE, g_szRecordStylePlayer[type], WHITE, LIGHTRED, WHITE, LIMEGREEN, g_szRecordStyleMapTime[type], WHITE, BLUE, g_szMapName, WHITE);
+			PrintToChat(client, " %cSurftimer %c| %c%s %cholds the %csideways %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, DARKBLUE, g_szRecordStylePlayer[type], WHITE, LIGHTRED, WHITE, LIMEGREEN, g_szRecordStyleMapTime[type], WHITE, BLUE, g_szMapName, WHITE);
 		}
 	}
 	else if(type == 2) // hsw
 	{
 		if(g_fRecordStyleMapTime[type] != 9999999.0)
 		{
-			PrintToChat(client, " %cSurfTimer %c| %c%s %cholds the %chalf-sideways %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, DARKBLUE, g_szRecordStylePlayer[type], WHITE, LIGHTRED, WHITE, LIMEGREEN, g_szRecordStyleMapTime[type], WHITE, BLUE, g_szMapName, WHITE);
+			PrintToChat(client, " %cSurftimer %c| %c%s %cholds the %chalf-sideways %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, DARKBLUE, g_szRecordStylePlayer[type], WHITE, LIGHTRED, WHITE, LIMEGREEN, g_szRecordStyleMapTime[type], WHITE, BLUE, g_szMapName, WHITE);
 		}
 	}
 	else if(type == 3) // bw
 	{
 		if(g_fRecordStyleMapTime[type] != 9999999.0)
 		{
-			PrintToChat(client, " %cSurfTimer %c| %c%s %cholds the %cbackwards %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, DARKBLUE, g_szRecordStylePlayer[type], WHITE, LIGHTRED, WHITE, LIMEGREEN, g_szRecordStyleMapTime[type], WHITE, BLUE, g_szMapName, WHITE);
+			PrintToChat(client, " %cSurftimer %c| %c%s %cholds the %cbackwards %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, DARKBLUE, g_szRecordStylePlayer[type], WHITE, LIGHTRED, WHITE, LIMEGREEN, g_szRecordStyleMapTime[type], WHITE, BLUE, g_szMapName, WHITE);
 		}
 	}
 	else if(type == 4) // low-gravity
 	{
 		if(g_fRecordStyleMapTime[type] != 9999999.0)
 		{
-			PrintToChat(client, " %cSurfTimer %c| %c%s %cholds the %clow-gravity %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, DARKBLUE, g_szRecordStylePlayer[type], WHITE, LIGHTRED, WHITE, LIMEGREEN, g_szRecordStyleMapTime[type], WHITE, BLUE, g_szMapName, WHITE);
+			PrintToChat(client, " %cSurftimer %c| %c%s %cholds the %clow-gravity %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, DARKBLUE, g_szRecordStylePlayer[type], WHITE, LIGHTRED, WHITE, LIMEGREEN, g_szRecordStyleMapTime[type], WHITE, BLUE, g_szMapName, WHITE);
 		}
 	}
 	else if(type == 5) // slow motion
 	{
 		if(g_fRecordStyleMapTime[type] != 9999999.0)
 		{
-			PrintToChat(client, " %cSurfTimer %c| %c%s %cholds the %cslow motion %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, DARKBLUE, g_szRecordStylePlayer[type], WHITE, LIGHTRED, WHITE, LIMEGREEN, g_szRecordStyleMapTime[type], WHITE, BLUE, g_szMapName, WHITE);
+			PrintToChat(client, " %cSurftimer %c| %c%s %cholds the %cslow motion %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, DARKBLUE, g_szRecordStylePlayer[type], WHITE, LIGHTRED, WHITE, LIMEGREEN, g_szRecordStyleMapTime[type], WHITE, BLUE, g_szMapName, WHITE);
 		}
 	}
 	else if(type == 6) // fast forward
 	{
 		if(g_fRecordStyleMapTime[type] != 9999999.0)
 		{
-			PrintToChat(client, " %cSurfTimer %c| %c%s %cholds the %cfast forward %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, DARKBLUE, g_szRecordStylePlayer[type], WHITE, LIGHTRED, WHITE, LIMEGREEN, g_szRecordStyleMapTime[type], WHITE, BLUE, g_szMapName, WHITE);
+			PrintToChat(client, " %cSurftimer %c| %c%s %cholds the %cfast forward %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, DARKBLUE, g_szRecordStylePlayer[type], WHITE, LIGHTRED, WHITE, LIMEGREEN, g_szRecordStyleMapTime[type], WHITE, BLUE, g_szMapName, WHITE);
 		}
 	}
 	else if(type == 991) //bonus sideways
@@ -1619,7 +1874,7 @@ public void PrintMapRecords(int client, int type)
 		{
 			if (g_fStyleBonusFastest[type][i] != 9999999.0) // BONUS
 			{
-				PrintToChat(client, " %cSurfTimer %c| %c%s %cholds the %csideways %c%s %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, ORANGE, g_szStyleBonusFastest[type][i], WHITE, ORANGE, g_szZoneGroupName[i], WHITE, LIMEGREEN, g_szStyleBonusFastestTime[type][i], WHITE, BLUE, g_szMapName, WHITE);
+				PrintToChat(client, " %cSurftimer %c| %c%s %cholds the %csideways %c%s %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, ORANGE, g_szStyleBonusFastest[type][i], WHITE, ORANGE, g_szZoneGroupName[i], WHITE, LIMEGREEN, g_szStyleBonusFastestTime[type][i], WHITE, BLUE, g_szMapName, WHITE);
 			}
 		}
 	}
@@ -1630,7 +1885,7 @@ public void PrintMapRecords(int client, int type)
 		{
 			if (g_fStyleBonusFastest[type][i] != 9999999.0) // BONUS
 			{
-				PrintToChat(client, " %cSurfTimer %c| %c%s %cholds the %chalf-sideways %c%s %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, ORANGE, g_szStyleBonusFastest[type][i], WHITE,LIGHTRED,  ORANGE, g_szZoneGroupName[i], WHITE, LIMEGREEN, g_szStyleBonusFastestTime[type][i], WHITE, BLUE, g_szMapName, WHITE);
+				PrintToChat(client, " %cSurftimer %c| %c%s %cholds the %chalf-sideways %c%s %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, ORANGE, g_szStyleBonusFastest[type][i], WHITE,LIGHTRED,  ORANGE, g_szZoneGroupName[i], WHITE, LIMEGREEN, g_szStyleBonusFastestTime[type][i], WHITE, BLUE, g_szMapName, WHITE);
 			}
 		}
 	}
@@ -1641,7 +1896,7 @@ public void PrintMapRecords(int client, int type)
 		{
 			if (g_fStyleBonusFastest[type][i] != 9999999.0) // BONUS
 			{
-				PrintToChat(client, " %cSurfTimer %c| %c%s %cholds the %cbackwards %c%s %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, ORANGE, g_szStyleBonusFastest[type][i], WHITE, LIGHTRED, ORANGE, g_szZoneGroupName[i], WHITE, LIMEGREEN, g_szStyleBonusFastestTime[type][i], WHITE, BLUE, g_szMapName, WHITE);
+				PrintToChat(client, " %cSurftimer %c| %c%s %cholds the %cbackwards %c%s %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, ORANGE, g_szStyleBonusFastest[type][i], WHITE, LIGHTRED, ORANGE, g_szZoneGroupName[i], WHITE, LIMEGREEN, g_szStyleBonusFastestTime[type][i], WHITE, BLUE, g_szMapName, WHITE);
 			}
 		}
 	}
@@ -1652,7 +1907,7 @@ public void PrintMapRecords(int client, int type)
 		{
 			if (g_fStyleBonusFastest[type][i] != 9999999.0) // BONUS
 			{
-				PrintToChat(client, " %cSurfTimer %c| %c%s %cholds the %clow-gravity %c%s %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, ORANGE, g_szStyleBonusFastest[type][i], WHITE, LIGHTRED, ORANGE, g_szZoneGroupName[i], WHITE, LIMEGREEN, g_szStyleBonusFastestTime[type][i], WHITE, BLUE, g_szMapName, WHITE);
+				PrintToChat(client, " %cSurftimer %c| %c%s %cholds the %clow-gravity %c%s %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, ORANGE, g_szStyleBonusFastest[type][i], WHITE, LIGHTRED, ORANGE, g_szZoneGroupName[i], WHITE, LIMEGREEN, g_szStyleBonusFastestTime[type][i], WHITE, BLUE, g_szMapName, WHITE);
 			}
 		}
 	}
@@ -1663,7 +1918,7 @@ public void PrintMapRecords(int client, int type)
 		{
 			if (g_fStyleBonusFastest[type][i] != 9999999.0) // BONUS
 			{
-				PrintToChat(client, " %cSurfTimer %c| %c%s %cholds the %cslow motion %c%s %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, ORANGE, g_szStyleBonusFastest[type][i], WHITE, LIGHTRED, ORANGE, g_szZoneGroupName[i], WHITE, LIMEGREEN, g_szStyleBonusFastestTime[type][i], WHITE, BLUE, g_szMapName, WHITE);
+				PrintToChat(client, " %cSurftimer %c| %c%s %cholds the %cslow motion %c%s %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, ORANGE, g_szStyleBonusFastest[type][i], WHITE, LIGHTRED, ORANGE, g_szZoneGroupName[i], WHITE, LIMEGREEN, g_szStyleBonusFastestTime[type][i], WHITE, BLUE, g_szMapName, WHITE);
 			}
 		}
 	}
@@ -1674,7 +1929,7 @@ public void PrintMapRecords(int client, int type)
 		{
 			if (g_fStyleBonusFastest[type][i] != 9999999.0) // BONUS
 			{
-				PrintToChat(client, " %cSurfTimer %c| %c%s %cholds the %cfast forward %c%s %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, ORANGE, g_szStyleBonusFastest[type][i], WHITE, LIGHTRED, ORANGE, g_szZoneGroupName[i], WHITE, LIMEGREEN, g_szStyleBonusFastestTime[type][i], WHITE, BLUE, g_szMapName, WHITE);
+				PrintToChat(client, " %cSurftimer %c| %c%s %cholds the %cfast forward %c%s %crecord with time: %c%s %con %c%s%c.", LIMEGREEN, WHITE, ORANGE, g_szStyleBonusFastest[type][i], WHITE, LIGHTRED, ORANGE, g_szZoneGroupName[i], WHITE, LIMEGREEN, g_szStyleBonusFastestTime[type][i], WHITE, BLUE, g_szMapName, WHITE);
 			}
 		}
 	}
@@ -1740,11 +1995,12 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 						//int r = GetRandomInt(1, 2);
 						PlayRecordSound(2);
 						PrintToChat(i, "%t", "NewMapRecord", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY, DARKBLUE);
-						PrintToConsole(i, "SurfTimer | %s scored a new MAP RECORD", szName);
+						PrintToConsole(i, "surftimer | %s scored a new MAP RECORD", szName);
 					}
 				}
 			}
-		} else
+		} 
+		else
 		{ // Print to own chat only
 			if (IsValidClient(client) && !IsFakeClient(client))
 			{
@@ -1773,11 +2029,22 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 			}
 		}
 
+		// Send Announcements
+		if (g_bMapSRVRecord[client])
+		{
+			if (GetConVarBool(g_hRecordAnnounce))
+				db_insertAnnouncement(szName, g_szMapName, g_szFinalTime[client]);
+			char buffer[1024];
+			GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
+			if (!StrEqual(buffer, ""))
+				sendDiscordAnnouncement(szName, g_szMapName, g_szFinalTime[client]);
+		}
+
 		if(g_bTop10Time[client])
 			PlayRecordSound(3);
 
 		if (g_MapRank[client] == 99999 && IsValidClient(client))
-			PrintToChat(client, " %cSurfTimer %c| %cFailed to save your data correctly! Please contact an admin.", LIMEGREEN, WHITE, DARKRED, RED, DARKRED);
+			PrintToChat(client, " %cSurftimer %c| %cFailed to save your data correctly! Please contact an admin.", LIMEGREEN, WHITE, DARKRED, RED, DARKRED);
 
 		CreateTimer(0.0, UpdatePlayerProfile, client, TIMER_FLAG_NO_MAPCHANGE);
 
@@ -1915,7 +2182,7 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 	db_CalcAvgRunTimeBonus();
 
 	if (rank == 9999999 && IsValidClient(client))
-		PrintToChat(client, " %cSurfTimer %c| %cFailed to save your data correctly! Please contact an admin.", LIMEGREEN, WHITE, DARKRED, RED, DARKRED);
+		PrintToChat(client, " %cSurftimer %c| %cFailed to save your data correctly! Please contact an admin.", LIMEGREEN, WHITE, DARKRED, RED, DARKRED);
 
 	return;
 }
@@ -1989,7 +2256,8 @@ public void FormatTimeFloat(int client, float time, int type, char[] string, int
 	int iseconds;
 	int iminutes;
 	int ihours;
-	time = FloatAbs(time);
+	if (type != 6)
+		time = FloatAbs(time);
 	imilli = RoundToZero(time * 100);
 	imilli2 = RoundToZero(time * 10);
 	imilli = imilli % 100;
@@ -2139,6 +2407,36 @@ public void FormatTimeFloat(int client, float time, int type, char[] string, int
 			else
 				Format(string, length, "%s:%ss", szSeconds, szMilli);
 	}
+	// +-00:00:00
+	if (type == 6)
+	{
+		if (imilli < 10)
+			Format(szMilli, 16, "0%d", imilli);
+		else
+			Format(szMilli, 16, "%d", imilli);
+		if (iseconds < 10)
+			Format(szSeconds, 16, "0%d", iseconds);
+		else
+			Format(szSeconds, 16, "%d", iseconds);
+		if (iminutes < 10)
+			Format(szMinutes, 16, "0%d", iminutes);
+		else
+			Format(szMinutes, 16, "%d", iminutes);
+		if (ihours > 0)
+		{
+			Format(szHours, 16, "%d", ihours);
+			Format(string, length, "%s:%s:%s:%s", szHours, szMinutes, szSeconds, szMilli);
+		}
+		else
+			Format(string, length, "%s:%s:%s", szMinutes, szSeconds, szMilli);
+		
+		ReplaceString(string, length, "-", "");
+
+		if (time > 0.0)
+			Format(string, length, "+%s", string);
+		else
+			Format(string, length, "-%s", string);
+	}
 }
 
 public void SetSkillGroups()
@@ -2208,7 +2506,7 @@ public void SetSkillGroups()
 			CloseHandle(hKeyValues);
 	}
 	else
-		SetFailState("[SurfTimer] %s not found.", SKILLGROUP_PATH);
+		SetFailState("[surftimer] %s not found.", SKILLGROUP_PATH);
 
 }
 
@@ -2217,155 +2515,206 @@ public void getPlayerRank(int client, int rank, int points)
 	char szName[64];
 	GetClientName(client, szName, sizeof(szName));
 	parseColorsFromString(szName, 64);
+	char szSkillGroup[32];
+	GetRankName(client, rank, points, szSkillGroup, 32);
+	Format(g_pr_rankname[client], 128, szSkillGroup);
+	Format(g_szRankName[client], sizeof(g_szRankName), szSkillGroup);
 
 	if(points == 0)
 	{
-		Format(g_pr_rankname[client], 128, "Unranked");
-		Format(g_pr_chat_coloredrank[client], 128, "Unranked |%c", WHITE);
-		g_szRankName[client] = "Unranked";
+		Format(g_pr_chat_coloredrank[client], 128, "[Unranked]%c", WHITE);
 		g_rankNameChatColour[client] = 0;
 	}
-	else if(points <= 999 && rank > 250)
+	else if (rank >= 701 && rank <= 750)
 	{
-		Format(g_pr_rankname[client], 128, "Newbie");
-		Format(g_pr_chat_coloredrank[client], 128, "%cNewbie |%c", GRAY, WHITE);
-		g_szRankName[client] = "Newbie";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cNewbie%c]", WHITE, GRAY, WHITE);
 		g_rankNameChatColour[client] = 0;
 	}
-	else if(points <= 1999 && rank > 250)
+	else if(rank >= 651 && rank <= 700)
 	{
-		Format(g_pr_rankname[client], 128, "Learning");
-		Format(g_pr_chat_coloredrank[client], 128, "%cLearning |%c", GRAY, GRAY);
-		g_szRankName[client] = "Learning";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cLearning%c]%c", WHITE, GRAY, WHITE, GRAY);
 		g_rankNameChatColour[client] = 7;
 	}
-	else if(points <= 2999 && rank > 250)
+	else if(rank >= 601 && rank <= 650)
 	{
-		Format(g_pr_rankname[client], 128, "Novice");
-		Format(g_pr_chat_coloredrank[client], 128, "%cNovice |%c", DARKGREY, WHITE);
-		g_szRankName[client] = "Novice";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cNovice%c]", WHITE, DARKGREY, WHITE);
 		g_rankNameChatColour[client] = 0;
 	}
-	else if(points <= 3999 && rank > 250)
+	else if(rank >= 551 && rank <= 600)
 	{
-		Format(g_pr_rankname[client], 128, "Beginner");
-		Format(g_pr_chat_coloredrank[client], 128, "%cBeginner |%c", DARKGREY, DARKGREY);
-		g_szRankName[client] = "Beginner";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cBeginner%c]%c", WHITE, DARKGREY, WHITE, DARKGREY);
 		g_rankNameChatColour[client] = 14;
 	}
-	else if(points <= 4999 && rank > 250)
+	else if(rank >= 501 && rank <= 550)
 	{
-		Format(g_pr_rankname[client], 128, "Rookie");
-		Format(g_pr_chat_coloredrank[client], 128, "%cRookie |%c", YELLOW, WHITE);
-		g_szRankName[client] = "Rookie";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cRookie%c]", WHITE, YELLOW, WHITE);
 		g_rankNameChatColour[client] = 0;
 	}
-	else if(points <= 5999 && rank > 250)
+	else if(rank >= 451 && rank <= 500)
 	{
-		Format(g_pr_rankname[client], 128, "Average");
-		Format(g_pr_chat_coloredrank[client], 128, "%cAverage |%c", YELLOW, YELLOW);
-		g_szRankName[client] = "Average";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cAverage%c]%c", WHITE, YELLOW, WHITE, YELLOW);
 		g_rankNameChatColour[client] = 8;
 	}
-	else if(points <= 6999 && rank > 250)
+	else if(rank >= 401 && rank <= 450)
 	{
-		Format(g_pr_rankname[client], 128, "Casual");
-		Format(g_pr_chat_coloredrank[client], 128, "%cCasual |%c", MOSSGREEN, WHITE);
-		g_szRankName[client] = "Casual";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cCasual%c]", WHITE, MOSSGREEN, WHITE);
 		g_rankNameChatColour[client] = 0;
 	}
-	else if(points <= 7999  && rank > 250)
+	else if(rank >= 351 && rank <= 400)
 	{
-		Format(g_pr_rankname[client], 128, "Advanced");
-		Format(g_pr_chat_coloredrank[client], 128, "%cAdvanced |%c", MOSSGREEN, MOSSGREEN);
-		g_szRankName[client] = "Advanced";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cAdvanced%c]%c", WHITE, MOSSGREEN, WHITE, MOSSGREEN);
 		g_rankNameChatColour[client] = 5;
 	}
-	else if(points <= 9999 && rank > 250)
+	else if(rank >= 301 && rank <= 350)
 	{
-		Format(g_pr_rankname[client], 128, "Skilled");
-		Format(g_pr_chat_coloredrank[client], 128, "%cSkilled |%c", LIMEGREEN, WHITE);
-		g_szRankName[client] = "Skilled";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cSkilled%c]", WHITE, LIMEGREEN, WHITE);
 		g_rankNameChatColour[client] = 0;
 	}
-	else if(points >= 10000 && rank > 250)
+	else if(rank >= 251 && rank <= 300)
 	{
-		Format(g_pr_rankname[client], 128, "Exceptional");
-		Format(g_pr_chat_coloredrank[client], 128, "%cExceptional |%c", LIMEGREEN, LIMEGREEN);
-		g_szRankName[client] = "Exceptional";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cExceptional%c]%c", WHITE, LIMEGREEN, WHITE, LIMEGREEN);
 		g_rankNameChatColour[client] = 3;
 	}
-	else if(rank >= 201)
+	else if(rank >= 201 && rank <= 250)
 	{
-		Format(g_pr_rankname[client], 128, "Amazing");
-		Format(g_pr_chat_coloredrank[client], 128, "%cAmazing |%c", GREEN, WHITE);
-		g_szRankName[client] = "Amazing";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cAmazing%c]", WHITE, GREEN, WHITE);
 		g_rankNameChatColour[client] = 0;
 	}
-	else if(rank >= 101)
+	else if(rank >= 101 && rank <= 200)
 	{
-		Format(g_pr_rankname[client], 128, "Pro");
-		Format(g_pr_chat_coloredrank[client], 128, "%cPro |%c", GREEN, GREEN);
-		g_szRankName[client] = "Pro";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cPro%c]%c", WHITE, GREEN, WHITE, GREEN);
 		g_rankNameChatColour[client] = 2;
 	}
-	else if(rank >= 51)
+	else if(rank >= 51 && rank <= 100)
 	{
-		Format(g_pr_rankname[client], 128, "Veteran");
-		Format(g_pr_chat_coloredrank[client], 128, "%cVeteran |%c", BLUE, WHITE);
-		g_szRankName[client] = "Veteran";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cVeteran%c]", WHITE, BLUE, WHITE);
 		g_rankNameChatColour[client] = 0;
 	}
-	else if(rank >= 26)
+	else if(rank >= 26 && rank <= 50)
 	{
-		Format(g_pr_rankname[client], 128, "Expert");
-		Format(g_pr_chat_coloredrank[client], 128, "%cExpert |%c", BLUE, BLUE);
-		g_szRankName[client] = "Expert";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cExpert%c]%c", WHITE, BLUE, WHITE, BLUE);
 		g_rankNameChatColour[client] = 4;
 	}
-	else if(rank >= 11)
+	else if (rank >= 11 && rank <= 25)
 	{
-		Format(g_pr_rankname[client], 128, "Elite");
-		Format(g_pr_chat_coloredrank[client], 128, "%cElite |%c", DARKBLUE, DARKBLUE);
-		g_szRankName[client] = "Elite";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cElite%c]%c", WHITE, DARKBLUE, WHITE, DARKBLUE);
 		g_rankNameChatColour[client] = 10;
 	}
-	else if(rank >= 4)
+	else if (rank >= 4 && rank <= 10)
 	{
-		Format(g_pr_rankname[client], 128, "Master");
-		Format(g_pr_chat_coloredrank[client], 128, "%cMaster |%c", ORANGE, ORANGE);
-		g_szRankName[client] = "Master";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cMaster%c]%c", WHITE, ORANGE, WHITE, ORANGE);
 		g_rankNameChatColour[client] = 15;
 	}
 	else if(rank == 3)
 	{
-		Format(g_pr_rankname[client], 128, "Legendary");
-		Format(g_pr_chat_coloredrank[client], 128, "%cLegendary |%c", PINK, PINK);
-		g_szRankName[client] = "Legendary";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cLegendary%c]%c", WHITE, PINK, WHITE, PINK);
 		g_rankNameChatColour[client] = 11;
 		g_bCustomTitleAccess[client] = true;
 	}
 	else if(rank == 2)
 	{
-		Format(g_pr_rankname[client], 128, "Godly");
-		Format(g_pr_chat_coloredrank[client], 128, "%cGodly |%c", LIGHTRED, LIGHTRED);
-		g_szRankName[client] = "Godly";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cGodly%c]%c", WHITE, LIGHTRED, WHITE, LIGHTRED);
 		g_rankNameChatColour[client] = 12;
 		g_bCustomTitleAccess[client] = true;
 	}
 	else if(rank == 1)
 	{
-		Format(g_pr_rankname[client], 128, "King");
-		Format(g_pr_chat_coloredrank[client], 128, "%cKing |%c", DARKRED, DARKRED);
-		g_szRankName[client] = "King";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[%cKing%c]%c", WHITE, DARKRED, WHITE, DARKRED);
 		g_rankNameChatColour[client] = 1;
 		g_bCustomTitleAccess[client] = true;
 	}
 	else
 	{
-		Format(g_pr_rankname[client], 128, "Unranked");
-		Format(g_pr_chat_coloredrank[client], 128, "Unranked%c", WHITE);
-		g_szRankName[client] = "Unranked";
+		Format(g_pr_chat_coloredrank[client], 128, "%c[Unranked]", WHITE);
+		g_rankNameChatColour[client] = 0;
+	}
+}
+
+public void GetRankName(int client, int rank, int points, char[] szRank, int length)
+{
+	if(points == 0)
+	{
+		Format(szRank, length, "[Unranked]");
+	}
+	else if (rank >= 701 && rank <= 750)
+	{
+		Format(szRank, length, "[Newbie]");
+	}
+	else if(rank >= 651 && rank <= 700)
+	{
+		Format(szRank, length, "[Learning]");
+	}
+	else if(rank >= 601 && rank <= 650)
+	{
+		Format(szRank, length, "[Novice]");
+	}
+	else if(rank >= 551 && rank <= 600)
+	{
+		Format(szRank, length, "[Beginner]");
+	}
+	else if(rank >= 501 && rank <= 550)
+	{
+		Format(szRank, length, "[Rookie]");
+	}
+	else if(rank >= 451 && rank <= 500)
+	{
+		Format(szRank, length, "[Average]");
+	}
+	else if(rank >= 401 && rank <= 450)
+	{
+		Format(szRank, length, "[Casual]");
+	}
+	else if(rank >= 351 && rank <= 400)
+	{
+		Format(szRank, length, "[Advanced]");
+	}
+	else if(rank >= 301 && rank <= 350)
+	{
+		Format(szRank, length, "[Skilled]");
+	}
+	else if(rank >= 251 && rank <= 300)
+	{
+		Format(szRank, length, "[Exceptional]");
+	}
+	else if(rank >= 201 && rank <= 250)
+	{
+		Format(szRank, length, "[Amazing]");
+	}
+	else if(rank >= 101 && rank <= 200)
+	{
+		Format(szRank, length, "[Pro]");
+	}
+	else if(rank >= 51 && rank <= 100)
+	{
+		Format(szRank, length, "[Veteran]");
+	}
+	else if(rank >= 26 && rank <= 50)
+	{
+		Format(szRank, length, "[Expert]");
+	}
+	else if (rank >= 11 && rank <= 25)
+	{
+		Format(szRank, length, "[Elite]");
+	}
+	else if (rank >= 4 && rank <= 10)
+	{
+		Format(szRank, length, "[Master]");
+	}
+	else if(rank == 3)
+	{
+		Format(szRank, length, "[Legendary]");
+	}
+	else if(rank == 2)
+	{
+		Format(szRank, length, "[Godly]");
+	}
+	else if(rank == 1)
+	{
+		Format(szRank, length, "[King]");
+	}
+	else
+	{
+		Format(szRank, length, "[Unranked]");
 	}
 }
 
@@ -2381,7 +2730,6 @@ public void SetPlayerRank(int client)
 	}
 
 	int RankValue[SkillGroup];
-	int index = GetSkillgroupFromPoints(g_pr_points[client]);
 
 	//fluffys
 	if (!g_bDbCustomTitleInUse[client])
@@ -2485,34 +2833,34 @@ stock Action PrintSpecMessageAll(int client)
 	if (g_bHasCustomTextColour[client])
 		setTextColor(szTextToAll, g_iCustomColours[client][1], 1024);
 
-		if (GetConVarBool(g_hCountry))
-			CPrintToChatAll("{green}%s{default} *SPEC* %s {grey}%s{default}: %s", g_szCountryCode[client], szChatRank, szName, szTextToAll);
-		else if (GetConVarBool(g_hPointSystem))
+	if (GetConVarBool(g_hCountry))
+		CPrintToChatAll("{green}%s{default} *SPEC* %s {grey}%s{default}: %s", g_szCountryCode[client], szChatRank, szName, szTextToAll);
+	else if (GetConVarBool(g_hPointSystem))
+	{
+		if(StrContains(szChatRank, "{blue}") != -1)
 		{
-			if(StrContains(szChatRank, "{blue}") != -1)
-			{
-				char szPlayerTitle2[256][2];
-				ExplodeString(szChatRank, "{blue}", szPlayerTitle2, 2, 256);
-				if (IsPlayerAlive(client))
-					CPrintToChatAll("%s%c%s %s{default}: %s", szPlayerTitle2[0], BLUE, szPlayerTitle2[1], szName, szTextToAll);
-				else
-					CPrintToChatAll("*DEAD* %s%c%s %s{default}: %s", szPlayerTitle2[0], BLUE, szPlayerTitle2[1], szName, szTextToAll);
-
-				return Plugin_Handled;
-			}
-			else if(StrContains(szChatRank, "{orange}") != -1)
-			{
-				char szPlayerTitle2[256][2];
-				ExplodeString(szChatRank, "{orange}", szPlayerTitle2, 2, 256);
-				if (IsPlayerAlive(client))
-					CPrintToChatAll("%s%c%s %s{default}: %s", szPlayerTitle2[0], ORANGE, szPlayerTitle2[1], szName, szTextToAll);
-				else
-					CPrintToChatAll("*DEAD* %s%c%s %s{default}: %s", szPlayerTitle2[0], ORANGE, szPlayerTitle2[1], szName, szTextToAll);
-
-				return Plugin_Handled;
-			}
+			char szPlayerTitle2[256][2];
+			ExplodeString(szChatRank, "{blue}", szPlayerTitle2, 2, 256);
+			if (IsPlayerAlive(client))
+				CPrintToChatAll("%s%c%s %s{default}: %s", szPlayerTitle2[0], BLUE, szPlayerTitle2[1], szName, szTextToAll);
 			else
-				CPrintToChatAll("*SPEC* %s {grey}%s{default}: %s", szChatRank, szName, szTextToAll);
+				CPrintToChatAll("*DEAD* %s%c%s %s{default}: %s", szPlayerTitle2[0], BLUE, szPlayerTitle2[1], szName, szTextToAll);
+
+			return Plugin_Handled;
+		}
+		else if(StrContains(szChatRank, "{orange}") != -1)
+		{
+			char szPlayerTitle2[256][2];
+			ExplodeString(szChatRank, "{orange}", szPlayerTitle2, 2, 256);
+			if (IsPlayerAlive(client))
+				CPrintToChatAll("%s%c%s %s{default}: %s", szPlayerTitle2[0], ORANGE, szPlayerTitle2[1], szName, szTextToAll);
+			else
+				CPrintToChatAll("*DEAD* %s%c%s %s{default}: %s", szPlayerTitle2[0], ORANGE, szPlayerTitle2[1], szName, szTextToAll);
+
+			return Plugin_Handled;
+		}
+		else
+			CPrintToChatAll("*SPEC* %s {grey}%s{default}: %s", szChatRank, szName, szTextToAll);
 		}
 		else
 			CPrintToChatAll("*SPEC* {grey}%s{default}: %s", szName, szTextToAll);
@@ -2617,6 +2965,8 @@ public void GetRGBColor(int bot, char color[256])
 
 	if (bot == 0 && g_RecordBot != -1 && IsValidClient(g_RecordBot))
 		SetEntityRenderColor(g_RecordBot, g_ReplayBotColor[0], g_ReplayBotColor[1], g_ReplayBotColor[2], 50);
+	else if (bot == 0 && g_WrcpBot != -1 && IsValidClient(g_WrcpBot))
+		SetEntityRenderColor(g_WrcpBot, 255, 0, 255, 50);
 	else
 		if (bot == 1 && g_BonusBot != -1 && IsValidClient(g_BonusBot))
 		SetEntityRenderColor(g_BonusBot, g_BonusBotColor[0], g_BonusBotColor[1], g_BonusBotColor[2], 50);
@@ -2710,7 +3060,7 @@ public void CheckRun(int client)
 				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
 				{
 					g_bMissedBonusBest[client] = true;
-					PrintToChat(client, " %cSurfTimer %c| %cYou have missed your best bonus time of (%c%s%c)", LIMEGREEN, WHITE, GRAY, ORANGE, g_szPersonalRecordBonus[g_iClientInZone[client][2]][client], GRAY);
+					PrintToChat(client, " %cSurftimer %c| %cYou have missed your best bonus time of (%c%s%c)", LIMEGREEN, WHITE, GRAY, ORANGE, g_szPersonalRecordBonus[g_iClientInZone[client][2]][client], GRAY);
 					EmitSoundToClient(client, "buttons/button18.wav", client);
 				}
 			}
@@ -2823,7 +3173,7 @@ public void SpecListMenuDead(int client) // What Spectators see
 				Format(szProBest, 32, "None");
 
 			if (g_bhasStages) //  There are stages
-				Format(szStage, 32, "%i / %i", g_Stage[g_iClientInZone[ObservedUser][2]][ObservedUser], (g_mapZonesTypeCount[g_iClientInZone[ObservedUser][2]][3] + 1));
+				Format(szStage, 32, "Stage: %i / %i", g_Stage[g_iClientInZone[ObservedUser][2]][ObservedUser], (g_mapZonesTypeCount[g_iClientInZone[ObservedUser][2]][3] + 1));
 			else
 				Format(szStage, 32, "Linear map");
 
@@ -2844,27 +3194,27 @@ public void SpecListMenuDead(int client) // What Spectators see
 					{
 						if (!IsFakeClient(ObservedUser))
 						{
-							Format(g_szPlayerPanelText[client], 512, "Specs (%i):\n%s\n  \n%s\n%s\nRecord: %s\n\nStage: %s\n", count, sSpecs, szTime, szPlayerRank, szProBest, szStage);
+							Format(g_szPlayerPanelText[client], 512, "Specs (%i):\n%s\n  \n%s\n%s\nRecord: %s\n\n%s\n", count, sSpecs, szTime, szPlayerRank, szProBest, szStage);
 							if (!g_bShowSpecs[client])
 								Format(g_szPlayerPanelText[client], 512, "Specs (%i)\n \n%s\n%s\nRecord: %s\n\nStage: %s\n", count, szTime, szPlayerRank, szProBest, szStage);
 						}
 						else
 						{
 							if (ObservedUser == g_RecordBot)
-								Format(g_szPlayerPanelText[client], 512, "[Map Record Replay]\n%s\nTickrate: %s\nSpecs: %i\n\nStage: %s\n", szTime, szTick, count, szStage);
+								Format(g_szPlayerPanelText[client], 512, "[Map Record Replay]\n%s\nTickrate: %s\nSpecs: %i\n\n%s\n", szTime, szTick, count, szStage);
 							else
 								if (ObservedUser == g_BonusBot)
-									Format(g_szPlayerPanelText[client], 512, "[%s Record Replay]\n%s\nTickrate: %s\nSpecs: %i\n\nStage: %s\n", g_szZoneGroupName[g_iClientInZone[g_BonusBot][2]], szTime, szTick, count, szStage);
+									Format(g_szPlayerPanelText[client], 512, "[%s Record Replay]\n%s\nTickrate: %s\nSpecs: %i\n\n%s\n", g_szZoneGroupName[g_iClientInZone[g_BonusBot][2]], szTime, szTick, count, szStage);
 
 						}
 					}
 					else
 					{
 						if (ObservedUser == g_RecordBot)
-							Format(g_szPlayerPanelText[client], 512, "[Map Record Replay]\nTime: PAUSED\nTickrate: %s\nSpecs: %i\n\nStage: %s\n", szTick, count, szStage);
+							Format(g_szPlayerPanelText[client], 512, "[Map Record Replay]\nTime: PAUSED\nTickrate: %s\nSpecs: %i\n\n%s\n", szTick, count, szStage);
 						else
 							if (ObservedUser == g_BonusBot)
-								Format(g_szPlayerPanelText[client], 512, "[%s Record Replay]\nTime: PAUSED\nTickrate: %s\nSpecs: %i\n\nStage: Bonus\n", g_szZoneGroupName[g_iClientInZone[g_BonusBot][2]], szTick, count);
+								Format(g_szPlayerPanelText[client], 512, "[%s Record Replay]\nTime: PAUSED\nTickrate: %s\nSpecs: %i\n\nBonus\n", g_szZoneGroupName[g_iClientInZone[g_BonusBot][2]], szTick, count);
 					}
 				}
 				else
@@ -2877,31 +3227,35 @@ public void SpecListMenuDead(int client) // What Spectators see
 					}
 				}
 
-				if (!g_bShowTime[client] && g_bShowSpecs[client])
+				if (g_bShowSpecs[client])
 				{
-					if (ObservedUser != g_RecordBot && ObservedUser != g_BonusBot)
-						Format(g_szPlayerPanelText[client], 512, "%Specs (%i):\n%s\n \n%s\nRecord: %s\n\nStage: %s\n", count, sSpecs, szPlayerRank, szProBest, szStage);
+					if (ObservedUser != g_RecordBot && ObservedUser != g_BonusBot && ObservedUser != g_WrcpBot)
+						Format(g_szPlayerPanelText[client], 512, "%Specs (%i):\n%s\n \n%s\nRecord: %s\n\n%s\n", count, sSpecs, szPlayerRank, szProBest, szStage);
 					else
 					{
 						if (ObservedUser == g_RecordBot)
-							Format(g_szPlayerPanelText[client], 512, "Record replay of\n%s\n \nTickrate: %s\nSpecs (%i):\n%s\n\nStage: %s\n", g_szReplayName, szTick, count, sSpecs, szStage);
-						else
-							if (ObservedUser == g_BonusBot)
-							Format(g_szPlayerPanelText[client], 512, "Bonus replay of\n%s\n \nTickrate: %s\nSpecs (%i):\n%s\n\nStage: Bonus\n", g_szBonusName, szTick, count, sSpecs);
+							Format(g_szPlayerPanelText[client], 512, "Map Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \n%s\n", g_szReplayName, g_szReplayTime, count, sSpecs, szStage);
+						else if (ObservedUser == g_BonusBot)
+							Format(g_szPlayerPanelText[client], 512, "Bonus Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \nBonus\n", g_szBonusName, g_szBonusTime, count, sSpecs);
+						else if (ObservedUser == g_WrcpBot)
+						{
+							int stage = g_StageReplayCurrentStage;
+							Format(g_szPlayerPanelText[client], 512, "Stage %i Replay (%i)\n%s (%s)\n \nSpecs (%i):\n%s\n", g_StageReplayCurrentStage, g_StageReplaysLoop, g_szWrcpReplayName[stage],  g_szWrcpReplayTime[stage], count, sSpecs);
+						}
 
 					}
 				}
-				if (!g_bShowTime[client] && !g_bShowSpecs[client])
+				if (!g_bShowSpecs[client])
 				{
 					if (ObservedUser != g_RecordBot)
-						Format(g_szPlayerPanelText[client], 512, "%s\nRecord: %s\n\nStage: %s\n", szPlayerRank, szProBest, szStage);
+						Format(g_szPlayerPanelText[client], 512, "%s\nRecord: %s\n\n%s\n", szPlayerRank, szProBest, szStage);
 					else
 					{
 						if (ObservedUser == g_RecordBot)
-							Format(g_szPlayerPanelText[client], 512, "Record replay of\n%s\n \nTickrate: %s\n\nStage: %s\n", g_szReplayName, szTick, szStage);
+							Format(g_szPlayerPanelText[client], 512, "Record replay of\n%s\n \nTickrate: %s\n\n%s\n", g_szReplayName, szTick, szStage);
 						else
 							if (ObservedUser == g_BonusBot)
-							Format(g_szPlayerPanelText[client], 512, "Bonus replay of\n%s\n \nTickrate: %s\n\nStage: Bonus\n", g_szBonusName, szTick, szStage);
+							Format(g_szPlayerPanelText[client], 512, "Bonus replay of\n%s\n \nTickrate: %s\n\nBonus\n", g_szBonusName, szTick, szStage);
 
 					}
 				}
@@ -2966,7 +3320,7 @@ public void LoadInfoBot()
 	g_InfoBot = -1;
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if (!IsValidClient(i) || !IsFakeClient(i) || i == g_RecordBot || i == g_BonusBot)
+		if (!IsValidClient(i) || !IsFakeClient(i) || i == g_RecordBot || i == g_BonusBot || i == g_WrcpBot)
 			continue;
 		g_InfoBot = i;
 		break;
@@ -2995,7 +3349,7 @@ public void CreateNavFiles()
 	Format(SourceFile, sizeof(SourceFile), "maps/replay_bot.nav");
 	if (!FileExists(SourceFile))
 	{
-		LogError("<SurfTimer> Failed to create .nav files. Reason: %s doesn't exist!", SourceFile);
+		LogError("<surftimer> Failed to create .nav files. Reason: %s doesn't exist!", SourceFile);
 		return;
 	}
 	char map[256];
@@ -3073,7 +3427,7 @@ public void CenterHudDead(int client)
 		//keys
 		char sResult[256];
 		int Buttons;
-		if (g_bInfoPanel[client] && IsValidClient(ObservedUser))
+		if (IsValidClient(ObservedUser))
 		{
 			Buttons = g_LastButton[ObservedUser];
 			if (Buttons & IN_MOVELEFT)
@@ -3111,7 +3465,7 @@ public void CenterHudDead(int client)
 				obsTimer = GetGameTime() - g_fStartWrcpTime[ObservedUser] - g_fPauseTime[ObservedUser];
 				FormatTimeFloat(client, obsTimer, 3, obsAika, sizeof(obsAika));
 			}
-			else if(!g_bSurfTimerEnabled[ObservedUser])
+			else if(!g_bTimerEnabled[ObservedUser])
 				obsAika = "<font color='#FF0000'>Disabled</font>";
 			else {
 				obsAika = "<font color='#FF0000'>00:00:00</font>";
@@ -3136,252 +3490,488 @@ public void CenterHudAlive(int client)
 	if (!IsValidClient(client))
 		return;
 
-	int style = g_iCurrentStyle[client];
-
-	char pAika[54], timerText[32], StageString[54];
-
-	if (g_bInfoPanel[client])
+	if (g_bCentreHud[client])
 	{
-		if (!g_bhasStages) // map is linear
-		{
-			Format(StageString, 54, "Linear Map\t\t");
-		}
-		else // map has stages
-		{
-			if (g_Stage[g_iClientInZone[client][2]][client] > 9)
-				Format(StageString, 54, "Stage %i / %i\t", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1)); // less \t's to make lines align
-			else
-				Format(StageString, 54, "Stage %i / %i\t\t", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
-		}
-		//fluffys && inpracmode
-		if (g_bTimeractivated[client] && !g_bPause[client])
-		{
-			FormatTimeFloat(client, g_fCurrentRunTime[client], 3, pAika, 128);
-			if(g_bInBonus[client])
-			{
-				Format(pAika, 128, "<font color='#ff8200'>%s</font>", pAika);
-			}
-			else if (g_bMissedMapBest[client] && g_fPersonalRecord[client] > 0.0 && !g_bPracticeMode[client]) // missed best personal time
-			{
-				Format(pAika, 128, "<font color='#fd0000'>%s</font>", pAika);
-			}
-			else if (g_fPersonalRecord[client] < 0.1 && !g_bPracticeMode[client]) // hasn't finished the map yet
-			{
-				Format(pAika, 128, "<font color='#0089ff'>%s</font>", pAika);
-			}
-			else if(g_bPracticeMode[client])
-			{
-				Format(pAika, 128, "<font color='#ffffff'>%s</font>", pAika); //white in prac mode
-			}
-			else
-			{
-			Format(pAika, 128, "<font color='#00ff00'>%s</font>", pAika); //hasn't missed best personal time yet
-			}
-		}
-		else if(g_bWrcpTimeractivated[client] && !g_bPracticeMode[client])
-		{
-			FormatTimeFloat(client, g_fCurrentWrcpRunTime[client], 3, pAika, 128);
-			Format(pAika, 128, "<font color='#bd00ff'>%s</font>", pAika); //purple when doing !s
-		}
+		int style = g_iCurrentStyle[client];
+		char module[6][1024];
+		char pAika[54];
 
-		if (g_bPracticeMode[client])
-			Format(timerText, 32, "[P]: ");
-		else if (g_iCurrentStyle[client] != 0)
-			Format(timerText, 32, "%s ", g_szStyleHud[client]);
-		else
-			Format(timerText, 32, "");
+		float gametime = GetGameTime();
 
-		// Set Checkpoint back to normal
-		if (GetGameTime() - g_fLastDifferenceTime[client] > 5.0)
+		for (int i = 0; i < 6; i++)
 		{
-			if (g_iClientInZone[client][2] == 0 && g_iCurrentStyle[client] == 0)
+			if (g_iCentreHudModule[client][i] == 0)
 			{
-				if (g_fRecordMapTime != 9999999.0)
+				Format(module[i], 128, "                         ");
+			}
+			if (g_iCentreHudModule[client][i] == 1)
+			{
+				// Timer
+				if (g_bTimeractivated[client])
 				{
-					//fluffys
-					if(g_bPracticeMode[client])
-						Format(g_szLastSRDifference[client], 64, "\tSR: %s", g_szRecordMapTime);
-					else
-						Format(g_szLastSRDifference[client], 64, "\t\tSR: %s", g_szRecordMapTime);
-
-					if (g_fPersonalRecord[client] > 0.0)
+					FormatTimeFloat(client, g_fCurrentRunTime[client], 3, pAika, 128);
+					if (g_bPause[client])
 					{
-						Format(g_szLastPBDifference[client], 64, "%s", g_szPersonalRecord[client]);
+						// Paused
+						Format(module[i], 128, "<font color='#FFFF00'>%s       </font>", pAika);
+					}
+					else if (g_bPracticeMode[client])
+					{
+						// Prac mode
+						Format(module[i], 128, "<font color='#ffffff'>[P]: %s       </font>", pAika);
+					}
+					else if (g_bInBonus[client])
+					{
+						// In Bonus
+						Format(module[i], 128, "<font color='#ff8200'>%s       </font>", pAika);
+					}
+					else if (g_bMissedMapBest[client] && g_fPersonalRecord[client] > 0.0)
+					{
+						// Missed Personal Best time
+						Format(module[i], 128, "<font color='#fd0000'>%s       </font>", pAika);
+					}
+					else if (g_fPersonalRecord[client] < 0.1)
+					{
+						// No Personal Best on map
+						Format(module[i], 128, "<font color='#0089ff'>%s       </font>", pAika);
 					}
 					else
 					{
-						Format(g_szLastPBDifference[client], 64, "N/A");
+						// Hasn't missed Personal Best yet
+						Format(module[i], 128, "<font color='#00ff00'>%s       </font>", pAika);
 					}
 				}
+				else if (g_bWrcpTimeractivated[client] && !g_bPracticeMode[client])
+				{
+					FormatTimeFloat(client, g_fCurrentWrcpRunTime[client], 3, pAika, 128);
+					Format(module[i], 128, "<font color='#bd00ff'>%s       </font>", pAika);
+				}
+				else if (!g_bTimerEnabled[client])
+					Format(module[i], 128, "<font color='#FFFF00'>Disabled       </font>");
 				else
 				{
-					Format(g_szLastSRDifference[client], 64, "\t\tSR: N/A");
-					Format(g_szLastPBDifference[client], 64, "N/A");
+					Format(module[i], 128, "<font color='#FF0000'>00:00:00       </font>");
 				}
-			}
-			else if(g_iClientInZone[client][2] == 0 && g_iCurrentStyle[client] != 0) //styles
-			{
-				if (g_fRecordStyleMapTime[style] != 9999999.0)
-				{
-					//fluffys
-					if(g_bPracticeMode[client])
-						Format(g_szLastSRDifference[client], 64, "\tSR: %s", g_szRecordStyleMapTime[style]);
-					else
-						Format(g_szLastSRDifference[client], 64, "\tSR: %s", g_szRecordStyleMapTime[style]);
 
-					if (g_fPersonalStyleRecord[style][client] > 0.0)
+				if (g_iCurrentStyle[client] != 0)
+				{
+					switch (g_iCurrentStyle[client])
 					{
-						Format(g_szLastPBDifference[client], 64, "%s", g_szPersonalStyleRecord[style][client]);
+						case 1: Format(module[i], 128, "SW %s", module[i]);
+						case 2: Format(module[i], 128, "HSW %s", module[i]);
+						case 3: Format(module[i], 128, "BW %s", module[i]);
+						case 4: Format(module[i], 128, "LG %s", module[i]);
+						case 5: Format(module[i], 128, "SM %s", module[i]);
+						case 6: Format(module[i], 128, "FF %s", module[i]);
+					}
+				}
+			}
+			else if (g_iCentreHudModule[client][i] == 2)
+			{
+				// WR
+				if (gametime - g_fLastDifferenceTime[client] > 5.0)
+				{
+					if (g_iClientInZone[client][2] == 0 && style == 0)
+					{
+						if (g_fRecordMapTime != 9999999.0)
+						{
+							//fluffys
+							if(g_bPracticeMode[client])
+								Format(g_szLastSRDifference[client], 64, "WR: %s", g_szRecordMapTime);
+							else
+								Format(g_szLastSRDifference[client], 64, "WR: %s", g_szRecordMapTime);
+						}
+						else
+							Format(g_szLastSRDifference[client], 64, "WR: N/A");
+					}
+					else if(g_iClientInZone[client][2] == 0 && g_iCurrentStyle[client] != 0) //styles
+					{
+						if (g_fRecordStyleMapTime[style] != 9999999.0)
+						{
+							//fluffys
+							if(g_bPracticeMode[client])
+								Format(g_szLastSRDifference[client], 64, "WR: %s", g_szRecordStyleMapTime[style]);
+							else
+								Format(g_szLastSRDifference[client], 64, "WR: %s", g_szRecordStyleMapTime[style]);
+						}
+						else
+							Format(g_szLastSRDifference[client], 64, "WR: N/A");
 					}
 					else
 					{
-						Format(g_szLastPBDifference[client], 64, "N/A");
+						if(g_iCurrentStyle[client] == 0)
+							Format(g_szLastSRDifference[client], 64, "WR: %s", g_szBonusFastestTime[g_iClientInZone[client][2]]);
+						else if(g_iCurrentStyle[client] != 0) // styles
+							Format(g_szLastSRDifference[client], 64, "WR: %s", g_szStyleBonusFastestTime[style][g_iClientInZone[client][2]]);
+					}
+				}
+				Format(module[i], 128, "%s", g_szLastSRDifference[client]);
+			}
+			else if (g_iCentreHudModule[client][i] == 3)
+			{
+				// PB
+				if (gametime - g_fLastDifferenceTime[client] > 5.0)
+				{
+					if (g_iClientInZone[client][2] == 0 && style == 0)
+					{
+						if (g_fRecordMapTime != 9999999.0)
+						{
+							if (g_fPersonalRecord[client] > 0.0)
+								Format(g_szLastPBDifference[client], 64, "PB: %s", g_szPersonalRecord[client]);
+							else
+								Format(g_szLastPBDifference[client], 64, "PB: N/A");
+						}
+						else
+							Format(g_szLastPBDifference[client], 64, "PB: N/A");
+					}
+					else if(g_iClientInZone[client][2] == 0 && g_iCurrentStyle[client] != 0) //styles
+					{
+						if (g_fRecordStyleMapTime[style] != 9999999.0)
+						{
+							if (g_fPersonalStyleRecord[style][client] > 0.0)
+								Format(g_szLastPBDifference[client], 64, "PB: %s", g_szPersonalStyleRecord[style][client]);
+							else
+								Format(g_szLastPBDifference[client], 64, "PB: N/A");
+						}
+						else
+							Format(g_szLastPBDifference[client], 64, "PB: N/A");
+					}
+					else
+					{
+						if(g_iCurrentStyle[client] == 0)
+							Format(g_szLastPBDifference[client], 64, "PB: %s", g_szPersonalRecordBonus[g_iClientInZone[client][2]][client]);
+						else if(g_iCurrentStyle[client] != 0) // styles
+							Format(g_szLastPBDifference[client], 64, "PB: %s", g_szStylePersonalRecordBonus[style][g_iClientInZone[client][2]][client]);
+					}
+				}
+				Format(module[i], 128, "%s", g_szLastPBDifference[client]);
+			}
+			else if (g_iCentreHudModule[client][i] == 4)
+			{
+				// Rank Display
+				char szRank[32];
+				if (g_iClientInZone[client][2] > 0) // if in bonus stage, get bonus times
+				{
+					if(g_iCurrentStyle[client] == 0) //normal
+					{
+						if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
+							Format(szRank, 64, "Rank: %i / %i", g_MapRankBonus[g_iClientInZone[client][2]][client], g_iBonusCount[g_iClientInZone[client][2]]);
+						else
+							if (g_iBonusCount[g_iClientInZone[client][2]] > 0)
+								Format(szRank, 64, "Rank: - / %i", g_iBonusCount[g_iClientInZone[client][2]]);
+							else
+								Format(szRank, 64, "Rank: N/A");
+					}
+					else if(g_iCurrentStyle[client] != 0) // styles
+					{
+						if (g_fStylePersonalRecordBonus[style][g_iClientInZone[client][2]][client] > 0.0)
+							Format(szRank, 64, "Rank: %i / %i", g_StyleMapRankBonus[style][g_iClientInZone[client][2]][client], g_iStyleBonusCount[style][g_iClientInZone[client][2]]);
+						else
+							if (g_iStyleBonusCount[style][g_iClientInZone[client][2]] > 0)
+								Format(szRank, 64, "Rank: - / %i", g_iStyleBonusCount[style][g_iClientInZone[client][2]]);
+							else
+								Format(szRank, 64, "Rank: N/A");
+					}
+				}
+				else // if in normal map, get normal times
+				{
+					if(g_iCurrentStyle[client] == 0) // Normal
+					{
+						if (g_fPersonalRecord[client] > 0.0)
+							Format(szRank, 64, "Rank: %i / %i", g_MapRank[client], g_MapTimesCount);
+						else
+							if (g_MapTimesCount > 0)
+								Format(szRank, 64, "Rank: - / %i", g_MapTimesCount);
+							else
+								Format(szRank, 64, "Rank: N/A");
+					}
+					else if(g_iCurrentStyle[client] != 0) // styles
+					{
+						if (g_fPersonalStyleRecord[style][client] > 0.0)
+							Format(szRank, 64, "Rank: %i / %i", g_StyleMapRank[style][client], g_StyleMapTimesCount[style]);
+						else
+							if (g_StyleMapTimesCount[style] > 0)
+								Format(szRank, 64, "Rank: - / %i", g_StyleMapTimesCount[style]);
+							else
+								Format(szRank, 64, "Rank: N/A");
+					}
+				}
+
+				Format(module[i], 128, "%s", szRank);
+			}
+			else if (g_iCentreHudModule[client][i] == 5)
+			{
+				// Stage Display
+				if (g_iClientInZone[client][2] == 0)
+				{
+					if (!g_bhasStages) // map is linear
+					{
+						Format(module[i], 128, "Linear Map");
+					}
+					else // map has stages
+					{
+						Format(module[i], 128, "Stage %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1)); // less \t's to make lines align
 					}
 				}
 				else
-				{
-					Format(g_szLastSRDifference[client], 64, "\tSR: N/A");
-					Format(g_szLastPBDifference[client], 64, "N/A");
-				}
+					Format(module[i], 128, "Bonus %i", g_iClientInZone[client][2]);
 			}
-			else
+			else if (g_iCentreHudModule[client][i] == 6)
 			{
-				if(g_iCurrentStyle[client] == 0)
+				// Speed Display
+				GetSpeedColour(client, RoundToNearest(g_fLastSpeed[client]), g_SpeedGradient[client]);
+				if (RoundToNearest(g_fLastSpeed[client]) < 10 && RoundToNearest(g_fLastSpeed[client]) > -1)
 				{
-					Format(g_szLastPBDifference[client], 64, "%s", g_szPersonalRecordBonus[g_iClientInZone[client][2]][client]);
-					Format(g_szLastSRDifference[client], 64, "\t\tSR: %s", g_szBonusFastestTime[g_iClientInZone[client][2]]);
+					if (i == 0 || i == 2 || i == 4)
+						Format(module[i], 128, "Speed: <font color='%s'>%i</font> u/s       ", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
+					else
+						Format(module[i], 128, "Speed: <font color='%s'>%i</font> u/s", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
 				}
-				else if(g_iCurrentStyle[client] != 0) // styles
-				{
-					Format(g_szLastPBDifference[client], 64, "%s", g_szStylePersonalRecordBonus[style][g_iClientInZone[client][2]][client]);
-					Format(g_szLastSRDifference[client], 64, "\tSR: %s", g_szStyleBonusFastestTime[style][g_iClientInZone[client][2]]);
-				}
+				else
+					Format(module[i], 128, "Speed: <font color='%s'>%i</font> u/s", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
+			}
+			else if (g_iCentreHudModule[client][i] == 7)
+			{
+				// Strafe Sync
+				Format(module[i], 128, "Sync: %.02f%%", GetStrafeSync(client, true));
 			}
 		}
 
-
-
-		char szRank[32];
-		if (g_iClientInZone[client][2] > 0) // if in bonus stage, get bonus times
-		{
-			if(g_iCurrentStyle[client] == 0) //normal
-			{
-				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
-					Format(szRank, 64, "\tRank: %i / %i", g_MapRankBonus[g_iClientInZone[client][2]][client], g_iBonusCount[g_iClientInZone[client][2]]);
-				else
-					if (g_iBonusCount[g_iClientInZone[client][2]] > 0)
-						Format(szRank, 64, "\t\tRank: - / %i", g_iBonusCount[g_iClientInZone[client][2]]);
-					else
-						Format(szRank, 64, "\t\tRank: N/A");
-			}
-			else if(g_iCurrentStyle[client] != 0) // styles
-			{
-				if (g_fStylePersonalRecordBonus[style][g_iClientInZone[client][2]][client] > 0.0)
-					Format(szRank, 64, "\tRank: %i / %i", g_StyleMapRankBonus[style][g_iClientInZone[client][2]][client], g_iStyleBonusCount[style][g_iClientInZone[client][2]]);
-				else
-					if (g_iStyleBonusCount[style][g_iClientInZone[client][2]] > 0)
-						Format(szRank, 64, "\t\tRank: - / %i", g_iStyleBonusCount[style][g_iClientInZone[client][2]]);
-					else
-						Format(szRank, 64, "\t\tRank: N/A");
-			}
-
-		}
-		else // if in normal map, get normal times
-		{
-			if(g_iCurrentStyle[client] == 0) // Normal
-			{
-				if (g_fPersonalRecord[client] > 0.0)
-					Format(szRank, 64, "\tRank: %i / %i", g_MapRank[client], g_MapTimesCount);
-				else
-					if (g_MapTimesCount > 0)
-						Format(szRank, 64, "\t\tRank: - / %i", g_MapTimesCount);
-					else
-						Format(szRank, 64, "\t\tRank: N/A");
-			}
-			else if(g_iCurrentStyle[client] != 0) // styles
-			{
-				if (g_fPersonalStyleRecord[style][client] > 0.0)
-					Format(szRank, 64, "\tRank: %i / %i", g_StyleMapRank[style][client], g_StyleMapTimesCount[style]);
-				else
-					if (g_StyleMapTimesCount[style] > 0)
-						Format(szRank, 64, "\t\tRank: - / %i", g_StyleMapTimesCount[style]);
-					else
-						Format(szRank, 64, "\t\tRank: N/A");
-			}
-		}
+		// if (g_iCurrentStyle[client] > 0)
+		// 	Format(timerText, sizeof(timerText), "%s%s", g_szStyleHud[client], timerColour);
+		// else
+		// 	Format(timerText, sizeof(timerText), "%s", timerColour);
 
 		if (IsValidEntity(client) && 1 <= client <= MaxClients && !g_bOverlay[client])
 		{
-			if (g_bTimeractivated[client])
+			//PrintHintText(client, "<font face=''>%s%s\n%s%s\n%s%s</font>", module[0], module2, module[2], module4, module[4], module6);
+			PrintHintText(client, "<font face=''>%15s\t %15s\n%15s\t %15s\n%15s\t %15s</font>", module[0], module[1], module[2], module[3], module[4], module[5]);
+		}
+	}
+}
+
+public void SideHudAlive(int client)
+{
+	if (!IsValidClient(client) || IsFakeClient(client) || GetClientMenu(client) != MenuSource_None)
+		return;
+
+	if (g_bSideHud[client])
+	{
+		char szPanel[1280], szBuffer[2][256], szModule[5][1280];
+		int style = g_iCurrentStyle[client];
+		int moduleCount = 0;
+
+		for (int i = 0; i < 5; i++)
+		{
+			if (g_iSideHudModule[client][i] != 0)
+				moduleCount++;
+		}
+
+		for (int i = 0; i < 5; i++)
+		{
+			if (g_iSideHudModule[client][i] == 0)
 			{
-				if (g_bPause[client])
+				Format(szModule[i], 256, "");
+			}
+			if (g_iSideHudModule[client][i] == 1)
+			{
+				int timeleft;
+				GetMapTimeLeft(timeleft);
+				int mins = timeleft / 60;
+				int secs = timeleft % 60;
+
+				if (mins > 0)
+					Format(szModule[i], 256, "Timeleft: %d mins", mins);
+				else
+					Format(szModule[i], 256, "Timeleft: %d secs", secs);
+				
+				if ((i + 1) != moduleCount)
+					Format(szModule[i], 256, "%s\n \n", szModule[i]);
+			}
+			else if (g_iSideHudModule[client][i] == 2)
+			{
+				char szWR[128];
+				if (StrContains(g_szLastSRDifference[client], "<font") != -1)
 				{
-					PrintHintText(client, "<font face=''>%s<font color='#FF0000'>Paused</font> %s\nPB: %s%s\n%sSpeed: %i</font>", timerText, g_szLastSRDifference[client], g_szLastPBDifference[client], szRank, StageString, RoundToNearest(g_fLastSpeed[client]));
+					ExplodeString(g_szLastSRDifference[client], ">", szBuffer, 2, 128);
+					ExplodeString(szBuffer[1], "<", szBuffer, 2, 128);
+					Format(szWR, 128, "WR: %s", szBuffer[0]);
 				}
 				else
-				{	//fluffys
-					if(g_bPracticeMode[client])
+					Format(szWR, 128, "%s", g_szLastSRDifference[client]);
+				char szWRHolder[64];
+				if (g_iClientInZone[client][2] == 0)
+					Format(szWRHolder, 64, g_szRecordPlayer);
+				else
+					Format(szWRHolder, 64, g_szBonusFastest[g_iClientInZone[client][2]]);
+				
+				Format(szModule[i], 256, "%s\nby %s", szWR, szWRHolder);
+
+				if ((i + 1) != moduleCount)
+					Format(szModule[i], 256, "%s\n \n", szModule[i]);
+			}
+			else if (g_iSideHudModule[client][i] == 3)
+			{
+				char szPB[128];
+				if (StrContains(g_szLastPBDifference[client], "<font") != -1)
+				{
+					ExplodeString(g_szLastPBDifference[client], ">", szBuffer, 2, 128);
+					ExplodeString(szBuffer[1], "<", szBuffer, 2, 128);
+					Format(szPB, sizeof(szPB), "PB: %s", szBuffer[0]);
+				}
+				else
+					Format(szPB, sizeof(szPB), g_szLastPBDifference[client]);
+
+				// Rank Display
+				char szRank[32];
+				if (g_iClientInZone[client][2] > 0) // if in bonus stage, get bonus times
+				{
+					if(g_iCurrentStyle[client] == 0) //normal
 					{
-						/*PrintHintText(client, "<font face=''>%s%s %s\nPB: %s%s\nStage: %sSpeed: %i</font>", timerText, pAika, g_szLastSRDifference[client], g_szLastPBDifference[client], szRank, StageString, RoundToNearest(g_fLastSpeed[client]));*/
-
-						char sResult[256];
-						int Buttons;
-						//fluffys comeback
-						if (IsValidClient(client))
-						{
-							Buttons = g_LastButton[client];
-							if (Buttons & IN_MOVELEFT)
-								Format(sResult, sizeof(sResult), "<font color='#00ff00'>A</font>");
+						if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
+							Format(szRank, 64, "Rank: %i / %i", g_MapRankBonus[g_iClientInZone[client][2]][client], g_iBonusCount[g_iClientInZone[client][2]]);
+						else
+							if (g_iBonusCount[g_iClientInZone[client][2]] > 0)
+								Format(szRank, 64, "Rank: - / %i", g_iBonusCount[g_iClientInZone[client][2]]);
 							else
-								Format(sResult, sizeof(sResult), "_");
-							if (Buttons & IN_FORWARD)
-								Format(sResult, sizeof(sResult), "%s <font color='#00ff00'>W</font>", sResult);
-							else
-								Format(sResult, sizeof(sResult), "%s _", sResult);
-							if (Buttons & IN_BACK)
-								Format(sResult, sizeof(sResult), "%s <font color='#00ff00'>S</font>", sResult);
-							else
-								Format(sResult, sizeof(sResult), "%s _", sResult);
-							if (Buttons & IN_MOVERIGHT)
-								Format(sResult, sizeof(sResult), "%s <font color='#00ff00'>D</font>", sResult);
-							else
-								Format(sResult, sizeof(sResult), "%s _", sResult);
-							if (Buttons & IN_DUCK)
-								Format(sResult, sizeof(sResult), "%s - <font color='#00ff00'>DUCK</font>", sResult);
-							else
-								Format(sResult, sizeof(sResult), "%s - _", sResult);
-							if (Buttons & IN_JUMP)
-								Format(sResult, sizeof(sResult), "%s <font color='#00ff00'>JUMP</font>", sResult);
-							else
-								Format(sResult, sizeof(sResult), "%s _", sResult);
-
-							GetSpeedColour(client, RoundToNearest(g_fLastSpeed[client]), g_SpeedGradient[client]);
-							PrintHintText(client, "<font face=''><font color='#0089ff'>%s</font>%s\n<font color='#0089ff'>Speed:</font> %i u/s\n%s", timerText, pAika, RoundToNearest(g_fLastSpeed[client]), sResult);
-						}
+								Format(szRank, 64, "Rank: N/A");
 					}
-					else
+					else if(g_iCurrentStyle[client] != 0) // styles
 					{
-						GetSpeedColour(client, RoundToNearest(g_fLastSpeed[client]), g_SpeedGradient[client]);
-						PrintHintText(client, "<font face=''>%s%s %s\nPB: %s%s\n%sSpeed: <font color='%s'>%i</font> u/s</font>", timerText, pAika, g_szLastSRDifference[client], g_szLastPBDifference[client], szRank, StageString, g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
+						if (g_fStylePersonalRecordBonus[style][g_iClientInZone[client][2]][client] > 0.0)
+							Format(szRank, 64, "Rank: %i / %i", g_StyleMapRankBonus[style][g_iClientInZone[client][2]][client], g_iStyleBonusCount[style][g_iClientInZone[client][2]]);
+						else
+							if (g_iStyleBonusCount[style][g_iClientInZone[client][2]] > 0)
+								Format(szRank, 64, "Rank: - / %i", g_iStyleBonusCount[style][g_iClientInZone[client][2]]);
+							else
+								Format(szRank, 64, "Rank: N/A");
 					}
 				}
+				else // if in normal map, get normal times
+				{
+					if(g_iCurrentStyle[client] == 0) // Normal
+					{
+						if (g_fPersonalRecord[client] > 0.0)
+							Format(szRank, 64, "Rank: %i / %i", g_MapRank[client], g_MapTimesCount);
+						else
+							if (g_MapTimesCount > 0)
+								Format(szRank, 64, "Rank: - / %i", g_MapTimesCount);
+							else
+								Format(szRank, 64, "Rank: N/A");
+					}
+					else if(g_iCurrentStyle[client] != 0) // styles
+					{
+						if (g_fPersonalStyleRecord[style][client] > 0.0)
+							Format(szRank, 64, "Rank: %i / %i", g_StyleMapRank[style][client], g_StyleMapTimesCount[style]);
+						else
+							if (g_StyleMapTimesCount[style] > 0)
+								Format(szRank, 64, "Rank: - / %i", g_StyleMapTimesCount[style]);
+							else
+								Format(szRank, 64, "Rank: N/A");
+					}
+				}
+
+				Format(szModule[i], 256, "%s\n%s", szPB, szRank);
+
+				if ((i + 1) != moduleCount)
+					Format(szModule[i], 256, "%s\n \n", szModule[i]);
 			}
-			else if(g_bWrcpTimeractivated[client])
+			else if (g_iSideHudModule[client][i] == 4)
 			{
-				GetSpeedColour(client, RoundToNearest(g_fLastSpeed[client]), g_SpeedGradient[client]);
-				PrintHintText(client, "<font face=''>%s%s %s\nPB: %s%s\n%sSpeed: <font color='%s'>%i</font> u/s</font>", timerText, pAika, g_szLastSRDifference[client], g_szLastPBDifference[client], szRank, StageString, g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
+				int stage = g_Stage[g_iClientInZone[client][2]][client];
+
+				// Stage Display
+				char szStage[64];
+				if (g_iClientInZone[client][2] == 0)
+				{
+					if (!g_bhasStages) // map is linear
+					{
+						//Format(szStage, 64, "Linear Map");
+						char szCP[64];
+						char szCurrentCP[64];
+						if (g_iCurrentCheckpoint[client] == g_mapZonesTypeCount[g_iClientInZone[client][2]][4])
+						{
+							FormatTimeFloat(0, g_fRecordMapTime, 3, szCP, 64);
+							Format(szCurrentCP, 64, "End Zone");
+						}
+						else
+						{
+							Format(szCurrentCP, 64, "Checkpoint [%i]", g_iCurrentCheckpoint[client] + 1);
+							FormatTimeFloat(0, g_fCheckpointServerRecord[g_iClientInZone[client][2]][g_iCurrentCheckpoint[client]], 3, szCP, 64);
+						}
+
+						Format(szModule[i], 256, "%s\n%s", szCurrentCP, szCP);
+
+						if ((i + 1) != moduleCount)
+							Format(szModule[i], 256, "%s\n \n", szModule[i]);
+					}
+					else // map has stages
+					{
+						Format(szStage, 64, "Stage %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+						char szWrcpTime[64];
+						FormatTimeFloat(0, g_fStageRecord[stage], 3, szWrcpTime, 64);
+						char szName[64];
+						Format(szName, 64, "%s", g_szStageRecordPlayer[stage]);
+						Format(szModule[i], 256, "%s\nWRCP: %s\nby %s", szStage, szWrcpTime, szName);
+
+						if ((i + 1) != moduleCount)
+							Format(szModule[i], 256, "%s\n \n", szModule[i]);
+					}
+				}
+				else
+				{
+					//Format(szStage, 64, "Bonus %i", g_iClientInZone[client][2]);
+					Format(szModule[i], 256, "", szStage);
+				}
+
 			}
-			else if(!g_bSurfTimerEnabled[client])
+			else if (g_iSideHudModule[client][i] == 5)
 			{
-				GetSpeedColour(client, RoundToNearest(g_fLastSpeed[client]), g_SpeedGradient[client]);
-				PrintHintText(client, "<font face=''>%s<font color='#FF0000'>Disabled</font> %s\nPB: %s%s\n%sSpeed: <font color='%s'>%i</font> u/s</font>", timerText, g_szLastSRDifference[client], g_szLastPBDifference[client], szRank, StageString, g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
-			}
-			else
-			{
-				GetSpeedColour(client, RoundToNearest(g_fLastSpeed[client]), g_SpeedGradient[client]);
-				PrintHintText(client, "<font face=''>%s<font color='#FF0000'>00:00:00</font> %s\nPB: %s%s\n%sSpeed: <font color='%s'>%i</font> u/s</font>", timerText, g_szLastSRDifference[client], g_szLastPBDifference[client], szRank, StageString, g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
+				char sSpecs[512];
+				char szSpecList[512];
+				int SpecMode;
+				Format(sSpecs, 512, "");
+				Format(szSpecList, 512, "Specs (0)");
+				int count = 0;
+				for (int j = 0; j <= MaxClients; j++)
+				{
+					if (IsValidClient(j) && !IsFakeClient(client) && !IsPlayerAlive(j) && !g_bFirstTeamJoin[j] && g_bSpectate[j])
+					{
+						SpecMode = GetEntProp(j, Prop_Send, "m_iObserverMode");
+						if (SpecMode == 4 || SpecMode == 5)
+						{
+							int Target;
+							Target = GetEntPropEnt(j, Prop_Send, "m_hObserverTarget");
+							if (Target == client)
+							{
+								count++;
+								if (count < 6)
+									Format(sSpecs, 512, "%s%N\n", sSpecs, j);
+
+							}
+							if (count == 6)
+								Format(sSpecs, 512, "%s...", sSpecs);
+						}
+					}
+				}
+				if (count > 0)
+					Format(szSpecList, 512, "Specs (%i):\n%s ", count, sSpecs);
+				else
+					Format(szSpecList, 512, "Specs (0)");
+
+				Format(szModule[i], 256, "%s", szSpecList);
+
+				if ((i + 1) != moduleCount)
+					Format(szModule[i], 256, "%s\n \n", szModule[i]);
 			}
 		}
+
+		Format(szPanel, sizeof(szPanel), "%s%s%s%s%s", szModule[0], szModule[1], szModule[2], szModule[3], szModule[4]);
+		Handle panel = CreatePanel();
+		DrawPanelText(panel, szPanel);
+
+		SendPanelToClient(panel, client, PanelHandler, 1);
+		CloseHandle(panel);
 	}
 }
 
@@ -3431,28 +4021,28 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		if (f_srDiff > 0)
 		{
 			Format(sz_srDiff_colorless, 128, "-%s", sz_srDiff);
-			Format(sz_srDiff, 128, "%c%cWR: %c-%s%c", YELLOW, PURPLE, GREEN, sz_srDiff, YELLOW);
+			Format(sz_srDiff, 128, "%c%cWR: %c-%s%c", YELLOW, WHITE, GREEN, sz_srDiff, YELLOW);
 			if (zonegroup > 0)
 				Format(g_szLastSRDifference[client], 64, "WR: <font color='#00ff00'>%s</font>", sz_srDiff_colorless);
 			else
-				Format(g_szLastSRDifference[client], 64, "\t\tWR: <font color='#00ff00'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "WR: <font color='#00ff00'>%s</font>", sz_srDiff_colorless);
 
 		}
 		else
 		{
 			Format(sz_srDiff_colorless, 128, "+%s", sz_srDiff);
-			Format(sz_srDiff, 128, "%c%cSR: %c+%s%c", YELLOW, PURPLE, RED, sz_srDiff, YELLOW);
+			Format(sz_srDiff, 128, "%c%cWR: %c+%s%c", YELLOW, WHITE, RED, sz_srDiff, YELLOW);
 			if (zonegroup > 0)
 				Format(g_szLastSRDifference[client], 64, "WR: <font color='#FF0000'>%s</font>", sz_srDiff_colorless);
 			else if(g_iCurrentStyle[client] > 0)
 				Format(g_szLastSRDifference[client], 64, "\tWR: <font color='#FF0000'>%s</font>", sz_srDiff_colorless);
 			else
-				Format(g_szLastSRDifference[client], 64, "\t\tWR: <font color='#FF0000'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "WR: <font color='#FF0000'>%s</font>", sz_srDiff_colorless);
 		}
 		g_fLastDifferenceTime[client] = GetGameTime();
 	}
 	else
-		Format(sz_srDiff, 128, "%c%cWR: %cN/A%c", YELLOW, PURPLE, MOSSGREEN, WHITE);
+		Format(sz_srDiff, 128, "%c%cWR: %cN/A%c", YELLOW, WHITE, MOSSGREEN, WHITE);
 
 
 	// Get client name for spectators
@@ -3481,9 +4071,9 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 			Format(szDiff_colorless, 32, "-%s", szDiff);
 			Format(szDiff, sizeof(szDiff), "%c-%s", GREEN, szDiff);
 			if (zonegroup > 0)
-				Format(g_szLastPBDifference[client], 64, "<font color='#00ff00'>%s</font>", szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "PB: <font color='#00ff00'>%s</font>", szDiff_colorless);
 			else
-				Format(g_szLastPBDifference[client], 64, "<font color='#00ff00'>%s</font>", szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "PB: <font color='#00ff00'>%s</font>", szDiff_colorless);
 
 			/*
 			if (zonegroup > 0)
@@ -3497,9 +4087,9 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 			Format(szDiff_colorless, 32, "+%s", szDiff);
 			Format(szDiff, sizeof(szDiff), "%c+%s", RED, szDiff);
 			if (zonegroup > 0)
-				Format(g_szLastPBDifference[client], 64, "<font color='#FF0000'>%s</font>", szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "PB: <font color='#FF0000'>%s</font>", szDiff_colorless);
 			else
-				Format(g_szLastPBDifference[client], 64, "<font color='#FF0000'>%s</font>", szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "PB: <font color='#FF0000'>%s</font>", szDiff_colorless);
 			/*
 			if (zonegroup > 0)
 				Format(g_szLastPBDifference[client], 64, "%s <font color='#FF9999' size='16'>%s</font>", g_szPersonalRecordBonus[zonegroup][client], szDiff_colorless);
@@ -3517,9 +4107,9 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		FormatTimeFloat(client, time, 3, szTime, 32);
 
 		if (g_bCheckpointsEnabled[client])
-			PrintToChat(client, " %cSurfTimer %c| %cCP [%i]:%c %c%s %c(%cPB: %s%c | %s%c)", LIMEGREEN, WHITE, DARKBLUE, g_iClientInZone[client][1] + 1, WHITE, LIMEGREEN, szTime, WHITE, YELLOW, szDiff, WHITE, sz_srDiff, WHITE);
+			PrintToChat(client, " %cSurftimer %c| %cCP [%i]:%c %c%s %c(%cPB: %s%c - %s%c)", LIMEGREEN, WHITE, WHITE, g_iClientInZone[client][1] + 1, WHITE, LIMEGREEN, szTime, WHITE, WHITE, szDiff, WHITE, sz_srDiff, WHITE);
 
-		Format(szSpecMessage, sizeof(szSpecMessage), " %cSurfTimer %c| %c%s %c| %cCP [%i]:%c %c%s %c(%cPB: %s%c | %s%c)", LIMEGREEN, WHITE, YELLOW, szName, WHITE, DARKBLUE, g_iClientInZone[client][1] + 1, WHITE, LIMEGREEN, szTime, WHITE, YELLOW, szDiff, WHITE, sz_srDiff, WHITE);
+		Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| %c%s %c| %cCP [%i]:%c %c%s %c(%cPB: %s%c - %s%c)", LIMEGREEN, WHITE, YELLOW, szName, WHITE, WHITE, g_iClientInZone[client][1] + 1, WHITE, LIMEGREEN, szTime, WHITE, YELLOW, szDiff, WHITE, sz_srDiff, WHITE);
 		CheckpointToSpec(client, szSpecMessage);
 
 		// Saving difference time for next checkpoint
@@ -3540,9 +4130,9 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 			if (percent > -1.0)
 			{
 				if (g_bCheckpointsEnabled[client])
-					PrintToChat(client, " %cSurfTimer %c| %cCP [%i]:%c %c%s %c(%cPB: %cN/A%c | %s%c)", LIMEGREEN, WHITE, DARKBLUE, g_iClientInZone[client][1] + 1, WHITE, LIMEGREEN, szTime, WHITE, YELLOW, MOSSGREEN, WHITE, sz_srDiff, WHITE);
+					PrintToChat(client, " %cSurftimer %c| %cCP [%i]:%c %c%s %c(%cPB: %cN/A%c | %s%c)", LIMEGREEN, WHITE, WHITE, g_iClientInZone[client][1] + 1, WHITE, LIMEGREEN, szTime, WHITE, WHITE, MOSSGREEN, WHITE, sz_srDiff, WHITE);
 
-				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurfTimer %c| %c%s %c| %cCP [%i]:%c %c%s %c(%cPB: %cN/A%c | %s%c)", LIMEGREEN, WHITE, YELLOW, szName, WHITE, DARKBLUE, g_iClientInZone[client][1] + 1, WHITE, LIMEGREEN, szTime, WHITE, YELLOW, MOSSGREEN, WHITE, sz_srDiff, WHITE);
+				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| %c%s %c| %cCP [%i]:%c %c%s %c(%cPB: %cN/A%c | %s%c)", LIMEGREEN, WHITE, YELLOW, szName, WHITE, WHITE, g_iClientInZone[client][1] + 1, WHITE, LIMEGREEN, szTime, WHITE, YELLOW, MOSSGREEN, WHITE, sz_srDiff, WHITE);
 				CheckpointToSpec(client, szSpecMessage);
 			}
 		}
@@ -3568,10 +4158,17 @@ public void CheckpointToSpec(int client, char[] buffer)
 
 public void ResetGravity(int client)
 {
-	float gravity = GetEntityGravity(client);
-	if(gravity != 1.0)
-		SetEntityGravity(client, 1.0);
-	return;
+	if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		float gravity = GetEntityGravity(client);
+		if (g_iCurrentStyle[client] != 4)
+		{
+			if(gravity != 1.0)
+				SetEntityGravity(client, 1.0);
+		}
+		else
+			SetEntityGravity(client, 0.5);
+	}
 }
 
 stock void StyleFinishedMsgs(int client, int style)
@@ -3590,20 +4187,20 @@ stock void StyleFinishedMsgs(int client, int style)
 				{
 					if (g_bStyleMapFirstRecord[style][client]) // 1st time finishing
 					{
-						PrintToChat(i, " %cSurfTimer %c| %c%s%c finished the %cmap %c%s %cwith a time of (%c%s%c). %c[rank %c#%i%c/%i | record %c%s%c", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY, DARKBLUE, LIGHTRED, g_szStyleFinishPrint[style], GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, WHITE, LIMEGREEN, g_StyleMapRank[style][client], WHITE, count, LIMEGREEN, g_szRecordStyleMapTime[style], WHITE);
+						PrintToChat(i, " %cSurftimer %c| %c%s%c finished the %cmap %c%s %cwith a time of (%c%s%c). %c[rank %c#%i%c/%i | record %c%s%c", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY, DARKBLUE, LIGHTRED, g_szStyleFinishPrint[style], GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, WHITE, LIMEGREEN, g_StyleMapRank[style][client], WHITE, count, LIMEGREEN, g_szRecordStyleMapTime[style], WHITE);
 					}
 					else
 					if (g_bStyleMapPBRecord[style][client]) // Own record
 					{
 						PlayUnstoppableSound(client);
-						PrintToChat(i, " %cSurfTimer %c| %c%s%c finished the %cmap %c%s %cwith a time of (%c%s%c). Improving their best time by (%c%s%c). %c[rank %c#%i%c/%i | record %c%s%c]", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY, DARKBLUE, LIGHTRED, g_szStyleFinishPrint[style], GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, GREEN, g_szTimeDifference[client], GRAY, WHITE, LIMEGREEN, g_StyleMapRank[style][client], WHITE, count, LIMEGREEN, g_szRecordStyleMapTime[style], WHITE);
+						PrintToChat(i, " %cSurftimer %c| %c%s%c finished the %cmap %c%s %cwith a time of (%c%s%c). Improving their best time by (%c%s%c). %c[rank %c#%i%c/%i | record %c%s%c]", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY, DARKBLUE, LIGHTRED, g_szStyleFinishPrint[style], GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, GREEN, g_szTimeDifference[client], GRAY, WHITE, LIMEGREEN, g_StyleMapRank[style][client], WHITE, count, LIMEGREEN, g_szRecordStyleMapTime[style], WHITE);
 					}
 
 					if (g_bStyleMapSRVRecord[style][client])
 					{
 						//int r = GetRandomInt(1, 2);
 						PlayRecordSound(2);
-						PrintToChat(i, " %cSurfTimer %c| %c%s%c has beaten the %c%s %cMAP RECORD", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY, LIGHTRED, g_szStyleRecordPrint[style], DARKBLUE);
+						PrintToChat(i, " %cSurftimer %c| %c%s%c has beaten the %c%s %cMAP RECORD", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY, LIGHTRED, g_szStyleRecordPrint[style], DARKBLUE);
 					}
 				}
 			}
@@ -3616,12 +4213,12 @@ stock void StyleFinishedMsgs(int client, int style)
 				{
 					//int r = GetRandomInt(1, 2);
 					PlayRecordSound(2);
-					PrintToChat(i, " %cSurfTimer %c| %c%s%c has beaten the %c%s %cMAP RECORD", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY, LIGHTRED, g_szStyleRecordPrint[style], DARKBLUE);
+					PrintToChat(i, " %cSurftimer %c| %c%s%c has beaten the %c%s %cMAP RECORD", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY, LIGHTRED, g_szStyleRecordPrint[style], DARKBLUE);
 				}
 			}
 		}
 		if (g_StyleMapRank[style][client] == 99999 && IsValidClient(client))
-		PrintToChat(client, " %cSurfTimer %c| %cFailed to save your data correctly! Please contact an admin.", LIMEGREEN, WHITE, DARKRED, RED, DARKRED);
+		PrintToChat(client, " %cSurftimer %c| %cFailed to save your data correctly! Please contact an admin.", LIMEGREEN, WHITE, DARKRED, RED, DARKRED);
 		return;
 	}
 }
@@ -3649,34 +4246,34 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 	}
 	if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 	{
-		PrintToChatAll(" %cSurfTimer %c| %c%s has beaten the %c%s %c%s RECORD", LIMEGREEN, WHITE, LIMEGREEN, szName, LIGHTRED, g_szStyleRecordPrint[style], ORANGE, g_szZoneGroupName[zGroup]);
+		PrintToChatAll(" %cSurftimer %c| %c%s has beaten the %c%s %c%s RECORD", LIMEGREEN, WHITE, LIMEGREEN, szName, LIGHTRED, g_szStyleRecordPrint[style], ORANGE, g_szZoneGroupName[zGroup]);
 		if (g_tmpBonusCount[zGroup] == 0)
-			PrintToChatAll(" %cSurfTimer %c| %c%s %cfinished the %c%s %c%s %cwith a time of %c%s%c. [rank %c#1 %c/ 1 | record %c%s%c]", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY, LIGHTRED, g_szStyleFinishPrint[style], ORANGE, g_szZoneGroupName[zGroup], GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, WHITE, LIMEGREEN, g_szFinalTime[client], WHITE);
+			PrintToChatAll(" %cSurftimer %c| %c%s %cfinished the %c%s %c%s %cwith a time of %c%s%c. [rank %c#1 %c/ 1 | record %c%s%c]", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY, LIGHTRED, g_szStyleFinishPrint[style], ORANGE, g_szZoneGroupName[zGroup], GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, WHITE, LIMEGREEN, g_szFinalTime[client], WHITE);
 		else
-			PrintToChatAll(" %cSurfTimer %c| %c%s %cfinished the %c%s %c%s %cwith a time of %c%s%c. Improving the best time by %c%s%c. [rank %c#%i %c/%i | record %c%s%c]", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY, LIGHTRED, g_szStyleFinishPrint[style], ORANGE, g_szZoneGroupName[zGroup], GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, szRecordDiff, GRAY, LIMEGREEN, g_StyleMapRankBonus[style][zGroup][client], GRAY, g_iStyleBonusCount[style][zGroup], LIMEGREEN, g_szFinalTime[client], WHITE);
+			PrintToChatAll(" %cSurftimer %c| %c%s %cfinished the %c%s %c%s %cwith a time of %c%s%c. Improving the best time by %c%s%c. [rank %c#%i %c/%i | record %c%s%c]", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY, LIGHTRED, g_szStyleFinishPrint[style], ORANGE, g_szZoneGroupName[zGroup], GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, szRecordDiff, GRAY, LIMEGREEN, g_StyleMapRankBonus[style][zGroup][client], GRAY, g_iStyleBonusCount[style][zGroup], LIMEGREEN, g_szFinalTime[client], WHITE);
 	}
 	if (g_bBonusPBRecord[client] && g_bBonusSRVRecord[client])
 	{
-		PrintToChatAll(" %cSurfTimer %c| %c%s has beaten the %c%s %c%s RECORD", LIMEGREEN, WHITE, LIMEGREEN, szName, LIGHTRED, g_szStyleRecordPrint[style], ORANGE, g_szZoneGroupName[zGroup]);
-		PrintToChatAll(" %cSurfTimer %s| %c%s %cfinished the %c%s %c%s %cwith a time of %c%s%c. Improving the best time by %c%s%c. [rank %c#%i %c/%i | record %c%s%c]", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY,LIGHTRED, g_szStyleFinishPrint[style], ORANGE, g_szZoneGroupName[zGroup], GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, szRecordDiff, GRAY, LIMEGREEN, g_StyleMapRankBonus[style][zGroup][client], GRAY, g_iStyleBonusCount[style][zGroup], LIMEGREEN, g_szFinalTime[client], WHITE);
+		PrintToChatAll(" %cSurftimer %c| %c%s has beaten the %c%s %c%s RECORD", LIMEGREEN, WHITE, LIMEGREEN, szName, LIGHTRED, g_szStyleRecordPrint[style], ORANGE, g_szZoneGroupName[zGroup]);
+		PrintToChatAll(" %cSurftimer %c| %c%s %cfinished the %c%s %c%s %cwith a time of %c%s%c. Improving the best time by %c%s%c. [rank %c#%i %c/%i | record %c%s%c]", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY,LIGHTRED, g_szStyleFinishPrint[style], ORANGE, g_szZoneGroupName[zGroup], GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, szRecordDiff, GRAY, LIMEGREEN, g_StyleMapRankBonus[style][zGroup][client], GRAY, g_iStyleBonusCount[style][zGroup], LIMEGREEN, g_szFinalTime[client], WHITE);
 	}
 	if (g_bBonusPBRecord[client] && !g_bBonusSRVRecord[client])
 	{
 		PlayUnstoppableSound(client);
-		PrintToChatAll(" %cSurfTimer %c| %c%s %cfinished the %c%s %c%s %cwith a time of %c%s%c. Improving their best time by %c%s%c. [rank %c#%i/%c%i | record %c%s%c]", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY,LIGHTRED, g_szStyleFinishPrint[style], ORANGE, g_szZoneGroupName[zGroup], GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, g_szBonusTimeDifference[client], GRAY, LIMEGREEN, g_StyleMapRankBonus[style][zGroup][client], GRAY, g_iStyleBonusCount[style][zGroup], LIMEGREEN, g_szStyleBonusFastestTime[style][zGroup], WHITE);
+		PrintToChatAll(" %cSurftimer %c| %c%s %cfinished the %c%s %c%s %cwith a time of %c%s%c. Improving their best time by %c%s%c. [rank %c#%i/%c%i | record %c%s%c]", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY,LIGHTRED, g_szStyleFinishPrint[style], ORANGE, g_szZoneGroupName[zGroup], GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, g_szBonusTimeDifference[client], GRAY, LIMEGREEN, g_StyleMapRankBonus[style][zGroup][client], GRAY, g_iStyleBonusCount[style][zGroup], LIMEGREEN, g_szStyleBonusFastestTime[style][zGroup], WHITE);
 	}
 	if (g_bBonusFirstRecord[client] && !g_bBonusSRVRecord[client])
 	{
-		PrintToChatAll(" %cSurfTimer %c| %c%s %cfinished the %c%s %c%s %cwith a time of %c%s%c. [rank %c#%i/%c%i | record %c%s%c]", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY,LIGHTRED, g_szStyleFinishPrint[style], ORANGE, g_szZoneGroupName[zGroup], GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, g_StyleMapRankBonus[style][zGroup][client], GRAY, g_iStyleBonusCount[style][zGroup], LIMEGREEN, g_szStyleBonusFastestTime[style][zGroup], WHITE);
+		PrintToChatAll(" %cSurftimer %c| %c%s %cfinished the %c%s %c%s %cwith a time of %c%s%c. [rank %c#%i/%c%i | record %c%s%c]", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY,LIGHTRED, g_szStyleFinishPrint[style], ORANGE, g_szZoneGroupName[zGroup], GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, g_StyleMapRankBonus[style][zGroup][client], GRAY, g_iStyleBonusCount[style][zGroup], LIMEGREEN, g_szStyleBonusFastestTime[style][zGroup], WHITE);
 	}
 	if (!g_bBonusSRVRecord[client] && !g_bBonusFirstRecord[client] && !g_bBonusPBRecord[client])
 	{
-		PrintToChatAll(" %cSurfTimer %c| %c%s %cfinished the %c%s %c%s %cwith a time of %c%s%c. Missing their best time by %c%s%c. [rank %c#%i/%c%i | record %c%s%c]", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY, LIGHTRED, g_szStyleFinishPrint[style], ORANGE, g_szZoneGroupName[zGroup], GRAY, RED, g_szFinalTime[client], GRAY, RED, g_szBonusTimeDifference[client], GRAY, LIMEGREEN, g_StyleMapRankBonus[style][zGroup][client], GRAY, g_iStyleBonusCount[style][zGroup], LIMEGREEN, g_szStyleBonusFastestTime[style][zGroup], GRAY);
+		PrintToChatAll(" %cSurftimer %c| %c%s %cfinished the %c%s %c%s %cwith a time of %c%s%c. Missing their best time by %c%s%c. [rank %c#%i/%c%i | record %c%s%c]", LIMEGREEN, WHITE, LIMEGREEN, szName, GRAY, LIGHTRED, g_szStyleFinishPrint[style], ORANGE, g_szZoneGroupName[zGroup], GRAY, RED, g_szFinalTime[client], GRAY, RED, g_szBonusTimeDifference[client], GRAY, LIMEGREEN, g_StyleMapRankBonus[style][zGroup][client], GRAY, g_iStyleBonusCount[style][zGroup], LIMEGREEN, g_szStyleBonusFastestTime[style][zGroup], GRAY);
 	}
 
 	CheckBonusStyleRanks(client, zGroup, style);
 	if (rank == 9999999 && IsValidClient(client))
-	PrintToChat(client, " %cSurfTimer %c| %cFailed to save your data correctly! Please contact an admin.", LIMEGREEN, WHITE, DARKRED, RED, DARKRED);
+	PrintToChat(client, " %cSurftimer %c| %cFailed to save your data correctly! Please contact an admin.", LIMEGREEN, WHITE, DARKRED, RED, DARKRED);
 
 	return;
 }
@@ -3697,24 +4294,6 @@ public void CheckBonusStyleRanks(int client, int zGroup, int style)
 	}
 }
 
-// Mode 0: Adds player time on a frequency
-public Action UpdateTimes(Handle timer)
-{
-	for(int i=1; i <= MaxClients && IsClientInGame(i); i++)
-	{
-		if (!IsFakeClient(i) && IsClientAuthorized(i) && !(sm_playtime_team.IntValue == 1 && GetClientTeam(i) < 2))
-			IncreaseClientTime(i, sm_playtime_refresh.IntValue);
-	}
-	return Plugin_Continue;
-}
-// Called of refresh frequency or mode is called. Changing it is not recommended while running, as we may lose/get some time
-public void ModeChanged(ConVar convar, const char[] oldValue, const char[] newValue)
-{
-	CloseHandle(refreshTimer);
-	if(sm_playtime_mode.IntValue == 0)
-		refreshTimer = CreateTimer(sm_playtime_refresh.FloatValue, UpdateTimes, _, TIMER_REPEAT);
-}
-
 // Streamline Logging jakeey802
 /*public Action Commands_CommandListener(int client, const char[] command, any argc)
 {
@@ -3724,46 +4303,49 @@ public void ModeChanged(ConVar convar, const char[] oldValue, const char[] newVa
 	return Plugin_Continue;
 }*/
 
-public Action OnNormalSoundPlayed(int clients[MAXPLAYERS], int &numClients, char sample[PLATFORM_MAX_PATH], int &entity, int &channel, float &volume, int &level, int &pitch, int &flags, char soundEntry[PLATFORM_MAX_PATH], int &seed)
-{
-	if(StrContains(sample, "footsteps") != -1 || StrContains(sample, "land") != -1)
-		return Plugin_Handled;
-
-	return Plugin_Continue;
-}
-
 public void GetSpeedColour(int client, int speed, int type)
 {
 	int pos;
 	if (g_fMaxVelocity == 10000.0)
 	{
-		if (type == 1) // green
+		if (type == 1 && g_SpeedMode[client] == 0) // green
 		{
 			pos = RoundToFloor(speed / 400.0);
 			if (pos > 24)
 				pos = 24;
 			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), g_sz10000mvGradient[pos]);
 		}
-		else if (type == 2) // rainbow
+		else if (type == 2 && g_SpeedMode[client] == 0) // rainbow
 		{
 			pos = RoundToFloor(speed / 500.0);
 			if (pos > 7)
 				pos = 7;
 			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), g_szRainbowGradient[pos]);
 		}
-		else if (type == 0)
+		else if (type == 3 && g_SpeedMode[client] == 0) // gain/loss
+		{
+			if (speed >= GetConVarInt(g_hMaxVelocity))
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#a300ff");
+			else if (g_iPreviousSpeed[client] < speed || g_iPreviousSpeed[client] == speed)
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#66bbff");
+			else
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#ff7d7d");
+			
+			g_iPreviousSpeed[client] = speed;
+		}
+		else
 			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#ffffff");
 	}
 	else
 	{
-		if (type == 1) // green
+		if (type == 1 && g_SpeedMode[client] == 0) // green
 		{
 			pos = RoundToFloor(speed / 100.0);
 			if (pos > 34)
 				pos = 34;
 			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), g_sz3500mvGradient[pos]);
 		}
-		else if (type == 2) // rainbow
+		else if (type == 2 && g_SpeedMode[client] == 0) // rainbow
 		{
 			pos = RoundToFloor(speed / 500.0);
 			if (pos > 7)
@@ -3771,7 +4353,18 @@ public void GetSpeedColour(int client, int speed, int type)
 
 			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), g_szRainbowGradient[pos]);
 		}
-		else if (type == 0)
+		else if (type == 3 && g_SpeedMode[client] == 0) // gain/loss
+		{
+			if (speed >= GetConVarInt(g_hMaxVelocity))
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#a300ff");
+			else if (g_iPreviousSpeed[client] < speed || g_iPreviousSpeed[client] == speed)
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#66bbff");
+			else
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#ff7d7d");
+			
+			g_iPreviousSpeed[client] = speed;
+		}
+		else
 			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#ffffff");
 	}
 }
@@ -3799,4 +4392,325 @@ public void getColourName(int client, char[] buffer, int length, int colour)
 	}
 
 	return;
+}
+
+public void diffForHumans(int unix, char[] buffer, int size, int type)
+{
+	int years, months, days, hours, mins, secs;
+	if (type == 0)
+	{
+		if (unix > 31535999)
+		{
+			years = unix / 60 / 60 / 24 / 365;
+			Format(buffer, size, "%d year%s ago", years, years==1?"":"s");
+		}
+		if (unix > 2591999)
+		{
+			months = unix / 60 / 60 / 24 / 30;
+			Format(buffer, size, "%d month%s ago", months, months==1?"":"s");
+		}
+		if (unix > 86399)
+		{
+			days = unix / 60 / 60 / 24;
+			hours = unix / 3600 % 60;
+			mins = unix / 60 % 60;
+			secs = unix % 60;
+			Format(buffer, size, "%d day%s ago", days, days==1?"":"s");
+		}
+		else if (unix > 3599)
+		{
+			hours = unix / 3600 % 60;
+			mins = unix / 60 % 60;
+			secs = unix % 60;
+			Format(buffer, size, "%d hour%s %d minute%s %d second%s ago", hours, hours==1?"":"s", mins, mins==1?"":"s", secs, secs==1?"":"s");
+		}
+		else if (unix > 59)
+		{
+			mins = unix / 60 % 60;
+			secs = unix % 60;
+			Format(buffer, size, "%d minute%s %d second%s ago", mins, mins==1?"":"s", secs, secs==1?"":"s");
+		}
+		else
+		{
+			secs = unix;
+			Format(buffer, size, "%d second%s ago", secs, secs==1?"":"s");
+		}
+	}
+	else if (type == 1)
+	{
+		if (unix > 31535999)
+		{
+			years = unix / 60 / 60 / 24 / 365;
+			Format(buffer, size, "%d year%s ago", years, years==1?"":"s");
+		}
+		if (unix > 2591999)
+		{
+			months = unix / 60 / 60 / 24 / 30;
+			Format(buffer, size, "%d month%s ago", months, months==1?"":"s");
+		}
+		if (unix > 86399)
+		{
+			days = unix / 60 / 60 / 24;
+			Format(buffer, size, "%d day%s ago", days, days==1?"":"s");
+		}
+		else if (unix > 3599)
+		{
+			hours = unix / 3600 % 60;
+			Format(buffer, size, "%d hour%s ago", hours, hours==1?"":"s");
+		}
+		else if (unix > 59)
+		{
+			mins = unix / 60 % 60;
+			Format(buffer, size, "%d minute%s ago", mins, mins==1?"":"s");
+		}
+		else
+		{
+			secs = unix;
+			Format(buffer, size, "%d second%s ago", secs, secs==1?"":"s");
+		}
+	}
+}
+
+public void totalTimeForHumans(int unix, char[] buffer, int size)
+{
+	int years, months, days, hours, mins, secs;
+	if (unix > 31535999)
+	{
+		years = unix / 60 / 60 / 24 / 365;
+		months = unix / 60 / 60 / 24 / 30;
+		days = unix / 60 / 60 / 24;
+		hours = unix / 3600 % 60;
+		mins = unix / 60 % 60;
+		secs = unix % 60;
+		Format(buffer, size, "%d year%s %d month%s %d day%s %d hour%s %d minute%s %d second%s", years, years==1?"":"s", months, months==1?"":"s", days, days==1?"":"s", hours, hours==1?"":"s", mins, mins==1?"":"s", secs, secs==1?"":"s");
+	}
+	if (unix > 2591999)
+	{
+		months = unix / 60 / 60 / 24 / 30;
+		days = unix / 60 / 60 / 24;
+		hours = unix / 3600 % 60;
+		mins = unix / 60 % 60;
+		secs = unix % 60;
+		Format(buffer, size, "%d month%s %d day%s %d hour%s %d minute%s %d second%s", months, months==1?"":"s", days, days==1?"":"s", hours, hours==1?"":"s", mins, mins==1?"":"s", secs, secs==1?"":"s");
+	}
+	if (unix > 86399)
+	{
+		days = unix / 60 / 60 / 24;
+		hours = unix / 3600 % 60;
+		mins = unix / 60 % 60;
+		secs = unix % 60;
+		Format(buffer, size, "%d day%s %d hour%s %d minute%s %d second%s", days, days==1?"":"s", hours, hours==1?"":"s", mins, mins==1?"":"s", secs, secs==1?"":"s");
+	}
+	else if (unix > 3599)
+	{
+		hours = unix / 3600 % 60;
+		mins = unix / 60 % 60;
+		secs = unix % 60;
+		Format(buffer, size, "%d hour%s %d minute%s %d second%s", hours, hours==1?"":"s", mins, mins==1?"":"s", secs, secs==1?"":"s");
+	}
+	else if (unix > 59)
+	{
+		mins = unix / 60 % 60;
+		secs = unix % 60;
+		Format(buffer, size, "%d minute%s %d second%s", mins, mins==1?"":"s", secs, secs==1?"":"s");
+	}
+	else
+	{
+		secs = unix;
+		Format(buffer, size, "%d second%s", secs, secs==1?"":"s");
+	}
+}
+
+public void sendDiscordAnnouncement(char szName[32], char szMapName[128], char szTime[32])
+{
+	char webhook[1024];
+	GetConVarString(g_hRecordAnnounceDiscord, webhook, 1024);
+	if (StrEqual(webhook, ""))
+		return;
+	// Send Discord Announcement
+	DiscordWebHook hook = new DiscordWebHook(webhook);
+	hook.SlackMode = true;
+	
+	hook.SetUsername("Surftimer Records");
+	
+	MessageEmbed Embed = new MessageEmbed();
+
+	// Get a random colour for the.. left colour
+	int hex = GetRandomInt(0, 6);
+	switch (hex)
+	{
+		case 0: Embed.SetColor("#ff0000");
+		case 1: Embed.SetColor("#ff7F00");
+		case 2: Embed.SetColor("#ffD700");
+		case 3: Embed.SetColor("#00aa00");
+		case 4: Embed.SetColor("#0000ff");
+		case 5: Embed.SetColor("#6600ff");
+		case 6: Embed.SetColor("#8b00ff");
+		default: Embed.SetColor("#ff0000");
+	}
+
+	Embed.SetTitle("**NEW MAP RECORD**");
+
+	// Format the msg
+	char szMessage[256];
+
+	Format(szMessage, sizeof(szMessage), "%s has beaten the %s map record in the %s server with a time of %s", szName, szMapName, g_sServerName, szTime);
+
+	// Get a random emoji
+	int emoji = GetRandomInt(0, 3);
+	char szEmoji[128];
+	switch (emoji)
+	{
+		case 0: Format(szEmoji, sizeof(szEmoji), ":ok_hand: :ok_hand: :ok_hand: :ok_hand: :ok_hand:");
+		case 1: Format(szEmoji, sizeof(szEmoji), ":thinking: :thinking: :thinking: :thinking: :thinking:");
+		case 2: Format(szEmoji, sizeof(szEmoji), ":fire: :fire: :fire: :fire: :fire:");
+		case 3: Format(szEmoji, sizeof(szEmoji), ":scream: :scream: :scream: :scream: :scream:");
+		default: Format(szEmoji, sizeof(szEmoji), ":ok_hand: :ok_hand: :ok_hand: :ok_hand: :ok_hand:");
+	}
+
+	Embed.AddField(szEmoji, szMessage, false);
+					
+	hook.Embed(Embed);
+	hook.Send();
+	delete hook;
+}
+
+bool IsPlayerVip(int client, int vip, bool admin = true, bool reply = true)
+{
+	if (admin)
+	{
+		if (CheckCommandAccess(client, "", ADMFLAG_GENERIC))
+			return true;
+	}
+
+	if (g_iVipLvl[client] < vip)
+	{
+		if (reply)
+		{
+			if (vip == 2)
+			{
+				PrintToChat(client, " %cSurftimer %c| This is a Super VIP feature", LIMEGREEN, WHITE);
+				PrintToConsole(client, "surftimer | This is a Super VIP feature");
+			}
+			else if (vip == 3)
+			{
+				PrintToChat(client, " %cSurftimer %c| This is a Superior VIP feature", LIMEGREEN, WHITE);
+				PrintToConsole(client, "surftimer | This is a Superior VIP feature");
+			}
+			else
+			{
+				PrintToChat(client, " %cSurftimer %c| This is a VIP feature", LIMEGREEN, WHITE);
+				PrintToConsole(client, "surftimer | This is a VIP feature");
+			}
+		}
+		return false;
+	}
+	
+	return true;
+}
+
+public float GetStrafeSync(int client, bool sync)
+{
+	// Strafe sync taken from shavit's bhop timer
+	return view_as<float>((sync)? (g_iGoodGains[client] == 0)? 100.0:(g_iGoodGains[client] / float(g_iTotalMeasures[client]) * 100.0):-1.0);
+}
+
+public void ResetSaveLocs()
+{
+	g_iSaveLocCount = 0;
+	for (int i = 0; i < MAX_LOCS; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			g_fSaveLocCoords[i][j] = 0.0;
+			g_fSaveLocAngle[i][j] = 0.0;
+			g_fSaveLocVel[i][j] = 0.0;
+		}
+		g_iSaveLocUnix[i] = 0;
+		g_szSaveLocTargetname[i][0] = '\0';
+	}
+}
+
+public void TeleportToSaveloc(int client, int id)
+{
+	g_iLastSaveLocIdClient[client] = id;
+	ResetGravity(client);
+	g_bPracticeMode[client] = true;
+	g_bWrcpTimeractivated[client] = false;
+	CL_OnStartTimerPress(client);
+	DispatchKeyValue(client, "targetname", g_szSaveLocTargetname[id]);
+	SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, 0.0 } ));
+	TeleportEntity(client, g_fSaveLocCoords[id], g_fSaveLocAngle[id], g_fSaveLocVel[id]);
+}
+
+public void SendBugReport(int client)
+{
+	char webhook[1024];
+	GetConVarString(g_hReportBugsDiscord, webhook, 1024);
+	if (StrEqual(webhook, ""))
+		return;
+
+	// Send Discord Announcement
+	DiscordWebHook hook = new DiscordWebHook("webhook");
+	hook.SlackMode = true;
+	
+	hook.SetUsername("Surftimer Bugtracker");
+	
+	MessageEmbed Embed = new MessageEmbed();
+
+	// Format title
+	char sTitle[256];
+	Format(sTitle, sizeof(sTitle), "Bug Type: %s || Server: %s || Map: %s", g_sBugType[client], g_sServerName, g_szMapName);
+	Embed.SetTitle(sTitle);
+
+	// Format player
+	char sName[MAX_NAME_LENGTH];
+	GetClientName(client, sName, sizeof(sName));
+
+	// Format msg
+	char sMessage[512];
+	Format(sMessage, sizeof(sMessage), "%s (%s): %s", sName, g_szSteamID[client], g_sBugMsg[client]);
+	Embed.AddField("", sMessage, true);
+					
+	hook.Embed(Embed);
+	hook.Send();
+	delete hook;
+	
+	PrintToChat(client, " %cSurftimer %c| Bug report sent", LIMEGREEN, WHITE);
+}
+
+public void CallAdmin(int client, char[] sText)
+{
+	char webhook[1024];
+	GetConVarString(g_hCalladminDiscord, webhook, 1024);
+	if (StrEqual(webhook, ""))
+		return;
+
+	// Send Discord Announcement
+	DiscordWebHook hook = new DiscordWebHook(webhook);
+	hook.SlackMode = true;
+	
+	hook.SetUsername("Surftimer Calladmin");
+	
+	MessageEmbed Embed = new MessageEmbed();
+
+	// Format title
+	char sTitle[256];
+	Format(sTitle, sizeof(sTitle), "Server: %s || Map: %s", g_sServerName, g_szMapName);
+	Embed.SetTitle(sTitle);
+
+	// Format player
+	char sName[MAX_NAME_LENGTH];
+	GetClientName(client, sName, sizeof(sName));
+
+	// Format msg
+	char sMessage[512];
+	Format(sMessage, sizeof(sMessage), "%s (%s): %s", sName, g_szSteamID[client], sText);
+	Embed.AddField("", sMessage, true);
+					
+	hook.Embed(Embed);
+	hook.Send();
+	delete hook;
+	
+	PrintToChat(client, " %cSurftimer %c| Report sent", LIMEGREEN, WHITE);
 }

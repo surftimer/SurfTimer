@@ -8,17 +8,17 @@ public void Admin_renameZone(int client, const char[] name)
 	//avoid unnecessary calls by checking the first cell first. If it's 0 -> \0 then negating it will make the if check pass -> return
 	if (!name[0] || StrEqual(name, " ") || StrEqual(name, ""))
 	{
-		PrintToChat(client, "[%CK%c] Please give the zone a valid name.", LIMEGREEN, WHITE);
+		PrintToChat(client, " %cSurftimer %c| Please give the zone a valid name.", LIMEGREEN, WHITE);
 		return;
 	}
 	if (strlen(name) > 128)
 	{
-		PrintToChat(client, " %cSurfTimer %c| Zone name too long. Maximum is 128 characters.", LIMEGREEN, WHITE);
+		PrintToChat(client, " %cSurftimer %c| Zone name too long. Maximum is 128 characters.", LIMEGREEN, WHITE);
 		return;
 	}
 	if (StrEqual(name, "!cancel", false)) //false -> non sensitive
 	{
-		PrintToChat(client, " %cSurfTimer %c| Cancelled bonus renaming.", LIMEGREEN, WHITE);
+		PrintToChat(client, " %cSurftimer %c| Cancelled bonus renaming.", LIMEGREEN, WHITE);
 		g_ClientRenamingZone[client] = false;
 		ListBonusSettings(client);
 		return;
@@ -43,7 +43,7 @@ public void OnAdminMenuReady(Handle topmenu)
 public int TopMenuHandler2(Handle topmenu, TopMenuAction action, TopMenuObject object_id, int param, char[] buffer, int maxlength)
 {
 	if (action == TopMenuAction_DisplayOption)
-		Format(buffer, maxlength, "SurfTimer");
+		Format(buffer, maxlength, "surftimer");
 
 	else
 		if (action == TopMenuAction_SelectOption)
@@ -55,13 +55,16 @@ public Action Admin_insertMapTier(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	if(!g_bZoner[client] && !CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+	if (!(GetUserFlagBits(client) & g_ZoneMenuFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT) && !g_bZoner[client])
+	{
+		PrintToChat(client, " %cSurftimer %c| You don't have access to the zones menu.", LIMEGREEN, WHITE);
 		return Plugin_Handled;
+	}
 
 	if (args < 2)
 	{
-		ReplyToCommand(client, " %cSurfTimer%c | Usage: sm_addmaptier <ZoneGroup> <Tier>", LIMEGREEN, WHITE);
-		PrintToChat(client, " %cSurfTimer %c| Zone Groups:", LIMEGREEN, WHITE);
+		ReplyToCommand(client, " %cSurftimer%c | Usage: sm_addmaptier <ZoneGroup> <Tier>", LIMEGREEN, WHITE);
+		PrintToChat(client, " %cSurftimer %c| Zone Groups:", LIMEGREEN, WHITE);
 		PrintToChat(client, "[%c0.%c] Map Tier", LIMEGREEN, WHITE);
 		for (int i = 1; i < g_mapZoneGroupCount; i++)
 		{
@@ -80,7 +83,7 @@ public Action Admin_insertMapTier(int client, int args)
 		if ((tier < 7 || tier > 0) && (-1 < zonegroup < g_mapZoneGroupCount))
 			db_insertMapTier(tier, zonegroup);
 		else
-			PrintToChat(client, " %cSurfTimer %c| Invalid tier number or zone group. Please choose a tier number between 1-6 and a valid zone group.", LIMEGREEN, WHITE);
+			PrintToChat(client, " %cSurftimer %c| Invalid tier number or zone group. Please choose a tier number between 1-6 and a valid zone group.", LIMEGREEN, WHITE);
 	}
 	return Plugin_Handled;
 }
@@ -90,7 +93,7 @@ public Action Admin_insertSpawnLocation(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	if(!g_bZoner[client] && !CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+	if (!CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
 		return Plugin_Handled;
 
 	float SpawnLocation[3];
@@ -103,15 +106,15 @@ public Action Admin_insertSpawnLocation(int client, int args)
 
 	SpawnLocation[2] += 3.0;
 
-	if (g_bGotSpawnLocation[g_iClientInZone[client][2]])
+	if (g_bGotSpawnLocation[g_iClientInZone[client][2]][1])
 	{
 		db_updateSpawnLocations(SpawnLocation, SpawnAngle, Velocity, g_iClientInZone[client][2]);
-		PrintToChat(client, " %cSurfTimer %c| Spawnpoint edited", LIMEGREEN, WHITE);
+		PrintToChat(client, " %cSurftimer %c| Spawnpoint edited", LIMEGREEN, WHITE);
 	}
 	else
 	{
 		db_insertSpawnLocations(SpawnLocation, SpawnAngle, Velocity, g_iClientInZone[client][2]);
-		PrintToChat(client, " %cSurfTimer %c| Spawnpoint added", LIMEGREEN, WHITE);
+		PrintToChat(client, " %cSurftimer %c| Spawnpoint added", LIMEGREEN, WHITE);
 	}
 
 	return Plugin_Handled;
@@ -122,16 +125,16 @@ public Action Admin_deleteSpawnLocation(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	if(!g_bZoner[client] && !CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+	if (!CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
 		return Plugin_Handled;
 
-	if (g_bGotSpawnLocation[g_iClientInZone[client][2]])
+	if (g_bGotSpawnLocation[g_iClientInZone[client][2]][1])
 	{
 		db_deleteSpawnLocations(g_iClientInZone[client][2]);
-		PrintToChat(client, " %cSurfTimer %c| Spawnpoint deleted", LIMEGREEN, WHITE);
+		PrintToChat(client, " %cSurftimer %c| Spawnpoint deleted", LIMEGREEN, WHITE);
 	}
 	else
-		PrintToChat(client, " %cSurfTimer %c| No spawnpoint to delete!", LIMEGREEN, WHITE);
+		PrintToChat(client, " %cSurftimer %c| No spawnpoint to delete!", LIMEGREEN, WHITE);
 
 	return Plugin_Handled;
 }
@@ -154,8 +157,8 @@ public Action Admin_ckPanel(int client, int args)
 	ckAdminMenu(client);
 	if ((GetUserFlagBits(client) & g_AdminMenuFlag))
 	{
-		PrintToChat(client, " %cSurfTimer %c| See console for more commands", LIMEGREEN, WHITE);
-		PrintToConsole(client, "\n[SurfTimer Admin]\n");
+		PrintToChat(client, " %cSurftimer %c| See console for more commands", LIMEGREEN, WHITE);
+		PrintToConsole(client, "\n[Surftimer Admin]\n");
 		PrintToConsole(client, "\n sm_refreshprofile <steamid> (recalculates player profile for given steamid)\n sm_deleteproreplay <mapname> (Deletes pro replay file for a given map)\n sm_deletetpreplay <mapname> (Deletes tp replay file for a given map)\n ");
 		PrintToConsole(client, "\n sm_zones (Open up the zonee modification menu)\n sm_insertmapzones (Inserts premade map zones into the servers database. ONLY RUN THIS ONCE!)\n sm_insertmaptiers (Inserts premade map tier information into the servers database. ONLY RUN THIS ONCE!)\n");
 		PrintToConsole(client, "[PLAYER RANKING]\n sm_resetranks (Drops playerrank table)\n sm_resetextrapoints (Resets given extra points for all players)\n");
@@ -174,7 +177,7 @@ public void ckAdminMenu(int client)
 
 	if (!(GetUserFlagBits(client) & g_AdminMenuFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT))
 	{
-		PrintToChat(client, " %cSurfTimer %c| You don't have access to the admin menu.", LIMEGREEN, WHITE);
+		PrintToChat(client, " %cSurftimer %c| You don't have access to the admin menu.", LIMEGREEN, WHITE);
 		return;
 	}
 
@@ -182,9 +185,9 @@ public void ckAdminMenu(int client)
 
 	Handle adminmenu = CreateMenu(AdminPanelHandler);
 	if (GetUserFlagBits(client) & g_ZoneMenuFlag)
-		Format(szTmp, sizeof(szTmp), "SurfTimer %s Admin Menu (full access)", VERSION);
+		Format(szTmp, sizeof(szTmp), "Surftimer %s Admin Menu (full access)", VERSION);
 	else
-		Format(szTmp, sizeof(szTmp), "SurfTimer %s Admin Menu (limited access)", VERSION);
+		Format(szTmp, sizeof(szTmp), "Surftimer %s Admin Menu (limited access)", VERSION);
 	SetMenuTitle(adminmenu, szTmp);
 
 	if (!g_pr_RankingRecalc_InProgress)
@@ -611,7 +614,7 @@ public Action Admin_RefreshProfile(int client, int args)
 {
 	if (args == 0)
 	{
-		ReplyToCommand(client, " %cSurfTimer%c | Usage: sm_refreshprofile <steamid>", LIMEGREEN, WHITE);
+		ReplyToCommand(client, " %cSurftimer%c | Usage: sm_refreshprofile <steamid>", LIMEGREEN, WHITE);
 		return Plugin_Handled;
 	}
 	if (args > 0)

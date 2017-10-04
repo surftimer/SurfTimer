@@ -2,6 +2,7 @@ public void CreateZoneEntity(int zoneIndex)
 {
 	float fMiddle[3], fMins[3], fMaxs[3];
 	char sZoneName[64];
+	char szHookName[128];
 
 	if (g_mapZones[zoneIndex][PointA][0] == -1.0 && g_mapZones[zoneIndex][PointA][1] == -1.0 && g_mapZones[zoneIndex][PointA][2] == -1.0)
 	{
@@ -12,63 +13,133 @@ public void CreateZoneEntity(int zoneIndex)
 	Array_Copy(g_mapZones[zoneIndex][PointB], fMaxs, 3);
 
 	Format(sZoneName, sizeof(sZoneName), "%s", g_mapZones[zoneIndex][zoneName]);
+	Format(szHookName, sizeof(szHookName), "%s", g_mapZones[zoneIndex][hookName]);
 
-	int iEnt = CreateEntityByName("trigger_multiple");
-
-	if (iEnt > 0 && IsValidEntity(iEnt)) {
-		SetEntityModel(iEnt, ZONE_MODEL);
-		// Spawnflags:	1 - only a player can trigger this by touch, makes it so a NPC cannot fire a trigger_multiple
-		// 2 - Won't fire unless triggering ent's view angles are within 45 degrees of trigger's angles (in addition to any other conditions), so if you want the player to only be able to fire the entity at a 90 degree angle you would do ",angles,0 90 0," into your spawnstring.
-		// 4 - Won't fire unless player is in it and pressing use button (in addition to any other conditions), you must make a bounding box,(max\mins) for this to work.
-		// 8 - Won't fire unless player/NPC is in it and pressing fire button, you must make a bounding box,(max\mins) for this to work.
-		// 16 - only non-player NPCs can trigger this by touch
-		// 128 - Start off, has to be activated by a target_activate to be touchable/usable
-		// 256 - multiple players can trigger the entity at the same time
-		DispatchKeyValue(iEnt, "spawnflags", "257");
-		DispatchKeyValue(iEnt, "StartDisabled", "0");
-
-		Format(sZoneName, sizeof(sZoneName), "sm_ckZone %i", zoneIndex);
-		DispatchKeyValue(iEnt, "targetname", sZoneName);
-		DispatchKeyValue(iEnt, "wait", "0");
-
-		if (DispatchSpawn(iEnt))
+	if (!StrEqual(szHookName, "None"))
+	{
+		int iEnt;
+		for (int i = 0; i < GetArraySize(g_hTriggerMultiple); i++)
 		{
-			ActivateEntity(iEnt);
+			iEnt = GetArrayCell(g_hTriggerMultiple, i);
 
-			GetMiddleOfABox(fMins, fMaxs, fMiddle);
+			if (IsValidEntity(iEnt))
+			{
+				char szTriggerName[128];
+				GetEntPropString(iEnt, Prop_Send, "m_iName", szTriggerName, 128, 0);
 
-			TeleportEntity(iEnt, fMiddle, NULL_VECTOR, NULL_VECTOR);
+				if (StrEqual(szHookName, szTriggerName))
+				{
+					Format(sZoneName, sizeof(sZoneName), "sm_ckZone %i", zoneIndex);
+					float position[3];
+					// come back
+					GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", position);
+					GetEntPropVector(iEnt, Prop_Send, "m_vecMins", fMins);
+					GetEntPropVector(iEnt, Prop_Send, "m_vecMaxs", fMaxs);
+					
 
-			// Have the mins always be negative
-			for(int i = 0; i < 3; i++){
-				fMins[i] = fMins[i] - fMiddle[i];
-				if(fMins[i] > 0.0)
-					fMins[i] *= -1.0;
+					g_mapZones[zoneIndex][CenterPoint][0] = position[0];
+					g_mapZones[zoneIndex][CenterPoint][1] = position[1];
+					g_mapZones[zoneIndex][CenterPoint][2] = position[2];
+					//g_mapZones[zoneIndex][zoneType]
+
+					for (int j = 0; j < 3; j++)
+					{
+						fMins[j] = (fMins[j] + position[j]);
+					}
+
+					for (int j = 0; j < 3; j++)
+					{
+						fMaxs[j] = (fMaxs[j] + position[j]);
+					}
+
+					g_mapZones[zoneIndex][PointA][0] = fMins[0];
+					g_mapZones[zoneIndex][PointA][1] = fMins[1];
+					g_mapZones[zoneIndex][PointA][2] = fMins[2];
+					g_mapZones[zoneIndex][PointB][0] = fMaxs[0];
+					g_mapZones[zoneIndex][PointB][1] = fMaxs[1];
+					g_mapZones[zoneIndex][PointB][2] = fMaxs[2];
+
+					for (int j = 0; j < 3; j++)
+					{
+						g_fZoneCorners[zoneIndex][0][j] = g_mapZones[zoneIndex][PointA][j];
+						g_fZoneCorners[zoneIndex][7][j] = g_mapZones[zoneIndex][PointB][j];
+					}
+
+					for(int j = 1; j < 7; j++)
+					{
+						for(int k = 0; k < 3; k++)
+						{
+							g_fZoneCorners[zoneIndex][j][k] = g_fZoneCorners[zoneIndex][((j >> (2-k)) & 1) * 7][k];
+						}
+					}
+
+					DispatchKeyValue(iEnt, "targetname", sZoneName);
+
+					SDKHook(iEnt, SDKHook_StartTouch, StartTouchTrigger);
+					SDKHook(iEnt, SDKHook_EndTouch, EndTouchTrigger);
+				}
 			}
-
-			// And the maxs always be positive
-			for(int i = 0; i < 3; i++){
-				fMaxs[i] = fMaxs[i] - fMiddle[i];
-				if(fMaxs[i] < 0.0)
-					fMaxs[i] *= -1.0;
-			}
-
-			SetEntPropVector(iEnt, Prop_Send, "m_vecMins", fMins);
-			SetEntPropVector(iEnt, Prop_Send, "m_vecMaxs", fMaxs);
-			SetEntProp(iEnt, Prop_Send, "m_nSolidType", 2);
-
-			int iEffects = GetEntProp(iEnt, Prop_Send, "m_fEffects");
-			iEffects |= 0x020;
-			SetEntProp(iEnt, Prop_Send, "m_fEffects", iEffects);
-
-
-			SDKHook(iEnt, SDKHook_StartTouch, StartTouchTrigger);
-			SDKHook(iEnt, SDKHook_EndTouch, EndTouchTrigger);
 		}
-		else
-		{
+	}
+	else
+	{
+		int iEnt = CreateEntityByName("trigger_multiple");
 
-			LogError("Not able to dispatchspawn for Entity %i in SpawnTrigger", iEnt);
+		if (iEnt > 0 && IsValidEntity(iEnt))
+		{
+			SetEntityModel(iEnt, ZONE_MODEL);
+			// Spawnflags:	1 - only a player can trigger this by touch, makes it so a NPC cannot fire a trigger_multiple
+			// 2 - Won't fire unless triggering ent's view angles are within 45 degrees of trigger's angles (in addition to any other conditions), so if you want the player to only be able to fire the entity at a 90 degree angle you would do ",angles,0 90 0," into your spawnstring.
+			// 4 - Won't fire unless player is in it and pressing use button (in addition to any other conditions), you must make a bounding box,(max\mins) for this to work.
+			// 8 - Won't fire unless player/NPC is in it and pressing fire button, you must make a bounding box,(max\mins) for this to work.
+			// 16 - only non-player NPCs can trigger this by touch
+			// 128 - Start off, has to be activated by a target_activate to be touchable/usable
+			// 256 - multiple players can trigger the entity at the same time
+			DispatchKeyValue(iEnt, "spawnflags", "257");
+			DispatchKeyValue(iEnt, "StartDisabled", "0");
+
+			Format(sZoneName, sizeof(sZoneName), "sm_ckZone %i", zoneIndex);
+			DispatchKeyValue(iEnt, "targetname", sZoneName);
+			DispatchKeyValue(iEnt, "wait", "0");
+
+			if (DispatchSpawn(iEnt))
+			{
+				ActivateEntity(iEnt);
+
+				GetMiddleOfABox(fMins, fMaxs, fMiddle);
+
+				TeleportEntity(iEnt, fMiddle, NULL_VECTOR, NULL_VECTOR);
+
+				// Have the mins always be negative
+				for(int i = 0; i < 3; i++){
+					fMins[i] = fMins[i] - fMiddle[i];
+					if(fMins[i] > 0.0)
+						fMins[i] *= -1.0;
+				}
+
+				// And the maxs always be positive
+				for(int i = 0; i < 3; i++){
+					fMaxs[i] = fMaxs[i] - fMiddle[i];
+					if(fMaxs[i] < 0.0)
+						fMaxs[i] *= -1.0;
+				}
+
+				SetEntPropVector(iEnt, Prop_Send, "m_vecMins", fMins);
+				SetEntPropVector(iEnt, Prop_Send, "m_vecMaxs", fMaxs);
+				SetEntProp(iEnt, Prop_Send, "m_nSolidType", 2);
+
+				int iEffects = GetEntProp(iEnt, Prop_Send, "m_fEffects");
+				iEffects |= 0x020;
+				SetEntProp(iEnt, Prop_Send, "m_fEffects", iEffects);
+
+
+				SDKHook(iEnt, SDKHook_StartTouch, StartTouchTrigger);
+				SDKHook(iEnt, SDKHook_EndTouch, EndTouchTrigger);
+			}
+			else
+			{
+				LogError("Not able to dispatchspawn for Entity %i in SpawnTrigger", iEnt);
+			}
 		}
 	}
 }
@@ -91,6 +162,38 @@ public Action StartTouchTrigger(int caller, int activator)
 	action[1] = g_mapZones[id][zoneTypeId];
 	action[2] = g_mapZones[id][zoneGroup];
 
+	// Hack fix to allow bonus zones to sit on top of start zones, e.g surf_aircontrol_ksf bonus 1
+	if (g_bInBonus[activator])
+	{
+		if (action[2] != g_iInBonus[activator])
+			return Plugin_Handled;
+	}
+	else
+	{
+		if (!g_bInBonus[activator] && action[2] > 0)
+			return Plugin_Handled;
+		else if (StrEqual(g_szMapName, "surf_christmas2") && !g_bUsingStageTeleport[activator])
+		{
+			if (action[0] == 3)
+			{
+				if (action[1] > (g_Stage[g_iClientInZone[activator][2]][activator] + 1) || action[1] < (g_Stage[g_iClientInZone[activator][2]][activator] - 1))
+					return Plugin_Handled;
+			}
+		}
+	}
+
+	if (g_bUsingStageTeleport[activator])
+		g_bUsingStageTeleport[activator] = false;
+
+	// Set Client targetName
+	if (!StrEqual("player", g_mapZones[id][targetName]))
+	{
+		DispatchKeyValue(activator, "targetname", g_mapZones[id][targetName]);
+	}
+	
+	// Reset Prehop Limit
+	//g_bJumpedInZone[activator] = false;
+
 	if (action[2] == g_iClientInZone[activator][2]) // Is touching zone in right zonegroup
 	{
 		// Set client location
@@ -112,7 +215,7 @@ public Action StartTouchTrigger(int caller, int activator)
 			StartTouch(activator, action);
 		}
 		else
-			if (action[0] == 6 || action[0] == 7 || action[0] == 8 || action[0] == 0 || action[0] == 9 || action[0 == 10]) // Allow MISC zones regardless of zonegroup //fluffys add nojump, noduck
+			if (action[0] == 6 || action[0] == 7 || action[0] == 8 || action[0] == 0 || action[0] == 9 || action[0] == 10 || action[0] == 11) // Allow MISC zones regardless of zonegroup //fluffys add nojump, noduck
 				StartTouch(activator, action);
 	}
 
@@ -131,6 +234,9 @@ public Action EndTouchTrigger(int caller, int activator)
 		g_bIgnoreZone[activator] = false;
 		return Plugin_Handled;
 	}
+
+	// Reset Prehop Limit
+	//g_bJumpedInZone[activator] = false;
 
 	char sTargetName[256];
 	int action[3];
@@ -165,31 +271,52 @@ public void StartTouch(int client, int action[3])
 		}
 		else if (action[0] == 1 || action[0] == 5) // Start Zone or Speed Start
 		{
+			// Reset Player to default targetname
+			//DispatchKeyValue(client, "targetname", "player");
+
 			//gravity
 			if(g_iCurrentStyle[client] != 4) //lowgrav
 				ResetGravity(client);
 
 			g_KeyCount[client] = 0;
 
-			if (g_Stage[g_iClientInZone[client][2]][client] == 1 && g_bPracticeMode[client]) // If practice mode is on
-				Command_goToPlayerCheckpoint(client, 1);
-			else
-			{
-				g_Stage[g_iClientInZone[client][2]][client] = 1;
+			g_bInJump[client] = false;
+			g_bInDuck[client] = false;
+			g_iCurrentCheckpoint[client] = 0;
 
-				Client_Stop(client, 1);
-				//fluffys
-				g_bInStartZone[client] = true;
-				if(g_bhasStages)
-				{
-					g_bWrcpTimeractivated[client] = false;
-					g_CurrentStage[client] = 0;
-				}
-				//styles
-				g_iCurrentStyle[client] = g_iInitalStyle[client];
-				// Resetting last checkpoint
-				lastCheckpoint[g_iClientInZone[client][2]][client] = 1;
+			g_Stage[g_iClientInZone[client][2]][client] = 1;
+
+			Client_Stop(client, 1);
+			//fluffys
+			g_bInStartZone[client] = true;
+			if(g_bhasStages)
+			{
+				g_bWrcpTimeractivated[client] = false;
+				g_CurrentStage[client] = 0;
 			}
+			//styles
+			g_iCurrentStyle[client] = g_iInitalStyle[client];
+			// Resetting last checkpoint
+			lastCheckpoint[g_iClientInZone[client][2]][client] = 1;
+
+				// Start recording
+				// if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)))
+				// {
+				// 	if (!IsPlayerAlive(client) || GetClientTeam(client) == 1)
+				// 	{
+				// 		if (g_hRecording[client] != null)
+				// 			StopRecording(client);
+				// 	}
+				// 	else
+				// 	{
+				// 		if (g_hRecording[client] != null)
+				// 			StopRecording(client);
+				// 		StartRecording(client);
+
+				// 		if (g_bhasStages)
+				// 			Stage_StartRecording(client);
+				// 	}
+				// }
 		}
 		else if (action[0] == 2) // End Zone
 		{
@@ -198,6 +325,9 @@ public void StartTouch(int client, int action[3])
 				//fluffys gravity
 				if(g_iCurrentStyle[client] != 4)//low grav
 					ResetGravity(client);
+				
+				g_bInJump[client] = false;
+				g_bInDuck[client] = false;
 
 				//fluffys wrcps
 				if(g_bhasStages)
@@ -220,7 +350,16 @@ public void StartTouch(int client, int action[3])
 		else if (action[0] == 3) // Stage Zone
 		{
 			g_bInStageZone[client] = true;
+			g_bInJump[client] = false;
+			g_bInDuck[client] = false;
 			g_KeyCount[client] = 0;
+
+			// stop bot wrcp timer
+			if (client == g_WrcpBot)
+			{
+				Client_Stop(client, 1);
+				g_bWrcpTimeractivated[client] = false;
+			}
 
 			if (g_bPracticeMode[client]) // If practice mode is on
 			{
@@ -259,12 +398,15 @@ public void StartTouch(int client, int action[3])
 
 				if(g_bWrcpTimeractivated[client])
 					g_bWrcpTimeractivated[client] = false;
+
+				//Stage_StartRecording(client);
 			}
 		}
 		else if (action[0] == 4) // Checkpoint Zone
 		{
 			if (action[1] != lastCheckpoint[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] == action[2])
 			{
+				g_iCurrentCheckpoint[client]++;
 				// Announcing checkpoint in linear maps
 				if(g_iCurrentStyle[client] == 0)
 				{
@@ -295,6 +437,11 @@ public void StartTouch(int client, int action[3])
 		{
 			g_bInDuck[client] = true;
 		}
+		else if (action[0] == 11) // MaxSpeed
+		{
+			g_bInMaxSpeed[client] = true;
+			//PrintToChat(client, "Inside MaxSpeed zone");
+		}
 	}
 }
 
@@ -302,6 +449,22 @@ public void EndTouch(int client, int action[3])
 {
 	if (IsValidClient(client))
 	{
+		LimitSpeed(client);
+		// Set Client targetName
+		if (StrEqual(g_szMapName, "surf_forgotten"))
+		{
+			if (!StrEqual("player", g_mapZones[g_iClientInZone[client][3]][targetName]))
+				DispatchKeyValue(client, "targetname", g_mapZones[g_iClientInZone[client][3]][targetName]);
+		}
+
+		// float CurVelVec[3];
+		// GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
+		// float currentspeed = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0) + Pow(CurVelVec[2], 2.0));
+		// float xy = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0));
+		// float z = SquareRoot(Pow(CurVelVec[2], 2.0));
+		// PrintToChat(client, "XY: %f Z: %f XYZ: %f", xy, z, currentspeed);
+		// PrintToChat(client, "%f", CurVelVec);
+		// PrintToChat(client, "%f %f %f", CurVelVec[0], CurVelVec[1], CurVelVec[2]);
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 		if (action[0] == 1 || action[0] == 5)
 		{
@@ -319,17 +482,17 @@ public void EndTouch(int client, int action[3])
 					// NoClip check
 					if (g_bNoClip[client] || (!g_bNoClip[client] && (GetGameTime() - g_fLastTimeNoClipUsed[client]) < 3.0))
 					{
-						PrintToChat(client, " %cSurfTimer %c| You are noclipping or have noclipped recently, timer disabled.", LIMEGREEN, WHITE);
+						PrintToChat(client, " %cSurftimer %c| You are noclipping or have noclipped recently, timer disabled.", LIMEGREEN, WHITE);
 						ClientCommand(client, "play buttons\\button10.wav");
 						//fluffys
 						//ClientCommand(client, "sm_stuck");
 					}
 					else
 					{
-						if(g_bhasStages && g_bSurfTimerEnabled[client])
+						if(g_bhasStages && g_bTimerEnabled[client])
 							CL_OnStartWrcpTimerPress(client); //fluffys only start stage timer if not in prac mode
 
-						if(g_bSurfTimerEnabled[client])
+						if(g_bTimerEnabled[client])
 							CL_OnStartTimerPress(client);
 					}
 
@@ -344,9 +507,26 @@ public void EndTouch(int client, int action[3])
 		//fluffys
 		else if(action[0] == 3) //fluffys stage
 		{
+			// targetname filters
+			if (StrEqual(g_szMapName, "surf_treespam") && g_Stage[g_iClientInZone[client][2]][client] == 4)
+			{
+				DispatchKeyValue(client, "targetname", "s4neutral");
+			}
+			else if (StrEqual(g_szMapName, "surf_looksmodern"))
+			{	
+				if (g_Stage[g_iClientInZone[client][2]][client] == 2)
+					DispatchKeyValue(client, "classname", "two_1");
+				else if (g_Stage[g_iClientInZone[client][2]][client] == 3)
+					DispatchKeyValue(client, "classname", "threer");
+				else if (g_Stage[g_iClientInZone[client][2]][client] == 4)
+					DispatchKeyValue(client, "classname", "four_1");
+				else if (g_Stage[g_iClientInZone[client][2]][client] == 5)
+					DispatchKeyValue(client, "classname", "five_1");
+			}
+
 			g_bInStageZone[client] = false;
 
-			if(!g_bPracticeMode[client] && g_bSurfTimerEnabled[client])
+			if(!g_bPracticeMode[client] && g_bTimerEnabled[client])
 			{
 				CL_OnStartWrcpTimerPress(client);
 			}
@@ -358,6 +538,11 @@ public void EndTouch(int client, int action[3])
 		else if (action[0] == 10) //fluffys noduck
 		{
 			g_bInDuck[client] = false;
+		}
+		else if (action[0] == 11) // MaxSpeed zone
+		{
+			g_bInMaxSpeed[client] = false;
+		//	PrintToChat(client, "Left MaxSpeed zone");
 		}
 
 		// Set client location
@@ -413,7 +598,7 @@ public void DrawBeamBox(int client)
 {
 	int zColor[4];
 	getZoneTeamColor(g_CurrentZoneTeam[client], zColor);
-	TE_SendBeamBoxToClient(client, g_Positions[client][1], g_Positions[client][0], g_BeamSprite, g_HaloSprite, 0, 30, 1.0, 5.0, 5.0, 2, 1.0, zColor, 0, 1);
+	TE_SendBeamBoxToClient(client, g_Positions[client][1], g_Positions[client][0], g_BeamSprite, g_HaloSprite, 0, 30, 1.0, 1.0, 1.0, 2, 0.0, zColor, 0, 1);
 	CreateTimer(1.0, BeamBox, client, TIMER_REPEAT);
 }
 
@@ -425,7 +610,7 @@ public Action BeamBox(Handle timer, any client)
 		{
 			int zColor[4];
 			getZoneTeamColor(g_CurrentZoneTeam[client], zColor);
-			TE_SendBeamBoxToClient(client, g_Positions[client][1], g_Positions[client][0], g_BeamSprite, g_HaloSprite, 0, 30, 1.0, 5.0, 5.0, 2, 1.0, zColor, 0, 1);
+			TE_SendBeamBoxToClient(client, g_Positions[client][1], g_Positions[client][0], g_BeamSprite, g_HaloSprite, 0, 30, 1.0, 1.0, 1.0, 2, 0.0, zColor, 0, 1);
 			return Plugin_Continue;
 		}
 	}
@@ -476,13 +661,13 @@ public Action BeamBoxAll(Handle timer, any data)
 			getZoneTeamColor(g_mapZones[i][Team], tzColor);
 			for (int p = 1; p <= MaxClients; p++)
 			{
-				if (!g_bShowZones[p])
+				if (!g_bShowZones[p] && g_Editing[p] == 0)
 				{
-					if (GetConVarInt(g_hZoneDisplayType) < 1)
+					//if (GetConVarInt(g_hZoneDisplayType) < 1)
 						continue;
 				}
 
-				if (IsValidClient(p))
+				if (IsValidClient(p) && g_bShowZones[p] || g_Editing[p] > 0)
 				{
 					if ( g_mapZones[i][Vis] == 2 ||  g_mapZones[i][Vis] == 3)
 					{
@@ -494,7 +679,7 @@ public Action BeamBoxAll(Handle timer, any data)
 								buffer_a[x] = g_mapZones[i][PointA][x];
 								buffer_b[x] = g_mapZones[i][PointB][x];
 							}
-							TE_SendBeamBoxToClient(p, buffer_a, buffer_b, g_BeamSprite, g_HaloSprite, 0, 30, GetConVarFloat(g_hChecker), 5.0, 5.0, 2, 1.0, tzColor, 0, 0, i);
+							TE_SendBeamBoxToClient(p, buffer_a, buffer_b, g_BeamSprite, g_HaloSprite, 0, 30, GetConVarFloat(g_hChecker), 1.0, 1.0, 2, 0.0, tzColor, 0, 0, i);
 						}
 					}
 					else
@@ -507,7 +692,7 @@ public Action BeamBoxAll(Handle timer, any data)
 								buffer_a[x] = g_mapZones[i][PointA][x];
 								buffer_b[x] = g_mapZones[i][PointB][x];
 							}
-							TE_SendBeamBoxToClient(p, buffer_a, buffer_b, g_BeamSprite, g_HaloSprite, 0, 30, GetConVarFloat(g_hChecker), 5.0, 5.0, 2, 1.0, zColor, 0, 0, i);
+							TE_SendBeamBoxToClient(p, buffer_a, buffer_b, g_BeamSprite, g_HaloSprite, 0, 30, GetConVarFloat(g_hChecker), 1.0, 1.0, 2, 0.0, zColor, 0, 0, i);
 						}
 					}
 				}
@@ -583,26 +768,66 @@ public void BeamBox_OnPlayerRunCmd(int client)
 			if (g_Editing[client] == 10)
 			{
 				TR_GetEndPosition(g_fBonusStartPos[client][1]);
-				TE_SendBeamBoxToClient(client, g_fBonusStartPos[client][1], g_fBonusStartPos[client][0], g_BeamSprite, g_HaloSprite, 0, 30, 0.1, 5.0, 5.0, 2, 1.0, zColor, 0, 1);
+				TE_SendBeamBoxToClient(client, g_fBonusStartPos[client][1], g_fBonusStartPos[client][0], g_BeamSprite, g_HaloSprite, 0, 30, 0.1, 1.0, 1.0, 2, 0.0, zColor, 0, 1);
 			}
 			else
 			{
 				TR_GetEndPosition(g_fBonusEndPos[client][1]);
-				TE_SendBeamBoxToClient(client, g_fBonusEndPos[client][1], g_fBonusEndPos[client][0], g_BeamSprite, g_HaloSprite, 0, 30, 0.1, 5.0, 5.0, 2, 1.0, zColor, 0, 1);
+				TE_SendBeamBoxToClient(client, g_fBonusEndPos[client][1], g_fBonusEndPos[client][0], g_BeamSprite, g_HaloSprite, 0, 30, 0.1, 1.0, 1.0, 2, 0.0, zColor, 0, 1);
 			}
 		}
 		else
-			TE_SendBeamBoxToClient(client, g_Positions[client][1], g_Positions[client][0], g_BeamSprite, g_HaloSprite, 0, 30, 0.1, 5.0, 5.0, 2, 1.0, zColor, 0, 1);
+			TE_SendBeamBoxToClient(client, g_Positions[client][1], g_Positions[client][0], g_BeamSprite, g_HaloSprite, 0, 30, 0.1, 1.0, 1.0, 2, 0.0, zColor, 0, 1);
+	}
+
+	if (g_iSelectedTrigger[client] > -1)
+	{
+		// come back
+		float position[3], fMins[3], fMaxs[3];
+		int zColor[4];
+		getZoneTeamColor(g_CurrentZoneTeam[client], zColor);
+
+		int iEnt = GetArrayCell(g_hTriggerMultiple, g_iSelectedTrigger[client]);
+
+		GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", position);
+		GetEntPropVector(iEnt, Prop_Send, "m_vecMins", fMins);
+		GetEntPropVector(iEnt, Prop_Send, "m_vecMaxs", fMaxs);
+
+		for (int j = 0; j < 3; j++)
+		{
+			fMins[j] = (fMins[j] + position[j]);
+		}
+
+		for (int j = 0; j < 3; j++)
+		{
+			fMaxs[j] = (fMaxs[j] + position[j]);
+		}
+
+		// for (int j = 0; j < 3; j++)
+		// {
+		// 	corners[0][j] = fMins[j];
+		// 	corners[7][j] = fMaxs[j];
+		// }
+
+		// for(int j = 1; j < 7; j++)
+		// {
+		// 	for(int k = 0; k < 3; k++)
+		// 	{
+		// 		corners[j][k] = corners[((j >> (2-k)) & 1) * 7][k];
+		// 	}
+		// }
+		//PrintToChat(client, "sending beam");
+		TE_SendBeamBoxToClient(client, fMins, fMaxs, g_BeamSprite, g_HaloSprite, 0, 30, 1.0, 1.0, 1.0, 2, 0.0, view_as<int>({255, 255, 0, 255}), 0, 1);
 	}
 }
 
 stock void TE_SendBeamBoxToClient(int client, float uppercorner[3], float bottomcorner[3], int ModelIndex, int HaloIndex, int StartFrame, int FrameRate, float Life, float Width, float EndWidth, int FadeLength, float Amplitude, const int Color[4], int Speed, int type, int zoneid = -1)
 {
 	//0 = Do not display zones, 1 = Display the lower edges of zones, 2 = Display whole zone
-	if (!IsValidClient(client) || GetConVarInt(g_hZoneDisplayType) < 1 && !g_bShowZones[client])
+	if (!IsValidClient(client) || GetConVarInt(g_hZoneDisplayType) < 1 && !g_bShowZones[client] && g_Editing[client] == 0 && g_iSelectedTrigger[client] == -1)
 		return;
 
-	if (GetConVarInt(g_hZoneDisplayType) > 1 || type == 1) // All sides
+	if (GetConVarInt(g_hZoneDisplayType) > 1 || type == 1 || g_bShowZones[client] || g_Editing[client] > 0 || g_iSelectedTrigger[client] > -1) // All sides
 	{
 		float corners[8][3];
 		if (zoneid == -1)
@@ -630,11 +855,11 @@ stock void TE_SendBeamBoxToClient(int client, float uppercorner[3], float bottom
 		// Send beams to client
 		// https://forums.alliedmods.net/showpost.php?p=2006539&postcount=8
 		for (int i = 0, i2 = 3; i2 >= 0; i+=i2--)
+	  {
+	    for(int j = 1; j <= 7; j += (j / 2) + 1)
 	    {
-	        for(int j = 1; j <= 7; j += (j / 2) + 1)
-	        {
-	            if(j != 7-i)
-	            {
+	      if(j != 7-i)
+	      {
 					TE_SetupBeamPoints(corners[i], corners[j], ModelIndex, HaloIndex, StartFrame, FrameRate, Life, Width, EndWidth, FadeLength, Amplitude, Color, Speed);
 					TE_SendToClient(client);
 				}
@@ -643,7 +868,7 @@ stock void TE_SendBeamBoxToClient(int client, float uppercorner[3], float bottom
 	}
 	else
 	{
-		if (GetConVarInt(g_hZoneDisplayType) == 1 && zoneid != -1 || g_bShowZones[client]) // Only bottom corners
+		if (GetConVarInt(g_hZoneDisplayType) == 1 && zoneid != -1 || g_bShowZones[client] || g_Editing[client] > 0 || g_iSelectedTrigger[client] > -1) // Only bottom corners
 		{
 			float corners[4][3], fTop[3];
 
@@ -695,10 +920,15 @@ stock void TE_SendBeamBoxToClient(int client, float uppercorner[3], float bottom
 			}
 
 			// lift a bit higher, so not under ground
-			corners[0][2] += 5.0;
-			corners[1][2] += 5.0;
-			corners[2][2] += 5.0;
-			corners[3][2] += 5.0;
+			// corners[0][2] += 5.0;
+			// corners[1][2] += 5.0;
+			// corners[2][2] += 5.0;
+			// corners[3][2] += 5.0;
+
+			corners[0][2] += 1.0;
+			corners[1][2] += 1.0;
+			corners[2][2] += 1.0;
+			corners[3][2] += 1.0;
 
 			for (int i = 0; i < 2; i++) // Connect main corners to the other corners
 			{
@@ -719,11 +949,11 @@ public void ZoneMenu(int client)
 	if (!IsValidClient(client))
 		return;
 
-	/*if (!(GetUserFlagBits(client) & g_ZoneMenuFlag) && !(GetUserFlagBits(client) & ADMFLAG_CUSTOM1))
+	if (!(GetUserFlagBits(client) & g_ZoneMenuFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT) && !g_bZoner[client])
 	{
-		PrintToChat(client, " %cSurfTimer %c| You don't have access to the zones menu.", LIMEGREEN, WHITE);
+		PrintToChat(client, " %cSurftimer %c| You don't have access to the zones menu.", LIMEGREEN, WHITE);
 		return;
-	}*/
+	}
 
 	resetSelection(client);
 	Menu ckZoneMenu = new Menu(Handle_ZoneMenu);
@@ -1019,7 +1249,7 @@ public void renameBonusGroup(int client)
 	if (!IsValidClient(client))
 		return;
 
-	PrintToChat(client, " %cSurfTimer %c| Please write the bonus name in chat or use %c!cancel%c to stop.", LIMEGREEN, WHITE, LIMEGREEN, WHITE);
+	PrintToChat(client, " %cSurftimer %c| Please write the bonus name in chat or use %c!cancel%c to stop.", LIMEGREEN, WHITE, LIMEGREEN, WHITE);
 	g_ClientRenamingZone[client] = true;
 }
 // Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
@@ -1156,7 +1386,7 @@ public int H_CreateBonusFirst(Handle tMenu, MenuAction action, int client, int i
 						return;
 
 					g_Editing[client] = 2;
-					PrintToChat(client, " %cSurfTimer %c| Bonus Start Zone Created", LIMEGREEN, WHITE);
+					PrintToChat(client, " %cSurftimer %c| Bonus Start Zone Created", LIMEGREEN, WHITE);
 					EndBonusZoneCreation(client);
 				}
 			}
@@ -1234,10 +1464,10 @@ public void SaveBonusZones(int client)
 		int id2 = g_mapZonesCount + 1;
 		db_insertZone(g_mapZonesCount, 1, 0, g_fBonusStartPos[client][0][0], g_fBonusStartPos[client][0][1], g_fBonusStartPos[client][0][2], g_fBonusStartPos[client][1][0], g_fBonusStartPos[client][1][1], g_fBonusStartPos[client][1][2], 0, 0, g_mapZoneGroupCount);
 		db_insertZone(id2, 2, 0, g_fBonusEndPos[client][0][0], g_fBonusEndPos[client][0][1], g_fBonusEndPos[client][0][2], g_fBonusEndPos[client][1][0], g_fBonusEndPos[client][1][1], g_fBonusEndPos[client][1][2], 0, 0, g_mapZoneGroupCount);
-		PrintToChat(client, " %cSurfTimer %c| Bonus Saved!", LIMEGREEN, WHITE);
+		PrintToChat(client, " %cSurftimer %c| Bonus Saved!", LIMEGREEN, WHITE);
 	}
 	else
-		PrintToChat(client, " %cSurfTimer %c| Failed to Save Bonus, error in coordinates", LIMEGREEN, WHITE);
+		PrintToChat(client, " %cSurftimer %c| Failed to Save Bonus, error in coordinates", LIMEGREEN, WHITE);
 
 	resetSelection(client);
 	ZoneMenu(client);
@@ -1375,6 +1605,7 @@ public void SelectMiscZoneType(int client)
 	//fluffys add antijump and antiduck zones to menu
 	SelectZoneMenu.AddItem("9", "AntiJump");
 	SelectZoneMenu.AddItem("10", "AntiDuck");
+	SelectZoneMenu.AddItem("11", "MaxSpeed");
 	SelectZoneMenu.AddItem("0", "Stop");
 
 	SelectZoneMenu.ExitButton = true;
@@ -1594,6 +1825,22 @@ public void EditorMenu(int client)
 				editMenu.AddItem("", "Visibility: CT");
 			}
 		}
+
+		char szTargetName[128];
+		if (g_mapZones[g_CurrentZoneType[client]][targetName] != 0)
+			Format(szTargetName, sizeof(szTargetName), "Target Name: %s", g_mapZones[g_CurrentZoneType[client]][targetName]);
+		else
+			Format(szTargetName, sizeof(szTargetName), "None");
+		editMenu.AddItem("", szTargetName);
+		
+		if (g_mapZones[g_CurrentZoneType[client]][oneJumpLimit] == 1)
+		{
+			editMenu.AddItem("", "Disable One Jump Limit");
+		}
+		else
+		{
+			editMenu.AddItem("", "Enable One Jump Limit");
+		}
 	}
 	editMenu.ExitButton = true;
 	editMenu.Display(client, MENU_TIME_FOREVER);
@@ -1645,6 +1892,7 @@ public int MenuHandler_Editor(Handle tMenu, MenuAction action, int client, int i
 					if (g_ClientSelectedZone[client] != -1)
 					{
 						db_deleteZone(client, g_mapZones[g_ClientSelectedZone[client]][zoneId]);
+						resetZone(g_ClientSelectedZone[client]);
 					}
 					resetSelection(client);
 					ZoneMenu(client);
@@ -1655,9 +1903,9 @@ public int MenuHandler_Editor(Handle tMenu, MenuAction action, int client, int i
 					if (g_ClientSelectedZone[client] != -1)
 					{
 						if (!g_bEditZoneType[client])
-							db_updateZone(g_mapZones[g_ClientSelectedZone[client]][zoneId], g_mapZones[g_ClientSelectedZone[client]][zoneType], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId], g_Positions[client][0], g_Positions[client][1], g_CurrentZoneVis[client], g_CurrentZoneTeam[client], g_CurrentSelectedZoneGroup[client]);
+							db_updateZone(g_mapZones[g_ClientSelectedZone[client]][zoneId], g_mapZones[g_ClientSelectedZone[client]][zoneType], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId], g_Positions[client][0], g_Positions[client][1], g_CurrentZoneVis[client], g_CurrentZoneTeam[client], g_CurrentSelectedZoneGroup[client], g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit]);
 						else
-							db_updateZone(g_mapZones[g_ClientSelectedZone[client]][zoneId], g_CurrentZoneType[client], g_CurrentZoneTypeId[client], g_Positions[client][0], g_Positions[client][1], g_CurrentZoneVis[client], g_CurrentZoneTeam[client], g_CurrentSelectedZoneGroup[client]);
+							db_updateZone(g_mapZones[g_ClientSelectedZone[client]][zoneId], g_CurrentZoneType[client], g_CurrentZoneTypeId[client], g_Positions[client][0], g_Positions[client][1], g_CurrentZoneVis[client], g_CurrentZoneTeam[client], g_CurrentSelectedZoneGroup[client], g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit]);
 						g_bEditZoneType[client] = false;
 					}
 					else
@@ -1681,7 +1929,7 @@ public int MenuHandler_Editor(Handle tMenu, MenuAction action, int client, int i
 				{
 					// Teleport
 					float ZonePos[3];
-					ckSurf_StopTimer(client);
+					surftimer_StopTimer(client);
 					AddVectors(g_Positions[client][0], g_Positions[client][1], ZonePos);
 					ZonePos[0] = FloatDiv(ZonePos[0], 2.0);
 					ZonePos[1] = FloatDiv(ZonePos[1], 2.0);
@@ -1718,6 +1966,19 @@ public int MenuHandler_Editor(Handle tMenu, MenuAction action, int client, int i
 							PrintToChat(client, "%t", "ZoneVisInv", LIMEGREEN, WHITE);
 						}
 					}
+					EditorMenu(client);
+				}
+				case 9:
+				{
+					// Set Target Name
+				}
+				case 10:
+				{
+					if (g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit] == 1)
+						g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit] = 0;
+					else
+						g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit] = 1;
+					
 					EditorMenu(client);
 				}
 			}
@@ -1939,4 +2200,17 @@ stock void RemoveZones()
 			AcceptEntityInput(i, "Kill");
 		}
 	}
+}
+
+void resetZone(int zoneIndex)
+{
+	g_mapZones[zoneIndex][zoneId] = -1;
+	g_mapZones[zoneIndex][PointA] = -1.0;
+	g_mapZones[zoneIndex][PointB] = -1.0;
+	g_mapZones[zoneIndex][zoneType] = -1;
+	g_mapZones[zoneIndex][zoneTypeId] = -1;
+	g_mapZones[zoneIndex][zoneName] = 0;
+	g_mapZones[zoneIndex][Vis] = 0;
+	g_mapZones[zoneIndex][Team] = 0;
+	g_mapZones[zoneIndex][zoneGroup] = 0;
 }

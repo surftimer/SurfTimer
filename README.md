@@ -1,16 +1,20 @@
-# SurfTimer v2.00 CS:GO
+# SurfTimer v2.01 CS:GO
 
 ## Backstory
 
 This is a CS:GO timer which is heavily modified from ckSurf, the original developer (Jonitaikaponi) has quit working on it, I decided to use this a opportunity to learn SourcePawn, I didn't want to release this yet as a lot of things are hard coded and very messy, but events occurred and well, here it is.
 
-Keep in mind this version of my timer is a older version and has a lot of issues, so perhaps you should look to <a href="https://github.com/nikooo777/ckSurf">Nikos</a> or <a href="https://github.com/marcowmadeira/ckSurf">Marcos</a> fork of ckSurf instead. I may look into releasing the updated version once I feel like it's ready to be released.
+Keep in mind this is my own version of ckSurf, a lot of things are hard coded so perhaps you should look to <a href="https://github.com/nikooo777/ckSurf">Nikos</a> or <a href="https://github.com/marcowmadeira/ckSurf">Marcos</a> fork of ckSurf instead.
 
 ## Requirements
 
 * Sourcemod 1.8
 * MySQL (SQLite may work but is not supported by me)
 * DHooks (Included)
+* The following dependencies are required for the discord functionality, I will make these things optional in the future, sorry
+* Sourcemod-Discord (Included)
+* <a href="https://forums.alliedmods.net/showthread.php?t=229556">SteamWorks</a>
+* <a href="https://forums.alliedmods.net/showthread.php?t=184604">SMJansson</a>
 
 ## Installation
 

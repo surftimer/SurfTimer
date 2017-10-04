@@ -5,8 +5,7 @@ public void setMapSettings()
   SetConVarFloat(g_hBonusPreSpeed, g_fBonusPreSpeed, true, true);
   SetConVarFloat(g_hMaxVelocity, g_fMaxVelocity, true, true);
   SetConVarFloat(g_hAnnounceRecord, g_fAnnounceRecord, true, true);
-
-  return;
+  SetConVarBool(g_hGravityFix, g_bGravityFix, true, true);
 }
 
 public Action Command_SetStartPreSpeed(int client, int args)
@@ -14,7 +13,7 @@ public Action Command_SetStartPreSpeed(int client, int args)
   if (!IsValidClient(client))
   return Plugin_Handled;
 
-  if(!g_bZoner[client] && !CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+  if (!CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
     return Plugin_Handled;
 
   char arg[128];
@@ -36,7 +35,7 @@ public Action Command_SetBonusPreSpeed(int client, int args)
   if (!IsValidClient(client))
   return Plugin_Handled;
 
-  if(!g_bZoner[client] && !CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+  if (!CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
     return Plugin_Handled;
 
   char arg[128];
@@ -58,14 +57,14 @@ public Action Command_SetStagePreSpeed(int client, int args)
   if (!IsValidClient(client))
   return Plugin_Handled;
 
-  if(!g_bZoner[client] && !CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+  if (!CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
     return Plugin_Handled;
 
   char arg1[128];
   char arg2[128];
   if(args == 0)
   {
-    PrintToChat(client, " %cSurfTimer %c| Usage: sm_stageps [#stage/prespeed] [prespeed]", LIMEGREEN, WHITE);
+    PrintToChat(client, " %cSurftimer %c| Usage: sm_stageps [#stage/prespeed] [prespeed]", LIMEGREEN, WHITE);
     return Plugin_Handled;
   }
 
@@ -78,18 +77,18 @@ public Action Command_SetStagePreSpeed(int client, int args)
 
     if(stageSelect > g_TotalStages || stageSelect < 2)
     {
-      PrintToChat(client, " %cSurfTimer %c| Invalid stage", LIMEGREEN, WHITE);
+      PrintToChat(client, " %cSurftimer %c| Invalid stage", LIMEGREEN, WHITE);
       return Plugin_Handled;
     }
 
     GetCmdArg(2, arg2, 128);
     db_updateStageMapSettings(client, arg2, stageSelect);
-    PrintToChatAll(" %cSurfTimer %c| Stage %i prespeed changed to %c%s", LIMEGREEN, WHITE, stageSelect, LIMEGREEN, arg2);
+    PrintToChatAll(" %cSurftimer %c| Stage %i prespeed changed to %c%s", LIMEGREEN, WHITE, stageSelect, LIMEGREEN, arg2);
   }
   else
   {
     db_updateStageMapSettings(client, arg1, 0);
-    PrintToChatAll(" %cSurfTimer %c| All stages prespeed changed to %c%s", LIMEGREEN, WHITE, LIMEGREEN, arg1);
+    PrintToChatAll(" %cSurftimer %c| All stages prespeed changed to %c%s", LIMEGREEN, WHITE, LIMEGREEN, arg1);
   }
 
   return Plugin_Handled;
@@ -100,7 +99,7 @@ public Action Command_SetMaxVelocity(int client, int args)
   if (!IsValidClient(client))
   return Plugin_Handled;
 
-  if(!g_bZoner[client] && !CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+  if (!CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
     return Plugin_Handled;
 
   char arg[128];
@@ -123,83 +122,45 @@ public Action Command_SetAnnounceRecord(int client, int args)
   if (!IsValidClient(client))
   return Plugin_Handled;
 
-  if(!g_bZoner[client] && !CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+  if (!CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
     return Plugin_Handled;
 
   char arg[128];
   if(args == 0)
   {
-    PrintToChat(client, "Current Announce Record: %f (0 = All Finishes, 1 = PB Only, 2 = SR Only)", g_fAnnounceRecord);
+    PrintToChat(client, "Current Announce Record: %f (0 = All Finishes, 1 = PB Only, 2 = WR Only)", g_fAnnounceRecord);
     return Plugin_Handled;
   }
 
   GetCmdArg(1, arg, 128);
   g_iMapSettingType[client] = 4;
   db_updateMapSettings(client, arg);
-  PrintToChat(client, "(0 = All Finishes, 1 = PB Only, 2 = SR Only)");
+  PrintToChat(client, "(0 = All Finishes, 1 = PB Only, 2 = WR Only)");
 
   return Plugin_Handled;
 }
 
-public Action Command_AntiBhopMap(int client, int args)
+public Action Command_SetGravityFix(int client, int args)
 {
   if (!IsValidClient(client))
-  return Plugin_Handled;
-
-  if(!g_bZoner[client] && !CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
     return Plugin_Handled;
 
-  char arg[128];
-  if(args == 0)
+  if (!CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+    return Plugin_Handled;
+
+  if (args == 0)
   {
-    if (g_bAntiBhopMap)
-      PrintToChat(client, " %cSurfTimer %c| AntiBhop on the %cMain Map %cis %cenabled", LIMEGREEN, WHITE, DARKBLUE, WHITE, GREEN);
+    if (g_bGravityFix)
+      ReplyToCommand(client, " %cSurftimer %c| Usage: sm_gravityfix <0/1> (0 Disabled, 1 Enabled) (Gravity Fix currently %cenabled%c)", LIMEGREEN, WHITE, GREEN, WHITE);
     else
-      PrintToChat(client, " %cSurfTimer %c| AntiBhop on the %cMain Map %cis %cdisabled", LIMEGREEN, WHITE, DARKBLUE, WHITE, DARKRED);
+      ReplyToCommand(client, " %cSurftimer %c| Usage: sm_gravityfix <0/1> (0 Disabled, 1 Enabled) (Gravity Fix currently %cdisabled%c)", LIMEGREEN, WHITE, DARKRED, WHITE);
 
     return Plugin_Handled;
   }
 
+  char arg[128];
   GetCmdArg(1, arg, 128);
   g_iMapSettingType[client] = 5;
-
-  if (g_bAntiBhopMap)
-    PrintToChatAll(" %cSurfTimer %c| AntiBhop on the %cMain Map %chas been %cdisabled", LIMEGREEN, WHITE, DARKBLUE, WHITE, DARKRED);
-  else
-    PrintToChatAll(" %cSurfTimer %c| AntiBhop on the %cMain Map %chas been %cenabled", LIMEGREEN, WHITE, DARKBLUE, WHITE, GREEN);
-
-  db_updateMapSettings(client, arg);
-
-  return Plugin_Handled;
-}
-
-public Action Command_AntiBhopBonus(int client, int args)
-{
-  if (!IsValidClient(client))
-  return Plugin_Handled;
-
-  if(!g_bZoner[client] && !CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
-    return Plugin_Handled;
-
-  char arg[128];
-  if(args == 0)
-  {
-    if (g_bAntiBhopBonus)
-      PrintToChat(client, " %cSurfTimer %c| AntiBhop on the %cBonus %cis %cenabled", LIMEGREEN, WHITE, ORANGE, WHITE, GREEN);
-    else
-      PrintToChat(client, " %cSurfTimer %c| AntiBhop on the %cBonus %cis %cdisabled", LIMEGREEN, WHITE, ORANGE, WHITE, DARKRED);
-
-    return Plugin_Handled;
-  }
-
-  GetCmdArg(1, arg, 128);
-  g_iMapSettingType[client] = 6;
-
-  if (g_bAntiBhopBonus)
-    PrintToChatAll(" %cSurfTimer %c| AntiBhop on the %cBonus %chas been %cdisabled", LIMEGREEN, WHITE, ORANGE, WHITE, DARKRED);
-  else
-    PrintToChatAll(" %cSurfTimer %c| AntiBhop on the %cBonus %chas been %cenabled", LIMEGREEN, WHITE, ORANGE, WHITE, GREEN);
-
   db_updateMapSettings(client, arg);
 
   return Plugin_Handled;
@@ -208,7 +169,7 @@ public Action Command_AntiBhopBonus(int client, int args)
 public void db_viewMapSettings()
 {
   char szQuery[2048];
-  Format(szQuery, 2048, "SELECT `mapname`, `startprespeed`, `bonusprespeed`, `stageprespeed2`, `stageprespeed3`, `stageprespeed4`, `stageprespeed5`, `stageprespeed6`, `stageprespeed7`, `stageprespeed8`, `stageprespeed9`, `stageprespeed10`, `stageprespeed11`, `stageprespeed12`, `stageprespeed13`, `stageprespeed14`, `stageprespeed15`, `stageprespeed16`, `stageprespeed17`, `stageprespeed18`, `stageprespeed19`, `stageprespeed20`, `stageprespeed21`, `stageprespeed22`, `stageprespeed23`, `stageprespeed24`, `stageprespeed25`, `stageprespeed26`, `stageprespeed27`, `stageprespeed28`, `stageprespeed29`, `stageprespeed30`, `stageprespeed31`, `stageprespeed32`, `stageprespeed33`, `stageprespeed34`, `stageprespeed35`, `maxvelocity`, `announcerecord`, `antibhopmap`, `antibhopbonus` FROM `ck_mapsettings` WHERE `mapname` = '%s'", g_szMapName);
+  Format(szQuery, 2048, "SELECT `mapname`, `startprespeed`, `bonusprespeed`, `stageprespeed2`, `stageprespeed3`, `stageprespeed4`, `stageprespeed5`, `stageprespeed6`, `stageprespeed7`, `stageprespeed8`, `stageprespeed9`, `stageprespeed10`, `stageprespeed11`, `stageprespeed12`, `stageprespeed13`, `stageprespeed14`, `stageprespeed15`, `stageprespeed16`, `stageprespeed17`, `stageprespeed18`, `stageprespeed19`, `stageprespeed20`, `stageprespeed21`, `stageprespeed22`, `stageprespeed23`, `stageprespeed24`, `stageprespeed25`, `stageprespeed26`, `stageprespeed27`, `stageprespeed28`, `stageprespeed29`, `stageprespeed30`, `stageprespeed31`, `stageprespeed32`, `stageprespeed33`, `stageprespeed34`, `stageprespeed35`, `maxvelocity`, `announcerecord`, `gravityfix` FROM `ck_mapsettings` WHERE `mapname` = '%s'", g_szMapName);
   SQL_TQuery(g_hDb, sql_viewMapSettingsCallback, szQuery, DBPrio_Low);
 }
 
@@ -216,7 +177,7 @@ public void sql_viewMapSettingsCallback(Handle owner, Handle hndl, const char[] 
 {
   if (hndl == null)
   {
-    LogError("[SurfTimer] SQL Error (sql_viewMapSettingsCallback): %s", error);
+    LogError("[surftimer] SQL Error (sql_viewMapSettingsCallback): %s", error);
   }
 
   if (SQL_HasResultSet(hndl) && SQL_GetRowCount(hndl) > 0)
@@ -235,18 +196,7 @@ public void sql_viewMapSettingsCallback(Handle owner, Handle hndl, const char[] 
 
       g_fMaxVelocity = SQL_FetchFloat(hndl, 37);
       g_fAnnounceRecord = SQL_FetchFloat(hndl, 38);
-      int antibhopmap = SQL_FetchInt(hndl, 39);
-      int antibhopbonus = SQL_FetchInt(hndl, 40);
-
-      if(antibhopmap == 1)
-        g_bAntiBhopMap = true;
-      else
-        g_bAntiBhopMap = false;
-
-      if(antibhopbonus == 1)
-        g_bAntiBhopBonus = true;
-      else
-        g_bAntiBhopBonus = false;
+      g_bGravityFix = view_as<bool>(SQL_FetchInt(hndl, 39));
     }
     setMapSettings();
   }
@@ -262,7 +212,7 @@ public void sql_insertMapSettingsCallback(Handle owner, Handle hndl, const char[
 {
   if (hndl == null)
   {
-    LogError("[SurfTimer] SQL Error (sql_insertMapSettingsCallback): %s", error);
+    LogError("[surftimer] SQL Error (sql_insertMapSettingsCallback): %s", error);
   }
 
   db_viewMapSettings();
@@ -280,9 +230,7 @@ public void db_updateMapSettings(int client, char[] arg)
   else if (g_iMapSettingType[client] == 4)
     Format(szQuery, 512, "UPDATE `ck_mapsettings` SET `announcerecord` = '%s' WHERE `mapname` = '%s'", arg, g_szMapName);
   else if (g_iMapSettingType[client] == 5)
-    Format(szQuery, 512, "UPDATE `ck_mapsettings` SET `antibhopmap` = %s WHERE `mapname` = '%s'", arg, g_szMapName);
-  else if (g_iMapSettingType[client] == 6)
-    Format(szQuery, 512, "UPDATE `ck_mapsettings` SET `antibhopbonus` = %s WHERE `mapname` = '%s'", arg, g_szMapName);
+    Format(szQuery, 512, "UPDATE `ck_mapsettings` SET `gravityfix` = %s WHERE `mapname` = '%s'", arg, g_szMapName);
 
 
   SQL_TQuery(g_hDb, sql_insertMapSettingsCallback, szQuery, DBPrio_Low);

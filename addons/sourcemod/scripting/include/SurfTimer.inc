@@ -1,7 +1,7 @@
-#if defined _CKSurf_included
+#if defined _surftimer_included
  #endinput
 #endif
-#define _CKSurf_included
+#define _surftimer_included
 
 /* Natives */
 
@@ -9,9 +9,9 @@
  * Checks clients timer status
  *
  * @param client    Client's id
- * @return          True / False 
+ * @return          True / False
  */
-native bool:ckSurf_GetTimerStatus(client);
+native bool:surftimer_GetTimerStatus(client);
 
 /**
  * Stops client's timer.
@@ -19,7 +19,7 @@ native bool:ckSurf_GetTimerStatus(client);
  * @param client    Client's id
  * @return          No return
  */
-native ckSurf_StopTimer(client);
+native surftimer_StopTimer(client);
 
 /**
  * Starts client's timer
@@ -27,7 +27,7 @@ native ckSurf_StopTimer(client);
  * @param client    Client's id
  * @return          No return
  */
-native ckSurf_EmulateStartButtonPress(client);
+native surftimer_EmulateStartButtonPress(client);
 
 /**
  * Finishes a client's run.
@@ -35,7 +35,7 @@ native ckSurf_EmulateStartButtonPress(client);
  * @param client    Client's id
  * @return          No return
  */
-native ckSurf_EmulateStopButtonPress(client);
+native surftimer_EmulateStopButtonPress(client);
 
 /**
  * Get client's current runtime.
@@ -43,7 +43,7 @@ native ckSurf_EmulateStopButtonPress(client);
  * @param client     Client's id
  * @return           Client's curren runtime as a float.
  */
-native Float:ckSurf_GetCurrentTime(client);
+native Float:surftimer_GetCurrentTime(client);
 
 /**
  * Checks if the client has VIP status
@@ -51,7 +51,7 @@ native Float:ckSurf_GetCurrentTime(client);
  * @param client     Client's id
  * @return           True / False
  */
-native bool:ckSurf_ClientIsVIP(client);
+native bool:surftimer_ClientIsVIP(client);
 
 /**
  * Gets the server rank of a client
@@ -59,7 +59,7 @@ native bool:ckSurf_ClientIsVIP(client);
  * @param client     Client's id
  * @return           Server rank as an int
  */
-native ckSurf_GetServerRank(client);
+native surftimer_GetServerRank(client);
 
 /**
  * Safely teleports the client. Does not trigger end touches
@@ -72,7 +72,7 @@ native ckSurf_GetServerRank(client);
  * @param bStopTimer 		Stop the client's timer, default false
  * @return           true on success / false on failure
  */
-native bool:ckSurf_SafeTeleport(client, Float:fDestination[3], Float:fAngle[3], Float:fVelocity[3], bool:bStopTimer = false);
+native bool:surftimer_SafeTeleport(client, Float:fDestination[3], Float:fAngle[3], Float:fVelocity[3], bool:bStopTimer = false);
 
 /*
 		FORWARDS
@@ -84,7 +84,7 @@ native bool:ckSurf_SafeTeleport(client, Float:fDestination[3], Float:fAngle[3], 
  * @param client     Player index.
  * @return           Plugin_Handled; to stop the player from searching.
  */
-forward Action:ckSurf_OnMapFinished(client, Float:fRunTime, String:sRunTime[54], rank, total);
+forward Action:surftimer_OnMapFinished(client, Float:fRunTime, String:sRunTime[54], rank, total);
 
 /**
  * Called when a player finishes a bonus
@@ -92,7 +92,7 @@ forward Action:ckSurf_OnMapFinished(client, Float:fRunTime, String:sRunTime[54],
  * @param client     Player index.
  * @return           Plugin_Handled; to stop the player from searching.
  */
-forward Action:ckSurf_OnBonusFinished(client, Float:fRunTime, String:sRunTime[54], rank, total, bonusid);
+forward Action:surftimer_OnBonusFinished(client, Float:fRunTime, String:sRunTime[54], rank, total, bonusid);
 
 /**
  * Called when a player finishes a map in practice mode
@@ -100,13 +100,13 @@ forward Action:ckSurf_OnBonusFinished(client, Float:fRunTime, String:sRunTime[54
  * @param client     Player index.
  * @return           Plugin_Handled; to stop the player from searching.
  */
- forward Action:ckSurf_OnPracticeFinished(client, Float:fRunTime, String:sRunTime[54]);
+ forward Action:surftimer_OnPracticeFinished(client, Float:fRunTime, String:sRunTime[54]);
 
 
-public SharedPlugin:__pl_ckSurf =
+public SharedPlugin:__pl_surftimer =
 {
-	name = "ckSurf",
-	file = "ckSurf.smx",
+	name = "surftimer",
+	file = "surftimer.smx",
 	#if defined REQUIRE_PLUGIN
 	required = 1,
 	#else
@@ -114,14 +114,14 @@ public SharedPlugin:__pl_ckSurf =
 	#endif
 };
 
-public __pl_ckSurf_SetNTVOptional()
+public __pl_surftimer_SetNTVOptional()
 {
-	MarkNativeAsOptional("ckSurf_GetTimerStatus");
-	MarkNativeAsOptional("ckSurf_StopTimer");
-	MarkNativeAsOptional("ckSurf_EmulateStartButtonPress");	
-	MarkNativeAsOptional("ckSurf_EmulateStopButtonPress");
-	MarkNativeAsOptional("ckSurf_GetCurrentTime");
-	MarkNativeAsOptional("ckSurf_ClientIsVIP");
-	MarkNativeAsOptional("ckSurf_GetServerRank");
-	MarkNativeAsOptional("ckSurf_SafeTeleport");
+	MarkNativeAsOptional("surftimer_GetTimerStatus");
+	MarkNativeAsOptional("surftimer_StopTimer");
+	MarkNativeAsOptional("surftimer_EmulateStartButtonPress");
+	MarkNativeAsOptional("surftimer_EmulateStopButtonPress");
+	MarkNativeAsOptional("surftimer_GetCurrentTime");
+	MarkNativeAsOptional("surftimer_ClientIsVIP");
+	MarkNativeAsOptional("surftimer_GetServerRank");
+	MarkNativeAsOptional("surftimer_SafeTeleport");
 }

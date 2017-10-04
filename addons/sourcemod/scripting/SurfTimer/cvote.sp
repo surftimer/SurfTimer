@@ -37,7 +37,7 @@ public Action start_vote(int client, int args)
   }
   else if (args < 1)
   {
-    PrintToChat(client, " %cSurfTimer%c | Usage: sm_cvote <extend, changemap, setnextmap> <mapname>", LIMEGREEN, WHITE);
+    PrintToChat(client, " %cSurftimer %c| Usage: sm_cvote <extend, changemap, setnextmap> <mapname>", LIMEGREEN, WHITE);
   }
 
   GetCmdArg(1, votetype, sizeof(votetype));
@@ -54,11 +54,11 @@ public Action start_vote(int client, int args)
     AddMenuItem(menu, "no", "No");
     SetMenuExitButton(menu, false);
     VoteMenuToAll(menu, 20);
-    CPrintToChatAll(" %cSurfTimer%c | Vote to Extend started by %c%s", LIMEGREEN, WHITE, LIMEGREEN, szPlayerName);
+    CPrintToChatAll(" %cSurftimer %c| Vote to Extend started by %c%s", LIMEGREEN, WHITE, LIMEGREEN, szPlayerName);
   }
   else if(strcmp(votetype, "changemap", false) == 0 && strcmp(mapnameforvote, "", false) == 0)
   {
-    PrintToChat(client, " %cSurfTimer%c | Usage: sm_cvote <changemap> <mapname>", LIMEGREEN, WHITE);
+    PrintToChat(client, " %cSurftimer %c| Usage: sm_cvote <changemap> <mapname>", LIMEGREEN, WHITE);
   }
   else if(strcmp(votetype, "changemap", false) == 0)
   {
@@ -68,11 +68,11 @@ public Action start_vote(int client, int args)
     AddMenuItem(menu, "no", "No");
     SetMenuExitButton(menu, false);
     VoteMenuToAll(menu, 20);
-    CPrintToChatAll(" %cSurfTimer%c | Vote to change map to %c%s started by %c%s", LIMEGREEN, WHITE, BLUE, mapnameforvote, LIMEGREEN, szPlayerName);
+    CPrintToChatAll(" %cSurftimer %c| Vote to change map to %c%s started by %c%s", LIMEGREEN, WHITE, BLUE, mapnameforvote, LIMEGREEN, szPlayerName);
   }
   else if(strcmp(votetype, "setnextmap", false) == 0 && strcmp(mapnameforvote, "", false) == 0)
   {
-    PrintToChat(client, " %cSurfTimer%c | Usage: sm_cvote <setnextmap> <mapname>", LIMEGREEN, WHITE);
+    PrintToChat(client, " %cSurftimer %c| Usage: sm_cvote <setnextmap> <mapname>", LIMEGREEN, WHITE);
   }
   else if(strcmp(votetype, "setnextmap", false) == 0)
   {
@@ -82,7 +82,7 @@ public Action start_vote(int client, int args)
     AddMenuItem(menu, "no", "No");
     SetMenuExitButton(menu, false);
     VoteMenuToAll(menu, 20);
-    CPrintToChatAll(" %cSurfTimer%c | Vote to set next map to %c%s started by %c%s", LIMEGREEN, WHITE, BLUE, mapnameforvote, LIMEGREEN, szPlayerName);
+    CPrintToChatAll(" %cSurftimer %c| Vote to set next map to %c%s started by %c%s", LIMEGREEN, WHITE, BLUE, mapnameforvote, LIMEGREEN, szPlayerName);
   }
   return Plugin_Handled;
 }
@@ -120,12 +120,12 @@ public int Handle_VoteMenuExtend(Menu menu, MenuAction action, int param1, int p
     /* 0=yes, 1=no */
     if ((strcmp(item, VOTE_YES) == 0 && FloatCompare(percent,limit) < 0 && param1 == 0) || (strcmp(item, VOTE_NO) == 0 && param1 == 1))
     {
-      PrintToChatAll(" %cSurfTimer %c| Vote failed. %i%c vote required. (Received %i%c of %i votes)", LIMEGREEN, WHITE, RoundToNearest(100.0*limit), PERCENT, RoundToNearest(100.0*percent), PERCENT, totalVotes);
+      PrintToChatAll(" %cSurftimer %c| Vote failed. %i%c vote required. (Received %i%c of %i votes)", LIMEGREEN, WHITE, RoundToNearest(100.0*limit), PERCENT, RoundToNearest(100.0*percent), PERCENT, totalVotes);
     }
     else
     {
-      PrintToChatAll(" %cSurfTimer %c| Vote successful. (Received %i%c of %i votes)", LIMEGREEN, WHITE, RoundToNearest(100.0*percent), PERCENT, totalVotes);
-      PrintToChatAll(" %cSurfTimer%c | Extending map by 10 minutes.", LIMEGREEN, WHITE);
+      PrintToChatAll(" %cSurftimer %c| Vote successful. (Received %i%c of %i votes)", LIMEGREEN, WHITE, RoundToNearest(100.0*percent), PERCENT, totalVotes);
+      PrintToChatAll(" %cSurftimer %c| Extending map by 10 minutes.", LIMEGREEN, WHITE);
       extendMap(600);
     }
   }
@@ -142,12 +142,12 @@ public int Handle_VoteMenuChangeMap(Menu menu, MenuAction action, int param1, in
     /* 0=yes, 1=no */
     if (param1 == 0) // yes
     {
-      CreateTimer(5.0, Change_Map);
+      CreateTimer(5.0, Change_Map, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
       PrintToChatAll("[SM] Changing map to %s.", mapnameforvote);
     }
     else // No
     {
-      PrintToChatAll(" %cSurfTimer%c | Vote failed.", LIMEGREEN, WHITE);
+      PrintToChatAll(" %cSurftimer %c| Vote failed.", LIMEGREEN, WHITE);
     }
   }
 }

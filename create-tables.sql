@@ -1,3 +1,12 @@
+CREATE TABLE `ck_announcements` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `server` varchar(256) NOT NULL DEFAULT 'Beginner',
+ `name` varchar(32) NOT NULL,
+ `mapname` varchar(128) NOT NULL,
+ `time` varchar(32) NOT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1446 DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `ck_bonus` (
   `steamid` varchar(32) NOT NULL DEFAULT '',
   `name` varchar(32) DEFAULT NULL,
@@ -51,17 +60,6 @@ CREATE TABLE IF NOT EXISTS `ck_checkpoints` (
   PRIMARY KEY (`steamid`,`mapname`,`zonegroup`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `ck_comments` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `report_id` int(11) NOT NULL,
-  `steam_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `comment` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS `ck_latestrecords` (
   `steamid` varchar(32) NOT NULL DEFAULT '',
   `name` varchar(32) DEFAULT NULL,
@@ -111,9 +109,7 @@ CREATE TABLE `ck_mapsettings` (
  `stageprespeed35` float NOT NULL DEFAULT '350',
  `maxvelocity` float NOT NULL DEFAULT '3500',
  `announcerecord` float NOT NULL DEFAULT '0',
- `gravityfix` int(11) NOT NULL DEFAULT '1',
- `antibhopmap` int(11) NOT NULL DEFAULT '0',
- `antibhopbonus` int(11) NOT NULL DEFAULT '0',
+ `gravityfix` int(11) NOT NULL DEFAULT '1'
  PRIMARY KEY (`mapname`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -133,35 +129,62 @@ CREATE TABLE IF NOT EXISTS `ck_maptier` (
   PRIMARY KEY (`mapname`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `ck_playeroptions` (
-  `steamid` varchar(32) NOT NULL DEFAULT '',
-  `speedmeter` int(12) DEFAULT '0',
-  `quake_sounds` int(12) DEFAULT '1',
-  `autobhop` int(12) DEFAULT '0',
-  `shownames` int(12) DEFAULT '1',
-  `goto` int(12) DEFAULT '1',
-  `showtime` int(12) DEFAULT '1',
-  `hideplayers` int(12) DEFAULT '0',
-  `showspecs` int(12) DEFAULT '1',
-  `knife` varchar(32) DEFAULT 'weapon_knife',
-  `new1` int(12) DEFAULT '0',
-  `new2` int(12) DEFAULT '0',
-  `new3` int(12) DEFAULT '0',
-  `checkpoints` int(12) DEFAULT '1',
-  `surftimer` int(11) NOT NULL DEFAULT '1',
-  `gradient` int(11) NOT NULL DEFAULT '2',
-  PRIMARY KEY (`steamid`)
+CREATE TABLE `ck_playeroptions2` (
+ `steamid` varchar(32) NOT NULL DEFAULT '',
+ `timer` int(11) NOT NULL DEFAULT '1',
+ `hide` int(11) NOT NULL DEFAULT '0',
+ `sounds` int(11) NOT NULL DEFAULT '1',
+ `chat` int(11) NOT NULL DEFAULT '0',
+ `viewmodel` int(11) NOT NULL DEFAULT '1',
+ `autobhop` int(11) NOT NULL DEFAULT '1',
+ `checkpoints` int(11) NOT NULL DEFAULT '1',
+ `gradient` int(11) NOT NULL DEFAULT '3',
+ `speedmode` int(11) NOT NULL DEFAULT '0',
+ `centrespeed` int(11) NOT NULL DEFAULT '0',
+ `centrehud` int(11) NOT NULL DEFAULT '1',
+ `module1c` int(11) NOT NULL DEFAULT '1',
+ `module2c` int(11) NOT NULL DEFAULT '2',
+ `module3c` int(11) NOT NULL DEFAULT '3',
+ `module4c` int(11) NOT NULL DEFAULT '4',
+ `module5c` int(11) NOT NULL DEFAULT '5',
+ `module6c` int(11) NOT NULL DEFAULT '6',
+ `sidehud` int(11) NOT NULL DEFAULT '1',
+ `module1s` int(11) NOT NULL DEFAULT '5',
+ `module2s` int(11) NOT NULL DEFAULT '0',
+ `module3s` int(11) NOT NULL DEFAULT '0',
+ `module4s` int(11) NOT NULL DEFAULT '0',
+ `module5s` int(11) NOT NULL DEFAULT '0',
+ PRIMARY KEY (`steamid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `ck_playerrank` (
-  `steamid` varchar(32) NOT NULL DEFAULT '',
-  `name` varchar(32) DEFAULT NULL,
-  `country` varchar(32) DEFAULT NULL,
-  `points` int(12) DEFAULT '0',
-  `finishedmaps` int(12) DEFAULT '0',
-  `finishedmapspro` int(12) DEFAULT '0',
-  `lastseen` date DEFAULT NULL,
-  PRIMARY KEY (`steamid`)
+CREATE TABLE `ck_playerrank` (
+ `steamid` varchar(32) NOT NULL DEFAULT '',
+ `steamid64` varchar(64) DEFAULT NULL,
+ `name` varchar(32) DEFAULT NULL,
+ `country` varchar(32) DEFAULT NULL,
+ `points` int(12) DEFAULT '0',
+ `wrpoints` int(12) NOT NULL DEFAULT '0',
+ `wrbpoints` int(12) NOT NULL DEFAULT '0',
+ `top10points` int(12) NOT NULL DEFAULT '0',
+ `groupspoints` int(12) NOT NULL DEFAULT '0',
+ `mappoints` int(11) NOT NULL DEFAULT '0',
+ `bonuspoints` int(12) NOT NULL DEFAULT '0',
+ `finishedmaps` int(12) DEFAULT '0',
+ `finishedmapspro` int(12) DEFAULT '0',
+ `finishedbonuses` int(12) NOT NULL DEFAULT '0',
+ `finishedstages` int(12) NOT NULL DEFAULT '0',
+ `wrs` int(12) NOT NULL DEFAULT '0',
+ `wrbs` int(12) NOT NULL DEFAULT '0',
+ `wrcps` int(12) NOT NULL DEFAULT '0',
+ `top10s` int(12) NOT NULL DEFAULT '0',
+ `groups` int(12) NOT NULL DEFAULT '0',
+ `lastseen` int(64) DEFAULT NULL,
+ `joined` int(64) NOT NULL,
+ `timealive` int(64) NOT NULL DEFAULT '0',
+ `timespec` int(64) NOT NULL DEFAULT '0',
+ `connections` int(64) NOT NULL DEFAULT '1',
+ `readchangelog` int(11) NOT NULL DEFAULT '0',
+ PRIMARY KEY (`steamid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `ck_playertemp` (
@@ -190,28 +213,6 @@ CREATE TABLE IF NOT EXISTS `ck_playertimes` (
   KEY `maprank` (`mapname`,`runtimepro`,`style`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `ck_playertotaltime` (
-  `name` varchar(64) NOT NULL,
-  `steamid` varchar(64) NOT NULL,
-  `time_played` int(64) NOT NULL,
-  UNIQUE KEY `steamid` (`steamid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `ck_reports` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `steamid` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `mapname` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `report` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` int(11) NOT NULL DEFAULT '0',
-  `open` int(11) NOT NULL DEFAULT '1',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
-  `closer_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS `ck_spawnlocations` (
   `mapname` varchar(54) NOT NULL,
   `pos_x` float NOT NULL,
@@ -228,21 +229,22 @@ CREATE TABLE IF NOT EXISTS `ck_spawnlocations` (
   PRIMARY KEY (`mapname`,`zonegroup`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `ck_titles` (
-  `titleid` int(12) DEFAULT NULL,
-  `titlename` varchar(64) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `ck_vipadmins` (
-  `steamid` varchar(32) NOT NULL DEFAULT '',
-  `title` varchar(128) DEFAULT '0',
-  `namecolour` int(11) DEFAULT '0',
-  `textcolour` int(11) NOT NULL DEFAULT '0',
-  `inuse` int(11) DEFAULT '0',
-  `vip` int(11) DEFAULT '0',
-  `admin` int(11) DEFAULT '0',
-  `zoner` int(11) DEFAULT '0',
-  PRIMARY KEY (`steamid`)
+CREATE TABLE `ck_vipadmins` (
+ `steamid` varchar(32) NOT NULL DEFAULT '',
+ `title` varchar(128) DEFAULT '0',
+ `namecolour` int(11) DEFAULT '0',
+ `textcolour` int(11) NOT NULL DEFAULT '0',
+ `joinmsg` varchar(255) DEFAULT 'none',
+ `pbsound` varchar(256) NOT NULL DEFAULT 'none',
+ `topsound` varchar(256) NOT NULL DEFAULT 'none',
+ `wrsound` varchar(256) NOT NULL DEFAULT 'none',
+ `inuse` int(11) DEFAULT '0',
+ `vip` int(11) DEFAULT '0',
+ `admin` int(11) NOT NULL DEFAULT '0',
+ `zoner` int(11) NOT NULL DEFAULT '0',
+ `active` int(11) NOT NULL DEFAULT '1',
+ PRIMARY KEY (`steamid`),
+ KEY `vip` (`steamid`,`vip`,`admin`,`zoner`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `ck_wrcps` (
@@ -256,20 +258,23 @@ CREATE TABLE IF NOT EXISTS `ck_wrcps` (
   KEY `stagerank` (`mapname`,`runtimepro`,`stage`,`style`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `ck_zones` (
-  `mapname` varchar(54) NOT NULL,
-  `zoneid` int(12) NOT NULL DEFAULT '-1',
-  `zonetype` int(12) DEFAULT '-1',
-  `zonetypeid` int(12) DEFAULT '-1',
-  `pointa_x` float DEFAULT '-1',
-  `pointa_y` float DEFAULT '-1',
-  `pointa_z` float DEFAULT '-1',
-  `pointb_x` float DEFAULT '-1',
-  `pointb_y` float DEFAULT '-1',
-  `pointb_z` float DEFAULT '-1',
-  `vis` int(12) DEFAULT '0',
-  `team` int(12) DEFAULT '0',
-  `zonegroup` int(11) NOT NULL DEFAULT '0',
-  `zonename` varchar(128) DEFAULT NULL,
-  PRIMARY KEY (`mapname`,`zoneid`)
+CREATE TABLE `ck_zones` (
+ `mapname` varchar(54) NOT NULL,
+ `zoneid` int(12) NOT NULL DEFAULT '-1',
+ `zonetype` int(12) DEFAULT '-1',
+ `zonetypeid` int(12) DEFAULT '-1',
+ `pointa_x` float DEFAULT '-1',
+ `pointa_y` float DEFAULT '-1',
+ `pointa_z` float DEFAULT '-1',
+ `pointb_x` float DEFAULT '-1',
+ `pointb_y` float DEFAULT '-1',
+ `pointb_z` float DEFAULT '-1',
+ `vis` int(12) DEFAULT '0',
+ `team` int(12) DEFAULT '0',
+ `zonegroup` int(11) NOT NULL DEFAULT '0',
+ `zonename` varchar(128) DEFAULT NULL,
+ `hookname` varchar(128) DEFAULT 'None',
+ `targetname` varchar(128) DEFAULT 'player',
+ `onejumplimit` int(12) NOT NULL DEFAULT '1',
+ PRIMARY KEY (`mapname`,`zoneid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

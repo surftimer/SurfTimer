@@ -5,10 +5,13 @@ public Action ColorMenu(int client, int args)
 		return Plugin_Handled;
 	}
 
-	if (g_iVipLvl[client] > 1)
-		PaintColourMenu(client);
-	else
-		ReplyToCommand(client, " %cSurfTimer %c| This is a SuperVIP feature", LIMEGREEN, WHITE);
+	if (g_iVipLvl[client] < 2)
+	{
+		PrintToChat(client, " %cSurftimer %c| This is a SuperVIP feature", LIMEGREEN, WHITE);
+		return Plugin_Handled;
+	}
+
+	PaintColourMenu(client);
 
 	return Plugin_Handled;
 }
@@ -60,8 +63,13 @@ public Action StartDraw(int client, int args)
 		return Plugin_Handled;
 	}
 
-	if (g_iVipLvl[client] >= 2)
-		bPaintMode[client] = true;
+	if (g_iVipLvl[client] < 2)
+	{
+		ReplyToCommand(client, " %cSurftimer %c| You do not have access to this commnad", LIMEGREEN, WHITE);
+		return Plugin_Handled;
+	}
+
+	bPaintMode[client] = true;
 
 	return Plugin_Handled;
 }
@@ -70,12 +78,15 @@ public Action EndDraw(int client, int args)
 {
 	if (!IsClientInGame(client))
 	{
-		ReplyToCommand(client, " %cSurfTimer %c| You do not have access to this commnad", LIMEGREEN, WHITE);
 		return Plugin_Handled;
 	}
 
-	if (g_iVipLvl[client] >= 2)
-		bPaintMode[client] = false;
+	if (g_iVipLvl[client] < 2)
+	{
+		return Plugin_Handled;
+	}
+
+	bPaintMode[client] = false;
 
 	return Plugin_Handled;
 }
@@ -137,7 +148,7 @@ public int MenuHandle_ChooseColor(Menu menu, MenuAction action, int param1, int 
 			char sID[12]; char sDisplay[64];
 			GetMenuItem(menu, param2, sID, sizeof(sID), _, sDisplay, sizeof(sDisplay));
 			iChosenColor[param1] = StringToInt(sID);
-			PrintToChat(param1, " %cSurfTimer%c | You've chosen the colour %s", MOSSGREEN, WHITE, sDisplay);
+			PrintToChat(param1, " %cSurftimer %c| You've chosen the colour %s", MOSSGREEN, WHITE, sDisplay);
 		}
 		case MenuAction_End:
 		{

@@ -47,13 +47,10 @@ public Action SetPlayerWeapons(Handle timer, any client)
 		StripAllWeapons(client);
 		if (!IsFakeClient(client))
 			GivePlayerItem(client, "weapon_usp_silencer");
-		if (!g_bStartWithUsp[client])
-		{
-			int weapon;
-			weapon = GetPlayerWeaponSlot(client, 2);
-			if (weapon != -1 && !IsFakeClient(client))
-				SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
-		}
+		int weapon;
+		weapon = GetPlayerWeaponSlot(client, 2);
+		if (weapon != -1 && !IsFakeClient(client))
+			SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
 	}
 
 	return Plugin_Handled;
@@ -133,7 +130,6 @@ public Action CKTimer1(Handle timer)
 			}
 			else
 				CenterHudDead(client);
-
 		}
 	}
 	return Plugin_Continue;
@@ -144,8 +140,13 @@ public Action DelayedStuff(Handle timer)
 	if (FileExists("cfg/sourcemod/surftimer/main.cfg"))
 		ServerCommand("exec sourcemod/surftimer/main.cfg");
 	else
-		SetFailState("<SurfTimer> cfg/sourcemod/surftimer/main.cfg not found.");
+		SetFailState("<surftimer> cfg/sourcemod/surftimer/main.cfg not found.");
 
+	return Plugin_Handled;
+}
+
+public Action LoadReplaysTimer (Handle timer)
+{
 	LoadReplays();
 	LoadInfoBot();
 	return Plugin_Handled;
@@ -187,9 +188,19 @@ public Action CKTimer2(Handle timer)
 						g_bRoundEnd = true;
 						ServerCommand("mp_ignore_round_win_conditions 0");
 						PrintToChatAll("%t", "TimeleftCounter", LIMEGREEN, WHITE, BLUE, g_szMapName, WHITE, MOSSGREEN, 1, WHITE);
+						char szNextMap[128];
+						GetNextMap(szNextMap, 128);
+						PrintToChatAll(" %cSurftimer %c| Nextmap: %s", LIMEGREEN, WHITE, szNextMap);
 						CreateTimer(1.0, TerminateRoundTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 					}
 				}
+			}
+
+			if (timeleft == 60 || timeleft == 30 || timeleft == 15)
+			{
+				char szNextMap[128];
+				GetNextMap(szNextMap, 128);
+				PrintToChatAll(" %cSurftimer %c| Nextmap: %c%s", LIMEGREEN, WHITE, BLUE, szNextMap);
 			}
 		}
 	}
@@ -235,7 +246,10 @@ public Action CKTimer2(Handle timer)
 		if (IsPlayerAlive(i))
 		{
 			//spec hud
-			SpecListMenuAlive(i);
+			if (g_bSpecListOnly[i])
+				SpecListMenuAlive(i);
+			else if (g_bSideHud[i])
+				SideHudAlive(i);
 
 			//Last Cords & Angles
 			GetClientAbsOrigin(i, g_fPlayerCordsLastPosition[i]);
@@ -344,6 +358,11 @@ public Action SetClanTag(Handle timer, any client)
 public Action TerminateRoundTimer(Handle timer)
 {
 	CS_TerminateRound(1.0, CSRoundEnd_CTWin, true);
+	for (int i = 0; i <= MaxClients; i++)
+	{
+		if (IsValidClient(i) && !IsFakeClient(i))
+			ForcePlayerSuicide(i);
+	}
 	return Plugin_Handled;
 }
 
@@ -492,23 +511,73 @@ public Action Block2Load(Handle timer, any client)
 	ServerCommand("sm plugins load block2");
 }
 
-public Action ReportRateLimitTimer(Handle timer, any client)
-{
-  g_bReportRateLimited[client] = false;
-  return;
-}
-
 // Replay Bot Fixes
 
 public Action FixBot_Off(Handle timer)
 {
 	ServerCommand("ck_replay_bot 0");
 	ServerCommand("ck_bonus_bot 0");
+	ServerCommand("ck_wrcp_bot 0");
+	return Plugin_Handled;
 }
 
 public Action FixBot_On(Handle timer)
 {
 	ServerCommand("ck_replay_bot 1");
 	ServerCommand("ck_bonus_bot 1");
-	CPrintToChatAll(" %cSurfTimer %c| Replay bots fixed", LIMEGREEN, WHITE);
+	ServerCommand("ck_wrcp_bot 1");
+	return Plugin_Handled;
+}
+
+public Action PlayTimeTimer(Handle timer)
+{
+	for(int i = 1; i <= MaxClients; i++)
+	{
+		if (IsValidClient(i) && !IsFakeClient(i) && IsClientInGame(i))
+		{
+			int team = GetClientTeam(i);
+
+			if(team == 2 || team == 3)
+			{
+				g_iPlayTimeAliveSession[i]++;
+			}
+			else
+			{
+				g_iPlayTimeSpecSession[i]++;
+			}
+		}
+	}
+}
+
+public Action AnnouncementTimer(Handle timer)
+{
+	if (g_bHasLatestID)
+		db_checkAnnouncements();
+
+	return Plugin_Continue;
+}
+
+public Action CenterSpeedDisplayTimer(Handle timer, any client)
+{
+	if (IsValidClient(client) && !IsFakeClient(client) && g_bCenterSpeedDisplay[client])
+	{
+		char szSpeed[128];
+		if (IsPlayerAlive(client))
+			Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
+		else if (g_SpecTarget[client] != -1)
+			Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[g_SpecTarget[client]]));
+
+		ShowHudText(client, 2, szSpeed);
+	}
+	else
+		return Plugin_Stop;
+
+	return Plugin_Continue;
+}
+
+public Action EnableJoinMsgs(Handle timer)
+{
+	g_bEnableJoinMsgs = true;
+
+	return Plugin_Handled;
 }
