@@ -18,6 +18,9 @@ Keep in mind this version of my timer is a older version and has a lot of issues
 * Upload all the files to your csgo server directory
 * Add a MySQL database called `surftimer` to `csgo/addons/sourcemod/configs/databases.cfg`
 
+## Stripper
+* I have uploaded my stripper files <a href="https://github.com/fluffyst/skillsurf-csgo">here</a>
+
 ## Credits
 
 * Jonitaikaponi - Original ckSurf creator
