@@ -717,16 +717,33 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	{
 		if(!g_bInStartZone[client] && !g_bInStageZone[client])
 		{
-			if(buttons & IN_MOVELEFT)
+			if (!GetConVarBool(g_hSidewaysBlockKeys))
 			{
-				g_iCurrentStyle[client] = 0;
-				PrintToChat(client, " %cSurftimer %c| Style set to %cNormal%c, A used.", LIMEGREEN, WHITE, GREEN, WHITE);
-			}
+				if(buttons & IN_MOVELEFT)
+				{
+					g_iCurrentStyle[client] = 0;
+					PrintToChat(client, " %cSurftimer %c| Style set to %cNormal%c, A used.", LIMEGREEN, WHITE, GREEN, WHITE);
+				}
 
-			if(buttons & IN_MOVERIGHT)
+				if(buttons & IN_MOVERIGHT)
+				{
+					g_iCurrentStyle[client] = 0;
+					PrintToChat(client, " %cSurftimer %c| Style set to %cNormal%c, D used.", LIMEGREEN, WHITE, GREEN, WHITE);
+				}
+			}
+			else
 			{
-				g_iCurrentStyle[client] = 0;
-				PrintToChat(client, " %cSurftimer %c| Style set to %cNormal%c, D used.", LIMEGREEN, WHITE, GREEN, WHITE);
+				if (buttons & IN_MOVELEFT)
+				{
+					vel[1] = 0.0;
+					buttons &= ~IN_MOVELEFT;
+				}
+
+				if (buttons & IN_MOVERIGHT)
+				{
+					vel[1] = 0.0;
+					buttons &= ~IN_MOVERIGHT;
+				}
 			}
 		}
 	}

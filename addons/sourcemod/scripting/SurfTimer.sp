@@ -91,10 +91,10 @@ The original version of this timer was by jonitaikaponi
 #define TOP10_RELATIVE_SOUND_PATH "*surftimer/top10/valve_logo_music.mp3"
 #define PR_FULL_SOUND_PATH "sound/surftimer/pr/valve_logo_music.mp3"
 #define PR_RELATIVE_SOUND_PATH "*surftimer/pr/valve_logo_music.mp3"
-#define WRCP_FULL_SOUND_PATH "sound/custom/wow_fast.mp3"
-#define WRCP_RELATIVE_SOUND_PATH "*custom/wow_fast.mp3"
-#define DISCOTIME_FULL_SOUND_PATH "sound/custom/discotime.mp3"
-#define DISCOTIME_RELATIVE_SOUND_PATH "*/custom/discotime.mp3"
+#define WRCP_FULL_SOUND_PATH "sound/surftimer/wow_fast.mp3"
+#define WRCP_RELATIVE_SOUND_PATH "*surftimer/wow_fast.mp3"
+#define DISCOTIME_FULL_SOUND_PATH "sound/surftimer/discotime.mp3"
+#define DISCOTIME_RELATIVE_SOUND_PATH "*/surftimer/discotime.mp3"
 #define MAX_STYLES 7
 
 #define VOTE_NO "###no###"
@@ -646,6 +646,7 @@ ConVar g_hRecordAnnounce = null; // Enable/Disable cross-server announcements
 ConVar g_hRecordAnnounceDiscord = null; // Web hook link to announce records to discord
 ConVar g_hReportBugsDiscord = null; // Web hook link to report bugs to discord
 ConVar g_hCalladminDiscord = null; // Web hook link to allow players to call admin to discord
+ConVar g_hSidewaysBlockKeys = null;
 
 /*----------  SQL Variables  ----------*/
 Handle g_hDb = null; 											// SQL driver
@@ -2519,7 +2520,9 @@ public void OnPluginStart()
 
 	g_hReportBugsDiscord = CreateConVar("ck_report_discord", "", "Web hook link to report bugs to discord, keep empty to disable");
 
-	g_hCalladminDiscord = CreateConVar("ck_calladmin_discord", "Web hook link to allow players to call admin to discord, keep empty to disable");
+	g_hCalladminDiscord = CreateConVar("ck_calladmin_discord", "", "Web hook link to allow players to call admin to discord, keep empty to disable");
+
+	g_hSidewaysBlockKeys = CreateConVar("ck_sideways_block_keys", "0", "Changes the functionality of sideways, 1 will block keys, 0 will change the clients style to normal if not surfing sideways");
 
 	// Server Name
 	g_hHostName = FindConVar("hostname");

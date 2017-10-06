@@ -332,8 +332,9 @@ public Action SetClanTag(Handle timer, any client)
 	}
 	SetPlayerRank(client);
 
-	/*if (GetConVarBool(g_hCountry))
+	if (GetConVarBool(g_hCountry))
 	{
+		char tag[154];
 		Format(tag, 154, "%s | %s", g_szCountryCode[client], g_pr_rankname[client]);
 		CS_SetClientClanTag(client, tag);
 	}
@@ -341,11 +342,11 @@ public Action SetClanTag(Handle timer, any client)
 	{
 		if (GetConVarBool(g_hPointSystem) || ((StrEqual(g_pr_rankname[client], "ADMIN", false)) && GetConVarBool(g_hAdminClantag)))
 			CS_SetClientClanTag(client, g_pr_rankname[client]);
-	}*/
+	}
 
 	//fluffys
-	if (GetConVarBool(g_hPointSystem) || ((StrEqual(g_pr_rankname[client], "ADMIN", false)) && GetConVarBool(g_hAdminClantag)))
-		CS_SetClientClanTag(client, g_pr_rankname[client]);
+	// if (GetConVarBool(g_hPointSystem) || ((StrEqual(g_pr_rankname[client], "ADMIN", false)) && GetConVarBool(g_hAdminClantag)))
+	// 	CS_SetClientClanTag(client, g_pr_rankname[client]);
 
 	//new rank
 	if (oldrank && GetConVarBool(g_hPointSystem))
