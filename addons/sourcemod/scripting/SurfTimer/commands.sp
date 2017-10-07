@@ -4698,7 +4698,7 @@ public Action Command_Startpos(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	if (g_bTimerEnabled[client] == true)
+	if (g_bTimerEnabled[client])
 		Startpos(client);
 	else 
 		ReplyToCommand(client, " %cSurftimer %c| Your timer must be enabled to use %c!startpos", LIMEGREEN, WHITE, GREEN);
@@ -4711,7 +4711,7 @@ public Action Command_ResetStartpos(int client, int args)
 	if(!IsValidClient(client))
 		return Plugin_Handled;
 
-	g_bStartposUsed[client][g_iClientInZone[client][0]] = false;
+	g_bStartposUsed[client][g_iClientInZone[client][2]] = false;
 	ReplyToCommand(client, " %cSurftimer %c| Start position reset", LIMEGREEN, WHITE);
 
 	return Plugin_Handled;
@@ -4721,9 +4721,9 @@ public void Startpos(int client)
 {
 	if (IsPlayerAlive(client) && g_iClientInZone[client][0] == 1 && GetEntityFlags(client) & FL_ONGROUND)
 	{
-		GetClientAbsOrigin(client, g_fStartposLocation[client][g_iClientInZone[client][0]]);
-		GetClientEyeAngles(client, g_fStartposAngle[client][g_iClientInZone[client][0]]);
-		g_bStartposUsed[client][g_iClientInZone[client][0]] = true;
+		GetClientAbsOrigin(client, g_fStartposLocation[client][g_iClientInZone[client][2]]);
+		GetClientEyeAngles(client, g_fStartposAngle[client][g_iClientInZone[client][2]]);
+		g_bStartposUsed[client][g_iClientInZone[client][2]] = true;
 		PrintToChat(client, " %cSurftimer %c| New start position saved", MOSSGREEN, WHITE);
 	}
 	else

@@ -920,9 +920,9 @@ bool g_bShowTriggers[MAXPLAYERS + 1];
 int g_Offset_m_fEffects = -1;
 
 /*--------- !startpos Goose-----------*/
-float g_fStartposLocation[MAXPLAYERS + 1][MAXZONES][3];
-float g_fStartposAngle[MAXPLAYERS + 1][MAXZONES][3];
-bool g_bStartposUsed[MAXPLAYERS + 1][MAXZONES];
+float g_fStartposLocation[MAXPLAYERS + 1][MAXZONEGROUPS][3];
+float g_fStartposAngle[MAXPLAYERS + 1][MAXZONEGROUPS][3];
+bool g_bStartposUsed[MAXPLAYERS + 1][MAXZONEGROUPS];
 
 // Strafe Sync (Taken from shavit's bhop timer)
 int g_iGoodGains[MAXPLAYERS + 1];
