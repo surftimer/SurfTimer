@@ -185,19 +185,20 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 
 	// Check for spawn locations
 	int realZone;
-	if (zone == -1)
+	if (zone < 0)
 		realZone = 0;
 	else
 		realZone = zone;
 
-	if (g_bStartposUsed[client][realZone])
+	if (g_bStartposUsed[client][zonegroup])
 	{
 		if (GetClientTeam(client) == 1 || GetClientTeam(client) == 0) // Spectating
 		{
 			if (stopTime)
 				Client_Stop(client, 0);
 
-			Array_Copy(g_fSpawnLocation[zonegroup][realZone], g_fStartposLocation[client][realZone], 3);
+			Array_Copy(g_fStartposLocation[client][zonegroup], g_fTeleLocation[client], 3);
+			//Array_Copy(g_fSpawnLocation[zonegroup][realZone], g_fStartposLocation[client][zonegroup], 3);
 
 			g_specToStage[client] = true;
 			g_bRespawnPosition[client] = false;
@@ -214,7 +215,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 			if (!StrEqual(g_mapZones[zId][hookName], "None"))
 				g_iTeleportingZoneId[client] = zId;
 
-			teleportEntitySafe(client, g_fStartposLocation[client][zone], g_fStartposAngle[client][zone], view_as<float>( { 0.0, 0.0, 0.0 } ), stopTime);
+			teleportEntitySafe(client, g_fStartposLocation[client][zonegroup], g_fStartposAngle[client][zonegroup], view_as<float>( { 0.0, 0.0, 0.0 } ), stopTime);
 
 			return;
 		}
@@ -1572,7 +1573,7 @@ public void SetClientDefaults(int client)
 	g_bShowTriggers[client] = false;
 
 	// Goose Start Pos
-	for (int i = 0; i < MAXZONES; i++)
+	for (int i = 0; i < MAXZONEGROUPS; i++)
 		g_bStartposUsed[client][i] = false;
 	
 	// Save loc
@@ -4651,7 +4652,7 @@ public void SendBugReport(int client)
 		return;
 
 	// Send Discord Announcement
-	DiscordWebHook hook = new DiscordWebHook("webhook");
+	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 	
 	hook.SetUsername("Surftimer Bugtracker");
