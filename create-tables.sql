@@ -225,7 +225,7 @@ CREATE TABLE IF NOT EXISTS `ck_spawnlocations` (
   `vel_y` float NOT NULL DEFAULT '0',
   `vel_z` float NOT NULL DEFAULT '0',
   `zonegroup` int(12) NOT NULL DEFAULT '0',
-  `stage` int(12) DEFAULT '0',
+  `stage` int(12) DEFAULT '1',
   PRIMARY KEY (`mapname`,`zonegroup`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
