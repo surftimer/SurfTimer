@@ -4652,7 +4652,7 @@ public void SendBugReport(int client)
 		return;
 
 	// Send Discord Announcement
-	DiscordWebHook hook = new DiscordWebHook("webhook");
+	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 	
 	hook.SetUsername("Surftimer Bugtracker");
