@@ -1244,6 +1244,10 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if (client == 0 && !IsPlayerAlive(client) && !IsClientObserver(client))
 		return Plugin_Continue;
+	
+	int zoneid = g_iClientInZone[client][3];
+	if (zoneid < 0)
+		zoneid = 0;
 
 	if (IsValidClient(client) && !IsFakeClient(client))
 	{
@@ -1252,7 +1256,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 		{
 			if (g_bInStartZone[client] || g_bInStageZone[client])
 			{
-				if (g_mapZones[g_iClientInZone[client][3]][oneJumpLimit] == 1)
+				if (g_mapZones[zoneid][oneJumpLimit] == 1)
 				{
 					if (!g_bJumpedInZone[client])
 					{
