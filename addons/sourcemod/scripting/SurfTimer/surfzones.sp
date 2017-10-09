@@ -163,7 +163,7 @@ public Action StartTouchTrigger(int caller, int activator)
 	action[2] = g_mapZones[id][zoneGroup];
 
 	// Hack fix to allow bonus zones to sit on top of start zones, e.g surf_aircontrol_ksf bonus 1
-	if (g_bInBonus[activator])
+	if (action[0] < 6 && g_bInBonus[activator])
 	{
 		if (action[2] != g_iInBonus[activator])
 			return Plugin_Handled;
