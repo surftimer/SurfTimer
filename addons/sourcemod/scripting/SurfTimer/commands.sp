@@ -1,18 +1,20 @@
 public Action sm_test(int client, int args)
 {
-	for (int i = 0; i < 3; i++)
-		PrintToChat(client, "g_mapZones[0][PointA][%i]: %f", i, g_mapZones[0][PointA][i]);
+	// for (int i = 0; i < 3; i++)
+	// 	PrintToChat(client, "g_mapZones[0][PointA][%i]: %f", i, g_mapZones[0][PointA][i]);
 
-	for (int i = 0; i < 3; i++)
-		PrintToChat(client, "g_mapZones[0][PointB][%i]: %f", i, g_mapZones[0][PointB][i]);
+	// for (int i = 0; i < 3; i++)
+	// 	PrintToChat(client, "g_mapZones[0][PointB][%i]: %f", i, g_mapZones[0][PointB][i]);
 	
-	for (int i = 0; i < 7; i++)
-	{
-		for (int j = 0; j < 3; j++)
-			PrintToChat(client, "g_fZoneCorners[0][%i][%i]: %f", i, j, g_fZoneCorners[0][i][j]);
-	}
+	// for (int i = 0; i < 7; i++)
+	// {
+	// 	for (int j = 0; j < 3; j++)
+	// 		PrintToChat(client, "g_fZoneCorners[0][%i][%i]: %f", i, j, g_fZoneCorners[0][i][j]);
+	// }
 
-	PrintToChat(client, "g_iSelectedTrigger[client]: %i", g_iSelectedTrigger[client]);
+	// PrintToChat(client, "g_iSelectedTrigger[client]: %i", g_iSelectedTrigger[client]);
+	
+	LoadDefaultTitle(client);
 
 	return Plugin_Handled;
 }

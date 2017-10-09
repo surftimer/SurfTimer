@@ -693,6 +693,10 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 
 		g_fTick[client][0] = GetGameTime();
 		LoadClientSetting(client, g_iSettingToLoad[client]);
+
+		// Check Enforced Tags
+		if (GetConVarInt(g_hEnforceDefaultTitles) > 0)
+			LoadDefaultTitle(client);
 	}
 }
 

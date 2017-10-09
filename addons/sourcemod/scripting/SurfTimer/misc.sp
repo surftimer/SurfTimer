@@ -1585,6 +1585,9 @@ public void SetClientDefaults(int client)
 
 	// surf_christmas2
 	g_bUsingStageTeleport[client] = false;
+
+	// Enforce Titles
+	g_bEnforceTitle[client] = false;
 }
 
 // public void clearPlayerCheckPoints(int client)
@@ -2732,16 +2735,28 @@ public void SetPlayerRank(int client)
 
 	int RankValue[SkillGroup];
 
-	//fluffys
-	if (!g_bDbCustomTitleInUse[client])
+	if (g_bEnforceTitle[client])
+	{
+		// g_hEnforceDefaultTitles - 0 = Disabled, 1 = Chat Only, 2 = Scoreboard Only, 3 = Both
+		if (GetConVarInt(g_hEnforceDefaultTitles) == 1 || GetConVarInt(g_hEnforceDefaultTitles) == 3)
+			Format(g_pr_chat_coloredrank[client], 256, g_szEnforcedTitle[client]);
+
+		if (GetConVarInt(g_hEnforceDefaultTitles) == 2 || GetConVarInt(g_hEnforceDefaultTitles) == 3)
+		{
+			char szTitle[256];
+			Format(szTitle, 256, g_szEnforcedTitle[client]);
+			parseColorsFromString(szTitle, 256);
+			Format(g_pr_rankname[client], 256, szTitle);
+		}
+
+		if (GetConVarInt(g_hEnforceDefaultTitles) == 0)
+			g_bEnforceTitle[client] = false;
+	}
+	else if (!g_bDbCustomTitleInUse[client])
 	{
 		// Player is not using a title
 		if (GetConVarBool(g_hPointSystem))
 		{
-			//GetArrayArray(g_hSkillGroups, index, RankValue[0]);
-
-			//Format(g_pr_rankname[client], 128, "%s", RankValue[RankName]);
-			//Format(g_pr_chat_coloredrank[client], 128, "%s%c", RankValue[RankNameColored], WHITE);
 			int rank = g_PlayerRank[client];
 			int points = g_pr_points[client];
 			getPlayerRank(client, rank, points);
@@ -2755,20 +2770,6 @@ public void SetPlayerRank(int client)
 		if (GetConVarBool(g_hPointSystem))
 		{
 			g_PlayerChatRank[client] = RankValue[NameColor];
-		}
-		//fluffys
-		//Format(g_pr_rankname[client], 128, "[%s]", g_szCustomTitleColoured[client]);
-		//Format(g_pr_chat_coloredrank[client], 128, "[%s%c]", g_szflagTitle_Colored[g_iTitleInUse[client]], WHITE);
-		//Format(g_pr_chat_coloredrank[client], 128, "[%s%c]", g_szCustomTitleColoured[client], WHITE);
-	}
-
-	// Admin Clantag
-	if (GetConVarBool(g_hAdminClantag))
-	{ if (GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)
-		{
-			Format(g_pr_chat_coloredrank[client], 128, "%s %cADMIN%c", g_pr_chat_coloredrank[client], LIMEGREEN, WHITE);
-			Format(g_pr_rankname[client], 128, "ADMIN");
-			return;
 		}
 	}
 }
@@ -2869,16 +2870,10 @@ stock Action PrintSpecMessageAll(int client)
 	for (int i = 1; i <= MaxClients; i++)
 		if (IsValidClient(i))
 		{
-			if (GetConVarBool(g_hCountry) && (GetConVarBool(g_hPointSystem) || ((StrEqual(g_pr_rankname[client], "ADMIN", false)) && GetConVarBool(g_hAdminClantag))))
-				PrintToConsole(i, "%s [%s] *SPEC* %s: %s", g_szCountryCode[client], g_pr_rankname[client], szName, szTextToAll);
+			if (GetConVarBool(g_hPointSystem))
+				PrintToConsole(i, "[%s] *SPEC* %s: %s", g_pr_rankname[client], szName, szTextToAll);
 			else
-				if (GetConVarBool(g_hPointSystem) || ((StrEqual(g_pr_rankname[client], "ADMIN", false)) && GetConVarBool(g_hAdminClantag)))
-					PrintToConsole(i, "[%s] *SPEC* %s: %s", g_szCountryCode[client], szName, szTextToAll);
-				else
-					if (GetConVarBool(g_hPointSystem))
-						PrintToConsole(i, "[%s] *SPEC* %s: %s", g_pr_rankname[client], szName, szTextToAll);
-					else
-						PrintToConsole(i, "*SPEC* %s: %s", szName, szTextToAll);
+				PrintToConsole(i, "*SPEC* %s: %s", szName, szTextToAll);
 		}
 	return Plugin_Handled;
 }
@@ -4714,4 +4709,45 @@ public void CallAdmin(int client, char[] sText)
 	delete hook;
 	
 	PrintToChat(client, " %cSurftimer %c| Report sent", LIMEGREEN, WHITE);
+}
+
+public void LoadDefaultTitle(int client)
+{
+	// Set Defaults
+	g_bEnforceTitle[client] = false;
+	Format(g_szEnforcedTitle[client], sizeof(g_szEnforcedTitle), "");
+
+	if (GetConVarInt(g_hEnforceDefaultTitles) > 0)
+	{
+		if (GetConVarInt(g_hEnforceDefaultTitles) < 3)
+			db_viewCustomTitles(client, g_szSteamID[client]);
+	}
+
+	char sPath[PLATFORM_MAX_PATH];
+	BuildPath(Path_SM, sPath, sizeof(sPath), "%s", DEFAULT_TITLES_PATH);
+	Handle kv = CreateKeyValues("Default Titles");
+	FileToKeyValues(kv, sPath);
+
+	if (!KvGotoFirstSubKey(kv))
+		return;
+
+	char szTitle[256];
+	char szSection[128];
+
+	do
+	{
+		KvGetSectionName(kv, szSection, sizeof(szSection));
+		KvGetString(kv, "title", szTitle, sizeof(szTitle));
+		int bit = ReadFlagString(szSection);
+
+		if (CheckCommandAccess(client, "", bit))
+		{
+			g_bEnforceTitle[client] = true;
+			Format(g_szEnforcedTitle[client], sizeof(g_szEnforcedTitle), szTitle);
+			CreateTimer(1.0, SetClanTag, client, TIMER_FLAG_NO_MAPCHANGE);
+			break;
+		}
+	} while (KvGotoNextKey(kv));
+
+	CloseHandle(kv);
 }

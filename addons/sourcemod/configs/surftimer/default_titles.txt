@@ -1,0 +1,11 @@
+"Default Titles"
+{
+  "z"
+  {
+    "title" "{default}[{darkred}Owner{default}]"
+  }
+  "b"
+  {
+    "title" "{default}[{green}Admin{default}]"
+  }
+}

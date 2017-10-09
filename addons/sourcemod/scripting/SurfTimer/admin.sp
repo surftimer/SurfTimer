@@ -316,13 +316,6 @@ public void ckAdminMenu(int client)
 	AddMenuItem(adminmenu, szTmp, szTmp);
 	menuItemNumber++;
 
-	if (GetConVarBool(g_hAdminClantag))
-		Format(szTmp, sizeof(szTmp), "[%i.] Admin clan tag  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Admin clan tag  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
 	if (GetConVarBool(g_hMapEnd))
 		Format(szTmp, sizeof(szTmp), "[%i.] Allow map changes  -  Enabled", menuItemNumber);
 	else
@@ -536,21 +529,13 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 
 			case 17:
 			{
-				if (!GetConVarBool(g_hAdminClantag))
-					ServerCommand("ck_admin_clantag 1");
-				else
-					ServerCommand("ck_admin_clantag 0");
-			}
-
-			case 18:
-			{
 				if (!GetConVarBool(g_hMapEnd))
 					ServerCommand("ck_map_end 1");
 				else
 					ServerCommand("ck_map_end 0");
 			}
 
-			case 19:
+			case 18:
 			{
 				if (!GetConVarBool(g_hConnectMsg))
 					ServerCommand("ck_connect_msg 1");
@@ -558,7 +543,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 					ServerCommand("ck_connect_msg 0");
 			}
 
-			case 20:
+			case 19:
 			{
 				if (!GetConVarBool(g_hDisconnectMsg))
 					ServerCommand("ck_disconnect_msg 1");
@@ -566,7 +551,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 					ServerCommand("ck_disconnect_msg 0");
 			}
 
-			case 21:
+			case 20:
 			{
 				if (!GetConVarBool(g_hInfoBot))
 					ServerCommand("ck_info_bot 1");
@@ -574,7 +559,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 					ServerCommand("ck_info_bot 0");
 			}
 
-			case 22:
+			case 21:
 			{
 				if (!GetConVarBool(g_hAttackSpamProtection))
 					ServerCommand("ck_attack_spam_protection 1");
@@ -582,7 +567,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 					ServerCommand("ck_attack_spam_protection 0");
 			}
 
-			case 23:
+			case 22:
 			{
 				if (!GetConVarBool(g_hAllowRoundEndCvar))
 					ServerCommand("ck_round_end 1");

@@ -81,6 +81,7 @@ The original version of this timer was by jonitaikaponi
 #define CP_RELATIVE_SOUND_PATH "*quake/wickedsick.mp3"
 #define UNSTOPPABLE_SOUND_PATH "sound/quake/unstoppable.mp3"
 #define UNSTOPPABLE_RELATIVE_SOUND_PATH "*quake/unstoppable.mp3"
+#define DEFAULT_TITLES_PATH "configs/surftimer/default_titles.txt"
 
 //fluffys
 #define WR_FULL_SOUND_PATH "sound/surftimer/wr/1/valve_logo_music.mp3"
@@ -596,7 +597,6 @@ ConVar g_hPauseServerside = null; 								// Allow !pause?
 ConVar g_hAutoBhopConVar = null; 								// Allow autobhop?
 bool g_bAutoBhop;
 ConVar g_hDynamicTimelimit = null; 								// Dynamic timelimit?
-ConVar g_hAdminClantag = null;									// Admin clan tag?
 ConVar g_hConnectMsg = null; 									// Connect message?
 ConVar g_hDisconnectMsg = null; 								// Disconnect message?
 ConVar g_hRadioCommands = null; 								// Allow radio commands?
@@ -647,6 +647,7 @@ ConVar g_hRecordAnnounceDiscord = null; // Web hook link to announce records to 
 ConVar g_hReportBugsDiscord = null; // Web hook link to report bugs to discord
 ConVar g_hCalladminDiscord = null; // Web hook link to allow players to call admin to discord
 ConVar g_hSidewaysBlockKeys = null;
+ConVar g_hEnforceDefaultTitles = null;
 
 /*----------  SQL Variables  ----------*/
 Handle g_hDb = null; 											// SQL driver
@@ -966,6 +967,10 @@ bool g_bUsingStageTeleport[MAXPLAYERS + 1];
 
 // Footsteps
 ConVar g_hFootsteps = null;
+
+// Enforced Titles
+bool g_bEnforceTitle[MAXPLAYERS + 1];
+char g_szEnforcedTitle[MAXPLAYERS + 1][512];
 
 /*=========================================
 =            Predefined arrays            =
@@ -1907,21 +1912,6 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 			}
 		}
 	}
-	else if (convar == g_hAdminClantag)
-	{
-		if (GetConVarBool(g_hAdminClantag))
-		{
-			for (int i = 1; i <= MaxClients; i++)
-				if (IsValidClient(i))
-					CreateTimer(0.0, SetClanTag, i, TIMER_FLAG_NO_MAPCHANGE);
-		}
-		else
-		{
-			for (int i = 1; i <= MaxClients; i++)
-				if (IsValidClient(i))
-					CreateTimer(0.0, SetClanTag, i, TIMER_FLAG_NO_MAPCHANGE);
-		}
-	}
 	else if (convar == g_hAutoRespawn)
 	{
 		if (GetConVarBool(g_hAutoRespawn))
@@ -2241,20 +2231,6 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 		else
 			g_AdminMenuFlag = FlagToBit(flag);
 	}
-	// else if (convar == g_hCustomTitlesFlag) 
-	// {
-	// 	AdminFlag flag;
-	// 	bool validFlag;
-	// 	validFlag = FindFlagByChar(newValue[0], flag);
-
-	// 	if (!validFlag)
-	// 	{
-	// 		PrintToServer("Surftimer | Invalid flag for ck_customtitles_flag");
-	// 		g_CustomTitlesFlag = ADMFLAG_GENERIC;
-	// 	}
-	// 	else
-	// 		g_CustomTitlesFlag = FlagToBit(flag);
-	// }
 	else if (convar == g_hServerType)
 	{
 		if (GetConVarInt(g_hServerType) == 1) // Bhop
@@ -2267,6 +2243,14 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 	else if (convar == g_hHostName)
 	{
 		GetConVarString(g_hHostName, g_sServerName, sizeof(g_sServerName));
+	}
+	else if (convar == g_hEnforceDefaultTitles)
+	{
+		for (int i = 1; i < MaxClients; i++)
+		{
+			if (IsValidClient(i) && !IsFakeClient(i))
+				LoadDefaultTitle(i);
+		}
 	}
 
 	if (g_hZoneTimer != INVALID_HANDLE)
@@ -2383,8 +2367,6 @@ public void OnPluginStart()
 	HookConVarChange(g_hAutoRespawn, OnSettingChanged);
 	g_hCvarNoBlock = CreateConVar("ck_noblock", "1", "on/off - Player no blocking", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	HookConVarChange(g_hCvarNoBlock, OnSettingChanged);
-	g_hAdminClantag = CreateConVar("ck_admin_clantag", "1", "on/off - Admin clan tag (necessary flag: b - z)", FCVAR_NOTIFY, true, 0.0, true, 1.0);
-	HookConVarChange(g_hAdminClantag, OnSettingChanged);
 	g_hReplayBot = CreateConVar("ck_replay_bot", "1", "on/off - Bots mimic the local map record", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	HookConVarChange(g_hReplayBot, OnSettingChanged);
 	g_hBonusBot = CreateConVar("ck_bonus_bot", "1", "on/off - Bots mimic the local bonus record", FCVAR_NOTIFY, true, 0.0, true, 1.0);
@@ -2523,6 +2505,9 @@ public void OnPluginStart()
 	g_hCalladminDiscord = CreateConVar("ck_calladmin_discord", "", "Web hook link to allow players to call admin to discord, keep empty to disable");
 
 	g_hSidewaysBlockKeys = CreateConVar("ck_sideways_block_keys", "0", "Changes the functionality of sideways, 1 will block keys, 0 will change the clients style to normal if not surfing sideways");
+
+	g_hEnforceDefaultTitles = CreateConVar("ck_enforce_default_titles", "0", "Sets whether default titles will be enforced on clients, 0 to disable, 1 for chat only, 2 for scoreboard only, 3 for both");
+	HookConVarChange(g_hEnforceDefaultTitles, OnSettingChanged);
 
 	// Server Name
 	g_hHostName = FindConVar("hostname");
