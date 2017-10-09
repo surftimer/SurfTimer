@@ -765,7 +765,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 			}
 		}
 
-		db_selectWrcpRecord(client, 0);
+		db_selectWrcpRecord(client, 0, stage);
 		g_bWrcpTimeractivated[client] = false;
 	}
 	else if(g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] != 0) //styles
@@ -802,7 +802,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		Format(sz_srDiff, 128, "");*/
 
 		FormatTimeFloat(client, g_fFinalWrcpTime[client], 3, g_szFinalWrcpTime[client], 32);
-		db_selectWrcpRecord(client, style);
+		db_selectWrcpRecord(client, style, stage);
 		g_bWrcpTimeractivated[client] = false;
 	}
 }

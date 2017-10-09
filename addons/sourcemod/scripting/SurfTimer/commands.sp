@@ -13,7 +13,7 @@ public Action sm_test(int client, int args)
 	// }
 
 	// PrintToChat(client, "g_iSelectedTrigger[client]: %i", g_iSelectedTrigger[client]);
-	
+
 	LoadDefaultTitle(client);
 
 	return Plugin_Handled;
@@ -669,6 +669,7 @@ public Action Command_ToStage(int client, int args)
 {
 	if (!IsValidClient(client))
 		return Plugin_Handled;
+
 	if (args < 1)
 	{
 		// Remove chat output to reduce chat spam
@@ -686,6 +687,7 @@ public Action Command_ToStage(int client, int args)
 		int StageId = StringToInt(arg1);
 		if (StageId == 3)
 		{
+			g_bWrcpTimeractivated[client] = false;
 			teleportClient(client, 0, 3, true);
 			g_Stage[0][client] = 3;
 			g_CurrentStage[client] = 3;

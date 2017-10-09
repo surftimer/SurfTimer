@@ -6821,30 +6821,42 @@ public void sql_selectTotalStageCountCallback(Handle owner, Handle hndl, const c
 	return;
 }
 
-public void db_selectWrcpRecord(int client, int style)
+public void db_selectWrcpRecord(int client, int style, int stage)
 {
-	if (!IsValidClient(client))
+	if (!IsValidClient(client) || g_bUsingStageTeleport[client])
 	return;
 
-	if(g_CurrentStage[client] > g_TotalStages) // Hack fix for multiple end zones
-		g_CurrentStage[client] = g_TotalStages;
+	if (stage > g_TotalStages) // Hack fix for multiple end zones
+		stage = g_TotalStages;
+
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackCell(pack, style);
+	WritePackCell(pack, stage);
 
 	char szQuery[255];
 	if(style == 0)
-		Format(szQuery, 255, "SELECT runtimepro FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = 0", g_szSteamID[client], g_szMapName, g_CurrentStage[client]);
+		Format(szQuery, 255, "SELECT runtimepro FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = 0", g_szSteamID[client], g_szMapName, stage);
 	else if(style != 0)
-		Format(szQuery, 255, "SELECT runtimepro FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = %i", g_szSteamID[client], g_szMapName, g_CurrentStage[client], style);
+		Format(szQuery, 255, "SELECT runtimepro FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = %i", g_szSteamID[client], g_szMapName, stage, style);
 
-	SQL_TQuery(g_hDb, sql_selectWrcpRecordCallback, szQuery, client, DBPrio_Low); //need to add stage int
+	SQL_TQuery(g_hDb, sql_selectWrcpRecordCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[] error, any data)
+public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[] error, any packx)
 {
 	if (hndl == null)
 	{
 		LogError("[Surftimer] SQL Error (sql_selectWrcpRecordCallback): %s", error);
+		CloseHandle(packx);
 		return;
 	}
+
+	ResetPack(packx);
+	int data = ReadPackCell(packx);
+	int style = ReadPackCell(packx);
+	int stage = ReadPackCell(packx);
+	CloseHandle(packx);
 
 	if (!IsValidClient(data))
 	return;
@@ -6854,11 +6866,9 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 
 
 	char szQuery[512];
-	int stage = g_CurrentStage[data];
+
 	if (stage > g_TotalStages) // Hack fix for multiple end zones
 		stage = g_TotalStages;
-
-	int style = g_iCurrentStyle[data];
 
 	char sz_srDiff[128];
 	char szDiff[128];
