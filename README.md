@@ -29,6 +29,9 @@ Keep in mind this is my own version of ckSurf, a lot of things are hard coded so
 ## Stripper
 * I have uploaded my stripper files <a href="https://github.com/fluffyst/skillsurf-csgo">here</a>
 
+## Extra
+* I've made a discord so it's easier to discuss changes/additions rather than having to use GitHub issues https://discord.gg/MmuRW4k
+
 ## Credits
 
 * Jonitaikaponi - Original ckSurf creator
