@@ -702,20 +702,29 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 	GetClientName(client, szName, MAX_NAME_LENGTH);
 
 
+	// if(g_bWrcpEndZone[client])
+	// {
+	// 	g_CurrentStage[client] += 1;
+	// 	g_bWrcpEndZone[client] = false;
+	// }
+	// else
+	// 	g_CurrentStage[client] = g_Stage[g_iClientInZone[client][2]][client] - 1;
+
+	int stage = g_Stage[0][client] - 1;
+
 	if(g_bWrcpEndZone[client])
 	{
-		g_CurrentStage[client] += 1;
+		stage += 1;
 		g_bWrcpEndZone[client] = false;
 	}
-	else
-		g_CurrentStage[client] = g_Stage[g_iClientInZone[client][2]][client] - 1;
+
+	if (stage > g_TotalStages) // Hack Fix for multiple end zone issue
+		stage = g_TotalStages;
 
 	if(g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0)
 	{
-		int stage = g_CurrentStage[client];
+		//int stage = g_CurrentStage[client];
 
-		if (stage > g_TotalStages) // Hack Fix for multiple end zone issue
-			stage = g_TotalStages;
 		//g_fFinalWrcpTime[client] = GetGameTime() - g_fStartWrcpTime[client];
 		g_fFinalWrcpTime[client] = g_fCurrentWrcpRunTime[client];
 
@@ -770,11 +779,6 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 	}
 	else if(g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] != 0) //styles
 	{
-		int stage = g_CurrentStage[client];
-
-		if (stage > g_TotalStages) // Hack Fix for multiple end zone issue
-			stage = g_TotalStages;
-
 		int style = g_iCurrentStyle[client];
 		g_fFinalWrcpTime[client] = GetGameTime() - g_fStartWrcpTime[client];
 		if(g_fFinalWrcpTime[client] <= 0.0)

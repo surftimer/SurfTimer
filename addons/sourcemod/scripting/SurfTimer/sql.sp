@@ -6906,7 +6906,7 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 		// If old time was slower than the new time, update record
 		if ((g_fFinalWrcpTime[data] <= stagetime || stagetime <= 0.0))
 		{
-			db_updateWrcpRecord(data, style);
+			db_updateWrcpRecord(data, style, stage);
 		}
 		else
 		{//fluffys come back
@@ -6915,14 +6915,14 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 			g_bStageSRVRecord[data][stage] = false;
 			if(style == 0)
 			{
-				PrintToChat(data, " %cSurftimer %c| %cStage %i:%c %c%s %c(%s%c - %s%c)", LIMEGREEN, WHITE, WHITE, g_CurrentStage[data], WHITE, LIMEGREEN, g_szFinalWrcpTime[data], WHITE, szDiff, WHITE, sz_srDiff, WHITE);
+				PrintToChat(data, " %cSurftimer %c| %cStage %i:%c %c%s %c(%s%c - %s%c)", LIMEGREEN, WHITE, WHITE, stage, WHITE, LIMEGREEN, g_szFinalWrcpTime[data], WHITE, szDiff, WHITE, sz_srDiff, WHITE);
 
-				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| %c%s %c| %cStage %i:%c %c%s %c(%s%c - %s%c)", LIMEGREEN, WHITE, YELLOW, szName, WHITE, PINK, g_CurrentStage[data], WHITE, LIMEGREEN, g_szFinalWrcpTime[data], WHITE, szDiff, WHITE, sz_srDiff, WHITE);
+				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| %c%s %c| %cStage %i:%c %c%s %c(%s%c - %s%c)", LIMEGREEN, WHITE, YELLOW, szName, WHITE, PINK, stage, WHITE, LIMEGREEN, g_szFinalWrcpTime[data], WHITE, szDiff, WHITE, sz_srDiff, WHITE);
 			}
 			else if(style != 0)//styles
 			{
-				PrintToChat(data, " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s%s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, g_CurrentStage[data], LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[data], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][data][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
-				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s%s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, g_CurrentStage[data], LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[data], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][data][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
+				PrintToChat(data, " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s%s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE,  stage, LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[data], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][data][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
+				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s%s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, stage, LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[data], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][data][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
 			}
 			CheckpointToSpec(data, szSpecMessage);
 
@@ -6963,7 +6963,7 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 //
 // If latest record was faster than old - Update time
 //
-public void db_updateWrcpRecord(int client, int style)
+public void db_updateWrcpRecord(int client, int style, int stage)
 {
 	char szUName[MAX_NAME_LENGTH];
 
@@ -6975,13 +6975,14 @@ public void db_updateWrcpRecord(int client, int style)
 	// Also updating name in database, escape string
 	char szName[MAX_NAME_LENGTH * 2 + 1];
 	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH * 2 + 1);
-	int stage = g_CurrentStage[client];
+	//int stage = g_CurrentStage[client];
 
 	// Packing required information for later
 	Handle pack = CreateDataPack();
 	WritePackFloat(pack, g_fFinalWrcpTime[client]);
-	WritePackCell(pack, client);
 	WritePackCell(pack, style);
+	WritePackCell(pack, stage);
+	WritePackCell(pack, client);
 
 	char szQuery[1024];
 	//"UPDATE ck_playertimes SET name = '%s', runtimepro = '%f' WHERE steamid = '%s' AND mapname = '%s';";
@@ -6998,15 +6999,15 @@ public void SQL_UpdateWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 	if (hndl == null)
 	{
 		LogError("[Surftimer] SQL Error (SQL_UpdateWrcpRecordCallback): %s", error);
+		CloseHandle(data);
 		return;
 	}
 
 	ResetPack(data);
 	float stagetime = ReadPackFloat(data);
-	int client = ReadPackCell(data);
+	//int client = ReadPackCell(data);
 	int style = ReadPackCell(data);
-	CloseHandle(data);
-	int stage = g_CurrentStage[client];
+	int stage = ReadPackCell(data);
 
 	if (g_TotalStageRecords[stage] > 0) //fluffys FIXME
 		db_viewTotalStageRecords();
@@ -7020,18 +7021,26 @@ public void SQL_UpdateWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 	else if(style != 0)
 		Format(szQuery, 512, "SELECT count(runtimepro) FROM ck_wrcps WHERE mapname = '%s' AND runtimepro < %f AND stage = %i AND style = %i AND runtimepro > -1.0;", g_szMapName, stagetime, stage, style);
 
-	SQL_TQuery(g_hDb, SQL_UpdateWrcpRecordCallback2, szQuery, client, DBPrio_Low);
+	SQL_TQuery(g_hDb, SQL_UpdateWrcpRecordCallback2, szQuery, data, DBPrio_Low);
 }
 
-public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[] error, any client)
+public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[] error, any data)
 {
 	if (hndl == null)
 	{
 		LogError("[Surftimer] SQL Error (SQL_UpdateRecordProCallback2): %s", error);
+		CloseHandle(data);
 		return;
 	}
 
-	if(g_CurrentStage[client] == 0)
+	ResetPack(data);
+	float time = ReadPackFloat(data);
+	int style = ReadPackCell(data);
+	int stage = ReadPackCell(data);
+	int client = ReadPackCell(data);
+	CloseHandle(data);
+
+	if(stage == 0)
 	return;
 
 	// Get players rank, 9999999 = error
@@ -7041,10 +7050,8 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 		stagerank = SQL_FetchInt(hndl, 0)+1;
 	}
 
-	int stage = g_CurrentStage[client];
 	if (stage > g_TotalStages) // Hack Fix for multiple end zone issue
 		stage = g_TotalStages;
-	int style = g_iCurrentStyle[client];
 
 	if(style == 0)
 		g_StageRank[client][stage] = stagerank;
@@ -7058,7 +7065,6 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 	GetClientName(client, szName, MAX_NAME_LENGTH);
 
 	char sz_srDiff[128];
-	float time = g_fFinalWrcpTime[client];
 
 	// PB
 	char szDiff[128];
@@ -7107,7 +7113,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 				Format(g_szStageRecordPlayer[stage], MAX_NAME_LENGTH, "%s", szName);
 				FormatTimeFloat(1, g_fStageRecord[stage], 3, g_szRecordStageTime[stage], 64);
 
-				PrintToChatAll(" %cSurftimer %c| %c%s %chas beaten the %cSTAGE %i RECORD %c%s %s %c(Rank: %c#1%c/%i)", LIMEGREEN, WHITE, LIMEGREEN, szName, WHITE, PINK, g_CurrentStage[client], LIMEGREEN, g_szFinalWrcpTime[client], sz_srDiff, WHITE, LIMEGREEN, WHITE, g_TotalStageRecords[stage]);
+				PrintToChatAll(" %cSurftimer %c| %c%s %chas beaten the %cSTAGE %i RECORD %c%s %s %c(Rank: %c#1%c/%i)", LIMEGREEN, WHITE, LIMEGREEN, szName, WHITE, PINK, stage, LIMEGREEN, g_szFinalWrcpTime[client], sz_srDiff, WHITE, LIMEGREEN, WHITE, g_TotalStageRecords[stage]);
 				g_bSavingWrcpReplay[client] = true;
 				//Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 				//PlayWRCPRecord(1);
@@ -7118,9 +7124,9 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 
 				char szSpecMessage[512];
 
-				PrintToChat(client, " %cSurftimer %c| Stage %i%c: %c%s %c(%s%c | %s%c) (Rank: %c%i%c/%c%i%c)", LIMEGREEN, WHITE, g_CurrentStage[client], WHITE, LIMEGREEN, g_szFinalWrcpTime[client], WHITE, szDiff, WHITE, sz_srDiff, WHITE, LIMEGREEN, g_StageRank[client][stage], WHITE, LIMEGREEN, g_TotalStageRecords[stage], WHITE);
+				PrintToChat(client, " %cSurftimer %c| Stage %i%c: %c%s %c(%s%c | %s%c) (Rank: %c%i%c/%c%i%c)", LIMEGREEN, WHITE, stage, WHITE, LIMEGREEN, g_szFinalWrcpTime[client], WHITE, szDiff, WHITE, sz_srDiff, WHITE, LIMEGREEN, g_StageRank[client][stage], WHITE, LIMEGREEN, g_TotalStageRecords[stage], WHITE);
 
-				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| %c%s %c| Stage %i%c: %c%s %c(%s%c | %s%c) (Rank: %c%i%c/%c%i%c)", LIMEGREEN, WHITE, YELLOW, szName, WHITE, g_CurrentStage[client], WHITE, LIMEGREEN, g_szFinalWrcpTime[client], WHITE, szDiff, WHITE, sz_srDiff, WHITE, LIMEGREEN, g_StageRank[client][stage], WHITE, LIMEGREEN, g_TotalStageRecords[stage], WHITE);
+				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| %c%s %c| Stage %i%c: %c%s %c(%s%c | %s%c) (Rank: %c%i%c/%c%i%c)", LIMEGREEN, WHITE, YELLOW, szName, WHITE, stage, WHITE, LIMEGREEN, g_szFinalWrcpTime[client], WHITE, szDiff, WHITE, sz_srDiff, WHITE, LIMEGREEN, g_StageRank[client][stage], WHITE, LIMEGREEN, g_TotalStageRecords[stage], WHITE);
 				CheckpointToSpec(client, szSpecMessage);
 			}
 		}
@@ -7131,7 +7137,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			Format(g_szStageRecordPlayer[stage], MAX_NAME_LENGTH, "%s", szName);
 			FormatTimeFloat(1, g_fStageRecord[stage], 3, g_szRecordStageTime[stage], 64);
 
-			PrintToChatAll(" %cSurftimer %c| %c%s %chas set a new %cSTAGE %i RECORD %c%s %c(Rank: %c#1%c/1)", LIMEGREEN, WHITE, LIMEGREEN, szName, WHITE, PINK, g_CurrentStage[client], LIMEGREEN, g_szFinalWrcpTime[client], WHITE, LIMEGREEN, WHITE);
+			PrintToChatAll(" %cSurftimer %c| %c%s %chas set a new %cSTAGE %i RECORD %c%s %c(Rank: %c#1%c/1)", LIMEGREEN, WHITE, LIMEGREEN, szName, WHITE, PINK, stage, LIMEGREEN, g_szFinalWrcpTime[client], WHITE, LIMEGREEN, WHITE);
 			g_bSavingWrcpReplay[client] = true;
 			//Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 			//PlayWRCPRecord(1);
@@ -7150,7 +7156,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 				Format(g_szStyleStageRecordPlayer[style][stage], MAX_NAME_LENGTH, "%s", szName);
 				FormatTimeFloat(1, g_fStyleStageRecord[style][stage], 3, g_szStyleRecordStageTime[style][stage], 64);
 
-				PrintToChatAll(" %cSurftimer %c| %c%s %chas beaten the %c%s %cSTAGE %i RECORD %c%s %s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, LIMEGREEN, szName, WHITE, LIGHTRED, g_szStyleRecordPrint[style], PINK, g_CurrentStage[client], LIMEGREEN, g_szFinalWrcpTime[client], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][client][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
+				PrintToChatAll(" %cSurftimer %c| %c%s %chas beaten the %c%s %cSTAGE %i RECORD %c%s %s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, LIMEGREEN, szName, WHITE, LIGHTRED, g_szStyleRecordPrint[style], PINK, stage, LIMEGREEN, g_szFinalWrcpTime[client], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][client][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
 				//PlayWRCPRecord(1);
 			}
 			else
@@ -7159,8 +7165,8 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 
 				char szSpecMessage[512];
 
-				PrintToChat(client, " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s%s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, g_CurrentStage[client], LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[client], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][client][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
-				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s%s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, g_CurrentStage[client], LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[client], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][client][stage], WHITE,  g_TotalStageStyleRecords[style][stage]);
+				PrintToChat(client, " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s%s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, stage, LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[client], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][client][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
+				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s%s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, stage, LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[client], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][client][stage], WHITE,  g_TotalStageStyleRecords[style][stage]);
 				CheckpointToSpec(client, szSpecMessage);
 			}
 		}
@@ -7171,7 +7177,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			Format(g_szStyleStageRecordPlayer[style][stage], MAX_NAME_LENGTH, "%s", szName);
 			FormatTimeFloat(1, g_fStyleStageRecord[style][stage], 3, g_szStyleRecordStageTime[style][stage], 64);
 
-			PrintToChatAll(" %cSurftimer %c| %c%s %chas set a new %c%s %cSTAGE %i RECORD %c%s %c(Rank: %c#1%c/1)", LIMEGREEN, WHITE, LIMEGREEN, szName, WHITE, LIGHTRED, g_szStyleRecordPrint[style], PINK, g_CurrentStage[client], LIMEGREEN, g_szFinalWrcpTime[client], WHITE, LIMEGREEN, WHITE);
+			PrintToChatAll(" %cSurftimer %c| %c%s %chas set a new %c%s %cSTAGE %i RECORD %c%s %c(Rank: %c#1%c/1)", LIMEGREEN, WHITE, LIMEGREEN, szName, WHITE, LIGHTRED, g_szStyleRecordPrint[style], PINK, stage, LIMEGREEN, g_szFinalWrcpTime[client], WHITE, LIMEGREEN, WHITE);
 			//PlayWRCPRecord(1);
 		}
 	}
