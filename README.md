@@ -21,7 +21,9 @@ Keep in mind this is my own version of ckSurf, a lot of things are hard coded so
 * The timer does auto-create some tables, but they will most likely have the wrong schema, use the create-tables.sql file instead.
 * Upload all the files to your csgo server directory
 * Add a MySQL database called `surftimer` to `csgo/addons/sourcemod/configs/databases.cfg`
-#### Optional
+#### Upgrading
+If you wish to upgrade from niko's ckSurf v1.20 you may run the `optional/upgrading/upgrade-niko.sql` file, this will convert your database schema to this timers, so make sure you backup first!
+###### Optional
 * Import the ck_zones.sql file if you want to use my pre-made zones
 * Import the ck_maptier.sql file if you want to use my pre-made tiers
 * Import the ck_mapsettings.sql file if you want to use my pre-made mapsettings
