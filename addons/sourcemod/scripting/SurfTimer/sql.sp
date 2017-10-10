@@ -6965,12 +6965,11 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 //
 public void db_updateWrcpRecord(int client, int style, int stage)
 {
+	if (IsValidClient(client) && !IsFakeClient(client))
+		return;
+		
 	char szUName[MAX_NAME_LENGTH];
-
-	if (IsValidClient(client))
 	GetClientName(client, szUName, MAX_NAME_LENGTH);
-	else
-	return;
 
 	// Also updating name in database, escape string
 	char szName[MAX_NAME_LENGTH * 2 + 1];
@@ -7005,7 +7004,6 @@ public void SQL_UpdateWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 
 	ResetPack(data);
 	float stagetime = ReadPackFloat(data);
-	//int client = ReadPackCell(data);
 	int style = ReadPackCell(data);
 	int stage = ReadPackCell(data);
 
@@ -7041,7 +7039,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 	CloseHandle(data);
 
 	if(stage == 0)
-	return;
+		return;
 
 	// Get players rank, 9999999 = error
 	int stagerank = 9999999;
