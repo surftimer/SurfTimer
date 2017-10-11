@@ -12,7 +12,7 @@ DROP PRIMARY KEY,
 DROP INDEX bonusrank,
 ADD COLUMN `style` int(11) NOT NULL DEFAULT 0 AFTER `zonegroup`,
 ADD PRIMARY KEY (steamid, mapname, zonegroup, style),
-ADD INDEX `bonusrrank` (mapname, runtime, zonegroup, style);
+ADD INDEX `bonusrank` (mapname, runtime, zonegroup, style);
 
 CREATE TABLE `ck_mapsettings` (
  `mapname` varchar(128) NOT NULL,
