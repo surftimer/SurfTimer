@@ -6965,7 +6965,7 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 //
 public void db_updateWrcpRecord(int client, int style, int stage)
 {
-	if (IsValidClient(client) && !IsFakeClient(client))
+	if (!IsValidClient(client) || IsFakeClient(client))
 		return;
 		
 	char szUName[MAX_NAME_LENGTH];
