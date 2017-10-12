@@ -729,39 +729,6 @@ public void readMapycycle()
 	return;
 }
 
-public bool loadHiddenChatCommands()
-{
-	char sPath[PLATFORM_MAX_PATH];
-	char line[64];
-
-	//add blocked chat commands list
-	for (int x = 0; x < 256; x++)
-		Format(g_BlockedChatText[x], sizeof(g_BlockedChatText), "");
-
-	BuildPath(Path_SM, sPath, sizeof(sPath), "%s", BLOCKED_LIST_PATH);
-	int count = 0;
-	Handle fileHandle = OpenFile(sPath, "r");
-	if (fileHandle != null)
-	{
-		while (!IsEndOfFile(fileHandle) && ReadFileLine(fileHandle, line, sizeof(line)))
-		{
-			TrimString(line);
-			if ((StrContains(line, "//", true) == -1) && count < 256)
-			{
-				Format(g_BlockedChatText[count], sizeof(g_BlockedChatText), "%s", line);
-				count++;
-			}
-		}
-	}
-	else
-		LogError("[surftimer] %s is empty or does not exist.", BLOCKED_LIST_PATH);
-
-	if (fileHandle != null)
-		CloseHandle(fileHandle);
-
-	return true;
-}
-
 public void addColorToString(char[] StringToAdd, int size)
 {
 	ReplaceString(StringToAdd, size, "{default}", szWHITE, false);

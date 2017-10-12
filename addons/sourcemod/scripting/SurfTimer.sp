@@ -71,7 +71,6 @@ The original version of this timer was by jonitaikaponi
 
 // Paths
 #define CK_REPLAY_PATH "data/replays/"
-#define BLOCKED_LIST_PATH "configs/surftimer/hidden_chat_commands.txt"
 #define MULTI_SERVER_MAPCYCLE "configs/surftimer/multi_server_mapcycle.txt"
 #define CUSTOM_TITLE_PATH "configs/surftimer/custom_chat_titles.txt"
 #define SKILLGROUP_PATH "configs/surftimer/skillgroups.cfg"
@@ -1332,7 +1331,6 @@ public void OnMapStart()
 	LoadTranslations("surftimer.phrases");
 
 	// load configs
-	loadHiddenChatCommands();
 	//loadCustomTitles();
 
 	CheatFlag("bot_zombie", false, true);
@@ -1556,7 +1554,7 @@ public void OnConfigsExecuted()
 	else
 		ServerCommand("mp_respawn_on_death_ct 0;mp_respawn_on_death_t 0");
 
-	ServerCommand("mp_endmatch_votenextmap 0;mp_do_warmup_period 0;mp_warmuptime 0;mp_match_can_clinch 0;mp_match_end_changelevel 1;mp_match_restart_delay 10;mp_endmatch_votenextleveltime 10;mp_endmatch_votenextmap 0;mp_halftime 0;	bot_zombie 1;mp_do_warmup_period 0;mp_maxrounds 1;mp_drop_knife_enable 1;sv_clamp_unsafe_velocities 0;sv_ladder_scale_speed 1;sv_friction 5.2;sv_staminamax 0");
+	ServerCommand("mp_endmatch_votenextmap 0;mp_do_warmup_period 0;mp_warmuptime 0;mp_match_can_clinch 0;mp_match_end_changelevel 1;mp_match_restart_delay 10;mp_endmatch_votenextleveltime 10;mp_endmatch_votenextmap 0;mp_halftime 0;bot_zombie 1;mp_do_warmup_period 0;mp_maxrounds 1");
 
 	if (GetConVarInt(g_hServerType) == 1) // Bhop
 	{
