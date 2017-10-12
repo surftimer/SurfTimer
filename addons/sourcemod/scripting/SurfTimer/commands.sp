@@ -3579,10 +3579,10 @@ public int StageStyleSelectMenuHandler(Menu menu, MenuAction action, int param1,
 //fluffys sm_gb
 public Action Command_GoBack(int client, int args)
 {
-	if(g_CurrentStage[client] <= 1)
+	if(g_Stage[0][client] <= 1)
 		Command_Restart(client, 1);
 	else
-		teleportClient(client, 0, g_CurrentStage[client], false);
+		teleportClient(client, 0, g_Stage[0][client] - 1, false);
 
 	return Plugin_Handled;
 }

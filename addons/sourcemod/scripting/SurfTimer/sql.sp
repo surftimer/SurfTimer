@@ -6921,17 +6921,17 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 			}
 			else if(style != 0)//styles
 			{
-				PrintToChat(data, " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s %s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE,  stage, LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[data], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][data][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
+				PrintToChat(data, " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s %s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, stage, LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[data], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][data][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
 				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s %s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, stage, LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[data], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][data][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
 			}
 			CheckpointToSpec(data, szSpecMessage);
 
 			if(g_bRepeat[data])
 			{
-				if(g_CurrentStage[data] <= 1)
+				if (stage <= 1)
 					Command_Restart(data, 1);
 				else
-					teleportClient(data, 0, g_CurrentStage[data], false);
+					teleportClient(data, 0, stage, false);
 			}
 		}
 	}
