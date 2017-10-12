@@ -691,7 +691,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 	return;
 
 	// Print bot finishing message to spectators
-	if (IsFakeClient(client) && g_bWrcpTimeractivated[client])
+	if (IsFakeClient(client) && g_bWrcpTimeractivated[client] || IsFakeClient(client))
 	{
 		g_bWrcpTimeractivated[client] = false;
 		return;

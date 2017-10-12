@@ -6823,8 +6823,8 @@ public void sql_selectTotalStageCountCallback(Handle owner, Handle hndl, const c
 
 public void db_selectWrcpRecord(int client, int style, int stage)
 {
-	if (!IsValidClient(client) || g_bUsingStageTeleport[client])
-	return;
+	if (!IsValidClient(client) || IsFakeClient(client) || g_bUsingStageTeleport[client])
+		return;
 
 	if (stage > g_TotalStages) // Hack fix for multiple end zones
 		stage = g_TotalStages;
@@ -6858,8 +6858,8 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 	int stage = ReadPackCell(packx);
 	CloseHandle(packx);
 
-	if (!IsValidClient(data))
-	return;
+	if (!IsValidClient(data) || IsFakeClient(data))
+		return;
 
 	char szName[32];
 	GetClientName(data, szName, 32);
