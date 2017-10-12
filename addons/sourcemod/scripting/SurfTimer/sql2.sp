@@ -327,7 +327,7 @@ public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] er
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[surftimer] %s: Finished db_CheckVIPAdmin in %fs", g_szSteamID[client], tick);
+		LogToFileEx(g_szLogFile, "[Surftimer] %s: Finished db_CheckVIPAdmin in %fs", g_szSteamID[client], tick);
 		g_fTick[client][0] = GetGameTime();
 
 
@@ -689,7 +689,7 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[surftimer] %s: Finished db_viewCustomTitles in %fs", g_szSteamID[client], tick);
+		LogToFileEx(g_szLogFile, "[Surftimer] %s: Finished db_viewCustomTitles in %fs", g_szSteamID[client], tick);
 
 		g_fTick[client][0] = GetGameTime();
 		LoadClientSetting(client, g_iSettingToLoad[client]);
@@ -1560,7 +1560,7 @@ public void SQL_SelectAnnouncementsCallback(Handle owner, Handle hndl, const cha
 		g_fServerLoading[1] = GetGameTime();
 		g_bHasLatestID = true;
 		float time = g_fServerLoading[1] - g_fServerLoading[0];
-		LogToFileEx(g_szLogFile, "[surftimer] Finished loading server settings in %fs", time);
+		LogToFileEx(g_szLogFile, "[Surftimer] Finished loading server settings in %fs", time);
 		loadAllClientSettings();
 	} 
 }
