@@ -7186,10 +7186,10 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 
 	if(g_bRepeat[client])
 	{
-		if(g_CurrentStage[client] <= 1)
+		if(stage <= 1)
 			Command_Restart(client, 1);
 		else
-			teleportClient(client, 0, g_CurrentStage[client], false);
+			teleportClient(client, 0, stage, false);
 	}
 
 }

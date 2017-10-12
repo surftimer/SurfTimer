@@ -378,12 +378,11 @@ public void StartTouch(int client, int action[3])
 				// Announcing checkpoint
 				if (action[1] != lastCheckpoint[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] == action[2])
 				{
-					//fluffys
-					g_Stage[g_iClientInZone[client][2]][client] = (action[1] + 2);
-					//make sure not going backwards
-
-					if (g_CurrentStage[client] >= g_Stage[g_iClientInZone[client][2]][client])
+					// Make sure the player is not going backwards
+					if ((action[1] + 2) < g_Stage[g_iClientInZone[client][2]][client])
 						g_bWrcpTimeractivated[client] = false;
+
+					g_Stage[g_iClientInZone[client][2]][client] = (action[1] + 2);
 
 					float time = g_fCurrentRunTime[client];
 					float time2 = g_fCurrentWrcpRunTime[client];
