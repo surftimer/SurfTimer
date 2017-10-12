@@ -1,3 +1,3 @@
-// If you would like to use the same records on multipul servers,
+// If you would like to use the same records on multiple servers,
 // add your combined mapcycle here and set ck_multi_server_mapcycle to 1
 // NOTE: Make sure you keep this file updated at all times.
