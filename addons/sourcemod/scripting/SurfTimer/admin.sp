@@ -93,7 +93,7 @@ public Action Admin_insertSpawnLocation(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	if (!CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+	if (!g_bZoner[client] && !CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
 		return Plugin_Handled;
 
 	float SpawnLocation[3];

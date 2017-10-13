@@ -2604,42 +2604,42 @@ public void OnPluginStart()
 	RegAdminCmd("sm_clearassists", Admin_ClearAssists, g_AdminMenuFlag, "[surftimer] Clears assist points (map progress) from all players");
 
 	// DB Map Settings && Zoners
-	RegConsoleCmd("sm_zones", Command_Zones, "[surftimer] Opens up the zone creation menu.");
-	RegConsoleCmd("sm_hookzone", Command_HookZones, "[surftimer] Opens up zone hook creation menu.");
-	RegConsoleCmd("sm_addmaptier", Admin_insertMapTier, "[surftimer] Changes maps tier");
-	RegConsoleCmd("sm_amt", Admin_insertMapTier, "[surftimer] Changes maps tier");
-	RegConsoleCmd("sm_addspawn", Admin_insertSpawnLocation, "[surftimer] Changes the position !r takes players to");
-	RegConsoleCmd("sm_delspawn", Admin_deleteSpawnLocation, "[surftimer] Removes custom !r position");
-	RegConsoleCmd("sm_startprespeed", Command_SetStartPreSpeed);
-	RegConsoleCmd("sm_sps", Command_SetStartPreSpeed);
-	RegConsoleCmd("sm_bonusprespeed", Command_SetBonusPreSpeed);
-	RegConsoleCmd("sm_bps", Command_SetBonusPreSpeed);
-	RegConsoleCmd("sm_stageprespeed", Command_SetStagePreSpeed);
-	RegConsoleCmd("sm_stageps", Command_SetStagePreSpeed);
-	RegConsoleCmd("sm_maxvelocity", Command_SetMaxVelocity);
-	RegConsoleCmd("sm_mv", Command_SetMaxVelocity);
-	RegConsoleCmd("sm_announcerecord", Command_SetAnnounceRecord);
-	RegConsoleCmd("sm_ar", Command_SetAnnounceRecord);
-	RegConsoleCmd("sm_gravityfix", Command_SetGravityFix);
-	RegConsoleCmd("sm_gf", Command_SetGravityFix);
-	RegConsoleCmd("sm_triggers", Command_ToggleTriggers);
-	RegConsoleCmd("sm_noclipspeed", Command_NoclipSpeed);
+	RegConsoleCmd("sm_zones", Command_Zones, "[surftimer] [zoner] Opens up the zone creation menu.");
+	RegConsoleCmd("sm_hookzone", Command_HookZones, "[surftimer] [zoner] Opens up zone hook creation menu.");
+	RegConsoleCmd("sm_addmaptier", Admin_insertMapTier, "[surftimer] [zoner] Changes maps tier");
+	RegConsoleCmd("sm_amt", Admin_insertMapTier, "[surftimer] [zoner] Changes maps tier");
+	RegConsoleCmd("sm_addspawn", Admin_insertSpawnLocation, "[surftimer] [zoner] Changes the position !r takes players to");
+	RegConsoleCmd("sm_delspawn", Admin_deleteSpawnLocation, "[surftimer] [zoner] Removes custom !r position");
+	RegAdminCmd("sm_startprespeed", Command_SetStartPreSpeed, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set the current maps start prespeed");
+	RegAdminCmd("sm_sps", Command_SetStartPreSpeed, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set the current maps start prespeed");
+	RegAdminCmd("sm_bonusprespeed", Command_SetBonusPreSpeed, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set the current maps bonus prespeed");
+	RegAdminCmd("sm_bps", Command_SetBonusPreSpeed, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set the current maps bonus prespeed");
+	RegAdminCmd("sm_stageprespeed", Command_SetStagePreSpeed, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set the current maps stage prespeed");
+	RegAdminCmd("sm_stageps", Command_SetStagePreSpeed, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set the current maps stage prespeed");
+	RegAdminCmd("sm_maxvelocity", Command_SetMaxVelocity, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set the current maps maxvelocity");
+	RegAdminCmd("sm_mv", Command_SetMaxVelocity, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set the current maps max velocity");
+	RegAdminCmd("sm_announcerecord", Command_SetAnnounceRecord, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set whether records will be announced on all finishes, pb only or client only");
+	RegAdminCmd("sm_ar", Command_SetAnnounceRecord, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set whether records will be announced on all finishes, pb only or client only");
+	RegAdminCmd("sm_gravityfix", Command_SetGravityFix, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Toggle the gravity fix on the current map");
+	RegAdminCmd("sm_gf", Command_SetGravityFix, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Toggle the gravity fix on the current map");
+	RegAdminCmd("sm_triggers", Command_ToggleTriggers, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Toggle the gravity fix on the current map");
+	RegAdminCmd("sm_noclipspeed", Command_NoclipSpeed, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Toggle the gravity fix on the current map");
 
 	// VIP Commands
-	RegConsoleCmd("sm_fixbot", Admin_FixBot, "[surftimer] Toggles replay bots off and on");
+	RegAdminCmd("sm_fixbot", Admin_FixBot, ADMFLAG_RESERVATION, "[surftimer] Toggles replay bots off and on");
 
-	RegConsoleCmd("sm_vip", Command_Vip, "[surftimer] Displays the VIP menu to client");
-	RegConsoleCmd("sm_mytitle", Command_PlayerTitle, "[surftimer] VIPs can set their own custom title into a db.");
-	RegConsoleCmd("sm_title", Command_PlayerTitle, "[surftimer] VIPs can set their own custom title into a db.");
-	RegConsoleCmd("sm_customtitle", Command_SetDbTitle, "[surftimer] VIPs can set their own custom title into a db.");
-	RegConsoleCmd("sm_namecolour", Command_SetDbNameColour, "[surftimer] VIPs can set their own custom name colour into the db.");
-	RegConsoleCmd("sm_textcolour", Command_SetDbTextColour, "[surftimer] VIPs can set their own custom text colour into the db.");
-	RegConsoleCmd("sm_ve", Command_VoteExtend, "[surftimer] Vote to extend the map");
+	RegConsoleCmd("sm_vip", Command_Vip, "[surftimer] [vip] Displays the VIP menu to client");
+	RegConsoleCmd("sm_mytitle", Command_PlayerTitle, "[surftimer] [vip] VIPs can set their own custom title into a db.");
+	RegConsoleCmd("sm_title", Command_PlayerTitle, "[surftimer] [vip] VIPs can set their own custom title into a db.");
+	RegConsoleCmd("sm_customtitle", Command_SetDbTitle, "[surftimer] [vip] VIPs can set their own custom title into a db.");
+	RegConsoleCmd("sm_namecolour", Command_SetDbNameColour, "[surftimer] [vip] VIPs can set their own custom name colour into the db.");
+	RegConsoleCmd("sm_textcolour", Command_SetDbTextColour, "[surftimer] [vip] VIPs can set their own custom text colour into the db.");
+	RegConsoleCmd("sm_ve", Command_VoteExtend, "[surftimer] [vip] Vote to extend the map");
 	RegConsoleCmd("sm_colours", Command_ListColours, "[surftimer] Lists available colours for sm_mytitle and sm_namecolour");
-	RegConsoleCmd("sm_toggletitle", Command_ToggleTitle, "[surftimer] VIPs can toggle their title.");
-	RegConsoleCmd("sm_votemute", Command_VoteMute, "[surftimer] starts a vote to mute a client");
-	RegConsoleCmd("sm_votegag", Command_VoteGag, "[surftimer] starts a vote to gag a client");
-	RegConsoleCmd("sm_joinmsg", Command_JoinMsg, "[surftimer] Allows a vip to set their join msg");
+	RegConsoleCmd("sm_toggletitle", Command_ToggleTitle, "[surftimer] [vip] VIPs can toggle their title.");
+	RegConsoleCmd("sm_votemute", Command_VoteMute, "[surftimer] [vip] starts a vote to mute a client");
+	RegConsoleCmd("sm_votegag", Command_VoteGag, "[surftimer] [vip] starts a vote to gag a client");
+	RegConsoleCmd("sm_joinmsg", Command_JoinMsg, "[surftimer] [vip] Allows a vip to set their join msg");
 
 	// Automatic Donate Commands
 	RegAdminCmd("sm_givevip", VIP_GiveVip, ADMFLAG_ROOT, "[surftimer] Give a player VIP");

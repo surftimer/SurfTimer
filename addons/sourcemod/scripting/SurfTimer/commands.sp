@@ -2005,7 +2005,21 @@ public Action Client_Help(int client, int args)
 	char szCommand[320];
 	while (ReadCommandIterator(cmdIter, name, sizeof(name), flags, desc, sizeof(desc)))
 	{
-		if ((StrContains(desc, "[surftimer]", false) != -1) && CheckCommandAccess(client, name, flags))
+		if ((StrContains(desc, "[zoner]", false) != -1) && g_bZoner[client])
+		{
+			char szBuffer[512][2];
+			ExplodeString(desc, "[surftimer]", szBuffer, 2, 512, false);
+			Format(szCommand, 320, "%s - %s", name, szBuffer[1]);
+			AddMenuItem(menu, "", szCommand, ITEMDRAW_DISABLED);
+		}
+		else if ((StrContains(desc, "[vip]", false) != -1) && g_iVipLvl[client] > 0)
+		{
+			char szBuffer[512][2];
+			ExplodeString(desc, "[surftimer]", szBuffer, 2, 512, false);
+			Format(szCommand, 320, "%s - %s", name, szBuffer[1]);
+			AddMenuItem(menu, "", szCommand, ITEMDRAW_DISABLED);
+		}
+		else if ((StrContains(desc, "[surftimer]", false) != -1) && CheckCommandAccess(client, name, flags))
 		{
 			char szBuffer[512][2];
 			ExplodeString(desc, "[surftimer]", szBuffer, 2, 512, false);
@@ -4053,6 +4067,9 @@ public Action Command_Repeat(int client, int args)
 
 public Action Admin_FixBot(int client, int args)
 {
+	if (!g_bZoner[client] && !CheckCommandAccess(client, "", ADMFLAG_ROOT))
+		return Plugin_Handled;
+		
 	PrintToChat(client, " %cSurftimer %c| Fixing replay bots", LIMEGREEN, WHITE);
 	CreateTimer(5.0, FixBot_Off, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 	CreateTimer(10.0, FixBot_On, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
