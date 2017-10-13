@@ -1651,9 +1651,6 @@ public void OnClientPutInServer(int client)
 	if (GetConVarBool(g_hcvarRestore) && !g_bRenaming && !g_bInTransactionChain)
 	db_selectLastRun(client);
 
-	//console info
-	PrintConsoleInfo(client);
-
 	if (g_bLateLoaded && IsPlayerAlive(client))
 	PlayerSpawn(client);
 
@@ -2286,15 +2283,8 @@ public void OnPluginStart()
  		SetConVarInt(g_cvar_sv_hibernate_when_empty, 0);
  	}
 
-	//Get Server Tickate
-	float fltickrate = 1.0 / GetTickInterval();
-	if (fltickrate > 65)
-		if (fltickrate < 103)
-			g_Server_Tickrate = 102;
-		else
-			g_Server_Tickrate = 128;
-	else
-		g_Server_Tickrate = 64;
+	// Server Tickate
+	g_Server_Tickrate = RoundFloat(1 / GetTickInterval());
 
 	//language file
 	LoadTranslations("surftimer.phrases");
@@ -2308,7 +2298,6 @@ public void OnPluginStart()
 	g_hMapEnd = CreateConVar("ck_map_end", "1", "on/off - Allows map changes after the timelimit has run out (mp_timelimit must be greater than 0)", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hColoredNames = CreateConVar("ck_colored_chatnames", "0", "on/off Colors players names based on their rank in chat.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hNoClipS = CreateConVar("ck_noclip", "1", "on/off - Allows players to use noclip", FCVAR_NOTIFY, true, 0.0, true, 1.0);
-	//g_hAutoTimer = CreateConVar("ck_auto_timer", "0", "on/off - Timer automatically starts when a player joins a team, dies or uses !start/!r", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hGoToServer = CreateConVar("ck_goto", "1", "on/off - Allows players to use the !goto command", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hCommandToEnd = CreateConVar("ck_end", "1", "on/off - Allows players to use the !end command", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hCvarGodMode = CreateConVar("ck_godmode", "1", "on/off - unlimited hp", FCVAR_NOTIFY, true, 0.0, true, 1.0);
@@ -2535,8 +2524,8 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_spec", Client_Spec, "[surftimer] chooses a player who you want to spectate and switch you to spectators");
 	RegConsoleCmd("sm_watch", Client_Spec, "[surftimer] chooses a player who you want to spectate and switch you to spectators");
 	RegConsoleCmd("sm_spectate", Client_Spec, "[surftimer] chooses a player who you want to spectate and switch you to spectators");
-	RegConsoleCmd("sm_helpmenu", Client_Help, "[surftimer] help menu which displays all kp commands");
-	RegConsoleCmd("sm_help", Client_Help, "[surftimer] help menu which displays all kp commands");
+	RegConsoleCmd("sm_helpmenu", Client_Help, "[surftimer] help menu which displays all surftimer commands");
+	RegConsoleCmd("sm_help", Client_Help, "[surftimer] help menu which displays all surftimer commands");
 	RegConsoleCmd("sm_profile", Client_Profile, "[surftimer] opens a player profile");
 	RegConsoleCmd("sm_options", Client_OptionMenu, "[surftimer] opens options menu");
 	RegConsoleCmd("sm_top", Client_Top, "[surftimer] displays top rankings (Top 100 Players, Top 50 overall)");
@@ -2598,7 +2587,7 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_normal", Command_normalMode, "[surftimer] Switches player back to normal mode.");
 	RegConsoleCmd("sm_n", Command_normalMode, "[surftimer] Switches player back to normal mode.");
 
-	RegAdminCmd("sm_ckadmin", Admin_ckPanel, g_AdminMenuFlag, "[surftimer] Displays the kp menu panel");
+	RegAdminCmd("sm_ckadmin", Admin_ckPanel, g_AdminMenuFlag, "[surftimer] Displays the surftimer admin menu panel");
 	RegAdminCmd("sm_refreshprofile", Admin_RefreshProfile, g_AdminMenuFlag, "[surftimer] Recalculates player profile for given steam id");
 
 	RegAdminCmd("sm_clearassists", Admin_ClearAssists, g_AdminMenuFlag, "[surftimer] Clears assist points (map progress) from all players");
@@ -2781,7 +2770,7 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_resetstartpos", Command_ResetStartpos, "[surftimer] Removes custom !r spawn.");
 
 	// Discord
-	RegConsoleCmd("sm_bug", Command_Bug, "[surftimer] report a bug to the KP discord");
+	RegConsoleCmd("sm_bug", Command_Bug, "[surftimer] report a bug to our discord");
 	RegConsoleCmd("sm_calladmin", Command_Calladmin, "[surftimer] sends a message to the staff");
 
 	// CPR
