@@ -153,6 +153,6 @@ CREATE TABLE IF NOT EXISTS `ck_wrcps` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE `ck_zones`
-ADD COLUMN `hookname` varchar(128) NULL DEFAULT NULL AFTER `zonename`,
-ADD COLUMN `targetname` varchar(128) NULL DEFAULT NULL AFTER `hookname`,
+ADD COLUMN `hookname` varchar(128) NULL DEFAULT 'None' AFTER `zonename`,
+ADD COLUMN `targetname` varchar(128) NULL DEFAULT 'player' AFTER `hookname`,
 ADD COLUMN `onejumplimit` int(12) NOT NULL DEFAULT 1 AFTER `targetname`;
