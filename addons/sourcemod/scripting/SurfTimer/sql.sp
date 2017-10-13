@@ -6946,8 +6946,9 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 		// Move required information in datapack
 		Handle pack = CreateDataPack();
 		WritePackFloat(pack, g_fFinalWrcpTime[data]);
-		WritePackCell(pack, data);
 		WritePackCell(pack, style);
+		WritePackCell(pack, stage);
+		WritePackCell(pack, data);
 
 		if(style == 0)
 			Format(szQuery, 512, "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage) VALUES ('%s', '%s', '%s', '%f', %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage);
