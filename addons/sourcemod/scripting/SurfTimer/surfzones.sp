@@ -1261,7 +1261,6 @@ public void SelectBonusZoneType(int client)
 	h_selectBonusZoneType.AddItem("2", "End");
 	h_selectBonusZoneType.AddItem("3", "Stage");
 	h_selectBonusZoneType.AddItem("4", "Checkpoint");
-	h_selectBonusZoneType.AddItem("5", "Start Speed");
 
 	h_selectBonusZoneType.ExitButton = true;
 	h_selectBonusZoneType.Display(client, MENU_TIME_FOREVER);
@@ -1491,8 +1490,6 @@ public void SelectNormalZoneType(int client)
 	}
 	else if (g_mapZonesTypeCount[g_CurrentSelectedZoneGroup[client]][3] == 0 && g_mapZonesTypeCount[g_CurrentSelectedZoneGroup[client]][4] > 0)
 		SelectNormalZoneMenu.AddItem("4", "Checkpoint");
-
-	SelectNormalZoneMenu.AddItem("5", "Start Speed");
 
 	SelectNormalZoneMenu.ExitButton = true;
 	SelectNormalZoneMenu.Display(client, MENU_TIME_FOREVER);

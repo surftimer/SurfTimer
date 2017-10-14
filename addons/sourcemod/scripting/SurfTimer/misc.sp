@@ -3129,53 +3129,53 @@ public void SpecListMenuDead(int client) // What Spectators see
 					{
 						if (!IsFakeClient(ObservedUser))
 						{
-							Format(g_szPlayerPanelText[client], 512, "Spectators (%i):\n%s\n  \n%s\n%s\nRecord: %s\n\n%s\n", count, sSpecs, szTime, szPlayerRank, szProBest, szStage);
+							Format(g_szPlayerPanelText[client], 512, "Specs (%i):\n%s\n  \n%s\n%s\nRecord: %s\n\n%s\n", count, sSpecs, szTime, szPlayerRank, szProBest, szStage);
 							if (!g_bShowSpecs[client])
-								Format(g_szPlayerPanelText[client], 512, "Spectators (%i)\n \n%s\n%s\nRecord: %s\n\nStage: %s\n", count, szTime, szPlayerRank, szProBest, szStage);
+								Format(g_szPlayerPanelText[client], 512, "Specs (%i)\n \n%s\n%s\nRecord: %s\n\nStage: %s\n", count, szTime, szPlayerRank, szProBest, szStage);
 						}
 						else
 						{
 							if (ObservedUser == g_RecordBot)
-								Format(g_szPlayerPanelText[client], 512, "[Map Record Replay]\n%s\nTickrate: %s\nSpectators: %i\n\n%s\n", szTime, szTick, count, szStage);
+								Format(g_szPlayerPanelText[client], 512, "[Map Record Replay]\n%s\nTickrate: %s\nSpecs: %i\n\n%s\n", szTime, szTick, count, szStage);
 							else
 								if (ObservedUser == g_BonusBot)
-									Format(g_szPlayerPanelText[client], 512, "[%s Record Replay]\n%s\nTickrate: %s\nSpectators: %i\n\n%s\n", g_szZoneGroupName[g_iClientInZone[g_BonusBot][2]], szTime, szTick, count, szStage);
+									Format(g_szPlayerPanelText[client], 512, "[%s Record Replay]\n%s\nTickrate: %s\nSpecs: %i\n\n%s\n", g_szZoneGroupName[g_iClientInZone[g_BonusBot][2]], szTime, szTick, count, szStage);
 
 						}
 					}
 					else
 					{
 						if (ObservedUser == g_RecordBot)
-							Format(g_szPlayerPanelText[client], 512, "[Map Record Replay]\nTime: PAUSED\nTickrate: %s\nSpectators: %i\n\n%s\n", szTick, count, szStage);
+							Format(g_szPlayerPanelText[client], 512, "[Map Record Replay]\nTime: PAUSED\nTickrate: %s\nSpecs: %i\n\n%s\n", szTick, count, szStage);
 						else
 							if (ObservedUser == g_BonusBot)
-								Format(g_szPlayerPanelText[client], 512, "[%s Record Replay]\nTime: PAUSED\nTickrate: %s\nSpectators: %i\n\nBonus\n", g_szZoneGroupName[g_iClientInZone[g_BonusBot][2]], szTick, count);
+								Format(g_szPlayerPanelText[client], 512, "[%s Record Replay]\nTime: PAUSED\nTickrate: %s\nSpecs: %i\n\nBonus\n", g_szZoneGroupName[g_iClientInZone[g_BonusBot][2]], szTick, count);
 					}
 				}
 				else
 				{
 					if (ObservedUser != g_RecordBot)
 					{
-						Format(g_szPlayerPanelText[client], 512, "%Spectators (%i):\n%s\n \n%s\nRecord: %s\n", count, sSpecs, szPlayerRank, szProBest);
+						Format(g_szPlayerPanelText[client], 512, "%Specs (%i):\n%s\n \n%s\nRecord: %s\n", count, sSpecs, szPlayerRank, szProBest);
 						if (!g_bShowSpecs[client])
-							Format(g_szPlayerPanelText[client], 512, "Spectators (%i)\n \n%s\nRecord: %s\n", count, szPlayerRank, szProBest);
+							Format(g_szPlayerPanelText[client], 512, "Specs (%i)\n \n%s\nRecord: %s\n", count, szPlayerRank, szProBest);
 					}
 				}
 
 				if (g_bShowSpecs[client])
 				{
 					if (ObservedUser != g_RecordBot && ObservedUser != g_BonusBot && ObservedUser != g_WrcpBot)
-						Format(g_szPlayerPanelText[client], 512, "%Spectators (%i):\n%s\n \n%s\nRecord: %s\n\n%s\n", count, sSpecs, szPlayerRank, szProBest, szStage);
+						Format(g_szPlayerPanelText[client], 512, "Specs (%i):\n%s\n \n%s\nRecord: %s\n\n%s\n", count, sSpecs, szPlayerRank, szProBest, szStage);
 					else
 					{
 						if (ObservedUser == g_RecordBot)
-							Format(g_szPlayerPanelText[client], 512, "Map Replay\n%s (%s)\n \nSpectators (%i):\n%s\n \n%s\n", g_szReplayName, g_szReplayTime, count, sSpecs, szStage);
+							Format(g_szPlayerPanelText[client], 512, "Map Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \n%s\n", g_szReplayName, g_szReplayTime, count, sSpecs, szStage);
 						else if (ObservedUser == g_BonusBot)
-							Format(g_szPlayerPanelText[client], 512, "Bonus Replay\n%s (%s)\n \nSpectators (%i):\n%s\n \nBonus\n", g_szBonusName, g_szBonusTime, count, sSpecs);
+							Format(g_szPlayerPanelText[client], 512, "Bonus Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \nBonus\n", g_szBonusName, g_szBonusTime, count, sSpecs);
 						else if (ObservedUser == g_WrcpBot)
 						{
 							int stage = g_StageReplayCurrentStage;
-							Format(g_szPlayerPanelText[client], 512, "Stage: %i Replay (%i)\n%s (%s)\n \nSpectators (%i):\n%s\n", g_StageReplayCurrentStage, g_StageReplaysLoop, g_szWrcpReplayName[stage],  g_szWrcpReplayTime[stage], count, sSpecs);
+							Format(g_szPlayerPanelText[client], 512, "Stage: %i Replay (%i)\n%s (%s)\n \nSpecs (%i):\n%s\n", g_StageReplayCurrentStage, g_StageReplaysLoop, g_szWrcpReplayName[stage],  g_szWrcpReplayTime[stage], count, sSpecs);
 						}
 
 					}
@@ -3359,7 +3359,7 @@ public void CenterHudDead(int client)
 	if (SpecMode == 4 || SpecMode == 5)
 	{
 		g_SpecTarget[client] = ObservedUser;
-		//keys
+		// Show Keys
 		char sResult[256];
 		int Buttons;
 		if (IsValidClient(ObservedUser))
@@ -3399,7 +3399,7 @@ public void CenterHudDead(int client)
 				Format(sResult, sizeof(sResult), "%s __", sResult);
 
 			if (g_bTimeractivated[ObservedUser])
-			 {
+			{
 				obsTimer = GetGameTime() - g_fStartTime[ObservedUser] - g_fPauseTime[ObservedUser];
 				FormatTimeFloat(client, obsTimer, 3, obsAika, sizeof(obsAika));
 			}
@@ -3875,7 +3875,7 @@ public void SideHudAlive(int client)
 				char szSpecList[512];
 				int SpecMode;
 				Format(sSpecs, 512, "");
-				Format(szSpecList, 512, "Spectators (0)");
+				Format(szSpecList, 512, "Specs (0)");
 				int count = 0;
 				for (int j = 0; j <= MaxClients; j++)
 				{
@@ -3899,9 +3899,9 @@ public void SideHudAlive(int client)
 					}
 				}
 				if (count > 0)
-					Format(szSpecList, 512, "Spectators (%i):\n%s ", count, sSpecs);
+					Format(szSpecList, 512, "Specs (%i):\n%s ", count, sSpecs);
 				else
-					Format(szSpecList, 512, "Spectators (0)");
+					Format(szSpecList, 512, "Specs (0)");
 
 				Format(szModule[i], 256, "%s", szSpecList);
 
