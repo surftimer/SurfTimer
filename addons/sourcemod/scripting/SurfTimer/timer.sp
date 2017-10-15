@@ -5,14 +5,6 @@ public Action reloadRank(Handle timer, any client)
 	return Plugin_Handled;
 }
 
-public Action reloadConsoleInfo(Handle timer, any client)
-{
-	if (IsValidClient(client))
-		PrintConsoleInfo(client);
-	return Plugin_Handled;
-}
-
-
 public Action AnnounceMap(Handle timer, any client)
 {
 	if (IsValidClient(client))

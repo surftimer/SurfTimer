@@ -45,7 +45,7 @@ public void CL_OnStartTimerPress(int client)
 		if (g_bActivateCheckpointsOnStart[client])
 		g_bCheckpointsEnabled[client] = true;
 
-		// Reser run variables
+		// Reset run variables
 		tmpDiff[client] = 9999.0;
 		g_fPauseTime[client] = 0.0;
 		g_fStartPauseTime[client] = 0.0;
