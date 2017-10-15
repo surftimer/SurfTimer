@@ -2566,7 +2566,6 @@ public int BonusTopMenuHandler(Menu menu, MenuAction action, int param1, int par
 
 public void HelpPanel(int client)
 {
-	PrintConsoleInfo(client);
 	Handle panel = CreatePanel();
 	char title[64];
 	Format(title, 64, "Help (1/4)");

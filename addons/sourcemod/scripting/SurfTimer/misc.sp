@@ -1095,34 +1095,6 @@ stock bool IsValidClient(int client)
 	return false;
 }
 
-public void PrintConsoleInfo(int client)
-{
-
-	if (g_hSkillGroups == null)
-	{
-		CreateTimer(5.0, reloadConsoleInfo, client);
-		return;
-	}
-
-	int iConsoleTimeleft;
-	GetMapTimeLeft(iConsoleTimeleft);
-	int mins, secs;
-	char finalOutput[1024];
-	mins = iConsoleTimeleft / 60;
-	secs = iConsoleTimeleft % 60;
-	Format(finalOutput, 1024, "%d:%02d", mins, secs);
-	float fltickrate = 1.0 / GetTickInterval();
-
-	if (!IsValidClient(client) || IsFakeClient(client))
-		return;
-
-	PrintToConsole(client, "-----------------------------------------------------------------------------------------------------------");
-	PrintToConsole(client, "Surftimer v%s - Server tickrate: %i", VERSION, RoundToNearest(fltickrate));
-	PrintToConsole(client, " ");
-	PrintToConsole(client, "-----------------------------------------------------------------------------------------------------------");
-	PrintToConsole(client, " ");
-	return;
-}
 stock void FakePrecacheSound(const char[] szPath)
 {
 	AddToStringTable(FindStringTable("soundprecache"), szPath);
@@ -3193,7 +3165,7 @@ public void SpecListMenuDead(int client) // What Spectators see
 				if (g_bShowSpecs[client])
 				{
 					if (ObservedUser != g_RecordBot && ObservedUser != g_BonusBot && ObservedUser != g_WrcpBot)
-						Format(g_szPlayerPanelText[client], 512, "%Specs (%i):\n%s\n \n%s\nRecord: %s\n\n%s\n", count, sSpecs, szPlayerRank, szProBest, szStage);
+						Format(g_szPlayerPanelText[client], 512, "Specs (%i):\n%s\n \n%s\nRecord: %s\n\n%s\n", count, sSpecs, szPlayerRank, szProBest, szStage);
 					else
 					{
 						if (ObservedUser == g_RecordBot)
@@ -3203,7 +3175,7 @@ public void SpecListMenuDead(int client) // What Spectators see
 						else if (ObservedUser == g_WrcpBot)
 						{
 							int stage = g_StageReplayCurrentStage;
-							Format(g_szPlayerPanelText[client], 512, "Stage %i Replay (%i)\n%s (%s)\n \nSpecs (%i):\n%s\n", g_StageReplayCurrentStage, g_StageReplaysLoop, g_szWrcpReplayName[stage],  g_szWrcpReplayTime[stage], count, sSpecs);
+							Format(g_szPlayerPanelText[client], 512, "Stage: %i Replay (%i)\n%s (%s)\n \nSpecs (%i):\n%s\n", g_StageReplayCurrentStage, g_StageReplaysLoop, g_szWrcpReplayName[stage],  g_szWrcpReplayTime[stage], count, sSpecs);
 						}
 
 					}
@@ -3283,7 +3255,7 @@ public void LoadInfoBot()
 	g_InfoBot = -1;
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if (!IsValidClient(i) || !IsFakeClient(i) || i == g_RecordBot || i == g_BonusBot || i == g_WrcpBot)
+		if (!IsValidClient(i) || !IsFakeClient(i) || IsClientSourceTV(i) || i == g_RecordBot || i == g_BonusBot || i == g_WrcpBot)
 			continue;
 		g_InfoBot = i;
 		break;
@@ -3387,7 +3359,7 @@ public void CenterHudDead(int client)
 	if (SpecMode == 4 || SpecMode == 5)
 	{
 		g_SpecTarget[client] = ObservedUser;
-		//keys
+		// Show Keys
 		char sResult[256];
 		int Buttons;
 		if (IsValidClient(ObservedUser))
@@ -3410,16 +3382,24 @@ public void CenterHudDead(int client)
 			else
 				Format(sResult, sizeof(sResult), "%s _", sResult);
 			if (Buttons & IN_DUCK)
-				Format(sResult, sizeof(sResult), "%s - <font color='#00ff00'>DUCK</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s - <font color='#00ff00'>+D</font>", sResult);
 			else
-				Format(sResult, sizeof(sResult), "%s - _", sResult);
+				Format(sResult, sizeof(sResult), "%s - __", sResult);
 			if (Buttons & IN_JUMP)
-				Format(sResult, sizeof(sResult), "%s <font color='#00ff00'>JUMP</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s <font color='#00ff00'>+J</font>", sResult);
 			else
-				Format(sResult, sizeof(sResult), "%s _", sResult);
+				Format(sResult, sizeof(sResult), "%s __", sResult);
+			if (Buttons & IN_LEFT)
+				Format(sResult, sizeof(sResult), "%s <font color='#00ff00'>+L</font>", sResult);
+			else
+				Format(sResult, sizeof(sResult), "%s __", sResult);
+			if (Buttons & IN_RIGHT)
+				Format(sResult, sizeof(sResult), "%s <font color='#00ff00'>+R</font>", sResult);
+			else
+				Format(sResult, sizeof(sResult), "%s __", sResult);
 
 			if (g_bTimeractivated[ObservedUser])
-			 {
+			{
 				obsTimer = GetGameTime() - g_fStartTime[ObservedUser] - g_fPauseTime[ObservedUser];
 				FormatTimeFloat(client, obsTimer, 3, obsAika, sizeof(obsAika));
 			}
@@ -3441,7 +3421,8 @@ public void CenterHudDead(int client)
 			else if(g_iCurrentStyle[ObservedUser] != 0)
 				Format(timerText, 32, "%s ", g_szStyleHud[ObservedUser]);
 				//fluffys come back here
-			PrintHintText(client, "<font face=''><font color='#0089ff'>%sTimer:</font> %s\n<font color='#0089ff'>Speed:</font> %.1f u/s\n%s", timerText, obsAika, g_fLastSpeed[ObservedUser], sResult);
+				
+			PrintHintText(client, "<font face=''>%sTime: <font color='#00ff00'>%s</font>\nSpeed: <font color='#66bbff'>%i</font> u/s\nKeys: %s", timerText, obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
 		}
 	}
 	else
@@ -3476,44 +3457,44 @@ public void CenterHudAlive(int client)
 					if (g_bPause[client])
 					{
 						// Paused
-						Format(module[i], 128, "<font color='#FFFF00'>%s       </font>", pAika);
+						Format(module[i], 128, "Time: <font color='#FFFF00'>%s</font>", pAika);
 					}
 					else if (g_bPracticeMode[client])
 					{
 						// Prac mode
-						Format(module[i], 128, "<font color='#ffffff'>[P]: %s       </font>", pAika);
+						Format(module[i], 128, "Time: <font color='#ffffff'>[P]: %s</font>", pAika);
 					}
 					else if (g_bInBonus[client])
 					{
 						// In Bonus
-						Format(module[i], 128, "<font color='#ff8200'>%s       </font>", pAika);
+						Format(module[i], 128, "Time: <font color='#ff8200'>%s</font>", pAika);
 					}
 					else if (g_bMissedMapBest[client] && g_fPersonalRecord[client] > 0.0)
 					{
 						// Missed Personal Best time
-						Format(module[i], 128, "<font color='#fd0000'>%s       </font>", pAika);
+						Format(module[i], 128, "Time: <font color='#fd0000'>%s</font>", pAika);
 					}
 					else if (g_fPersonalRecord[client] < 0.1)
 					{
 						// No Personal Best on map
-						Format(module[i], 128, "<font color='#0089ff'>%s       </font>", pAika);
+						Format(module[i], 128, "Time: <font color='#0089ff'>%s</font>", pAika);
 					}
 					else
 					{
 						// Hasn't missed Personal Best yet
-						Format(module[i], 128, "<font color='#00ff00'>%s       </font>", pAika);
+						Format(module[i], 128, "Time: <font color='#00ff00'>%s</font>", pAika);
 					}
 				}
 				else if (g_bWrcpTimeractivated[client] && !g_bPracticeMode[client])
 				{
 					FormatTimeFloat(client, g_fCurrentWrcpRunTime[client], 3, pAika, 128);
-					Format(module[i], 128, "<font color='#bd00ff'>%s       </font>", pAika);
+					Format(module[i], 128, "Time: <font color='#bd00ff'>%s</font>", pAika);
 				}
 				else if (!g_bTimerEnabled[client])
-					Format(module[i], 128, "<font color='#FFFF00'>Disabled       </font>");
+					Format(module[i], 128, "Time: <font color='#FFFF00'>Disabled</font>");
 				else
 				{
-					Format(module[i], 128, "<font color='#FF0000'>00:00:00       </font>");
+					Format(module[i], 128, "Time: <font color='#FF0000'>00:00:00</font>");
 				}
 
 				if (g_iCurrentStyle[client] != 0)
@@ -3673,7 +3654,7 @@ public void CenterHudAlive(int client)
 					}
 					else // map has stages
 					{
-						Format(module[i], 128, "Stage %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1)); // less \t's to make lines align
+						Format(module[i], 128, "Stage: %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1)); // less \t's to make lines align
 					}
 				}
 				else
@@ -3870,7 +3851,7 @@ public void SideHudAlive(int client)
 					}
 					else // map has stages
 					{
-						Format(szStage, 64, "Stage %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+						Format(szStage, 64, "Stage: %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
 						char szWrcpTime[64];
 						FormatTimeFloat(0, g_fStageRecord[stage], 3, szWrcpTime, 64);
 						char szName[64];
