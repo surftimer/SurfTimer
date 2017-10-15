@@ -14,7 +14,10 @@ public Action sm_test(int client, int args)
 
 	// PrintToChat(client, "g_iSelectedTrigger[client]: %i", g_iSelectedTrigger[client]);
 
-	LoadDefaultTitle(client);
+	if (g_bZoner[client])
+		PrintToChat(client, "true - %i", g_iVipLvl[client]);
+	else
+		PrintToChat(client, "false - %i", g_iVipLvl[client]);
 
 	return Plugin_Handled;
 }
@@ -2021,6 +2024,8 @@ public Action Client_Help(int client, int args)
 		}
 		else if ((StrContains(desc, "[surftimer]", false) != -1) && CheckCommandAccess(client, name, flags))
 		{
+			if ((StrContains(desc, "[zoner]", false) != -1) || (StrContains(desc, "[vip]", false) != -1))
+				continue;
 			char szBuffer[512][2];
 			ExplodeString(desc, "[surftimer]", szBuffer, 2, 512, false);
 			Format(szCommand, 320, "%s - %s", name, szBuffer[1]);

@@ -1492,6 +1492,7 @@ public void SetClientDefaults(int client)
 
 	// VIP
 	g_bCheckCustomTitle[client] = false;
+	g_bZoner[client] = false;
 
 	// WRCP Replays
 	g_bSavingWrcpReplay[client] = false;

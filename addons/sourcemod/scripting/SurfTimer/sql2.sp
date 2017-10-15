@@ -294,6 +294,7 @@ public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] er
 	}
 
 	g_iVipLvl[client] = 0;
+	g_bZoner[client] = false;
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
@@ -301,17 +302,23 @@ public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] er
 		g_bZoner[client] = view_as<bool>(SQL_FetchInt(hndl, 2));
 	}
 
-	if (g_iVipLvl[client] < 1) // No VIP from database, let's check sb
+	if (!g_bZoner[client]) // No Zoner from database, let's check flags
 	{
-		if (CheckCommandAccess(client, "", ADMFLAG_CUSTOM5)) // BDC
+		if (CheckCommandAccess(client, "", ADMFLAG_CUSTOM6))
+			g_bZoner[client] = true;
+	}
+
+	if (g_iVipLvl[client] < 1) // No VIP from database, let's check flags
+	{
+		if (CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
 		{
 			g_iVipLvl[client] = 3;
 		}
-		else if (CheckCommandAccess(client, "", ADMFLAG_CUSTOM1)) // SuperVIP
+		else if (CheckCommandAccess(client, "", ADMFLAG_CUSTOM1))
 		{
 			g_iVipLvl[client] = 2;
 		}
-		else if (CheckCommandAccess(client, "", ADMFLAG_CUSTOM6)) // VIP
+		else if (CheckCommandAccess(client, "", ADMFLAG_RESERVATION))
 		{
 			g_iVipLvl[client] = 1;
 		}
