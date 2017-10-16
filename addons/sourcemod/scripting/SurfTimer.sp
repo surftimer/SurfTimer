@@ -80,6 +80,7 @@ The original version of this timer was by jonitaikaponi
 #define CP_RELATIVE_SOUND_PATH "*quake/wickedsick.mp3"
 #define UNSTOPPABLE_SOUND_PATH "sound/quake/unstoppable.mp3"
 #define UNSTOPPABLE_RELATIVE_SOUND_PATH "*quake/unstoppable.mp3"
+#define DEFAULT_TITLES_WHITELIST_PATH "configs/surftimer/default_titles_whitelist.txt"
 #define DEFAULT_TITLES_PATH "configs/surftimer/default_titles.txt"
 
 //fluffys
@@ -363,6 +364,7 @@ int g_TotalStages;
 float g_fWrcpMenuLastQuery[MAXPLAYERS + 1] = 1.0;
 bool g_bSelectWrcp[MAXPLAYERS + 1];
 //char g_StageSelect[MAXPLAYERS + 1]; //can't remember what this was for, keeping just in case
+int g_iWrcpMenuStyleSelect[MAXPLAYERS + 1];
 char g_szWrcpMapSelect[MAXPLAYERS + 1][128];
 bool g_bStageSRVRecord[MAXPLAYERS + 1][CPLIMIT];
 char g_szStageRecordPlayer[CPLIMIT][MAX_NAME_LENGTH];
@@ -969,7 +971,9 @@ ConVar g_hFootsteps = null;
 
 // Enforced Titles
 bool g_bEnforceTitle[MAXPLAYERS + 1];
-char g_szEnforcedTitle[MAXPLAYERS + 1][512];
+char g_szEnforcedTitle[MAXPLAYERS + 1][256];
+char g_szWhitelistedFlags[20][2];
+Handle g_DefaultTitlesWhitelist = null;
 
 /*=========================================
 =            Predefined arrays            =
@@ -1306,7 +1310,10 @@ public void OnMapStart()
 	* 15. Get total amount of stages on the map (db_GetTotalStages)
 	* -> loadAllClientSettings
 	*/
-	if (!g_bRenaming && !g_bInTransactionChain && IsServerProcessing())
+
+	ConVar cvHibernateWhenEmpty = FindConVar("sv_hibernate_when_empty");
+	
+	if (!g_bRenaming && !g_bInTransactionChain && (IsServerProcessing() || !cvHibernateWhenEmpty.BoolValue))
 	{
 		LogToFileEx(g_szLogFile, "[surftimer] Starting to load server settings");
 		g_fServerLoading[0] = GetGameTime();
@@ -1537,6 +1544,9 @@ public void OnConfigsExecuted()
 		readMapycycle();
 	else
 		readMultiServerMapcycle();
+	
+	if (GetConVarInt(g_hEnforceDefaultTitles) > 0)
+		ReadDefaultTitlesWhitelist();
 
 	// Count the amount of bonuses and then set skillgroups
 	if (!g_bRenaming && !g_bInTransactionChain)
@@ -2244,7 +2254,12 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 		for (int i = 1; i < MaxClients; i++)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i))
-				LoadDefaultTitle(i);
+			{
+				if (GetConVarInt(g_hEnforceDefaultTitles) == 0)
+					db_viewCustomTitles(i, g_szSteamID[i]);
+				else
+					LoadDefaultTitle(i);
+			}
 		}
 	}
 

@@ -1,0 +1,3 @@
+// Assign whitelists to the default title function here
+// Put each users steamid on a new line in STEAM_1:X:YYYYYYYYY format (SteamID32)
+STEAM_1:0:20019070

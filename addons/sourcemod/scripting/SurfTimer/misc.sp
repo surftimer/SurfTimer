@@ -4660,43 +4660,98 @@ public void CallAdmin(int client, char[] sText)
 	PrintToChat(client, " %cSurftimer %c| Report sent", LIMEGREEN, WHITE);
 }
 
+public void ReadDefaultTitlesWhitelist()
+{
+	PrintToChatAll("test");
+	if (g_DefaultTitlesWhitelist == null)
+		g_DefaultTitlesWhitelist = CreateArray();
+		
+	ClearArray(g_DefaultTitlesWhitelist);
+	char sPath[PLATFORM_MAX_PATH];
+	BuildPath(Path_SM, sPath, sizeof(sPath), "%s", DEFAULT_TITLES_WHITELIST_PATH);
+	File whitelist = OpenFile(sPath, "r");
+	if (whitelist != null)
+	{
+		char line[32];
+		while (!IsEndOfFile(whitelist) && ReadFileLine(whitelist, line, sizeof(line)))
+		{
+			TrimString(line);
+			if (StrContains(line, "//", true) == -1)
+				PushArrayString(g_DefaultTitlesWhitelist, line);
+		}
+		CloseHandle(whitelist);
+	}
+	else
+		LogError("[Surftimer] %s not found", DEFAULT_TITLES_WHITELIST_PATH);
+}
+
 public void LoadDefaultTitle(int client)
 {
 	// Set Defaults
 	g_bEnforceTitle[client] = false;
 	Format(g_szEnforcedTitle[client], sizeof(g_szEnforcedTitle), "");
+	if (g_DefaultTitlesWhitelist != null)
+		if ((FindStringInArray(g_DefaultTitlesWhitelist, g_szSteamID[client])) != -1)
+		{
+			PrintToChatAll("found");
+			return;
+		}
 
-	if (GetConVarInt(g_hEnforceDefaultTitles) > 0)
-	{
-		if (GetConVarInt(g_hEnforceDefaultTitles) < 3)
-			db_viewCustomTitles(client, g_szSteamID[client]);
-	}
+	if (GetConVarInt(g_hEnforceDefaultTitles) > 0 && GetConVarInt(g_hEnforceDefaultTitles) < 3)
+		db_viewCustomTitles(client, g_szSteamID[client]);
 
 	char sPath[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, sPath, sizeof(sPath), "%s", DEFAULT_TITLES_PATH);
-	Handle kv = CreateKeyValues("Default Titles");
-	FileToKeyValues(kv, sPath);
 
-	if (!KvGotoFirstSubKey(kv))
-		return;
-
-	char szTitle[256];
-	char szSection[128];
-
-	do
+	if (FileExists(sPath))
 	{
-		KvGetSectionName(kv, szSection, sizeof(szSection));
-		KvGetString(kv, "title", szTitle, sizeof(szTitle));
-		int bit = ReadFlagString(szSection);
-
-		if (CheckCommandAccess(client, "", bit))
+		Handle kv = CreateKeyValues("Default Titles");
+		if (FileToKeyValues(kv, sPath) && KvGotoFirstSubKey(kv))
 		{
-			g_bEnforceTitle[client] = true;
-			Format(g_szEnforcedTitle[client], sizeof(g_szEnforcedTitle), szTitle);
-			CreateTimer(1.0, SetClanTag, client, TIMER_FLAG_NO_MAPCHANGE);
-			break;
-		}
-	} while (KvGotoNextKey(kv));
+			char szBuffer[256];
+			do
+			{
+				KvGetString(kv, "steamid", szBuffer, sizeof(szBuffer), "none");
+				// Check if this keyvalue has a steamid
+				if (!StrEqual(szBuffer, "none"))
+				{
+					// Does the steamid match the clients?
+					if (StrEqual(g_szSteamID[client], szBuffer))
+					{
+						KvGetString(kv, "title", szBuffer, sizeof(szBuffer));
+						SetDefaultTitle(client, szBuffer);
+						break;
+					}
+					else
+						continue;
+				}
+				
+				KvGetString(kv, "flag", szBuffer, sizeof(szBuffer), "none");
+				// Has to be a flag since no steamid was found, otherwise invalid entry
+				if (StrEqual(szBuffer, "none"))
+					continue;
 
-	CloseHandle(kv);
+				// Check if client has access to this flag
+				int bit = ReadFlagString(szBuffer);
+				if (!CheckCommandAccess(client, "", bit))
+					continue;
+
+				KvGetString(kv, "title", szBuffer, sizeof(szBuffer));
+				SetDefaultTitle(client, szBuffer);
+				break;
+					
+			} while (KvGotoNextKey(kv));
+		}
+		delete kv;
+	}
+	else
+		LogError("[Surftimer] %s not found", DEFAULT_TITLES_PATH);
+}
+
+public void SetDefaultTitle(int client, const char szTitle[256])
+{
+	// Set the clients default title
+	g_bEnforceTitle[client] = true;
+	Format(g_szEnforcedTitle[client], sizeof(g_szEnforcedTitle), szTitle);
+	CreateTimer(1.0, SetClanTag, client, TIMER_FLAG_NO_MAPCHANGE);
 }

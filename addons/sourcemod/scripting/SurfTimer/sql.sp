@@ -8288,8 +8288,8 @@ public void db_viewStyleWrcpMap(int client, char mapname[128], int style)
 	Format(szQuery, 512, "SELECT `mapname`, COUNT(`zonetype`) AS stages FROM `ck_zones` WHERE `zonetype` = '3' AND `mapname` = (SELECT DISTINCT `mapname` FROM `ck_zones` WHERE `zonetype` = '3' AND `mapname` LIKE '%c%s%c' LIMIT 0, 1)", PERCENT, g_szWrcpMapSelect[client], PERCENT);
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
-	WritePackString(pack, mapname);
 	WritePackCell(pack, style);
+	WritePackString(pack, mapname);
 	SQL_TQuery(g_hDb, sql_viewStyleWrcpMapCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -8306,8 +8306,8 @@ public void sql_viewStyleWrcpMapCallback(Handle owner, Handle hndl, const char[]
 	char szStageString[MAXPLAYERS + 1];
 	ResetPack(pack);
 	int client = ReadPackCell(pack);
-	char mapname[128];
 	int style = ReadPackCell(pack);
+	char mapname[128];
 	ReadPackString(pack, mapname, 128);
 	CloseHandle(pack);
 
@@ -8328,7 +8328,7 @@ public void sql_viewStyleWrcpMapCallback(Handle owner, Handle hndl, const char[]
 			Menu menu;
 			menu = CreateMenu(StageStyleSelectMenuHandler);
 
-			SetMenuTitle(menu, "%s: Select a stage [%s]\n------------------------------\n", mapnameresult, g_szStyleMenuPrint[style]);
+			SetMenuTitle(menu, "%s: select a stage [%s]\n------------------------------\n", mapnameresult, g_szStyleMenuPrint[style]);
 			int stageCount = totalstages;
 			for (int i = 1; i <= stageCount; i++)
 			{
@@ -8402,7 +8402,7 @@ public void sql_selectStageStyleTopSurfersCallback(Handle owner, Handle hndl, co
 				{
 					GetArrayString(stringArray, x, lineBuf, sizeof(lineBuf));
 					if (StrEqual(lineBuf, szName, false))
-					bduplicat = true;
+						bduplicat = true;
 				}
 				if (bduplicat == false && i < 51)
 				{
@@ -8448,7 +8448,7 @@ public int StageStyleTopMenuHandler(Menu menu, MenuAction action, int client, in
 	}
 	else if (action == MenuAction_Cancel)
 	{
-			db_viewStyleWrcpMap(client, g_szWrcpMapSelect[client], 1);
+			db_viewStyleWrcpMap(client, g_szWrcpMapSelect[client], g_iWrcpMenuStyleSelect[client]);
 	}
 	else if (action == MenuAction_End)
 		CloseHandle(menu);

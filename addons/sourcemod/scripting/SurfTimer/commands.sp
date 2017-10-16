@@ -3458,31 +3458,37 @@ public Action Client_Wrcp(int client, int args)
 public Action Client_SWWrcp(int client, int args)
 {
 	WrcpMenu(client, args, 1);
+	return Plugin_Handled;
 }
 
 public Action Client_HSWWrcp(int client, int args)
 {
 	WrcpMenu(client, args, 2);
+	return Plugin_Handled;
 }
 
 public Action Client_BWWrcp(int client, int args)
 {
 	WrcpMenu(client, args, 3);
+	return Plugin_Handled;
 }
 
 public Action Client_LGWrcp(int client, int args)
 {
 	WrcpMenu(client, args, 4);
+	return Plugin_Handled;
 }
 
 public Action Client_SMWrcp(int client, int args)
 {
 	WrcpMenu(client, args, 5);
+	return Plugin_Handled;
 }
 
 public Action Client_FFWrcp(int client, int args)
 {
 	WrcpMenu(client, args, 6);
+	return Plugin_Handled;
 }
 
 public void WrcpMenu(int client, int args, int style)
@@ -3494,6 +3500,7 @@ public void WrcpMenu(int client, int args, int style)
 		g_bSelectWrcp[client] = false;
 		return;
 	}
+	g_iWrcpMenuStyleSelect[client] = style;
 	g_fWrcpMenuLastQuery[client] = GetGameTime();
 
 	char szStageString[MAXPLAYERS + 1];
