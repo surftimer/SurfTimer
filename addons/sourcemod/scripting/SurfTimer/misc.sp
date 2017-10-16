@@ -4662,9 +4662,6 @@ public void CallAdmin(int client, char[] sText)
 
 public void ReadDefaultTitlesWhitelist()
 {
-	if (g_DefaultTitlesWhitelist == null)
-		g_DefaultTitlesWhitelist = CreateArray();
-
 	ClearArray(g_DefaultTitlesWhitelist);
 	char sPath[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, sPath, sizeof(sPath), "%s", DEFAULT_TITLES_WHITELIST_PATH);
@@ -4692,7 +4689,7 @@ public void LoadDefaultTitle(int client)
 	if (g_DefaultTitlesWhitelist != null)
 		if ((FindStringInArray(g_DefaultTitlesWhitelist, g_szSteamID[client])) != -1)
 			return;
-			
+
 	if (GetConVarInt(g_hEnforceDefaultTitles) > 0 && GetConVarInt(g_hEnforceDefaultTitles) < 3)
 		db_viewCustomTitles(client, g_szSteamID[client]);
 

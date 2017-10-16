@@ -2846,6 +2846,9 @@ public void OnPluginStart()
 	int arraySize = ByteCountToCells(PLATFORM_MAX_PATH);
 	g_MapList = CreateArray(arraySize);
 
+	// default titles whitelist array
+	g_DefaultTitlesWhitelist = CreateArray();
+
 	//add command listeners
 	AddCommandListener(Command_JoinTeam, "jointeam");
 	AddCommandListener(Command_ext_Menu, "radio1");
