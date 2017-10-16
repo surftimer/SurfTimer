@@ -4691,11 +4691,8 @@ public void LoadDefaultTitle(int client)
 	Format(g_szEnforcedTitle[client], sizeof(g_szEnforcedTitle), "");
 	if (g_DefaultTitlesWhitelist != null)
 		if ((FindStringInArray(g_DefaultTitlesWhitelist, g_szSteamID[client])) != -1)
-		{
-			PrintToChatAll("found");
 			return;
-		}
-
+			
 	if (GetConVarInt(g_hEnforceDefaultTitles) > 0 && GetConVarInt(g_hEnforceDefaultTitles) < 3)
 		db_viewCustomTitles(client, g_szSteamID[client]);
 
