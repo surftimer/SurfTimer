@@ -4662,10 +4662,9 @@ public void CallAdmin(int client, char[] sText)
 
 public void ReadDefaultTitlesWhitelist()
 {
-	PrintToChatAll("test");
 	if (g_DefaultTitlesWhitelist == null)
 		g_DefaultTitlesWhitelist = CreateArray();
-		
+
 	ClearArray(g_DefaultTitlesWhitelist);
 	char sPath[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, sPath, sizeof(sPath), "%s", DEFAULT_TITLES_WHITELIST_PATH);
