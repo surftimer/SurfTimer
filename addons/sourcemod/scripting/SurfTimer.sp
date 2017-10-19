@@ -205,15 +205,6 @@ enum SkillGroup
 	String:RankNameColored[32], // Skillgroup name with colors
 }
 
-enum PlayerTitle
-{
-	client,
-	type,
-	String: title[256],
-	String: titleColoured[256],
-	display
-}
-
 
 /*===================================
 =            Plugin Info            =
@@ -327,6 +318,7 @@ int g_userJumps[MAXPLAYERS][UserJumps];
 /*----------  VIP Variables  ----------*/
 int g_VipFlag;
 int g_iVipLvl[MAXPLAYERS + 1];
+ConVar g_hAutoVipFlag = null;
 bool g_bVip[MAXPLAYERS + 1];
 bool g_bCheckCustomTitle[MAXPLAYERS + 1];
 bool g_bEnableJoinMsgs;
@@ -2487,7 +2479,7 @@ public void OnPluginStart()
 	g_hGravityFix = CreateConVar("ck_gravityfix_enable", "1", "Enables/Disables trigger_gravity fix", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 
 	// VIP ConVars
-	g_hAutoVipFlag = CreateConVar("ck_vip_flag", "a"), "VIP status will be automatically granted to players with this flag. If the convar is invalid or not set, a (reservation) will be used by default.", FCVAR_NOTIFY);
+	g_hAutoVipFlag = CreateConVar("ck_vip_flag", "a", "VIP status will be automatically granted to players with this flag. If the convar is invalid or not set, a (reservation) will be used by default.", FCVAR_NOTIFY);
 	// g_hCustomTitlesFlag = CreateConVar("ck_customtitles_flag", "a", "Which flag must players have to use Custom Titles. Invalid or not set, disables Custom Titles.", FCVAR_NOTIFY);
 	// GetConVarString(g_hCustomTitlesFlag, szFlag, 24);
 	// g_bCustomTitlesFlag = FindFlagByChar(szFlag[0], bufferFlag);
@@ -2998,8 +2990,9 @@ public int Native_SafeTeleport(Handle plugin, int numParams)
 
 public int Native_GetVipLevel(Handle plugin, int numParams)
 {
+	int client = GetNativeCell(1);
 	if (IsValidClient(client) && !IsFakeClient(client))
-		return g_iVipLvl[GetNativeCell(1)];
+		return g_iVipLvl[client];
 	else
 		return -1;
 }

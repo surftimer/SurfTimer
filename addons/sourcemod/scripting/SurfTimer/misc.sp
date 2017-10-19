@@ -2681,7 +2681,7 @@ public void SetPlayerRank(int client)
 		if (g_iEnforceTitleType[client] == 0 || g_iEnforceTitleType[client] == 2)
 			Format(g_pr_chat_coloredrank[client], 256, g_szEnforcedTitle[client]);
 
-		if (g_iEnforceTitleType[client] == 1 || g_iEnforceTitleType[client]) == 2)
+		if (g_iEnforceTitleType[client] == 1 || g_iEnforceTitleType[client] == 2)
 		{
 			char szTitle[256];
 			Format(szTitle, 256, g_szEnforcedTitle[client]);
@@ -4725,7 +4725,7 @@ public void LoadDefaultTitle(int client)
 
 				// "type"
 				g_iEnforceTitleType[client] = 2;
-				KVGetString(kv, "type", szBuffer, sizeof(sBuffer), "both");
+				KvGetString(kv, "type", szBuffer, sizeof(szBuffer), "both");
 				if (StrEqual(szBuffer, "scoreboard"))
 					g_iEnforceTitleType[client] = 1;
 				else if (StrEqual(szBuffer, "chat"))
