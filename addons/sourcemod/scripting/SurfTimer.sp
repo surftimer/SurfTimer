@@ -205,6 +205,15 @@ enum SkillGroup
 	String:RankNameColored[32], // Skillgroup name with colors
 }
 
+enum PlayerTitle
+{
+	client,
+	type,
+	String: title[256],
+	String: titleColoured[256],
+	display
+}
+
 
 /*===================================
 =            Plugin Info            =
@@ -316,8 +325,13 @@ bool g_bInMaxSpeed[MAXPLAYERS + 1];
 int g_userJumps[MAXPLAYERS][UserJumps];
 
 /*----------  VIP Variables  ----------*/
+int g_VipFlag;
 int g_iVipLvl[MAXPLAYERS + 1];
-bool g_bZoner[MAXPLAYERS + 1];
+bool g_bVip[MAXPLAYERS + 1];
+bool g_bCheckCustomTitle[MAXPLAYERS + 1];
+bool g_bEnableJoinMsgs;
+char g_szCustomJoinMsg[MAXPLAYERS + 1][256];
+//char g_szCustomSounds[MAXPLAYERS + 1][3][256]; // 1 = PB Sound, 2 = Top 10 Sound, 3 = WR sound
 
 /*----------  Custom Titles  ----------*/
 char g_szCustomTitleColoured[MAXPLAYERS + 1][1024];
@@ -556,8 +570,9 @@ Handle g_PracticeFinishForward;
 
 /*----------  CVars  ----------*/
 // Zones
-int g_ZoneMenuFlag;
-ConVar g_hZoneMenuFlag = null;
+bool g_bZoner[MAXPLAYERS + 1];
+int g_ZonerFlag;
+ConVar g_hZonerFlag = null;
 ConVar g_hZoneDisplayType = null;								 // How zones are displayed (lower edge, full)
 ConVar g_hZonesToDisplay = null; 								// Which zones are displayed
 ConVar g_hChecker; 												// Zone refresh rate
@@ -888,12 +903,6 @@ bool g_bJumpedInZone[MAXPLAYERS + 1];
 float g_fJumpedInZoneTime[MAXPLAYERS + 1];
 bool g_bResetOneJump[MAXPLAYERS + 1];
 
-// VIP Varibles
-bool g_bCheckCustomTitle[MAXPLAYERS + 1];
-bool g_bEnableJoinMsgs;
-char g_szCustomJoinMsg[MAXPLAYERS + 1][256];
-//char g_szCustomSounds[MAXPLAYERS + 1][3][256]; // 1 = PB Sound, 2 = Top 10 Sound, 3 = WR sound
-
 // Stage replays
 int g_StageRecStartFrame[MAXPLAYERS+1];	// Number of frames where the replay started being recorded
 int g_StageRecStartAT[MAXPLAYERS+1];	// Ammount of additional teleport when the replay started being recorded
@@ -971,6 +980,7 @@ ConVar g_hFootsteps = null;
 
 // Enforced Titles
 bool g_bEnforceTitle[MAXPLAYERS + 1];
+int g_iEnforceTitleType[MAXPLAYERS + 1];
 char g_szEnforcedTitle[MAXPLAYERS + 1][256];
 char g_szWhitelistedFlags[20][2];
 Handle g_DefaultTitlesWhitelist = null;
@@ -1545,7 +1555,7 @@ public void OnConfigsExecuted()
 	else
 		readMultiServerMapcycle();
 	
-	if (GetConVarInt(g_hEnforceDefaultTitles) > 0)
+	if (GetConVarBool(g_hEnforceDefaultTitles))
 		ReadDefaultTitlesWhitelist();
 
 	// Count the amount of bonuses and then set skillgroups
@@ -2209,7 +2219,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 		Format(color, 28, "%s", newValue[0]);
 		StringRGBtoInt(color, g_iZoneColors[0]);
 	}
-	else if (convar == g_hZoneMenuFlag) {
+	else if (convar == g_hZonerFlag) {
 		AdminFlag flag;
 		bool validFlag;
 		validFlag = FindFlagByChar(newValue[0], flag);
@@ -2217,10 +2227,10 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 		if (!validFlag)
 		{
 			PrintToServer("Surftimer | Invalid flag for ck_zonemenu_flag");
-			g_ZoneMenuFlag = ADMFLAG_ROOT;
+			g_ZonerFlag = ADMFLAG_ROOT;
 		}
 		else
-			g_ZoneMenuFlag = FlagToBit(flag);
+			g_ZonerFlag = FlagToBit(flag);
 	}
 	else if (convar == g_hAdminMenuFlag) 
 	{
@@ -2255,7 +2265,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 		{
 			if (IsValidClient(i) && !IsFakeClient(i))
 			{
-				if (GetConVarInt(g_hEnforceDefaultTitles) == 0)
+				if (!GetConVarBool(g_hEnforceDefaultTitles))
 					db_viewCustomTitles(i, g_szSteamID[i]);
 				else
 					LoadDefaultTitle(i);
@@ -2461,22 +2471,23 @@ public void OnPluginStart()
 		g_AdminMenuFlag = FlagToBit(bufferFlag);
 	HookConVarChange(g_hAdminMenuFlag, OnSettingChanged);
 
-	g_hZoneMenuFlag = CreateConVar("ck_zonemenu_flag", "z", "Admin flag required to open the !zones menu. Invalid or not set, requires flag z. Requires a server restart.", FCVAR_NOTIFY);
-	GetConVarString(g_hZoneMenuFlag, szFlag, 24);
+	g_hZonerFlag = CreateConVar("ck_zoner_flag", "z", "Zoner status will automatically be granted to players with this flag. If the convar is invalid or not set, z (root) will be used by default.", FCVAR_NOTIFY);
+	GetConVarString(g_hZonerFlag, szFlag, 24);
 	validFlag = FindFlagByChar(szFlag[0], bufferFlag);
 	if (!validFlag)
 	{
-		PrintToServer("Surftimer | Invalid flag for ck_zonemenu_flag.");
-		g_ZoneMenuFlag = ADMFLAG_ROOT;
+		PrintToServer("Surftimer | Invalid flag for ck_zoner_flag.");
+		g_ZonerFlag = ADMFLAG_ROOT;
 	}
 	else
-		g_ZoneMenuFlag = FlagToBit(bufferFlag);
-	HookConVarChange(g_hZoneMenuFlag, OnSettingChanged);
+		g_ZonerFlag = FlagToBit(bufferFlag);
+	HookConVarChange(g_hZonerFlag, OnSettingChanged);
 
 	// Map Setting ConVars
 	g_hGravityFix = CreateConVar("ck_gravityfix_enable", "1", "Enables/Disables trigger_gravity fix", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 
 	// VIP ConVars
+	g_hAutoVipFlag = CreateConVar("ck_vip_flag", "a"), "VIP status will be automatically granted to players with this flag. If the convar is invalid or not set, a (reservation) will be used by default.", FCVAR_NOTIFY);
 	// g_hCustomTitlesFlag = CreateConVar("ck_customtitles_flag", "a", "Which flag must players have to use Custom Titles. Invalid or not set, disables Custom Titles.", FCVAR_NOTIFY);
 	// GetConVarString(g_hCustomTitlesFlag, szFlag, 24);
 	// g_bCustomTitlesFlag = FindFlagByChar(szFlag[0], bufferFlag);
@@ -2508,7 +2519,7 @@ public void OnPluginStart()
 
 	g_hSidewaysBlockKeys = CreateConVar("ck_sideways_block_keys", "0", "Changes the functionality of sideways, 1 will block keys, 0 will change the clients style to normal if not surfing sideways");
 
-	g_hEnforceDefaultTitles = CreateConVar("ck_enforce_default_titles", "0", "Sets whether default titles will be enforced on clients, 0 to disable, 1 for chat only, 2 for scoreboard only, 3 for both");
+	g_hEnforceDefaultTitles = CreateConVar("ck_enforce_default_titles", "0", "Sets whether default titles will be enforced on clients, Enable / Disable");
 	HookConVarChange(g_hEnforceDefaultTitles, OnSettingChanged);
 
 	// Server Name
@@ -2985,6 +2996,14 @@ public int Native_SafeTeleport(Handle plugin, int numParams)
 		return false;
 }
 
+public int Native_GetVipLevel(Handle plugin, int numParams)
+{
+	if (IsValidClient(client) && !IsFakeClient(client))
+		return g_iVipLvl[GetNativeCell(1)];
+	else
+		return -1;
+}
+
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
 	RegPluginLibrary("surftimer");
@@ -2995,6 +3014,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	CreateNative("surftimer_GetCurrentTime", Native_GetCurrentTime);
 	CreateNative("surftimer_GetServerRank", Native_GetServerRank);
 	CreateNative("surftimer_SafeTeleport", Native_SafeTeleport);
+	CreateNative("surftimer_GetVipLevel", Native_GetVipLevel);
 	MarkNativeAsOptional("Store_GetClientCredits");
 	MarkNativeAsOptional("Store_SetClientCredits");
 	g_bLateLoaded = late;

@@ -55,7 +55,7 @@ public Action Admin_insertMapTier(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	if (!(GetUserFlagBits(client) & g_ZoneMenuFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT) && !g_bZoner[client])
+	if (!(GetUserFlagBits(client) & g_ZonerFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT) && !g_bZoner[client])
 	{
 		PrintToChat(client, " %cSurftimer %c| You don't have access to the zones menu.", LIMEGREEN, WHITE);
 		return Plugin_Handled;
@@ -184,7 +184,7 @@ public void ckAdminMenu(int client)
 	char szTmp[128];
 
 	Handle adminmenu = CreateMenu(AdminPanelHandler);
-	if (GetUserFlagBits(client) & g_ZoneMenuFlag)
+	if (GetUserFlagBits(client) & g_ZonerFlag)
 		Format(szTmp, sizeof(szTmp), "Surftimer %s Admin Menu (full access)", VERSION);
 	else
 		Format(szTmp, sizeof(szTmp), "Surftimer %s Admin Menu (limited access)", VERSION);
@@ -199,7 +199,7 @@ public void ckAdminMenu(int client)
 
 	int menuItemNumber = 2;
 
-	if (GetUserFlagBits(client) & g_ZoneMenuFlag)
+	if (GetUserFlagBits(client) & g_ZonerFlag)
 	{
 		Format(szTmp, sizeof(szTmp), "[%i.] Edit or create zones", menuItemNumber);
 		AddMenuItem(adminmenu, szTmp, szTmp);

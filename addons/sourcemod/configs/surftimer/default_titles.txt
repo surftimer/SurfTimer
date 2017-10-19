@@ -3,6 +3,7 @@
 //
 // Accepts "steamid" or "flag"
 // SteamIDs must be in STEAM_1:X:YYYYYYYYY format (SteamID32)
+// "type" can be "chat", "scoreboard", "both" to change where the title will display, default is both
 // Note: The first match for either a steamid or flag is what title will be assigned
 //
 // Available colors: {default}, {green}, 
@@ -17,15 +18,18 @@
   {
     "flag" "z"
     "title" "{default}[{darkred}Owner{default}]"
+    "type" "both"
   }
   "1"
   {
     "flag" "b"
     "title" "{default}[{green}Admin{default}]"
+    "type" "both"
   }
   // "2"
   // {
   //  "steamid" "STEAM_1:0:20019070"
   //  "title" "[test]"
+      "type" "both"
   // }
 }

@@ -4311,7 +4311,7 @@ public Action Command_HookZones(int client, int args)
 
 public void HookZonesMenu(int client)
 {
-	if (!(GetUserFlagBits(client) & g_ZoneMenuFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT) && !g_bZoner[client])
+	if (!(GetUserFlagBits(client) & g_ZonerFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT) && !g_bZoner[client])
 	{
 		PrintToChat(client, " %cSurftimer %c| You don't have access to the zones menu.", LIMEGREEN, WHITE);
 		return;

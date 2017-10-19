@@ -702,7 +702,7 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 		LoadClientSetting(client, g_iSettingToLoad[client]);
 
 		// Check Enforced Tags
-		if (GetConVarInt(g_hEnforceDefaultTitles) > 0)
+		if (GetConVarBool(g_hEnforceDefaultTitles))
 			LoadDefaultTitle(client);
 	}
 }

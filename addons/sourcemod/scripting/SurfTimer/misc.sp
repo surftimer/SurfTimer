@@ -2677,20 +2677,17 @@ public void SetPlayerRank(int client)
 
 	if (g_bEnforceTitle[client])
 	{
-		// g_hEnforceDefaultTitles - 0 = Disabled, 1 = Chat Only, 2 = Scoreboard Only, 3 = Both
-		if (GetConVarInt(g_hEnforceDefaultTitles) == 1 || GetConVarInt(g_hEnforceDefaultTitles) == 3)
+		// g_iEnforceTitleType[client], 0 = chat, 1 = scoreboard, 2 = both
+		if (g_iEnforceTitleType[client] == 0 || g_iEnforceTitleType[client] == 2)
 			Format(g_pr_chat_coloredrank[client], 256, g_szEnforcedTitle[client]);
 
-		if (GetConVarInt(g_hEnforceDefaultTitles) == 2 || GetConVarInt(g_hEnforceDefaultTitles) == 3)
+		if (g_iEnforceTitleType[client] == 1 || g_iEnforceTitleType[client]) == 2)
 		{
 			char szTitle[256];
 			Format(szTitle, 256, g_szEnforcedTitle[client]);
 			parseColorsFromString(szTitle, 256);
 			Format(g_pr_rankname[client], 256, szTitle);
 		}
-
-		if (GetConVarInt(g_hEnforceDefaultTitles) == 0)
-			g_bEnforceTitle[client] = false;
 	}
 	else if (!g_bDbCustomTitleInUse[client])
 	{
@@ -4690,9 +4687,6 @@ public void LoadDefaultTitle(int client)
 		if ((FindStringInArray(g_DefaultTitlesWhitelist, g_szSteamID[client])) != -1)
 			return;
 
-	if (GetConVarInt(g_hEnforceDefaultTitles) > 0 && GetConVarInt(g_hEnforceDefaultTitles) < 3)
-		db_viewCustomTitles(client, g_szSteamID[client]);
-
 	char sPath[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, sPath, sizeof(sPath), "%s", DEFAULT_TITLES_PATH);
 
@@ -4728,6 +4722,16 @@ public void LoadDefaultTitle(int client)
 				int bit = ReadFlagString(szBuffer);
 				if (!CheckCommandAccess(client, "", bit))
 					continue;
+
+				// "type"
+				g_iEnforceTitleType[client] = 2;
+				KVGetString(kv, "type", szBuffer, sizeof(sBuffer), "both");
+				if (StrEqual(szBuffer, "scoreboard"))
+					g_iEnforceTitleType[client] = 1;
+				else if (StrEqual(szBuffer, "chat"))
+					g_iEnforceTitleType[client] = 0;
+				else
+					g_iEnforceTitleType[client] = 2;
 
 				KvGetString(kv, "title", szBuffer, sizeof(szBuffer));
 				SetDefaultTitle(client, szBuffer);

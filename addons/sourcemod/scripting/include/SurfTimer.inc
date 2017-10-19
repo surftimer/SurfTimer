@@ -49,9 +49,9 @@ native Float:surftimer_GetCurrentTime(client);
  * Checks if the client has VIP status
  *
  * @param client     Client's id
- * @return           True / False
+ * @return           Clients VIP level / -1 on error
  */
-native bool:surftimer_ClientIsVIP(client);
+native bool:surftimer_GetVipLevel(client);
 
 /**
  * Gets the server rank of a client
