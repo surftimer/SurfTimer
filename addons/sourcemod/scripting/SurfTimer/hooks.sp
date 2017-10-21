@@ -1,3 +1,33 @@
+/*
+	Surftimer Hooks
+	TODO: Cleanup
+*/
+
+void CreateHooks()
+{
+	HookUserMessage(GetUserMessageId("SendPlayerItemFound"), ItemFoundMsg, true);
+	
+	//hooks
+	HookEvent("player_spawn", Event_OnPlayerSpawn, EventHookMode_Post);
+	HookEvent("player_death", Event_OnPlayerDeath);
+	HookEvent("round_start", Event_OnRoundStart, EventHookMode_PostNoCopy);
+	HookEvent("round_end", Event_OnRoundEnd, EventHookMode_Pre);
+	HookEvent("player_hurt", Event_OnPlayerHurt);
+	HookEvent("weapon_fire", Event_OnFire, EventHookMode_Pre);
+	HookEvent("player_team", Event_OnPlayerTeam, EventHookMode_Post);
+	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
+	HookEvent("player_jump", Event_PlayerJump);
+	//HookEvent("player_disconnect", Event_PlayerDisconnect);
+
+	// AddNormalSoundHook(OnNormalSoundPlayed);
+
+	// Gunshots
+	AddTempEntHook("Shotgun Shot", Hook_ShotgunShot);
+
+	// Footsteps
+	AddNormalSoundHook(Hook_FootstepCheck);
+}
+
 public Action SayText2(UserMsg msg_id, Handle bf, int[] players, int playersNum, bool reliable, bool init)
 {
 	if (!reliable)return Plugin_Continue;
