@@ -298,7 +298,7 @@ public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] er
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-		g_bVip = view_as<bool>(SQL_FetchInt(hndl, 0));
+		g_bVip[client] = view_as<bool>(SQL_FetchInt(hndl, 0));
 		g_bZoner[client] = view_as<bool>(SQL_FetchInt(hndl, 2));
 	}
 
@@ -631,7 +631,7 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 		Format(g_pr_rankname[client], 1024, "%s", szTitle);
 		Format(g_szCustomTitle[client], 1024, "%s", szTitle);
 
-		if (!SQL_IsFieldNull(hndl, 6) && IsPlayerVip(client, 2, true, false))
+		if (!SQL_IsFieldNull(hndl, 6) && IsPlayerVip(client, true, false))
 			SQL_FetchString(hndl, 6, g_szCustomJoinMsg[client], sizeof(g_szCustomJoinMsg));
 		else
 			Format(g_szCustomJoinMsg[client], sizeof(g_szCustomJoinMsg), "none");

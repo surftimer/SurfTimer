@@ -336,6 +336,11 @@ public Action Client_TargetName(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action Command_Vip(int client, int args)
+{
+	return Plugin_Handled;
+}
+
 // public Action Command_Vip(int client, int args)
 // {
 // 	if (!IsPlayerVip(client, 1))
@@ -385,10 +390,8 @@ public Action Client_TargetName(int client, int args)
 
 public void CustomTitleMenu(int client)
 {
-	if (!IsPlayerVip(client, 2))
-	{
+	if (!IsPlayerVip(client))
 		return;
-	}
 
 	char szName[64], szSteamID[32], szColour[3][96], szTitle[256], szItem[128], szItem2[128];
 
@@ -431,7 +434,7 @@ public int CustomTitleMenuHandler(Handle menu, MenuAction action, int param1, in
 
 public Action Command_VoteExtend(int client, int args)
 {
-	if(!IsValidClient(client) || !IsPlayerVip(client, 1))
+	if (!IsValidClient(client) || !IsPlayerVip(client))
 		return Plugin_Handled;
 
 	VoteExtend(client);
@@ -2304,11 +2307,15 @@ public Action Client_Help(int client, int args)
 		if ((StrContains(desc, "[surftimer]", false) != -1) && CheckCommandAccess(client, name, flags))
 		{
 			if ((StrContains(desc, "[zoner]", false) != -1))
+			{
 				if (!g_bZoner[client])
 					continue;
+			}
 			else if ((StrContains(desc, "[vip]", false) != -1))
+			{
 				if (!g_bVip[client])
 					continue;
+			}
 
 			char szBuffer[512][2];
 			ExplodeString(desc, "[surftimer]", szBuffer, 2, 512, false);
@@ -4229,7 +4236,7 @@ public Action Command_SelectBonusTime(int client, int args)
 // Show Triggers https://forums.alliedmods.net/showthread.php?t=290356
 public Action Command_ToggleTriggers(int client, int args)
 {
-	if (!IsPlayerVip(client, 1, true, false))
+	if (!IsPlayerVip(client))
 		return Plugin_Handled;
 
 	g_bShowTriggers[client] = !g_bShowTriggers[client];

@@ -2267,15 +2267,15 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 	{
 		AdminFlag flag;
 		bool validFlag;
-			
-  	validFlag = FindFlagByChar(newValue[0], flag);
-  	if (!validFlag)
-  	{
-    	LogError("Surftimer | Invalid flag for ck_vip_flag");
-    	g_VipFlag = ADMFLAG_RESERVATION;
-  	}
-  	else
-  		g_VipFlag = FlagToBit(flag);
+		validFlag = FindFlagByChar(newValue[0], flag);
+		
+		if (!validFlag)
+		{
+			LogError("Surftimer | Invalid flag for ck_vip_flag");
+			g_VipFlag = ADMFLAG_RESERVATION;
+		}
+		else
+			g_VipFlag = FlagToBit(flag);
 	}
 
 	if (g_hZoneTimer != INVALID_HANDLE)
@@ -2468,7 +2468,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	CreateNative("surftimer_GetCurrentTime", Native_GetCurrentTime);
 	CreateNative("surftimer_GetServerRank", Native_GetServerRank);
 	CreateNative("surftimer_SafeTeleport", Native_SafeTeleport);
-	CreateNative("surftimer_IsClientVip", Native_GetVipLevel);
+	CreateNative("surftimer_IsClientVip", Native_IsClientVip);
 	MarkNativeAsOptional("Store_GetClientCredits");
 	MarkNativeAsOptional("Store_SetClientCredits");
 	g_bLateLoaded = late;

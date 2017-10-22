@@ -3969,10 +3969,8 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 		LogToFileEx(g_szLogFile, "[Surftimer] Finished loading %s - %s settings in %fs", g_szSteamID[client], szName, time);
 		
 		// Print a VIP's custom join msg to all
-		if (g_bEnableJoinMsgs && !StrEqual(g_szCustomJoinMsg[client], "none") && IsPlayerVip(client, 2, true, false))
-		{
+		if (g_bEnableJoinMsgs && !StrEqual(g_szCustomJoinMsg[client], "none") && IsPlayerVip(client, true, false))
 			CPrintToChatAll("%s", g_szCustomJoinMsg[client]);
-		}
 
 		//CalculatePlayerRank(client);
 		g_bSettingsLoaded[client] = true;
