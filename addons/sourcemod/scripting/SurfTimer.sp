@@ -2468,7 +2468,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	CreateNative("surftimer_GetCurrentTime", Native_GetCurrentTime);
 	CreateNative("surftimer_GetServerRank", Native_GetServerRank);
 	CreateNative("surftimer_SafeTeleport", Native_SafeTeleport);
-	CreateNative("surftimer_GetVipLevel", Native_GetVipLevel);
+	CreateNative("surftimer_IsClientVip", Native_GetVipLevel);
 	MarkNativeAsOptional("Store_GetClientCredits");
 	MarkNativeAsOptional("Store_SetClientCredits");
 	g_bLateLoaded = late;
