@@ -91,29 +91,29 @@ void CreateCommands()
 	RegAdminCmd("sm_clearassists", Admin_ClearAssists, g_AdminMenuFlag, "[surftimer] Clears assist points (map progress) from all players");
 
 	// DB Map Settings && Zoners
-	RegConsoleCmd("sm_zones", Command_Zones, "[surftimer] [zoner] Opens up the zone creation menu.");
-	RegConsoleCmd("sm_hookzone", Command_HookZones, "[surftimer] [zoner] Opens up zone hook creation menu.");
-	RegConsoleCmd("sm_addmaptier", Admin_insertMapTier, "[surftimer] [zoner] Changes maps tier");
-	RegConsoleCmd("sm_amt", Admin_insertMapTier, "[surftimer] [zoner] Changes maps tier");
-	RegConsoleCmd("sm_addspawn", Admin_insertSpawnLocation, "[surftimer] [zoner] Changes the position !r takes players to");
-	RegConsoleCmd("sm_delspawn", Admin_deleteSpawnLocation, "[surftimer] [zoner] Removes custom !r position");
-	RegAdminCmd("sm_startprespeed", Command_SetStartPreSpeed, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set the current maps start prespeed");
-	RegAdminCmd("sm_sps", Command_SetStartPreSpeed, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set the current maps start prespeed");
-	RegAdminCmd("sm_bonusprespeed", Command_SetBonusPreSpeed, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set the current maps bonus prespeed");
-	RegAdminCmd("sm_bps", Command_SetBonusPreSpeed, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set the current maps bonus prespeed");
-	RegAdminCmd("sm_stageprespeed", Command_SetStagePreSpeed, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set the current maps stage prespeed");
-	RegAdminCmd("sm_stageps", Command_SetStagePreSpeed, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set the current maps stage prespeed");
-	RegAdminCmd("sm_maxvelocity", Command_SetMaxVelocity, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set the current maps maxvelocity");
-	RegAdminCmd("sm_mv", Command_SetMaxVelocity, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set the current maps max velocity");
-	RegAdminCmd("sm_announcerecord", Command_SetAnnounceRecord, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set whether records will be announced on all finishes, pb only or client only");
-	RegAdminCmd("sm_ar", Command_SetAnnounceRecord, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Set whether records will be announced on all finishes, pb only or client only");
-	RegAdminCmd("sm_gravityfix", Command_SetGravityFix, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Toggle the gravity fix on the current map");
-	RegAdminCmd("sm_gf", Command_SetGravityFix, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Toggle the gravity fix on the current map");
-	RegAdminCmd("sm_triggers", Command_ToggleTriggers, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Toggle the gravity fix on the current map");
-	RegAdminCmd("sm_noclipspeed", Command_NoclipSpeed, ADMFLAG_CUSTOM6, "[surftimer] [zoner] Toggle the gravity fix on the current map");
+	RegAdminCmd("sm_zones", Command_Zones, g_ZonerFlag, "[surftimer] [zoner] Opens up the zone creation menu.");
+	RegAdminCmd("sm_hookzone", Command_HookZones, g_ZonerFlag, "[surftimer] [zoner] Opens up zone hook creation menu.");
+	RegAdminCmd("sm_addmaptier", Admin_insertMapTier, g_ZonerFlag, "[surftimer] [zoner] Changes maps tier");
+	RegAdminCmd("sm_amt", Admin_insertMapTier, g_ZonerFlag, "[surftimer] [zoner] Changes maps tier");
+	RegAdminCmd("sm_addspawn", Admin_insertSpawnLocation, g_ZonerFlag, "[surftimer] [zoner] Changes the position !r takes players to");
+	RegAdminCmd("sm_delspawn", Admin_deleteSpawnLocation, g_ZonerFlag, "[surftimer] [zoner] Removes custom !r position");
+	RegAdminCmd("sm_startprespeed", Command_SetStartPreSpeed, g_ZonerFlag, "[surftimer] [zoner] Set the current maps start prespeed");
+	RegAdminCmd("sm_sps", Command_SetStartPreSpeed, g_ZonerFlag, "[surftimer] [zoner] Set the current maps start prespeed");
+	RegAdminCmd("sm_bonusprespeed", Command_SetBonusPreSpeed, g_ZonerFlag, "[surftimer] [zoner] Set the current maps bonus prespeed");
+	RegAdminCmd("sm_bps", Command_SetBonusPreSpeed, g_ZonerFlag, "[surftimer] [zoner] Set the current maps bonus prespeed");
+	RegAdminCmd("sm_stageprespeed", Command_SetStagePreSpeed, g_ZonerFlag, "[surftimer] [zoner] Set the current maps stage prespeed");
+	RegAdminCmd("sm_stageps", Command_SetStagePreSpeed, g_ZonerFlag, "[surftimer] [zoner] Set the current maps stage prespeed");
+	RegAdminCmd("sm_maxvelocity", Command_SetMaxVelocity, g_ZonerFlag, "[surftimer] [zoner] Set the current maps maxvelocity");
+	RegAdminCmd("sm_mv", Command_SetMaxVelocity, g_ZonerFlag, "[surftimer] [zoner] Set the current maps max velocity");
+	RegAdminCmd("sm_announcerecord", Command_SetAnnounceRecord, g_ZonerFlag, "[surftimer] [zoner] Set whether records will be announced on all finishes, pb only or client only");
+	RegAdminCmd("sm_ar", Command_SetAnnounceRecord, g_ZonerFlag, "[surftimer] [zoner] Set whether records will be announced on all finishes, pb only or client only");
+	RegAdminCmd("sm_gravityfix", Command_SetGravityFix, g_ZonerFlag, "[surftimer] [zoner] Toggle the gravity fix on the current map");
+	RegAdminCmd("sm_gf", Command_SetGravityFix, g_ZonerFlag, "[surftimer] [zoner] Toggle the gravity fix on the current map");
+	RegAdminCmd("sm_triggers", Command_ToggleTriggers, g_ZonerFlag, "[surftimer] [zoner] Toggle the gravity fix on the current map");
+	RegAdminCmd("sm_noclipspeed", Command_NoclipSpeed, g_ZonerFlag, "[surftimer] [zoner] Toggle the gravity fix on the current map");
 
 	// VIP Commands
-	RegAdminCmd("sm_fixbot", Admin_FixBot, ADMFLAG_RESERVATION, "[surftimer] Toggles replay bots off and on");
+	RegAdminCmd("sm_fixbot", Admin_FixBot, g_VipFlag, "[surftimer] Toggles replay bots off and on");
 
 	RegConsoleCmd("sm_vip", Command_Vip, "[surftimer] [vip] Displays the VIP menu to client");
 	RegConsoleCmd("sm_mytitle", Command_PlayerTitle, "[surftimer] [vip] VIPs can set their own custom title into a db.");
@@ -312,11 +312,6 @@ public Action sm_test(int client, int args)
 
 	// PrintToChat(client, "g_iSelectedTrigger[client]: %i", g_iSelectedTrigger[client]);
 
-	if (g_bZoner[client])
-		PrintToChat(client, "true - %i", g_iVipLvl[client]);
-	else
-		PrintToChat(client, "false - %i", g_iVipLvl[client]);
-
 	return Plugin_Handled;
 }
 
@@ -341,52 +336,52 @@ public Action Client_TargetName(int client, int args)
 	return Plugin_Handled;
 }
 
-public Action Command_Vip(int client, int args)
-{
-	if (!IsPlayerVip(client, 1))
-	{
-		return Plugin_Handled;
-	}
+// public Action Command_Vip(int client, int args)
+// {
+// 	if (!IsPlayerVip(client, 1))
+// 	{
+// 		return Plugin_Handled;
+// 	}
 	
-	VipMenu(client);
-	return Plugin_Handled;
-}
+// 	VipMenu(client);
+// 	return Plugin_Handled;
+// }
 
-public void VipMenu(int client)
-{
-	Menu menu = CreateMenu(VipMenuHandler);
-	SetMenuTitle(menu, "VIP Menu");
-	AddMenuItem(menu, "ve", "Vote Extend");
-	AddMenuItem(menu, "models", "Player Models");
-	if (g_iVipLvl[client] > 1)
-	{
-		AddMenuItem(menu, "title", "VIP Title");
-		AddMenuItem(menu, "paintcolour", "Paint Colour");
-	}
-	else
-	{
-		AddMenuItem(menu, "title", "VIP Title", ITEMDRAW_DISABLED);
-		AddMenuItem(menu, "paintcolour", "Paint Colour", ITEMDRAW_DISABLED);
-	}
-	SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
-	DisplayMenu(menu, client, MENU_TIME_FOREVER);
-}
+// public void VipMenu(int client)
+// {
+// 	Menu menu = CreateMenu(VipMenuHandler);
+// 	SetMenuTitle(menu, "VIP Menu");
+// 	AddMenuItem(menu, "ve", "Vote Extend");
+// 	AddMenuItem(menu, "models", "Player Models");
+// 	if (g_iVipLvl[client] > 1)
+// 	{
+// 		AddMenuItem(menu, "title", "VIP Title");
+// 		AddMenuItem(menu, "paintcolour", "Paint Colour");
+// 	}
+// 	else
+// 	{
+// 		AddMenuItem(menu, "title", "VIP Title", ITEMDRAW_DISABLED);
+// 		AddMenuItem(menu, "paintcolour", "Paint Colour", ITEMDRAW_DISABLED);
+// 	}
+// 	SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
+// 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+// }
 
-public int VipMenuHandler(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Select)
-	{
-		switch (param2)
-		{
-			case 0: VoteExtend(param1);
-			case 1: FakeClientCommandEx(param1, "sm_models");
-			case 2: CustomTitleMenu(param1);
-			case 3: FakeClientCommandEx(param1, "sm_paintcolour");
-		}
-	}
-	else if (action == MenuAction_End)
-		CloseHandle(menu);
-}
+// public int VipMenuHandler(Menu menu, MenuAction action, int param1, int param2)
+// {
+// 	if (action == MenuAction_Select)
+// 	{
+// 		switch (param2)
+// 		{
+// 			case 0: VoteExtend(param1);
+// 			case 1: FakeClientCommandEx(param1, "sm_models");
+// 			case 2: CustomTitleMenu(param1);
+// 			case 3: FakeClientCommandEx(param1, "sm_paintcolour");
+// 		}
+// 	}
+// 	else if (action == MenuAction_End)
+// 		CloseHandle(menu);
+// }
 
 public void CustomTitleMenu(int client)
 {
@@ -2306,24 +2301,15 @@ public Action Client_Help(int client, int args)
 	char szCommand[320];
 	while (ReadCommandIterator(cmdIter, name, sizeof(name), flags, desc, sizeof(desc)))
 	{
-		if ((StrContains(desc, "[zoner]", false) != -1) && g_bZoner[client])
+		if ((StrContains(desc, "[surftimer]", false) != -1) && CheckCommandAccess(client, name, flags))
 		{
-			char szBuffer[512][2];
-			ExplodeString(desc, "[surftimer]", szBuffer, 2, 512, false);
-			Format(szCommand, 320, "%s - %s", name, szBuffer[1]);
-			AddMenuItem(menu, "", szCommand, ITEMDRAW_DISABLED);
-		}
-		else if ((StrContains(desc, "[vip]", false) != -1) && g_iVipLvl[client] > 0)
-		{
-			char szBuffer[512][2];
-			ExplodeString(desc, "[surftimer]", szBuffer, 2, 512, false);
-			Format(szCommand, 320, "%s - %s", name, szBuffer[1]);
-			AddMenuItem(menu, "", szCommand, ITEMDRAW_DISABLED);
-		}
-		else if ((StrContains(desc, "[surftimer]", false) != -1) && CheckCommandAccess(client, name, flags))
-		{
-			if ((StrContains(desc, "[zoner]", false) != -1) || (StrContains(desc, "[vip]", false) != -1))
-				continue;
+			if ((StrContains(desc, "[zoner]", false) != -1))
+				if (!g_bZoner[client])
+					continue;
+			else if ((StrContains(desc, "[vip]", false) != -1))
+				if (!g_bVip[client])
+					continue;
+
 			char szBuffer[512][2];
 			ExplodeString(desc, "[surftimer]", szBuffer, 2, 512, false);
 			Format(szCommand, 320, "%s - %s", name, szBuffer[1]);
@@ -3438,19 +3424,15 @@ public int MiscellaneousOptionsHandler(Menu menu, MenuAction action, int param1,
 //fluffys
 public Action Command_PlayerTitle(int client, int args)
 {
-	CustomTitleMenu(client);
+	if (IsValidClient(client) && IsPlayerVip(client))
+		CustomTitleMenu(client);
 	return Plugin_Handled;
 }
 
 public Action Command_SetDbTitle(int client, int args)
 {
-	if (!IsValidClient(client))
+	if (!IsValidClient(client) || !IsPlayerVip(client))
 		return Plugin_Handled;
-
-	if (!IsPlayerVip(client, 2))
-	{
-		return Plugin_Handled;
-	}
 
 	char arg[256], authSteamId[MAXPLAYERS + 1];
 	GetClientAuthId(client, AuthId_Steam2, authSteamId, MAX_NAME_LENGTH, true);
@@ -3507,7 +3489,7 @@ public Action Command_SetDbTitle(int client, int args)
 
 public Action Command_JoinMsg(int client, int args)
 {
-	if (!IsValidClient(client) || !IsPlayerVip(client, 2))
+	if (!IsValidClient(client) || !IsPlayerVip(client))
 		return Plugin_Handled;
 	
 	if (args == 0)
@@ -3525,13 +3507,8 @@ public Action Command_JoinMsg(int client, int args)
 
 public Action Command_ToggleTitle(int client, int args)
 {
-	if (!IsValidClient(client))
+	if (!IsValidClient(client) || !IsPlayerVip(client))
 		return Plugin_Handled;
-
-	if (!IsPlayerVip(client, 1))
-	{
-		return Plugin_Handled;
-	}
 
 	char authSteamId[MAXPLAYERS + 1];
 
@@ -3544,13 +3521,8 @@ public Action Command_ToggleTitle(int client, int args)
 
 public Action Command_SetDbNameColour(int client, int args)
 {
-	if (!IsValidClient(client))
+	if (!IsValidClient(client) || !IsPlayerVip(client))
 		return Plugin_Handled;
-
-	if (!IsPlayerVip(client, 2))
-	{
-		return Plugin_Handled;
-	}
 
 	char arg[128], authSteamId[MAXPLAYERS + 1];
 	GetClientAuthId(client, AuthId_Steam2, authSteamId, MAX_NAME_LENGTH, true);
@@ -3619,8 +3591,7 @@ public Action Command_SetDbNameColour(int client, int args)
 		}
 		else if (StrContains(upperArg, "{PURPLE}", false)!=-1)
 		{
-			//arg = "13";
-			arg = "0";
+			arg = "13";
 		}
 		else if (StrContains(upperArg, "{DARKGREY}", false)!=-1)
 		{
@@ -3643,13 +3614,8 @@ public Action Command_SetDbNameColour(int client, int args)
 
 public Action Command_SetDbTextColour(int client, int args)
 {
-	if (!IsValidClient(client))
+	if (!IsValidClient(client) || !IsPlayerVip(client))
 		return Plugin_Handled;
-
-	if (!IsPlayerVip(client, 2))
-	{
-		return Plugin_Handled;
-	}
 
 	char arg[128], authSteamId[MAXPLAYERS + 1];
 	GetClientAuthId(client, AuthId_Steam2, authSteamId, MAX_NAME_LENGTH, true);
@@ -3718,8 +3684,7 @@ public Action Command_SetDbTextColour(int client, int args)
 		}
 		else if (StrContains(upperArg, "{PURPLE}", false)!=-1)
 		{
-			//arg = "13";
-			arg = "0";
+			arg = "13";
 		}
 		else if (StrContains(upperArg, "{DARKGREY}", false)!=-1)
 		{
@@ -3743,7 +3708,6 @@ public Action Command_SetDbTextColour(int client, int args)
 public Action Command_ListColours(int client, int args)
 {
 	PrintToChat(client, " %cSurftimer %c| Available Colours: %c{darkred} %c{lightred} %c{red} %c{green} %c{limegreen} %c{mossgreen} %c{darkblue} %c{lightblue} %c{blue} %c{pink} %c{purple} %c{orange} %c{yellow} %c{darkgrey} %c{grey} %c{white}", LIMEGREEN, WHITE, DARKRED, LIGHTRED, RED, GREEN, LIMEGREEN, MOSSGREEN, DARKBLUE, LIGHTBLUE, BLUE, PINK, PURPLE, ORANGE, YELLOW, DARKGREY, GRAY, WHITE);
-
 	return Plugin_Handled;
 }
 
@@ -4857,13 +4821,8 @@ public Action Client_ShowComms(int client, int args)
 
 public Action Command_VoteMute(int client, int args)
 {
-	if (IsValidClient(client) && !IsFakeClient(client))
+	if (IsValidClient(client) && IsPlayerVip(client))
 	{
-		if (!IsPlayerVip(client, 1))
-		{
-			return Plugin_Handled;
-		}
-
 		if (IsVoteInProgress())
 		{
 			ReplyToCommand(client, " %cSurftimer %c| A vote is already in progress", LIMEGREEN, WHITE);
@@ -4877,13 +4836,8 @@ public Action Command_VoteMute(int client, int args)
 
 public Action Command_VoteGag(int client, int args)
 {
-	if (IsValidClient(client) && !IsFakeClient(client))
+	if (IsValidClient(client) && IsPlayerVip(client))
 	{
-		if (!IsPlayerVip(client, 1))
-		{
-			return Plugin_Handled;
-		}
-
 		if (IsVoteInProgress())
 		{
 			ReplyToCommand(client, " %cSurftimer %c| A vote is already in progress", LIMEGREEN, WHITE);

@@ -144,13 +144,13 @@ void CreateConVars()
   bool validFlag;
   char szFlag[24];
   AdminFlag bufferFlag;
-  g_hAdminMenuFlag = CreateConVar("ck_adminmenu_flag", "b", "Admin flag required to open the !ckadmin menu. Invalid or not set, requires flag b. Requires a server restart.", FCVAR_NOTIFY);
+  g_hAdminMenuFlag = CreateConVar("ck_adminmenu_flag", "z", "Admin flag required to open the !ckadmin menu. Invalid or not set, requires flag z. Requires a server restart.", FCVAR_NOTIFY);
   GetConVarString(g_hAdminMenuFlag, szFlag, 24);
   validFlag = FindFlagByChar(szFlag[0], bufferFlag);
   if (!validFlag)
   {
     PrintToServer("Surftimer | Invalid flag for ck_adminmenu_flag.");
-    g_AdminMenuFlag = ADMFLAG_GENERIC;
+    g_AdminMenuFlag = ADMFLAG_ROOT;
   }
   else
   g_AdminMenuFlag = FlagToBit(bufferFlag);

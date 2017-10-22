@@ -293,35 +293,22 @@ public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] er
 			LoadClientSetting(client, g_iSettingToLoad[client]);
 	}
 
-	g_iVipLvl[client] = 0;
+	g_bVip[client] = false;
 	g_bZoner[client] = false;
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-		g_iVipLvl[client] = SQL_FetchInt(hndl, 0);
+		g_bVip = view_as<bool>(SQL_FetchInt(hndl, 0));
 		g_bZoner[client] = view_as<bool>(SQL_FetchInt(hndl, 2));
 	}
 
-	if (!g_bZoner[client]) // No Zoner from database, let's check flags
+	if (!g_bVip[client] || !g_bZoner[client]) // No VIP or Zoner from database, let's check flags
 	{
-		if (CheckCommandAccess(client, "", ADMFLAG_CUSTOM6))
-			g_bZoner[client] = true;
-	}
+		if (CheckCommandAccess(client, "", g_VipFlag))
+			g_bVip[client] = true;
 
-	if (g_iVipLvl[client] < 1) // No VIP from database, let's check flags
-	{
-		if (CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
-		{
-			g_iVipLvl[client] = 3;
-		}
-		else if (CheckCommandAccess(client, "", ADMFLAG_CUSTOM1))
-		{
-			g_iVipLvl[client] = 2;
-		}
-		else if (CheckCommandAccess(client, "", ADMFLAG_RESERVATION))
-		{
-			g_iVipLvl[client] = 1;
-		}
+		if (CheckCommandAccess(client, "", g_ZonerFlag))
+			g_bZoner[client] = true;
 	}
 
 	if (g_bCheckCustomTitle[client])
@@ -623,22 +610,9 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 		return;
 	}
 
-	if (g_iVipLvl[client] <= 1 && !g_bSettingsLoaded[client])
-	{
-		if (g_iVipLvl[client] == 1)
-		{
-			g_bDbCustomTitleInUse[client] = true;
-			Format(g_pr_chat_coloredrank[client], 1024, "[{lime}VIP{default}]");
-			Format(g_pr_rankname[client], 1024, "[VIP]");
-			Format(g_szCustomTitle[client], 1024, "[VIP]");
-		}
-		else
-		{
-			g_bDbCustomTitleInUse[client] = false;
-			g_bHasCustomTextColour[client] = false;
-			g_bdbHasCustomTitle[client] = false;
-		}
-	}
+	g_bDbCustomTitleInUse[client] = false;
+	g_bHasCustomTextColour[client] = false;
+	g_bdbHasCustomTitle[client] = false;
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{

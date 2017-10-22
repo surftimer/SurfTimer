@@ -4517,7 +4517,7 @@ public void sendDiscordAnnouncement(char szName[32], char szMapName[128], char s
 	delete hook;
 }
 
-bool IsPlayerVip(int client, int vip, bool admin = true, bool reply = true)
+bool IsPlayerVip(int client, bool admin = true, bool reply = true)
 {
 	if (admin)
 	{
@@ -4525,25 +4525,12 @@ bool IsPlayerVip(int client, int vip, bool admin = true, bool reply = true)
 			return true;
 	}
 
-	if (g_iVipLvl[client] < vip)
+	if (!g_bVip[client])
 	{
 		if (reply)
 		{
-			if (vip == 2)
-			{
-				PrintToChat(client, " %cSurftimer %c| This is a Super VIP feature", LIMEGREEN, WHITE);
-				PrintToConsole(client, "surftimer | This is a Super VIP feature");
-			}
-			else if (vip == 3)
-			{
-				PrintToChat(client, " %cSurftimer %c| This is a Superior VIP feature", LIMEGREEN, WHITE);
-				PrintToConsole(client, "surftimer | This is a Superior VIP feature");
-			}
-			else
-			{
-				PrintToChat(client, " %cSurftimer %c| This is a VIP feature", LIMEGREEN, WHITE);
-				PrintToConsole(client, "surftimer | This is a VIP feature");
-			}
+			PrintToChat(client, " %cSurftimer %c| This is a VIP feature", LIMEGREEN, WHITE);
+			PrintToConsole(client, "surftimer | This is a VIP feature");
 		}
 		return false;
 	}

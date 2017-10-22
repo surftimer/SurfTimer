@@ -33,9 +33,9 @@ The original version of this timer was by jonitaikaponi
 =            Declarations            =
 ====================================*/
 
-/*============================================
-=           	 Definitions 		         =
-=============================================*/
+/*====================================
+=            Definitions 		       	 =
+====================================*/
 
 // Require new syntax and semicolons
 #pragma newdecls required
@@ -316,9 +316,8 @@ bool g_bInMaxSpeed[MAXPLAYERS + 1];
 int g_userJumps[MAXPLAYERS][UserJumps];
 
 /*----------  VIP Variables  ----------*/
-int g_VipFlag;
-int g_iVipLvl[MAXPLAYERS + 1];
 ConVar g_hAutoVipFlag = null;
+int g_VipFlag;
 bool g_bVip[MAXPLAYERS + 1];
 bool g_bCheckCustomTitle[MAXPLAYERS + 1];
 bool g_bEnableJoinMsgs;
@@ -974,7 +973,6 @@ ConVar g_hFootsteps = null;
 bool g_bEnforceTitle[MAXPLAYERS + 1];
 int g_iEnforceTitleType[MAXPLAYERS + 1];
 char g_szEnforcedTitle[MAXPLAYERS + 1][256];
-char g_szWhitelistedFlags[20][2];
 Handle g_DefaultTitlesWhitelist = null;
 
 /*=========================================
@@ -2234,7 +2232,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 		if (!validFlag)
 		{
 			PrintToServer("Surftimer | Invalid flag for ck_adminmenu_flag");
-			g_AdminMenuFlag = ADMFLAG_GENERIC;
+			g_AdminMenuFlag = ADMFLAG_ROOT;
 		}
 		else
 			g_AdminMenuFlag = FlagToBit(flag);
@@ -2264,6 +2262,20 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 					LoadDefaultTitle(i);
 			}
 		}
+	}
+	else if (convar == g_hAutoVipFlag)
+	{
+		AdminFlag flag;
+		bool validFlag;
+			
+  	validFlag = FindFlagByChar(newValue[0], flag);
+  	if (!validFlag)
+  	{
+    	LogError("Surftimer | Invalid flag for ck_vip_flag");
+    	g_VipFlag = ADMFLAG_RESERVATION;
+  	}
+  	else
+  		g_VipFlag = FlagToBit(flag);
 	}
 
 	if (g_hZoneTimer != INVALID_HANDLE)
@@ -2437,13 +2449,13 @@ public int Native_SafeTeleport(Handle plugin, int numParams)
 		return false;
 }
 
-public int Native_GetVipLevel(Handle plugin, int numParams)
+public int Native_IsClientVip(Handle plugin, int numParams)
 {
 	int client = GetNativeCell(1);
 	if (IsValidClient(client) && !IsFakeClient(client))
-		return g_iVipLvl[client];
+		return g_bVip[client];
 	else
-		return -1;
+		return false;
 }
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
