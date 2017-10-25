@@ -312,6 +312,18 @@ public Action sm_test(int client, int args)
 
 	// PrintToChat(client, "g_iSelectedTrigger[client]: %i", g_iSelectedTrigger[client]);
 
+	int rank = g_PlayerRank[client];
+	int points = g_pr_points[client];
+
+	int RankValue[SkillGroup];
+	int index = GetSkillgroupIndex(rank, points);
+	GetArrayArray(g_hSkillGroups, index, RankValue[0]);
+	
+	PrintToChat(client, "%i", index);
+	PrintToChat(client, RankValue[RankNameColored]);
+	PrintToChat(client, RankValue[RankName]);
+	PrintToChat(client, RankValue[NameColour]);
+
 	return Plugin_Handled;
 }
 
@@ -2361,23 +2373,30 @@ public int HelpMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 public Action Client_Ranks(int client, int args)
 {
 	if (IsValidClient(client))
-	{
-		/*PrintToChat(client, " %cSurftimer %c| Unranked (0p) Newbie (1-199p) Learning (200-399p) %cNovice %c(400-599p) %cBeginner %c(600-799p) %cRookie %c(800-999p) %cAverage %c(1000-1499p) %cCasual %c(1500-2999p) %cAdvanced %c(3000p+) %cSkilled %c(Rank 451-500) %cExceptional %c(Rank 351-450)", LIMEGREEN, WHITE, GRAY, WHITE, GRAY, WHITE, YELLOW, WHITE, YELLOW, WHITE, MOSSGREEN, WHITE, MOSSGREEN, WHITE, LIMEGREEN, WHITE, LIMEGREEN, WHITE);
-
-		PrintToChat(client, " %cSurftimer %c| %cAmazing %c(Rank 201-350) %cPro %c(Rank 101-200) %cVeteran %c(Rank 51-100) %cExpert %c(Rank 26-50) %cElite %c(Rank 11-25) %cMaster %c(Rank 4-10) %cLegendary %c(Rank 3) %cGodly %c(Rank 2) %cKing %c(Rank 1) [Custom Rank] (Rank 1-3)", LIMEGREEN, WHITE, GREEN, WHITE, GREEN, WHITE, DARKBLUE, WHITE, DARKBLUE, WHITE, LIGHTBLUE, WHITE, LIGHTBLUE, WHITE, ORANGE, WHITE, PINK, WHITE, LIGHTRED, WHITE, DARKRED, WHITE);*/
-
-		displayRanksMenu(client, 0);
-
-	}
+		displayRanksMenu(client);
 	return Plugin_Handled;
 }
 
-public void displayRanksMenu(int client, int args)
+public void displayRanksMenu(int client)
 {
-
 	Menu menu = CreateMenu(ShowRanksMenuHandler);
-	SetMenuTitle(menu, "Rank 1: King [Players Choice]\nRank 2: Godly [Players Choice]\nRank 3: Legendary [Players Choice]\nRank 4-10: Master\nRank 11-25: Elite\nRank 26-50: Expert\nRank 51-100: Veteran\nRank 101-200: Pro\nRank 201-250: Amazing\nRank 251-300 Exceptional\nRank 301-350: Skilled\nRank 351-400: Advanced\nRank 401-450: Casual\nRank 451-500: Average\nRank 501-550: Rookie\nRank 551-600: Beginner\nRank 601-650: Novice\nRank 651-700: Learning\nRank 701-750: Newbie\n0 Points: Unranked");
-	AddMenuItem(menu, "", "", ITEMDRAW_SPACER);
+	SetMenuTitle(menu, "Chat Ranks");
+	char ChatLine[512];
+	int RankValue[SkillGroup];
+	for (int i = 0; i < GetArraySize(g_hSkillGroups); i++)
+	{
+		GetArrayArray(g_hSkillGroups, i, RankValue[0]);
+		if (RankValue[PointsBot] > -1 && RankValue[PointsTop] > -1)
+			Format(ChatLine, 512, "%i-%i Points: %s", RankValue[PointsBot], RankValue[PointsTop], RankValue[RankName]);
+		else if (RankValue[PointReq] > -1)
+			Format(ChatLine, 512, "%i Points: %s", RankValue[PointReq], RankValue[RankName]);
+		else if (RankValue[RankBot] > 0 && RankValue[RankTop] > 0)
+			Format(ChatLine, 512, "Rank %i-%i: %s", RankValue[RankBot], RankValue[RankTop], RankValue[RankName]);
+		else
+			Format(ChatLine, 512, "Rank %i: %s", RankValue[RankReq], RankValue[RankName]);
+		
+		AddMenuItem(menu, "", ChatLine, ITEMDRAW_DISABLED);
+	}
 	SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
 }

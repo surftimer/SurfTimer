@@ -16,7 +16,7 @@ The original version of this timer was by jonitaikaponi
 #include <smlib>
 #include <geoip>
 #include <basecomm>
-#include <colors>
+#include <colorvariables>
 #undef REQUIRE_EXTENSIONS
 #include <clientprefs>
 #undef REQUIRE_PLUGIN
@@ -199,12 +199,16 @@ enum MapZone
 
 enum SkillGroup
 {
+	PointsBot,
+	PointsTop,
 	PointReq,				// Points required for next skillgroup
-	NameColor,				// Color to use for name if colored chatnames is turned on
-	String:RankName[32],	// Skillgroup name without colors
-	String:RankNameColored[32], // Skillgroup name with colors
+	RankBot,
+	RankTop,
+	RankReq,
+	String:RankName[128],	// Skillgroup name without colors
+	String:RankNameColored[128], // Skillgroup name with colors
+	String:NameColour[32]				// Colour to use for name if coloured chatnames is turned on
 }
-
 
 /*===================================
 =            Plugin Info            =
@@ -792,6 +796,7 @@ int g_MVPStars[MAXPLAYERS + 1]; 								// The amount of MVP's a client has  TOD
 int g_PlayerChatRank[MAXPLAYERS + 1]; 							// What color is client's name in chat (based on rank)
 char g_pr_chat_coloredrank[MAXPLAYERS + 1][256]; 				// Clients rank, colored, used in chat
 char g_pr_rankname[MAXPLAYERS + 1][32]; 						// Client's rank, non-colored, used in clantag
+char g_pr_namecolour[MAXPLAYERS + 1][32];
 char g_szMapPrefix[2][32]; 										// Map's prefix, used to execute prefix cfg's
 char g_szMapName[128]; 											// Current map's name
 char g_szPlayerPanelText[MAXPLAYERS + 1][512];					// Info panel text when spectating
@@ -837,7 +842,7 @@ int g_pr_Recalc_ClientID = 0;									// Client ID being recalculated
 int g_pr_Recalc_AdminID = -1;									// ClientID that started the recalculation
 int g_pr_AllPlayers; 											// Ranked player count on server
 int g_pr_RankedPlayers; 										// Player count with points
-int g_pr_MapCount;												// Total map count in mapcycle
+int g_pr_MapCount[7];												// Total map count in mapcycle
 int g_pr_TableRowCount; 										// The amount of clients that get recalculated in a full recalculation
 int g_pr_points[MAX_PR_PLAYERS + 1]; 							// Clients points
 int g_pr_oldpoints[MAX_PR_PLAYERS + 1];							// Clients points before recalculation

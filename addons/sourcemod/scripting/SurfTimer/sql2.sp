@@ -620,9 +620,9 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 		SQL_FetchString(hndl, 0, g_szCustomTitleColoured[client], sizeof(g_szCustomTitleColoured));
 
 		//fluffys temp fix for scoreboard
-		int RankValue[SkillGroup];
-		int index = GetSkillgroupFromPoints(g_pr_points[client]);
-		GetArrayArray(g_hSkillGroups, index, RankValue[0]);
+		// int RankValue[SkillGroup];
+		// int index = GetSkillgroupIndex(g_pr_rank[client], g_pr_points[client]);
+		// GetArrayArray(g_hSkillGroups, index, RankValue[0]);
 		Format(g_pr_chat_coloredrank[client], 1024, "%s", g_szCustomTitleColoured[client]);
 
 		char szTitle[1024];
@@ -1597,7 +1597,7 @@ public void SQL_CheckAnnouncementsCallback(Handle owner, Handle hndl, const char
 public void db_selectMapCycle()
 {
 	char szQuery[128];
-	Format(szQuery, sizeof(szQuery), "SELECT mapname FROM ck_maptier ORDER BY mapname ASC");
+	Format(szQuery, sizeof(szQuery), "SELECT mapname, tier FROM ck_maptier ORDER BY mapname ASC");
 	SQL_TQuery(g_hDb, SQL_SelectMapCycleCallback, szQuery, 1, DBPrio_Low);
 }
 
@@ -1609,18 +1609,27 @@ public void SQL_SelectMapCycleCallback(Handle owner, Handle hndl, const char[] e
 		return;
 	}
 
-	g_pr_MapCount = 0;
+	g_pr_MapCount[0] = 0;
 	ClearArray(g_MapList);
 
 	if (SQL_HasResultSet(hndl))
 	{
 		char szMapname[128];
+		int tier;
 
 		while (SQL_FetchRow(hndl))
 		{
-			g_pr_MapCount++;
+			g_pr_MapCount[0]++;
 			SQL_FetchString(hndl, 0, szMapname, sizeof(szMapname));
-			PushArrayString(g_MapList, szMapname);			
+			tier = SQL_FetchInt(hndl, 1);
+			// No out of bounds arrays please
+			if (tier > 6)
+				tier = 6;
+			else if (tier < 1)
+				tier = 1;
+
+			g_pr_MapCount[tier]++;
+			PushArrayString(g_MapList, szMapname);	
 		}
 	}
 }

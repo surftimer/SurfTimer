@@ -1491,13 +1491,13 @@ public void sql_CountFinishedMapsCallback(Handle owner, Handle hndl, const char[
 	// Finished maps amount is stored in memory
 	g_pr_finishedmaps[client] = finishedMaps;
 	// Percentage of maps finished
-	g_pr_finishedmaps_perc[client] = (float(finishedMaps) / float(g_pr_MapCount)) * 100.0;
+	g_pr_finishedmaps_perc[client] = (float(finishedMaps) / float(g_pr_MapCount[0])) * 100.0;
 
 	//wrs
 	g_WRs[client][0] = wrs;
 
 	int totalperc = g_pr_finishedstages[client] + g_pr_finishedbonuses[client] + g_pr_finishedmaps[client];
-	int totalcomp = g_pr_StageCount + g_pr_BonusCount + g_pr_MapCount;
+	int totalcomp = g_pr_StageCount + g_pr_BonusCount + g_pr_MapCount[0];
 	float ftotalperc;
 
 	ftotalperc = (float(totalperc) / (float(totalcomp))) * 100.0;
@@ -1655,7 +1655,7 @@ public void db_viewPlayerPointsCallback(Handle owner, Handle hndl, const char[] 
 	{
 		g_pr_points[client] = SQL_FetchInt(hndl, 2);
 		g_pr_finishedmaps[client] = SQL_FetchInt(hndl, 3);
-		g_pr_finishedmaps_perc[client] = (float(g_pr_finishedmaps[client]) / float(g_pr_MapCount)) * 100.0;
+		g_pr_finishedmaps_perc[client] = (float(g_pr_finishedmaps[client]) / float(g_pr_MapCount[0])) * 100.0;
 
 		g_iPlayTimeAlive[client] = SQL_FetchInt(hndl, 6);
 		g_iPlayTimeSpec[client] = SQL_FetchInt(hndl, 7);
@@ -1992,7 +1992,7 @@ public void SQL_ViewRankedPlayerCallback6(Handle owner, Handle hndl, const char[
 	char szBPerc[32];
 	char szStagePerc[32];
 	char szTotalPerc[32];
-	fperc = (float(finishedmapspro) / (float(g_pr_MapCount))) * 100.0;
+	fperc = (float(finishedmapspro) / (float(g_pr_MapCount[0]))) * 100.0;
 	int finishedbonuses = g_totalBonusTimes[client];
 	int target = g_ClientProfile[client];
 	char percent[2]; //fluffys percent wont print !!
@@ -2061,7 +2061,7 @@ public void SQL_ViewRankedPlayerCallback6(Handle owner, Handle hndl, const char[
 		Format(szStagePerc, 32, "%.1f", stagefperc);
 
 	int totalperc = playerstages + finishedbonuses + finishedmapspro;
-	int totalcomp = totalstages + g_pr_BonusCount + g_pr_MapCount;
+	int totalcomp = totalstages + g_pr_BonusCount + g_pr_MapCount[0];
 	float ftotalperc;
 
 	ftotalperc = (float(totalperc) / (float(totalcomp))) * 100.0;
@@ -2074,12 +2074,12 @@ public void SQL_ViewRankedPlayerCallback6(Handle owner, Handle hndl, const char[
 		Format(szTotalPerc, 32, "%.1f", ftotalperc);
 
 
-	if (finishedmapspro > g_pr_MapCount)
-		finishedmapspro = g_pr_MapCount;
+	if (finishedmapspro > g_pr_MapCount[0])
+		finishedmapspro = g_pr_MapCount[0];
 
 	//fluffys ksf style Ranking
-	GetRankName(client, rank, points, szSkillGroup, 32);
-	//Format(szSkillGroup, 32, "%s", );
+	//GetRankName(client, rank, points, szSkillGroup, 32);
+	Format(szSkillGroup, 32, "%s", g_pr_rankname[client]);
 
 	char szRank[32];
 	if (rank > g_pr_RankedPlayers || points == 0)
@@ -2099,7 +2099,7 @@ public void SQL_ViewRankedPlayerCallback6(Handle owner, Handle hndl, const char[
 
 	if(g_bProfileInServer[client])
 	{
-		Format(szMapPoints, 128, "Maps: %i/%i - [%i] (%s%c)", finishedmapspro, g_pr_MapCount, g_Points[target][0], szPerc, PERCENT);
+		Format(szMapPoints, 128, "Maps: %i/%i - [%i] (%s%c)", finishedmapspro, g_pr_MapCount[0], g_Points[target][0], szPerc, PERCENT);
 
 		if(g_Points[target][4] > 0)
 			Format(szBonusPoints, 128, "Bonuses: %i/%i - [%i+%i] (%s%c)", finishedbonuses, g_pr_BonusCount, g_Points[target][1], g_Points[target][4], szBPerc, PERCENT);
@@ -2123,7 +2123,7 @@ public void SQL_ViewRankedPlayerCallback6(Handle owner, Handle hndl, const char[
 	}
 	else
 	{
-		Format(g_pr_szrank[client], 512, "Rank: %s/%i (%s)\nTotal pts: %ip \n \nCompleted:\nMaps: %i/%i (%s%s)\nStages: %i/%i (%s%s)\nBonuses: %i/%i (%s%s)\n \nRecords:\nMap WR: %i\nStage WR: %i\nBonus WR: %i\n ", szRank, g_pr_RankedPlayers, szSkillGroup, points, finishedmapspro, g_pr_MapCount, szPerc, percent, playerstages, totalstages, szStagePerc, percent, finishedbonuses, g_pr_BonusCount, szBPerc, percent, prorecords, stagerecords, bonusrecords);
+		Format(g_pr_szrank[client], 512, "Rank: %s/%i (%s)\nTotal pts: %ip \n \nCompleted:\nMaps: %i/%i (%s%s)\nStages: %i/%i (%s%s)\nBonuses: %i/%i (%s%s)\n \nRecords:\nMap WR: %i\nStage WR: %i\nBonus WR: %i\n ", szRank, g_pr_RankedPlayers, szSkillGroup, points, finishedmapspro, g_pr_MapCount[0], szPerc, percent, playerstages, totalstages, szStagePerc, percent, finishedbonuses, g_pr_BonusCount, szBPerc, percent, prorecords, stagerecords, bonusrecords);
 	}
 
 	char szID[32][2];
@@ -5983,7 +5983,7 @@ public void db_viewUnfinishedMapsCallback(Handle owner, Handle hndl, const char[
 		{
 			PrintToConsole(client, " ");
 			PrintToConsole(client, "------- User Stats -------");
-			PrintToConsole(client, "%i unfinished maps of total %i maps", mapCount, g_pr_MapCount);
+			PrintToConsole(client, "%i unfinished maps of total %i maps", mapCount, g_pr_MapCount[0]);
 			PrintToConsole(client, "%i unfinished bonuses", bonusCount);
 			PrintToConsole(client, "SteamID: %s", g_szProfileSteamId[client]);
 			PrintToConsole(client, "--------------------------");
@@ -6553,7 +6553,7 @@ public void db_selectTop100PlayersCallback(Handle owner, Handle hndl, const char
 			int pro = SQL_FetchInt(hndl, 2);
 			SQL_FetchString(hndl, 3, szSteamID, 32);
 			float fperc;
-			fperc = (float(pro) / (float(g_pr_MapCount))) * 100.0;
+			fperc = (float(pro) / (float(g_pr_MapCount[0]))) * 100.0;
 
 			if (fperc < 10.0)
 			Format(szPerc, 16, "  %.1f%c  ", fperc, PERCENT);
@@ -8657,7 +8657,7 @@ public void SQL_ViewRankedPlayerStyleCallback5(Handle owner, Handle hndl, const 
 	char szPerc[32];
 	char szBPerc[32];
 	char szStagePerc[32];
-	fperc = (float(finishedmapspro) / (float(g_pr_MapCount))) * 100.0;
+	fperc = (float(finishedmapspro) / (float(g_pr_MapCount[0]))) * 100.0;
 	int finishedbonuses = g_totalBonusTimes[client];
 	char percent[2]; //fluffys percent wont print !!
 	percent = "%%";
@@ -8712,8 +8712,8 @@ public void SQL_ViewRankedPlayerStyleCallback5(Handle owner, Handle hndl, const 
 	Format(szStagePerc, 32, "%.1f", stagefperc);
 
 
-	if (finishedmapspro > g_pr_MapCount)
-	finishedmapspro = g_pr_MapCount;
+	if (finishedmapspro > g_pr_MapCount[0])
+	finishedmapspro = g_pr_MapCount[0];
 
 	char szStyle[128];
 	if(style == 1) //sideways
@@ -8732,7 +8732,7 @@ public void SQL_ViewRankedPlayerStyleCallback5(Handle owner, Handle hndl, const 
 	if (master == false)
 	{ //fluffys edit !p menu
 		if (GetConVarBool(g_hPointSystem))
-			Format(g_pr_szrank[client], 512, "%s Completed:\nMaps: %i/%i (%s%s)\nStages: %i/%i (%s%s)\nBonuses: %i/%i (%s%s)\n \n%s Records:\nMap WR: %i\nStage WR: (WIP)\nBonus WR: %i\n ", szStyle, finishedmapspro, g_pr_MapCount, szPerc, percent, playerstages, totalstages, szStagePerc, percent, finishedbonuses, g_pr_BonusCount, szBPerc, percent, szStyle, prorecords, bonusrecords);
+			Format(g_pr_szrank[client], 512, "%s Completed:\nMaps: %i/%i (%s%s)\nStages: %i/%i (%s%s)\nBonuses: %i/%i (%s%s)\n \n%s Records:\nMap WR: %i\nStage WR: (WIP)\nBonus WR: %i\n ", szStyle, finishedmapspro, g_pr_MapCount[0], szPerc, percent, playerstages, totalstages, szStagePerc, percent, finishedbonuses, g_pr_BonusCount, szBPerc, percent, szStyle, prorecords, bonusrecords);
 	}
 
 	char szID[32][2];

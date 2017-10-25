@@ -3,14 +3,10 @@
 //
 // Accepts "steamid" or "flag"
 // SteamIDs must be in STEAM_1:X:YYYYYYYYY format (SteamID32)
-// "type" can be "chat", "scoreboard", "both" to change where the title will display, default is both
+// "type" can be "chat", "scoreboard" or "both" to change where the title will display, default is both
 // Note: The first match for either a steamid or flag is what title will be assigned
 //
-// Available colors: {default}, {green}, 
-// {mossgreen}, {limegreen}, {gray}, {yellow}, 
-// {orange}, {darkgray}, {blue}, {darkblue}, 
-// {purple}, {lightblue}, {pink}, {lightred},
-// {darkred}, {red}
+// Available colors: {default}, {red}, {lightred}, {darkred}, {bluegray}, {blue}, {darkblue}, {purple}, {orchid}, {yellow}, {gold}, {lightgreen}, {green}, {lime}, {gray}, {gray2}
 
 "Default Titles"
 {

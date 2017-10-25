@@ -375,15 +375,14 @@ public Action Say_Hook(int client, const char[] command, int argc)
 
 		char szName[64];
 		GetClientName(client, szName, 64);
+		CRemoveColors(szName, 64);
 
 		//log the chat of the player to the server so that tools such as HLSW/HLSTATX see it and also it remains logged in the log file
 		WriteChatLog(client, "say", sText);
 		PrintToServer("%s: %s", szName, sText);
 
-		parseColorsFromString(szName, 64);
-
 		if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
-			setNameColor(szName, g_rankNameChatColour[client], 64);
+			Format(szName, sizeof(szName), "%s%s", g_pr_namecolour[client], szName);
 		else if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
 			setNameColor(szName, g_iCustomColours[client][0], 64);
 			//fluffys

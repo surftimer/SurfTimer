@@ -671,7 +671,7 @@ public void readMultiServerMapcycle()
 	char line[128];
 
 	ClearArray(g_MapList);
-	g_pr_MapCount = 0;
+	g_pr_MapCount[0] = 0;
 	BuildPath(Path_SM, sPath, sizeof(sPath), "%s", MULTI_SERVER_MAPCYCLE);
 	Handle fileHandle = OpenFile(sPath, "r");
 
@@ -682,7 +682,7 @@ public void readMultiServerMapcycle()
 			TrimString(line); // Only take the map name
 			if (StrContains(line, "//", true) == -1) // Escape comments
 			{
-				g_pr_MapCount++;
+				g_pr_MapCount[0]++;
 				PushArrayString(g_MapList, line);
 	 		}
 		}
@@ -701,7 +701,7 @@ public void readMapycycle()
 	char map[128];
 	char map2[128];
 	int mapListSerial = -1;
-	g_pr_MapCount = 0;
+	g_pr_MapCount[0] = 0;
 	if (ReadMapList(g_MapList,
 			mapListSerial,
 			"mapcyclefile",
@@ -723,7 +723,7 @@ public void readMapycycle()
 			int lastPiece = ExplodeString(map, "/", mapPieces, sizeof(mapPieces), sizeof(mapPieces[]));
 			Format(map2, sizeof(map2), "%s", mapPieces[lastPiece - 1]);
 			SetArrayString(g_MapList, i, map2);
-			g_pr_MapCount++;
+			g_pr_MapCount[0]++;
 		}
 	}
 	return;
@@ -2387,19 +2387,39 @@ public void SetSkillGroups()
 {
 	//Map Points
 	int mapcount;
-	if (g_pr_MapCount < 1)
+	if (g_pr_MapCount[0] < 1)
 		mapcount = 1;
 	else
-		mapcount = g_pr_MapCount;
+		mapcount = g_pr_MapCount[0];
 
-	float MaxPoints = (float(mapcount) * 700.0) + (float(g_totalBonusCount) * 400.0);
+	float MaxPoints = 0.0;
+
+	if (GetConVarBool(g_hDBMapcycle))
+	{
+		// There is no "maxpoints" since WR points are always scaling, I'll just use total map completion points + bonus wr points (bonus wrs dont scale)
+		// Map Points (arrays start at 1 lol!)
+		MaxPoints += g_pr_MapCount[1] * 25.0;
+		MaxPoints += g_pr_MapCount[2] * 50.0;
+		MaxPoints += g_pr_MapCount[3] * 100.0;
+		MaxPoints += g_pr_MapCount[4] * 200.0;
+		MaxPoints += g_pr_MapCount[5] * 400.0;
+		MaxPoints += g_pr_MapCount[6] * 600.0; 
+		
+		// Bonus Points
+		MaxPoints += (float(g_totalBonusCount) * 200.0);
+	}
+	else
+	{
+		// Old way of calculating max points (inaccurate since map WR points aren't flat 700)
+		MaxPoints = (float(mapcount) * 700.0) + (float(g_totalBonusCount) * 200.0);
+	}
 
 	// Load rank cfg
 	char sPath[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, sPath, sizeof(sPath), SKILLGROUP_PATH);
 	if (FileExists(sPath))
 	{
-		Handle hKeyValues = CreateKeyValues("surftimer.SkillGroups");
+		Handle hKeyValues = CreateKeyValues("SkillGroups");
 		if (FileToKeyValues(hKeyValues, sPath) && KvGotoFirstSubKey(hKeyValues))
 		{
 			int RankValue[SkillGroup];
@@ -2409,41 +2429,85 @@ public void SetSkillGroups()
 			else
 				ClearArray(g_hSkillGroups);
 
-			char sRankName[128], sRankNameColored[128];
+			char sRankName[128], sRankNameColored[128], sNameColour[32], sBuffer[32];
 			float fPercentage;
-			int points;
+			int points, pointsBot, pointsTop, rankBot, rankTop, rank, i = 0;
 			do
 			{
-				// Get section as Rankname
-				KvGetString(hKeyValues, "name", sRankName, 128);
-				KvGetString(hKeyValues, "name", sRankNameColored, 128);
+				i++;
+				// Get Rankname & namecolour
+				KvGetString(hKeyValues, "rankTitle", sRankName, 128);
+				KvGetString(hKeyValues, "rankTitle", sRankNameColored, 128);
+				KvGetString(hKeyValues, "nameColour", sNameColour, 32, "{default}");
+
+				// Get points requirement
+				points = -1;
+				pointsBot = -1;
+				pointsTop = -1;
+
+				KvGetString(hKeyValues, "points", sBuffer, 32, "invalid");
+
+				// Is the points requirement a range?
+				if (StrContains(sBuffer, "-") != -1)
+				{
+					char sBuffer2[2][32];
+					ExplodeString(sBuffer, "-", sBuffer2, 2, 32);
+					pointsBot = StringToInt(sBuffer2[0]);
+					pointsTop = StringToInt(sBuffer2[1]);
+				}
+				else if (!StrEqual(sBuffer, "invalid"))
+					points = StringToInt(sBuffer);				
 
 				// Get percentage
-				fPercentage = KvGetFloat(hKeyValues, "percentage");
+				fPercentage = KvGetFloat(hKeyValues, "percentage", 0.0);
 
-				// Calculate required points for the rank
-				if (fPercentage < 0.0)
-					points = 0;
-				else
+				// Calculate percentage requirement
+				if (fPercentage > 0.0)
 					points = RoundToCeil(MaxPoints * fPercentage);
 
+				// Get rank requirement
+				rank = -1;
+				rankBot = -1;
+				rankTop = -1;
+				
+				KvGetString(hKeyValues, "rank", sBuffer, 32, "invalid");
+
+				// Is the rank requirement a range?
+				if (StrContains(sBuffer, "-") != -1)
+				{
+					char sBuffer2[2][32];
+					ExplodeString(sBuffer, "-", sBuffer2, 2, 32);
+					rankBot = StringToInt(sBuffer2[0]);
+					rankTop = StringToInt(sBuffer2[1]);
+				}
+				else if (!StrEqual(sBuffer, "invalid"))
+					rank = StringToInt(sBuffer);
+					
+				// Ignore invalid entries
+				if (pointsBot == -1 && pointsTop == -1 && points == -1 && fPercentage == 0.0 && rankBot == -1 && rankTop == -1 && rank == -1)
+				{
+					LogError("Skillgroup %i is invalid", i);
+					continue;
+				}
+
 				RankValue[PointReq] = points;
+				RankValue[PointsBot] = pointsBot;
+				RankValue[PointsTop] = pointsTop;
+				RankValue[RankBot] = rankBot;
+				RankValue[RankTop] = rankTop;
+				RankValue[RankReq] = rank;
 
 				// Replace colors on name
-				addColorToString(sRankNameColored, 128);
-
-				// Get player name color
-				RankValue[NameColor] = getFirstColor(sRankName);
+				//addColorToString(sRankNameColored, 128);
 
 				// Remove colors from rank name
-				parseColorsFromString(sRankName, 128);
-
+				CRemoveColors(sRankName, 128);
+				
 				Format(RankValue[RankName], 128, "%s", sRankName);
-
 				Format(RankValue[RankNameColored], 128, "%s", sRankNameColored);
+				Format(RankValue[NameColour], 32, "%s", sNameColour);
 
 				PushArrayArray(g_hSkillGroups, RankValue[0]);
-
 			} while (KvGotoNextKey(hKeyValues));
 		}
 		if (hKeyValues != null)
@@ -2452,214 +2516,6 @@ public void SetSkillGroups()
 	else
 		SetFailState("[surftimer] %s not found.", SKILLGROUP_PATH);
 
-}
-
-public void getPlayerRank(int client, int rank, int points)
-{
-	char szName[64];
-	GetClientName(client, szName, sizeof(szName));
-	parseColorsFromString(szName, 64);
-	char szSkillGroup[32];
-	GetRankName(client, rank, points, szSkillGroup, 32);
-	Format(g_pr_rankname[client], 128, szSkillGroup);
-	Format(g_szRankName[client], sizeof(g_szRankName), szSkillGroup);
-
-	if(points == 0)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "[Unranked]%c", WHITE);
-		g_rankNameChatColour[client] = 0;
-	}
-	else if (rank >= 701 && rank <= 750)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cNewbie%c]", WHITE, GRAY, WHITE);
-		g_rankNameChatColour[client] = 0;
-	}
-	else if(rank >= 651 && rank <= 700)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cLearning%c]%c", WHITE, GRAY, WHITE, GRAY);
-		g_rankNameChatColour[client] = 7;
-	}
-	else if(rank >= 601 && rank <= 650)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cNovice%c]", WHITE, DARKGREY, WHITE);
-		g_rankNameChatColour[client] = 0;
-	}
-	else if(rank >= 551 && rank <= 600)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cBeginner%c]%c", WHITE, DARKGREY, WHITE, DARKGREY);
-		g_rankNameChatColour[client] = 14;
-	}
-	else if(rank >= 501 && rank <= 550)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cRookie%c]", WHITE, YELLOW, WHITE);
-		g_rankNameChatColour[client] = 0;
-	}
-	else if(rank >= 451 && rank <= 500)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cAverage%c]%c", WHITE, YELLOW, WHITE, YELLOW);
-		g_rankNameChatColour[client] = 8;
-	}
-	else if(rank >= 401 && rank <= 450)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cCasual%c]", WHITE, MOSSGREEN, WHITE);
-		g_rankNameChatColour[client] = 0;
-	}
-	else if(rank >= 351 && rank <= 400)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cAdvanced%c]%c", WHITE, MOSSGREEN, WHITE, MOSSGREEN);
-		g_rankNameChatColour[client] = 5;
-	}
-	else if(rank >= 301 && rank <= 350)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cSkilled%c]", WHITE, LIMEGREEN, WHITE);
-		g_rankNameChatColour[client] = 0;
-	}
-	else if(rank >= 251 && rank <= 300)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cExceptional%c]%c", WHITE, LIMEGREEN, WHITE, LIMEGREEN);
-		g_rankNameChatColour[client] = 3;
-	}
-	else if(rank >= 201 && rank <= 250)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cAmazing%c]", WHITE, GREEN, WHITE);
-		g_rankNameChatColour[client] = 0;
-	}
-	else if(rank >= 101 && rank <= 200)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cPro%c]%c", WHITE, GREEN, WHITE, GREEN);
-		g_rankNameChatColour[client] = 2;
-	}
-	else if(rank >= 51 && rank <= 100)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cVeteran%c]", WHITE, BLUE, WHITE);
-		g_rankNameChatColour[client] = 0;
-	}
-	else if(rank >= 26 && rank <= 50)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cExpert%c]%c", WHITE, BLUE, WHITE, BLUE);
-		g_rankNameChatColour[client] = 4;
-	}
-	else if (rank >= 11 && rank <= 25)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cElite%c]%c", WHITE, DARKBLUE, WHITE, DARKBLUE);
-		g_rankNameChatColour[client] = 10;
-	}
-	else if (rank >= 4 && rank <= 10)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cMaster%c]%c", WHITE, ORANGE, WHITE, ORANGE);
-		g_rankNameChatColour[client] = 15;
-	}
-	else if(rank == 3)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cLegendary%c]%c", WHITE, PINK, WHITE, PINK);
-		g_rankNameChatColour[client] = 11;
-		g_bCustomTitleAccess[client] = true;
-	}
-	else if(rank == 2)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cGodly%c]%c", WHITE, LIGHTRED, WHITE, LIGHTRED);
-		g_rankNameChatColour[client] = 12;
-		g_bCustomTitleAccess[client] = true;
-	}
-	else if(rank == 1)
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[%cKing%c]%c", WHITE, DARKRED, WHITE, DARKRED);
-		g_rankNameChatColour[client] = 1;
-		g_bCustomTitleAccess[client] = true;
-	}
-	else
-	{
-		Format(g_pr_chat_coloredrank[client], 128, "%c[Unranked]", WHITE);
-		g_rankNameChatColour[client] = 0;
-	}
-}
-
-public void GetRankName(int client, int rank, int points, char[] szRank, int length)
-{
-	if(points == 0)
-	{
-		Format(szRank, length, "[Unranked]");
-	}
-	else if (rank >= 701 && rank <= 750)
-	{
-		Format(szRank, length, "[Newbie]");
-	}
-	else if(rank >= 651 && rank <= 700)
-	{
-		Format(szRank, length, "[Learning]");
-	}
-	else if(rank >= 601 && rank <= 650)
-	{
-		Format(szRank, length, "[Novice]");
-	}
-	else if(rank >= 551 && rank <= 600)
-	{
-		Format(szRank, length, "[Beginner]");
-	}
-	else if(rank >= 501 && rank <= 550)
-	{
-		Format(szRank, length, "[Rookie]");
-	}
-	else if(rank >= 451 && rank <= 500)
-	{
-		Format(szRank, length, "[Average]");
-	}
-	else if(rank >= 401 && rank <= 450)
-	{
-		Format(szRank, length, "[Casual]");
-	}
-	else if(rank >= 351 && rank <= 400)
-	{
-		Format(szRank, length, "[Advanced]");
-	}
-	else if(rank >= 301 && rank <= 350)
-	{
-		Format(szRank, length, "[Skilled]");
-	}
-	else if(rank >= 251 && rank <= 300)
-	{
-		Format(szRank, length, "[Exceptional]");
-	}
-	else if(rank >= 201 && rank <= 250)
-	{
-		Format(szRank, length, "[Amazing]");
-	}
-	else if(rank >= 101 && rank <= 200)
-	{
-		Format(szRank, length, "[Pro]");
-	}
-	else if(rank >= 51 && rank <= 100)
-	{
-		Format(szRank, length, "[Veteran]");
-	}
-	else if(rank >= 26 && rank <= 50)
-	{
-		Format(szRank, length, "[Expert]");
-	}
-	else if (rank >= 11 && rank <= 25)
-	{
-		Format(szRank, length, "[Elite]");
-	}
-	else if (rank >= 4 && rank <= 10)
-	{
-		Format(szRank, length, "[Master]");
-	}
-	else if(rank == 3)
-	{
-		Format(szRank, length, "[Legendary]");
-	}
-	else if(rank == 2)
-	{
-		Format(szRank, length, "[Godly]");
-	}
-	else if(rank == 1)
-	{
-		Format(szRank, length, "[King]");
-	}
-	else
-	{
-		Format(szRank, length, "[Unranked]");
-	}
 }
 
 public void SetPlayerRank(int client)
@@ -2673,8 +2529,6 @@ public void SetPlayerRank(int client)
 		return;
 	}
 
-	int RankValue[SkillGroup];
-
 	if (g_bEnforceTitle[client])
 	{
 		// g_iEnforceTitleType[client], 0 = chat, 1 = scoreboard, 2 = both
@@ -2685,7 +2539,7 @@ public void SetPlayerRank(int client)
 		{
 			char szTitle[256];
 			Format(szTitle, 256, g_szEnforcedTitle[client]);
-			parseColorsFromString(szTitle, 256);
+			CRemoveColors(szTitle, 256);
 			Format(g_pr_rankname[client], 256, szTitle);
 		}
 	}
@@ -2694,11 +2548,21 @@ public void SetPlayerRank(int client)
 		// Player is not using a title
 		if (GetConVarBool(g_hPointSystem))
 		{
+			char szName[MAX_NAME_LENGTH];
+			GetClientName(client, szName, sizeof(szName));
+			CRemoveColors(szName, sizeof(szName));
+
 			int rank = g_PlayerRank[client];
 			int points = g_pr_points[client];
-			getPlayerRank(client, rank, points);
 
-			g_PlayerChatRank[client] = RankValue[NameColor];
+			int RankValue[SkillGroup];
+			int index = GetSkillgroupIndex(rank, points);
+			GetArrayArray(g_hSkillGroups, index, RankValue[0]);
+			
+			Format(g_pr_chat_coloredrank[client], 128, RankValue[RankNameColored]);
+			Format(g_pr_rankname[client], 128, RankValue[RankName]);
+			Format(g_szRankName[client], sizeof(g_szRankName), RankValue[RankName]);
+			Format(g_pr_namecolour[client], 32, RankValue[NameColour]);
 		}
 	}
 	else
@@ -2706,44 +2570,66 @@ public void SetPlayerRank(int client)
 		// Player is using a title
 		if (GetConVarBool(g_hPointSystem))
 		{
-			g_PlayerChatRank[client] = RankValue[NameColor];
 		}
 	}
 }
 
-public int GetSkillgroupFromPoints(int points)
+public int GetSkillgroupIndex(int rank, int points)
 {
 	int size = GetArraySize(g_hSkillGroups);
 	for (int i = 0; i < size; i++)
 	{
 		int RankValue[SkillGroup];
 		GetArrayArray(g_hSkillGroups, i, RankValue[0]);
-
-		if (i == (size-1)) // Last rank
+		if (RankValue[RankReq] > -1)
 		{
-			if (points >= RankValue[PointReq])
+			if (rank == RankValue[RankReq])
+				return i;
+		}
+		else if (RankValue[RankBot] > -1 && RankValue[RankTop] > -1)
+		{
+			if (rank >= RankValue[RankBot] && rank <= RankValue[RankTop])
+				return i;
+		}
+		else if (RankValue[PointsBot] > -1 && RankValue[PointsTop] > -1)
+		{
+			if (points >= RankValue[PointsBot] && points <= RankValue[PointsTop])
+				return i;
+		}
+		else if (RankValue[PointReq] > -1)
+		{
+			if (i == (size - 1)) // Last Rank
 			{
+				if (points >= RankValue[PointReq])
 				return i;
 			}
-		}
-		else if (i == 0) // First rank
-		{
-			if (points <= RankValue[PointReq])
+			else if (i == 0) // First Rank
 			{
-				return i;
+				if (points <= RankValue[PointReq])
+					return i;
 			}
-		}
-		else // Mid ranks
-		{
-			int RankValueNext[SkillGroup];
-			GetArrayArray(g_hSkillGroups, (i+1), RankValueNext[0]);
-			if (points > RankValue[PointReq] && points <= RankValueNext[PointReq])
+			else // Mid ranks
 			{
-				return i;
+				int RankValueNext[SkillGroup];
+				GetArrayArray(g_hSkillGroups, (i+1), RankValueNext[0]);
+				if (RankValueNext[PointReq] > -1)
+				{
+					if (points >= RankValue[PointReq] && points <= RankValueNext[PointReq])
+						return i;
+				}
+				else if (RankValueNext[RankReq] > -1)
+				{
+					if (points >= RankValue[PointReq] && rank < RankValueNext[RankReq])
+						return i;
+				}
+				else if (RankValueNext[RankTop] > -1)
+				{
+					if (points >= RankValue[PointReq] && rank < RankValueNext[RankTop])
+						return i;
+				}
 			}
 		}
 	}
-	// Return 0 if not found
 	return 0;
 }
 
