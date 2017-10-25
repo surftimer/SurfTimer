@@ -1499,11 +1499,6 @@ public void SetClientDefaults(int client)
 
 	// Reset bonus bool
 	g_bInBonus[client] = false;
-
-	// surf_summer credits targetname
-	if (StrEqual(g_szMapName, "surf_summer"))
-		DispatchKeyValue(client, "targetname", "_m5_");
-	
 	g_iCenterSpeedEnt[client] = -1;
 
 	g_iPlayTimeAliveSession[client] = 0;

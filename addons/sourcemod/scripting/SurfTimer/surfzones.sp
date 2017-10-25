@@ -621,8 +621,8 @@ public Action BeamBoxAll(Handle timer, any data)
 	int zColor[4], tzColor[4];
 	bool draw;
 
-	/*if (GetConVarInt(g_hZoneDisplayType) < 1)
-		return Plugin_Handled;*/
+	// if (GetConVarInt(g_hZoneDisplayType) < 1)
+	// 	return Plugin_Handled;
 
 	for (int i = 0; i < g_mapZonesCount; ++i)
 	{
@@ -660,14 +660,17 @@ public Action BeamBoxAll(Handle timer, any data)
 			getZoneTeamColor(g_mapZones[i][Team], tzColor);
 			for (int p = 1; p <= MaxClients; p++)
 			{
-				if (!g_bShowZones[p] && g_Editing[p] == 0)
+				if (GetConVarInt(g_hZoneDisplayType) == 0 && !g_bShowZones[p] && g_Editing[p] == 0)
 				{
 					//if (GetConVarInt(g_hZoneDisplayType) < 1)
 						continue;
 				}
 
-				if (IsValidClient(p) && g_bShowZones[p] || g_Editing[p] > 0)
+				if (IsValidClient(p) && !IsFakeClient(p))
 				{
+					if (GetConVarInt(g_hZoneDisplayType) == 0 && !g_bShowZones[p])
+						continue;
+						
 					if ( g_mapZones[i][Vis] == 2 ||  g_mapZones[i][Vis] == 3)
 					{
 						if (GetClientTeam(p) ==  g_mapZones[i][Vis] && g_ClientSelectedZone[p] != i)
