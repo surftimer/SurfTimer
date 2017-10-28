@@ -13,21 +13,21 @@ public Action Admin_MapSettings(int client, int args)
 
 public void MapSettingsMenu(int client)
 {
-	Menu menu = CreateMenu(MapSettingsMenuHandler);
+  Menu menu = CreateMenu(MapSettingsMenuHandler);
   char szBuffer[256];
   Format(szBuffer, sizeof(szBuffer), "Map Settings - %s\n \n", g_szMapName);
-	SetMenuTitle(menu, szBuffer);
+  SetMenuTitle(menu, szBuffer);
   
   Format(szBuffer, sizeof(szBuffer), "Max Velocity: %f", GetConVarFloat(g_hMaxVelocity));
   AddMenuItem(menu, "", szBuffer);
-
+  
   if (g_fAnnounceRecord == 1)
     AddMenuItem(menu, "", "Announce Finishes: PBs Only");
   else if (g_fAnnounceRecord == 2)
     AddMenuItem(menu, "", "Announce Finishes: WRs Only");
   else
     AddMenuItem(menu, "", "Announce Finishes: All");
-
+  
   if (g_bGravityFix)
     AddMenuItem(menu, "", "Gravity Fix Enabled");
   else
@@ -37,9 +37,9 @@ public void MapSettingsMenu(int client)
     AddMenuItem(menu, "", "Unlimit prespeed for all stage zones");
   else
     AddMenuItem(menu, "", "Unlimit prespeed for all stage zones", ITEMDRAW_DISABLED);
-
-	SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
-	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+  
+  SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
+  DisplayMenu(menu, client, MENU_TIME_FOREVER);
 }
 
 public int MapSettingsMenuHandler(Handle menu, MenuAction action, int param1, int param2)
@@ -59,8 +59,8 @@ public int MapSettingsMenuHandler(Handle menu, MenuAction action, int param1, in
           g_fAnnounceRecord++;
         else
           g_fAnnounceRecord = 0.0;
-          db_updateMapSettings();
-          MapSettingsMenu(param1);
+        db_updateMapSettings();
+        MapSettingsMenu(param1);
       }
       case 2:
       {
@@ -97,33 +97,33 @@ public void MaxVelocityMenu(int client)
 
 public int MaxVelocityMenuHandler(Handle tMenu, MenuAction action, int client, int item)
 {
-	switch (action)
-	{
-		case MenuAction_Select:
-		{
-			char szMaxvelocity[32];
-			GetMenuItem(tMenu, item, szMaxvelocity, sizeof(szMaxvelocity));
-			float maxvelocity = StringToFloat(szMaxvelocity);
-			if (maxvelocity == -1.0)
-			{
-				CPrintToChat(client, "{lime}Surftimer {default}| Type the maxvelocity you want to set");
-				g_iWaitingForResponse[client] = 4;
-				return;
-			}
-			else
-				g_fMaxVelocity = maxvelocity;
+  switch (action)
+  {
+    case MenuAction_Select:
+    {
+      char szMaxvelocity[32];
+      GetMenuItem(tMenu, item, szMaxvelocity, sizeof(szMaxvelocity));
+      float maxvelocity = StringToFloat(szMaxvelocity);
+      if (maxvelocity == -1.0)
+      {
+        CPrintToChat(client, "{lime}Surftimer {default}| Type the maxvelocity you want to set");
+        g_iWaitingForResponse[client] = 4;
+        return;
+      }
+      else
+        g_fMaxVelocity = maxvelocity;
       db_updateMapSettings();
-			MaxVelocityMenu(client);
-		}
-		case MenuAction_Cancel:
-		{
-			MapSettingsMenu(client);
-		}
-		case MenuAction_End:
-		{
-			delete tMenu;
-		}
-	}
+      MaxVelocityMenu(client);
+    }
+    case MenuAction_Cancel:
+    {
+      MapSettingsMenu(client);
+    }
+    case MenuAction_End:
+    {
+      delete tMenu;
+    }
+  }
 }
 
 public Action Command_SetMaxVelocity(int client, int args)
