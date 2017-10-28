@@ -8,9 +8,7 @@ public Action reloadRank(Handle timer, any client)
 public Action AnnounceMap(Handle timer, any client)
 {
 	if (IsValidClient(client))
-	{
-		PrintToChat(client, g_sTierString[0]);
-	}
+		PrintToChat(client, g_sTierString);
 
 	AnnounceTimer[client] = null;
 	return Plugin_Handled;

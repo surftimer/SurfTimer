@@ -1826,21 +1826,21 @@ public void EditorMenu(int client)
 			}
 		}
 
-		char szTargetName[128];
-		if (g_mapZones[g_CurrentZoneType[client]][targetName] != 0)
-			Format(szTargetName, sizeof(szTargetName), "Target Name: %s", g_mapZones[g_CurrentZoneType[client]][targetName]);
-		else
-			Format(szTargetName, sizeof(szTargetName), "None");
-		editMenu.AddItem("", szTargetName);
+		char szMenuItem[128];
+		// Targetname
+		Format(szMenuItem, sizeof(szMenuItem), "Targetname: %s", g_mapZones[g_ClientSelectedZone[client]][targetName]);
+		editMenu.AddItem("", szMenuItem);
 		
-		if (g_mapZones[g_CurrentZoneType[client]][oneJumpLimit] == 1)
-		{
+		// One jump limit
+		if (g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit] == 1)
 			editMenu.AddItem("", "Disable One Jump Limit");
-		}
 		else
-		{
 			editMenu.AddItem("", "Enable One Jump Limit");
-		}
+		
+		// Prespeed
+		Format(szMenuItem, sizeof(szMenuItem), "Prespeed: %f", g_mapZones[g_ClientSelectedZone[client]][preSpeed]);
+		editMenu.AddItem("", szMenuItem);
+		
 	}
 	editMenu.ExitButton = true;
 	editMenu.Display(client, MENU_TIME_FOREVER);
@@ -1903,9 +1903,9 @@ public int MenuHandler_Editor(Handle tMenu, MenuAction action, int client, int i
 					if (g_ClientSelectedZone[client] != -1)
 					{
 						if (!g_bEditZoneType[client])
-							db_updateZone(g_mapZones[g_ClientSelectedZone[client]][zoneId], g_mapZones[g_ClientSelectedZone[client]][zoneType], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId], g_Positions[client][0], g_Positions[client][1], g_CurrentZoneVis[client], g_CurrentZoneTeam[client], g_CurrentSelectedZoneGroup[client], g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit]);
+							db_updateZone(g_mapZones[g_ClientSelectedZone[client]][zoneId], g_mapZones[g_ClientSelectedZone[client]][zoneType], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId], g_Positions[client][0], g_Positions[client][1], g_CurrentZoneVis[client], g_CurrentZoneTeam[client], g_CurrentSelectedZoneGroup[client], g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit], g_mapZones[g_ClientSelectedZone[client]][preSpeed]);
 						else
-							db_updateZone(g_mapZones[g_ClientSelectedZone[client]][zoneId], g_CurrentZoneType[client], g_CurrentZoneTypeId[client], g_Positions[client][0], g_Positions[client][1], g_CurrentZoneVis[client], g_CurrentZoneTeam[client], g_CurrentSelectedZoneGroup[client], g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit]);
+							db_updateZone(g_mapZones[g_ClientSelectedZone[client]][zoneId], g_CurrentZoneType[client], g_CurrentZoneTypeId[client], g_Positions[client][0], g_Positions[client][1], g_CurrentZoneVis[client], g_CurrentZoneTeam[client], g_CurrentSelectedZoneGroup[client], g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit], g_mapZones[g_ClientSelectedZone[client]][preSpeed]);
 						g_bEditZoneType[client] = false;
 					}
 					else
@@ -1974,12 +1974,18 @@ public int MenuHandler_Editor(Handle tMenu, MenuAction action, int client, int i
 				}
 				case 10:
 				{
+					// One jump limit
 					if (g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit] == 1)
 						g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit] = 0;
 					else
 						g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit] = 1;
 					
 					EditorMenu(client);
+				}
+				case 11:
+				{
+					// prespeed
+					PrespeedMenu(client);
 				}
 			}
 		}
@@ -2089,6 +2095,59 @@ public int MenuHandler_Scale(Handle tMenu, MenuAction action, int client, int it
 				}
 			}
 			ScaleMenu(client);
+		}
+		case MenuAction_Cancel:
+		{
+			EditorMenu(client);
+		}
+		case MenuAction_End:
+		{
+			delete tMenu;
+		}
+	}
+}
+
+public void PrespeedMenu(int client)
+{
+	Menu menu = new Menu(MenuHandler_Prespeed);
+	char szTitle[128];
+	if ( g_mapZones[g_ClientSelectedZone[client]][preSpeed] == 0.0)
+		Format(szTitle, sizeof(szTitle), "Zone Prespeed (No Limit)");
+	else
+		Format(szTitle, sizeof(szTitle), "Zone Prespeed (%f)", g_mapZones[g_ClientSelectedZone[client]][preSpeed]);
+	SetMenuTitle(menu, szTitle);
+
+	AddMenuItem(menu, "285.0", "285.0");
+	AddMenuItem(menu, "300.0", "300.0");
+	AddMenuItem(menu, "350.0", "350.0");
+	AddMenuItem(menu, "500.0", "500.0");
+	AddMenuItem(menu, "-1.0", "Custom Limit");
+	AddMenuItem(menu, "-2.0", "Remove Limit");
+
+	SetMenuExitBackButton(menu, true);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+public int MenuHandler_Prespeed(Handle tMenu, MenuAction action, int client, int item)
+{
+	switch (action)
+	{
+		case MenuAction_Select:
+		{
+			char szPrespeed[32];
+			GetMenuItem(tMenu, item, szPrespeed, sizeof(szPrespeed));
+			float prespeed = StringToFloat(szPrespeed);
+			if (prespeed == -1.0)
+			{
+				CPrintToChat(client, "{lime}Surftimer {default}| Type the prespeed to be set to {lightgreen}%s-%i", g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId] + 2);
+				g_iWaitingForResponse[client] = 0;
+				return;
+			}
+			else if (prespeed == -2.0)
+				g_mapZones[g_ClientSelectedZone[client]][preSpeed] = 0.0;
+			else
+				g_mapZones[g_ClientSelectedZone[client]][preSpeed] = prespeed;
+			PrespeedMenu(client);
 		}
 		case MenuAction_Cancel:
 		{

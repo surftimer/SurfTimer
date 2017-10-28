@@ -1237,69 +1237,18 @@ public void FixPlayerName(int client)
 
 public void LimitSpeed(int client)
 {
-	// Dont limits speed if in practice mode, or if there is no end zone in current zonegroup
-	if (!IsValidClient(client) || !IsPlayerAlive(client) || IsFakeClient(client) || g_bPracticeMode[client] || g_mapZonesTypeCount[g_iClientInZone[client][2]][2] == 0)
+	/* Dont limit speed in these conditions:
+	 * Practice mode
+	 * No end zone in current zonegroup
+	 * End Zone
+	 * Checkpoint Zone
+	 * Misc Zones
+	*/
+	if (!IsValidClient(client) || !IsPlayerAlive(client) || IsFakeClient(client) || g_bPracticeMode[client] || g_mapZonesTypeCount[g_iClientInZone[client][2]][2] == 0 || g_iClientInZone[client][3] < 0 || g_iClientInZone[client][0] == 2 || g_iClientInZone[client][0] == 4 || g_iClientInZone[client][0] >= 6)
 		return;
 
 	float speedCap = 0.0, CurVelVec[3];
-
-	if (g_iClientInZone[client][0] == 1 && g_iClientInZone[client][2] > 0)
-		speedCap = GetConVarFloat(g_hBonusPreSpeed);
-	else
-		if (g_iClientInZone[client][0] == 1)
-			speedCap = GetConVarFloat(g_hStartPreSpeed);
-		else
-			if (g_iClientInZone[client][0] == 5)
-			{
-				if (!g_bNoClipUsed[client])
-					speedCap = GetConVarFloat(g_hSpeedPreSpeed);
-				else
-					speedCap = GetConVarFloat(g_hStartPreSpeed); // If noclipping, top speed at normal start zone speed
-			}
-			else
-			{
-				// Stages
-				if (g_iClientInZone[client][0] == 3)
-				{
-					switch(g_iClientInZone[client][1])
-					{
-						case 0: speedCap = g_fStagePreSpeed[0]; // Start From Stage 2
-						case 1: speedCap = g_fStagePreSpeed[1];
-						case 2: speedCap = g_fStagePreSpeed[2];
-						case 3: speedCap = g_fStagePreSpeed[3];
-						case 4: speedCap = g_fStagePreSpeed[4];
-						case 5: speedCap = g_fStagePreSpeed[5];
-						case 6: speedCap = g_fStagePreSpeed[6];
-						case 7: speedCap = g_fStagePreSpeed[7];
-						case 8: speedCap = g_fStagePreSpeed[8];
-						case 9: speedCap = g_fStagePreSpeed[9];
-						case 10: speedCap = g_fStagePreSpeed[10];
-						case 11: speedCap = g_fStagePreSpeed[11];
-						case 12: speedCap = g_fStagePreSpeed[12];
-						case 13: speedCap = g_fStagePreSpeed[13];
-						case 14: speedCap = g_fStagePreSpeed[14];
-						case 15: speedCap = g_fStagePreSpeed[15];
-						case 16: speedCap = g_fStagePreSpeed[16];
-						case 17: speedCap = g_fStagePreSpeed[17];
-						case 18: speedCap = g_fStagePreSpeed[18];
-						case 19: speedCap = g_fStagePreSpeed[19];
-						case 20: speedCap = g_fStagePreSpeed[20];
-						case 21: speedCap = g_fStagePreSpeed[21];
-						case 22: speedCap = g_fStagePreSpeed[22];
-						case 23: speedCap = g_fStagePreSpeed[23];
-						case 24: speedCap = g_fStagePreSpeed[24];
-						case 25: speedCap = g_fStagePreSpeed[25];
-						case 26: speedCap = g_fStagePreSpeed[26];
-						case 27: speedCap = g_fStagePreSpeed[27];
-						case 28: speedCap = g_fStagePreSpeed[28];
-						case 29: speedCap = g_fStagePreSpeed[29];
-						case 30: speedCap = g_fStagePreSpeed[30];
-						case 31: speedCap = g_fStagePreSpeed[31];
-						case 32: speedCap = g_fStagePreSpeed[32];
-						case 33: speedCap = g_fStagePreSpeed[33]; // End at stage 35
-					}
-				}
-			}
+	speedCap = g_mapZones[g_iClientInZone[client][3]][preSpeed];
 
 	if (speedCap == 0.0)
 		return;
@@ -1515,14 +1464,13 @@ public void SetClientDefaults(int client)
 	g_iLastSaveLocIdClient[client] = 0;
 	g_fLastCheckpointMade[client] = 0.0;
 
-	// Discord
-	g_bWaitingForBugMsg[client] = false;
-
 	// surf_christmas2
 	g_bUsingStageTeleport[client] = false;
 
 	// Enforce Titles
 	g_bEnforceTitle[client] = false;
+
+	g_iWaitingForResponse[client] = -1;
 }
 
 // public void clearPlayerCheckPoints(int client)

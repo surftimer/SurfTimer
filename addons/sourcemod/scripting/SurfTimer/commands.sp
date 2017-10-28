@@ -60,9 +60,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_mapinfo", Command_Tier, "[surftimer] Prints information on the current map");
 	RegConsoleCmd("sm_m", Command_Tier, "[surftimer] Prints information on the current map");
 	RegConsoleCmd("sm_difficulty", Command_Tier, "[surftimer] Prints information on the current map");
-	RegConsoleCmd("sm_btier", Command_bTier, "[surftimer] Prints tier information on current map's bonuses");
-	RegConsoleCmd("sm_bonusinfo", Command_bTier, "[surftimer] Prints tier information on current map's bonuses");
-	RegConsoleCmd("sm_bi", Command_bTier, "[surftimer] Prints tier information on current map's bonuses");
 	RegConsoleCmd("sm_howto", Command_HowTo, "[surftimer] Displays a youtube video on how to surf");
 
 
@@ -97,12 +94,8 @@ void CreateCommands()
 	RegAdminCmd("sm_amt", Admin_insertMapTier, g_ZonerFlag, "[surftimer] [zoner] Changes maps tier");
 	RegAdminCmd("sm_addspawn", Admin_insertSpawnLocation, g_ZonerFlag, "[surftimer] [zoner] Changes the position !r takes players to");
 	RegAdminCmd("sm_delspawn", Admin_deleteSpawnLocation, g_ZonerFlag, "[surftimer] [zoner] Removes custom !r position");
-	RegAdminCmd("sm_startprespeed", Command_SetStartPreSpeed, g_ZonerFlag, "[surftimer] [zoner] Set the current maps start prespeed");
-	RegAdminCmd("sm_sps", Command_SetStartPreSpeed, g_ZonerFlag, "[surftimer] [zoner] Set the current maps start prespeed");
-	RegAdminCmd("sm_bonusprespeed", Command_SetBonusPreSpeed, g_ZonerFlag, "[surftimer] [zoner] Set the current maps bonus prespeed");
-	RegAdminCmd("sm_bps", Command_SetBonusPreSpeed, g_ZonerFlag, "[surftimer] [zoner] Set the current maps bonus prespeed");
-	RegAdminCmd("sm_stageprespeed", Command_SetStagePreSpeed, g_ZonerFlag, "[surftimer] [zoner] Set the current maps stage prespeed");
-	RegAdminCmd("sm_stageps", Command_SetStagePreSpeed, g_ZonerFlag, "[surftimer] [zoner] Set the current maps stage prespeed");
+	RegAdminCmd("sm_mapsettings", Admin_MapSettings, g_ZonerFlag, "[surftimer] [zoner] Displays menu containing various options to change map settings");
+	RegAdminCmd("sm_ms", Admin_MapSettings, g_ZonerFlag, "[surftimer] [zoner] Displays menu containing various options to change map settings");
 	RegAdminCmd("sm_maxvelocity", Command_SetMaxVelocity, g_ZonerFlag, "[surftimer] [zoner] Set the current maps maxvelocity");
 	RegAdminCmd("sm_mv", Command_SetMaxVelocity, g_ZonerFlag, "[surftimer] [zoner] Set the current maps max velocity");
 	RegAdminCmd("sm_announcerecord", Command_SetAnnounceRecord, g_ZonerFlag, "[surftimer] [zoner] Set whether records will be announced on all finishes, pb only or client only");
@@ -1341,35 +1334,8 @@ public Action Client_Wrff(int client, int args)
 
 public Action Command_Tier(int client, int args)
 {
-	if (IsValidClient(client) && g_bTierFound[0]) //the second condition is only checked if the first passes
-		PrintToChat(client, g_sTierString[0]);
-}
-
-public Action Command_bTier(int client, int args)
-{
-	if (IsValidClient(client))
-	{
-		if (g_mapZoneGroupCount == 1)
-		{
-			PrintToChat(client, " %cSurftimer %c| There are no bonuses in this map.", LIMEGREEN, WHITE);
-			return;
-		}
-
-		int found = 0;
-		for (int i = 1; i < MAXZONEGROUPS; i++)
-		{
-			if (g_bTierFound[i])
-			{
-				PrintToChat(client, g_sTierString[i]);
-				found++;
-			}
-		}
-
-		if (found == 0)
-		{
-			PrintToChat(client, " %cSurftimer %c| Bonus tiers have not been set on this map.", LIMEGREEN, WHITE);
-		}
-	}
+	if (IsValidClient(client) && g_bTierFound)
+		PrintToChat(client, g_sTierString);
 }
 
 public Action Client_Avg(int client, int args)
@@ -4715,7 +4681,7 @@ public int HookZoneGroupHandler(Menu menu, MenuAction action, int param1, int pa
 			{
 				case 0:
 				{
-					g_bWaitingForZonegroup[param1] = false;
+					g_iWaitingForResponse[param1] = -1;
 					g_iZonegroupHook[param1] = 0;
 					int iEnt = GetArrayCell(g_hTriggerMultiple, index);
 
@@ -4736,7 +4702,7 @@ public int HookZoneGroupHandler(Menu menu, MenuAction action, int param1, int pa
 				}
 				case 1:
 				{
-					g_bWaitingForZonegroup[param1] = true;
+					g_iWaitingForResponse[param1] = 3;
 					PrintToChat(param1, " %cSurftimer %c| Type the bonus number", LIMEGREEN, WHITE);
 
 					int iEnt = GetArrayCell(g_hTriggerMultiple, index);
@@ -4781,7 +4747,7 @@ public int HookZoneTypeHandler(Menu menu, MenuAction action, int param1, int par
 			char szTriggerName[128];
 			GetEntPropString(iEnt, Prop_Send, "m_iName", szTriggerName, 128, 0);
 
-			if (g_bWaitingForZonegroup[param1])
+			if (g_iWaitingForResponse[param1] == 3)
 			{
 				PrintToChat(param1, " %cSurftimer %c| Type a bonus number first", LIMEGREEN, WHITE);
 
@@ -5064,7 +5030,7 @@ public int ReportBugHandler(Menu menu, MenuAction action, int param1, int param2
 	if (action == MenuAction_Select)
 	{
 		GetMenuItem(menu, param2, g_sBugType[param1], 32);
-		g_bWaitingForBugMsg[param1] = true;
+		g_iWaitingForResponse[param1] = 1;
 		PrintToChat(param1, " %cSurftimer %c| Type your message", LIMEGREEN, WHITE);
 	}
 	else if (action == MenuAction_End)
@@ -5073,7 +5039,7 @@ public int ReportBugHandler(Menu menu, MenuAction action, int param1, int param2
 
 public Action Command_Calladmin(int client, int args)
 {
-	g_bWaitingForCAMsg[client] = true;
+	g_iWaitingForResponse[client] = 2;
 	PrintToChat(client, " %cSurftimer %c| Type your message", LIMEGREEN, WHITE);
 	return Plugin_Handled;
 }

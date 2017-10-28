@@ -192,6 +192,7 @@ enum MapZone
 	String:hookName[128],
 	String:targetName[128],
 	oneJumpLimit,
+	Float:preSpeed,
 	zoneGroup,
 	Vis,
 	Team
@@ -287,9 +288,9 @@ int g_iCurrentCheckpoint[MAXPLAYERS + 1];
 int g_Advert; 													// Defines which advert to play
 
 /*----------  Maptier Variables  ----------*/
-char g_sTierString[MAXZONEGROUPS][512];							// The string for each zonegroup
+char g_sTierString[512];							// The string for each zonegroup
 bool g_bTierEntryFound;											// Tier data found?
-bool g_bTierFound[MAXZONEGROUPS];								// Tier data found in ZGrp
+bool g_bTierFound;								// Tier data found in ZGrp
 Handle AnnounceTimer[MAXPLAYERS + 1];							// Tier announce timer
 
 /*----------  Zone Variables  ----------*/
@@ -380,16 +381,15 @@ char g_szStageRecordPlayer[CPLIMIT][MAX_NAME_LENGTH];
 //.bool g_bFirstStageRecord[CPLIMIT];
 
 /*----------  Map Settings variables ----------*/
-float g_fStartPreSpeed;
-float g_fBonusPreSpeed;
+//float g_fStartPreSpeed;
+//float g_fBonusPreSpeed;
 //ConVar g_hStagePreSpeed[36] = null; 								// Stage zone speed cap
-float g_fStagePreSpeed[36];
+//float g_fStagePreSpeed[36];
 float g_fMaxVelocity;
 ConVar g_hMaxVelocity;
 float g_fAnnounceRecord;
 bool g_bGravityFix;
 ConVar g_hGravityFix;
-int g_iMapSettingType[MAXPLAYERS + 1];
 
 /*----------  Style variables
 0 = normal, 1 = SW, 2 = HSW, 3 = BW, 4 = Low-Gravity, 5 = Slow Motion, 6 = Fast Forward
@@ -634,9 +634,9 @@ int g_ReplayBotColor[3];
 ConVar g_hBonusBotColor = null; 								// Bonus bot color
 int g_BonusBotColor[3];
 ConVar g_hDoubleRestartCommand;									// Double !r restart
-ConVar g_hStartPreSpeed = null; 								// Start zone speed cap
-ConVar g_hSpeedPreSpeed = null; 								// Speed Start zone speed cap
-ConVar g_hBonusPreSpeed = null; 								// Bonus zone speed cap
+// ConVar g_hStartPreSpeed = null; 								// Start zone speed cap
+// ConVar g_hSpeedPreSpeed = null; 								// Speed Start zone speed cap
+// ConVar g_hBonusPreSpeed = null; 								// Bonus zone speed cap
 ConVar g_hSoundEnabled = null; 									// Enable timer start sound
 ConVar g_hSoundPath = null;										// Define start sound
 //char sSoundPath[64];
@@ -884,7 +884,6 @@ char szWHITE[12], szDARKRED[12], szPURPLE[12], szGREEN[12], szMOSSGREEN[12], szL
 Handle g_hTriggerMultiple;
 int g_iTeleportingZoneId[MAXPLAYERS + 1];
 int g_iZonegroupHook[MAXPLAYERS + 1];
-bool g_bWaitingForZonegroup[MAXPLAYERS + 1];
 int g_iSelectedTrigger[MAXPLAYERS + 1];
 
 // Store
@@ -952,11 +951,7 @@ ConVar g_hHostName = null;
 
 // discord bugtracker
 char g_sBugType[MAXPLAYERS + 1][32];
-bool g_bWaitingForBugMsg[MAXPLAYERS + 1];
 char g_sBugMsg[MAXPLAYERS + 1][256];
-
-// discord calladmin
-bool g_bWaitingForCAMsg[MAXPLAYERS + 1];
 
 // Teleport Destinations
 Handle g_hDestinations;
@@ -979,6 +974,9 @@ bool g_bEnforceTitle[MAXPLAYERS + 1];
 int g_iEnforceTitleType[MAXPLAYERS + 1];
 char g_szEnforcedTitle[MAXPLAYERS + 1][256];
 Handle g_DefaultTitlesWhitelist = null;
+
+// Prespeed in zones
+int g_iWaitingForResponse[MAXPLAYERS + 1];
 
 /*=========================================
 =            Predefined arrays            =
@@ -1347,9 +1345,9 @@ public void OnMapStart()
 	//loadCustomTitles();
 
 	CheatFlag("bot_zombie", false, true);
+	g_bTierFound = false;
 	for (int i = 0; i < MAXZONEGROUPS; i++)
 	{
-		g_bTierFound[i] = false;
 		g_fBonusFastest[i] = 9999999.0;
 		g_bCheckpointRecordFound[i] = false;
 	}
@@ -1670,8 +1668,8 @@ public void OnClientPutInServer(int client)
 	if (g_bLateLoaded && IsPlayerAlive(client))
 	PlayerSpawn(client);
 
-	if (g_bTierFound[0])
-	AnnounceTimer[client] = CreateTimer(20.0, AnnounceMap, client, TIMER_FLAG_NO_MAPCHANGE);
+	if (g_bTierFound)
+		AnnounceTimer[client] = CreateTimer(20.0, AnnounceMap, client, TIMER_FLAG_NO_MAPCHANGE);
 
 	if (!g_bRenaming && !g_bInTransactionChain && g_bServerDataLoaded && !g_bSettingsLoaded[client] && !g_bLoadingSettings[client])
 	{

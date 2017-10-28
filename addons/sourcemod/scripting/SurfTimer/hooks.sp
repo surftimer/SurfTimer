@@ -290,30 +290,56 @@ public Action Say_Hook(int client, const char[] command, int argc)
 			}
 		}
 
-		if (g_bWaitingForBugMsg[client])
+		// Functions that require the client to input something via the chat box
+		if (g_iWaitingForResponse[client] > -1)
 		{
-			Format(g_sBugMsg[client], sizeof(g_sBugMsg), sText);
-			SendBugReport(client);
-			g_bWaitingForBugMsg[client] = false;
-			return Plugin_Handled;
-		}
-		else if (g_bWaitingForCAMsg[client])
-		{
-			CallAdmin(client, sText);
-			g_bWaitingForCAMsg[client] = false;
-			return Plugin_Handled;
-		}
-		else if (g_bWaitingForZonegroup[client])
-		{
-			int zgrp = StringToInt(sText);
-			if (zgrp < 1 || zgrp > 35)
+			switch (g_iWaitingForResponse[client])
 			{
-				PrintToChat(client, " %cSurftimer %c| Invalid Bonus", LIMEGREEN, WHITE);
-				return Plugin_Handled;
+				case 0: 
+				{
+					// Set zone Prespeed
+					float prespeed = StringToFloat(sText);
+					if (prespeed < 0.0)
+						prespeed = 0.0;
+					g_mapZones[g_ClientSelectedZone[client]][preSpeed] = prespeed;
+					PrespeedMenu(client);
+				}
+				case 1:
+				{
+					// BugMsg
+					Format(g_sBugMsg[client], sizeof(g_sBugMsg), sText);
+					SendBugReport(client);
+				}
+				case 2:
+				{
+					// Calladmin
+					CallAdmin(client, sText);
+				}
+				case 3:
+				{
+					// Hook zone zonegroup
+					int zgrp = StringToInt(sText);
+					if (zgrp < 1 || zgrp > 35)
+					{
+						PrintToChat(client, " %cSurftimer %c| Invalid Bonus", LIMEGREEN, WHITE);
+						return Plugin_Handled;
+					}
+					g_iZonegroupHook[client] = zgrp;
+					PrintToChat(client, " %cSurftimer %c| Bonus %i to use with hooked zones", LIMEGREEN, WHITE, zgrp);
+				}
+				case 4:
+				{
+					// Maxvelocity for map
+					float maxvelocity = StringToFloat(sText);
+					if (maxvelocity < 1.0)
+						maxvelocity = 10000.0;
+					g_fMaxVelocity = maxvelocity;
+					db_updateMapSettings();
+					MaxVelocityMenu(client);
+					CPrintToChat(client, "{lime}Surftimer {default}| %s max velocity set to %f", g_szMapName, maxvelocity);
+				}
 			}
-			g_iZonegroupHook[client] = zgrp;
-			PrintToChat(client, " %cSurftimer %c| Bonus %i to use with hooked zones", LIMEGREEN, WHITE, zgrp);
-			g_bWaitingForZonegroup[client] = false;
+			g_iWaitingForResponse[client] = -1;
 			return Plugin_Handled;
 		}
 

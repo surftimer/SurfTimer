@@ -61,29 +61,21 @@ public Action Admin_insertMapTier(int client, int args)
 		return Plugin_Handled;
 	}
 
-	if (args < 2)
+	if (args == 0)
 	{
-		ReplyToCommand(client, " %cSurftimer%c | Usage: sm_addmaptier <ZoneGroup> <Tier>", LIMEGREEN, WHITE);
-		PrintToChat(client, " %cSurftimer %c| Zone Groups:", LIMEGREEN, WHITE);
-		PrintToChat(client, "[%c0.%c] Map Tier", LIMEGREEN, WHITE);
-		for (int i = 1; i < g_mapZoneGroupCount; i++)
-		{
-			PrintToChat(client, "[%c%i.%c] %s", YELLOW, i, WHITE, g_szZoneGroupName[i]);
-		}
+		ReplyToCommand(client, " %cSurftimer%c | Usage: sm_addmaptier <Tier>", LIMEGREEN, WHITE);
 		return Plugin_Handled;
 	}
-	if (args > 1)
+	else
 	{
 		char arg1[3];
-		int tier, zonegroup;
-		GetCmdArg(2, arg1, sizeof(arg1));
-		tier = StringToInt(arg1);
+		int tier;
 		GetCmdArg(1, arg1, sizeof(arg1));
-		zonegroup = StringToInt(arg1);
-		if ((tier < 7 || tier > 0) && (-1 < zonegroup < g_mapZoneGroupCount))
-			db_insertMapTier(tier, zonegroup);
+		tier = StringToInt(arg1);
+		if (tier < 7 && tier > 0)
+			db_insertMapTier(tier);
 		else
-			PrintToChat(client, " %cSurftimer %c| Invalid tier number or zone group. Please choose a tier number between 1-6 and a valid zone group.", LIMEGREEN, WHITE);
+			PrintToChat(client, " %cSurftimer %c| Invalid tier number. Please choose a tier number between 1-6.", LIMEGREEN, WHITE);
 	}
 	return Plugin_Handled;
 }
