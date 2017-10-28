@@ -1,4 +1,42 @@
-# v2.01
+# v2.1
+* Added default titles which can be edited via `addons/sourcemod/config/surftimer/default_titles.txt`
+* Added new ConVar `ck_enforce_default_titles` which sets whether to enforce default titles on players
+* Added whitelist which will whitelist any player in the whitelist from being forced to use their default title `addons/sourcemod/config/surftimer/default_titles_whitelist.txt`
+* Fixed tele to start zones not working on Bonuses
+* Fixed `sm_repeat`
+* Fixed `sm_goback`
+* Added custom skill groups which can be edited via `addons/sourcemod/configs/surftimer/skillgroups.cfg`
+* Zone display now respects the `ck_zone_drawstyle` ConVar
+* Prespeed is now controlled on a per zone basis, you can edit it in the zones options on the second page
+* Added mapsettings menu `sm_mapsettings` `sm_ms`
+* Updated colours include (thanks 2called-chaos)
+* Zoner commands now respects `ck_zoner_flag`
+* Added ConVar `ck_vip_flag`
+* Added native `surftimer_IsClientVip`
+* Speed limiting no longer checks for players that are in checkpoint, end or misc zones
+* Removed bonus tiers
+* `ck_mapsettings` has been dropped with it's columns moved to `ck_maptier`
+
+###### Changes by aveniccii
+* Fixed spacing between stage completion message
+* Changed / Fixed various message colours and formatting
+* Removed unnecessary convars
+* Added titles to all config files
+* Moved hard coded convars from the timer into map type configs
+* Added clear readme description to the map_types folder
+* Updated DHooks(2.0.4 -> 2.1.1)
+* Updated Cleaner
+* Added colons to 'Stage' in side-hud and center-hud
+* Added 'Time:' prefix before timer in center hud
+* Changed IN_DUCK AND IN_JUMP to +D/+J
+* Added +L/+R for +left and +right inputs
+* Added colours to speed and time in the center hud when spectating
+* Removed various references to the KP community
+* Removed the remaning console print messages
+* Added better tickrate management
+Thanks
+
+## v2.01
 
 * Added the ability to "hook" trigger_multiples made by the mapper as zones `sm_hookzone`
 * Added the ability to set targetnames on clients when entering/leaving zones (No command yet, has to be done manually in the database)
