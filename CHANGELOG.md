@@ -1,4 +1,4 @@
-# v2.1
+# v2.1 (Latest)
 * Added default titles which can be edited via `addons/sourcemod/config/surftimer/default_titles.txt`
 * Added new ConVar `ck_enforce_default_titles` which sets whether to enforce default titles on players
 * Added whitelist which will whitelist any player in the whitelist from being forced to use their default title `addons/sourcemod/config/surftimer/default_titles_whitelist.txt`
@@ -17,7 +17,7 @@
 * Removed bonus tiers
 * `ck_mapsettings` has been dropped with it's columns moved to `ck_maptier`
 
-###### Changes by aveniccii
+###### Changes by aveniccii (thanks)
 * Fixed spacing between stage completion message
 * Changed / Fixed various message colours and formatting
 * Removed unnecessary convars
@@ -34,7 +34,6 @@
 * Removed various references to the KP community
 * Removed the remaning console print messages
 * Added better tickrate management
-Thanks
 
 ## v2.01
 
