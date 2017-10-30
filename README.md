@@ -31,6 +31,9 @@ If you wish to upgrade from a different fork of cksurf you may run the upgrade s
 ## Stripper
 * I have uploaded my stripper files <a href="https://github.com/fluffyst/skillsurf-csgo">here</a>
 
+## Other Plugins
+https://github.com/fluffyst/ckSurf-mapchooser
+
 ## Extra
 * I've made a discord so it's easier to discuss changes/additions rather than having to use GitHub issues https://discord.gg/MmuRW4k
 
