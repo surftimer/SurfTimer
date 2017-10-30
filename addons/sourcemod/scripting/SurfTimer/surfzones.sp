@@ -1826,20 +1826,23 @@ public void EditorMenu(int client)
 			}
 		}
 
-		char szMenuItem[128];
-		// Targetname
-		Format(szMenuItem, sizeof(szMenuItem), "Targetname: %s", g_mapZones[g_ClientSelectedZone[client]][targetName]);
-		editMenu.AddItem("", szMenuItem);
-		
-		// One jump limit
-		if (g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit] == 1)
-			editMenu.AddItem("", "Disable One Jump Limit");
-		else
-			editMenu.AddItem("", "Enable One Jump Limit");
-		
-		// Prespeed
-		Format(szMenuItem, sizeof(szMenuItem), "Prespeed: %f", g_mapZones[g_ClientSelectedZone[client]][preSpeed]);
-		editMenu.AddItem("", szMenuItem);
+		if (g_ClientSelectedZone[client] != -1)
+		{
+			char szMenuItem[128];
+			// Targetname
+			Format(szMenuItem, sizeof(szMenuItem), "Targetname: %s", g_mapZones[g_ClientSelectedZone[client]][targetName]);
+			editMenu.AddItem("", szMenuItem);
+			
+			// One jump limit
+			if (g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit] == 1)
+				editMenu.AddItem("", "Disable One Jump Limit");
+			else
+				editMenu.AddItem("", "Enable One Jump Limit");
+			
+			// Prespeed
+			Format(szMenuItem, sizeof(szMenuItem), "Prespeed: %f", g_mapZones[g_ClientSelectedZone[client]][preSpeed]);
+			editMenu.AddItem("", szMenuItem);
+		}
 		
 	}
 	editMenu.ExitButton = true;
