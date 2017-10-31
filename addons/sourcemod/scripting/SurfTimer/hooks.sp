@@ -206,7 +206,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 					}
 					else
 					{
-						g_bTimeractivated[client] = false;
+						g_bTimerRunning[client] = false;
 						g_fStartTime[client] = -1.0;
 						g_fCurrentRunTime[client] = -1.0;
 
@@ -465,7 +465,7 @@ public Action Event_OnPlayerTeam(Handle event, const char[] name, bool dontBroad
 			GetClientEyeAngles(client, g_fPlayerAnglesRestore[client]);
 			g_bRespawnPosition[client] = true;
 		}
-		if (g_bTimeractivated[client])
+		if (g_bTimerRunning[client])
 		{
 			g_fStartPauseTime[client] = GetGameTime();
 			if (g_fPauseTime[client] > 0.0)
@@ -725,7 +725,7 @@ public Action OnLogAction(Handle source, Identity ident, int client, int target,
 {
 	if ((1 > target > MaxClients))
 		return Plugin_Continue;
-	if (IsValidClient(target) && IsPlayerAlive(target) && g_bTimeractivated[target] && !IsFakeClient(target))
+	if (IsValidClient(target) && IsPlayerAlive(target) && g_bTimerRunning[target] && !IsFakeClient(target))
 	{
 		char logtag[PLATFORM_MAX_PATH];
 		if (ident == Identity_Plugin)
@@ -1075,7 +1075,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 			fAngle += 360.0;
 		}
 
-		if ((g_bTimeractivated[client] || g_bWrcpTimeractivated[client]) && iGroundEntity == -1 && (GetEntityFlags(client) & FL_INWATER) == 0 && fAngle != 0.0)
+		if ((g_bTimerRunning[client] || g_bWrcpTimeractivated[client]) && iGroundEntity == -1 && (GetEntityFlags(client) & FL_INWATER) == 0 && fAngle != 0.0)
 		{
 			float fAbsVelocity[3];
 			GetEntPropVector(client, Prop_Data, "m_vecAbsVelocity", fAbsVelocity);

@@ -57,7 +57,7 @@ public void CL_OnStartTimerPress(int client)
 		g_bPositionRestored[client] = false;
 		g_bMissedMapBest[client] = true;
 		g_bMissedBonusBest[client] = true;
-		g_bTimeractivated[client] = true;
+		g_bTimerRunning[client] = true;
 		g_bTop10Time[client] = false;
 		// strafe sync
 		g_iGoodGains[client] = 0;
@@ -121,7 +121,7 @@ public void CL_OnEndTimerPress(int client)
 	return;
 
 	// Print bot finishing message to spectators
-	if (IsFakeClient(client) && g_bTimeractivated[client])
+	if (IsFakeClient(client) && g_bTimerRunning[client])
 	{
 		for (int i = 1; i <= MaxClients; i++)
 		{
@@ -144,12 +144,12 @@ public void CL_OnEndTimerPress(int client)
 
 		PlayButtonSound(client);
 
-		g_bTimeractivated[client] = false;
+		g_bTimerRunning[client] = false;
 		return;
 	}
 
 	// If timer is not on, play error sound and return
-	if (!g_bTimeractivated[client])
+	if (!g_bTimerRunning[client])
 	{
 		ClientCommand(client, "play buttons\\button10.wav");
 		return;

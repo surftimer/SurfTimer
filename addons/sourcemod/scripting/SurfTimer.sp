@@ -698,7 +698,7 @@ int g_iSideHudModule[MAXPLAYERS + 1][5];
 
 /*----------  Run Variables  ----------*/
 float g_fPersonalRecord[MAXPLAYERS + 1];						// Clients personal record in map
-bool g_bTimeractivated[MAXPLAYERS + 1]; 						// Is clients timer running
+bool g_bTimerRunning[MAXPLAYERS + 1]; 						// Is clients timer running
 bool g_bValidRun[MAXPLAYERS + 1];								// Used to check if a clients run is valid in validator and checker zones
 bool g_bBonusFirstRecord[MAXPLAYERS + 1];						// First bonus time in map?
 bool g_bBonusPBRecord[MAXPLAYERS + 1];							// Personal best time in bonus
@@ -1759,7 +1759,7 @@ public void OnClientDisconnect(int client)
 	db_savePlayTime(client);
 
 	g_fPlayerLastTime[client] = -1.0;
-	if (g_fStartTime[client] != -1.0 && g_bTimeractivated[client])
+	if (g_fStartTime[client] != -1.0 && g_bTimerRunning[client])
 	{
 		if (g_bPause[client])
 		{
@@ -2406,7 +2406,7 @@ public void OnAllPluginsLoaded()
 
 public int Native_GetTimerStatus(Handle plugin, int numParams)
 {
-	return g_bTimeractivated[GetNativeCell(1)];
+	return g_bTimerRunning[GetNativeCell(1)];
 }
 
 public int Native_StopTimer(Handle plugin, int numParams)

@@ -397,7 +397,7 @@ void teleportEntitySafe(int client, float fDestination[3], float fAngles[3], flo
 
 	int zId = setClientLocation(client, fDestination); // Set new location
 
-	if (zId > -1 && g_bTimeractivated[client] && g_mapZones[zId][zoneType] == 2) // If teleporting to the end zone, stop timer
+	if (zId > -1 && g_bTimerRunning[client] && g_mapZones[zId][zoneType] == 2) // If teleporting to the end zone, stop timer
 		Client_Stop(client, 0);
 
 	// Teleport
@@ -613,7 +613,7 @@ void TeamChangeActual(int client, int toteam)
 
 	if (g_bSpectate[client])
 	{
-		if (g_fStartTime[client] != -1.0 && g_bTimeractivated[client] == true)
+		if (g_fStartTime[client] != -1.0 && g_bTimerRunning[client] == true)
 			g_fPauseTime[client] = GetGameTime() - g_fStartPauseTime[client];
 		g_bSpectate[client] = false;
 	}
@@ -1347,7 +1347,7 @@ public void SetClientDefaults(int client)
 	g_bFirstTimerStart[client] = true;
 	g_pr_Calculating[client] = false;
 
-	g_bTimeractivated[client] = false;
+	g_bTimerRunning[client] = false;
 	g_specToStage[client] = false;
 	g_bSpectate[client] = false;
 	if (!g_bLateLoaded)
@@ -2806,7 +2806,7 @@ public void CheckRun(int client)
 	if (!IsValidClient(client) || IsFakeClient(client))
 		return;
 
-	if (g_bTimeractivated[client])
+	if (g_bTimerRunning[client])
 	{
 		if (g_fCurrentRunTime[client] > g_fPersonalRecord[client] && !g_bMissedMapBest[client] && !g_bPause[client] && g_iClientInZone[client][2] == 0)
 		{
@@ -2839,7 +2839,7 @@ public void NoClipCheck(int client)
 		if (mt == MOVETYPE_NOCLIP)
 			g_bNoClipUsed[client] = true;
 	}
-	if (mt == MOVETYPE_NOCLIP && (g_bTimeractivated[client]))
+	if (mt == MOVETYPE_NOCLIP && (g_bTimerRunning[client]))
 	{
 		Client_Stop(client, 1);
 	}
@@ -2946,7 +2946,7 @@ public void SpecListMenuDead(int client) // What Spectators see
 			{
 				char szName[MAX_NAME_LENGTH];
 				GetClientName(ObservedUser, szName, MAX_NAME_LENGTH);
-				if (g_bTimeractivated[ObservedUser])
+				if (g_bTimerRunning[ObservedUser])
 				{
 					char szTime[32];
 					float Time;
@@ -3246,12 +3246,12 @@ public void CenterHudDead(int client)
 			else
 				Format(sResult, sizeof(sResult), "%s __", sResult);
 
-			if (g_bTimeractivated[ObservedUser])
+			if (g_bTimerRunning[ObservedUser])
 			{
 				obsTimer = GetGameTime() - g_fStartTime[ObservedUser] - g_fPauseTime[ObservedUser];
 				FormatTimeFloat(client, obsTimer, 3, obsAika, sizeof(obsAika));
 			}
-			else if(g_bWrcpTimeractivated[ObservedUser] && !g_bTimeractivated[ObservedUser])
+			else if(g_bWrcpTimeractivated[ObservedUser] && !g_bTimerRunning[ObservedUser])
 			{
 				obsTimer = GetGameTime() - g_fStartWrcpTime[ObservedUser] - g_fPauseTime[ObservedUser];
 				FormatTimeFloat(client, obsTimer, 3, obsAika, sizeof(obsAika));
@@ -3299,7 +3299,7 @@ public void CenterHudAlive(int client)
 			if (g_iCentreHudModule[client][i] == 1)
 			{
 				// Timer
-				if (g_bTimeractivated[client])
+				if (g_bTimerRunning[client])
 				{
 					FormatTimeFloat(client, g_fCurrentRunTime[client], 3, pAika, 128);
 					if (g_bPause[client])
@@ -3789,7 +3789,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 	percent = percent * 100.0;
 	Format(szPercnt, 24, "%1.f%%", percent);
 
-	if (g_bTimeractivated[client] && !g_bPracticeMode[client]) {
+	if (g_bTimerRunning[client] && !g_bPracticeMode[client]) {
 		if (g_fMaxPercCompleted[client] < 1.0) // First time a checkpoint is reached
 			g_fMaxPercCompleted[client] = percent;
 		else
@@ -3804,7 +3804,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 	char sz_srDiff[128];
 	char sz_srDiff_colorless[128];
 
-	if (g_bCheckpointRecordFound[zonegroup] && g_fCheckpointServerRecord[zonegroup][zone] > 0.1 && g_bTimeractivated[client])
+	if (g_bCheckpointRecordFound[zonegroup] && g_fCheckpointServerRecord[zonegroup][zone] > 0.1 && g_bTimerRunning[client])
 	{
 		float f_srDiff = (g_fCheckpointServerRecord[zonegroup][zone] - time);
 
@@ -3842,7 +3842,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 	GetClientName(client, szName, MAX_NAME_LENGTH);
 
 	// Has completed the map before
-	if (g_bCheckpointsFound[zonegroup][client] && g_bTimeractivated[client] && !g_bPracticeMode[client] && g_fCheckpointTimesRecord[zonegroup][client][zone] > 0.1)
+	if (g_bCheckpointsFound[zonegroup][client] && g_bTimerRunning[client] && !g_bPracticeMode[client] && g_fCheckpointTimesRecord[zonegroup][client][zone] > 0.1)
 	{
 		// Set percent of completion to assist
 		if (CS_GetMVPCount(client) < 1)
@@ -3908,7 +3908,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		tmpDiff[client] = diff;
 	}
 	else // if first run
-		if (g_bTimeractivated[client] && !g_bPracticeMode[client])
+		if (g_bTimerRunning[client] && !g_bPracticeMode[client])
 		{
 			// Set percent of completion to assist
 			if (CS_GetMVPCount(client) < 1)

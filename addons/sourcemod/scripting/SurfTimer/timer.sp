@@ -219,7 +219,7 @@ public Action CKTimer2(Handle timer)
 		{
 			float fltime;
 			fltime = GetGameTime() - g_fStartTime[i] - g_fPauseTime[i] + 1.0;
-			if (IsPlayerAlive(i) && g_bTimeractivated[i])
+			if (IsPlayerAlive(i) && g_bTimerRunning[i])
 			{
 				int time;
 				time = RoundToZero(fltime);

@@ -3390,7 +3390,7 @@ public void SQL_LastRunCallback(Handle owner, Handle hndl, const char[] error, a
 		return;
 	}
 
-	g_bTimeractivated[data] = false;
+	g_bTimerRunning[data] = false;
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl) && IsValidClient(data))
 	{
 
@@ -3420,7 +3420,7 @@ public void SQL_LastRunCallback(Handle owner, Handle hndl, const char[] error, a
 			if (fl_time > 0.0)
 			{
 				g_fStartTime[data] = GetGameTime() - fl_time;
-				g_bTimeractivated[data] = true;
+				g_bTimerRunning[data] = true;
 			}
 
 			if (SQL_FetchFloat(hndl, 0) == -1.0 && SQL_FetchFloat(hndl, 1) == -1.0 && SQL_FetchFloat(hndl, 2) == -1.0)
@@ -3448,7 +3448,7 @@ public void SQL_LastRunCallback(Handle owner, Handle hndl, const char[] error, a
 	else
 	{
 
-		g_bTimeractivated[data] = false;
+		g_bTimerRunning[data] = false;
 	}
 }
 
@@ -5031,7 +5031,7 @@ public void SQLTxn_ZoneRemovalFailed(Handle db, any client, int numQueries, cons
 
 public void db_insertLastPosition(int client, char szMapName[128], int stage, int zgroup)
 {
-	if (GetConVarBool(g_hcvarRestore) && !g_bRoundEnd && (StrContains(g_szSteamID[client], "STEAM_") != -1) && g_bTimeractivated[client])
+	if (GetConVarBool(g_hcvarRestore) && !g_bRoundEnd && (StrContains(g_szSteamID[client], "STEAM_") != -1) && g_bTimerRunning[client])
 	{
 		Handle pack = CreateDataPack();
 		WritePackCell(pack, client);
@@ -5067,7 +5067,7 @@ public void db_insertLastPositionCallback(Handle owner, Handle hndl, const char[
 
 	if (1 <= client <= MaxClients)
 	{
-		if (!g_bTimeractivated[client])
+		if (!g_bTimerRunning[client])
 		g_fPlayerLastTime[client] = -1.0;
 		int tickrate = g_Server_Tickrate * 5 * 11;
 		if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))

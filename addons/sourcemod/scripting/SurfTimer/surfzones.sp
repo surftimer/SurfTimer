@@ -163,21 +163,24 @@ public Action StartTouchTrigger(int caller, int activator)
 	action[2] = g_mapZones[id][zoneGroup];
 
 	// Hack fix to allow bonus zones to sit on top of start zones, e.g surf_aircontrol_ksf bonus 1
-	if (action[0] < 6 && g_bInBonus[activator])
+	if (g_bTimerRunning[activator])
 	{
-		if (g_bTimeractivated[activator] && action[2] != g_iInBonus[activator])
-			return Plugin_Handled;
-	}
-	else
-	{
-		if (!g_bInBonus[activator] && action[2] > 0)
-			return Plugin_Handled;
-		else if (StrEqual(g_szMapName, "surf_christmas2") && !g_bUsingStageTeleport[activator])
+		if (action[0] < 6 && g_bInBonus[activator])
 		{
-			if (action[0] == 3)
+			if (action[2] != g_iInBonus[activator])
+				return Plugin_Handled;
+		}
+		else
+		{
+			if (!g_bInBonus[activator] && action[2] > 0)
+				return Plugin_Handled;
+			else if (StrEqual(g_szMapName, "surf_christmas2") && !g_bUsingStageTeleport[activator])
 			{
-				if (action[1] > (g_Stage[g_iClientInZone[activator][2]][activator] + 1) || action[1] < (g_Stage[g_iClientInZone[activator][2]][activator] - 1))
-					return Plugin_Handled;
+				if (action[0] == 3)
+				{
+					if (action[1] > (g_Stage[g_iClientInZone[activator][2]][activator] + 1) || action[1] < (g_Stage[g_iClientInZone[activator][2]][activator] - 1))
+						return Plugin_Handled;
+				}
 			}
 		}
 	}
@@ -260,7 +263,7 @@ public void StartTouch(int client, int action[3])
 {
 	if (IsValidClient(client))
 	{
-		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0) //fluffys: NoBhop(9),NoCrouch(10)
+		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0) //fluffys: NoBhop(9), NoCrouch(10)
 
 		if (action[0] == 0) // Stop Zone
 		{
@@ -269,52 +272,23 @@ public void StartTouch(int client, int action[3])
 		}
 		else if (action[0] == 1 || action[0] == 5) // Start Zone or Speed Start
 		{
-			// Reset Player to default targetname
-			//DispatchKeyValue(client, "targetname", "player");
-
-			//gravity
-			if(g_iCurrentStyle[client] != 4) //lowgrav
-				ResetGravity(client);
-
+			// Set Default Values
+			Client_Stop(client, 1);
+			ResetGravity(client);
 			g_KeyCount[client] = 0;
-
 			g_bInJump[client] = false;
 			g_bInDuck[client] = false;
 			g_iCurrentCheckpoint[client] = 0;
-
 			g_Stage[g_iClientInZone[client][2]][client] = 1;
-
-			Client_Stop(client, 1);
-			//fluffys
 			g_bInStartZone[client] = true;
-			if(g_bhasStages)
+			g_iCurrentStyle[client] = g_iInitalStyle[client];
+			lastCheckpoint[g_iClientInZone[client][2]][client] = 1;
+
+			if (g_bhasStages)
 			{
 				g_bWrcpTimeractivated[client] = false;
 				g_CurrentStage[client] = 0;
 			}
-			//styles
-			g_iCurrentStyle[client] = g_iInitalStyle[client];
-			// Resetting last checkpoint
-			lastCheckpoint[g_iClientInZone[client][2]][client] = 1;
-
-				// Start recording
-				// if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)))
-				// {
-				// 	if (!IsPlayerAlive(client) || GetClientTeam(client) == 1)
-				// 	{
-				// 		if (g_hRecording[client] != null)
-				// 			StopRecording(client);
-				// 	}
-				// 	else
-				// 	{
-				// 		if (g_hRecording[client] != null)
-				// 			StopRecording(client);
-				// 		StartRecording(client);
-
-				// 		if (g_bhasStages)
-				// 			Stage_StartRecording(client);
-				// 	}
-				// }
 		}
 		else if (action[0] == 2) // End Zone
 		{
@@ -361,13 +335,8 @@ public void StartTouch(int client, int action[3])
 
 			if (g_bPracticeMode[client]) // If practice mode is on
 			{
-				if (action[1] > lastCheckpoint[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] == action[2] || lastCheckpoint[g_iClientInZone[client][2]][client] == 999)
-				{ //fluffys
-					//Command_normalMode(client, 1); // Temp fix. Need to track stages checkpoints were made in.
-				}
-				//fluffys
-				//else
-					//Command_goToPlayerCheckpoint(client, 1);
+				// TODO:
+				// * Practice CPs
 			}
 			else
 			{  // Setting valid to false, in case of checkers
@@ -385,18 +354,17 @@ public void StartTouch(int client, int action[3])
 					float time = g_fCurrentRunTime[client];
 					float time2 = g_fCurrentWrcpRunTime[client];
 					CL_OnEndWrcpTimerPress(client, time2);
+
 					if(g_iCurrentStyle[client] == 0)
 						Checkpoint(client, action[1], g_iClientInZone[client][2], time);
 
 					lastCheckpoint[g_iClientInZone[client][2]][client] = action[1];
 				}
-				else if(!g_bTimeractivated[client])
+				else if(!g_bTimerRunning[client])
 					g_iCurrentStyle[client] = g_iInitalStyle[client];
 
 				if(g_bWrcpTimeractivated[client])
 					g_bWrcpTimeractivated[client] = false;
-
-				//Stage_StartRecording(client);
 			}
 		}
 		else if (action[0] == 4) // Checkpoint Zone
@@ -462,10 +430,11 @@ public void EndTouch(int client, int action[3])
 		// PrintToChat(client, "XY: %f Z: %f XYZ: %f", xy, z, currentspeed);
 		// PrintToChat(client, "%f", CurVelVec);
 		// PrintToChat(client, "%f %f %f", CurVelVec[0], CurVelVec[1], CurVelVec[2]);
+
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 		if (action[0] == 1 || action[0] == 5)
 		{
-			if (g_bPracticeMode[client] && !g_bTimeractivated[client]) // If on practice mode, but timer isn't on - start timer
+			if (g_bPracticeMode[client] && !g_bTimerRunning[client]) // If on practice mode, but timer isn't on - start timer
 			{
 				CL_OnStartTimerPress(client);
 			}
@@ -501,7 +470,6 @@ public void EndTouch(int client, int action[3])
 				}
 			}
 		}
-		//fluffys
 		else if(action[0] == 3) //fluffys stage
 		{
 			// targetname filters
@@ -524,9 +492,7 @@ public void EndTouch(int client, int action[3])
 			g_bInStageZone[client] = false;
 
 			if(!g_bPracticeMode[client] && g_bTimerEnabled[client])
-			{
 				CL_OnStartWrcpTimerPress(client);
-			}
 		}
 		else if (action[0] == 9) //fluffys nojump
 		{

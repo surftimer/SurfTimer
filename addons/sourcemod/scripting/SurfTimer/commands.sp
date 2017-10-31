@@ -1027,7 +1027,7 @@ public Action Command_Restart(int client, int args)
 			g_bClientRestarting[client] = false;
 
 		// Check that the client has a timer running, the zonegroup he is in has stages and that this is the first click
-		if (IsValidClient(client) && g_bTimeractivated[client] && g_mapZonesTypeCount[g_iClientInZone[client][2]][3] > 0 && !g_bClientRestarting[client] && g_Stage[g_iClientInZone[client][2]][client] > 1)
+		if (IsValidClient(client) && g_bTimerRunning[client] && g_mapZonesTypeCount[g_iClientInZone[client][2]][3] > 0 && !g_bClientRestarting[client] && g_Stage[g_iClientInZone[client][2]][client] > 1)
 		{
 			g_fClientRestarting[client] = GetGameTime();
 			g_bClientRestarting[client] = true;
@@ -1101,7 +1101,7 @@ public Action ToggleCheckpoints(int client, int args)
 	}
 	else
 	{
-		if (g_bTimeractivated[client])
+		if (g_bTimerRunning[client])
 		{
 			PrintToChat(client, "%t", "ToggleCheckpoints3", LIMEGREEN, WHITE);
 			g_bActivateCheckpointsOnStart[client] = true;
@@ -2456,7 +2456,7 @@ public void PauseMethod(int client)
 		*/
 		SetEntityMoveType(client, MOVETYPE_NONE); //not sure why he sets vel to 0
 		//Timer enabled?
-		if (g_bTimeractivated[client] == true)
+		if (g_bTimerRunning[client] == true)
 		{
 			g_fStartPauseTime[client] = GetGameTime();
 			if (g_fPauseTime[client] > 0.0)
@@ -2467,7 +2467,7 @@ public void PauseMethod(int client)
 	}
 	else
 	{
-		if (g_fStartTime[client] != -1.0 && g_bTimeractivated[client] == true)
+		if (g_fStartTime[client] != -1.0 && g_bTimerRunning[client] == true)
 		{
 			g_fPauseTime[client] = GetGameTime() - g_fStartPauseTime[client];
 		}
@@ -2604,7 +2604,7 @@ public Action Client_GoTo(int client, int args)
 		if (!GetConVarBool(g_hCvarNoBlock))
 			PrintToChat(client, "%t", "Goto2", LIMEGREEN, WHITE);
 		else
-			if (g_bTimeractivated[client])
+			if (g_bTimerRunning[client])
 				PrintToChat(client, "%t", "Goto3", LIMEGREEN, WHITE, GREEN, WHITE);
 			else
 			{
@@ -2689,10 +2689,10 @@ void QuakeSounds(int client, bool menu = false)
 
 public Action Client_Stop(int client, int args)
 {
-	if (g_bTimeractivated[client])
+	if (g_bTimerRunning[client])
 	{
 		//PlayerPanel(client);
-		g_bTimeractivated[client] = false;
+		g_bTimerRunning[client] = false;
 		g_fStartTime[client] = -1.0;
 		g_fCurrentRunTime[client] = -1.0;
 	}
@@ -2722,7 +2722,7 @@ public void Action_NoClip(int client)
 			MoveType mt = GetEntityMoveType(client);
 			if (mt == MOVETYPE_WALK)
 			{
-				if (g_bTimeractivated[client])
+				if (g_bTimerRunning[client])
 				{
 					Client_Stop(client, 1);
 					g_fStartTime[client] = -1.0;
