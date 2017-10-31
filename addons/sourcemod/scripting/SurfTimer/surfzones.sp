@@ -165,7 +165,7 @@ public Action StartTouchTrigger(int caller, int activator)
 	// Hack fix to allow bonus zones to sit on top of start zones, e.g surf_aircontrol_ksf bonus 1
 	if (action[0] < 6 && g_bInBonus[activator])
 	{
-		if (action[2] != g_iInBonus[activator])
+		if (g_bTimeractivated[activator] && action[2] != g_iInBonus[activator])
 			return Plugin_Handled;
 	}
 	else
@@ -187,9 +187,7 @@ public Action StartTouchTrigger(int caller, int activator)
 
 	// Set Client targetName
 	if (!StrEqual("player", g_mapZones[id][targetName]))
-	{
 		DispatchKeyValue(activator, "targetname", g_mapZones[id][targetName]);
-	}
 	
 	// Reset Prehop Limit
 	//g_bJumpedInZone[activator] = false;
