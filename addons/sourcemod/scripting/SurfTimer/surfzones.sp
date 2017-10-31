@@ -198,9 +198,6 @@ public Action StartTouchTrigger(int caller, int activator)
 	// Set Client targetName
 	if (!StrEqual("player", g_mapZones[id][targetName]))
 		DispatchKeyValue(activator, "targetname", g_mapZones[id][targetName]);
-	
-	// Reset Prehop Limit
-	//g_bJumpedInZone[activator] = false;
 
 	if (action[2] == g_iClientInZone[activator][2]) // Is touching zone in right zonegroup
 	{
@@ -208,6 +205,7 @@ public Action StartTouchTrigger(int caller, int activator)
 		g_iClientInZone[activator][0] = action[0];
 		g_iClientInZone[activator][1] = action[1];
 		g_iClientInZone[activator][2] = action[2];
+		g_iInBonus[activator] = action[2];
 		g_iClientInZone[activator][3] = id;
 		StartTouch(activator, action);
 	}
@@ -219,6 +217,7 @@ public Action StartTouchTrigger(int caller, int activator)
 			g_iClientInZone[activator][0] = action[0];
 			g_iClientInZone[activator][1] = action[1];
 			g_iClientInZone[activator][2] = action[2];
+			g_iInBonus[activator] = action[2];
 			g_iClientInZone[activator][3] = id;
 			StartTouch(activator, action);
 		}
@@ -1777,32 +1776,16 @@ public void EditorMenu(int client)
 		editMenu.AddItem("", "Go to Zone");
 		editMenu.AddItem("", "Strech Zone");
 
-		switch (g_CurrentZoneVis[client])
-		{
-			case 0:
-			{
-				editMenu.AddItem("", "Visibility: CT");
-			}
-			case 1:
-			{
-				editMenu.AddItem("", "Visibility: CT");
-			}
-			case 2:
-			{
-				editMenu.AddItem("", "Visibility: CT");
-			}
-			case 3:
-			{
-				editMenu.AddItem("", "Visibility: CT");
-			}
-		}
-
 		if (g_ClientSelectedZone[client] != -1)
 		{
 			char szMenuItem[128];
+			// Hookname
+			Format(szMenuItem, sizeof(szMenuItem), "Hook Name: %s", g_mapZones[g_ClientSelectedZone[client]][hookName]);
+			editMenu.AddItem("", szMenuItem, ITEMDRAW_DISABLED);
+
 			// Targetname
-			Format(szMenuItem, sizeof(szMenuItem), "Targetname: %s", g_mapZones[g_ClientSelectedZone[client]][targetName]);
-			editMenu.AddItem("", szMenuItem);
+			Format(szMenuItem, sizeof(szMenuItem), "Target Name: %s", g_mapZones[g_ClientSelectedZone[client]][targetName]);
+			editMenu.AddItem("", szMenuItem, ITEMDRAW_DISABLED);
 			
 			// One jump limit
 			if (g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit] == 1)

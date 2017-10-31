@@ -305,17 +305,20 @@ public Action sm_test(int client, int args)
 
 	// PrintToChat(client, "g_iSelectedTrigger[client]: %i", g_iSelectedTrigger[client]);
 
-	int rank = g_PlayerRank[client];
-	int points = g_pr_points[client];
+	// int rank = g_PlayerRank[client];
+	// int points = g_pr_points[client];
 
-	int RankValue[SkillGroup];
-	int index = GetSkillgroupIndex(rank, points);
-	GetArrayArray(g_hSkillGroups, index, RankValue[0]);
+	// int RankValue[SkillGroup];
+	// int index = GetSkillgroupIndex(rank, points);
+	// GetArrayArray(g_hSkillGroups, index, RankValue[0]);
 	
-	PrintToChat(client, "%i", index);
-	PrintToChat(client, RankValue[RankNameColored]);
-	PrintToChat(client, RankValue[RankName]);
-	PrintToChat(client, RankValue[NameColour]);
+	// PrintToChat(client, "%i", index);
+	// PrintToChat(client, RankValue[RankNameColored]);
+	// PrintToChat(client, RankValue[RankName]);
+	// PrintToChat(client, RankValue[NameColour]);
+
+	PrintToChat(client, "In Zonegroup: %i", g_iClientInZone[client][2]);
+	PrintToChat(client, "In Bonus: %i", g_iInBonus[client]);
 
 	return Plugin_Handled;
 }
