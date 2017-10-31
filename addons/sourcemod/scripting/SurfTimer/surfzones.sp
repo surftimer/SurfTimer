@@ -184,6 +184,13 @@ public Action StartTouchTrigger(int caller, int activator)
 			}
 		}
 	}
+	else
+	{
+		if (action[2] > 0)
+			g_bInBonus[acivator] = true;
+		else
+			g_bInBonus[activator] = false;
+	}
 
 	if (g_bUsingStageTeleport[activator])
 		g_bUsingStageTeleport[activator] = false;
