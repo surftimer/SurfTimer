@@ -2331,9 +2331,6 @@ public void OnPluginStart()
 	//button sound hook
 	//AddNormalSoundHook(NormalSHook_callback);
 
-	//nav files
-	CreateNavFiles();
-
 	// Botmimic 2
 	// https://forums.alliedmods.net/showthread.php?t=180114
 	// Optionally setup a hook on CBaseEntity::Teleport to keep track of sudden place changes
