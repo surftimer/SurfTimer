@@ -187,7 +187,7 @@ public Action StartTouchTrigger(int caller, int activator)
 	else
 	{
 		if (action[2] > 0)
-			g_bInBonus[acivator] = true;
+			g_bInBonus[activator] = true;
 		else
 			g_bInBonus[activator] = false;
 	}
