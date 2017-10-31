@@ -1274,6 +1274,9 @@ public void OnMapStart()
 	// Get mapname
 	GetCurrentMap(g_szMapName, 128);
 
+	// Create nav file
+	CreateNavFile();
+
 	// Debug Logging
 	if (!DirExists("addons/sourcemod/logs/surftimer"))
 		CreateDirectory("addons/sourcemod/logs/surftimer", 511);

@@ -3104,31 +3104,52 @@ public void LoadInfoBot()
 	}
 }
 
-public void CreateNavFiles()
+// public void CreateNavFiles()
+// {
+// 	char DestFile[256];
+// 	char SourceFile[256];
+// 	Format(SourceFile, sizeof(SourceFile), "maps/replay_bot.nav");
+// 	if (!FileExists(SourceFile))
+// 	{
+// 		LogError("<surftimer> Failed to create .nav files. Reason: %s doesn't exist!", SourceFile);
+// 		return;
+// 	}
+// 	char map[256];
+// 	int mapListSerial = -1;
+// 	if (ReadMapList(g_MapList, mapListSerial, "mapcyclefile", MAPLIST_FLAG_CLEARARRAY | MAPLIST_FLAG_NO_DEFAULT) == null)
+// 		if (mapListSerial == -1)
+// 			return;
+
+// 	for (int i = 0; i < GetArraySize(g_MapList); i++)
+// 	{
+// 		GetArrayString(g_MapList, i, map, sizeof(map));
+// 		if (map[0])
+// 		{
+// 			Format(DestFile, sizeof(DestFile), "maps/%s.nav", map);
+// 			if (!FileExists(DestFile))
+// 				File_Copy(SourceFile, DestFile);
+// 		}
+// 	}
+// }
+
+public void CreateNavFile()
 {
-	char DestFile[256];
-	char SourceFile[256];
-	Format(SourceFile, sizeof(SourceFile), "maps/replay_bot.nav");
-	if (!FileExists(SourceFile))
+	// Check if source nav file exists
+	char szSource[PLATFORM_MAX_PATH];
+	Format(szSource, sizeof(szSource), "maps/replay_bot.nav");
+	if (!FileExists(szSource))
 	{
-		LogError("<surftimer> Failed to create .nav files. Reason: %s doesn't exist!", SourceFile);
+		LogError("[Surftimer] Failed to create .nav files. %s doesn't exist!", szSource);
 		return;
 	}
-	char map[256];
-	int mapListSerial = -1;
-	if (ReadMapList(g_MapList, mapListSerial, "mapcyclefile", MAPLIST_FLAG_CLEARARRAY | MAPLIST_FLAG_NO_DEFAULT) == null)
-		if (mapListSerial == -1)
-			return;
 
-	for (int i = 0; i < GetArraySize(g_MapList); i++)
+	// Generate new nav file
+	char szNav[PLATFORM_MAX_PATH];
+	Format(szNav, sizeof(szNav), "maps/%s.nav", g_szMapName);
+	if (!FileExists(szNav))
 	{
-		GetArrayString(g_MapList, i, map, sizeof(map));
-		if (map[0])
-		{
-			Format(DestFile, sizeof(DestFile), "maps/%s.nav", map);
-			if (!FileExists(DestFile))
-				File_Copy(SourceFile, DestFile);
-		}
+		File_Copy(szSource, szNav);
+		ForceChangeLevel(g_szMapName, ".nav file generated");
 	}
 }
 
