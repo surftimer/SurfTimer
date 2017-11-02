@@ -4610,8 +4610,15 @@ public int HookZonesMenuHandler(Menu menu, MenuAction action, int param1, int pa
 			SetMenuOptionFlags(menu2, MENUFLAG_BUTTON_EXIT);
 			DisplayMenu(menu2, param1, MENU_TIME_FOREVER);
 		}
-		case MenuAction_Cancel: g_iSelectedTrigger[param1] = -1;
-		case MenuAction_End: g_iSelectedTrigger[param1] = -1;
+		case MenuAction_Cancel: 
+		{
+			if (IsValidClient(param1))
+				g_iSelectedTrigger[param1] = -1;
+		}
+		case MenuAction_End: 
+		{
+			delete menu;
+		}
 	}
 }
 
@@ -4663,7 +4670,8 @@ public int HookZoneHandler(Menu menu, MenuAction action, int param1, int param2)
 		case MenuAction_Cancel: g_iSelectedTrigger[param1] = -1;
 		case MenuAction_End:
 		{
-			g_iSelectedTrigger[param1] = -1;
+			if (IsValidClient(param1))
+				g_iSelectedTrigger[param1] = -1;
 			delete menu;
 		}
 	}
@@ -4750,6 +4758,7 @@ public int HookZoneTypeHandler(Menu menu, MenuAction action, int param1, int par
 			char szTriggerName[128];
 			GetEntPropString(iEnt, Prop_Send, "m_iName", szTriggerName, 128, 0);
 
+
 			if (g_iWaitingForResponse[param1] == 3)
 			{
 				PrintToChat(param1, " %cSurftimer %c| Type a bonus number first", LIMEGREEN, WHITE);
@@ -4768,24 +4777,39 @@ public int HookZoneTypeHandler(Menu menu, MenuAction action, int param1, int par
 				return;
 			}
 
+			float position[3], fMins[3], fMaxs[3];
+			GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", position);
+			GetEntPropVector(iEnt, Prop_Send, "m_vecMins", fMins);
+			GetEntPropVector(iEnt, Prop_Send, "m_vecMaxs", fMaxs);
+
+			for (int j = 0; j < 3; j++)
+			{
+				fMins[j] = (fMins[j] + position[j]);
+			}
+
+			for (int j = 0; j < 3; j++)
+			{
+				fMaxs[j] = (fMaxs[j] + position[j]);
+			}
+
 			switch (param2)
 			{
 				case 0: // Start Zone
 				{
 					//public void db_insertZoneHook(int zoneid, int zonetype, int zonetypeid, float pointax, float pointay, float pointaz, float pointbx, float pointby, float pointbz, int vis, int team, int zonegroup, char[] szHookName)
-					db_insertZoneHook(g_mapZonesCount, 1, g_mapZonesTypeCount[0][1], 0, 0, g_iZonegroupHook[param1], szTriggerName);
+					db_insertZoneHook(g_mapZonesCount, 1, g_mapZonesTypeCount[0][1], 0, 0, g_iZonegroupHook[param1], szTriggerName, fMins, fMaxs);
 				}
 				case 1: // Checkpoint Zone
 				{
-					db_insertZoneHook(g_mapZonesCount, 4, g_mapZonesTypeCount[0][4], 0, 0, g_iZonegroupHook[param1], szTriggerName);
+					db_insertZoneHook(g_mapZonesCount, 4, g_mapZonesTypeCount[0][4], 0, 0, g_iZonegroupHook[param1], szTriggerName, fMins, fMaxs);
 				}
 				case 2: // Stage Zone
 				{
-					db_insertZoneHook(g_mapZonesCount, 3, g_mapZonesTypeCount[0][3], 0, 0, g_iZonegroupHook[param1], szTriggerName);
+					db_insertZoneHook(g_mapZonesCount, 3, g_mapZonesTypeCount[0][3], 0, 0, g_iZonegroupHook[param1], szTriggerName, fMins, fMaxs);
 				}
 				case 3: // End Zone
 				{
-					db_insertZoneHook(g_mapZonesCount, 2, g_mapZonesTypeCount[0][2], 0, 0, g_iZonegroupHook[param1], szTriggerName);
+					db_insertZoneHook(g_mapZonesCount, 2, g_mapZonesTypeCount[0][2], 0, 0, g_iZonegroupHook[param1], szTriggerName, fMins, fMaxs);
 				}
 			}
 		}

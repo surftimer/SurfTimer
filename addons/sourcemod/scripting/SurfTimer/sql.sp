@@ -55,10 +55,14 @@ public void db_setupDatabase()
 		db_createTables();
 		return;
 	}
-	else if (!SQL_FastQuery(g_hDb, "SELECT prespeed FROM ck_zones LIMIT 1"))
+	else 
 	{
-		db_upgradeDatabase(0);
-		return;
+		// Check for db upgrades
+		if (!SQL_FastQuery(g_hDb, "SELECT prespeed FROM ck_zones LIMIT 1"))
+		{
+			db_upgradeDatabase(0);
+			return;
+		}
 	}
 
 	SQL_UnlockDatabase(g_hDb);
@@ -452,7 +456,7 @@ public void sql_selectRankedPlayerCallback(Handle owner, Handle hndl, const char
 
 			// play time
 			g_iPlayTimeAlive[client] = 0;
-			g_iPlayTimeSpec[client ] = 0;
+			g_iPlayTimeSpec[client] = 0;
 		}
 	}
 }
@@ -654,113 +658,16 @@ public void sql_CountFinishedStagesCallback(Handle owner, Handle hndl, const cha
 				GetArrayString(g_MapList, i, szMapName2, sizeof(szMapName2));
 				if (StrEqual(szMapName2, szMap, false))
 				{
-					switch (rank)
+					if (rank == 1)
 					{
-						case 1: wrcps++;
+						wrcps++;
+						int wrcpPoints = GetConVarInt(g_hWrcpPoints);
+						if (wrcpPoints > 0)
+						{
+							g_pr_points[client] += wrcpPoints;
+							g_Points[client][4] += wrcpPoints;
+						}
 					}
-					/*switch (rank)
-					{
-						case 1:
-						{
-							g_pr_points[client] += 200;
-							g_Points[client][4] += 200;
-						}
-						case 2:
-						{
-							g_pr_points[client] += 190;
-							g_Points[client][1] += 190;
-						}
-						case 3:
-						{
-							g_pr_points[client] += 180;
-							g_Points[client][1] += 180;
-						}
-						case 4:
-						{
-							g_pr_points[client] += 170;
-							g_Points[client][1] += 170;
-						}
-						case 5:
-						{
-							g_pr_points[client] += 150;
-							g_Points[client][1] += 150;
-						}
-						case 6:
-						{
-							g_pr_points[client] += 140;
-							g_Points[client][1] += 140;
-						}
-						case 7:
-						{
-							g_pr_points[client] += 135;
-							g_Points[client][1] += 135;
-						}
-						case 8:
-						{
-							g_pr_points[client] += 120;
-							g_Points[client][1] += 120;
-						}
-						case 9:
-						{
-							g_pr_points[client] += 115;
-							g_Points[client][1] += 115;
-						}
-						case 10:
-						{
-							g_pr_points[client] += 105;
-							g_Points[client][1] += 105;
-						}
-						case 11:
-						{
-							g_pr_points[client] += 100;
-							g_Points[client][1] += 100;
-						}
-						case 12:
-						{
-							g_pr_points[client] += 90;
-							g_Points[client][1] += 90;
-						}
-						case 13:
-						{
-							g_pr_points[client] += 80;
-							g_Points[client][1] += 80;
-						}
-						case 14:
-						{
-							g_pr_points[client] += 75;
-							g_Points[client][1] += 75;
-						}
-						case 15:
-						{
-							g_pr_points[client] += 60;
-							g_Points[client][1] += 60;
-						}
-						case 16:
-						{
-							g_pr_points[client] += 50;
-							g_Points[client][1] += 50;
-						}
-						case 17:
-						{
-							g_pr_points[client] += 40;
-							g_Points[client][1] += 40;
-						}
-						case 18:
-						{
-							g_pr_points[client] += 30;
-							g_Points[client][1] += 30;
-						}
-						case 19:
-						{
-							g_pr_points[client] += 20;
-							g_Points[client][1] += 20;
-						}
-						case 20:
-						{
-							g_pr_points[client] += 10;
-							g_Points[client][1] += 10;
-						}
-					}*/
 					break;
 				}
 			}
@@ -4376,7 +4283,7 @@ public void SQL_insertZonesCallback(Handle owner, Handle hndl, const char[] erro
 	db_selectMapZones();
 }
 
-public void db_insertZoneHook(int zoneid, int zonetype, int zonetypeid, int vis, int team, int zonegroup, char[] szHookName)
+public void db_insertZoneHook(int zoneid, int zonetype, int zonetypeid, int vis, int team, int zonegroup, char[] szHookName, float point_a[3], float point_b[3])
 {
 	char szQuery[1024];
 	char zName[128];
@@ -4387,7 +4294,7 @@ public void db_insertZoneHook(int zoneid, int zonetype, int zonetypeid, int vis,
 	Format(zName, 128, g_szZoneGroupName[zonegroup]);
 
 	//"INSERT INTO ck_zones (mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename) VALUES ('%s', '%i', '%i', '%i', '%f', '%f', '%f', '%f', '%f', '%f', '%i', '%i', '%i', '%s')";
-	Format(szQuery, 1024, "INSERT INTO ck_zones (mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename, hookname) VALUES ('%s', '%i', '%i', '%i', '%f', '%f', '%f', '%f', '%f', '%f', '%i', '%i', '%i','%s','%s')", g_szMapName, zoneid, zonetype, zonetypeid, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, vis, team, zonegroup, zName, szHookName);
+	Format(szQuery, 1024, "INSERT INTO ck_zones (mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename, hookname) VALUES ('%s', '%i', '%i', '%i', '%f', '%f', '%f', '%f', '%f', '%f', '%i', '%i', '%i','%s','%s')", g_szMapName, zoneid, zonetype, zonetypeid, point_a[0], point_a[1], point_a[2], point_b[0], point_b[1], point_b[2], vis, team, zonegroup, zName, szHookName);
 	SQL_TQuery(g_hDb, SQL_insertZonesCallback, szQuery, 1, DBPrio_Low);
 }
 
@@ -4414,10 +4321,10 @@ public void SQL_saveZonesCallBack(Handle owner, Handle hndl, const char[] error,
 	}
 }
 
-public void db_updateZone(int zoneid, int zonetype, int zonetypeid, float[] Point1, float[] Point2, int vis, int team, int zonegroup, int onejumplimit, float prespeed)
+public void db_updateZone(int zoneid, int zonetype, int zonetypeid, float[] Point1, float[] Point2, int vis, int team, int zonegroup, int onejumplimit, float prespeed, char[] hookname, char[] targetname)
 {
 	char szQuery[1024];
-	Format(szQuery, 1024, sql_updateZone, zonetype, zonetypeid, Point1[0], Point1[1], Point1[2], Point2[0], Point2[1], Point2[2], vis, team, onejumplimit, prespeed, zonegroup, zoneid, g_szMapName);
+	Format(szQuery, 1024, sql_updateZone, zonetype, zonetypeid, Point1[0], Point1[1], Point1[2], Point2[0], Point2[1], Point2[2], vis, team, onejumplimit, prespeed, hookname, targetname, zonegroup, zoneid, g_szMapName);
 	SQL_TQuery(g_hDb, SQL_updateZoneCallback, szQuery, 1, DBPrio_Low);
 }
 
@@ -4747,7 +4654,7 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 			* 0 = zone not found
 			* 1 = zone found
 			*
-			* IDs must be in order 0, 1, 2.... n
+			* IDs must be in order 0, 1, 2....
 			* Duplicate zoneids not possible due to primary key
 			*/
 			zoneIdChecker[g_mapZones[g_mapZonesCount][zoneId]]++;

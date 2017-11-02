@@ -293,6 +293,15 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		// Functions that require the client to input something via the chat box
 		if (g_iWaitingForResponse[client] > -1)
 		{
+			// Check if client is cancelling
+			if (StrEqual(sText, "cancel"))
+			{
+				CPrintToChat(client, "{lime}Surftimer {default}| Cancelled");
+				g_iWaitingForResponse[client] = -1;
+				return Plugin_Handled;
+			}
+
+			// Check which function we're waiting for
 			switch (g_iWaitingForResponse[client])
 			{
 				case 0: 
@@ -337,6 +346,18 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					db_updateMapSettings();
 					MaxVelocityMenu(client);
 					CPrintToChat(client, "{lime}Surftimer {default}| %s max velocity set to %f", g_szMapName, maxvelocity);
+				}
+				case 5:
+				{
+					// Zone set clients Target Name
+					if (StrEqual(sText, "reset"))
+						Format(sText, sizeof(sText), "player");
+
+					Format(g_mapZones[g_ClientSelectedZone[client]][targetName], sizeof(g_mapZones), "%s", sText);
+
+					CPrintToChat(client, "{lime}Surftimer {default}| %s-%i set to {lime}%s", g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId], sText);
+
+					EditorMenu(client);
 				}
 			}
 			g_iWaitingForResponse[client] = -1;
@@ -718,7 +739,6 @@ public Action Hook_OnTakeDamage(int victim, int &attacker, int &inflictor, float
 	return Plugin_Continue;
 }
 
-
 //thx to TnTSCS (player slap stops timer)
 //https://forums.alliedmods.net/showthread.php?t=233966
 public Action OnLogAction(Handle source, Identity ident, int client, int target, const char[] message)
@@ -742,12 +762,12 @@ public Action OnLogAction(Handle source, Identity ident, int client, int target,
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
 	//fluffys
-	if(buttons & IN_JUMP && g_bInJump[client] == true && !g_bInStartZone[client] && !g_bInStageZone[client])
+	if (buttons & IN_JUMP && g_bInJump[client] == true && !g_bInStartZone[client] && !g_bInStageZone[client])
 	{
-		if(!g_bJumpZoneTimer[client])
+		if (!g_bJumpZoneTimer[client])
 		{
 			CreateTimer(1.0, StartJumpZonePrintTimer, client);
-			PrintToChat(client, "%cSurftimer %c| | You may not jump in this area.");
+			CPrintToChat(client, "{lime}Surftimer {default}| {darkred}You may not jump in this area");
 			TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, view_as<float>( { 0.0, 0.0, 0.0} ));
 			SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, 0.0 } ));
 			g_bJumpZoneTimer[client] = true;
@@ -755,7 +775,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	}
 	else if(buttons & IN_DUCK && g_bInDuck[client] == true)
 	{
-		PrintToChat(client, "%cSurftimer %c| | You may not crouch in this area.");
+		CPrintToChat(client, "{lime}Surftimer {default}| {darkred}You may not crouch in this area");
 	}
 	else if(buttons & IN_DUCK && g_bInPushTrigger[client] == true)
 	{

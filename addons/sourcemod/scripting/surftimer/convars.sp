@@ -1,3 +1,102 @@
+/*----------  CVars  ----------*/
+// Zones
+bool g_bZoner[MAXPLAYERS + 1];
+int g_ZonerFlag;
+ConVar g_hZonerFlag = null;
+ConVar g_hZoneDisplayType = null;								 // How zones are displayed (lower edge, full)
+ConVar g_hZonesToDisplay = null; 								// Which zones are displayed
+ConVar g_hChecker; 												// Zone refresh rate
+Handle g_hZoneTimer = INVALID_HANDLE;
+//Zone Colors
+int g_iZoneColors[ZONEAMOUNT+2][4];								// ZONE COLOR TYPES: Stop(0), Start(1), End(2), BonusStart(3), BonusEnd(4), Stage(5),
+char g_szZoneColors[ZONEAMOUNT+2][24];							// Checkpoint(6), Speed(7), TeleToStart(8), Validator(9), Chekcer(10)
+ConVar g_hzoneStartColor = null;
+ConVar g_hzoneEndColor = null;
+ConVar g_hzoneBonusStartColor = null;
+ConVar g_hzoneBonusEndColor = null;
+ConVar g_hzoneStageColor = null;
+ConVar g_hzoneCheckpointColor = null;
+ConVar g_hzoneSpeedColor = null;
+ConVar g_hzoneTeleToStartColor = null;
+ConVar g_hzoneValidatorColor = null;
+ConVar g_hzoneCheckerColor = null;
+ConVar g_hzoneStopColor = null;
+ConVar g_hAnnounceRecord;										// Announce rank type: 0 announce all, 1 announce only PB's, 3 announce only SR's
+ConVar g_hCommandToEnd; 										// !end Enable / Disable
+ConVar g_hWelcomeMsg = null;
+ConVar g_hReplayBotPlayerModel = null;
+ConVar g_hReplayBotArmModel = null; 							// Replay bot arm model
+ConVar g_hPlayerModel = null; 									// Player models
+ConVar g_hArmModel = null; 										// Player arm models
+ConVar g_hcvarRestore = null; 									// Restore player's runs?
+ConVar g_hNoClipS = null; 										// Allow noclip?
+ConVar g_hReplayBot = null; 									// Replay bot?
+ConVar g_hWrcpBot = null;
+ConVar g_hBackupReplays = null;									// Back up replay bots?
+ConVar g_hReplaceReplayTime = null;								// Replace replay times, even if not SR
+ConVar g_hTeleToStartWhenSettingsLoaded = null;
+bool g_bMapReplay; // Why two bools?
+ConVar g_hBonusBot = null; 										// Bonus bot?
+bool g_bMapBonusReplay[MAXZONEGROUPS];
+ConVar g_hColoredNames = null; 									// Colored names in chat?
+ConVar g_hPauseServerside = null; 								// Allow !pause?
+ConVar g_hAutoBhopConVar = null; 								// Allow autobhop?
+bool g_bAutoBhop;
+ConVar g_hDynamicTimelimit = null; 								// Dynamic timelimit?
+ConVar g_hConnectMsg = null; 									// Connect message?
+ConVar g_hDisconnectMsg = null; 								// Disconnect message?
+ConVar g_hRadioCommands = null; 								// Allow radio commands?
+ConVar g_hInfoBot = null; 										// Info bot?
+ConVar g_hAttackSpamProtection = null; 							// Throttle shooting?
+int g_AttackCounter[MAXPLAYERS + 1]; 							// Used to calculate player shots
+ConVar g_hGoToServer = null; 									// Allow !goto?
+ConVar g_hAllowRoundEndCvar = null; 							// Allow round ending?
+bool g_bRoundEnd; // Why two bools?
+ConVar g_hPlayerSkinChange = null; 								// Allow changing player models?
+ConVar g_hCountry = null; 										// Display countries for players?
+ConVar g_hAutoRespawn = null; 									// Respawn players automatically?
+ConVar g_hCvarNoBlock = null; 									// Allow player blocking?
+ConVar g_hPointSystem = null; 									// Use the point system?
+ConVar g_hCleanWeapons = null; 									// Clean weapons from ground?
+int g_ownerOffset; 												// Used to clear weapons from ground
+ConVar g_hCvarGodMode = null;									// Enable god mode?
+//ConVar g_hAutoTimer = null;
+ConVar g_hMapEnd = null; 										// Allow map ending?
+ConVar g_hAutohealing_Hp = null; 								// Automatically heal lost HP?
+// Bot Colors & effects:
+ConVar g_hReplayBotColor = null; 								// Replay bot color
+int g_ReplayBotColor[3];
+ConVar g_hBonusBotColor = null; 								// Bonus bot color
+int g_BonusBotColor[3];
+ConVar g_hDoubleRestartCommand;									// Double !r restart
+// ConVar g_hStartPreSpeed = null; 								// Start zone speed cap
+// ConVar g_hSpeedPreSpeed = null; 								// Speed Start zone speed cap
+// ConVar g_hBonusPreSpeed = null; 								// Bonus zone speed cap
+ConVar g_hSoundEnabled = null; 									// Enable timer start sound
+ConVar g_hSoundPath = null;										// Define start sound
+//char sSoundPath[64];
+ConVar g_hSpawnToStartZone = null; 								// Teleport on spawn to start zone
+ConVar g_hAnnounceRank = null; 									// Min rank to announce in chat
+ConVar g_hForceCT = null; 										// Force players CT
+ConVar g_hChatSpamFilter = null; 								// Chat spam limiter
+float g_fLastChatMessage[MAXPLAYERS + 1]; 						// Last message time
+int g_messages[MAXPLAYERS + 1]; 								// Spam message count
+ConVar g_henableChatProcessing = null; 							// Is chat processing enabled
+ConVar g_hMultiServerMapcycle = null;							// Use multi server mapcycle
+ConVar g_hDBMapcycle = null;									// use maps from ck_maptier as the servers mapcycle
+ConVar g_hPrestigeRank = null;								// Rank to limit the server
+ConVar g_hServerType = null;									// Set server to surf or bhop mode
+ConVar g_hOneJumpLimit = null;								// Only allows players to jump once inside a start or stage zone
+ConVar g_hServerID = null; // Sets the servers id for cross-server announcements
+ConVar g_hRecordAnnounce = null; // Enable/Disable cross-server announcements
+ConVar g_hRecordAnnounceDiscord = null; // Web hook link to announce records to discord
+ConVar g_hReportBugsDiscord = null; // Web hook link to report bugs to discord
+ConVar g_hCalladminDiscord = null; // Web hook link to allow players to call admin to discord
+ConVar g_hSidewaysBlockKeys = null;
+ConVar g_hEnforceDefaultTitles = null;
+ConVar g_hWrcpPoints = null;
+
+
 void CreateConVars()
 {
   CreateConVar("timer_version", VERSION, "Timer Version.", FCVAR_DONTRECORD | FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY);
@@ -217,6 +316,9 @@ void CreateConVars()
   
   g_hEnforceDefaultTitles = CreateConVar("ck_enforce_default_titles", "0", "Sets whether default titles will be enforced on clients, Enable / Disable");
   HookConVarChange(g_hEnforceDefaultTitles, OnSettingChanged);
+
+  // Wrcp Points
+  g_hWrcpPoints = CreateConVar("ck_wrcp_points", "0", "Sets the amount of points a player should get for a WRCP, 0 to disable");
   
   // Server Name
   g_hHostName = FindConVar("hostname");

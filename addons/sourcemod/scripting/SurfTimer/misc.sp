@@ -409,7 +409,7 @@ int setClientLocation(int client, float fDestination[3])
 	int zId = IsInsideZone(fDestination);
 
 	// Hack fix for hooked zones setting the clients zone id to -1
-	if (!StrEqual(g_mapZones[g_iTeleportingZoneId[client]][hookName], "None"))
+	if (g_mapZonesCount > 0 && !StrEqual(g_mapZones[g_iTeleportingZoneId[client]][hookName], "None"))
 	{
 		// Any side effects from doing this? Not sure, I assume joni is getting a new zone id for a reason but I don't understand why when he gets the new zone id in the teleportClient function
 		zId = g_iTeleportingZoneId[client];

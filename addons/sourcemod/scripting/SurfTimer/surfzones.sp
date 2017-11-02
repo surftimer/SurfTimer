@@ -760,36 +760,24 @@ public void BeamBox_OnPlayerRunCmd(int client)
 		getZoneTeamColor(g_CurrentZoneTeam[client], zColor);
 
 		int iEnt = GetArrayCell(g_hTriggerMultiple, g_iSelectedTrigger[client]);
-
-		GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", position);
-		GetEntPropVector(iEnt, Prop_Send, "m_vecMins", fMins);
-		GetEntPropVector(iEnt, Prop_Send, "m_vecMaxs", fMaxs);
-
-		for (int j = 0; j < 3; j++)
+		if (IsValidEntity(iEnt))
 		{
-			fMins[j] = (fMins[j] + position[j]);
+			GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", position);
+			GetEntPropVector(iEnt, Prop_Send, "m_vecMins", fMins);
+			GetEntPropVector(iEnt, Prop_Send, "m_vecMaxs", fMaxs);
+
+			for (int j = 0; j < 3; j++)
+			{
+				fMins[j] = (fMins[j] + position[j]);
+			}
+
+			for (int j = 0; j < 3; j++)
+			{
+				fMaxs[j] = (fMaxs[j] + position[j]);
+			}
+
+			TE_SendBeamBoxToClient(client, fMins, fMaxs, g_BeamSprite, g_HaloSprite, 0, 30, 1.0, 1.0, 1.0, 2, 0.0, view_as<int>({255, 255, 0, 255}), 0, 1);
 		}
-
-		for (int j = 0; j < 3; j++)
-		{
-			fMaxs[j] = (fMaxs[j] + position[j]);
-		}
-
-		// for (int j = 0; j < 3; j++)
-		// {
-		// 	corners[0][j] = fMins[j];
-		// 	corners[7][j] = fMaxs[j];
-		// }
-
-		// for(int j = 1; j < 7; j++)
-		// {
-		// 	for(int k = 0; k < 3; k++)
-		// 	{
-		// 		corners[j][k] = corners[((j >> (2-k)) & 1) * 7][k];
-		// 	}
-		// }
-		//PrintToChat(client, "sending beam");
-		TE_SendBeamBoxToClient(client, fMins, fMaxs, g_BeamSprite, g_HaloSprite, 0, 30, 1.0, 1.0, 1.0, 2, 0.0, view_as<int>({255, 255, 0, 255}), 0, 1);
 	}
 }
 
@@ -1463,6 +1451,8 @@ public void SelectNormalZoneType(int client)
 	}
 	else if (g_mapZonesTypeCount[g_CurrentSelectedZoneGroup[client]][3] == 0 && g_mapZonesTypeCount[g_CurrentSelectedZoneGroup[client]][4] > 0)
 		SelectNormalZoneMenu.AddItem("4", "Checkpoint");
+	
+	SelectNormalZoneMenu.AddItem("hook", "Hook Zone");
 
 	SelectNormalZoneMenu.ExitButton = true;
 	SelectNormalZoneMenu.Display(client, MENU_TIME_FOREVER);
@@ -1476,12 +1466,16 @@ public int Handle_SelectNormalZoneType(Handle tMenu, MenuAction action, int clie
 		{
 			char aID[12];
 			GetMenuItem(tMenu, item, aID, sizeof(aID));
-			g_CurrentZoneType[client] = StringToInt(aID);
-			if (g_bEditZoneType[client]) {
-				db_selectzoneTypeIds(g_CurrentZoneType[client], client, 0);
-			}
+			if (StrEqual(aID, "hook"))
+				HookZonesMenu(client);
 			else
-				EditorMenu(client);
+			{
+				g_CurrentZoneType[client] = StringToInt(aID);
+				if (g_bEditZoneType[client])
+					db_selectzoneTypeIds(g_CurrentZoneType[client], client, 0);
+				else
+					EditorMenu(client);
+			}
 		}
 		case MenuAction_Cancel:
 		{
@@ -1785,7 +1779,7 @@ public void EditorMenu(int client)
 
 			// Targetname
 			Format(szMenuItem, sizeof(szMenuItem), "Target Name: %s", g_mapZones[g_ClientSelectedZone[client]][targetName]);
-			editMenu.AddItem("", szMenuItem, ITEMDRAW_DISABLED);
+			editMenu.AddItem("", szMenuItem);
 			
 			// One jump limit
 			if (g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit] == 1)
@@ -1860,9 +1854,9 @@ public int MenuHandler_Editor(Handle tMenu, MenuAction action, int client, int i
 					if (g_ClientSelectedZone[client] != -1)
 					{
 						if (!g_bEditZoneType[client])
-							db_updateZone(g_mapZones[g_ClientSelectedZone[client]][zoneId], g_mapZones[g_ClientSelectedZone[client]][zoneType], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId], g_Positions[client][0], g_Positions[client][1], g_CurrentZoneVis[client], g_CurrentZoneTeam[client], g_CurrentSelectedZoneGroup[client], g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit], g_mapZones[g_ClientSelectedZone[client]][preSpeed]);
+							db_updateZone(g_mapZones[g_ClientSelectedZone[client]][zoneId], g_mapZones[g_ClientSelectedZone[client]][zoneType], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId], g_Positions[client][0], g_Positions[client][1], g_CurrentZoneVis[client], g_CurrentZoneTeam[client], g_CurrentSelectedZoneGroup[client], g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit], g_mapZones[g_ClientSelectedZone[client]][preSpeed], g_mapZones[g_ClientSelectedZone[client]][hookName], g_mapZones[g_ClientSelectedZone[client]][targetName]);
 						else
-							db_updateZone(g_mapZones[g_ClientSelectedZone[client]][zoneId], g_CurrentZoneType[client], g_CurrentZoneTypeId[client], g_Positions[client][0], g_Positions[client][1], g_CurrentZoneVis[client], g_CurrentZoneTeam[client], g_CurrentSelectedZoneGroup[client], g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit], g_mapZones[g_ClientSelectedZone[client]][preSpeed]);
+							db_updateZone(g_mapZones[g_ClientSelectedZone[client]][zoneId], g_CurrentZoneType[client], g_CurrentZoneTypeId[client], g_Positions[client][0], g_Positions[client][1], g_CurrentZoneVis[client], g_CurrentZoneTeam[client], g_CurrentSelectedZoneGroup[client], g_mapZones[g_ClientSelectedZone[client]][oneJumpLimit], g_mapZones[g_ClientSelectedZone[client]][preSpeed], g_mapZones[g_ClientSelectedZone[client]][hookName], g_mapZones[g_ClientSelectedZone[client]][targetName]);
 						g_bEditZoneType[client] = false;
 					}
 					else
@@ -1902,32 +1896,13 @@ public int MenuHandler_Editor(Handle tMenu, MenuAction action, int client, int i
 				}
 				case 8:
 				{
-					++g_CurrentZoneVis[client];
-					switch (g_CurrentZoneVis[client])
-					{
-						case 1:
-						{
-							PrintToChat(client, "%t", "ZoneVisAll", LIMEGREEN, WHITE);
-						}
-						case 2:
-						{
-							PrintToChat(client, "%t", "ZoneVisT", LIMEGREEN, WHITE);
-						}
-						case 3:
-						{
-							PrintToChat(client, "%t", "ZoneVisCT", LIMEGREEN, WHITE);
-						}
-						case 4:
-						{
-							g_CurrentZoneVis[client] = 0;
-							PrintToChat(client, "%t", "ZoneVisInv", LIMEGREEN, WHITE);
-						}
-					}
-					EditorMenu(client);
+					ChangeZonesHook(client);
 				}
 				case 9:
 				{
 					// Set Target Name
+					g_iWaitingForResponse[client] = 5;
+					CPrintToChat(client, "{lime}Surftimer {default}| Type the desired target name (type reset to reset)");
 				}
 				case 10:
 				{
@@ -2096,7 +2071,7 @@ public int MenuHandler_Prespeed(Handle tMenu, MenuAction action, int client, int
 			float prespeed = StringToFloat(szPrespeed);
 			if (prespeed == -1.0)
 			{
-				CPrintToChat(client, "{lime}Surftimer {default}| Type the prespeed to be set to {lightgreen}%s-%i", g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId] + 2);
+				CPrintToChat(client, "{lime}Surftimer {default}| Type the prespeed to be set to {lightgreen}%s-%i", g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId]);
 				g_iWaitingForResponse[client] = 0;
 				return;
 			}
@@ -2114,6 +2089,141 @@ public int MenuHandler_Prespeed(Handle tMenu, MenuAction action, int client, int
 		{
 			delete tMenu;
 		}
+	}
+}
+
+public void ChangeZonesHook(int client)
+{
+	Menu menu = CreateMenu(ChangeZonesHookMenuHandler);
+	SetMenuTitle(menu, "Select a trigger");
+
+	for (int i = 0; i < GetArraySize(g_TriggerMultipleList); i++)
+	{
+		char szTriggerName[128];
+		GetArrayString(g_TriggerMultipleList, i, szTriggerName, sizeof(szTriggerName));
+		AddMenuItem(menu, szTriggerName, szTriggerName);
+	}
+	SetMenuExitButton(menu, true);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+public int ChangeZonesHookMenuHandler(Handle menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+		SelectTrigger(param1, param2);
+	else if (action == MenuAction_Cancel)
+		g_iSelectedTrigger[param1] = -1;
+	else if (action == MenuAction_End)
+		delete menu;
+}
+
+public void SelectTrigger(int client, int index)
+{
+	g_iSelectedTrigger[client] = index;
+	char szTriggerName[128];
+	GetArrayString(g_TriggerMultipleList, index, szTriggerName, sizeof(szTriggerName));
+
+	Menu menu = CreateMenu(ZoneHookHandler);
+	SetMenuTitle(menu, szTriggerName);
+
+	char szParam[128];
+	IntToString(index, szParam, sizeof(szParam));
+	AddMenuItem(menu, szParam, "Teleport to zone");
+	AddMenuItem(menu, szParam, "Hook zone");
+	AddMenuItem(menu, szParam, "Back");
+
+	SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+public int ZoneHookHandler(Handle menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char szTriggerIndex[128];
+		GetMenuItem(menu, param2, szTriggerIndex, sizeof(szTriggerIndex));
+		int index = StringToInt(szTriggerIndex);
+		int iEnt = GetArrayCell(g_hTriggerMultiple, index);
+		g_iSelectedTrigger[param1] = index;
+		char szTriggerName[128];
+		GetArrayString(g_TriggerMultipleList, index, szTriggerName, sizeof(szTriggerName));
+
+		switch (param2)
+		{
+			case 0: // teleport
+			{
+				float position[3];
+				float angles[3];
+				GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", position);
+				GetClientEyeAngles(param1, angles);
+
+				CPrintToChat(param1, "{lime}Surftimer {default}| Teleporting to %s at %f %f %f", szTriggerName, position[0],	position[1], position[2]);
+
+				teleportEntitySafe(param1, position, angles, view_as<float>( { 0.0, 0.0, -100.0 } ), true);
+				SelectTrigger(param1, index);
+			}
+			case 1: // hook zone
+			{
+				float position[3], fMins[3], fMaxs[3];
+
+				GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", position);
+				GetEntPropVector(iEnt, Prop_Send, "m_vecMins", fMins);
+				GetEntPropVector(iEnt, Prop_Send, "m_vecMaxs", fMaxs);
+					
+
+				g_mapZones[g_ClientSelectedZone[param1]][CenterPoint][0] = position[0];
+				g_mapZones[g_ClientSelectedZone[param1]][CenterPoint][1] = position[1];
+				g_mapZones[g_ClientSelectedZone[param1]][CenterPoint][2] = position[2];
+
+				for (int j = 0; j < 3; j++)
+				{
+					fMins[j] = (fMins[j] + position[j]);
+				}
+
+				for (int j = 0; j < 3; j++)
+				{
+					fMaxs[j] = (fMaxs[j] + position[j]);
+				}
+
+				g_mapZones[g_ClientSelectedZone[param1]][PointA][0] = fMins[0];
+				g_mapZones[g_ClientSelectedZone[param1]][PointA][1] = fMins[1];
+				g_mapZones[g_ClientSelectedZone[param1]][PointA][2] = fMins[2];
+				g_mapZones[g_ClientSelectedZone[param1]][PointB][0] = fMaxs[0];
+				g_mapZones[g_ClientSelectedZone[param1]][PointB][1] = fMaxs[1];
+				g_mapZones[g_ClientSelectedZone[param1]][PointB][2] = fMaxs[2];
+
+				for (int j = 0; j < 3; j++)
+				{
+					g_fZoneCorners[g_ClientSelectedZone[param1]][0][j] = g_mapZones[g_ClientSelectedZone[param1]][PointA][j];
+					g_fZoneCorners[g_ClientSelectedZone[param1]][7][j] = g_mapZones[g_ClientSelectedZone[param1]][PointB][j];
+				}
+
+				for(int j = 1; j < 7; j++)
+				{
+					for(int k = 0; k < 3; k++)
+					{
+						g_fZoneCorners[g_ClientSelectedZone[param1]][j][k] = g_fZoneCorners[g_ClientSelectedZone[param1]][((j >> (2-k)) & 1) * 7][k];
+					}
+				}
+
+				g_Positions[param1][0] = fMins;
+				g_Positions[param1][1] = fMaxs;
+
+				Format(g_mapZones[g_ClientSelectedZone[param1]][hookName], sizeof(g_mapZones), szTriggerName);
+
+				CPrintToChat(param1, "{lime}Surftimer {default}| Set %s-%i hook name to %s", g_szZoneDefaultNames[g_CurrentZoneType[param1]], g_mapZones[g_ClientSelectedZone[param1]][zoneTypeId], szTriggerName);
+				SelectTrigger(param1, index);
+			}
+			case 2: // Back
+			{
+				g_iSelectedTrigger[param1] = -1;
+				EditorMenu(param1);
+			}
+		}
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
 	}
 }
 

@@ -1,13 +1,14 @@
 # v2.1 (Latest)
 * Added default titles which can be edited via `addons/sourcemod/config/surftimer/default_titles.txt`
 * Added new ConVar `ck_enforce_default_titles` which sets whether to enforce default titles on players
-* Added whitelist which will whitelist any player in the whitelist from being forced to use their default title `addons/sourcemod/config/surftimer/default_titles_whitelist.txt`
+* Added default titles whitelist which will whitelist players from being forced to use their default title `addons/sourcemod/config/surftimer/default_titles_whitelist.txt`
 * Fixed tele to start zones not working on Bonuses
 * Fixed `sm_repeat`
 * Fixed `sm_goback`
 * Added custom skill groups which can be edited via `addons/sourcemod/configs/surftimer/skillgroups.cfg`
 * Zone display now respects the `ck_zone_drawstyle` ConVar
 * Prespeed is now controlled on a per zone basis, you can edit it in the zones options on the second page
+* Added Target Name to the zones menu allowing zoners to change what players target name will be when entering/leaving a zone
 * Added mapsettings menu `sm_mapsettings` `sm_ms`
 * Updated colours include (thanks 2called-chaos)
 * Zoner commands now respects `ck_zoner_flag`
@@ -16,6 +17,7 @@
 * Speed limiting no longer checks for players that are in checkpoint, end or misc zones
 * Removed bonus tiers
 * `ck_mapsettings` has been dropped with it's columns moved to `ck_maptier`
+* Added ConVar to enable WRCP points `ck_wrcp_points` 
 
 ###### Changes by aveniccii (thanks)
 * Fixed spacing between stage completion message
