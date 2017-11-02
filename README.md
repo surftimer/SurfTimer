@@ -42,5 +42,3 @@ https://github.com/fluffyst/ckSurf-mapchooser
 * <a href="http://steamcommunity.com/id/fluffystko/">fluffys</a>
 * Jakeey802
 * Grandpa Goose
-
-Checkout <a href="http://kpsurf.xyz">KP Surf</a> if you want to see the latest version in action.
