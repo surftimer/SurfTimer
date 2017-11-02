@@ -2,6 +2,7 @@
 -- Table structure for table `ck_maptier`
 --
 
+DROP TABLE IF EXISTS `ck_maptier`;
 CREATE TABLE IF NOT EXISTS `ck_maptier` (
   `mapname` varchar(54) NOT NULL,
   `tier` int(12) NOT NULL,

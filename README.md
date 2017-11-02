@@ -20,12 +20,17 @@ Keep in mind this is my own version of ckSurf, a lot of things are hard coded so
 
 * Upload all the files to your csgo server directory
 * Add a MySQL database called `surftimer` to `csgo/addons/sourcemod/configs/databases.cfg`
-#### Optional
+#### Upgrading
+If you wish to upgrade from a different fork of cksurf you may run the upgrade sql files located in `optional/upgrading/`, this will convert your database schema to this timers, so make sure you backup first!
+###### Optional
 * Import the ck_zones.sql file if you want to use my pre-made zones
 * Import the ck_maptier.sql file if you want to use my pre-made tiers
 
 ## Stripper
 * I have uploaded my stripper files <a href="https://github.com/fluffyst/skillsurf-csgo">here</a>
+
+## Extra
+* I've made a discord so it's easier to discuss changes/additions rather than having to use GitHub issues https://discord.gg/MmuRW4k
 
 ## Credits
 

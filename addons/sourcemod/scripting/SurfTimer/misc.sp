@@ -406,6 +406,9 @@ void teleportEntitySafe(int client, float fDestination[3], float fAngles[3], flo
 
 int setClientLocation(int client, float fDestination[3])
 {
+	if(!IsValidClient(client) || IsFakeClient(client))
+		return Plugin_Handled;
+		
 	int zId = IsInsideZone(fDestination);
 
 	// Hack fix for hooked zones setting the clients zone id to -1
