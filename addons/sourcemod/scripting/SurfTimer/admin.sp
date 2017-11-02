@@ -55,35 +55,27 @@ public Action Admin_insertMapTier(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	if (!(GetUserFlagBits(client) & g_ZoneMenuFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT) && !g_bZoner[client])
+	if (!(GetUserFlagBits(client) & g_ZonerFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT) && !g_bZoner[client])
 	{
 		PrintToChat(client, " %cSurftimer %c| You don't have access to the zones menu.", LIMEGREEN, WHITE);
 		return Plugin_Handled;
 	}
 
-	if (args < 2)
+	if (args == 0)
 	{
-		ReplyToCommand(client, " %cSurftimer%c | Usage: sm_addmaptier <ZoneGroup> <Tier>", LIMEGREEN, WHITE);
-		PrintToChat(client, " %cSurftimer %c| Zone Groups:", LIMEGREEN, WHITE);
-		PrintToChat(client, "[%c0.%c] Map Tier", LIMEGREEN, WHITE);
-		for (int i = 1; i < g_mapZoneGroupCount; i++)
-		{
-			PrintToChat(client, "[%c%i.%c] %s", YELLOW, i, WHITE, g_szZoneGroupName[i]);
-		}
+		ReplyToCommand(client, " %cSurftimer%c | Usage: sm_addmaptier <Tier>", LIMEGREEN, WHITE);
 		return Plugin_Handled;
 	}
-	if (args > 1)
+	else
 	{
 		char arg1[3];
-		int tier, zonegroup;
-		GetCmdArg(2, arg1, sizeof(arg1));
-		tier = StringToInt(arg1);
+		int tier;
 		GetCmdArg(1, arg1, sizeof(arg1));
-		zonegroup = StringToInt(arg1);
-		if ((tier < 7 || tier > 0) && (-1 < zonegroup < g_mapZoneGroupCount))
-			db_insertMapTier(tier, zonegroup);
+		tier = StringToInt(arg1);
+		if (tier < 7 && tier > 0)
+			db_insertMapTier(tier);
 		else
-			PrintToChat(client, " %cSurftimer %c| Invalid tier number or zone group. Please choose a tier number between 1-6 and a valid zone group.", LIMEGREEN, WHITE);
+			PrintToChat(client, " %cSurftimer %c| Invalid tier number. Please choose a tier number between 1-6.", LIMEGREEN, WHITE);
 	}
 	return Plugin_Handled;
 }
@@ -93,7 +85,7 @@ public Action Admin_insertSpawnLocation(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	if (!CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+	if (!g_bZoner[client] && !CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
 		return Plugin_Handled;
 
 	float SpawnLocation[3];
@@ -184,7 +176,7 @@ public void ckAdminMenu(int client)
 	char szTmp[128];
 
 	Handle adminmenu = CreateMenu(AdminPanelHandler);
-	if (GetUserFlagBits(client) & g_ZoneMenuFlag)
+	if (GetUserFlagBits(client) & g_ZonerFlag)
 		Format(szTmp, sizeof(szTmp), "Surftimer %s Admin Menu (full access)", VERSION);
 	else
 		Format(szTmp, sizeof(szTmp), "Surftimer %s Admin Menu (limited access)", VERSION);
@@ -199,7 +191,7 @@ public void ckAdminMenu(int client)
 
 	int menuItemNumber = 2;
 
-	if (GetUserFlagBits(client) & g_ZoneMenuFlag)
+	if (GetUserFlagBits(client) & g_ZonerFlag)
 	{
 		Format(szTmp, sizeof(szTmp), "[%i.] Edit or create zones", menuItemNumber);
 		AddMenuItem(adminmenu, szTmp, szTmp);
@@ -313,13 +305,6 @@ public void ckAdminMenu(int client)
 		Format(szTmp, sizeof(szTmp), "[%i.] Auto bunnyhop (only surf_/bhop_ maps)  -  Enabled", menuItemNumber);
 	else
 		Format(szTmp, sizeof(szTmp), "[%i.] Auto bunnyhop  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hAdminClantag))
-		Format(szTmp, sizeof(szTmp), "[%i.] Admin clan tag  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Admin clan tag  -  Disabled", menuItemNumber);
 	AddMenuItem(adminmenu, szTmp, szTmp);
 	menuItemNumber++;
 
@@ -536,21 +521,13 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 
 			case 17:
 			{
-				if (!GetConVarBool(g_hAdminClantag))
-					ServerCommand("ck_admin_clantag 1");
-				else
-					ServerCommand("ck_admin_clantag 0");
-			}
-
-			case 18:
-			{
 				if (!GetConVarBool(g_hMapEnd))
 					ServerCommand("ck_map_end 1");
 				else
 					ServerCommand("ck_map_end 0");
 			}
 
-			case 19:
+			case 18:
 			{
 				if (!GetConVarBool(g_hConnectMsg))
 					ServerCommand("ck_connect_msg 1");
@@ -558,7 +535,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 					ServerCommand("ck_connect_msg 0");
 			}
 
-			case 20:
+			case 19:
 			{
 				if (!GetConVarBool(g_hDisconnectMsg))
 					ServerCommand("ck_disconnect_msg 1");
@@ -566,7 +543,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 					ServerCommand("ck_disconnect_msg 0");
 			}
 
-			case 21:
+			case 20:
 			{
 				if (!GetConVarBool(g_hInfoBot))
 					ServerCommand("ck_info_bot 1");
@@ -574,7 +551,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 					ServerCommand("ck_info_bot 0");
 			}
 
-			case 22:
+			case 21:
 			{
 				if (!GetConVarBool(g_hAttackSpamProtection))
 					ServerCommand("ck_attack_spam_protection 1");
@@ -582,7 +559,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 					ServerCommand("ck_attack_spam_protection 0");
 			}
 
-			case 23:
+			case 22:
 			{
 				if (!GetConVarBool(g_hAllowRoundEndCvar))
 					ServerCommand("ck_round_end 1");

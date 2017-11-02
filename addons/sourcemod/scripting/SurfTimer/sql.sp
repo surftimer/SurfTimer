@@ -1,122 +1,4 @@
-/////////////////////////
-// PREPARED STATEMENTS //
-////////////////////////
-
-//TABLE PLAYER REPORTS
-char sql_createPlayerReports[] = "CREATE TABLE IF NOT EXISTS ck_reports (id int(11) NOT NULL AUTO_INCREMENT, steamid varchar(32) NOT NULL, map varchar(32) NOT NULL, ip varchar(16) NOT NULL, port INT(6) NOT NULL, report varchar(255) NOT NULL, vip int(1) NOT NULL, date timestamp NOT NULL default CURRENT_TIMESTAMP, PRIMARY KEY (id));";
-
-//TABLE PLAYER TIME
-char sql_createPlayerTotalTime[] = "CREATE TABLE IF NOT EXISTS ck_playertotaltime (name varchar(64) CHARACTER SET utf8 NOT NULL, steamid varchar(64) NOT NULL, time_played int(64) NOT NULL, UNIQUE KEY steamid (steamid));";
-
-//TABLE CK_SPAWNLOCATIONS
-char sql_createSpawnLocations[] = "CREATE TABLE IF NOT EXISTS ck_spawnlocations (mapname VARCHAR(54) NOT NULL, pos_x FLOAT NOT NULL, pos_y FLOAT NOT NULL, pos_z FLOAT NOT NULL, ang_x FLOAT NOT NULL, ang_y FLOAT NOT NULL, ang_z FLOAT NOT NULL,  `vel_x` float NOT NULL DEFAULT '0', `vel_y` float NOT NULL DEFAULT '0', `vel_z` float NOT NULL DEFAULT '0', zonegroup INT(12) DEFAULT 0, stage INT(12) DEFAULT 0, PRIMARY KEY(mapname, zonegroup, stage));";
-char sql_insertSpawnLocations[] = "INSERT INTO ck_spawnlocations (mapname, pos_x, pos_y, pos_z, ang_x, ang_y, ang_z, vel_x, vel_y, vel_z, zonegroup) VALUES ('%s', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', %i);";
-char sql_updateSpawnLocations[] = "UPDATE ck_spawnlocations SET pos_x = '%f', pos_y = '%f', pos_z = '%f', ang_x = '%f', ang_y = '%f', ang_z = '%f', vel_x = '%f', vel_y = '%f', vel_z = '%f' WHERE mapname = '%s' AND zonegroup = %i";
-char sql_selectSpawnLocations[] = "SELECT mapname, pos_x, pos_y, pos_z, ang_x, ang_y, ang_z, vel_x, vel_y, vel_z, zonegroup, stage FROM ck_spawnlocations WHERE mapname ='%s';";
-char sql_deleteSpawnLocations[] = "DELETE FROM ck_spawnlocations WHERE mapname = '%s' AND zonegroup = %i AND stage = 0";
-
-//TABLE ZONES
-char sql_createZones[] = "CREATE TABLE IF NOT EXISTS ck_zones (mapname VARCHAR(54) NOT NULL, zoneid INT(12) DEFAULT '-1', zonetype INT(12) DEFAULT '-1', zonetypeid INT(12) DEFAULT '-1', pointa_x FLOAT DEFAULT '-1.0', pointa_y FLOAT DEFAULT '-1.0', pointa_z FLOAT DEFAULT '-1.0', pointb_x FLOAT DEFAULT '-1.0', pointb_y FLOAT DEFAULT '-1.0', pointb_z FLOAT DEFAULT '-1.0', vis INT(12) DEFAULT '0', team INT(12) DEFAULT '0', zonegroup INT(12) DEFAULT 0, zonename VARCHAR(128), PRIMARY KEY(mapname, zoneid));";
-char sql_insertZones[] = "INSERT INTO ck_zones (mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename) VALUES ('%s', '%i', '%i', '%i', '%f', '%f', '%f', '%f', '%f', '%f', '%i', '%i', '%i','%s')";
-char sql_updateZone[] = "UPDATE ck_zones SET zonetype = '%i', zonetypeid = '%i', pointa_x = '%f', pointa_y ='%f', pointa_z = '%f', pointb_x = '%f', pointb_y = '%f', pointb_z = '%f', vis = '%i', team = '%i', onejumplimit = '%i', zonegroup = '%i' WHERE zoneid = '%i' AND mapname = '%s'";
-char sql_selectzoneTypeIds[] = "SELECT zonetypeid FROM ck_zones WHERE mapname='%s' AND zonetype='%i' AND zonegroup = '%i';";
-char sql_selectMapZones[] = "SELECT zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename, hookname, targetname, onejumplimit FROM ck_zones WHERE mapname = '%s' ORDER BY zonetypeid ASC";
-char sql_selectTotalBonusCount[] = "SELECT mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename FROM ck_zones WHERE zonetype = 3 GROUP BY mapname, zonegroup;";
-char sql_selectZoneIds[] = "SELECT mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename FROM ck_zones WHERE mapname = '%s' ORDER BY zoneid ASC";
-char sql_selectBonusesInMap[] = "SELECT mapname, zonegroup, zonename FROM `ck_zones` WHERE mapname LIKE '%c%s%c' AND zonegroup > 0 GROUP BY zonegroup;";
-char sql_deleteMapZones[] = "DELETE FROM ck_zones WHERE mapname = '%s'";
-char sql_deleteZone[] = "DELETE FROM ck_zones WHERE mapname = '%s' AND zoneid = '%i'";
-char sql_deleteZonesInGroup[] = "DELETE FROM ck_zones WHERE mapname = '%s' AND zonegroup = '%i'";
-char sql_setZoneNames[] = "UPDATE ck_zones SET zonename = '%s' WHERE mapname = '%s' AND zonegroup = '%i';";
-
-//TABLE MAPTIER
-char sql_createMapTier[] = "CREATE TABLE IF NOT EXISTS ck_maptier (mapname VARCHAR(54) NOT NULL, tier INT(12), btier1 INT(12), btier2 INT(12), btier3 INT(12), btier4 INT(12), btier5 INT(12), btier6 INT(12), btier7 INT(12), btier8 INT(12), btier9 INT(12), btier10 INT(12), PRIMARY KEY(mapname));";
-char sql_selectMapTier[] = "SELECT tier, btier1, btier2, btier3, btier4, btier5, btier6, btier7, btier8, btier9, btier10 FROM ck_maptier WHERE mapname = '%s'";
-char sql_insertmaptier[] = "INSERT INTO ck_maptier (mapname, tier) VALUES ('%s', '%i');";
-char sql_updatemaptier[] = "UPDATE ck_maptier SET tier = %i WHERE mapname ='%s'";
-char sql_updateBonusTier[] = "UPDATE ck_maptier SET btier%i = %i WHERE mapname ='%s'";
-char sql_insertBonusTier[] = "INSERT INTO ck_maptier (mapname, btier%i) VALUES ('%s', '%i');";
-
-//TABLE BONUS
-char sql_createBonus[] = "CREATE TABLE IF NOT EXISTS ck_bonus (steamid VARCHAR(32), name VARCHAR(32), mapname VARCHAR(32), runtime FLOAT NOT NULL DEFAULT '-1.0', zonegroup INT(12) NOT NULL DEFAULT 1, PRIMARY KEY(steamid, mapname, zonegroup));";
-char sql_createBonusIndex[] = "CREATE INDEX bonusrank ON ck_bonus (mapname,runtime,zonegroup);";
-char sql_insertBonus[] = "INSERT INTO ck_bonus (steamid, name, mapname, runtime, zonegroup) VALUES ('%s', '%s', '%s', '%f', '%i')";
-char sql_updateBonus[] = "UPDATE ck_bonus SET runtime = '%f', name = '%s' WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = %i";
-char sql_selectBonusCount[] = "SELECT zonegroup, style, count(1) FROM ck_bonus WHERE mapname = '%s' GROUP BY zonegroup, style;";
-char sql_selectPersonalBonusRecords[] = "SELECT runtime, zonegroup, style FROM ck_bonus WHERE steamid = '%s' AND mapname = '%s' AND runtime > '0.0'";
-char sql_selectPlayerRankBonus[] = "SELECT name FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '%s' AND mapname= '%s' AND runtime > 0.0 AND zonegroup = %i AND style = 0) AND mapname = '%s' AND zonegroup = %i AND style = 0;";
-char sql_selectFastestBonus[] = "SELECT name, MIN(runtime), zonegroup, style FROM ck_bonus WHERE mapname = '%s' GROUP BY zonegroup, style;";
-char sql_deleteBonus[] = "DELETE FROM ck_bonus WHERE mapname = '%s'";
-char sql_selectAllBonusTimesinMap[] = "SELECT zonegroup, runtime from ck_bonus WHERE mapname = '%s';";
-char sql_selectTopBonusSurfers[] = "SELECT db2.steamid, db1.name, db2.runtime as overall, db1.steamid, db2.mapname FROM ck_bonus as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname LIKE '%c%s%c' AND style = 0 AND db2.runtime > -1.0 AND zonegroup = %i ORDER BY overall ASC LIMIT 100;";
-
-//TABLE CHECKPOINTS
-char sql_createCheckpoints[] = "CREATE TABLE IF NOT EXISTS ck_checkpoints (steamid VARCHAR(32), mapname VARCHAR(32), cp1 FLOAT DEFAULT '0.0', cp2 FLOAT DEFAULT '0.0', cp3 FLOAT DEFAULT '0.0', cp4 FLOAT DEFAULT '0.0', cp5 FLOAT DEFAULT '0.0', cp6 FLOAT DEFAULT '0.0', cp7 FLOAT DEFAULT '0.0', cp8 FLOAT DEFAULT '0.0', cp9 FLOAT DEFAULT '0.0', cp10 FLOAT DEFAULT '0.0', cp11 FLOAT DEFAULT '0.0', cp12 FLOAT DEFAULT '0.0', cp13 FLOAT DEFAULT '0.0', cp14 FLOAT DEFAULT '0.0', cp15 FLOAT DEFAULT '0.0', cp16 FLOAT DEFAULT '0.0', cp17  FLOAT DEFAULT '0.0', cp18 FLOAT DEFAULT '0.0', cp19 FLOAT DEFAULT '0.0', cp20  FLOAT DEFAULT '0.0', cp21 FLOAT DEFAULT '0.0', cp22 FLOAT DEFAULT '0.0', cp23 FLOAT DEFAULT '0.0', cp24 FLOAT DEFAULT '0.0', cp25 FLOAT DEFAULT '0.0', cp26 FLOAT DEFAULT '0.0', cp27 FLOAT DEFAULT '0.0', cp28 FLOAT DEFAULT '0.0', cp29 FLOAT DEFAULT '0.0', cp30 FLOAT DEFAULT '0.0', cp31 FLOAT DEFAULT '0.0', cp32  FLOAT DEFAULT '0.0', cp33 FLOAT DEFAULT '0.0', cp34 FLOAT DEFAULT '0.0', cp35 FLOAT DEFAULT '0.0', zonegroup INT(12) NOT NULL DEFAULT 0, PRIMARY KEY(steamid, mapname, zonegroup));";
-char sql_updateCheckpoints[] = "UPDATE ck_checkpoints SET cp1='%f', cp2='%f', cp3='%f', cp4='%f', cp5='%f', cp6='%f', cp7='%f', cp8='%f', cp9='%f', cp10='%f', cp11='%f', cp12='%f', cp13='%f', cp14='%f', cp15='%f', cp16='%f', cp17='%f', cp18='%f', cp19='%f', cp20='%f', cp21='%f', cp22='%f', cp23='%f', cp24='%f', cp25='%f', cp26='%f', cp27='%f', cp28='%f', cp29='%f', cp30='%f', cp31='%f', cp32='%f', cp33='%f', cp34='%f', cp35='%f' WHERE steamid='%s' AND mapname='%s' AND zonegroup='%i'";
-char sql_insertCheckpoints[] = "INSERT INTO ck_checkpoints VALUES ('%s', '%s', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%i')";
-char sql_selectCheckpoints[] = "SELECT zonegroup, cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20, cp21, cp22, cp23, cp24, cp25, cp26, cp27, cp28, cp29, cp30, cp31, cp32, cp33, cp34, cp35 FROM ck_checkpoints WHERE mapname='%s' AND steamid = '%s';";
-char sql_selectCheckpointsinZoneGroup[] = "SELECT cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20, cp21, cp22, cp23, cp24, cp25, cp26, cp27, cp28, cp29, cp30, cp31, cp32, cp33, cp34, cp35 FROM ck_checkpoints WHERE mapname='%s' AND steamid = '%s' AND zonegroup = %i;";
-char sql_selectRecordCheckpoints[] = "SELECT zonegroup, cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20, cp21, cp22, cp23, cp24, cp25, cp26, cp27, cp28, cp29, cp30, cp31, cp32, cp33, cp34, cp35 FROM ck_checkpoints WHERE steamid = '%s' AND mapname='%s' UNION SELECT a.zonegroup, b.cp1, b.cp2, b.cp3, b.cp4, b.cp5, b.cp6, b.cp7, b.cp8, b.cp9, b.cp10, b.cp11, b.cp12, b.cp13, b.cp14, b.cp15, b.cp16, b.cp17, b.cp18, b.cp19, b.cp20, b.cp21, b.cp22, b.cp23, b.cp24, b.cp25, b.cp26, b.cp27, b.cp28, b.cp29, b.cp30, b.cp31, b.cp32, b.cp33, b.cp34, b.cp35 FROM ck_bonus a LEFT JOIN ck_checkpoints b ON a.steamid = b.steamid AND a.zonegroup = b.zonegroup WHERE a.mapname = '%s' GROUP BY a.zonegroup";
-char sql_deleteCheckpoints[] = "DELETE FROM ck_checkpoints WHERE mapname = '%s'";
-
-//TABLE LATEST 15 LOCAL RECORDS
-char sql_createLatestRecords[] = "CREATE TABLE IF NOT EXISTS ck_latestrecords (steamid VARCHAR(32), name VARCHAR(32), runtime FLOAT NOT NULL DEFAULT '-1.0', map VARCHAR(32), date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(steamid,map,date));";
-char sql_insertLatestRecords[] = "INSERT INTO ck_latestrecords (steamid, name, runtime, map) VALUES('%s','%s','%f','%s');";
-char sql_selectLatestRecords[] = "SELECT name, runtime, map, date FROM ck_latestrecords ORDER BY date DESC LIMIT 50";
-
-//TABLE PLAYEROPTIONS
-char sql_createPlayerOptions[] = "CREATE TABLE `ck_playeroptions2` ( `steamid` varchar(32) NOT NULL DEFAULT '', `timer` int(11) NOT NULL DEFAULT '1', `hide` int(11) NOT NULL DEFAULT '0', `sounds` int(11) NOT NULL DEFAULT '1', `chat` int(11) NOT NULL DEFAULT '0', `viewmodel` int(11) NOT NULL DEFAULT '1', `autobhop` int(11) NOT NULL DEFAULT '1', `checkpoints` int(11) NOT NULL DEFAULT '1', `centrehud` int(11) NOT NULL DEFAULT '1', `centretimer` int(11) NOT NULL DEFAULT '1', `centrewr` int(11) NOT NULL DEFAULT '1', `centrepb` int(11) NOT NULL DEFAULT '1', `centrestage` int(11) NOT NULL DEFAULT '1', `centrespeedometer` int(11) NOT NULL DEFAULT '1', `centrespeedmode` int(11) NOT NULL DEFAULT '0', `centregradient` int(11) NOT NULL DEFAULT '3', `centrestrafesync` int(11) NOT NULL DEFAULT '0', `sidehud` int(11) NOT NULL DEFAULT '1', `sidetimer` int(11) NOT NULL DEFAULT '0', `sidewr` int(11) NOT NULL DEFAULT '0', `sidepb` int(11) NOT NULL DEFAULT '0', `sidestage` int(11) NOT NULL DEFAULT '0', `sidespeedometer` int(11) NOT NULL DEFAULT '0', `sidespeedmode` int(11) NOT NULL DEFAULT '0', `sidestrafesync` int(11) NOT NULL DEFAULT '0', `sidespeclist` int(11) NOT NULL DEFAULT '1', PRIMARY KEY (`steamid`));";
-
-char sql_insertPlayerOptions[] = "INSERT INTO ck_playeroptions2 (steamid) VALUES ('%s');";
-
-char sql_selectPlayerOptions[] = "SELECT timer, hide, sounds, chat, viewmodel, autobhop, checkpoints, gradient, speedmode, centrespeed, centrehud, module1c, module2c, module3c, module4c, module5c, module6c, sidehud, module1s, module2s, module3s, module4s, module5s FROM ck_playeroptions2 where steamid = '%s';";
-
-char sql_updatePlayerOptions[] = "UPDATE ck_playeroptions2 SET timer = %i, hide = %i, sounds = %i, chat = %i, viewmodel = %i, autobhop = %i, checkpoints = %i, gradient = %i, speedmode = %i, centrespeed = %i, centrehud = %i, module1c = %i, module2c = %i, module3c = %i, module4c = %i, module5c = %i, module6c = %i, sidehud = %i, module1s = %i, module2s = %i, module3s = %i, module4s = %i, module5s = %i where steamid = '%s'";
-
-//TABLE PLAYERRANK
-char sql_createPlayerRank[] = "CREATE TABLE IF NOT EXISTS ck_playerrank (steamid VARCHAR(32), name VARCHAR(32), country VARCHAR(32), points INT(12)  DEFAULT '0',finishedmaps INT(12) DEFAULT '0', finishedmapspro INT(12) DEFAULT '0', lastseen DATE, PRIMARY KEY(steamid));";
-char sql_insertPlayerRank[] = "INSERT INTO ck_playerrank (steamid, steamid64, name, country, joined) VALUES('%s', '%s', '%s', '%s', %i);";
-char sql_updatePlayerRankPoints[] = "UPDATE ck_playerrank SET name ='%s', points ='%i', wrpoints = %i, wrbpoints = %i, top10points = %i, groupspoints = %i, mappoints = %i, bonuspoints = %i, finishedmapspro='%i', finishedbonuses = %i, finishedstages = %i, wrs = %i, wrbs = %i, wrcps = %i, top10s = %i, groups = %i where steamid='%s';";
-char sql_updatePlayerRankPoints2[] = "UPDATE ck_playerrank SET name ='%s', points ='%i', wrpoints = %i, wrbpoints = %i, top10points = %i, groupspoints = %i, mappoints = %i, bonuspoints = %i, finishedmapspro='%i', finishedbonuses = %i, finishedstages = %i, wrs = %i, wrbs = %i, wrcps = %i, top10s = %i, groups = %i, country = '%s' where steamid='%s';";
-char sql_updatePlayerRank[] = "UPDATE ck_playerrank SET finishedmaps ='%i', finishedmapspro='%i' where steamid='%s'";
-char sql_selectPlayerRankAll[] = "SELECT name, steamid FROM ck_playerrank where name like '%c%s%c'";
-char sql_selectPlayerRankAll2[] = "SELECT name, steamid FROM ck_playerrank where name = '%s'";
-char sql_selectPlayerName[] = "SELECT name FROM ck_playerrank where steamid = '%s'";
-char sql_UpdateLastSeenMySQL[] = "UPDATE ck_playerrank SET lastseen = UNIX_TIMESTAMP() where steamid = '%s';";
-char sql_UpdateLastSeenSQLite[] = "UPDATE ck_playerrank SET lastseen = date('now') where steamid = '%s';";
-char sql_selectTopPlayers[] = "SELECT name, points, finishedmapspro, steamid FROM ck_playerrank ORDER BY points DESC LIMIT 100";
-char sql_selectRankedPlayer[] = "SELECT steamid, name, points, finishedmapspro, country, lastseen, timealive, timespec, connections, readchangelog from ck_playerrank where steamid='%s';";
-char sql_selectRankedPlayersRank[] = "SELECT name FROM ck_playerrank WHERE points >= (SELECT points FROM ck_playerrank WHERE steamid = '%s') ORDER BY points";
-char sql_selectRankedPlayers[] = "SELECT steamid, name from ck_playerrank where points > 0 ORDER BY points DESC";
-char sql_CountRankedPlayers[] = "SELECT COUNT(steamid) FROM ck_playerrank";
-char sql_CountRankedPlayers2[] = "SELECT COUNT(steamid) FROM ck_playerrank where points > 0";
-
-//TABLE PLAYERTIMES
-char sql_createPlayertimes[] = "CREATE TABLE IF NOT EXISTS ck_playertimes (steamid VARCHAR(32), mapname VARCHAR(32), name VARCHAR(32), runtimepro FLOAT NOT NULL DEFAULT '-1.0', PRIMARY KEY(steamid,mapname));";
-char sql_createPlayertimesIndex[] = "CREATE INDEX maprank ON ck_playertimes (mapname, runtimepro, style);";
-char sql_insertPlayer[] = "INSERT INTO ck_playertimes (steamid, mapname, name) VALUES('%s', '%s', '%s');";
-char sql_insertPlayerTime[] = "INSERT INTO ck_playertimes (steamid, mapname, name, runtimepro, style) VALUES('%s', '%s', '%s', '%f', %i);";
-char sql_updateRecordPro[] = "UPDATE ck_playertimes SET name = '%s', runtimepro = '%f' WHERE steamid = '%s' AND mapname = '%s' AND style = %i;";
-char sql_selectPlayer[] = "SELECT steamid FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s';";
-char sql_selectMapRecord[] = "SELECT MIN(runtimepro), name, steamid, style FROM ck_playertimes WHERE mapname = '%s' AND runtimepro > -1.0 GROUP BY style;";
-char sql_selectPersonalRecords[] = "SELECT runtimepro, name FROM ck_playertimes WHERE mapname = '%s' AND steamid = '%s' AND runtimepro > 0.0";
-char sql_selectPersonalAllRecords[] = "SELECT db1.name, db2.steamid, db2.mapname, db2.runtimepro as overall, db1.steamid, db3.tier FROM ck_playertimes as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid INNER JOIN ck_maptier AS db3 ON db2.mapname = db3.mapname WHERE db2.steamid = '%s' AND db2.style = 0 AND db2.runtimepro > -1.0 ORDER BY mapname ASC";
-char sql_selectProSurfers[] = "SELECT db1.name, db2.runtimepro, db2.steamid, db1.steamid FROM ck_playertimes as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname = '%s' AND db2.runtimepro > -1.0 ORDER BY db2.runtimepro ASC LIMIT 20";
-char sql_selectTopSurfers2[] = "SELECT db2.steamid, db1.name, db2.runtimepro as overall, db1.steamid, db2.mapname FROM ck_playertimes as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname LIKE '%c%s%c' AND db2.style = 0 AND db2.runtimepro > -1.0 ORDER BY overall ASC LIMIT 100;";
-char sql_selectTopSurfers3[] = "SELECT db2.steamid, db1.name, db2.runtimepro as overall, db1.steamid, db2.mapname FROM ck_playertimes as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname = '%s' AND db2.style = 0 AND db2.runtimepro > -1.0 ORDER BY overall ASC LIMIT 100;";
-char sql_selectTopSurfers[] = "SELECT db2.steamid, db1.name, db2.runtimepro as overall, db1.steamid, db2.mapname FROM ck_playertimes as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname = '%s' AND db2.style = 0 AND db2.runtimepro > -1.0 ORDER BY overall ASC LIMIT 100;";
-char sql_selectPlayerProCount[] = "SELECT style, count(1) FROM ck_playertimes WHERE mapname = '%s' GROUP BY style;";
-char sql_selectPlayerRankProTime[] = "SELECT name,mapname FROM ck_playertimes WHERE runtimepro <= (SELECT runtimepro FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND style = 0 AND runtimepro > -1.0) AND mapname = '%s' AND style = 0 AND runtimepro > -1.0 ORDER BY runtimepro;";
-char sql_selectMapRecordHolders[] = "SELECT y.steamid, COUNT(*) AS rekorde FROM (SELECT s.steamid FROM ck_playertimes s INNER JOIN (SELECT mapname, MIN(runtimepro) AS runtimepro FROM ck_playertimes where runtimepro > -1.0 GROUP BY mapname) x ON s.mapname = x.mapname AND s.runtimepro = x.runtimepro) y GROUP BY y.steamid ORDER BY rekorde DESC , y.steamid LIMIT 5;";
-char sql_selectMapRecordCount[] = "SELECT y.steamid, COUNT(*) AS rekorde FROM (SELECT s.steamid, s.style FROM ck_playertimes s INNER JOIN (SELECT mapname, MIN(runtimepro) AS runtimepro FROM ck_playertimes where runtimepro > -1.0 AND style = 0 GROUP BY mapname) x ON s.mapname = x.mapname AND s.runtimepro = x.runtimepro) y where y.steamid = '%s' AND y.style = 0 GROUP BY y.steamid ORDER BY rekorde DESC , y.steamid";
-char sql_selectAllMapTimesinMap[] = "SELECT runtimepro from ck_playertimes WHERE mapname = '%s';";
-
-//TABLE PLAYERTEMP
-char sql_createPlayertmp[] = "CREATE TABLE IF NOT EXISTS ck_playertemp (steamid VARCHAR(32), mapname VARCHAR(32), cords1 FLOAT NOT NULL DEFAULT '-1.0', cords2 FLOAT NOT NULL DEFAULT '-1.0', cords3 FLOAT NOT NULL DEFAULT '-1.0', angle1 FLOAT NOT NULL DEFAULT '-1.0',angle2 FLOAT NOT NULL DEFAULT '-1.0',angle3 FLOAT NOT NULL DEFAULT '-1.0', EncTickrate INT(12) DEFAULT '-1.0', runtimeTmp FLOAT NOT NULL DEFAULT '-1.0', Stage INT, zonegroup INT NOT NULL DEFAULT 0, PRIMARY KEY(steamid,mapname));";
-char sql_insertPlayerTmp[] = "INSERT INTO ck_playertemp (cords1, cords2, cords3, angle1,angle2,angle3,runtimeTmp,steamid,mapname,EncTickrate,Stage,zonegroup) VALUES ('%f','%f','%f','%f','%f','%f','%f','%s', '%s', '%i', %i, %i);";
-char sql_updatePlayerTmp[] = "UPDATE ck_playertemp SET cords1 = '%f', cords2 = '%f', cords3 = '%f', angle1 = '%f', angle2 = '%f', angle3 = '%f', runtimeTmp = '%f', mapname ='%s', EncTickrate='%i', Stage = %i, zonegroup = %i WHERE steamid = '%s';";
-char sql_deletePlayerTmp[] = "DELETE FROM ck_playertemp where steamid = '%s';";
-char sql_selectPlayerTmp[] = "SELECT cords1,cords2,cords3, angle1, angle2, angle3,runtimeTmp, EncTickrate, Stage, zonegroup FROM ck_playertemp WHERE steamid = '%s' AND mapname = '%s';";
+#include "surftimer/db/queries.sp"
 
 ////////////////////////
 //// DATABASE SETUP/////
@@ -141,278 +23,53 @@ public void db_setupDatabase()
 
 	if (strcmp(szIdent, "mysql", false) == 0)
 	{
+		// https://github.com/nikooo777/ckSurf/pull/58
+		SQL_FastQuery(g_hDb, "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
 		g_DbType = MYSQL;
 	}
-	else
-	if (strcmp(szIdent, "sqlite", false) == 0)
-	g_DbType = SQLITE;
+	else if (strcmp(szIdent, "sqlite", false) == 0)
+	{
+			SetFailState("[Surftimer] Sorry SQLite is not supported.");
+			return;
+	}
 	else
 	{
-		LogError("[Surftimer] Invalid Database-Type");
+		SetFailState("[Surftimer] Invalid database type");
 		return;
 	}
 
 	// If updating from a previous version
 	SQL_LockDatabase(g_hDb);
-	SQL_FastQuery(g_hDb, "SET NAMES  'utf8'");
+	SQL_FastQuery(g_hDb, "SET NAMES 'utf8'");
 	SQL_FastQuery(g_hDb, "SET name 'utf8'");
-	SQL_FastQuery(g_hDb, "SET closername 'utf8'");
-	SQL_FastQuery(g_hDb, "SET reopenname 'utf8'");
-	SQL_FastQuery(g_hDb, "ALTER TABLE reports AUTO_INCREMENT = 1;");
 
 
-	////////////////////////////////
-	// CHECK WHICH CHANGES ARE    //
-	// TO BE DONE TO THE DATABASE //
-	////////////////////////////////
+	// Check if tables need to be Created or database needs to be upgraded
 	g_bRenaming = false;
 	g_bInTransactionChain = false;
 
-	// If coming from KZTimer or a really old version, rename and edit tables to new format
-	if (SQL_FastQuery(g_hDb, "SELECT steamid FROM playerrank LIMIT 1") && !SQL_FastQuery(g_hDb, "SELECT steamid FROM ck_playerrank LIMIT 1"))
-	{
-		SQL_UnlockDatabase(g_hDb);
-		db_renameTables();
-		return;
-	}
-	else // If startring for the first time and tables haven't been created yet.
-	if (!SQL_FastQuery(g_hDb, "SELECT steamid FROM playerrank LIMIT 1") && !SQL_FastQuery(g_hDb, "SELECT steamid FROM ck_playerrank LIMIT 1"))
+	 // If tables haven't been created yet.
+	if (!SQL_FastQuery(g_hDb, "SELECT steamid FROM ck_playerrank LIMIT 1"))
 	{
 		SQL_UnlockDatabase(g_hDb);
 		db_createTables();
 		return;
 	}
-
-
-	// 1.17 Command to disable checkpoint messages
-	SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD checkpoints INT DEFAULT 1;");
-
-
-	////////////////////////////
-	// 1.18 A bunch of changes //
-	// - Zone Groups          //
-	// - Zone Names           //
-	// - Bonus Tiers          //
-	// - Titles               //
-	// - More checkpoints     //
-	////////////////////////////
-
-	SQL_FastQuery(g_hDb, "ALTER TABLE ck_zones ADD zonegroup INT NOT NULL DEFAULT 0;");
-	SQL_FastQuery(g_hDb, "ALTER TABLE ck_zones ADD zonename VARCHAR(128);");
-	SQL_FastQuery(g_hDb, "ALTER TABLE ck_playertemp ADD zonegroup INT NOT NULL DEFAULT 0;");
-
-	SQL_FastQuery(g_hDb, "CREATE INDEX maprank ON ck_playertimes (mapname, runtimepro)");
-	SQL_FastQuery(g_hDb, "CREATE INDEX bonusrank ON ck_bonus (mapname,runtime,zonegroup)");
+	else 
+	{
+		// Check for db upgrades
+		if (!SQL_FastQuery(g_hDb, "SELECT prespeed FROM ck_zones LIMIT 1"))
+		{
+			db_upgradeDatabase(0);
+			return;
+		}
+	}
 
 	SQL_UnlockDatabase(g_hDb);
 
 	for (int i = 0; i < sizeof(g_failedTransactions); i++)
-	g_failedTransactions[i] = 0;
-
-	txn_addExtraCheckpoints();
-	return;
+		g_failedTransactions[i] = 0;
 }
-
-void txn_addExtraCheckpoints()
-{
-	// Add extra checkpoints to Checkpoints and add new primary key:
-	if (!SQL_FastQuery(g_hDb, "SELECT cp35 FROM ck_checkpoints;"))
-	{
-		PrintToServer("---------------------------------------------------------------------------");
-		disableServerHibernate();
-		PrintToServer("surftimer | Started to make changes to database. Updating from 1.17 -> 1.18.");
-		PrintToServer("surftimer | WARNING: DO NOT CONNECT TO THE SERVER, OR CHANGE MAP!");
-		PrintToServer("surftimer | Adding extra checkpoints... (1 / 6)");
-
-		g_bInTransactionChain = true;
-		Transaction h_checkpoint = SQL_CreateTransaction();
-
-		SQL_AddQuery(h_checkpoint, "ALTER TABLE ck_checkpoints RENAME TO ck_checkpoints_temp;");
-		SQL_AddQuery(h_checkpoint, sql_createCheckpoints);
-		SQL_AddQuery(h_checkpoint, "INSERT INTO ck_checkpoints(steamid, mapname, zonegroup, cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20) SELECT steamid, mapname, 0, cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20 FROM ck_checkpoints_temp GROUP BY mapname, steamid;");
-		SQL_AddQuery(h_checkpoint, "DROP TABLE ck_checkpoints_temp;");
-
-		SQL_ExecuteTransaction(g_hDb, h_checkpoint, SQLTxn_Success, SQLTxn_TXNFailed, 1);
-	}
-	else
-	{
-		PrintToServer("surftimer | No database update needed!");
-		return;
-	}
-}
-
-void txn_addZoneGroups()
-{
-	// Add zonegroups to ck_bonus and make it a primary key
-	if (!SQL_FastQuery(g_hDb, "SELECT zonegroup FROM ck_bonus;"))
-	{
-		Transaction h_bonus = SQL_CreateTransaction();
-
-		SQL_AddQuery(h_bonus, "ALTER TABLE ck_bonus RENAME TO ck_bonus_temp;");
-		SQL_AddQuery(h_bonus, sql_createBonus);
-		SQL_AddQuery(h_bonus, sql_createBonusIndex);
-		SQL_AddQuery(h_bonus, "INSERT INTO ck_bonus(steamid, name, mapname, runtime) SELECT steamid, name, mapname, runtime FROM ck_bonus_temp;");
-		SQL_AddQuery(h_bonus, "DROP TABLE ck_bonus_temp;");
-
-		SQL_ExecuteTransaction(g_hDb, h_bonus, SQLTxn_Success, SQLTxn_TXNFailed, 2);
-	}
-	else
-	{
-		PrintToServer("surftimer | Zonegroup changes were already done! Skipping to recreating playertemp!");
-		txn_recreatePlayerTemp();
-	}
-}
-
-void txn_recreatePlayerTemp()
-{
-	// Recreate playertemp without BonusTimer
-	if (SQL_FastQuery(g_hDb, "SELECT BonusTimer FROM ck_playertemp;"))
-	{
-		// No need to preserve temp data, just drop table
-		Transaction h_playertemp = SQL_CreateTransaction();
-		SQL_AddQuery(h_playertemp, "DROP TABLE IF EXISTS ck_playertemp");
-		SQL_AddQuery(h_playertemp, sql_createPlayertmp);
-		SQL_ExecuteTransaction(g_hDb, h_playertemp, SQLTxn_Success, SQLTxn_TXNFailed, 3);
-	}
-	else
-	{
-		PrintToServer("surftimer | Playertemp was already recreated! Skipping to bonus tiers");
-		txn_addBonusTiers();
-	}
-}
-
-void txn_addBonusTiers()
-{
-	// Add bonus tiers
-	if (SQL_FastQuery(g_hDb, "ALTER TABLE ck_maptier ADD btier1 INT;"))
-	{
-		Transaction h_maptiers = SQL_CreateTransaction();
-		char sql[258];
-		for (int x = 2; x < 11; x++)
-		{
-			Format(sql, 258, "ALTER TABLE ck_maptier ADD btier%i INT;", x);
-			SQL_AddQuery(h_maptiers, sql);
-		}
-		SQL_ExecuteTransaction(g_hDb, h_maptiers, SQLTxn_Success, SQLTxn_TXNFailed, 4);
-	}
-	else
-	{
-		PrintToServer("surftimer | Bonus tiers were already added. Skipping to spawn points");
-		txn_addSpawnPoints();
-	}
-}
-void txn_addSpawnPoints()
-{
-	if (!SQL_FastQuery(g_hDb, "SELECT zonegroup FROM ck_spawnlocations;"))
-	{
-		Transaction h_spawnPoints = SQL_CreateTransaction();
-		SQL_AddQuery(h_spawnPoints, "ALTER TABLE ck_spawnlocations RENAME TO ck_spawnlocations_temp;");
-		SQL_AddQuery(h_spawnPoints, sql_createSpawnLocations);
-		SQL_AddQuery(h_spawnPoints, "INSERT INTO ck_spawnlocations (mapname, pos_x, pos_y, pos_z, ang_x, ang_y, ang_z) SELECT mapname, pos_x, pos_y, pos_z, ang_x, ang_y, ang_z, vel FROM ck_spawnlocations_temp;");
-		SQL_AddQuery(h_spawnPoints, "DROP TABLE ck_spawnlocations_temp");
-		SQL_ExecuteTransaction(g_hDb, h_spawnPoints, SQLTxn_Success, SQLTxn_TXNFailed, 5);
-	}
-	else
-	{
-		PrintToServer("surftimer | Spawnpoints were already added! Skipping to changes in zones");
-		txn_changesToZones();
-	}
-}
-
-void txn_changesToZones()
-{
-	Transaction h_changesToZones = SQL_CreateTransaction();
-	// Set right zonegroups
-	SQL_AddQuery(h_changesToZones, "UPDATE ck_zones SET zonegroup = 1 WHERE zonetype = 3 OR zonetype = 4;");
-	SQL_AddQuery(h_changesToZones, "UPDATE ck_zones SET zonetypeid = 0 WHERE zonetype = 3 OR zonetype = 4;");
-
-	// Remove ZoneTypes 3 & 4
-	SQL_AddQuery(h_changesToZones, "UPDATE ck_zones SET zonetype = 1 WHERE zonetype = 3;");
-	SQL_AddQuery(h_changesToZones, "UPDATE ck_zones SET zonetype = 2 WHERE zonetype = 4;");
-
-	// Adjust bigger zonetype numbers to match the changes
-	SQL_AddQuery(h_changesToZones, "UPDATE ck_zones SET zonetype = zonetype-2 WHERE zonetype > 4;");
-	SQL_ExecuteTransaction(g_hDb, h_changesToZones, SQLTxn_Success, SQLTxn_TXNFailed, 6);
-}
-
-
-public void SQLTxn_Success(Handle db, any data, int numQueries, Handle[] results, any[] queryData)
-{
-	switch (data)
-	{
-		case 1: {
-			PrintToServer("surftimer | Checkpoints added succesfully! Next up: adding zonegroups to ck_bonus (2 / 6)");
-			txn_addZoneGroups();
-		}
-		case 2: {
-			PrintToServer("surftimer | Bonus zonegroups succesfully added! Next up: recreating playertemp (3 / 6)");
-			txn_recreatePlayerTemp();
-		}
-		case 3: {
-			PrintToServer("surftimer | Playertemp succesfully recreated! Next up: adding bonus tiers (4 / 6)");
-			txn_addBonusTiers();
-		}
-		case 4: {
-			PrintToServer("surftimer | Bonus tiers added succesfully! Next up: adding spawn points (5 / 6)");
-			txn_addSpawnPoints();
-		}
-		case 5: {
-			PrintToServer("surftimer | Spawnpoints added succesfully! Next up: making changes to zones, to make them match the new database (6 / 6)");
-			txn_changesToZones();
-		}
-		case 6: {
-			g_bInTransactionChain = false;
-
-			revertServerHibernateSettings();
-			PrintToServer("surftimer | All changes succesfully done! Changing map!");
-			ForceChangeLevel(g_szMapName, "surftimer | Changing level after changes to the database have been done");
-		}
-	}
-}
-
-public void SQLTxn_TXNFailed(Handle db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
-{
-	if (g_failedTransactions[data] == 0)
-	{
-		switch (data)
-		{
-			case 1: {
-				PrintToServer("surftimer | Error in adding extra checkpoints! Retrying.. (%s)", error);
-				txn_addExtraCheckpoints();
-			}
-			case 2: {
-				PrintToServer("surftimer | Error in addin zonegroups! Retrying... (%s)", error);
-				txn_addZoneGroups();
-			}
-			case 3: {
-				PrintToServer("surftimer | Error in recreating playertemp! Retrying... (%s)", error);
-				txn_recreatePlayerTemp();
-			}
-			case 4: {
-				PrintToServer("surftimer | Error in adding bonus tiers! Retrying... (%s)", error);
-				txn_addBonusTiers();
-			}
-			case 5: {
-				PrintToServer("surftimer | Error in adding spawn points! Retrying... (%s)", error);
-				txn_addSpawnPoints();
-			}
-			case 6: {
-				PrintToServer("surftimer | Error in making changes to zones! Retrying... (%s)", error);
-				txn_changesToZones();
-			}
-		}
-	}
-	else
-	{
-		revertServerHibernateSettings();
-		PrintToServer("surftimer | Couldn't make changes into the database. Transaction: %i, error: %s", data, error);
-		PrintToServer("surftimer | Revert back to database backup.");
-		LogError("[Surftimer]: Couldn't make changes into the database. Transaction: %i, error: %s", data, error);
-		return;
-	}
-	g_failedTransactions[data]++;
-}
-
 
 public void db_createTables()
 {
@@ -430,8 +87,9 @@ public void db_createTables()
 	SQL_AddQuery(createTableTnx, sql_createZones);
 	SQL_AddQuery(createTableTnx, sql_createMapTier);
 	SQL_AddQuery(createTableTnx, sql_createSpawnLocations);
-	SQL_AddQuery(createTableTnx, sql_createPlayerReports);
-	SQL_AddQuery(createTableTnx, sql_createPlayerTotalTime);
+	SQL_AddQuery(createTableTnx, sql_createAnnouncements);
+	SQL_AddQuery(createTableTnx, sql_createVipAdmins);
+	SQL_AddQuery(createTableTnx, sql_createWrcps);
 
 	SQL_ExecuteTransaction(g_hDb, createTableTnx, SQLTxn_CreateDatabaseSuccess, SQLTxn_CreateDatabaseFailed);
 
@@ -447,95 +105,33 @@ public void SQLTxn_CreateDatabaseFailed(Handle db, any data, int numQueries, con
 	SetFailState("[Surftimer] Database tables could not be created! Error: %s", error);
 }
 
-
-public void db_renameTables()
+public void db_upgradeDatabase(int ver)
 {
-	disableServerHibernate();
-
-	g_bRenaming = true;
-	Transaction hndl = SQL_CreateTransaction();
-
-	SQL_AddQuery(hndl, sql_createSpawnLocations);
-
-	if (g_DbType == MYSQL)
-	{
-		// Remove unused columns, if coming from KZTimer
-		SQL_AddQuery(hndl, "ALTER TABLE latestrecords DROP COLUMN teleports");
-		SQL_AddQuery(hndl, "ALTER TABLE playeroptions2 DROP COLUMN colorchat");
-		SQL_AddQuery(hndl, "ALTER TABLE playeroptions2 DROP COLUMN Surfersmenu_sounds");
-		SQL_AddQuery(hndl, "ALTER TABLE playeroptions2 DROP COLUMN strafesync");
-		SQL_AddQuery(hndl, "ALTER TABLE playeroptions2 DROP COLUMN cpmessage");
-		SQL_AddQuery(hndl, "ALTER TABLE playeroptions2 DROP COLUMN adv_menu");
-		SQL_AddQuery(hndl, "ALTER TABLE playeroptions2 DROP COLUMN jumppenalty");
-		SQL_AddQuery(hndl, "ALTER TABLE playerrank DROP COLUMN finishedmapstp");
-		SQL_AddQuery(hndl, "ALTER TABLE playertimes DROP COLUMN teleports");
-		SQL_AddQuery(hndl, "ALTER TABLE playertimes DROP COLUMN runtime");
-		SQL_AddQuery(hndl, "ALTER TABLE playertimes DROP COLUMN teleports_pro");
-		SQL_AddQuery(hndl, "ALTER TABLE playertmp DROP COLUMN teleports");
-		SQL_AddQuery(hndl, "ALTER TABLE playertmp DROP COLUMN checkpoints");
-		SQL_AddQuery(hndl, "ALTER TABLE LatestRecords DROP COLUMN teleports");
-
-		SQL_AddQuery(hndl, "ALTER TABLE playeroptions2 RENAME TO ck_playeroptions2;");
-		SQL_AddQuery(hndl, "ALTER TABLE playertimes RENAME TO ck_playertimes;");
-		SQL_AddQuery(hndl, "ALTER TABLE playerrank RENAME TO ck_playerrank;");
-
-	}
-	else if (g_DbType == SQLITE)
-	{
-		// player options
-		SQL_AddQuery(hndl, sql_createPlayerOptions);
-		SQL_AddQuery(hndl, "INSERT INTO ck_playeroptions2(steamid, speedmeter, quake_sounds, autobhop, shownames, goto, showtime, hideplayers, showspecs, new1, new2, new3) SELECT steamid, speedmeter, quake_sounds, autobhop, shownames, goto, showtime, hideplayers, showspecs, new1, new2, new3 FROM playeroptions2;");
-		SQL_AddQuery(hndl, "DROP TABLE IF EXISTS playeroptions2");
-
-		// player times
-		SQL_AddQuery(hndl, sql_createPlayertimes);
-		SQL_AddQuery(hndl, sql_createPlayertimesIndex);
-		SQL_AddQuery(hndl, "INSERT INTO ck_playertimes(steamid, mapname, name, runtimepro) SELECT steamid, mapname, name, runtimepro FROM playertimes;");
-		SQL_AddQuery(hndl, "DROP TABLE IF EXISTS playertimes");
-
-		// playerrank
-		SQL_AddQuery(hndl, sql_createPlayerRank);
-		SQL_AddQuery(hndl, "INSERT INTO ck_playerrank(steamid, name, country, points, winratio, pointsratio, finishedmaps, multiplier, finishedmapspro, lastseen) SELECT steamid, name, country, points, winratio, pointsratio, finishedmaps, multiplier, finishedmapspro, lastseen FROM playerrank;");
-		SQL_AddQuery(hndl, "DROP TABLE IF EXISTS playerrank");
-	}
-
-	SQL_AddQuery(hndl, "ALTER TABLE bonus RENAME TO ck_bonus;");
-	SQL_AddQuery(hndl, "ALTER TABLE checkpoints RENAME TO ck_checkpoints;");
-	SQL_AddQuery(hndl, "ALTER TABLE maptier RENAME TO ck_maptier;");
-	SQL_AddQuery(hndl, "ALTER TABLE zones RENAME TO ck_zones;");
-
-	SQL_AddQuery(hndl, sql_createPlayertmp);
-	SQL_AddQuery(hndl, sql_createLatestRecords);
-
-	// Drop useless tables from KZTimer
-	SQL_AddQuery(hndl, "DROP TABLE IF EXISTS playertmp");
-	SQL_AddQuery(hndl, "DROP TABLE IF EXISTS LatestRecords");
-	SQL_AddQuery(hndl, "DROP TABLE IF EXISTS ck_mapbuttons");
-	SQL_AddQuery(hndl, "DROP TABLE IF EXISTS playerjumpstats3");
-
-	SQL_ExecuteTransaction(g_hDb, hndl, SQLTxn_RenameSuccess, SQLTxn_RenameFailed);
+  if (ver == 0)
+  {
+    // Surftimer v2.01 -> Surftimer v2.1
+    char query[128];
+    for (int i = 1; i < 11; i++)
+    {
+      Format(query, sizeof(query), "ALTER TABLE ck_maptier DROP COLUMN btier%i", i);
+      SQL_FastQuery(g_hDb, query);
+    }
+    
+    SQL_FastQuery(g_hDb, "ALTER TABLE ck_maptier ADD COLUMN maxvelocity FLOAT NOT NULL DEFAULT '3500.0';");
+    SQL_FastQuery(g_hDb, "ALTER TABLE ck_maptier ADD COLUMN announcerecord INT(11) NOT NULL DEFAULT '0';");
+    SQL_FastQuery(g_hDb, "ALTER TABLE ck_maptier ADD COLUMN gravityfix INT(11) NOT NULL DEFAULT '1';");
+    SQL_FastQuery(g_hDb, "ALTER TABLE ck_zones ADD COLUMN `prespeed` int(64) NOT NULL DEFAULT '350';");
+    SQL_FastQuery(g_hDb, "CREATE INDEX tier ON ck_maptier (mapname, tier);");
+    SQL_FastQuery(g_hDb, "CREATE INDEX mapsettings ON ck_maptier (mapname, maxvelocity, announcerecord, gravityfix);");
+    SQL_FastQuery(g_hDb, "UPDATE ck_maptier a, ck_mapsettings b SET a.maxvelocity = b.maxvelocity WHERE a.mapname = b.mapname;");
+    SQL_FastQuery(g_hDb, "UPDATE ck_maptier a, ck_mapsettings b SET a.announcerecord = b.announcerecord WHERE a.mapname = b.mapname;");
+    SQL_FastQuery(g_hDb, "UPDATE ck_maptier a, ck_mapsettings b SET a.gravityfix = b.gravityfix WHERE a.mapname = b.mapname;");
+    SQL_FastQuery(g_hDb, "UPDATE ck_zones a, ck_mapsettings b SET a.prespeed = b.startprespeed WHERE a.mapname = b.mapname AND zonetype = 1;");
+    SQL_FastQuery(g_hDb, "DROP TABLE ck_mapsettings;");
+  }
+  
+  SQL_UnlockDatabase(g_hDb);
 }
-
-public void SQLTxn_RenameSuccess(Handle db, any data, int numQueries, Handle[] results, any[] queryData)
-{
-	g_bRenaming = false;
-	revertServerHibernateSettings();
-	PrintToChatAll(" %cSurftimer %c| Database changes done succesfully, reloading the map...");
-	ForceChangeLevel(g_szMapName, "Database Renaming Done. Restarting Map.");
-}
-
-public void SQLTxn_RenameFailed(Handle db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
-{
-	g_bRenaming = false;
-	revertServerHibernateSettings();
-	SetFailState("[Surftimer] Database changes failed! (Renaming) Error: %s", error);
-}
-
-
-///////////////////////
-//// PLAYER TITLES ////
-///////////////////////
-
 
 /////////////////////////
 //// SPAWN LOCATIONS ////
@@ -860,7 +456,7 @@ public void sql_selectRankedPlayerCallback(Handle owner, Handle hndl, const char
 
 			// play time
 			g_iPlayTimeAlive[client] = 0;
-			g_iPlayTimeSpec[client ] = 0;
+			g_iPlayTimeSpec[client] = 0;
 		}
 	}
 }
@@ -1062,113 +658,16 @@ public void sql_CountFinishedStagesCallback(Handle owner, Handle hndl, const cha
 				GetArrayString(g_MapList, i, szMapName2, sizeof(szMapName2));
 				if (StrEqual(szMapName2, szMap, false))
 				{
-					switch (rank)
+					if (rank == 1)
 					{
-						case 1: wrcps++;
+						wrcps++;
+						int wrcpPoints = GetConVarInt(g_hWrcpPoints);
+						if (wrcpPoints > 0)
+						{
+							g_pr_points[client] += wrcpPoints;
+							g_Points[client][4] += wrcpPoints;
+						}
 					}
-					/*switch (rank)
-					{
-						case 1:
-						{
-							g_pr_points[client] += 200;
-							g_Points[client][4] += 200;
-						}
-						case 2:
-						{
-							g_pr_points[client] += 190;
-							g_Points[client][1] += 190;
-						}
-						case 3:
-						{
-							g_pr_points[client] += 180;
-							g_Points[client][1] += 180;
-						}
-						case 4:
-						{
-							g_pr_points[client] += 170;
-							g_Points[client][1] += 170;
-						}
-						case 5:
-						{
-							g_pr_points[client] += 150;
-							g_Points[client][1] += 150;
-						}
-						case 6:
-						{
-							g_pr_points[client] += 140;
-							g_Points[client][1] += 140;
-						}
-						case 7:
-						{
-							g_pr_points[client] += 135;
-							g_Points[client][1] += 135;
-						}
-						case 8:
-						{
-							g_pr_points[client] += 120;
-							g_Points[client][1] += 120;
-						}
-						case 9:
-						{
-							g_pr_points[client] += 115;
-							g_Points[client][1] += 115;
-						}
-						case 10:
-						{
-							g_pr_points[client] += 105;
-							g_Points[client][1] += 105;
-						}
-						case 11:
-						{
-							g_pr_points[client] += 100;
-							g_Points[client][1] += 100;
-						}
-						case 12:
-						{
-							g_pr_points[client] += 90;
-							g_Points[client][1] += 90;
-						}
-						case 13:
-						{
-							g_pr_points[client] += 80;
-							g_Points[client][1] += 80;
-						}
-						case 14:
-						{
-							g_pr_points[client] += 75;
-							g_Points[client][1] += 75;
-						}
-						case 15:
-						{
-							g_pr_points[client] += 60;
-							g_Points[client][1] += 60;
-						}
-						case 16:
-						{
-							g_pr_points[client] += 50;
-							g_Points[client][1] += 50;
-						}
-						case 17:
-						{
-							g_pr_points[client] += 40;
-							g_Points[client][1] += 40;
-						}
-						case 18:
-						{
-							g_pr_points[client] += 30;
-							g_Points[client][1] += 30;
-						}
-						case 19:
-						{
-							g_pr_points[client] += 20;
-							g_Points[client][1] += 20;
-						}
-						case 20:
-						{
-							g_pr_points[client] += 10;
-							g_Points[client][1] += 10;
-						}
-					}*/
 					break;
 				}
 			}
@@ -1491,13 +990,13 @@ public void sql_CountFinishedMapsCallback(Handle owner, Handle hndl, const char[
 	// Finished maps amount is stored in memory
 	g_pr_finishedmaps[client] = finishedMaps;
 	// Percentage of maps finished
-	g_pr_finishedmaps_perc[client] = (float(finishedMaps) / float(g_pr_MapCount)) * 100.0;
+	g_pr_finishedmaps_perc[client] = (float(finishedMaps) / float(g_pr_MapCount[0])) * 100.0;
 
 	//wrs
 	g_WRs[client][0] = wrs;
 
 	int totalperc = g_pr_finishedstages[client] + g_pr_finishedbonuses[client] + g_pr_finishedmaps[client];
-	int totalcomp = g_pr_StageCount + g_pr_BonusCount + g_pr_MapCount;
+	int totalcomp = g_pr_StageCount + g_pr_BonusCount + g_pr_MapCount[0];
 	float ftotalperc;
 
 	ftotalperc = (float(totalperc) / (float(totalcomp))) * 100.0;
@@ -1655,7 +1154,7 @@ public void db_viewPlayerPointsCallback(Handle owner, Handle hndl, const char[] 
 	{
 		g_pr_points[client] = SQL_FetchInt(hndl, 2);
 		g_pr_finishedmaps[client] = SQL_FetchInt(hndl, 3);
-		g_pr_finishedmaps_perc[client] = (float(g_pr_finishedmaps[client]) / float(g_pr_MapCount)) * 100.0;
+		g_pr_finishedmaps_perc[client] = (float(g_pr_finishedmaps[client]) / float(g_pr_MapCount[0])) * 100.0;
 
 		g_iPlayTimeAlive[client] = SQL_FetchInt(hndl, 6);
 		g_iPlayTimeSpec[client] = SQL_FetchInt(hndl, 7);
@@ -1992,7 +1491,7 @@ public void SQL_ViewRankedPlayerCallback6(Handle owner, Handle hndl, const char[
 	char szBPerc[32];
 	char szStagePerc[32];
 	char szTotalPerc[32];
-	fperc = (float(finishedmapspro) / (float(g_pr_MapCount))) * 100.0;
+	fperc = (float(finishedmapspro) / (float(g_pr_MapCount[0]))) * 100.0;
 	int finishedbonuses = g_totalBonusTimes[client];
 	int target = g_ClientProfile[client];
 	char percent[2]; //fluffys percent wont print !!
@@ -2061,7 +1560,7 @@ public void SQL_ViewRankedPlayerCallback6(Handle owner, Handle hndl, const char[
 		Format(szStagePerc, 32, "%.1f", stagefperc);
 
 	int totalperc = playerstages + finishedbonuses + finishedmapspro;
-	int totalcomp = totalstages + g_pr_BonusCount + g_pr_MapCount;
+	int totalcomp = totalstages + g_pr_BonusCount + g_pr_MapCount[0];
 	float ftotalperc;
 
 	ftotalperc = (float(totalperc) / (float(totalcomp))) * 100.0;
@@ -2074,12 +1573,12 @@ public void SQL_ViewRankedPlayerCallback6(Handle owner, Handle hndl, const char[
 		Format(szTotalPerc, 32, "%.1f", ftotalperc);
 
 
-	if (finishedmapspro > g_pr_MapCount)
-		finishedmapspro = g_pr_MapCount;
+	if (finishedmapspro > g_pr_MapCount[0])
+		finishedmapspro = g_pr_MapCount[0];
 
 	//fluffys ksf style Ranking
-	GetRankName(client, rank, points, szSkillGroup, 32);
-	//Format(szSkillGroup, 32, "%s", );
+	//GetRankName(client, rank, points, szSkillGroup, 32);
+	Format(szSkillGroup, 32, "%s", g_pr_rankname[client]);
 
 	char szRank[32];
 	if (rank > g_pr_RankedPlayers || points == 0)
@@ -2099,7 +1598,7 @@ public void SQL_ViewRankedPlayerCallback6(Handle owner, Handle hndl, const char[
 
 	if(g_bProfileInServer[client])
 	{
-		Format(szMapPoints, 128, "Maps: %i/%i - [%i] (%s%c)", finishedmapspro, g_pr_MapCount, g_Points[target][0], szPerc, PERCENT);
+		Format(szMapPoints, 128, "Maps: %i/%i - [%i] (%s%c)", finishedmapspro, g_pr_MapCount[0], g_Points[target][0], szPerc, PERCENT);
 
 		if(g_Points[target][4] > 0)
 			Format(szBonusPoints, 128, "Bonuses: %i/%i - [%i+%i] (%s%c)", finishedbonuses, g_pr_BonusCount, g_Points[target][1], g_Points[target][4], szBPerc, PERCENT);
@@ -2123,7 +1622,7 @@ public void SQL_ViewRankedPlayerCallback6(Handle owner, Handle hndl, const char[
 	}
 	else
 	{
-		Format(g_pr_szrank[client], 512, "Rank: %s/%i (%s)\nTotal pts: %ip \n \nCompleted:\nMaps: %i/%i (%s%s)\nStages: %i/%i (%s%s)\nBonuses: %i/%i (%s%s)\n \nRecords:\nMap WR: %i\nStage WR: %i\nBonus WR: %i\n ", szRank, g_pr_RankedPlayers, szSkillGroup, points, finishedmapspro, g_pr_MapCount, szPerc, percent, playerstages, totalstages, szStagePerc, percent, finishedbonuses, g_pr_BonusCount, szBPerc, percent, prorecords, stagerecords, bonusrecords);
+		Format(g_pr_szrank[client], 512, "Rank: %s/%i (%s)\nTotal pts: %ip \n \nCompleted:\nMaps: %i/%i (%s%s)\nStages: %i/%i (%s%s)\nBonuses: %i/%i (%s%s)\n \nRecords:\nMap WR: %i\nStage WR: %i\nBonus WR: %i\n ", szRank, g_pr_RankedPlayers, szSkillGroup, points, finishedmapspro, g_pr_MapCount[0], szPerc, percent, playerstages, totalstages, szStagePerc, percent, finishedbonuses, g_pr_BonusCount, szBPerc, percent, prorecords, stagerecords, bonusrecords);
 	}
 
 	char szID[32][2];
@@ -3798,7 +3297,7 @@ public void SQL_LastRunCallback(Handle owner, Handle hndl, const char[] error, a
 		return;
 	}
 
-	g_bTimeractivated[data] = false;
+	g_bTimerRunning[data] = false;
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl) && IsValidClient(data))
 	{
 
@@ -3828,7 +3327,7 @@ public void SQL_LastRunCallback(Handle owner, Handle hndl, const char[] error, a
 			if (fl_time > 0.0)
 			{
 				g_fStartTime[data] = GetGameTime() - fl_time;
-				g_bTimeractivated[data] = true;
+				g_bTimerRunning[data] = true;
 			}
 
 			if (SQL_FetchFloat(hndl, 0) == -1.0 && SQL_FetchFloat(hndl, 1) == -1.0 && SQL_FetchFloat(hndl, 2) == -1.0)
@@ -3856,7 +3355,7 @@ public void SQL_LastRunCallback(Handle owner, Handle hndl, const char[] error, a
 	else
 	{
 
-		g_bTimeractivated[data] = false;
+		g_bTimerRunning[data] = false;
 	}
 }
 
@@ -3969,10 +3468,8 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 		LogToFileEx(g_szLogFile, "[Surftimer] Finished loading %s - %s settings in %fs", g_szSteamID[client], szName, time);
 		
 		// Print a VIP's custom join msg to all
-		if (g_bEnableJoinMsgs && !StrEqual(g_szCustomJoinMsg[client], "none") && IsPlayerVip(client, 2, true, false))
-		{
+		if (g_bEnableJoinMsgs && !StrEqual(g_szCustomJoinMsg[client], "none") && IsPlayerVip(client, true, false))
 			CPrintToChatAll("%s", g_szCustomJoinMsg[client]);
-		}
 
 		//CalculatePlayerRank(client);
 		g_bSettingsLoaded[client] = true;
@@ -4111,31 +3608,17 @@ public void SQL_deleteCheckpointsCallback(Handle owner, Handle hndl, const char[
 //// MapTier /////////
 //////////////////////
 
-public void db_insertMapTier(int tier, int zGrp)
+public void db_insertMapTier(int tier)
 {
 	char szQuery[256];
 	if (g_bTierEntryFound)
 	{
-		if (zGrp > 0)
-		{
-			Format(szQuery, 256, sql_updateBonusTier, zGrp, tier, g_szMapName);
-		}
-		else
-		{
-			Format(szQuery, 256, sql_updatemaptier, tier, g_szMapName);
-		}
+		Format(szQuery, 256, sql_updatemaptier, tier, g_szMapName);
 		SQL_TQuery(g_hDb, db_insertMapTierCallback, szQuery, 1, DBPrio_Low);
 	}
 	else
 	{
-		if (zGrp > 0)
-		{
-			Format(szQuery, 256, sql_insertBonusTier, zGrp, tier, g_szMapName);
-		}
-		else
-		{
-			Format(szQuery, 256, sql_insertmaptier, g_szMapName, tier);
-		}
+		Format(szQuery, 256, sql_insertmaptier, g_szMapName, tier);
 		SQL_TQuery(g_hDb, db_insertMapTierCallback, szQuery, 1, DBPrio_Low);
 	}
 }
@@ -4175,51 +3658,33 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 		g_bTierEntryFound = true;
 		int tier;
 
-		// Format tier string for all
-		for (int i = 0; i < 11; i++)
+		// Format tier string
+		tier = SQL_FetchInt(hndl, 0);
+		if (0 < tier < 7)
 		{
-			tier = SQL_FetchInt(hndl, i);
-			if (0 < tier < 7)
+			g_bTierFound = true;
+			g_iMapTier = tier;
+			Format(g_sTierString, 512, "  %cSurftimer %c| %c%s %c| ", LIMEGREEN, WHITE, LIMEGREEN, g_szMapName, GREEN);
+			switch (tier)
 			{
-				g_bTierFound[i] = true;
-				if (i == 0)
-				{
-					g_iMapTier = tier;
-					Format(g_sTierString[0], 512, "  %cSurftimer %c| %cMap: %c%s %c| ", LIMEGREEN, WHITE, GREEN, LIMEGREEN, g_szMapName, GREEN);
-					switch (tier)
-					{
-						case 1:Format(g_sTierString[0], 512, "%s%cTier %i %c| ", g_sTierString[0], GRAY, tier, GREEN);
-						case 2:Format(g_sTierString[0], 512, "%s%cTier %i %c| ", g_sTierString[0], LIGHTBLUE, tier, GREEN);
-						case 3:Format(g_sTierString[0], 512, "%s%cTier %i %c| ", g_sTierString[0], BLUE, tier, GREEN);
-						case 4:Format(g_sTierString[0], 512, "%s%cTier %i %c| ", g_sTierString[0], DARKBLUE, tier, GREEN);
-						case 5:Format(g_sTierString[0], 512, "%s%cTier %i %c| ", g_sTierString[0], RED, tier, GREEN);
-						case 6:Format(g_sTierString[0], 512, "%s%cTier %i %c| ", g_sTierString[0], DARKRED, tier, GREEN);
-						default:Format(g_sTierString[0], 512, "%s%cTier %i %c| ", g_sTierString[0], GRAY, tier, GREEN);
-					}
-					if (g_bhasStages)
-					Format(g_sTierString[0], 512, "%s%c%i Stages", g_sTierString[0], MOSSGREEN, (g_mapZonesTypeCount[0][3] + 1));
-					else
-					Format(g_sTierString[0], 512, "%s%cLinear", g_sTierString[0], LIMEGREEN);
-
-					if (g_bhasBonus)
-					if (g_mapZoneGroupCount > 2)
-					Format(g_sTierString[0], 512, "%s %c|%c %i Bonuses", g_sTierString[0], GREEN, ORANGE, (g_mapZoneGroupCount - 1));
-					else
-					Format(g_sTierString[0], 512, "%s %c|%c Bonus", g_sTierString[0], GREEN, ORANGE, (g_mapZoneGroupCount - 1));
-				}
-				else
-				{
-					switch (tier)
-					{
-						case 1:Format(g_sTierString[i], 512, " %cSurftimer %c| &c%s Tier: %i", LIMEGREEN, WHITE, GRAY, g_szZoneGroupName[i], tier);
-						case 2:Format(g_sTierString[i], 512, " %cSurftimer %c| &c%s Tier: %i", LIMEGREEN, WHITE, LIGHTBLUE, g_szZoneGroupName[i], tier);
-						case 3:Format(g_sTierString[i], 512, " %cSurftimer %c| &c%s Tier: %i", LIMEGREEN, WHITE, BLUE, g_szZoneGroupName[i], tier);
-						case 4:Format(g_sTierString[i], 512, " %cSurftimer %c| &c%s Tier: %i", LIMEGREEN, WHITE, DARKBLUE, g_szZoneGroupName[i], tier);
-						case 5:Format(g_sTierString[i], 512, " %cSurftimer %c| &c%s Tier: %i", LIMEGREEN, WHITE, RED, g_szZoneGroupName[i], tier);
-						case 6:Format(g_sTierString[i], 512, " %cSurftimer %c| &c%s Tier: %i", LIMEGREEN, WHITE, DARKRED, g_szZoneGroupName[i], tier);
-					}
-				}
+				case 1:Format(g_sTierString, 512, "%s%cTier %i %c| ", g_sTierString, GRAY, tier, GREEN);
+				case 2:Format(g_sTierString, 512, "%s%cTier %i %c| ", g_sTierString, LIGHTBLUE, tier, GREEN);
+				case 3:Format(g_sTierString, 512, "%s%cTier %i %c| ", g_sTierString, BLUE, tier, GREEN);
+				case 4:Format(g_sTierString, 512, "%s%cTier %i %c| ", g_sTierString, DARKBLUE, tier, GREEN);
+				case 5:Format(g_sTierString, 512, "%s%cTier %i %c| ", g_sTierString, RED, tier, GREEN);
+				case 6:Format(g_sTierString, 512, "%s%cTier %i %c| ", g_sTierString, DARKRED, tier, GREEN);
+				default:Format(g_sTierString, 512, "%s%cTier %i %c| ", g_sTierString, GRAY, tier, GREEN);
 			}
+			if (g_bhasStages)
+				Format(g_sTierString, 512, "%s%c%i Stages", g_sTierString, MOSSGREEN, (g_mapZonesTypeCount[0][3] + 1));
+			else
+				Format(g_sTierString, 512, "%s%cLinear", g_sTierString, LIMEGREEN);
+
+			if (g_bhasBonus)
+				if (g_mapZoneGroupCount > 2)
+					Format(g_sTierString, 512, "%s %c|%c %i Bonuses", g_sTierString, GREEN, ORANGE, (g_mapZoneGroupCount - 1));
+				else
+					Format(g_sTierString, 512, "%s %c|%c Bonus", g_sTierString, GREEN, ORANGE, (g_mapZoneGroupCount - 1));
 		}
 	}
 	else
@@ -4818,7 +4283,7 @@ public void SQL_insertZonesCallback(Handle owner, Handle hndl, const char[] erro
 	db_selectMapZones();
 }
 
-public void db_insertZoneHook(int zoneid, int zonetype, int zonetypeid, int vis, int team, int zonegroup, char[] szHookName)
+public void db_insertZoneHook(int zoneid, int zonetype, int zonetypeid, int vis, int team, int zonegroup, char[] szHookName, float point_a[3], float point_b[3])
 {
 	char szQuery[1024];
 	char zName[128];
@@ -4829,7 +4294,7 @@ public void db_insertZoneHook(int zoneid, int zonetype, int zonetypeid, int vis,
 	Format(zName, 128, g_szZoneGroupName[zonegroup]);
 
 	//"INSERT INTO ck_zones (mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename) VALUES ('%s', '%i', '%i', '%i', '%f', '%f', '%f', '%f', '%f', '%f', '%i', '%i', '%i', '%s')";
-	Format(szQuery, 1024, "INSERT INTO ck_zones (mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename, hookname) VALUES ('%s', '%i', '%i', '%i', '%f', '%f', '%f', '%f', '%f', '%f', '%i', '%i', '%i','%s','%s')", g_szMapName, zoneid, zonetype, zonetypeid, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, vis, team, zonegroup, zName, szHookName);
+	Format(szQuery, 1024, "INSERT INTO ck_zones (mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename, hookname) VALUES ('%s', '%i', '%i', '%i', '%f', '%f', '%f', '%f', '%f', '%f', '%i', '%i', '%i','%s','%s')", g_szMapName, zoneid, zonetype, zonetypeid, point_a[0], point_a[1], point_a[2], point_b[0], point_b[1], point_b[2], vis, team, zonegroup, zName, szHookName);
 	SQL_TQuery(g_hDb, SQL_insertZonesCallback, szQuery, 1, DBPrio_Low);
 }
 
@@ -4856,10 +4321,10 @@ public void SQL_saveZonesCallBack(Handle owner, Handle hndl, const char[] error,
 	}
 }
 
-public void db_updateZone(int zoneid, int zonetype, int zonetypeid, float[] Point1, float[] Point2, int vis, int team, int zonegroup, int onejumplimit)
+public void db_updateZone(int zoneid, int zonetype, int zonetypeid, float[] Point1, float[] Point2, int vis, int team, int zonegroup, int onejumplimit, float prespeed, char[] hookname, char[] targetname)
 {
 	char szQuery[1024];
-	Format(szQuery, 1024, sql_updateZone, zonetype, zonetypeid, Point1[0], Point1[1], Point1[2], Point2[0], Point2[1], Point2[2], vis, team, onejumplimit, zonegroup, zoneid, g_szMapName);
+	Format(szQuery, 1024, sql_updateZone, zonetype, zonetypeid, Point1[0], Point1[1], Point1[2], Point2[0], Point2[1], Point2[2], vis, team, onejumplimit, prespeed, hookname, targetname, zonegroup, zoneid, g_szMapName);
 	SQL_TQuery(g_hDb, SQL_updateZoneCallback, szQuery, 1, DBPrio_Low);
 }
 
@@ -5155,6 +4620,7 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 			g_mapZones[i][zoneGroup] = 0;
 			g_mapZones[i][targetName] = 0;
 			g_mapZones[i][oneJumpLimit] = 1;
+			g_mapZones[i][preSpeed] = 350.0;
 		}
 
 		for (int x = 0; x < MAXZONEGROUPS; x++)
@@ -5188,7 +4654,7 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 			* 0 = zone not found
 			* 1 = zone found
 			*
-			* IDs must be in order 0, 1, 2.... n
+			* IDs must be in order 0, 1, 2....
 			* Duplicate zoneids not possible due to primary key
 			*/
 			zoneIdChecker[g_mapZones[g_mapZonesCount][zoneId]]++;
@@ -5207,6 +4673,7 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 			SQL_FetchString(hndl, 13, g_mapZones[g_mapZonesCount][hookName], 128);
 			SQL_FetchString(hndl, 14, g_mapZones[g_mapZonesCount][targetName], 128);
 			g_mapZones[g_mapZonesCount][oneJumpLimit] = SQL_FetchInt(hndl, 15);
+			g_mapZones[g_mapZonesCount][preSpeed] = SQL_FetchFloat(hndl, 16);
 
 			if (!g_mapZones[g_mapZonesCount][zoneName][0])
 			{
@@ -5471,7 +4938,7 @@ public void SQLTxn_ZoneRemovalFailed(Handle db, any client, int numQueries, cons
 
 public void db_insertLastPosition(int client, char szMapName[128], int stage, int zgroup)
 {
-	if (GetConVarBool(g_hcvarRestore) && !g_bRoundEnd && (StrContains(g_szSteamID[client], "STEAM_") != -1) && g_bTimeractivated[client])
+	if (GetConVarBool(g_hcvarRestore) && !g_bRoundEnd && (StrContains(g_szSteamID[client], "STEAM_") != -1) && g_bTimerRunning[client])
 	{
 		Handle pack = CreateDataPack();
 		WritePackCell(pack, client);
@@ -5507,7 +4974,7 @@ public void db_insertLastPositionCallback(Handle owner, Handle hndl, const char[
 
 	if (1 <= client <= MaxClients)
 	{
-		if (!g_bTimeractivated[client])
+		if (!g_bTimerRunning[client])
 		g_fPlayerLastTime[client] = -1.0;
 		int tickrate = g_Server_Tickrate * 5 * 11;
 		if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
@@ -5985,7 +5452,7 @@ public void db_viewUnfinishedMapsCallback(Handle owner, Handle hndl, const char[
 		{
 			PrintToConsole(client, " ");
 			PrintToConsole(client, "------- User Stats -------");
-			PrintToConsole(client, "%i unfinished maps of total %i maps", mapCount, g_pr_MapCount);
+			PrintToConsole(client, "%i unfinished maps of total %i maps", mapCount, g_pr_MapCount[0]);
 			PrintToConsole(client, "%i unfinished bonuses", bonusCount);
 			PrintToConsole(client, "SteamID: %s", g_szProfileSteamId[client]);
 			PrintToConsole(client, "--------------------------");
@@ -6555,7 +6022,7 @@ public void db_selectTop100PlayersCallback(Handle owner, Handle hndl, const char
 			int pro = SQL_FetchInt(hndl, 2);
 			SQL_FetchString(hndl, 3, szSteamID, 32);
 			float fperc;
-			fperc = (float(pro) / (float(g_pr_MapCount))) * 100.0;
+			fperc = (float(pro) / (float(g_pr_MapCount[0]))) * 100.0;
 
 			if (fperc < 10.0)
 			Format(szPerc, 16, "  %.1f%c  ", fperc, PERCENT);
@@ -6821,44 +6288,54 @@ public void sql_selectTotalStageCountCallback(Handle owner, Handle hndl, const c
 	return;
 }
 
-public void db_selectWrcpRecord(int client, int style)
+public void db_selectWrcpRecord(int client, int style, int stage)
 {
-	if (!IsValidClient(client))
-	return;
+	if (!IsValidClient(client) || IsFakeClient(client) || g_bUsingStageTeleport[client])
+		return;
 
-	if(g_CurrentStage[client] > g_TotalStages) // Hack fix for multiple end zones
-		g_CurrentStage[client] = g_TotalStages;
+	if (stage > g_TotalStages) // Hack fix for multiple end zones
+		stage = g_TotalStages;
+
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackCell(pack, style);
+	WritePackCell(pack, stage);
 
 	char szQuery[255];
 	if(style == 0)
-		Format(szQuery, 255, "SELECT runtimepro FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = 0", g_szSteamID[client], g_szMapName, g_CurrentStage[client]);
+		Format(szQuery, 255, "SELECT runtimepro FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = 0", g_szSteamID[client], g_szMapName, stage);
 	else if(style != 0)
-		Format(szQuery, 255, "SELECT runtimepro FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = %i", g_szSteamID[client], g_szMapName, g_CurrentStage[client], style);
+		Format(szQuery, 255, "SELECT runtimepro FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = %i", g_szSteamID[client], g_szMapName, stage, style);
 
-	SQL_TQuery(g_hDb, sql_selectWrcpRecordCallback, szQuery, client, DBPrio_Low); //need to add stage int
+	SQL_TQuery(g_hDb, sql_selectWrcpRecordCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[] error, any data)
+public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[] error, any packx)
 {
 	if (hndl == null)
 	{
 		LogError("[Surftimer] SQL Error (sql_selectWrcpRecordCallback): %s", error);
+		CloseHandle(packx);
 		return;
 	}
 
-	if (!IsValidClient(data))
-	return;
+	ResetPack(packx);
+	int data = ReadPackCell(packx);
+	int style = ReadPackCell(packx);
+	int stage = ReadPackCell(packx);
+	CloseHandle(packx);
+
+	if (!IsValidClient(data) || IsFakeClient(data))
+		return;
 
 	char szName[32];
 	GetClientName(data, szName, 32);
 
 
 	char szQuery[512];
-	int stage = g_CurrentStage[data];
+
 	if (stage > g_TotalStages) // Hack fix for multiple end zones
 		stage = g_TotalStages;
-
-	int style = g_iCurrentStyle[data];
 
 	char sz_srDiff[128];
 	char szDiff[128];
@@ -6896,7 +6373,7 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 		// If old time was slower than the new time, update record
 		if ((g_fFinalWrcpTime[data] <= stagetime || stagetime <= 0.0))
 		{
-			db_updateWrcpRecord(data, style);
+			db_updateWrcpRecord(data, style, stage);
 		}
 		else
 		{//fluffys come back
@@ -6905,23 +6382,23 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 			g_bStageSRVRecord[data][stage] = false;
 			if(style == 0)
 			{
-				PrintToChat(data, " %cSurftimer %c| %cStage %i:%c %c%s %c(%s%c - %s%c)", LIMEGREEN, WHITE, WHITE, g_CurrentStage[data], WHITE, LIMEGREEN, g_szFinalWrcpTime[data], WHITE, szDiff, WHITE, sz_srDiff, WHITE);
+				PrintToChat(data, " %cSurftimer %c| %cStage %i:%c %c%s %c(%s%c - %s%c)", LIMEGREEN, WHITE, WHITE, stage, WHITE, LIMEGREEN, g_szFinalWrcpTime[data], WHITE, szDiff, WHITE, sz_srDiff, WHITE);
 
-				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| %c%s %c| %cStage %i:%c %c%s %c(%s%c - %s%c)", LIMEGREEN, WHITE, YELLOW, szName, WHITE, PINK, g_CurrentStage[data], WHITE, LIMEGREEN, g_szFinalWrcpTime[data], WHITE, szDiff, WHITE, sz_srDiff, WHITE);
+				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| %c%s %c| %cStage %i:%c %c%s %c(%s%c - %s%c)", LIMEGREEN, WHITE, YELLOW, szName, WHITE, PINK, stage, WHITE, LIMEGREEN, g_szFinalWrcpTime[data], WHITE, szDiff, WHITE, sz_srDiff, WHITE);
 			}
 			else if(style != 0)//styles
 			{
-				PrintToChat(data, " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s%s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, g_CurrentStage[data], LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[data], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][data][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
-				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s%s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, g_CurrentStage[data], LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[data], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][data][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
+				PrintToChat(data, " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s %s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, stage, LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[data], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][data][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
+				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s %s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, stage, LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[data], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][data][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
 			}
 			CheckpointToSpec(data, szSpecMessage);
 
 			if(g_bRepeat[data])
 			{
-				if(g_CurrentStage[data] <= 1)
+				if (stage <= 1)
 					Command_Restart(data, 1);
 				else
-					teleportClient(data, 0, g_CurrentStage[data], false);
+					teleportClient(data, 0, stage, false);
 			}
 		}
 	}
@@ -6936,8 +6413,9 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 		// Move required information in datapack
 		Handle pack = CreateDataPack();
 		WritePackFloat(pack, g_fFinalWrcpTime[data]);
-		WritePackCell(pack, data);
 		WritePackCell(pack, style);
+		WritePackCell(pack, stage);
+		WritePackCell(pack, data);
 
 		if(style == 0)
 			Format(szQuery, 512, "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage) VALUES ('%s', '%s', '%s', '%f', %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage);
@@ -6953,32 +6431,32 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 //
 // If latest record was faster than old - Update time
 //
-public void db_updateWrcpRecord(int client, int style)
+public void db_updateWrcpRecord(int client, int style, int stage)
 {
+	if (!IsValidClient(client) || IsFakeClient(client))
+		return;
+		
 	char szUName[MAX_NAME_LENGTH];
-
-	if (IsValidClient(client))
 	GetClientName(client, szUName, MAX_NAME_LENGTH);
-	else
-	return;
 
 	// Also updating name in database, escape string
 	char szName[MAX_NAME_LENGTH * 2 + 1];
 	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH * 2 + 1);
-	int stage = g_CurrentStage[client];
+	//int stage = g_CurrentStage[client];
 
 	// Packing required information for later
 	Handle pack = CreateDataPack();
 	WritePackFloat(pack, g_fFinalWrcpTime[client]);
-	WritePackCell(pack, client);
 	WritePackCell(pack, style);
+	WritePackCell(pack, stage);
+	WritePackCell(pack, client);
 
 	char szQuery[1024];
 	//"UPDATE ck_playertimes SET name = '%s', runtimepro = '%f' WHERE steamid = '%s' AND mapname = '%s';";
 	if(style == 0)
-		Format(szQuery, 1024, "UPDATE ck_wrcps SET name = '%s', runtimepro = '%f' WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = 0", szName, g_fFinalWrcpTime[client], g_szSteamID[client], g_szMapName, stage);
+		Format(szQuery, 1024, "UPDATE ck_wrcps SET name = '%s', runtimepro = '%f' WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = 0;", szName, g_fFinalWrcpTime[client], g_szSteamID[client], g_szMapName, stage);
 	if(style > 0)
-		Format(szQuery, 1024, "UPDATE ck_wrcps SET name = '%s', runtimepro = '%f' WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = %i", szName, g_fFinalWrcpTime[client], g_szSteamID[client], g_szMapName, stage, style);
+		Format(szQuery, 1024, "UPDATE ck_wrcps SET name = '%s', runtimepro = '%f' WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = %i;", szName, g_fFinalWrcpTime[client], g_szSteamID[client], g_szMapName, stage, style);
 	SQL_TQuery(g_hDb, SQL_UpdateWrcpRecordCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -6988,15 +6466,14 @@ public void SQL_UpdateWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 	if (hndl == null)
 	{
 		LogError("[Surftimer] SQL Error (SQL_UpdateWrcpRecordCallback): %s", error);
+		CloseHandle(data);
 		return;
 	}
 
 	ResetPack(data);
 	float stagetime = ReadPackFloat(data);
-	int client = ReadPackCell(data);
 	int style = ReadPackCell(data);
-	CloseHandle(data);
-	int stage = g_CurrentStage[client];
+	int stage = ReadPackCell(data);
 
 	if (g_TotalStageRecords[stage] > 0) //fluffys FIXME
 		db_viewTotalStageRecords();
@@ -7010,19 +6487,27 @@ public void SQL_UpdateWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 	else if(style != 0)
 		Format(szQuery, 512, "SELECT count(runtimepro) FROM ck_wrcps WHERE mapname = '%s' AND runtimepro < %f AND stage = %i AND style = %i AND runtimepro > -1.0;", g_szMapName, stagetime, stage, style);
 
-	SQL_TQuery(g_hDb, SQL_UpdateWrcpRecordCallback2, szQuery, client, DBPrio_Low);
+	SQL_TQuery(g_hDb, SQL_UpdateWrcpRecordCallback2, szQuery, data, DBPrio_Low);
 }
 
-public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[] error, any client)
+public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[] error, any data)
 {
 	if (hndl == null)
 	{
 		LogError("[Surftimer] SQL Error (SQL_UpdateRecordProCallback2): %s", error);
+		CloseHandle(data);
 		return;
 	}
 
-	if(g_CurrentStage[client] == 0)
-	return;
+	ResetPack(data);
+	float time = ReadPackFloat(data);
+	int style = ReadPackCell(data);
+	int stage = ReadPackCell(data);
+	int client = ReadPackCell(data);
+	CloseHandle(data);
+
+	if(stage == 0)
+		return;
 
 	// Get players rank, 9999999 = error
 	int stagerank = 9999999;
@@ -7031,10 +6516,8 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 		stagerank = SQL_FetchInt(hndl, 0)+1;
 	}
 
-	int stage = g_CurrentStage[client];
 	if (stage > g_TotalStages) // Hack Fix for multiple end zone issue
 		stage = g_TotalStages;
-	int style = g_iCurrentStyle[client];
 
 	if(style == 0)
 		g_StageRank[client][stage] = stagerank;
@@ -7048,7 +6531,6 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 	GetClientName(client, szName, MAX_NAME_LENGTH);
 
 	char sz_srDiff[128];
-	float time = g_fFinalWrcpTime[client];
 
 	// PB
 	char szDiff[128];
@@ -7097,7 +6579,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 				Format(g_szStageRecordPlayer[stage], MAX_NAME_LENGTH, "%s", szName);
 				FormatTimeFloat(1, g_fStageRecord[stage], 3, g_szRecordStageTime[stage], 64);
 
-				PrintToChatAll(" %cSurftimer %c| %c%s %chas beaten the %cSTAGE %i RECORD %c%s %s %c(Rank: %c#1%c/%i)", LIMEGREEN, WHITE, LIMEGREEN, szName, WHITE, PINK, g_CurrentStage[client], LIMEGREEN, g_szFinalWrcpTime[client], sz_srDiff, WHITE, LIMEGREEN, WHITE, g_TotalStageRecords[stage]);
+				PrintToChatAll(" %cSurftimer %c| %c%s %chas beaten the %cSTAGE %i RECORD %c%s %s %c(Rank: %c#1%c/%i)", LIMEGREEN, WHITE, LIMEGREEN, szName, WHITE, PINK, stage, LIMEGREEN, g_szFinalWrcpTime[client], sz_srDiff, WHITE, LIMEGREEN, WHITE, g_TotalStageRecords[stage]);
 				g_bSavingWrcpReplay[client] = true;
 				//Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 				//PlayWRCPRecord(1);
@@ -7108,9 +6590,9 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 
 				char szSpecMessage[512];
 
-				PrintToChat(client, " %cSurftimer %c| Stage %i%c: %c%s %c(%s%c | %s%c) (Rank: %c%i%c/%c%i%c)", LIMEGREEN, WHITE, g_CurrentStage[client], WHITE, LIMEGREEN, g_szFinalWrcpTime[client], WHITE, szDiff, WHITE, sz_srDiff, WHITE, LIMEGREEN, g_StageRank[client][stage], WHITE, LIMEGREEN, g_TotalStageRecords[stage], WHITE);
+				PrintToChat(client, " %cSurftimer %c| Stage %i%c: %c%s %c(%s%c | %s%c) (Rank: %c%i%c/%c%i%c)", LIMEGREEN, WHITE, stage, WHITE, LIMEGREEN, g_szFinalWrcpTime[client], WHITE, szDiff, WHITE, sz_srDiff, WHITE, LIMEGREEN, g_StageRank[client][stage], WHITE, LIMEGREEN, g_TotalStageRecords[stage], WHITE);
 
-				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| %c%s %c| Stage %i%c: %c%s %c(%s%c | %s%c) (Rank: %c%i%c/%c%i%c)", LIMEGREEN, WHITE, YELLOW, szName, WHITE, g_CurrentStage[client], WHITE, LIMEGREEN, g_szFinalWrcpTime[client], WHITE, szDiff, WHITE, sz_srDiff, WHITE, LIMEGREEN, g_StageRank[client][stage], WHITE, LIMEGREEN, g_TotalStageRecords[stage], WHITE);
+				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| %c%s %c| Stage %i%c: %c%s %c(%s%c | %s%c) (Rank: %c%i%c/%c%i%c)", LIMEGREEN, WHITE, YELLOW, szName, WHITE, stage, WHITE, LIMEGREEN, g_szFinalWrcpTime[client], WHITE, szDiff, WHITE, sz_srDiff, WHITE, LIMEGREEN, g_StageRank[client][stage], WHITE, LIMEGREEN, g_TotalStageRecords[stage], WHITE);
 				CheckpointToSpec(client, szSpecMessage);
 			}
 		}
@@ -7121,7 +6603,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			Format(g_szStageRecordPlayer[stage], MAX_NAME_LENGTH, "%s", szName);
 			FormatTimeFloat(1, g_fStageRecord[stage], 3, g_szRecordStageTime[stage], 64);
 
-			PrintToChatAll(" %cSurftimer %c| %c%s %chas set a new %cSTAGE %i RECORD %c%s %c(Rank: %c#1%c/1)", LIMEGREEN, WHITE, LIMEGREEN, szName, WHITE, PINK, g_CurrentStage[client], LIMEGREEN, g_szFinalWrcpTime[client], WHITE, LIMEGREEN, WHITE);
+			PrintToChatAll(" %cSurftimer %c| %c%s %chas set a new %cSTAGE %i RECORD %c%s %c(Rank: %c#1%c/1)", LIMEGREEN, WHITE, LIMEGREEN, szName, WHITE, PINK, stage, LIMEGREEN, g_szFinalWrcpTime[client], WHITE, LIMEGREEN, WHITE);
 			g_bSavingWrcpReplay[client] = true;
 			//Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 			//PlayWRCPRecord(1);
@@ -7140,7 +6622,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 				Format(g_szStyleStageRecordPlayer[style][stage], MAX_NAME_LENGTH, "%s", szName);
 				FormatTimeFloat(1, g_fStyleStageRecord[style][stage], 3, g_szStyleRecordStageTime[style][stage], 64);
 
-				PrintToChatAll(" %cSurftimer %c| %c%s %chas beaten the %c%s %cSTAGE %i RECORD %c%s %s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, LIMEGREEN, szName, WHITE, LIGHTRED, g_szStyleRecordPrint[style], PINK, g_CurrentStage[client], LIMEGREEN, g_szFinalWrcpTime[client], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][client][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
+				PrintToChatAll(" %cSurftimer %c| %c%s %chas beaten the %c%s %cSTAGE %i RECORD %c%s %s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, LIMEGREEN, szName, WHITE, LIGHTRED, g_szStyleRecordPrint[style], PINK, stage, LIMEGREEN, g_szFinalWrcpTime[client], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][client][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
 				//PlayWRCPRecord(1);
 			}
 			else
@@ -7149,8 +6631,8 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 
 				char szSpecMessage[512];
 
-				PrintToChat(client, " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s%s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, g_CurrentStage[client], LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[client], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][client][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
-				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s%s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, g_CurrentStage[client], LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[client], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][client][stage], WHITE,  g_TotalStageStyleRecords[style][stage]);
+				PrintToChat(client, " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s %s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, stage, LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[client], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][client][stage], WHITE, g_TotalStageStyleRecords[style][stage]);
+				Format(szSpecMessage, sizeof(szSpecMessage), " %cSurftimer %c| Completed %cStage %i %c%s %cin %c%s %s %c(Rank: %c#%i%c/%i)", LIMEGREEN, WHITE, WHITE, stage, LIGHTRED, g_szStyleFinishPrint[style], WHITE, LIMEGREEN, g_szFinalWrcpTime[client], sz_srDiff, WHITE, LIMEGREEN, g_StyleStageRank[style][client][stage], WHITE,  g_TotalStageStyleRecords[style][stage]);
 				CheckpointToSpec(client, szSpecMessage);
 			}
 		}
@@ -7161,7 +6643,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			Format(g_szStyleStageRecordPlayer[style][stage], MAX_NAME_LENGTH, "%s", szName);
 			FormatTimeFloat(1, g_fStyleStageRecord[style][stage], 3, g_szStyleRecordStageTime[style][stage], 64);
 
-			PrintToChatAll(" %cSurftimer %c| %c%s %chas set a new %c%s %cSTAGE %i RECORD %c%s %c(Rank: %c#1%c/1)", LIMEGREEN, WHITE, LIMEGREEN, szName, WHITE, LIGHTRED, g_szStyleRecordPrint[style], PINK, g_CurrentStage[client], LIMEGREEN, g_szFinalWrcpTime[client], WHITE, LIMEGREEN, WHITE);
+			PrintToChatAll(" %cSurftimer %c| %c%s %chas set a new %c%s %cSTAGE %i RECORD %c%s %c(Rank: %c#1%c/1)", LIMEGREEN, WHITE, LIMEGREEN, szName, WHITE, LIGHTRED, g_szStyleRecordPrint[style], PINK, stage, LIMEGREEN, g_szFinalWrcpTime[client], WHITE, LIMEGREEN, WHITE);
 			//PlayWRCPRecord(1);
 		}
 	}
@@ -7172,10 +6654,10 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 
 	if(g_bRepeat[client])
 	{
-		if(g_CurrentStage[client] <= 1)
+		if(stage <= 1)
 			Command_Restart(client, 1);
 		else
-			teleportClient(client, 0, g_CurrentStage[client], false);
+			teleportClient(client, 0, stage, false);
 	}
 
 }
@@ -8273,8 +7755,8 @@ public void db_viewStyleWrcpMap(int client, char mapname[128], int style)
 	Format(szQuery, 512, "SELECT `mapname`, COUNT(`zonetype`) AS stages FROM `ck_zones` WHERE `zonetype` = '3' AND `mapname` = (SELECT DISTINCT `mapname` FROM `ck_zones` WHERE `zonetype` = '3' AND `mapname` LIKE '%c%s%c' LIMIT 0, 1)", PERCENT, g_szWrcpMapSelect[client], PERCENT);
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
-	WritePackString(pack, mapname);
 	WritePackCell(pack, style);
+	WritePackString(pack, mapname);
 	SQL_TQuery(g_hDb, sql_viewStyleWrcpMapCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -8291,8 +7773,8 @@ public void sql_viewStyleWrcpMapCallback(Handle owner, Handle hndl, const char[]
 	char szStageString[MAXPLAYERS + 1];
 	ResetPack(pack);
 	int client = ReadPackCell(pack);
-	char mapname[128];
 	int style = ReadPackCell(pack);
+	char mapname[128];
 	ReadPackString(pack, mapname, 128);
 	CloseHandle(pack);
 
@@ -8313,7 +7795,7 @@ public void sql_viewStyleWrcpMapCallback(Handle owner, Handle hndl, const char[]
 			Menu menu;
 			menu = CreateMenu(StageStyleSelectMenuHandler);
 
-			SetMenuTitle(menu, "%s: Select a stage [%s]\n------------------------------\n", mapnameresult, g_szStyleMenuPrint[style]);
+			SetMenuTitle(menu, "%s: select a stage [%s]\n------------------------------\n", mapnameresult, g_szStyleMenuPrint[style]);
 			int stageCount = totalstages;
 			for (int i = 1; i <= stageCount; i++)
 			{
@@ -8387,7 +7869,7 @@ public void sql_selectStageStyleTopSurfersCallback(Handle owner, Handle hndl, co
 				{
 					GetArrayString(stringArray, x, lineBuf, sizeof(lineBuf));
 					if (StrEqual(lineBuf, szName, false))
-					bduplicat = true;
+						bduplicat = true;
 				}
 				if (bduplicat == false && i < 51)
 				{
@@ -8433,7 +7915,7 @@ public int StageStyleTopMenuHandler(Menu menu, MenuAction action, int client, in
 	}
 	else if (action == MenuAction_Cancel)
 	{
-			db_viewStyleWrcpMap(client, g_szWrcpMapSelect[client], 1);
+			db_viewStyleWrcpMap(client, g_szWrcpMapSelect[client], g_iWrcpMenuStyleSelect[client]);
 	}
 	else if (action == MenuAction_End)
 		CloseHandle(menu);
@@ -8644,7 +8126,7 @@ public void SQL_ViewRankedPlayerStyleCallback5(Handle owner, Handle hndl, const 
 	char szPerc[32];
 	char szBPerc[32];
 	char szStagePerc[32];
-	fperc = (float(finishedmapspro) / (float(g_pr_MapCount))) * 100.0;
+	fperc = (float(finishedmapspro) / (float(g_pr_MapCount[0]))) * 100.0;
 	int finishedbonuses = g_totalBonusTimes[client];
 	char percent[2]; //fluffys percent wont print !!
 	percent = "%%";
@@ -8699,8 +8181,8 @@ public void SQL_ViewRankedPlayerStyleCallback5(Handle owner, Handle hndl, const 
 	Format(szStagePerc, 32, "%.1f", stagefperc);
 
 
-	if (finishedmapspro > g_pr_MapCount)
-	finishedmapspro = g_pr_MapCount;
+	if (finishedmapspro > g_pr_MapCount[0])
+	finishedmapspro = g_pr_MapCount[0];
 
 	char szStyle[128];
 	if(style == 1) //sideways
@@ -8719,7 +8201,7 @@ public void SQL_ViewRankedPlayerStyleCallback5(Handle owner, Handle hndl, const 
 	if (master == false)
 	{ //fluffys edit !p menu
 		if (GetConVarBool(g_hPointSystem))
-			Format(g_pr_szrank[client], 512, "%s Completed:\nMaps: %i/%i (%s%s)\nStages: %i/%i (%s%s)\nBonuses: %i/%i (%s%s)\n \n%s Records:\nMap WR: %i\nStage WR: (WIP)\nBonus WR: %i\n ", szStyle, finishedmapspro, g_pr_MapCount, szPerc, percent, playerstages, totalstages, szStagePerc, percent, finishedbonuses, g_pr_BonusCount, szBPerc, percent, szStyle, prorecords, bonusrecords);
+			Format(g_pr_szrank[client], 512, "%s Completed:\nMaps: %i/%i (%s%s)\nStages: %i/%i (%s%s)\nBonuses: %i/%i (%s%s)\n \n%s Records:\nMap WR: %i\nStage WR: (WIP)\nBonus WR: %i\n ", szStyle, finishedmapspro, g_pr_MapCount[0], szPerc, percent, playerstages, totalstages, szStagePerc, percent, finishedbonuses, g_pr_BonusCount, szBPerc, percent, szStyle, prorecords, bonusrecords);
 	}
 
 	char szID[32][2];

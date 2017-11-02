@@ -1,3 +1,33 @@
+/*
+	Surftimer Hooks
+	TODO: Cleanup
+*/
+
+void CreateHooks()
+{
+	HookUserMessage(GetUserMessageId("SendPlayerItemFound"), ItemFoundMsg, true);
+	
+	//hooks
+	HookEvent("player_spawn", Event_OnPlayerSpawn, EventHookMode_Post);
+	HookEvent("player_death", Event_OnPlayerDeath);
+	HookEvent("round_start", Event_OnRoundStart, EventHookMode_PostNoCopy);
+	HookEvent("round_end", Event_OnRoundEnd, EventHookMode_Pre);
+	HookEvent("player_hurt", Event_OnPlayerHurt);
+	HookEvent("weapon_fire", Event_OnFire, EventHookMode_Pre);
+	HookEvent("player_team", Event_OnPlayerTeam, EventHookMode_Post);
+	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
+	HookEvent("player_jump", Event_PlayerJump);
+	//HookEvent("player_disconnect", Event_PlayerDisconnect);
+
+	// AddNormalSoundHook(OnNormalSoundPlayed);
+
+	// Gunshots
+	AddTempEntHook("Shotgun Shot", Hook_ShotgunShot);
+
+	// Footsteps
+	AddNormalSoundHook(Hook_FootstepCheck);
+}
+
 public Action SayText2(UserMsg msg_id, Handle bf, int[] players, int playersNum, bool reliable, bool init)
 {
 	if (!reliable)return Plugin_Continue;
@@ -176,7 +206,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 					}
 					else
 					{
-						g_bTimeractivated[client] = false;
+						g_bTimerRunning[client] = false;
 						g_fStartTime[client] = -1.0;
 						g_fCurrentRunTime[client] = -1.0;
 
@@ -260,30 +290,77 @@ public Action Say_Hook(int client, const char[] command, int argc)
 			}
 		}
 
-		if (g_bWaitingForBugMsg[client])
+		// Functions that require the client to input something via the chat box
+		if (g_iWaitingForResponse[client] > -1)
 		{
-			Format(g_sBugMsg[client], sizeof(g_sBugMsg), sText);
-			SendBugReport(client);
-			g_bWaitingForBugMsg[client] = false;
-			return Plugin_Handled;
-		}
-		else if (g_bWaitingForCAMsg[client])
-		{
-			CallAdmin(client, sText);
-			g_bWaitingForCAMsg[client] = false;
-			return Plugin_Handled;
-		}
-		else if (g_bWaitingForZonegroup[client])
-		{
-			int zgrp = StringToInt(sText);
-			if (zgrp < 1 || zgrp > 35)
+			// Check if client is cancelling
+			if (StrEqual(sText, "cancel"))
 			{
-				PrintToChat(client, " %cSurftimer %c| Invalid Bonus", LIMEGREEN, WHITE);
+				CPrintToChat(client, "{lime}Surftimer {default}| Cancelled");
+				g_iWaitingForResponse[client] = -1;
 				return Plugin_Handled;
 			}
-			g_iZonegroupHook[client] = zgrp;
-			PrintToChat(client, " %cSurftimer %c| Bonus %i to use with hooked zones", LIMEGREEN, WHITE, zgrp);
-			g_bWaitingForZonegroup[client] = false;
+
+			// Check which function we're waiting for
+			switch (g_iWaitingForResponse[client])
+			{
+				case 0: 
+				{
+					// Set zone Prespeed
+					float prespeed = StringToFloat(sText);
+					if (prespeed < 0.0)
+						prespeed = 0.0;
+					g_mapZones[g_ClientSelectedZone[client]][preSpeed] = prespeed;
+					PrespeedMenu(client);
+				}
+				case 1:
+				{
+					// BugMsg
+					Format(g_sBugMsg[client], sizeof(g_sBugMsg), sText);
+					SendBugReport(client);
+				}
+				case 2:
+				{
+					// Calladmin
+					CallAdmin(client, sText);
+				}
+				case 3:
+				{
+					// Hook zone zonegroup
+					int zgrp = StringToInt(sText);
+					if (zgrp < 1 || zgrp > 35)
+					{
+						PrintToChat(client, " %cSurftimer %c| Invalid Bonus", LIMEGREEN, WHITE);
+						return Plugin_Handled;
+					}
+					g_iZonegroupHook[client] = zgrp;
+					PrintToChat(client, " %cSurftimer %c| Bonus %i to use with hooked zones", LIMEGREEN, WHITE, zgrp);
+				}
+				case 4:
+				{
+					// Maxvelocity for map
+					float maxvelocity = StringToFloat(sText);
+					if (maxvelocity < 1.0)
+						maxvelocity = 10000.0;
+					g_fMaxVelocity = maxvelocity;
+					db_updateMapSettings();
+					MaxVelocityMenu(client);
+					CPrintToChat(client, "{lime}Surftimer {default}| %s max velocity set to %f", g_szMapName, maxvelocity);
+				}
+				case 5:
+				{
+					// Zone set clients Target Name
+					if (StrEqual(sText, "reset"))
+						Format(sText, sizeof(sText), "player");
+
+					Format(g_mapZones[g_ClientSelectedZone[client]][targetName], sizeof(g_mapZones), "%s", sText);
+
+					CPrintToChat(client, "{lime}Surftimer {default}| %s-%i set to {lime}%s", g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId], sText);
+
+					EditorMenu(client);
+				}
+			}
+			g_iWaitingForResponse[client] = -1;
 			return Plugin_Handled;
 		}
 
@@ -345,15 +422,14 @@ public Action Say_Hook(int client, const char[] command, int argc)
 
 		char szName[64];
 		GetClientName(client, szName, 64);
+		CRemoveColors(szName, 64);
 
 		//log the chat of the player to the server so that tools such as HLSW/HLSTATX see it and also it remains logged in the log file
 		WriteChatLog(client, "say", sText);
 		PrintToServer("%s: %s", szName, sText);
 
-		parseColorsFromString(szName, 64);
-
 		if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
-			setNameColor(szName, g_rankNameChatColour[client], 64);
+			Format(szName, sizeof(szName), "%s%s", g_pr_namecolour[client], szName);
 		else if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
 			setNameColor(szName, g_iCustomColours[client][0], 64);
 			//fluffys
@@ -410,7 +486,7 @@ public Action Event_OnPlayerTeam(Handle event, const char[] name, bool dontBroad
 			GetClientEyeAngles(client, g_fPlayerAnglesRestore[client]);
 			g_bRespawnPosition[client] = true;
 		}
-		if (g_bTimeractivated[client])
+		if (g_bTimerRunning[client])
 		{
 			g_fStartPauseTime[client] = GetGameTime();
 			if (g_fPauseTime[client] > 0.0)
@@ -663,14 +739,13 @@ public Action Hook_OnTakeDamage(int victim, int &attacker, int &inflictor, float
 	return Plugin_Continue;
 }
 
-
 //thx to TnTSCS (player slap stops timer)
 //https://forums.alliedmods.net/showthread.php?t=233966
 public Action OnLogAction(Handle source, Identity ident, int client, int target, const char[] message)
 {
 	if ((1 > target > MaxClients))
 		return Plugin_Continue;
-	if (IsValidClient(target) && IsPlayerAlive(target) && g_bTimeractivated[target] && !IsFakeClient(target))
+	if (IsValidClient(target) && IsPlayerAlive(target) && g_bTimerRunning[target] && !IsFakeClient(target))
 	{
 		char logtag[PLATFORM_MAX_PATH];
 		if (ident == Identity_Plugin)
@@ -687,12 +762,12 @@ public Action OnLogAction(Handle source, Identity ident, int client, int target,
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
 	//fluffys
-	if(buttons & IN_JUMP && g_bInJump[client] == true && !g_bInStartZone[client] && !g_bInStageZone[client])
+	if (buttons & IN_JUMP && g_bInJump[client] == true && !g_bInStartZone[client] && !g_bInStageZone[client])
 	{
-		if(!g_bJumpZoneTimer[client])
+		if (!g_bJumpZoneTimer[client])
 		{
 			CreateTimer(1.0, StartJumpZonePrintTimer, client);
-			PrintToChat(client, "%cSurftimer %c| | You may not jump in this area.");
+			CPrintToChat(client, "{lime}Surftimer {default}| {darkred}You may not jump in this area");
 			TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, view_as<float>( { 0.0, 0.0, 0.0} ));
 			SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, 0.0 } ));
 			g_bJumpZoneTimer[client] = true;
@@ -700,7 +775,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	}
 	else if(buttons & IN_DUCK && g_bInDuck[client] == true)
 	{
-		PrintToChat(client, "%cSurftimer %c| | You may not crouch in this area.");
+		CPrintToChat(client, "{lime}Surftimer {default}| {darkred}You may not crouch in this area");
 	}
 	else if(buttons & IN_DUCK && g_bInPushTrigger[client] == true)
 	{
@@ -1020,7 +1095,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 			fAngle += 360.0;
 		}
 
-		if ((g_bTimeractivated[client] || g_bWrcpTimeractivated[client]) && iGroundEntity == -1 && (GetEntityFlags(client) & FL_INWATER) == 0 && fAngle != 0.0)
+		if ((g_bTimerRunning[client] || g_bWrcpTimeractivated[client]) && iGroundEntity == -1 && (GetEntityFlags(client) & FL_INWATER) == 0 && fAngle != 0.0)
 		{
 			float fAbsVelocity[3];
 			GetEntPropVector(client, Prop_Data, "m_vecAbsVelocity", fAbsVelocity);
@@ -1244,6 +1319,10 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if (client == 0 && !IsPlayerAlive(client) && !IsClientObserver(client))
 		return Plugin_Continue;
+	
+	int zoneid = g_iClientInZone[client][3];
+	if (zoneid < 0)
+		zoneid = 0;
 
 	if (IsValidClient(client) && !IsFakeClient(client))
 	{
@@ -1252,7 +1331,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 		{
 			if (g_bInStartZone[client] || g_bInStageZone[client])
 			{
-				if (g_mapZones[g_iClientInZone[client][3]][oneJumpLimit] == 1)
+				if (g_mapZones[zoneid][oneJumpLimit] == 1)
 				{
 					if (!g_bJumpedInZone[client])
 					{

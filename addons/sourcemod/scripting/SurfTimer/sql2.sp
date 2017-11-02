@@ -293,28 +293,22 @@ public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] er
 			LoadClientSetting(client, g_iSettingToLoad[client]);
 	}
 
-	g_iVipLvl[client] = 0;
+	g_bVip[client] = false;
+	g_bZoner[client] = false;
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-		g_iVipLvl[client] = SQL_FetchInt(hndl, 0);
+		g_bVip[client] = view_as<bool>(SQL_FetchInt(hndl, 0));
 		g_bZoner[client] = view_as<bool>(SQL_FetchInt(hndl, 2));
 	}
 
-	if (g_iVipLvl[client] < 1) // No VIP from database, let's check sb
+	if (!g_bVip[client] || !g_bZoner[client]) // No VIP or Zoner from database, let's check flags
 	{
-		if (CheckCommandAccess(client, "", ADMFLAG_CUSTOM5)) // BDC
-		{
-			g_iVipLvl[client] = 3;
-		}
-		else if (CheckCommandAccess(client, "", ADMFLAG_CUSTOM1)) // SuperVIP
-		{
-			g_iVipLvl[client] = 2;
-		}
-		else if (CheckCommandAccess(client, "", ADMFLAG_CUSTOM6)) // VIP
-		{
-			g_iVipLvl[client] = 1;
-		}
+		if (CheckCommandAccess(client, "", g_VipFlag))
+			g_bVip[client] = true;
+
+		if (CheckCommandAccess(client, "", g_ZonerFlag))
+			g_bZoner[client] = true;
 	}
 
 	if (g_bCheckCustomTitle[client])
@@ -327,7 +321,7 @@ public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] er
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[surftimer] %s: Finished db_CheckVIPAdmin in %fs", g_szSteamID[client], tick);
+		LogToFileEx(g_szLogFile, "[Surftimer] %s: Finished db_CheckVIPAdmin in %fs", g_szSteamID[client], tick);
 		g_fTick[client][0] = GetGameTime();
 
 
@@ -616,22 +610,9 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 		return;
 	}
 
-	if (g_iVipLvl[client] <= 1 && !g_bSettingsLoaded[client])
-	{
-		if (g_iVipLvl[client] == 1)
-		{
-			g_bDbCustomTitleInUse[client] = true;
-			Format(g_pr_chat_coloredrank[client], 1024, "[{lime}VIP{default}]");
-			Format(g_pr_rankname[client], 1024, "[VIP]");
-			Format(g_szCustomTitle[client], 1024, "[VIP]");
-		}
-		else
-		{
-			g_bDbCustomTitleInUse[client] = false;
-			g_bHasCustomTextColour[client] = false;
-			g_bdbHasCustomTitle[client] = false;
-		}
-	}
+	g_bDbCustomTitleInUse[client] = false;
+	g_bHasCustomTextColour[client] = false;
+	g_bdbHasCustomTitle[client] = false;
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
@@ -639,9 +620,9 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 		SQL_FetchString(hndl, 0, g_szCustomTitleColoured[client], sizeof(g_szCustomTitleColoured));
 
 		//fluffys temp fix for scoreboard
-		int RankValue[SkillGroup];
-		int index = GetSkillgroupFromPoints(g_pr_points[client]);
-		GetArrayArray(g_hSkillGroups, index, RankValue[0]);
+		// int RankValue[SkillGroup];
+		// int index = GetSkillgroupIndex(g_pr_rank[client], g_pr_points[client]);
+		// GetArrayArray(g_hSkillGroups, index, RankValue[0]);
 		Format(g_pr_chat_coloredrank[client], 1024, "%s", g_szCustomTitleColoured[client]);
 
 		char szTitle[1024];
@@ -650,7 +631,7 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 		Format(g_pr_rankname[client], 1024, "%s", szTitle);
 		Format(g_szCustomTitle[client], 1024, "%s", szTitle);
 
-		if (!SQL_IsFieldNull(hndl, 6) && IsPlayerVip(client, 2, true, false))
+		if (!SQL_IsFieldNull(hndl, 6) && IsPlayerVip(client, true, false))
 			SQL_FetchString(hndl, 6, g_szCustomJoinMsg[client], sizeof(g_szCustomJoinMsg));
 		else
 			Format(g_szCustomJoinMsg[client], sizeof(g_szCustomJoinMsg), "none");
@@ -689,10 +670,14 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[surftimer] %s: Finished db_viewCustomTitles in %fs", g_szSteamID[client], tick);
+		LogToFileEx(g_szLogFile, "[Surftimer] %s: Finished db_viewCustomTitles in %fs", g_szSteamID[client], tick);
 
 		g_fTick[client][0] = GetGameTime();
 		LoadClientSetting(client, g_iSettingToLoad[client]);
+
+		// Check Enforced Tags
+		if (GetConVarBool(g_hEnforceDefaultTitles))
+			LoadDefaultTitle(client);
 	}
 }
 
@@ -1556,7 +1541,7 @@ public void SQL_SelectAnnouncementsCallback(Handle owner, Handle hndl, const cha
 		g_fServerLoading[1] = GetGameTime();
 		g_bHasLatestID = true;
 		float time = g_fServerLoading[1] - g_fServerLoading[0];
-		LogToFileEx(g_szLogFile, "[surftimer] Finished loading server settings in %fs", time);
+		LogToFileEx(g_szLogFile, "[Surftimer] Finished loading server settings in %fs", time);
 		loadAllClientSettings();
 	} 
 }
@@ -1612,7 +1597,7 @@ public void SQL_CheckAnnouncementsCallback(Handle owner, Handle hndl, const char
 public void db_selectMapCycle()
 {
 	char szQuery[128];
-	Format(szQuery, sizeof(szQuery), "SELECT mapname FROM ck_maptier ORDER BY mapname ASC");
+	Format(szQuery, sizeof(szQuery), "SELECT mapname, tier FROM ck_maptier ORDER BY mapname ASC");
 	SQL_TQuery(g_hDb, SQL_SelectMapCycleCallback, szQuery, 1, DBPrio_Low);
 }
 
@@ -1624,18 +1609,27 @@ public void SQL_SelectMapCycleCallback(Handle owner, Handle hndl, const char[] e
 		return;
 	}
 
-	g_pr_MapCount = 0;
+	g_pr_MapCount[0] = 0;
 	ClearArray(g_MapList);
 
 	if (SQL_HasResultSet(hndl))
 	{
 		char szMapname[128];
+		int tier;
 
 		while (SQL_FetchRow(hndl))
 		{
-			g_pr_MapCount++;
+			g_pr_MapCount[0]++;
 			SQL_FetchString(hndl, 0, szMapname, sizeof(szMapname));
-			PushArrayString(g_MapList, szMapname);			
+			tier = SQL_FetchInt(hndl, 1);
+			// No out of bounds arrays please
+			if (tier > 6)
+				tier = 6;
+			else if (tier < 1)
+				tier = 1;
+
+			g_pr_MapCount[tier]++;
+			PushArrayString(g_MapList, szMapname);	
 		}
 	}
 }

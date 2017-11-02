@@ -5,20 +5,10 @@ public Action reloadRank(Handle timer, any client)
 	return Plugin_Handled;
 }
 
-public Action reloadConsoleInfo(Handle timer, any client)
-{
-	if (IsValidClient(client))
-		PrintConsoleInfo(client);
-	return Plugin_Handled;
-}
-
-
 public Action AnnounceMap(Handle timer, any client)
 {
 	if (IsValidClient(client))
-	{
-		PrintToChat(client, g_sTierString[0]);
-	}
+		PrintToChat(client, g_sTierString);
 
 	AnnounceTimer[client] = null;
 	return Plugin_Handled;
@@ -171,26 +161,26 @@ public Action CKTimer2(Handle timer)
 			GetMapTimeLeft(timeleft);
 			switch (timeleft)
 			{
-				case 1800:PrintToChatAll("%t", "TimeleftMinutes", LIMEGREEN, WHITE, BLUE, g_szMapName, WHITE, MOSSGREEN, timeleft / 60, WHITE);
-				case 1200:PrintToChatAll("%t", "TimeleftMinutes", LIMEGREEN, WHITE, BLUE, g_szMapName, WHITE, MOSSGREEN, timeleft / 60, WHITE);
-				case 600:PrintToChatAll("%t", "TimeleftMinutes", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft / 60, WHITE);
-				case 300:PrintToChatAll("%t", "TimeleftMinutes", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft / 60, WHITE);
-				case 120:PrintToChatAll("%t", "TimeleftMinutes", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft / 60, WHITE);
-				case 60:PrintToChatAll("%t", "TimeleftSeconds", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft, WHITE);
-				case 30:PrintToChatAll("%t", "TimeleftSeconds", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft, WHITE);
-				case 15:PrintToChatAll("%t", "TimeleftSeconds", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft, WHITE);
-				case  - 1:PrintToChatAll("%t", "TimeleftCounter", LIMEGREEN, WHITE, BLUE, g_szMapName, WHITE, MOSSGREEN, 3, WHITE);
-				case  - 2:PrintToChatAll("%t", "TimeleftCounter", LIMEGREEN, WHITE, BLUE, g_szMapName, WHITE, MOSSGREEN, 2, WHITE);
+				case 1800:PrintToChatAll("%t", "TimeleftMinutes", LIMEGREEN, WHITE, BLUE, g_szMapName, WHITE, MOSSGREEN, timeleft / 60);
+				case 1200:PrintToChatAll("%t", "TimeleftMinutes", LIMEGREEN, WHITE, BLUE, g_szMapName, WHITE, MOSSGREEN, timeleft / 60);
+				case 600:PrintToChatAll("%t", "TimeleftMinutes", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft / 60);
+				case 300:PrintToChatAll("%t", "TimeleftMinutes", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft / 60);
+				case 120:PrintToChatAll("%t", "TimeleftMinutes", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft / 60);
+				case 60:PrintToChatAll("%t", "TimeleftSeconds", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft);
+				case 30:PrintToChatAll("%t", "TimeleftSeconds", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft);
+				case 15:PrintToChatAll("%t", "TimeleftSeconds", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft);
+				case  - 1:PrintToChatAll("%t", "TimeleftCounter", LIMEGREEN, WHITE, BLUE, g_szMapName, WHITE, MOSSGREEN, 3);
+				case  - 2:PrintToChatAll("%t", "TimeleftCounter", LIMEGREEN, WHITE, BLUE, g_szMapName, WHITE, MOSSGREEN, 2);
 				case  - 3:
 				{
 					if (!g_bRoundEnd)
 					{
 						g_bRoundEnd = true;
 						ServerCommand("mp_ignore_round_win_conditions 0");
-						PrintToChatAll("%t", "TimeleftCounter", LIMEGREEN, WHITE, BLUE, g_szMapName, WHITE, MOSSGREEN, 1, WHITE);
+						PrintToChatAll("%t", "TimeleftCounter", LIMEGREEN, WHITE, BLUE, g_szMapName, WHITE, MOSSGREEN, 1);
 						char szNextMap[128];
 						GetNextMap(szNextMap, 128);
-						PrintToChatAll(" %cSurftimer %c| Nextmap: %s", LIMEGREEN, WHITE, szNextMap);
+						PrintToChatAll(" %cSurftimer %c| Nextmap: %c%s", LIMEGREEN, WHITE, BLUE, szNextMap);
 						CreateTimer(1.0, TerminateRoundTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 					}
 				}
@@ -229,7 +219,7 @@ public Action CKTimer2(Handle timer)
 		{
 			float fltime;
 			fltime = GetGameTime() - g_fStartTime[i] - g_fPauseTime[i] + 1.0;
-			if (IsPlayerAlive(i) && g_bTimeractivated[i])
+			if (IsPlayerAlive(i) && g_bTimerRunning[i])
 			{
 				int time;
 				time = RoundToZero(fltime);
@@ -316,7 +306,7 @@ public Action SetClanTag(Handle timer, any client)
 	if (CS_GetClientClanTag(client, buffer,MAX_NAME_LENGTH) > 0)
 		return Plugin_Handled;
 	*/
-	if (!GetConVarBool(g_hCountry) && !GetConVarBool(g_hPointSystem) && !GetConVarBool(g_hAdminClantag))
+	if (!GetConVarBool(g_hCountry) && !GetConVarBool(g_hPointSystem))
 	{
 		CS_SetClientClanTag(client, "");
 		return Plugin_Handled;
@@ -340,13 +330,9 @@ public Action SetClanTag(Handle timer, any client)
 	}
 	else
 	{
-		if (GetConVarBool(g_hPointSystem) || ((StrEqual(g_pr_rankname[client], "ADMIN", false)) && GetConVarBool(g_hAdminClantag)))
+		if (GetConVarBool(g_hPointSystem))
 			CS_SetClientClanTag(client, g_pr_rankname[client]);
 	}
-
-	//fluffys
-	// if (GetConVarBool(g_hPointSystem) || ((StrEqual(g_pr_rankname[client], "ADMIN", false)) && GetConVarBool(g_hAdminClantag)))
-	// 	CS_SetClientClanTag(client, g_pr_rankname[client]);
 
 	//new rank
 	if (oldrank && GetConVarBool(g_hPointSystem))
@@ -380,7 +366,7 @@ public Action WelcomeMsgTimer(Handle timer, any client)
 public Action HelpMsgTimer(Handle timer, any client)
 {
 	if (IsValidClient(client) && !IsFakeClient(client))
-		PrintToChat(client, "%t", "HelpMsg", LIMEGREEN, WHITE, GREEN, WHITE);
+		PrintToChat(client, "%t", "HelpMsg", LIMEGREEN, WHITE, MOSSGREEN, WHITE, MOSSGREEN);
 
 	return Plugin_Handled;
 }
@@ -393,22 +379,22 @@ public Action AdvertTimer(Handle timer)
 	{
 		if (g_bhasBonus)
 		{
-			PrintToChatAll("%t", "AdvertBonus", LIMEGREEN, WHITE, LIMEGREEN, WHITE, MOSSGREEN);
+			PrintToChatAll("%t", "AdvertBonus", LIMEGREEN, WHITE, MOSSGREEN, WHITE, MOSSGREEN);
 		}
 		else if (g_bhasStages)
 		{
-			PrintToChatAll("%t", "AdvertStage", LIMEGREEN, WHITE, LIMEGREEN, WHITE, LIMEGREEN, WHITE, MOSSGREEN);
+			PrintToChatAll("%t", "AdvertStage", LIMEGREEN, WHITE, MOSSGREEN, WHITE, MOSSGREEN);
 		}
 	}
 	else
 	{
 		if (g_bhasStages)
 		{
-			PrintToChatAll("%t", "AdvertStage", LIMEGREEN, WHITE, LIMEGREEN, WHITE, LIMEGREEN, WHITE, MOSSGREEN);
+			PrintToChatAll("%t", "AdvertStage", LIMEGREEN, WHITE, MOSSGREEN, WHITE, MOSSGREEN);
 		}
 		else if (g_bhasBonus)
 		{
-			PrintToChatAll("%t", "AdvertBonus", LIMEGREEN, WHITE, LIMEGREEN, WHITE, MOSSGREEN);
+			PrintToChatAll("%t", "AdvertBonus", LIMEGREEN, WHITE, MOSSGREEN, WHITE, MOSSGREEN);
 		}
 	}
 	return Plugin_Continue;

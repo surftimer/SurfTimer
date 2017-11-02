@@ -45,7 +45,7 @@ public void CL_OnStartTimerPress(int client)
 		if (g_bActivateCheckpointsOnStart[client])
 		g_bCheckpointsEnabled[client] = true;
 
-		// Reser run variables
+		// Reset run variables
 		tmpDiff[client] = 9999.0;
 		g_fPauseTime[client] = 0.0;
 		g_fStartPauseTime[client] = 0.0;
@@ -57,7 +57,7 @@ public void CL_OnStartTimerPress(int client)
 		g_bPositionRestored[client] = false;
 		g_bMissedMapBest[client] = true;
 		g_bMissedBonusBest[client] = true;
-		g_bTimeractivated[client] = true;
+		g_bTimerRunning[client] = true;
 		g_bTop10Time[client] = false;
 		// strafe sync
 		g_iGoodGains[client] = 0;
@@ -121,7 +121,7 @@ public void CL_OnEndTimerPress(int client)
 	return;
 
 	// Print bot finishing message to spectators
-	if (IsFakeClient(client) && g_bTimeractivated[client])
+	if (IsFakeClient(client) && g_bTimerRunning[client])
 	{
 		for (int i = 1; i <= MaxClients; i++)
 		{
@@ -144,12 +144,12 @@ public void CL_OnEndTimerPress(int client)
 
 		PlayButtonSound(client);
 
-		g_bTimeractivated[client] = false;
+		g_bTimerRunning[client] = false;
 		return;
 	}
 
 	// If timer is not on, play error sound and return
-	if (!g_bTimeractivated[client])
+	if (!g_bTimerRunning[client])
 	{
 		ClientCommand(client, "play buttons\\button10.wav");
 		return;
@@ -691,7 +691,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 	return;
 
 	// Print bot finishing message to spectators
-	if (IsFakeClient(client) && g_bWrcpTimeractivated[client])
+	if (IsFakeClient(client) && g_bWrcpTimeractivated[client] || IsFakeClient(client))
 	{
 		g_bWrcpTimeractivated[client] = false;
 		return;
@@ -702,20 +702,29 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 	GetClientName(client, szName, MAX_NAME_LENGTH);
 
 
+	// if(g_bWrcpEndZone[client])
+	// {
+	// 	g_CurrentStage[client] += 1;
+	// 	g_bWrcpEndZone[client] = false;
+	// }
+	// else
+	// 	g_CurrentStage[client] = g_Stage[g_iClientInZone[client][2]][client] - 1;
+
+	int stage = g_Stage[0][client] - 1;
+
 	if(g_bWrcpEndZone[client])
 	{
-		g_CurrentStage[client] += 1;
+		stage += 1;
 		g_bWrcpEndZone[client] = false;
 	}
-	else
-		g_CurrentStage[client] = g_Stage[g_iClientInZone[client][2]][client] - 1;
+
+	if (stage > g_TotalStages) // Hack Fix for multiple end zone issue
+		stage = g_TotalStages;
 
 	if(g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0)
 	{
-		int stage = g_CurrentStage[client];
+		//int stage = g_CurrentStage[client];
 
-		if (stage > g_TotalStages) // Hack Fix for multiple end zone issue
-			stage = g_TotalStages;
 		//g_fFinalWrcpTime[client] = GetGameTime() - g_fStartWrcpTime[client];
 		g_fFinalWrcpTime[client] = g_fCurrentWrcpRunTime[client];
 
@@ -765,16 +774,11 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 			}
 		}
 
-		db_selectWrcpRecord(client, 0);
+		db_selectWrcpRecord(client, 0, stage);
 		g_bWrcpTimeractivated[client] = false;
 	}
 	else if(g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] != 0) //styles
 	{
-		int stage = g_CurrentStage[client];
-
-		if (stage > g_TotalStages) // Hack Fix for multiple end zone issue
-			stage = g_TotalStages;
-
 		int style = g_iCurrentStyle[client];
 		g_fFinalWrcpTime[client] = GetGameTime() - g_fStartWrcpTime[client];
 		if(g_fFinalWrcpTime[client] <= 0.0)
@@ -802,7 +806,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		Format(sz_srDiff, 128, "");*/
 
 		FormatTimeFloat(client, g_fFinalWrcpTime[client], 3, g_szFinalWrcpTime[client], 32);
-		db_selectWrcpRecord(client, style);
+		db_selectWrcpRecord(client, style, stage);
 		g_bWrcpTimeractivated[client] = false;
 	}
 }
