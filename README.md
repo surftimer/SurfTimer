@@ -1,4 +1,5 @@
 # SurfTimer v2.1 CS:GO
+[Read the changes](CHANGELOG.md)
 
 ## Backstory
 
@@ -29,6 +30,9 @@ If you wish to upgrade from a different fork of cksurf you may run the upgrade s
 ## Stripper
 * I have uploaded my stripper files <a href="https://github.com/fluffyst/skillsurf-csgo">here</a>
 
+## Other Plugins
+https://github.com/fluffyst/ckSurf-mapchooser
+
 ## Extra
 * I've made a discord so it's easier to discuss changes/additions rather than having to use GitHub issues https://discord.gg/MmuRW4k
 
@@ -39,5 +43,3 @@ If you wish to upgrade from a different fork of cksurf you may run the upgrade s
 * <a href="http://steamcommunity.com/id/fluffystko/">fluffys</a>
 * Jakeey802
 * Grandpa Goose
-
-Checkout <a href="http://kpsurf.xyz">KP Surf</a> if you want to see the latest version in action.
