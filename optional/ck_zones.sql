@@ -18,7 +18,7 @@ CREATE TABLE `ck_zones` (
   `targetname` varchar(128) DEFAULT 'player',
   `onejumplimit` int(12) NOT NULL DEFAULT '1',
   `prespeed` int(64) NOT NULL DEFAULT '350'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `ck_zones`
