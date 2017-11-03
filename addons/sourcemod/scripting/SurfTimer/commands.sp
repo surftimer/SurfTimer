@@ -4640,9 +4640,10 @@ public int HookZoneHandler(Menu menu, MenuAction action, int param1, int param2)
 					char szTriggerName[128];
 					GetEntPropString(iEnt, Prop_Send, "m_iName", szTriggerName, 128, 0);
 
-					PrintToChat(param1, "Teleporting to %s at %f %f %f", szTriggerName, position[0], position[1], position[2]);
+					CPrintToChat(param1, "{lime}Surftimer {default}| Teleporting to %s at %f %f %f", szTriggerName, position[0], position[1], position[2]);
 
-					teleportEntitySafe(param1, position, angles, view_as<float>( { 0.0, 0.0, -100.0 } ), true);
+					// teleportEntitySafe(param1, position, angles, view_as<float>( { 0.0, 0.0, -100.0 } ), true);
+					TeleportEntity(param1, position, angles, view_as<float>( { 0.0, 0.0, -100.0 } ));
 				}
 				case 1: // hook zone
 				{
