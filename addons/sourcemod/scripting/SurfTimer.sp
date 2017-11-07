@@ -2135,7 +2135,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 
 		if (!validFlag)
 		{
-			PrintToServer("Surftimer | Invalid flag for ck_zonemenu_flag");
+			PrintToServer("Surftimer | Invalid flag for ck_zoner_flag");
 			g_ZonerFlag = ADMFLAG_ROOT;
 		}
 		else
