@@ -4579,8 +4579,8 @@ db_selectMapZones();
 */
 public void db_selectMapZones()
 {
-	char szQuery[270];
-	Format(szQuery, 270, sql_selectMapZones, g_szMapName);
+	char szQuery[512];
+	Format(szQuery, sizeof(szQuery), sql_selectMapZones, g_szMapName);
 	SQL_TQuery(g_hDb, SQL_selectMapZonesCallback, szQuery, 1, DBPrio_High);
 }
 
