@@ -1313,10 +1313,11 @@ public void OnMapStart()
 	iEnt = -1;
 	if (g_hTriggerMultiple != null)
 		CloseHandle(g_hTriggerMultiple);
-	if (g_TriggerMultipleList != null)
-		ClearArray(g_TriggerMultipleList);
-	else
-		g_TriggerMultipleList = CreateArray(128);
+
+	// if (g_TriggerMultipleList != null)
+	// 	ClearArray(g_TriggerMultipleList);
+	// else
+	// 	g_TriggerMultipleList = CreateArray(128);
 
 	g_hTriggerMultiple = CreateArray(128);
 	while ((iEnt = FindEntityByClassname(iEnt, "trigger_multiple")) != -1)
@@ -1335,7 +1336,7 @@ public void OnMapStart()
 		{
 			char szTriggerName[128];
 			GetEntPropString(iEnt, Prop_Send, "m_iName", szTriggerName, 128, 0);
-			PushArrayString(g_TriggerMultipleList, szTriggerName);
+			//PushArrayString(g_TriggerMultipleList, szTriggerName);
 			AddMenuItem(g_mTriggerMultipleMenu, szTriggerName, szTriggerName);
 		}
 	}
@@ -2129,7 +2130,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 
 		if (!validFlag)
 		{
-			PrintToServer("Surftimer | Invalid flag for ck_zonemenu_flag");
+			PrintToServer("Surftimer | Invalid flag for ck_zoner_flag");
 			g_ZonerFlag = ADMFLAG_ROOT;
 		}
 		else

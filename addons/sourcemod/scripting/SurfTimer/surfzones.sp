@@ -29,7 +29,7 @@ public void CreateZoneEntity(int zoneIndex)
 
 				if (StrEqual(szHookName, szTriggerName))
 				{
-					Format(sZoneName, sizeof(sZoneName), "sm_ckZone %i", zoneIndex);
+					Format(sZoneName, sizeof(sZoneName), "sm_ckZoneHooked %i", zoneIndex);
 					float position[3];
 					// come back
 					GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", position);
@@ -73,6 +73,7 @@ public void CreateZoneEntity(int zoneIndex)
 					}
 
 					DispatchKeyValue(iEnt, "targetname", sZoneName);
+					//DispatchKeyValue(iEnt, "m_iClassname", "hooked");
 
 					SDKHook(iEnt, SDKHook_StartTouch, StartTouchTrigger);
 					SDKHook(iEnt, SDKHook_EndTouch, EndTouchTrigger);
@@ -152,7 +153,11 @@ public Action StartTouchTrigger(int caller, int activator)
 	char sTargetName[256];
 	int action[3];
 	GetEntPropString(caller, Prop_Data, "m_iName", sTargetName, sizeof(sTargetName));
-	ReplaceString(sTargetName, sizeof(sTargetName), "sm_ckZone ", "");
+
+	if (StrContains(sTargetName, "sm_ckZoneHooked") != -1)
+		ReplaceString(sTargetName, sizeof(sTargetName), "sm_ckZoneHooked ", "");
+	else
+		ReplaceString(sTargetName, sizeof(sTargetName), "sm_ckZone ", "");
 
 	int id = StringToInt(sTargetName);
 
@@ -246,7 +251,11 @@ public Action EndTouchTrigger(int caller, int activator)
 	char sTargetName[256];
 	int action[3];
 	GetEntPropString(caller, Prop_Data, "m_iName", sTargetName, sizeof(sTargetName));
-	ReplaceString(sTargetName, sizeof(sTargetName), "sm_ckZone ", "");
+
+	if (StrContains(sTargetName, "sm_ckZoneHooked") != -1)
+		ReplaceString(sTargetName, sizeof(sTargetName), "sm_ckZoneHooked ", "");
+	else
+		ReplaceString(sTargetName, sizeof(sTargetName), "sm_ckZone ", "");
 
 	int id = StringToInt(sTargetName);
 
@@ -2316,8 +2325,13 @@ stock void RemoveZones()
 		{
 			SDKUnhook(i, SDKHook_StartTouch, StartTouchTrigger);
 			SDKUnhook(i, SDKHook_EndTouch, EndTouchTrigger);
-			AcceptEntityInput(i, "Disable");
-			AcceptEntityInput(i, "Kill");
+			
+			// Don't destroy hooked zone entities
+			if (StrContains(sClassName, "sm_ckZoneHooked") == -1)
+			{
+				AcceptEntityInput(i, "Disable");
+				AcceptEntityInput(i, "Kill");
+			}
 		}
 	}
 }

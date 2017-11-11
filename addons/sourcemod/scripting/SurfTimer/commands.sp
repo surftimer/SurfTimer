@@ -4590,10 +4590,6 @@ public int HookZonesMenuHandler(Menu menu, MenuAction action, int param1, int pa
 			if (IsValidClient(param1))
 				g_iSelectedTrigger[param1] = -1;
 		}
-		case MenuAction_End: 
-		{
-			delete menu;
-		}
 	}
 }
 
@@ -4621,7 +4617,9 @@ public int HookZoneHandler(Menu menu, MenuAction action, int param1, int param2)
 
 					CPrintToChat(param1, "%t", "Commands59", g_szChatPrefix, szTriggerName, position[0], position[1], position[2]);
 
-					teleportEntitySafe(param1, position, angles, view_as<float>( { 0.0, 0.0, -100.0 } ), true);
+					// teleportEntitySafe(param1, position, angles, view_as<float>( { 0.0, 0.0, -100.0 } ), true);
+					Client_Stop(param1, 0);
+					TeleportEntity(param1, position, angles, view_as<float>( { 0.0, 0.0, -100.0 } ));
 				}
 				case 1: // hook zone
 				{
