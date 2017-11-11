@@ -13,7 +13,7 @@ public void SQL_ViewPlayerInfoCallback(Handle owner, Handle hndl, const char[] e
 		LogError("[surftimer] SQL Error (SQL_ViewPlayerInfoCallback): %s", error);
 		return;
 	}
-	
+
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
 		char szSteamId[32], szName[MAX_NAME_LENGTH], szCountry[128], szSteamId64[64];
@@ -27,47 +27,47 @@ public void SQL_ViewPlayerInfoCallback(Handle owner, Handle hndl, const char[] e
 		connections = SQL_FetchInt(hndl, 6);
 		timeAlive = SQL_FetchInt(hndl, 7);
 		timeSpec = SQL_FetchInt(hndl, 8);
-		
+
 		// Format Joined Time
 		char szTime[128];
 		FormatTime(szTime, sizeof(szTime), "%d %h %Y", joinUnix);
-		
+
 		// Format Last Seen Time
 		int unix = GetTime();
 		int diffUnix = unix - lastSeenUnix;
 		char szBuffer[128];
 		diffForHumans(diffUnix, szBuffer, 128, 0);
-		
+
 		int totalTime = (timeAlive + timeSpec);
-		
+
 		char szTotalTime[128], szTimeAlive[128], szTimeSpec[128];
-		
+
 		totalTimeForHumans(totalTime, szTotalTime, 128);
 		totalTimeForHumans(timeAlive, szTimeAlive, 128);
 		totalTimeForHumans(timeSpec, szTimeSpec, 128);
-		
+
 		Menu menu = CreateMenu(ProfileInfoMenuHandler);
 		char szTitle[1024];
 		Format(szTitle, 1024, "Player: %s\nSteamID: %s\n-------------------------------------- \n \nFirst Time Online: %s\nLast Time Online: %s\n \nTotal Online Time: %s\nTotal Alive Time: %s\nTotal Spec Time: %s\n \nTotal Connections %i\n \n", szName, szSteamId, szTime, szBuffer, szTotalTime, szTimeAlive, szTimeSpec, connections);
-		
+
 		SetMenuTitle(menu, szTitle);
-		
+
 		AddMenuItem(menu, szSteamId64, "Community Profile Link");
 		SetMenuExitButton(menu, true);
 		DisplayMenu(menu, client, MENU_TIME_FOREVER);
 	}
 	else if (IsClientInGame(client))
-		PrintToChat(client, "%t", "PlayerNotFound", LIMEGREEN, WHITE, g_szProfileName[client]);
+		CPrintToChat(client, "%t", "PlayerNotFound", g_szChatPrefix, g_szProfileName[client]);
 }
 
 public int ProfileInfoMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_Select)
 	{
-    //http://steamcommunity.com/profiles/76561198000303868/
+	// http://steamcommunity.com/profiles/76561198000303868/
 		char info[64];
 		GetMenuItem(menu, param2, info, sizeof(info));
-		PrintToChat(param1, " %cSurftimer %c| http://steamcommunity.com/profiles/%s/", LIMEGREEN, WHITE, info);
+		CPrintToChat(param1, "%t", "SQLTime1", g_szChatPrefix, info);
 	}
 	else
 		if (action == MenuAction_End)

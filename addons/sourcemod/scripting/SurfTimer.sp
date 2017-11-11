@@ -1,13 +1,13 @@
 /*=======================================================
-=            	CS:GO Surftimer		       					        *
-This is a heavy modification of ckSurf by fluffys
-The original version of this timer was by jonitaikaponi
-* https://forums.alliedmods.net/showthread.php?t=264498 =
+=                    CS:GO Surftimer                    =
+ This is a heavily modified version of ckSurf by fluffys 
+ The original version of this timer was by jonitaikaponi 
+= https://forums.alliedmods.net/showthread.php?t=264498 =
 =======================================================*/
 
-/*=============================================
-=            		Includes		          				=
-=============================================*/
+/*====================================
+=              Includes              =
+====================================*/
 
 #include <sourcemod>
 #include <sdkhooks>
@@ -28,30 +28,29 @@ The original version of this timer was by jonitaikaponi
 #include <sourcecomms>
 #include <surftimer>
 
-
 /*====================================
 =            Declarations            =
 ====================================*/
 
-/*====================================
-=            Definitions 		       	 =
-====================================*/
+/*===================================
+=            Definitions            =
+===================================*/
 
-// Require new syntax and semicolons
+// Require New Syntax & Semicolons
 #pragma newdecls required
 #pragma semicolon 1
 
-// Plugin info
+// Plugin Info
 #define VERSION "2.0.1"
 #define PLUGIN_VERSION 201
 
-// Database definitions
+// Database Definitions
 #define MYSQL 0
 #define SQLITE 1
 #define PERCENT 0x25
 #define QUOTE 0x22
 
-// Chat colors
+// Chat Colors
 #define WHITE 0x01
 #define DARKRED 0x02
 #define PURPLE 0x03
@@ -83,7 +82,7 @@ The original version of this timer was by jonitaikaponi
 #define DEFAULT_TITLES_WHITELIST_PATH "configs/surftimer/default_titles_whitelist.txt"
 #define DEFAULT_TITLES_PATH "configs/surftimer/default_titles.txt"
 
-//fluffys
+// fluffys
 #define WR_FULL_SOUND_PATH "sound/surftimer/wr/1/valve_logo_music.mp3"
 #define WR_RELATIVE_SOUND_PATH "*surftimer/wr/1/valve_logo_music.mp3"
 #define WR2_FULL_SOUND_PATH "sound/surftimer/wr/2/valve_logo_music.mp3"
@@ -101,26 +100,27 @@ The original version of this timer was by jonitaikaponi
 #define VOTE_NO "###no###"
 #define VOTE_YES "###yes###"
 
-// Checkpoint definitions
-#define CPLIMIT 37			// Maximum amount of checkpoints in a map
+// Checkpoint Definitions
+#define CPLIMIT 37														// Maximum amount of checkpoints in a map
 
-// Zone definitions
+// Zone Definitions
 #define ZONE_MODEL "models/props/de_train/barrel.mdl"
-//fluffys zoneamount
-#define ZONEAMOUNT 12		// The amount of different type of zones	-	Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0), AntiJump(9), AntiDuck(10), MaxSpeed(11)
-#define MAXZONEGROUPS 12	// Maximum amount of zonegroups in a map
-#define MAXZONES 128		// Maximum amount of zones in a map
 
-// Ranking definitions
+// fluffys Zone Amount
+#define ZONEAMOUNT 12													// The amount of different type of zones	-	Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0), AntiJump(9), AntiDuck(10), MaxSpeed(11)
+#define MAXZONEGROUPS 12												// Maximum amount of zonegroups in a map
+#define MAXZONES 128													// Maximum amount of zones in a map
+
+// Ranking Definitions
 #define MAX_PR_PLAYERS 1066
 #define MAX_SKILLGROUPS 64
 
-// UI definitions
+// UI Definitions
 #define HIDE_RADAR (1 << 12)
 #define HIDE_CHAT ( 1<<7 )
 #define HIDE_CROSSHAIR 1<<8
 
-// Replay definitions
+// Replay Definitions
 #define BM_MAGIC 0xBAADF00D
 #define BINARY_FORMAT_VERSION 0x01
 #define ADDITIONAL_FIELD_TELEPORTED_ORIGIN (1<<0)
@@ -182,9 +182,9 @@ enum FileHeader
 
 enum MapZone
 {
-	zoneId,  				// ID within the map
-	zoneType,  				// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
-	zoneTypeId, 			// ID of the same type eg. Start-1, Start-2, Start-3...
+	zoneId,																// ID within the map
+	zoneType,															// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
+	zoneTypeId,															// ID of the same type eg. Start-1, Start-2, Start-3...
 	Float:PointA[3],
 	Float:PointB[3],
 	Float:CenterPoint[3],
@@ -202,13 +202,13 @@ enum SkillGroup
 {
 	PointsBot,
 	PointsTop,
-	PointReq,				// Points required for next skillgroup
+	PointReq,															// Points required for next skillgroup
 	RankBot,
 	RankTop,
 	RankReq,
-	String:RankName[128],	// Skillgroup name without colors
-	String:RankNameColored[128], // Skillgroup name with colors
-	String:NameColour[32]				// Colour to use for name if coloured chatnames is turned on
+	String:RankName[128],												// Skillgroup name without colors
+	String:RankNameColored[128], 										// Skillgroup name with colors
+	String:NameColour[32]												// Colour to use for name if coloured chatnames is turned on
 }
 
 /*===================================
@@ -217,16 +217,16 @@ enum SkillGroup
 
 public Plugin myinfo =
 {
-	name = "Surftimer",
+	name = "SurfTimer",
 	author = "fluffys",
-	description = "fork of cksurf",
+	description = "A fork of ckSurf",
 	version = VERSION,
 	url = "http://steamcommunity.com/profiles/76561198000303868/"
 };
 
-/*=================================
-=            Variables            =
-=================================*/
+/*===================================
+=             Variables             =
+===================================*/
 
 // Testing Variables
 float g_fTick[MAXPLAYERS + 1][2];
@@ -234,28 +234,28 @@ float g_fServerLoading[2];
 float g_fClientsLoading[MAXPLAYERS + 1][2];
 char g_szLogFile[PLATFORM_MAX_PATH];
 
-// pr command
+// PR Commands
 int g_iPrTarget[MAXPLAYERS + 1];
 int g_totalStagesPr[MAXPLAYERS + 1];
 int g_totalBonusesPr[MAXPLAYERS + 1];
 
-// speed gradient
+// Speed Gradient
 char g_szSpeedColour[MAXPLAYERS + 1];
 
-// show zones
+// Show Zones
 bool g_bShowZones[MAXPLAYERS + 1];
 
 /*----------  Stages  ----------*/
 int g_Stage[MAXZONEGROUPS][MAXPLAYERS + 1];						// Which stage is the client in
 bool g_bhasStages; 												// Does the map have stages
 
-/*----------  Spawn locations  ----------*/
+/*----------  Spawn Locations  ----------*/
 float g_fSpawnLocation[MAXZONEGROUPS][CPLIMIT][3];						// Spawn coordinates
 float g_fSpawnAngle[MAXZONEGROUPS][CPLIMIT][3];							// Spawn angle
 float g_fSpawnVelocity[MAXZONEGROUPS][CPLIMIT][3];						// Spawn velocity
 bool g_bGotSpawnLocation[MAXZONEGROUPS][CPLIMIT]; 						// Does zonegroup have a spawn location
 
-/*----------  Bonus variables  ----------*/
+/*----------  Bonus Variables  ----------*/
 char g_szBonusFastest[MAXZONEGROUPS][MAX_NAME_LENGTH]; 			// Name of the #1 in the current maps bonus
 char g_szBonusFastestTime[MAXZONEGROUPS][64]; 					// Fastest bonus time in 00:00:00:00 format
 float g_fPersonalRecordBonus[MAXZONEGROUPS][MAXPLAYERS + 1]; 	// Clients personal bonus record in the current map
@@ -270,7 +270,7 @@ int g_iBonusCount[MAXZONEGROUPS]; 								// Amount of players that have passed 
 int g_totalBonusCount; 											// How many total bonuses there are
 bool g_bhasBonus;												// Does map have a bonus?
 
-/*----------  Checkpoint variables  ----------*/
+/*----------  Checkpoint Variables  ----------*/
 float g_fCheckpointTimesRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT]; // Clients best run's times
 float g_fCheckpointTimesNew[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT]; // Clients current run's times
 float g_fCheckpointServerRecord[MAXZONEGROUPS][CPLIMIT]; 		// Server record checkpoint times
@@ -284,7 +284,7 @@ bool g_bCheckpointRecordFound[MAXZONEGROUPS];					// Map record checkpoints foun
 float g_fMaxPercCompleted[MAXPLAYERS + 1]; 						// The biggest % amount the player has reached in current map
 int g_iCurrentCheckpoint[MAXPLAYERS + 1];
 
-/*----------  Advert variables  ----------*/
+/*----------  Advert Variables  ----------*/
 int g_Advert; 													// Defines which advert to play
 
 /*----------  Maptier Variables  ----------*/
@@ -327,7 +327,7 @@ bool g_bVip[MAXPLAYERS + 1];
 bool g_bCheckCustomTitle[MAXPLAYERS + 1];
 bool g_bEnableJoinMsgs;
 char g_szCustomJoinMsg[MAXPLAYERS + 1][256];
-//char g_szCustomSounds[MAXPLAYERS + 1][3][256]; // 1 = PB Sound, 2 = Top 10 Sound, 3 = WR sound
+// char g_szCustomSounds[MAXPLAYERS + 1][3][256]; // 1 = PB Sound, 2 = Top 10 Sound, 3 = WR sound
 
 /*----------  Custom Titles  ----------*/
 char g_szCustomTitleColoured[MAXPLAYERS + 1][1024];
@@ -335,19 +335,19 @@ char g_szCustomTitle[MAXPLAYERS + 1][1024];
 bool g_bDbCustomTitleInUse[MAXPLAYERS + 1] = false;
 bool g_bdbHasCustomTitle[MAXPLAYERS + 1] = false;
 int g_iCustomColours[MAXPLAYERS + 1][2]; // 0 = name, 1 = text;
-//int g_idbCustomTextColour[MAXPLAYERS + 1] = 0;
+// int g_idbCustomTextColour[MAXPLAYERS + 1] = 0;
 bool g_bHasCustomTextColour[MAXPLAYERS + 1] = false;
 bool g_bCustomTitleAccess[MAXPLAYERS + 1] = false;
 bool g_bUpdatingColours[MAXPLAYERS + 1];
-//char g_szsText[MAXPLAYERS + 1];
+// char g_szsText[MAXPLAYERS + 1];
 
 /*----------  Profile Menu  ----------*/
 int g_BonusRecordCount[MAXPLAYERS + 1];
 int g_totalBonusTimes[MAXPLAYERS + 1];
-//Handle g_FinishedMapsMenu;
-int g_StageRecordCount[MAXPLAYERS + 1]; //to be used with sm_p, stage sr
+// Handle g_FinishedMapsMenu;
+int g_StageRecordCount[MAXPLAYERS + 1]; // to be used with sm_p, stage sr
 int g_totalStageTimes[MAXPLAYERS +1];
-//fluffys total bonus
+// fluffys total bonus
 int g_pr_BonusCount;
 int g_totalMapsCompleted[MAXPLAYERS + 1];
 int g_mapsCompletedLoop[MAXPLAYERS + 1];
@@ -367,33 +367,32 @@ float g_fCurrentWrcpRunTime[MAXPLAYERS + 1];
 int g_StageRank[MAXPLAYERS + 1][CPLIMIT];
 float g_fStageRecord[CPLIMIT];
 char g_szRecordStageTime[CPLIMIT];
-//char g_szRecordStagePlayer[CPLIMIT]; //will be used, need to fix query
-//char g_szRecordStageSteamID[CPLIMIT]; // will be used, neex to fix query
+// char g_szRecordStagePlayer[CPLIMIT]; // will be used, need to fix query
+// char g_szRecordStageSteamID[CPLIMIT]; // will be used, neex to fix query
 int g_TotalStageRecords[CPLIMIT];
 int g_TotalStages;
 float g_fWrcpMenuLastQuery[MAXPLAYERS + 1] = 1.0;
 bool g_bSelectWrcp[MAXPLAYERS + 1];
-//char g_StageSelect[MAXPLAYERS + 1]; //can't remember what this was for, keeping just in case
+// char g_StageSelect[MAXPLAYERS + 1]; // can't remember what this was for, keeping just in case
 int g_iWrcpMenuStyleSelect[MAXPLAYERS + 1];
 char g_szWrcpMapSelect[MAXPLAYERS + 1][128];
 bool g_bStageSRVRecord[MAXPLAYERS + 1][CPLIMIT];
 char g_szStageRecordPlayer[CPLIMIT][MAX_NAME_LENGTH];
-//.bool g_bFirstStageRecord[CPLIMIT];
+// bool g_bFirstStageRecord[CPLIMIT];
 
-/*----------  Map Settings variables ----------*/
-//float g_fStartPreSpeed;
-//float g_fBonusPreSpeed;
-//ConVar g_hStagePreSpeed[36] = null; 								// Stage zone speed cap
-//float g_fStagePreSpeed[36];
+/*----------  Map Settings Variables ----------*/
+// float g_fStartPreSpeed;
+// float g_fBonusPreSpeed;
+// ConVar g_hStagePreSpeed[36] = null; 								// Stage zone speed cap
+// float g_fStagePreSpeed[36];
 float g_fMaxVelocity;
 ConVar g_hMaxVelocity;
 float g_fAnnounceRecord;
 bool g_bGravityFix;
 ConVar g_hGravityFix;
 
-/*----------  Style variables
-0 = normal, 1 = SW, 2 = HSW, 3 = BW, 4 = Low-Gravity, 5 = Slow Motion, 6 = Fast Forward
-----------*/
+/*----------  Style Variables  ----------*/
+// 0 = normal, 1 = SW, 2 = HSW, 3 = BW, 4 = Low-Gravity, 5 = Slow Motion, 6 = Fast Forward
 int g_iCurrentStyle[MAXPLAYERS + 1];
 int g_iInitalStyle[MAXPLAYERS + 1];
 char g_szInitalStyle[MAXPLAYERS + 1][256];
@@ -402,7 +401,7 @@ bool g_bRankedStyle[MAXPLAYERS + 1];
 bool g_bFunStyle[MAXPLAYERS + 1];
 int g_KeyCount[MAXPLAYERS + 1] = 0;
 
-//map styles
+// Map Styles
 int g_StyleMapRank[MAX_STYLES][MAXPLAYERS + 1];
 int g_OldStyleMapRank[MAX_STYLES][MAXPLAYERS + 1];
 float g_fPersonalStyleRecord[MAX_STYLES][MAXPLAYERS + 1];
@@ -416,7 +415,7 @@ bool g_bStyleMapFirstRecord[MAX_STYLES][MAXPLAYERS + 1];
 bool g_bStyleMapPBRecord[MAX_STYLES][MAXPLAYERS + 1];
 bool g_bStyleMapSRVRecord[MAX_STYLES][MAXPLAYERS + 1];
 
-//bonus styles
+// Bonus Styles
 char g_szStyleBonusFastest[MAX_STYLES][MAXZONEGROUPS][MAX_NAME_LENGTH];
 char g_szStyleBonusFastestTime[MAX_STYLES][MAXZONEGROUPS][64];
 float g_fStylePersonalRecordBonus[MAX_STYLES][MAXZONEGROUPS][MAXPLAYERS + 1];
@@ -428,7 +427,7 @@ int g_StyleOldMapRankBonus[MAX_STYLES][MAXZONEGROUPS][MAXPLAYERS + 1];
 int g_StyletmpBonusCount[MAX_STYLES][MAXZONEGROUPS];
 int g_iStyleBonusCount[MAX_STYLES][MAXZONEGROUPS];
 
-//wrcp styles
+// WRCP Styles
 float g_fStyleStageRecord[MAX_STYLES][CPLIMIT];
 int g_StyleStageRank[MAX_STYLES][MAXPLAYERS + 1][CPLIMIT];
 int g_TotalStageStyleRecords[MAX_STYLES][CPLIMIT];
@@ -436,36 +435,36 @@ char g_szStyleStageRecordPlayer[MAX_STYLES][MAX_NAME_LENGTH][CPLIMIT];
 char g_szStyleRecordStageTime[MAX_STYLES][CPLIMIT];
 int g_StyleStageSelect[MAXPLAYERS + 1];
 
-//style Profiles
+// Style Profiles
 int g_ProfileStyleSelect[MAXPLAYERS + 1];
 int g_totalStyleMapTimes[MAXPLAYERS + 1];
 
-/*---------- Player Settings  ----------*/
+/*----------  Player Settings  ----------*/
 bool g_bTimerEnabled[MAXPLAYERS + 1];
 int g_SpeedGradient[MAXPLAYERS + 1];
 int g_SpeedMode[MAXPLAYERS + 1];
 bool g_bCenterSpeedDisplay[MAXPLAYERS + 1];
 int g_iCenterSpeedEnt[MAXPLAYERS + 1];
 int g_iSettingToLoad[MAXPLAYERS + 1];
-//Handle g_hServerTier;
+// Handle g_hServerTier;
 // gain/loss speed colour in centre hud
 int g_iPreviousSpeed[MAXPLAYERS + 1];
 
 /*----------  Sounds  ----------*/
 bool g_bTop10Time[MAXPLAYERS + 1] = false;
 
-//rate limiting commands
+// Rate Limiting Commands
 float g_fCommandLastUsed[MAXPLAYERS + 1];
 bool g_bRateLimit[MAXPLAYERS + 1];
 
-// mrank command
+// MRank Command
 char g_szRuntimepro[MAXPLAYERS + 1][32];
 int g_totalPlayerTimes[MAXPLAYERS + 1];
 
-// rank command
+// Rank Command
 int g_rankArg[MAXPLAYERS + 1];
 
-/* --------- ksf style ranking distribution ---------*/
+/*----------  KSF Style Ranking Distribution  ----------*/
 char g_szRankName[MAXPLAYERS + 1][32];
 int g_rankNameChatColour[MAXPLAYERS + 1];
 int g_GroupMaps[MAX_PR_PLAYERS + 1];
@@ -477,7 +476,7 @@ bool g_bProfileInServer[MAXPLAYERS + 1];
 bool g_bInBonus[MAXPLAYERS + 1];
 int g_iInBonus[MAXPLAYERS + 1];
 
-/* --------- ksf points system ---------*/
+/*----------  KSF Points System  ----------*/
 float g_Group1Pc = 0.03125;
 float g_Group2Pc = 0.0625;
 float g_Group3Pc = 0.125;
@@ -501,16 +500,16 @@ bool g_bToggleMapFinish[MAXPLAYERS + 1] = true;
 bool g_bRepeat[MAXPLAYERS + 1] = false;
 bool g_bNotTeleporting[MAXPLAYERS + 1] = true;
 
-// Client Side autobhop
+// Client Side Autobhop
 Handle g_hAutoBhop = INVALID_HANDLE;
 Handle g_hEnableBhop = INVALID_HANDLE;
 
 /*----------  Flag Varibles  ----------*/
-//ConVar g_hCustomTitlesFlag = null;
-//int g_CustomTitlesFlag;
-//bool g_bCustomTitlesFlag;
+// ConVar g_hCustomTitlesFlag = null;
+// int g_CustomTitlesFlag;
+// bool g_bCustomTitlesFlag;
 
-// UNIX times
+// UNIX Times
 int g_iPlayTimeAlive[MAXPLAYERS + 1];
 int g_iPlayTimeSpec[MAXPLAYERS + 1];
 int g_iPlayTimeAliveSession[MAXPLAYERS + 1];
@@ -519,28 +518,28 @@ int g_iTotalConnections[MAXPLAYERS + 1];
 
 Menu g_mTriggerMultipleMenu = null;
 
-// Editing zones
+// Editing Zones
 bool g_bEditZoneType[MAXPLAYERS + 1];							// If editing zone type
 char g_CurrentZoneName[MAXPLAYERS + 1][64];						// Selected zone's name
 float g_Positions[MAXPLAYERS + 1][2][3];						// Selected zone's position
 float g_fBonusStartPos[MAXPLAYERS + 1][2][3];					// Bonus start zone position
 float g_fBonusEndPos[MAXPLAYERS + 1][2][3];						// Bonus end zone positions
-float g_AvaliableScales[5] =  { 1.0, 5.0, 10.0, 50.0, 100.0 };	// Scaling options
+float g_AvaliableScales[5] = { 1.0, 5.0, 10.0, 50.0, 100.0 };	// Scaling options
 int g_CurrentSelectedZoneGroup[MAXPLAYERS + 1];					// Currently selected zonegroup
 int g_CurrentZoneTeam[MAXPLAYERS + 1];							// Current zone team TODO: Remove
 int g_CurrentZoneVis[MAXPLAYERS + 1];							// Current zone visibility per team TODO: Remove
 int g_CurrentZoneType[MAXPLAYERS + 1];							// Currenyly selected zone's type
 int g_Editing[MAXPLAYERS + 1];									// What state of editing is happening eg. editing, creating etc.
-int g_ClientSelectedZone[MAXPLAYERS + 1] =  { -1, ... };		// Currently selected zone id
+int g_ClientSelectedZone[MAXPLAYERS + 1] = { -1, ... };			// Currently selected zone id
 int g_ClientSelectedScale[MAXPLAYERS + 1];						// Currently selected scale
 int g_ClientSelectedPoint[MAXPLAYERS + 1];						// Currently selected point
 int g_CurrentZoneTypeId[MAXPLAYERS + 1];						// Currently selected zone's type ID
 bool g_ClientRenamingZone[MAXPLAYERS + 1];						// Is client renaming zone?
-int beamColorT[] =  { 255, 0, 0, 255 };							// Zone team colors TODO: remove
-int beamColorCT[] =  { 0, 0, 255, 255 };
-int beamColorN[] =  { 255, 255, 0, 255 };
-int beamColorM[] =  { 0, 255, 0, 255 };
-char g_szZoneDefaultNames[ZONEAMOUNT][128] =  { "Stop", "Start", "End", "Stage", "Checkpoint", "SpeedStart", "TeleToStart", "Validator", "Checker", "AntiJump", "AntiDuck", "MaxSpeed" }; // Default zone names //fluffys
+int beamColorT[] = { 255, 0, 0, 255 };							// Zone team colors TODO: remove
+int beamColorCT[] = { 0, 0, 255, 255 };
+int beamColorN[] = { 255, 255, 0, 255 };
+int beamColorM[] = { 0, 255, 0, 255 };
+char g_szZoneDefaultNames[ZONEAMOUNT][128] = { "Stop", "Start", "End", "Stage", "Checkpoint", "SpeedStart", "TeleToStart", "Validator", "Checker", "AntiJump", "AntiDuck", "MaxSpeed" }; // Default zone names // fluffys
 int g_BeamSprite;												// Zone sprites
 int g_HaloSprite;
 
@@ -637,7 +636,7 @@ Handle g_hTeleport = null; 										// Used to track teleportations
 Handle g_hRecording[MAXPLAYERS + 1]; 							// Client is beign recorded
 Handle g_hLoadedRecordsAdditionalTeleport = null;
 Handle g_hRecordingAdditionalTeleport[MAXPLAYERS + 1];
-Handle g_hBotMimicsRecord[MAXPLAYERS + 1] =  { null, ... }; 	// Is mimicing a record
+Handle g_hBotMimicsRecord[MAXPLAYERS + 1] = { null, ... }; 	// Is mimicing a record
 Handle g_hBotTrail[2] = { null, null };							// Timer to refresh bot trails
 float g_fInitialPosition[MAXPLAYERS + 1][3]; 					// Replay start position
 float g_fInitialAngles[MAXPLAYERS + 1][3]; 						// Replay start angle
@@ -645,13 +644,13 @@ bool g_bValidTeleportCall[MAXPLAYERS + 1]; 						// Is teleport valid?
 bool g_bNewReplay[MAXPLAYERS + 1]; 								// Don't allow starting a new run if saving a record run
 bool g_bNewBonus[MAXPLAYERS + 1]; 								// Don't allow starting a new run if saving a record run
 bool g_createAdditionalTeleport[MAXPLAYERS + 1];
-int g_BotMimicRecordTickCount[MAXPLAYERS + 1] =  { 0, ... };
-int g_BotActiveWeapon[MAXPLAYERS + 1] =  { -1, ... };
+int g_BotMimicRecordTickCount[MAXPLAYERS + 1] = { 0, ... };
+int g_BotActiveWeapon[MAXPLAYERS + 1] = { -1, ... };
 int g_CurrentAdditionalTeleportIndex[MAXPLAYERS + 1];
 int g_RecordedTicks[MAXPLAYERS + 1];
 int g_RecordPreviousWeapon[MAXPLAYERS + 1];
 int g_OriginSnapshotInterval[MAXPLAYERS + 1];
-int g_BotMimicTick[MAXPLAYERS + 1] =  { 0, ... };
+int g_BotMimicTick[MAXPLAYERS + 1] = { 0, ... };
 int g_RecordBot = -1; 											// Record bot client ID
 int g_BonusBot = -1; 											// Bonus bot client ID
 int g_InfoBot = -1; 											// Info bot client ID
@@ -708,7 +707,6 @@ char g_szCountryCode[MAXPLAYERS + 1][16];						// Country codes
 char g_szSteamID[MAXPLAYERS + 1][32];							// Client's steamID
 char g_BlockedChatText[256][256];								// Blocked chat commands
 float g_fLastOverlay[MAXPLAYERS + 1];							// Last time an overlay was displayed
-
 
 /*----------  Player location restoring  ----------*/
 bool g_bPositionRestored[MAXPLAYERS + 1]; 						// Clients location was restored this run
@@ -769,11 +767,11 @@ bool g_bCreatedTeleport[MAXPLAYERS + 1];						// Client has created atleast one 
 bool g_bPracticeMode[MAXPLAYERS + 1]; 							// Client is in the practice mode
 
 /*----------  Store Server IP   ----------*/
-//char jakeeyIP[16];
+// char jakeeyIP[16];
 
 /*----------  Reports  ----------*/
 bool g_bReportSuccess[MAXPLAYERS + 1];
-//char g_sServerInfo[3][32]; // We can store more info later if we need 2
+// char g_sServerInfo[3][32]; // We can store more info later if we need 2
 
 // old challenge variables might need just incase
 float g_fSpawnPosition[MAXPLAYERS + 1][3];
@@ -828,7 +826,7 @@ int g_iTriggerTransmitCount;
 bool g_bShowTriggers[MAXPLAYERS + 1];
 int g_Offset_m_fEffects = -1;
 
-/*--------- !startpos Goose-----------*/
+/*----------  !startpos Goose  ----------*/
 float g_fStartposLocation[MAXPLAYERS + 1][MAXZONEGROUPS][3];
 float g_fStartposAngle[MAXPLAYERS + 1][MAXZONEGROUPS][3];
 bool g_bStartposUsed[MAXPLAYERS + 1][MAXZONEGROUPS];
@@ -864,7 +862,7 @@ float g_fClientCPs[MAXPLAYERS + 1][36];
 float g_fTargetTime[MAXPLAYERS + 1];
 char g_szTargetCPR[MAXPLAYERS + 1][MAX_NAME_LENGTH];
 char g_szCPRMapName[MAXPLAYERS + 1][128];
-//float g_fTargetCPs[MAXPLAYERS + 1][35];
+// float g_fTargetCPs[MAXPLAYERS + 1][35];
 
 // surf_christmas2
 bool g_bUsingStageTeleport[MAXPLAYERS + 1];
@@ -884,9 +882,13 @@ int g_iWaitingForResponse[MAXPLAYERS + 1];
 // Trigger List so we can store the names of the triggers before we rename them 
 Handle g_TriggerMultipleList;
 
-/*=========================================
-=            Predefined arrays            =
-=========================================*/
+// Chat Prefix
+char g_szChatPrefix[64];
+ConVar g_hChatPrefix = null;
+
+/*===================================
+=         Predefined Arrays         =
+===================================*/
 
 char g_sz10000mvGradient[][] =
 {
@@ -1048,28 +1050,25 @@ char g_szStyleMenuPrint[][] =
 	"Fast Forward"
 };
 
-char EntityList[][] =  // Disable entities that often break maps
+char EntityList[][] = 													// Disable entities that often break maps
 {
 	"logic_timer",
 	"team_round_timer",
 	"logic_relay",
 };
 
-char RadioCMDS[][] =  // Disable radio commands
+char RadioCMDS[][] = 													// Disable radio commands
 {
 	"coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", "fallback", "sticktog",
 	"getinpos", "stormfront", "report", "roger", "enemyspot", "needbackup", "sectorclear", "inposition",
 	"reportingin", "getout", "negative", "enemydown", "cheer", "thanks", "nice", "compliment"
 };
 
-/*=====  End of Declarations  ======*/
+/*======  End of Declarations  ======*/
 
-
-
-
-/*================================
-=            Includes            =
-================================*/
+/*====================================
+=              Includes              =
+====================================*/
 
 #include "surftimer/convars.sp"
 #include "surftimer/misc.sp"
@@ -1087,11 +1086,9 @@ char RadioCMDS[][] =  // Disable radio commands
 #include "surftimer/cvote.sp"
 #include "surftimer/vip.sp"
 
-
-
-/*==============================
-=            Events            =
-==============================*/
+/*====================================
+=               Events               =
+====================================*/
 
 public void OnLibraryAdded(const char[] name)
 {
@@ -1101,7 +1098,7 @@ public void OnLibraryAdded(const char[] name)
 	if (tmp != null)
 		CloseHandle(tmp);
 
-	//botmimic 2
+	// botmimic 2
 	if (StrEqual(name, "dhooks") && g_hTeleport == null)
 	{
 		// Optionally setup a hook on CBaseEntity::Teleport to keep track of sudden place changes
@@ -1132,7 +1129,7 @@ public void OnLibraryAdded(const char[] name)
 
 public void OnPluginEnd()
 {
-	//remove clan tags
+	// remove clan tags
 	for (int x = 1; x <= MaxClients; x++)
 	{
 		if (IsValidClient(x))
@@ -1146,14 +1143,13 @@ public void OnPluginEnd()
 	}
 
 
-	//set server convars back to default
+	// set server convars back to default
 	ServerCommand("sm_cvar sv_enablebunnyhopping 0;sv_friction 5.2;sv_accelerate 5.5;sv_airaccelerate 10;sv_maxvelocity 2000;sv_staminajumpcost .08;sv_staminalandcost .050");
 	ServerCommand("mp_respawn_on_death_ct 0;mp_respawn_on_death_t 0;mp_respawnwavetime_ct 10.0;mp_respawnwavetime_t 10.0;bot_zombie 0;mp_ignore_round_win_conditions 0");
 	ServerCommand("sv_infinite_ammo 0;mp_endmatch_votenextmap 1;mp_do_warmup_period 1;mp_warmuptime 60;mp_match_can_clinch 1;mp_match_end_changelevel 0");
 	ServerCommand("mp_match_restart_delay 15;mp_endmatch_votenextleveltime 20;mp_endmatch_votenextmap 1;mp_halftime 0;mp_do_warmup_period 1;mp_maxrounds 0;bot_quota 0");
 	ServerCommand("mp_startmoney 800; mp_playercashawards 1; mp_teamcashawards 1");
 }
-
 
 public void OnLibraryRemoved(const char[] name)
 {
@@ -1203,7 +1199,6 @@ public void OnMapStart()
 	int lastPiece = ExplodeString(g_szMapName, "/", mapPieces, sizeof(mapPieces), sizeof(mapPieces[]));
 	Format(g_szMapName, sizeof(g_szMapName), "%s", mapPieces[lastPiece - 1]);
 
-
 	/** Start Loading Server Settings:
 	* 1. Load zones (db_selectMapZones)
 	* 2. Get map record time (db_GetMapRecord_Pro)
@@ -1219,7 +1214,7 @@ public void OnMapStart()
 	* 12. Get spawn locations (db_selectSpawnLocations)
 	* 13. Clear latest records (db_ClearLatestRecords)
 	* 14. Get dynamic timelimit (db_GetDynamicTimelimit)
-	//fluffys
+	// fluffys
 	* 15. Get total amount of stages on the map (db_GetTotalStages)
 	* -> loadAllClientSettings
 	*/
@@ -1233,25 +1228,25 @@ public void OnMapStart()
 		db_selectMapZones();
 	}
 
-	//fluffys
-	//db_GetTotalStages();
+	// fluffys
+	// db_GetTotalStages();
 
-	//db_selectTotalBonusCount();
-	//db_selectTotalStageCount();
+	// db_selectTotalBonusCount();
+	// db_selectTotalStageCount();
 
-	//db_selectCurrentMapImprovement();
+	// db_selectCurrentMapImprovement();
 
-	//get map tag
+	// Get Map Tag
 	ExplodeString(g_szMapName, "_", g_szMapPrefix, 2, 32);
 
-	//sv_pure 1 could lead to problems with the ckSurf models
+	// sv_pure 1 could lead to problems with the ckSurf models
 	ServerCommand("sv_pure 0");
 
-	//reload language files
+	// reload language files
 	LoadTranslations("surftimer.phrases");
 
 	// load configs
-	//loadCustomTitles();
+	// loadCustomTitles();
 
 	CheatFlag("bot_zombie", false, true);
 	g_bTierFound = false;
@@ -1261,28 +1256,26 @@ public void OnMapStart()
 		g_bCheckpointRecordFound[i] = false;
 	}
 
-	//precache
+	// Precache
 	InitPrecache();
 	SetCashState();
 
-	//timers
+	// Timers
 	CreateTimer(0.1, CKTimer1, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 	CreateTimer(1.0, CKTimer2, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 	CreateTimer(60.0, AttackTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 	CreateTimer(600.0, PlayerRanksTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 	g_hZoneTimer = CreateTimer(GetConVarFloat(g_hChecker), BeamBoxAll, _, TIMER_REPEAT);
 
-	//AutoBhop?
+	// AutoBhop???
 	if (GetConVarBool(g_hAutoBhopConVar))
 		g_bAutoBhop = true;
 	else
 		g_bAutoBhop = false;
 
-
-	//main.cfg & replays
+	// main.cfg & replays
 	CreateTimer(1.0, DelayedStuff, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 	CreateTimer(10.0, LoadReplaysTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
-
 
 	if (g_bLateLoaded)
 		OnAutoConfigsBuffered();
@@ -1309,14 +1302,14 @@ public void OnMapStart()
 		SDKHook(iEnt, SDKHook_EndTouch, OnEndTouchPushTrigger);
 	}
 
-	//fluffys gravity
+	// fluffys gravity
 	iEnt = -1;
 	while ((iEnt = FindEntityByClassname(iEnt, "trigger_gravity")) != -1)
 	{
 		SDKHook(iEnt, SDKHook_EndTouch, OnEndTouchGravityTrigger);
 	}
 
-	// hook zones
+	// Hook Zones
 	iEnt = -1;
 	if (g_hTriggerMultiple != null)
 		CloseHandle(g_hTriggerMultiple);
@@ -1366,7 +1359,7 @@ public void OnMapStart()
 	// 	SDKHook(iEnt, SDKHook_EndTouch, OnEndTouchAllTriggers);
 	// }
 
-	//OnConfigsExecuted();
+	// OnConfigsExecuted();
 
 	// Set default values
 	g_fMapStartTime = GetGameTime();
@@ -1379,7 +1372,7 @@ public void OnMapStart()
 	// Playtime
 	CreateTimer(1.0, PlayTimeTimer, INVALID_HANDLE, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 	
-	if(FindPluginByFile("store.smx")!=INVALID_HANDLE)
+	if (FindPluginByFile("store.smx")!=INVALID_HANDLE)
 		LogMessage("Store plugin has been found! Timer credits enabled.");
 	else 
 	{
@@ -1400,7 +1393,7 @@ public void OnMapStart()
 
 public void OnMapEnd()
 {
-	//ServerCommand("sm_updater_force");
+	// ServerCommand("sm_updater_force");
 	g_bEnableJoinMsgs = false;
 	g_bServerDataLoaded = false;
 	g_bHasLatestID = false;
@@ -1426,14 +1419,14 @@ public void OnMapEnd()
 
 	Format(g_szMapName, sizeof(g_szMapName), "");
 
-	//fluffys wrcps
+	// fluffys wrcps
 	for (int client = 1; client <= MAXPLAYERS; client++)
 	{
 		g_fWrcpMenuLastQuery[client] = 0.0;
 		g_bWrcpTimeractivated[client] = false;
 	}
 
-	// hook zones
+	// Hook Zones
 	if (g_hTriggerMultiple != null)
 	{
 		ClearArray(g_hTriggerMultiple);
@@ -1447,7 +1440,7 @@ public void OnMapEnd()
 
 	if (g_hStore != null)
 		CloseHandle(g_hStore);
-	
+
 	if (g_hDestinations != null)
 		CloseHandle(g_hDestinations);
 
@@ -1462,7 +1455,7 @@ public void OnConfigsExecuted()
 		readMapycycle();
 	else
 		readMultiServerMapcycle();
-	
+
 	if (GetConVarBool(g_hEnforceDefaultTitles))
 		ReadDefaultTitlesWhitelist();
 
@@ -1495,10 +1488,9 @@ public void OnConfigsExecuted()
 	}
 }
 
-
 public void OnAutoConfigsBuffered()
 {
-	//just to be sure that it's not empty
+	// just to be sure that it's not empty
 	char szMap[128];
 	char szPrefix[2][32];
 	GetCurrentMap(szMap, 128);
@@ -1507,8 +1499,7 @@ public void OnAutoConfigsBuffered()
 	Format(szMap, sizeof(szMap), "%s", mapPieces[lastPiece - 1]);
 	ExplodeString(szMap, "_", szPrefix, 2, 32);
 
-
-	//map config
+	// map config
 	char szPath[256];
 	Format(szPath, sizeof(szPath), "sourcemod/surftimer/map_types/%s_.cfg", szPrefix[0]);
 	char szPath2[256];
@@ -1524,10 +1515,10 @@ public void OnClientPutInServer(int client)
 	if (!IsValidClient(client))
 	return;
 
-	//defaults
+	// Defaults
 	SetClientDefaults(client);
 
-	//SDKHooks
+	// SDKHooks
 	SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
 	SDKHook(client, SDKHook_PostThinkPost, Hook_PostThinkPost);
 	SDKHook(client, SDKHook_OnTakeDamage, Hook_OnTakeDamage);
@@ -1544,7 +1535,7 @@ public void OnClientPutInServer(int client)
 	g_bReportSuccess[client] = false;
 	g_fCommandLastUsed[client] = 0.0;
 
-	//fluffys set bools
+	// fluffys set bools
 	g_bToggleMapFinish[client] = true;
 	g_bRepeat[client] = false;
 	g_bNotTeleporting[client] = false;
@@ -1563,19 +1554,19 @@ public void OnClientPutInServer(int client)
 	else
 		g_MVPStars[client] = 0;
 
-	//client country
+	// Client Country
 	GetCountry(client);
 
 	if (LibraryExists("dhooks"))
 	DHookEntity(g_hTeleport, false, client);
 
-	//get client steamID
+	// Get SteamID
 	GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], MAX_NAME_LENGTH, true);
 
-	// ' char fix
+	// char fix
 	FixPlayerName(client);
 
-	//position restoring
+	// Position Restoring
 	if (GetConVarBool(g_hcvarRestore) && !g_bRenaming && !g_bInTransactionChain)
 	db_selectLastRun(client);
 
@@ -1642,7 +1633,7 @@ public void OnClientAuthorized(int client)
 			{
 				if (IsValidClient(i) && i != client)
 				{
-					PrintToChat(i, "%t", "Connected1", WHITE, MOSSGREEN, s_clientName, WHITE);
+					CPrintToChat(i, "%t", "Connected1", s_clientName);
 				}
 			}
 		}
@@ -1652,7 +1643,7 @@ public void OnClientAuthorized(int client)
 			{
 				if (IsValidClient(i) && i != client)
 				{
-					PrintToChat(i, "%t", "Connected2", WHITE, MOSSGREEN, s_clientName, WHITE, GREEN, s_Country);
+					CPrintToChat(i, "%t", "Connected2", s_clientName, s_Country);
 				}
 			}
 		}
@@ -1709,7 +1700,7 @@ public void OnClientDisconnect(int client)
 		return;
 	}
 
-	//Database
+	// Database
 	if (IsValidClient(client) && !g_bRenaming)
 	{
 		if (!g_bIgnoreZone[client] && !g_bPracticeMode[client])
@@ -1733,6 +1724,10 @@ public void OnClientDisconnect(int client)
 
 public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] newValue)
 {
+	if (convar == g_hChatPrefix)
+	{
+		GetConVarString(g_hChatPrefix, g_szChatPrefix, sizeof(g_szChatPrefix));
+	}
 	if (convar == g_hReplayBot)
 	{
 		if (GetConVarBool(g_hReplayBot))
@@ -2185,7 +2180,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 		AdminFlag flag;
 		bool validFlag;
 		validFlag = FindFlagByChar(newValue[0], flag);
-		
+
 		if (!validFlag)
 		{
 			LogError("Surftimer | Invalid flag for ck_vip_flag");
@@ -2201,16 +2196,14 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 		g_hZoneTimer = INVALID_HANDLE;
 	}
 
-
 	g_hZoneTimer = CreateTimer(GetConVarFloat(g_hChecker), BeamBoxAll, _, TIMER_REPEAT);
-
 }
 
 public void OnPluginStart()
 {
 	g_bServerDataLoaded = false;
 
-	//language file
+	// Language File
 	LoadTranslations("surftimer.phrases");
 
 	CreateConVars();
@@ -2220,27 +2213,27 @@ public void OnPluginStart()
 
 	db_setupDatabase();
 
-	//exec surftimer.cfg
+	// exec surftimer.cfg
 	AutoExecConfig(true, "surftimer");
 
-	//mic
+	// mic
 	g_ownerOffset = FindSendPropInfo("CBaseCombatWeapon", "m_hOwnerEntity");
 	g_ragdolls = FindSendPropInfo("CCSPlayer", "m_hRagdoll");
 
-	//add to admin menu
+	// add to admin menu
 	Handle tpMenu;
 	if (LibraryExists("adminmenu") && ((tpMenu = GetAdminTopMenu()) != null))
 		OnAdminMenuReady(tpMenu);
 
-	//mapcycle array
+	// mapcycle array
 	int arraySize = ByteCountToCells(PLATFORM_MAX_PATH);
 	g_MapList = CreateArray(arraySize);
 
 	// default titles whitelist array
 	g_DefaultTitlesWhitelist = CreateArray();
 
-	//button sound hook
-	//AddNormalSoundHook(NormalSHook_callback);
+	// button sound hook
+	// AddNormalSoundHook(NormalSHook_callback);
 
 	// Botmimic 2
 	// https://forums.alliedmods.net/showthread.php?t=180114
@@ -2307,13 +2300,12 @@ public void OnAllPluginsLoaded()
 	// Check if store is running
 	g_hStore = FindPluginByFile("store.smx");
 }
-/*=====  End of Events  ======*/
 
+/*======  End of Events  ======*/
 
-
-/*===============================
-=            Natives            =
-===============================*/
+/*===================================
+=              Natives              =
+===================================*/
 
 public int Native_GetTimerStatus(Handle plugin, int numParams)
 {
@@ -2389,8 +2381,9 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	return APLRes_Success;
 }
 
-/*=====  End of Natives  ======*/
+/*======  End of Natives  ======*/
+
 public Action ItemFoundMsg(UserMsg msg_id, Handle pb, const players[], any playersNum, any reliable, any init)
 {
-    return Plugin_Handled;
+	return Plugin_Handled;
 }

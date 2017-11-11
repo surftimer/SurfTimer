@@ -5,20 +5,20 @@ public void Admin_renameZone(int client, const char[] name)
 		g_ClientRenamingZone[client] = false;
 		return;
 	}
-	//avoid unnecessary calls by checking the first cell first. If it's 0 -> \0 then negating it will make the if check pass -> return
+	// avoid unnecessary calls by checking the first cell first. If it's 0 -> \0 then negating it will make the if check pass -> return
 	if (!name[0] || StrEqual(name, " ") || StrEqual(name, ""))
 	{
-		PrintToChat(client, " %cSurftimer %c| Please give the zone a valid name.", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin1", g_szChatPrefix);
 		return;
 	}
 	if (strlen(name) > 128)
 	{
-		PrintToChat(client, " %cSurftimer %c| Zone name too long. Maximum is 128 characters.", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin2", g_szChatPrefix);
 		return;
 	}
-	if (StrEqual(name, "!cancel", false)) //false -> non sensitive
+	if (StrEqual(name, "!cancel", false)) // false -> non sensitive
 	{
-		PrintToChat(client, " %cSurftimer %c| Cancelled bonus renaming.", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin3", g_szChatPrefix);
 		g_ClientRenamingZone[client] = false;
 		ListBonusSettings(client);
 		return;
@@ -57,13 +57,13 @@ public Action Admin_insertMapTier(int client, int args)
 
 	if (!(GetUserFlagBits(client) & g_ZonerFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT) && !g_bZoner[client])
 	{
-		PrintToChat(client, " %cSurftimer %c| You don't have access to the zones menu.", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin4", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 
 	if (args == 0)
 	{
-		ReplyToCommand(client, " %cSurftimer%c | Usage: sm_addmaptier <Tier>", LIMEGREEN, WHITE);
+		CReplyToCommand(client, "%t", "Admin5", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 	else
@@ -75,7 +75,7 @@ public Action Admin_insertMapTier(int client, int args)
 		if (tier < 7 && tier > 0)
 			db_insertMapTier(tier);
 		else
-			PrintToChat(client, " %cSurftimer %c| Invalid tier number. Please choose a tier number between 1-6.", LIMEGREEN, WHITE);
+			CPrintToChat(client, "%t", "Admin6", g_szChatPrefix);
 	}
 	return Plugin_Handled;
 }
@@ -101,12 +101,12 @@ public Action Admin_insertSpawnLocation(int client, int args)
 	if (g_bGotSpawnLocation[g_iClientInZone[client][2]][1])
 	{
 		db_updateSpawnLocations(SpawnLocation, SpawnAngle, Velocity, g_iClientInZone[client][2]);
-		PrintToChat(client, " %cSurftimer %c| Spawnpoint edited", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin7", g_szChatPrefix);
 	}
 	else
 	{
 		db_insertSpawnLocations(SpawnLocation, SpawnAngle, Velocity, g_iClientInZone[client][2]);
-		PrintToChat(client, " %cSurftimer %c| Spawnpoint added", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin8", g_szChatPrefix);
 	}
 
 	return Plugin_Handled;
@@ -123,10 +123,10 @@ public Action Admin_deleteSpawnLocation(int client, int args)
 	if (g_bGotSpawnLocation[g_iClientInZone[client][2]][1])
 	{
 		db_deleteSpawnLocations(g_iClientInZone[client][2]);
-		PrintToChat(client, " %cSurftimer %c| Spawnpoint deleted", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin9", g_szChatPrefix);
 	}
 	else
-		PrintToChat(client, " %cSurftimer %c| No spawnpoint to delete!", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin9", g_szChatPrefix);
 
 	return Plugin_Handled;
 }
@@ -149,16 +149,16 @@ public Action Admin_ckPanel(int client, int args)
 	ckAdminMenu(client);
 	if ((GetUserFlagBits(client) & g_AdminMenuFlag))
 	{
-		PrintToChat(client, " %cSurftimer %c| See console for more commands", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin10", g_szChatPrefix);
 		PrintToConsole(client, "\n[Surftimer Admin]\n");
 		PrintToConsole(client, "\n sm_refreshprofile <steamid> (recalculates player profile for given steamid)\n sm_deleteproreplay <mapname> (Deletes pro replay file for a given map)\n sm_deletetpreplay <mapname> (Deletes tp replay file for a given map)\n ");
 		PrintToConsole(client, "\n sm_zones (Open up the zonee modification menu)\n sm_insertmapzones (Inserts premade map zones into the servers database. ONLY RUN THIS ONCE!)\n sm_insertmaptiers (Inserts premade map tier information into the servers database. ONLY RUN THIS ONCE!)\n");
 		PrintToConsole(client, "[PLAYER RANKING]\n sm_resetranks (Drops playerrank table)\n sm_resetextrapoints (Resets given extra points for all players)\n");
 		PrintToConsole(client, "[PLAYER TIMES]\n sm_resettimes (Drops playertimes table)\n sm_resetmaptimes <map> (Resets player times for given map)\n sm_resetplayertimes <steamid> [<map>] (Resets players times + extra points for given steamid with or without given map.)\n");
-		PrintToConsole(client, " sm_resetplayertime <steamid> <map> (Resets map time for given steamid and map)\n");
+		PrintToConsole(client, "sm_resetplayertime <steamid> <map> (Resets map time for given steamid and map)\n");
 		PrintToConsole(client, "sm_deletecheckpoints (Deletes all checkpoint times in the current map)\n sm_deletebonus (Deletes all bonus times in the current map)\n \n");
-
 	}
+	
 	return Plugin_Handled;
 }
 
@@ -169,7 +169,7 @@ public void ckAdminMenu(int client)
 
 	if (!(GetUserFlagBits(client) & g_AdminMenuFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT))
 	{
-		PrintToChat(client, " %cSurftimer %c| You don't have access to the admin menu.", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin11", g_szChatPrefix);
 		return;
 	}
 
@@ -386,7 +386,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 			{
 				if (!g_pr_RankingRecalc_InProgress)
 				{
-					PrintToChat(param1, "%t", "PrUpdateStarted", LIMEGREEN, WHITE);
+					CPrintToChat(param1, "%t", "PrUpdateStarted", g_szChatPrefix);
 					g_bManualRecalc = true;
 					g_pr_Recalc_AdminID = param1;
 					RefreshPlayerRankTable(MAX_PR_PLAYERS);
@@ -397,7 +397,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 						g_bProfileRecalc[i] = false;
 					g_bManualRecalc = false;
 					g_pr_RankingRecalc_InProgress = false;
-					PrintToChat(param1, "%t", "StopRecalculation", LIMEGREEN, WHITE);
+					CPrintToChat(param1, "%t", "StopRecalculation", g_szChatPrefix);
 				}
 			}
 
@@ -578,7 +578,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 
 	if (action == MenuAction_End)
 	{
-		//test
+		// Test
 		if (IsValidClient(param1))
 		{
 			if (menu != null)
@@ -591,7 +591,7 @@ public Action Admin_RefreshProfile(int client, int args)
 {
 	if (args == 0)
 	{
-		ReplyToCommand(client, " %cSurftimer%c | Usage: sm_refreshprofile <steamid>", LIMEGREEN, WHITE);
+		CReplyToCommand(client, "%t", "Admin12", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 	if (args > 0)

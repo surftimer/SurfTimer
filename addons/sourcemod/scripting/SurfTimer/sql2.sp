@@ -1,4 +1,4 @@
-//sm_pr command
+// sm_pr command
 public void db_viewPlayerPr(int client, char szSteamId[32], char szMapName[128])
 {
 	char szQuery[1024];
@@ -13,7 +13,7 @@ public void db_viewPlayerPr(int client, char szSteamId[32], char szMapName[128])
 	StringToUpper(szUpper);
 	StringToUpper(szUpper2);
 
-	if(StrEqual(szUpper, szUpper2)) // is the mapname the current map?
+	if (StrEqual(szUpper, szUpper2)) // is the mapname the current map?
 	{
 		WritePackString(pack, szMapName);
 		WritePackCell(pack, g_TotalStages);
@@ -54,7 +54,7 @@ public void SQL_ViewMapNamePrCallback(Handle owner, Handle hndl, const char[] er
 	else
 	{
 		CloseHandle(pack);
-		PrintToChat(client, " %cSurftimer %c| Map not found");
+		CPrintToChat(client, "%t", "SQLTwo1", g_szChatPrefix);
 	}
 }
 
@@ -92,7 +92,6 @@ public void SQL_ViewPlayerPrMapInfoCallback(Handle owner, Handle hndl, const cha
 		CloseHandle(pack);
 	}
 }
-
 
 public void SQL_ViewPlayerPrMaptimeCallback(Handle owner, Handle hndl, const char[] error, any pack)
 {
@@ -137,7 +136,7 @@ public void SQL_ViewPlayerPrMaptimeCallback(Handle owner, Handle hndl, const cha
 		time = -1.0;
 	}
 
-	//PrintToChat(client, "total: %i , runtimepro: %f", total, time);
+	// CPrintToChat(client, "total: %i , runtimepro: %f", total, time);
 
 	WritePackFloat(pack, time);
 	WritePackCell(pack, total);
@@ -267,9 +266,7 @@ public int PrMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 	}
 }
 
-//
 // VIP
-//
 
 // fluffys start vip & admins
 
@@ -413,7 +410,7 @@ public void SQL_checkCustomPlayerNameColourCallback(Handle owner, Handle hndl, c
 	}
 	else
 	{
-		PrintToChat(client, "You must set a custom title using sm_mytitle before you can set your name colour.");
+		CPrintToChat(client, "%t", "SQLTwo2", g_szChatPrefix);
 	}
 }
 
@@ -451,7 +448,7 @@ public void SQL_checkCustomPlayerTextColourCallback(Handle owner, Handle hndl, c
 	}
 	else
 	{
-		PrintToChat(client, "You must set a custom title using sm_mytitle before you can set your text colour.");
+		CPrintToChat(client, "%t", "SQLTwo3", g_szChatPrefix);
 	}
 }
 
@@ -509,7 +506,6 @@ public void db_updateCustomPlayerNameColour(int client, char[] szSteamID, char[]
 	WritePackCell(pack, client);
 	WritePackString(pack, szSteamID);
 
-
 	char szQuery[512];
 	Format(szQuery, 512, "UPDATE `ck_vipadmins` SET `namecolour` = '%s' WHERE `steamid` = '%s';", arg, szSteamID);
 	SQL_TQuery(g_hDb, SQL_updateCustomPlayerNameColourCallback, szQuery, pack, DBPrio_Low);
@@ -532,7 +528,6 @@ public void db_updateCustomPlayerTextColour(int client, char[] szSteamID, char[]
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackString(pack, szSteamID);
-
 
 	char szQuery[512];
 	Format(szQuery, 512, "UPDATE `ck_vipadmins` SET `textcolour` = '%s' WHERE `steamid` = '%s';", arg, szSteamID);
@@ -558,7 +553,7 @@ public void db_toggleCustomPlayerTitle(int client, char[] szSteamID)
 	WritePackString(pack, szSteamID);
 
 	char szQuery[512];
-	if(g_bDbCustomTitleInUse[client])
+	if (g_bDbCustomTitleInUse[client])
 	{
 		Format(szQuery, 512, "UPDATE `ck_vipadmins` SET `inuse` = '0' WHERE `steamid` = '%s';", szSteamID);
 	}
@@ -619,7 +614,7 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 		g_bdbHasCustomTitle[client] = true;
 		SQL_FetchString(hndl, 0, g_szCustomTitleColoured[client], sizeof(g_szCustomTitleColoured));
 
-		//fluffys temp fix for scoreboard
+		// fluffys temp fix for scoreboard
 		// int RankValue[SkillGroup];
 		// int index = GetSkillgroupIndex(g_pr_rank[client], g_pr_points[client]);
 		// GetArrayArray(g_hSkillGroups, index, RankValue[0]);
@@ -635,7 +630,7 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 			SQL_FetchString(hndl, 6, g_szCustomJoinMsg[client], sizeof(g_szCustomJoinMsg));
 		else
 			Format(g_szCustomJoinMsg[client], sizeof(g_szCustomJoinMsg), "none");
-		
+
 		// SQL_FetchString(hndl, 7, g_szCustomSounds[client][0], sizeof(g_szCustomSounds));
 		// SQL_FetchString(hndl, 8, g_szCustomSounds[client][1], sizeof(g_szCustomSounds));
 		// SQL_FetchString(hndl, 9, g_szCustomSounds[client][2], sizeof(g_szCustomSounds));
@@ -648,7 +643,7 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 		{
 			g_bDbCustomTitleInUse[client] = true;
 			g_iCustomColours[client][0] = SQL_FetchInt(hndl, 1);
-			//setNameColor(szName, g_szdbCustomNameColour[client], 64);
+			// setNameColor(szName, g_szdbCustomNameColour[client], 64);
 
 			g_iCustomColours[client][1] = SQL_FetchInt(hndl, 2);
 			g_bHasCustomTextColour[client] = true;
@@ -695,19 +690,19 @@ public void db_viewPlayerColours(int client, char szSteamId[32], int type)
 
 public void SQL_ViewPlayerColoursCallback(Handle owner, Handle hndl, const char[] error, any data)
 {
-  if (hndl == null)
-  {
-    LogError("[surftimer] SQL Error (SQL_ViewPlayerColoursCallback): %s", error);
-    return;
-  }
+	if (hndl == null)
+	{
+		LogError("[surftimer] SQL Error (SQL_ViewPlayerColoursCallback): %s", error);
+		return;
+	}
 
-  ResetPack(data);
-  int client = ReadPackCell(data);
-  int type = ReadPackCell(data); // 0 = name colour, 1 = text colour
-  CloseHandle(data);
+	ResetPack(data);
+	int client = ReadPackCell(data);
+	int type = ReadPackCell(data); // 0 = name colour, 1 = text colour
+	CloseHandle(data);
 
-  if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-  {
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	{
 		char szSteamId[32];
 		int colour[2];
 
@@ -719,7 +714,7 @@ public void SQL_ViewPlayerColoursCallback(Handle owner, Handle hndl, const char[
 		char szColour[32];
 		getColourName(client, szColour, 32, colour[type]);
 
-    // change title menu
+		// change title menu
 		char szTitle[1024];
 		char szType[32];
 		switch (type)
@@ -759,62 +754,62 @@ public void SQL_ViewPlayerColoursCallback(Handle owner, Handle hndl, const char[
 
 		changeColoursMenu.ExitButton = true;
 		changeColoursMenu.Display(client, MENU_TIME_FOREVER);
-  }
+	}
 }
 
 public int changeColoursMenuHandler(Handle menu, MenuAction action, int client, int item)
 {
-  if (action == MenuAction_Select)
-  {
-    char szType[32];
-    int type;
-    GetMenuItem(menu, item, szType, sizeof(szType));
-    if (StrEqual(szType, "name"))
-      type = 0;
-    else if (StrEqual(szType, "text"))
-      type = 1;
+	if (action == MenuAction_Select)
+	{
+		char szType[32];
+		int type;
+		GetMenuItem(menu, item, szType, sizeof(szType));
+		if (StrEqual(szType, "name"))
+			type = 0;
+		else if (StrEqual(szType, "text"))
+			type = 1;
 
-    switch (item)
-    {
-      case 0:db_updateColours(client, g_szSteamID[client], 0, type);
-      case 1:db_updateColours(client, g_szSteamID[client], 1, type);
-      case 2:db_updateColours(client, g_szSteamID[client], 2, type);
-      case 3:db_updateColours(client, g_szSteamID[client], 3, type);
-      case 4:db_updateColours(client, g_szSteamID[client], 4, type);
-      case 5:db_updateColours(client, g_szSteamID[client], 5, type);
-      case 6:db_updateColours(client, g_szSteamID[client], 6, type);
-      case 7:db_updateColours(client, g_szSteamID[client], 7, type);
-      case 8:db_updateColours(client, g_szSteamID[client], 8, type);
-      case 9:db_updateColours(client, g_szSteamID[client], 9, type);
-      case 10:db_updateColours(client, g_szSteamID[client], 10, type);
-      case 11:db_updateColours(client, g_szSteamID[client], 11, type);
-      case 12:db_updateColours(client, g_szSteamID[client], 12, type);
-      case 13:db_updateColours(client, g_szSteamID[client], 13, type);
-      case 14:db_updateColours(client, g_szSteamID[client], 14, type);
-      case 15:db_updateColours(client, g_szSteamID[client], 15, type);
-    }
-  }
-  else
-  if (action == MenuAction_Cancel)
-  {
-    CustomTitleMenu(client);
-  }
-  else if (action == MenuAction_End)
-  {
-    CloseHandle(menu);
-  }
+		switch (item)
+		{
+			case 0:db_updateColours(client, g_szSteamID[client], 0, type);
+			case 1:db_updateColours(client, g_szSteamID[client], 1, type);
+			case 2:db_updateColours(client, g_szSteamID[client], 2, type);
+			case 3:db_updateColours(client, g_szSteamID[client], 3, type);
+			case 4:db_updateColours(client, g_szSteamID[client], 4, type);
+			case 5:db_updateColours(client, g_szSteamID[client], 5, type);
+			case 6:db_updateColours(client, g_szSteamID[client], 6, type);
+			case 7:db_updateColours(client, g_szSteamID[client], 7, type);
+			case 8:db_updateColours(client, g_szSteamID[client], 8, type);
+			case 9:db_updateColours(client, g_szSteamID[client], 9, type);
+			case 10:db_updateColours(client, g_szSteamID[client], 10, type);
+			case 11:db_updateColours(client, g_szSteamID[client], 11, type);
+			case 12:db_updateColours(client, g_szSteamID[client], 12, type);
+			case 13:db_updateColours(client, g_szSteamID[client], 13, type);
+			case 14:db_updateColours(client, g_szSteamID[client], 14, type);
+			case 15:db_updateColours(client, g_szSteamID[client], 15, type);
+		}
+	}
+	else
+	if (action == MenuAction_Cancel)
+	{
+		CustomTitleMenu(client);
+	}
+	else if (action == MenuAction_End)
+	{
+		CloseHandle(menu);
+	}
 }
 
 public void db_updateColours(int client, char szSteamId[32], int newColour, int type)
 {
-  char szQuery[512];
-  switch (type)
+	char szQuery[512];
+	switch (type)
 	{
 		case 0: Format(szQuery, 512, "UPDATE ck_vipadmins SET namecolour = %i WHERE steamid = '%s';", newColour, szSteamId);
 		case 1: Format(szQuery, 512, "UPDATE ck_vipadmins SET textcolour = %i WHERE steamid = '%s';", newColour, szSteamId);
 	}
 
-  SQL_TQuery(g_hDb, SQL_UpdatePlayerColoursCallback, szQuery, client, DBPrio_Low);
+	SQL_TQuery(g_hDb, SQL_UpdatePlayerColoursCallback, szQuery, client, DBPrio_Low);
 }
 
 public void SQL_UpdatePlayerColoursCallback(Handle owner, Handle hndl, const char[] error, any client)
@@ -853,7 +848,7 @@ public void SQL_selectAllBansCallback(Handle owner, Handle hndl, const char[] er
 
 		Menu menu = CreateMenu(AllBansMenuHandler);
 		SetMenuTitle(menu, "Recent Bans");
-					
+
 		while (SQL_FetchRow(hndl))
 		{
 			SQL_FetchString(hndl, 0, szName, sizeof(szName));
@@ -870,7 +865,7 @@ public void SQL_selectAllBansCallback(Handle owner, Handle hndl, const char[] er
 				Format(szBan, sizeof(szBan), "[Temp]");
 			else if (length == 0)
 				Format(szBan, sizeof(szBan), "[Perm]");
-			
+
 			time = GetTime();
 			banned = time - created;
 			diffForHumans(banned, szBanned, sizeof(szBanned), 1);
@@ -1057,7 +1052,7 @@ public void SQL_selectBanCallback2(Handle owner, Handle hndl, const char[] error
 		int ends = SQL_FetchInt(hndl, 4);
 		int length = SQL_FetchInt(hndl, 5);
 		char szReason[1024], szBanner[128], szBannerSteamid[128];
-		//char szRemoveType[3];
+		// char szRemoveType[3];
 		SQL_FetchString(hndl, 6, szReason, sizeof(szReason));
 		SQL_FetchString(hndl, 8, szBanner, sizeof(szBanner));
 		SQL_FetchString(hndl, 9, szBannerSteamid, sizeof(szBannerSteamid));
@@ -1158,7 +1153,7 @@ public void SQL_selectAllCommsCallback(Handle owner, Handle hndl, const char[] e
 
 		Menu menu = CreateMenu(AllCommsMenuHandler);
 		SetMenuTitle(menu, "Recent Mutes/Gags");
-					
+
 		while (SQL_FetchRow(hndl))
 		{
 			SQL_FetchString(hndl, 0, szName, sizeof(szName));
@@ -1182,7 +1177,7 @@ public void SQL_selectAllCommsCallback(Handle owner, Handle hndl, const char[] e
 				Format(szBan, sizeof(szBan), "[Perm Mute]");
 			else if (length == 0 && type == 2)
 				Format(szBan, sizeof(szBan), "[Perm Gag]");
-			
+
 			time = GetTime();
 			banned = time - created;
 			diffForHumans(banned, szBanned, sizeof(szBanned), 1);
@@ -1411,7 +1406,7 @@ public void SQL_selectCommCallback2(Handle owner, Handle hndl, const char[] erro
 		int ends = SQL_FetchInt(hndl, 4);
 		int length = SQL_FetchInt(hndl, 5);
 		char szReason[1024], szBanner[128], szBannerSteamid[128];
-		//char szRemoveType[3];
+		// char szRemoveType[3];
 		SQL_FetchString(hndl, 6, szReason, sizeof(szReason));
 		SQL_FetchString(hndl, 8, szBanner, sizeof(szBanner));
 		SQL_FetchString(hndl, 9, szBannerSteamid, sizeof(szBannerSteamid));
@@ -1468,7 +1463,7 @@ public void SQL_selectCommCallback2(Handle owner, Handle hndl, const char[] erro
 
 		// Banned Reason
 		Format(szBanReason, sizeof(szBanReason), "Reason: %s", szReason);
-		
+
 		// Expire Date
 		Format(szExpireDate, sizeof(szExpireDate), "Expire Date: %s", szExpires);
 
@@ -1586,9 +1581,9 @@ public void SQL_CheckAnnouncementsCallback(Handle owner, Handle hndl, const char
 			{
 				// Send Server Announcement
 				g_iLastID = id;
-				CPrintToChatAll("{darkred}-----------------------ANNOUNCEMENT-----------------------");
-				CPrintToChatAll("{lime}Surftimer {default}| {yellow}%s {default}has beaten the {yellow}%s {default}map record in the {lime}%s {default}server with a time of {lime}%s", szName, szMapName, szServerName, szTime);
-				CPrintToChatAll("{darkred}-----------------------------------------------------------------");
+				CPrintToChatAll("%t", "SQLTwo4.1");
+				CPrintToChatAll("%t", "SQLTwo4.2", g_szChatPrefix, szName, szMapName, szServerName, szTime);
+				CPrintToChatAll("%t", "SQLTwo4.3");
 			}
 		}
 	}
@@ -1629,7 +1624,7 @@ public void SQL_SelectMapCycleCallback(Handle owner, Handle hndl, const char[] e
 				tier = 1;
 
 			g_pr_MapCount[tier]++;
-			PushArrayString(g_MapList, szMapname);	
+			PushArrayString(g_MapList, szMapname);
 		}
 	}
 }
@@ -1651,9 +1646,9 @@ public void SQL_SetJoinMsgCallback(Handle owner, Handle hndl, const char[] error
 	}
 
 	if (StrEqual(g_szCustomJoinMsg[client], "none"))
-		PrintToChat(client, " %cSurftimer %c| Your join msg has been disabled", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "SQLTwo5", g_szChatPrefix);
 	else
-		CPrintToChat(client, " %cSurftimer %c| Your join msg has been set to %s", LIMEGREEN, WHITE, g_szCustomJoinMsg[client]);
+		CPrintToChat(client, "%t", "SQLTwo6", g_szChatPrefix, g_szCustomJoinMsg[client]);
 }
 
 // public void db_precacheCustomSounds()
@@ -1707,7 +1702,7 @@ public void db_selectCPR(int client, int rank, const char szMapName[128], const 
 	WritePackCell(pack, client);
 	WritePackCell(pack, rank);
 	WritePackString(pack, szSteamId);
-	
+
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `steamid` = '%s' AND `mapname` LIKE '%c%s%c' AND style = 0", g_szSteamID[client], PERCENT, szMapName, PERCENT);
 	SQL_TQuery(g_hDb, SQL_SelectCPRTimeCallback, szQuery, pack, DBPrio_Low);
@@ -1732,16 +1727,15 @@ public void SQL_SelectCPRTimeCallback(Handle owner, Handle hndl, const char[] er
 
 		char szQuery[512];
 		Format(szQuery, sizeof(szQuery), "SELECT cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20, cp21, cp22, cp23, cp24, cp25, cp26, cp27, cp28, cp29, cp30, cp31, cp32, cp33, cp34, cp35 FROM ck_checkpoints WHERE steamid = '%s' AND mapname LIKE '%c%s%c' AND zonegroup = 0;", g_szSteamID[client], PERCENT, g_szCPRMapName[client], PERCENT);
-		PrintToChat(client, "%s", g_szCPRMapName[client]);
+		CPrintToChat(client, "%s", g_szCPRMapName[client]);
 		SQL_TQuery(g_hDb, SQL_SelectCPRCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
 	{
-		PrintToChat(client, " %cSurftimer %c| No result found", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "SQLTwo7", g_szChatPrefix);
 		CloseHandle(pack);
 	}
 }
-
 
 public void SQL_SelectCPRCallback(Handle owner, Handle hndl, const char[] error, any pack)
 {
@@ -1767,7 +1761,7 @@ public void SQL_SelectCPRCallback(Handle owner, Handle hndl, const char[] error,
 	{
 		ResetPack(pack);
 		int client = ReadPackCell(pack);
-		PrintToChat(client, "2", LIMEGREEN, WHITE);
+		CPrintToChat(client, "2", LIMEGREEN, WHITE);
 	}
 }
 
@@ -1803,7 +1797,7 @@ public void SQL_SelectCPRTargetCallback(Handle owner, Handle hndl, const char[] 
 	{
 		ResetPack(pack);
 		int client = ReadPackCell(pack);
-		
+
 		char szSteamId[32];
 		SQL_FetchString(hndl, 0, szSteamId, sizeof(szSteamId));
 		SQL_FetchString(hndl, 1, g_szTargetCPR[client], sizeof(g_szTargetCPR));
@@ -1814,7 +1808,7 @@ public void SQL_SelectCPRTargetCallback(Handle owner, Handle hndl, const char[] 
 	{
 		ResetPack(pack);
 		int client = ReadPackCell(pack);
-		PrintToChat(client, "3", LIMEGREEN, WHITE);
+		CPrintToChat(client, "3", LIMEGREEN, WHITE);
 	}
 }
 
@@ -1822,7 +1816,7 @@ public void db_selectCPRTargetCPs(const char[] szSteamId, any pack)
 {
 	ResetPack(pack);
 	int client = ReadPackCell(pack);
-	
+
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), "SELECT cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20, cp21, cp22, cp23, cp24, cp25, cp26, cp27, cp28, cp29, cp30, cp31, cp32, cp33, cp34, cp35 FROM ck_checkpoints WHERE steamid = '%s' AND mapname LIKE '%c%s%c' AND zonegroup = 0;", szSteamId, PERCENT, g_szCPRMapName[client], PERCENT);
 	SQL_TQuery(g_hDb, SQL_SelectCPRTargetCPsCallback, szQuery, pack, DBPrio_Low);
@@ -1864,7 +1858,7 @@ public void SQL_SelectCPRTargetCPsCallback(Handle owner, Handle hndl, const char
 			Format(szItem, sizeof(szItem), "CP %i: %s (%s)", i, szCPR, szCompared);
 			AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
 		}
-		
+
 		char szTime[32], szCompared2[32];
 		float compared = g_fClientCPs[client][0] - g_fTargetTime[client];
 		FormatTimeFloat(client, g_fClientCPs[client][0], 3, szTime, sizeof(szTime));
@@ -1878,7 +1872,7 @@ public void SQL_SelectCPRTargetCPsCallback(Handle owner, Handle hndl, const char
 	{
 		ResetPack(pack);
 		int client = ReadPackCell(pack);
-		PrintToChat(client, "4", LIMEGREEN, WHITE);
+		CPrintToChat(client, "4", LIMEGREEN, WHITE);
 	}
 	CloseHandle(pack);
 }
