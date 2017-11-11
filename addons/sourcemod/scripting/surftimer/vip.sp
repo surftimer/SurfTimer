@@ -1,83 +1,83 @@
 // Commands
 public Action VIP_GiveVip(int client, int args)
 {
-  // sm_givevip steamid viplvl
-  if (args == 0)
-  {
-    ReplyToCommand(client, " %cSurftimer %c| Usage: sm_vip %csteamid%c %cviplvl%c", LIMEGREEN, WHITE, QUOTE, QUOTE, QUOTE, QUOTE);
-    return Plugin_Handled;
-  }
+	// sm_givevip steamid viplvl
+	if (args == 0)
+	{
+		CReplyToCommand(client, "%t", "VIP1", g_szChatPrefix, QUOTE, QUOTE, QUOTE, QUOTE);
+		return Plugin_Handled;
+	}
 
-  // if (IsValidClient(client))
-  // {
-  //   ReplyToCommand(client, " %cSurftimer %c| You do not have access to this command", LIMEGREEN, WHITE);
-  //   return Plugin_Handled;
-  // }
+	// if (IsValidClient(client))
+	// {
+	//  CReplyToCommand(client, "%cSurftimer %c| You do not have access to this command", LIMEGREEN, WHITE);
+	//  return Plugin_Handled;
+	// }
 
-  char szSteamId[128], szBuffer[128];
-  int iVip;
-  GetCmdArg(1, szSteamId, sizeof(szSteamId));
-  GetCmdArg(2, szBuffer, sizeof(szBuffer));
+	char szSteamId[128], szBuffer[128];
+	int iVip;
+	GetCmdArg(1, szSteamId, sizeof(szSteamId));
+	GetCmdArg(2, szBuffer, sizeof(szBuffer));
 
-  iVip = StringToInt(szBuffer);
-  db_selectVipStatus(szSteamId, iVip, 0);
+	iVip = StringToInt(szBuffer);
+	db_selectVipStatus(szSteamId, iVip, 0);
 
-  return Plugin_Handled;
+	return Plugin_Handled;
 }
 
 public Action VIP_RemoveVip(int client, int args)
 {
-  // sm_removevip steamid
-  if (args == 0)
-  {
-    ReplyToCommand(client, " %cSurftimer %c| Usage: sm_vip %csteamid%c", LIMEGREEN, WHITE, QUOTE, QUOTE);
-    return Plugin_Handled;
-  }
+	// sm_removevip steamid
+	if (args == 0)
+	{
+		CReplyToCommand(client, "%t", "VIP2", g_szChatPrefix, QUOTE, QUOTE);
+		return Plugin_Handled;
+	}
 
-  char szSteamId[128];
-  GetCmdArg(1, szSteamId, sizeof(szSteamId));
-  db_selectVipStatus(szSteamId, 0, 1);
+	char szSteamId[128];
+	GetCmdArg(1, szSteamId, sizeof(szSteamId));
+	db_selectVipStatus(szSteamId, 0, 1);
 
-  return Plugin_Handled;
+	return Plugin_Handled;
 }
 
 public Action VIP_GiveCredits(int client, int args)
 {
-  // sm_addcredits steamid
-  if (args != 2)
-  {
-    ReplyToCommand(client, " %cSurftimer %c| Usage: sm_addcredits %csteamid%c %camount%c", LIMEGREEN, WHITE, QUOTE, QUOTE, QUOTE, QUOTE);
-    return Plugin_Handled;
-  }
+	// sm_addcredits steamid
+	if (args != 2)
+	{
+		CReplyToCommand(client, "%t", "VIP3", g_szChatPrefix, QUOTE, QUOTE, QUOTE, QUOTE);
+		return Plugin_Handled;
+	}
 
-  char szSteamId[128];
-  GetCmdArg(1, szSteamId, sizeof(szSteamId));
-  // Find Client
-  int foundClient = -1;
-  for (int i = 1;i <= MaxClients;i++)
-  {
-    if (IsValidClient(i) && !IsFakeClient(i))
-    {
-      if (StrEqual(szSteamId, g_szSteamID[i]))
-      {
-        foundClient = i;
-        break;
-      }
-    }
-  }
+	char szSteamId[128];
+	GetCmdArg(1, szSteamId, sizeof(szSteamId));
+	// Find Client
+	int foundClient = -1;
+	for (int i = 1;i <= MaxClients;i++)
+	{
+		if (IsValidClient(i) && !IsFakeClient(i))
+		{
+			if (StrEqual(szSteamId, g_szSteamID[i]))
+			{
+				foundClient = i;
+				break;
+			}
+		}
+	}
 
-  if (foundClient == -1)
-    return Plugin_Handled;
+	if (foundClient == -1)
+	return Plugin_Handled;
 
-  int userid = GetClientUserId(foundClient);
+	int userid = GetClientUserId(foundClient);
 
-  // Get credit amount
-  char szCredits[128];
-  GetCmdArg(2, szCredits, sizeof(szCredits));
-  int credits = StringToInt(szCredits);
-  ServerCommand("sm_givecredits #%i %i", userid, credits);
+	// Get credit amount
+	char szCredits[128];
+	GetCmdArg(2, szCredits, sizeof(szCredits));
+	int credits = StringToInt(szCredits);
+	ServerCommand("sm_givecredits #%i %i", userid, credits);
 
-  return Plugin_Handled;
+	return Plugin_Handled;
 }
 
 // SQL
@@ -120,13 +120,13 @@ public void db_selectVipStatusCallback(Handle owner, Handle hndl, const char[] e
 		LogError("[surftimer] SQL Error (db_selectVipStatusCallback): %s", error);
 		return;
 	}
-	
+
 	char szSteamId[128];
 	ResetPack(pack);
 	ReadPackString(pack, szSteamId, sizeof(szSteamId));
 	int iVip = ReadPackCell(pack);
 	CloseHandle(pack);
-	
+
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
 		// Exisiting Player
@@ -134,8 +134,8 @@ public void db_selectVipStatusCallback(Handle owner, Handle hndl, const char[] e
 		SQL_FetchString(hndl, 0, szSteamId, 128);
 		iVipCompare = SQL_FetchInt(hndl, 1);
 		active = SQL_FetchInt(hndl, 2);
-		
-		//Check to see if need to update
+
+		// Check to see if need to update
 		if (active == 1)
 		{
 			if (iVip != iVipCompare)
@@ -164,7 +164,7 @@ public void db_removeVipCallback(Handle owner, Handle hndl, const char[] error, 
 		LogError("[surftimer] SQL Error (db_removeVipCallback): %s", error);
 		return;
 	}
-	
+
 	g_bCheckCustomTitle[client] = true;
 	db_CheckVIPAdmin(client, g_szSteamID[client]);
 }
@@ -191,11 +191,11 @@ public void db_insertVip(char szSteamId[128], int iVip)
 			colour = 1;
 		}
 	}
-	
+
 	Handle pack = CreateDataPack();
 	WritePackString(pack, szSteamId);
 	WritePackCell(pack, iVip);
-	
+
 	Format(szQuery, 256, "INSERT INTO ck_vipadmins (steamid, title, namecolour, textcolour, inuse, vip, admin, zoner) VALUES ('%s', '%s', %i, 0, 1 , %i, 0, 0);", szSteamId, szTitle, colour, iVip);
 	SQL_TQuery(g_hDb, db_insertVipCallback, szQuery, pack, DBPrio_Low);
 }
@@ -207,14 +207,14 @@ public void db_insertVipCallback(Handle owner, Handle hndl, const char[] error, 
 		LogError("[surftimer] SQL Error (db_insertVipCallback): %s", error);
 		return;
 	}
-	
+
 	char szSteamId[128];
 	int iVip;
 	ResetPack(pack);
 	ReadPackString(pack, szSteamId, 128);
 	iVip = ReadPackCell(pack);
 	CloseHandle(pack);
-	
+
 	// Find Client
 	int client = -1;
 	for (int i = 1;i <= MaxClients;i++)
@@ -228,12 +228,12 @@ public void db_insertVipCallback(Handle owner, Handle hndl, const char[] error, 
 			}
 		}
 	}
-	
+
 	if (client != -1)
 	{
 		g_bCheckCustomTitle[client] = true;
 		db_CheckVIPAdmin(client, szSteamId);
-		
+
 		// Give Credits to client
 		if (g_hStore != INVALID_HANDLE && GetPluginStatus(g_hStore) == Plugin_Running)
 		{
@@ -242,7 +242,7 @@ public void db_insertVipCallback(Handle owner, Handle hndl, const char[] error, 
 			newCredits = 2999;
 			else if (iVip == 2)
 			newCredits = 5999;
-			
+
 			Store_SetClientCredits(client, Store_GetClientCredits(client) + newCredits);
 		}
 	}
@@ -270,11 +270,11 @@ public void db_updateVip(char szSteamId[128], int iVip)
 			colour = 1;
 		}
 	}
-	
+
 	Handle pack = CreateDataPack();
 	WritePackString(pack, szSteamId);
 	WritePackCell(pack, iVip);
-	
+
 	Format(szQuery, 256, "UPDATE ck_vipadmins SET title = '%s', namecolour = %i, textcolour = 0, inuse = 1, vip = %i WHERE steamid = '%s';", szTitle, colour, iVip, szSteamId);
 	SQL_TQuery(g_hDb, db_insertVipCallback, szQuery, pack, DBPrio_Low);
 }

@@ -1,8 +1,7 @@
 
-//
 // Botmimic2 - modified by 1NutWunDeR
 // http://forums.alliedmods.net/showthread.php?t=164148
-//
+
 void setReplayTime(int zGrp, int stage)
 {
 	char sPath[256], sTime[54], sBuffer[4][54];
@@ -117,13 +116,13 @@ public void SaveRecording(int client, int zgroup)
 		CreateDirectory(sPath2, 511);
 	}
 
-	if (zgroup == 0) // replay bot
+	if (zgroup == 0) // Replay Bot
 	{
 		BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s%s.rec", CK_REPLAY_PATH, g_szMapName);
 	}
 	else
 	{
-		if (zgroup > 0) // bonus bot
+		if (zgroup > 0) // Bonus Bot
 		{
 			BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, g_szMapName, zgroup);
 		}
@@ -170,7 +169,7 @@ public void LoadReplays()
 {
 	if (!GetConVarBool(g_hReplayBot) && !GetConVarBool(g_hBonusBot) && !GetConVarBool(g_hWrcpBot))
 		return;
-	// Init variables:
+	// Init Variables:
 	g_bMapReplay = false;
 	for (int i = 0; i < MAXZONEGROUPS; i++)
 	{
@@ -279,7 +278,7 @@ public void LoadReplays()
 			g_BonusBotCount++;
 			g_bMapBonusReplay[i] = true;
 		}
-		else// Check if backup exists
+		else // Check if backup exists
 		{
 			char sPathBack[256];
 			BuildPath(Path_SM, sPathBack, sizeof(sPathBack), "%s%s_bonus_%i.rec.bak", CK_REPLAY_PATH, g_szMapName, i);
@@ -313,7 +312,7 @@ public void PlayRecord(int client, int type)
 	if (type == 0)
 	{
 		Format(sPath, sizeof(sPath), "%s%s.rec", CK_REPLAY_PATH, g_szMapName);
-		//Format(sPath, sizeof(sPath), "%s%s_stage_3.rec", CK_REPLAY_PATH, g_szMapName);
+		// Format(sPath, sizeof(sPath), "%s%s_stage_3.rec", CK_REPLAY_PATH, g_szMapName);
 	}
 	if (type == 1)
 		Format(sPath, sizeof(sPath), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, g_szMapName, g_iBonusToReplay[g_iCurrentBonusReplayIndex]);
@@ -362,7 +361,7 @@ public void PlayRecord(int client, int type)
 
 	Array_Copy(iFileHeader[view_as<int>(FH_initialPosition)], g_fInitialPosition[client], 3);
 	Array_Copy(iFileHeader[view_as<int>(FH_initialAngles)], g_fInitialAngles[client], 3);
-	//SDKHook(client, SDKHook_WeaponCanSwitchTo, Hook_WeaponCanSwitchTo);
+	// SDKHook(client, SDKHook_WeaponCanSwitchTo, Hook_WeaponCanSwitchTo);
 
 	// Disarm bot
 	Client_RemoveAllWeapons(client);
@@ -521,7 +520,7 @@ public void LoadRecordFromFile(const char[] path, int headerInfo[FILE_HEADER_LEN
 		CloseHandle(hAdditionalTeleport);
 
 	CloseHandle(hFile);
-	
+
 	return;
 }
 
@@ -563,7 +562,7 @@ public void LoadRecordReplay()
 		// "Having a bot in noclip and zero gravity ensures it's smooth" - Crashfort
 		// https://github.com/crashfort/SourceToolAssist/blob/be9218583ee0a8086c817a5bd29101b2a260e5a7/Source/surf_segmentplay.sp#L113
 		// Disabling noclip, makes the bot bug, look into later
-		//SetEntityMoveType(g_RecordBot, MOVETYPE_NOCLIP);
+		// SetEntityMoveType(g_RecordBot, MOVETYPE_NOCLIP);
 		SetEntityGravity(g_RecordBot, 0.0);
 
 		PlayRecord(g_RecordBot, 0);
@@ -623,7 +622,7 @@ public void LoadBonusReplay()
 		// "Having a bot in noclip and zero gravity ensures it's smooth" - Crashfort
 		// https://github.com/crashfort/SourceToolAssist/blob/be9218583ee0a8086c817a5bd29101b2a260e5a7/Source/surf_segmentplay.sp#L113
 		// Disabling noclip, makes the bot bug, look into later
-		//SetEntityMoveType(g_BonusBot, MOVETYPE_NOCLIP);
+		// SetEntityMoveType(g_BonusBot, MOVETYPE_NOCLIP);
 		SetEntityGravity(g_BonusBot, 0.0);
 
 		PlayRecord(g_BonusBot, 1);
@@ -683,7 +682,7 @@ public void LoadWrcpReplay()
 		// "Having a bot in noclip and zero gravity ensures it's smooth" - Crashfort
 		// https://github.com/crashfort/SourceToolAssist/blob/be9218583ee0a8086c817a5bd29101b2a260e5a7/Source/surf_segmentplay.sp#L113
 		// Disabling noclip, makes the bot bug, look into later
-		//SetEntityMoveType(g_WrcpBot, MOVETYPE_NOCLIP);
+		// SetEntityMoveType(g_WrcpBot, MOVETYPE_NOCLIP);
 		SetEntityGravity(g_WrcpBot, 0.0);
 
 		PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage);
@@ -714,7 +713,7 @@ public void StopPlayerMimic(int client)
 	g_CurrentAdditionalTeleportIndex[client] = 0;
 	g_BotMimicRecordTickCount[client] = 0;
 	g_bValidTeleportCall[client] = false;
-	//SDKUnhook(client, SDKHook_WeaponCanSwitchTo, Hook_WeaponCanSwitchTo);
+	// SDKUnhook(client, SDKHook_WeaponCanSwitchTo, Hook_WeaponCanSwitchTo);
 	delete g_hBotMimicsRecord[client];
 }
 
@@ -729,7 +728,7 @@ public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int
 {
 	if (g_hRecording[client] != null && !IsFakeClient(client))
 	{
-		if (g_bPause[client]) //  Dont record pause frames
+		if (g_bPause[client]) // Dont record pause frames
 			return;
 
 		int iFrame[FrameInfo];
@@ -795,7 +794,7 @@ public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int
 				g_RecordPreviousWeapon[client] = iNewWeapon;
 				char sClassName[64];
 				GetEdictClassname(iNewWeapon, sClassName, sizeof(sClassName));
-				ReplaceString(sClassName, sizeof(sClassName), "weapon_", "", false);
+				ReplaceString(sClassName, sizeof(sClassName), "weapon_", false);
 				char sWeaponAlias[64];
 				CS_GetTranslatedWeaponAlias(sClassName, sWeaponAlias, sizeof(sWeaponAlias));
 				CSWeaponID weaponId = CS_AliasToWeaponID(sWeaponAlias);
@@ -1067,7 +1066,7 @@ public void Stage_StartRecording(int client)
 
 	if (g_hRecording[client] == null)
 		StartRecording(client);
-		
+
 	g_StageRecStartFrame[client] = 0;
 	g_StageRecStartAT[client] = 0;
 }
@@ -1091,7 +1090,7 @@ public void Stage_SaveRecording(int client, int stage, char[] time)
 	}
 
 	BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s%s_stage_%d.rec", CK_REPLAY_PATH, g_szMapName, stage);
-	
+
 
 	if (FileExists(sPath2) && GetConVarBool(g_hBackupReplays))
 	{
