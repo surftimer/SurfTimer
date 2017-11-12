@@ -1319,7 +1319,7 @@ public Action Client_Wrff(int client, int args)
 public Action Command_Tier(int client, int args)
 {
 	if (IsValidClient(client) && g_bTierFound)
-		CPrintToChat(client, g_sTierString);
+		CPrintToChat(client, "%t", "Timer1", g_szChatPrefix, g_sTierString);
 }
 
 public Action Client_Avg(int client, int args)
@@ -4939,7 +4939,7 @@ public int CommsVoteHandle(Menu menu, MenuAction action, int param1, int param2)
 		/* 0=yes, 1=no */
 		if ((strcmp(item, VOTE_YES) == 0 && FloatCompare(percent,limit) < 0 && param1 == 0) || (strcmp(item, VOTE_NO) == 0 && param1 == 1))
 		{
-			CPrintToChatAll("%t", "Commands65", g_szChatPrefix, RoundToNearest(100.0*limit), PERCENT, RoundToNearest(100.0*percent), PERCENT, totalVotes);
+			CPrintToChatAll("%t", "Commands65", g_szChatPrefix, RoundToNearest(100.0*limit), RoundToNearest(100.0*percent), totalVotes);
 		}
 		else
 		{
@@ -4952,7 +4952,7 @@ public int CommsVoteHandle(Menu menu, MenuAction action, int param1, int param2)
 			GetClientAuthId(client, AuthId_Steam2, szSteamID, 32, true);
 			if (type == 0) // Vote Mute
 			{
-				CPrintToChatAll("%t", "Commands66", g_szChatPrefix, szTargetName, RoundToNearest(100.0*percent), PERCENT, totalVotes);
+				CPrintToChatAll("%t", "Commands66", g_szChatPrefix, szTargetName, RoundToNearest(100.0*percent), totalVotes);
 				Format(szReason, sizeof(szReason), "Muted via vote mute started by %s - %s", szName, szSteamID);
 				SourceComms_SetClientMute(target, true, 10, true, szReason);
 			}

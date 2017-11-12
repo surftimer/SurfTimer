@@ -665,7 +665,7 @@ int g_ClientSelectedPoint[MAXPLAYERS + 1];
 int g_CurrentZoneTypeId[MAXPLAYERS + 1];
 
 // Is client renaming zone?
-bool g_ClientRenamingZone[MAXPLAYERS +s 1];
+bool g_ClientRenamingZone[MAXPLAYERS + 1];
 
 // Zone team colors TODO: remove
 int beamColorT[] = { 255, 0, 0, 255 };
@@ -1825,6 +1825,9 @@ public void OnMapEnd()
 
 public void OnConfigsExecuted()
 {
+	// Get Chat Prefix
+	GetConVarString(g_hChatPrefix, g_szChatPrefix, sizeof(g_szChatPrefix));
+	
 	if (GetConVarBool(g_hDBMapcycle))
 		db_selectMapCycle();
 	else if (!GetConVarBool(g_hMultiServerMapcycle))
@@ -2104,7 +2107,6 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 					{
 						StopPlayerMimic(i);
 						KickClient(i);
-						g_bTrailOn[i] = false;
 					}
 					else
 					{
@@ -2141,7 +2143,6 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 					{
 						StopPlayerMimic(i);
 						KickClient(i);
-						g_bTrailOn[i] = false;
 					}
 					else
 					{
@@ -2180,7 +2181,6 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 					{
 						StopPlayerMimic(i);
 						KickClient(i);
-						g_bTrailOn[i] = false;
 					}
 					else
 					{
