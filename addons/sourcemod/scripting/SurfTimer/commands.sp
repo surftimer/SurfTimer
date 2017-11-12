@@ -191,18 +191,18 @@ void CreateCommands()
 	// RegConsoleCmd("sm_ffwrb", Client_Wrbff, "[surftimer] prints records fast forwards in chat");
 
 	// Style mtop
-	RegConsoleCmd("sm_mtopsw", Client_SWMapTop, "[surftimer] displays a local map top (sw) for a given map");
-	RegConsoleCmd("sm_swmtop", Client_SWMapTop, "[surftimer] displays a local map top (sw) for a given map");
-	RegConsoleCmd("sm_mtophsw", Client_HSWMapTop, "[surftimer] displays a local map top (hsw) for a given map");
-	RegConsoleCmd("sm_hswmtop", Client_HSWMapTop, "[surftimer] displays a local map top (hsw) for a given map");
-	RegConsoleCmd("sm_mtopbw", Client_BWMapTop, "[surftimer] displays a local map top (bw) for a given map");
-	RegConsoleCmd("sm_bwmtop", Client_BWMapTop, "[surftimer] displays a local map top (bw) for a given map");
-	RegConsoleCmd("sm_mtoplg", Client_LGMapTop, "[surftimer] displays a local map top (low-gravity) for a given map");
-	RegConsoleCmd("sm_lgmtop", Client_LGMapTop, "[surftimer] displays a local map top (low-gravity) for a given map");
-	RegConsoleCmd("sm_mtopsm", Client_SMMapTop, "[surftimer] displays a local map top (slow motion) for a given map");
-	RegConsoleCmd("sm_smmtop", Client_SMMapTop, "[surftimer] displays a local map top (slow motion) for a given map");
-	RegConsoleCmd("sm_mtopff", Client_FFMapTop, "[surftimer] displays a local map top (fast forwards) for a given map");
-	RegConsoleCmd("sm_ffmtop", Client_FFMapTop, "[surftimer] displays a local map top (fast forwards) for a given map");
+	// RegConsoleCmd("sm_mtopsw", Client_SWMapTop, "[surftimer] displays a local map top (sw) for a given map");
+	// RegConsoleCmd("sm_swmtop", Client_SWMapTop, "[surftimer] displays a local map top (sw) for a given map");
+	// RegConsoleCmd("sm_mtophsw", Client_HSWMapTop, "[surftimer] displays a local map top (hsw) for a given map");
+	// RegConsoleCmd("sm_hswmtop", Client_HSWMapTop, "[surftimer] displays a local map top (hsw) for a given map");
+	// RegConsoleCmd("sm_mtopbw", Client_BWMapTop, "[surftimer] displays a local map top (bw) for a given map");
+	// RegConsoleCmd("sm_bwmtop", Client_BWMapTop, "[surftimer] displays a local map top (bw) for a given map");
+	// RegConsoleCmd("sm_mtoplg", Client_LGMapTop, "[surftimer] displays a local map top (low-gravity) for a given map");
+	// RegConsoleCmd("sm_lgmtop", Client_LGMapTop, "[surftimer] displays a local map top (low-gravity) for a given map");
+	// RegConsoleCmd("sm_mtopsm", Client_SMMapTop, "[surftimer] displays a local map top (slow motion) for a given map");
+	// RegConsoleCmd("sm_smmtop", Client_SMMapTop, "[surftimer] displays a local map top (slow motion) for a given map");
+	// RegConsoleCmd("sm_mtopff", Client_FFMapTop, "[surftimer] displays a local map top (fast forwards) for a given map");
+	// RegConsoleCmd("sm_ffmtop", Client_FFMapTop, "[surftimer] displays a local map top (fast forwards) for a given map");
 
 	// style btop if i ever get around to it
 	/*RegConsoleCmd("sm_btopsw", Client_SWBonusTop, "[surftimer] displays a local bonus top (sw) for a given map");
@@ -219,18 +219,18 @@ void CreateCommands()
 	RegConsoleCmd("sm_ffbtop", Client_FFBonusTop, "[surftimer] displays a local bonus top (fast forwards) for a given map");*/
 
 	// Style WRCP
-	RegConsoleCmd("sm_wrcpsw", Client_SWWrcp, "[surftimer] displays sideways stage times for map");
-	RegConsoleCmd("sm_swwrcp", Client_SWWrcp, "[surftimer] displays sideways stage times for map");
-	RegConsoleCmd("sm_wrcphsw", Client_HSWWrcp, "[surftimer] displays half-sideways stage times for map");
-	RegConsoleCmd("sm_hswwrcp", Client_HSWWrcp, "[surftimer] displays half-sideways stage times for map");
-	RegConsoleCmd("sm_wrcpbw", Client_BWWrcp, "[surftimer] displays backwards stage times for map");
-	RegConsoleCmd("sm_bwwrcp", Client_BWWrcp, "[surftimer] displays backwards stage times for map");
-	RegConsoleCmd("sm_wrcplg", Client_LGWrcp, "[surftimer] displays low-gravity stage times for map");
-	RegConsoleCmd("sm_lgwrcp", Client_LGWrcp, "[surftimer] displays low-gravity stage times for map");
-	RegConsoleCmd("sm_wrcpsm", Client_SMWrcp, "[surftimer] displays slow motion stage times for map");
-	RegConsoleCmd("sm_smwrcp", Client_SMWrcp, "[surftimer] displays slow motion stage times for map");
-	RegConsoleCmd("sm_wrcpff", Client_FFWrcp, "[surftimer] displays fast forwards stage times for map");
-	RegConsoleCmd("sm_ffwrcp", Client_FFWrcp, "[surftimer] displays fast forwards stage times for map");
+	// RegConsoleCmd("sm_wrcpsw", Client_SWWrcp, "[surftimer] displays sideways stage times for map");
+	// RegConsoleCmd("sm_swwrcp", Client_SWWrcp, "[surftimer] displays sideways stage times for map");
+	// RegConsoleCmd("sm_wrcphsw", Client_HSWWrcp, "[surftimer] displays half-sideways stage times for map");
+	// RegConsoleCmd("sm_hswwrcp", Client_HSWWrcp, "[surftimer] displays half-sideways stage times for map");
+	// RegConsoleCmd("sm_wrcpbw", Client_BWWrcp, "[surftimer] displays backwards stage times for map");
+	// RegConsoleCmd("sm_bwwrcp", Client_BWWrcp, "[surftimer] displays backwards stage times for map");
+	// RegConsoleCmd("sm_wrcplg", Client_LGWrcp, "[surftimer] displays low-gravity stage times for map");
+	// RegConsoleCmd("sm_lgwrcp", Client_LGWrcp, "[surftimer] displays low-gravity stage times for map");
+	// RegConsoleCmd("sm_wrcpsm", Client_SMWrcp, "[surftimer] displays slow motion stage times for map");
+	// RegConsoleCmd("sm_smwrcp", Client_SMWrcp, "[surftimer] displays slow motion stage times for map");
+	// RegConsoleCmd("sm_wrcpff", Client_FFWrcp, "[surftimer] displays fast forwards stage times for map");
+	// RegConsoleCmd("sm_ffwrcp", Client_FFWrcp, "[surftimer] displays fast forwards stage times for map");
 
 	// Style Profiles
 	RegConsoleCmd("sm_psw", Client_SWProfile, "[surftimer] opens a player sw profile");
@@ -1462,8 +1462,38 @@ public Action Client_MapTop(int client, int args)
 	{
 		GetCmdArg(1, szArg, 128);
 	}
-	db_selectMapTopSurfers(client, szArg);
+	MapTopMenuSelectStyle(client, szArg);
 	return Plugin_Handled;
+}
+
+public void MapTopMenuSelectStyle(int client, char szMapName[128])
+{
+	Menu menu = CreateMenu(MapTopMenuSelectStyleHandler);
+	SetMenuTitle(menu, "Map Top: Select a style\n \n");
+	AddMenuItem(menu, szMapName, "Normal");
+	AddMenuItem(menu, szMapName, "Sideways");
+	AddMenuItem(menu, szMapName, "Half-Sideways");
+	AddMenuItem(menu, szMapName, "Backwards");
+	AddMenuItem(menu, szMapName, "Low-Gravity");
+	AddMenuItem(menu, szMapName, "Slow Motion");
+	AddMenuItem(menu, szMapName, "Fast Forward");
+	SetMenuExitButton(menu, true);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+public int MapTopMenuSelectStyleHandler(Handle menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char szMapName[128];
+		GetMenuItem(menu, param2, szMapName, sizeof(szMapName));
+		if (param2 == 0)
+			db_selectMapTopSurfers(param1, szMapName);
+		else
+			db_selectStyleMapTopSurfers(param1, szMapName, param2);
+	}
+	else if (action == MenuAction_End)
+		delete menu;
 }
 
 public Action Client_BonusTop(int client, int args)
@@ -1619,103 +1649,6 @@ public Action Client_SWBonusTop(int client, int args)
 	db_selectBonusTopSurfers(client, szArg, zGrp);
 	return Plugin_Handled;
 }
-
-public Action Client_SWMapTop(int client, int args)
-{
-	char szArg[128];
-
-	if (args == 0)
-	{
-		Format(szArg, 128, "%s", g_szMapName);
-	}
-	else
-	{
-		GetCmdArg(1, szArg, 128);
-	}
-	db_selectStyleMapTopSurfers(client, szArg, 1);
-	return Plugin_Handled;
-}
-
-public Action Client_HSWMapTop(int client, int args)
-{
-	char szArg[128];
-
-	if (args == 0)
-	{
-		Format(szArg, 128, "%s", g_szMapName);
-	}
-	else
-	{
-		GetCmdArg(1, szArg, 128);
-	}
-	db_selectStyleMapTopSurfers(client, szArg, 2);
-	return Plugin_Handled;
-}
-
-public Action Client_BWMapTop(int client, int args)
-{
-	char szArg[128];
-
-	if (args == 0)
-	{
-		Format(szArg, 128, "%s", g_szMapName);
-	}
-	else
-	{
-		GetCmdArg(1, szArg, 128);
-	}
-	db_selectStyleMapTopSurfers(client, szArg, 3);
-	return Plugin_Handled;
-}
-
-public Action Client_LGMapTop(int client, int args)
-{
-	char szArg[128];
-
-	if (args == 0)
-	{
-		Format(szArg, 128, "%s", g_szMapName);
-	}
-	else
-	{
-		GetCmdArg(1, szArg, 128);
-	}
-	db_selectStyleMapTopSurfers(client, szArg, 4);
-	return Plugin_Handled;
-}
-
-public Action Client_SMMapTop(int client, int args)
-{
-	char szArg[128];
-
-	if (args == 0)
-	{
-		Format(szArg, 128, "%s", g_szMapName);
-	}
-	else
-	{
-		GetCmdArg(1, szArg, 128);
-	}
-	db_selectStyleMapTopSurfers(client, szArg, 5);
-	return Plugin_Handled;
-}
-
-public Action Client_FFMapTop(int client, int args)
-{
-	char szArg[128];
-
-	if (args == 0)
-	{
-		Format(szArg, 128, "%s", g_szMapName);
-	}
-	else
-	{
-		GetCmdArg(1, szArg, 128);
-	}
-	db_selectStyleMapTopSurfers(client, szArg, 6);
-	return Plugin_Handled;
-}
-
 
 public Action Client_Spec(int client, int args)
 {
@@ -3606,44 +3539,40 @@ public Action Command_ListColours(int client, int args)
 
 public Action Client_Wrcp(int client, int args)
 {
-	WrcpMenu(client, args, 0);
+	if (args == 0)
+		Format(g_szWrcpMapSelect[client], sizeof(g_szWrcpMapSelect), g_szMapName);
+	else
+		GetCmdArg(1, g_szWrcpMapSelect[client], 128);
+	WrcpStyleSelectMenu(client);
 	return Plugin_Handled;
 }
 
-public Action Client_SWWrcp(int client, int args)
+public void WrcpStyleSelectMenu(int client)
 {
-	WrcpMenu(client, args, 1);
-	return Plugin_Handled;
+	Menu menu = CreateMenu(WrcpStyleSelectMenuHandler);
+	SetMenuTitle(menu, "WRCP: Select a style");
+	AddMenuItem(menu, "", "Normal");
+	AddMenuItem(menu, "", "Sideways");
+	AddMenuItem(menu, "", "Half-Sideways");
+	AddMenuItem(menu, "", "Backwards");
+	AddMenuItem(menu, "", "Low-Gravity");
+	AddMenuItem(menu, "", "Slow Motion");
+	AddMenuItem(menu, "", "Fast Forwards");
+	SetMenuExitButton(menu, true);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
 }
 
-public Action Client_HSWWrcp(int client, int args)
+public int WrcpStyleSelectMenuHandler(Handle menu, MenuAction action, int param1, int param2)
 {
-	WrcpMenu(client, args, 2);
-	return Plugin_Handled;
-}
-
-public Action Client_BWWrcp(int client, int args)
-{
-	WrcpMenu(client, args, 3);
-	return Plugin_Handled;
-}
-
-public Action Client_LGWrcp(int client, int args)
-{
-	WrcpMenu(client, args, 4);
-	return Plugin_Handled;
-}
-
-public Action Client_SMWrcp(int client, int args)
-{
-	WrcpMenu(client, args, 5);
-	return Plugin_Handled;
-}
-
-public Action Client_FFWrcp(int client, int args)
-{
-	WrcpMenu(client, args, 6);
-	return Plugin_Handled;
+	if (action == MenuAction_Select)
+	{
+		if (StrEqual(g_szMapName, g_szWrcpMapSelect[param1]))
+			WrcpMenu(param1, 0, param2);
+		else
+			WrcpMenu(param1, 1, param2);
+	}
+	else if (action == MenuAction_End)
+		delete menu;
 }
 
 public void WrcpMenu(int client, int args, int style)
@@ -3696,7 +3625,6 @@ public void WrcpMenu(int client, int args, int style)
 	}
 	else
 	{
-		GetCmdArg(1, g_szWrcpMapSelect[client], 128);
 		if (StrContains(g_szWrcpMapSelect[client], "#", false) != -1)
 		{
 			ReplaceString(g_szWrcpMapSelect[client], 128, "#", "", false);
