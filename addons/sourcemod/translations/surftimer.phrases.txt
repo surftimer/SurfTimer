@@ -375,17 +375,17 @@
   		"#format"	"{1:s}"
   		"en"		"{1} The server hasn't finished loading your settings, please wait."
 	}
-		"BPress4"
+	"BPress4"
 	{
   		"#format"	"{1:s},{2:s},{3:s}"
 		"en"		"{1} {lightgreen}{2} {default}finished the bonus with a time of [{blue}{3}{default}] in practice mode!"
 	}
-		"BPress5"
+	"BPress5"
 	{
   		"#format"	"{1:s},{2:s},{3:s}"
 		"en"		"{1} {lightgreen}{2} {default}finished the map with a time of [{blue}{3}{default}] in practice mode!"
 	}
-		"BPress6"
+	"BPress6"
 	{
   		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
 		"en"		"{1} {lightgreen}{2}{default} finished the {blue}map {red}{3} {default}with a time of ({lightgreen}{4}{default}). Missing their best time by ({red}{5}{default}). [rank {lightgreen}#{6}{default}/{7} | record {lightgreen}{8}{default}]"
@@ -440,7 +440,7 @@
   		"#format"	"{1:s},{2:f}"
 		"en"		"{1} Usage: sm_gravityfix <0/1> (0 Disabled, 1 Enabled) (Gravity Fix currently {red}disabled{default})"
 	}
-		"Commands1"
+	"Commands1"
 	{
   		"#format"	"{1:f},{2:f},{3:f}"
 		"en"		"X: {1} Y: {2} Z: {3}"
@@ -582,7 +582,7 @@
 	}
 	"Commands29"
 	{
-    "#format"	"{1:s},{2:i}"
+    	"#format"	"{1:s},{2:i}"
 		"en"		"{1} Invalid bonus ID {2}."
 	}
 	"Commands30"
@@ -1104,7 +1104,7 @@
 	"SurfZones7"
 	{
 		"#format"	"{1:s}"
-		"en"       "{1} Failed to save bonus, error in coordinates."
+		"en"		"{1} Failed to save bonus, error in coordinates."
 	}
 	"SurfZones8"
 	{
