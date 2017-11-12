@@ -582,7 +582,7 @@
 	}
 	"Commands29"
 	{
-    	"#format"	"{1:s},{2:i}"
+		"#format"	"{1:s},{2:i}"
 		"en"		"{1} Invalid bonus ID {2}."
 	}
 	"Commands30"
