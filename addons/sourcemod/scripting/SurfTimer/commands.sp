@@ -163,32 +163,32 @@ void CreateCommands()
 	RegConsoleCmd("sm_styles", Client_SelectStyle, "[surftimer] open style select menu.");
 
 	// Style WR
-	RegConsoleCmd("sm_wrsw", Client_Wrsw, "[surftimer] prints records sw in chat");
-	RegConsoleCmd("sm_swwr", Client_Wrsw, "[surftimer] prints records sw in chat");
-	RegConsoleCmd("sm_wrhsw", Client_Wrhsw, "[surftimer] prints records hsw in chat");
-	RegConsoleCmd("sm_hswwr", Client_Wrhsw, "[surftimer] prints records hsw in chat");
-	RegConsoleCmd("sm_wrbw", Client_Wrbw, "[surftimer] prints records bw in chat");
-	RegConsoleCmd("sm_bwwr", Client_Wrbw, "[surftimer] prints records bw in chat");
-	RegConsoleCmd("sm_wrlg", Client_Wrlg, "[surftimer] prints records low-gravity in chat");
-	RegConsoleCmd("sm_lgwr", Client_Wrlg, "[surftimer] prints records low-gravity in chat");
-	RegConsoleCmd("sm_wrsm", Client_Wrsm, "[surftimer] prints records slow motion in chat");
-	RegConsoleCmd("sm_smwr", Client_Wrsm, "[surftimer] prints records slow motion in chat");
-	RegConsoleCmd("sm_wrff", Client_Wrff, "[surftimer] prints records fast forwards in chat");
-	RegConsoleCmd("sm_ffwr", Client_Wrff, "[surftimer] prints records fast forwards in chat");
+	// RegConsoleCmd("sm_wrsw", Client_Wrsw, "[surftimer] prints records sw in chat");
+	// RegConsoleCmd("sm_swwr", Client_Wrsw, "[surftimer] prints records sw in chat");
+	// RegConsoleCmd("sm_wrhsw", Client_Wrhsw, "[surftimer] prints records hsw in chat");
+	// RegConsoleCmd("sm_hswwr", Client_Wrhsw, "[surftimer] prints records hsw in chat");
+	// RegConsoleCmd("sm_wrbw", Client_Wrbw, "[surftimer] prints records bw in chat");
+	// RegConsoleCmd("sm_bwwr", Client_Wrbw, "[surftimer] prints records bw in chat");
+	// RegConsoleCmd("sm_wrlg", Client_Wrlg, "[surftimer] prints records low-gravity in chat");
+	// RegConsoleCmd("sm_lgwr", Client_Wrlg, "[surftimer] prints records low-gravity in chat");
+	// RegConsoleCmd("sm_wrsm", Client_Wrsm, "[surftimer] prints records slow motion in chat");
+	// RegConsoleCmd("sm_smwr", Client_Wrsm, "[surftimer] prints records slow motion in chat");
+	// RegConsoleCmd("sm_wrff", Client_Wrff, "[surftimer] prints records fast forwards in chat");
+	// RegConsoleCmd("sm_ffwr", Client_Wrff, "[surftimer] prints records fast forwards in chat");
 
 	// Style WRB
-	RegConsoleCmd("sm_wrbsw", Client_Wrbsw, "[surftimer] prints records sw in chat");
-	RegConsoleCmd("sm_swwrb", Client_Wrbsw, "[surftimer] prints records sw in chat");
-	RegConsoleCmd("sm_wrbhsw", Client_Wrbhsw, "[surftimer] prints records hsw in chat");
-	RegConsoleCmd("sm_hswwrb", Client_Wrbhsw, "[surftimer] prints records hsw in chat");
-	RegConsoleCmd("sm_wrbbw", Client_Wrbbw, "[surftimer] prints records bw in chat");
-	RegConsoleCmd("sm_bwwrb", Client_Wrbbw, "[surftimer] prints records bw in chat");
-	RegConsoleCmd("sm_wrblg", Client_Wrblg, "[surftimer] prints records low-gravity in chat");
-	RegConsoleCmd("sm_lgwrb", Client_Wrblg, "[surftimer] prints records low-gravity in chat");
-	RegConsoleCmd("sm_wrbsm", Client_Wrbsm, "[surftimer] prints records slow motion in chat");
-	RegConsoleCmd("sm_smwrb", Client_Wrbsm, "[surftimer] prints records slow motion in chat");
-	RegConsoleCmd("sm_wrbff", Client_Wrbff, "[surftimer] prints records fast forwards in chat");
-	RegConsoleCmd("sm_ffwrb", Client_Wrbff, "[surftimer] prints records fast forwards in chat");
+	// RegConsoleCmd("sm_wrbsw", Client_Wrbsw, "[surftimer] prints records sw in chat");
+	// RegConsoleCmd("sm_swwrb", Client_Wrbsw, "[surftimer] prints records sw in chat");
+	// RegConsoleCmd("sm_wrbhsw", Client_Wrbhsw, "[surftimer] prints records hsw in chat");
+	// RegConsoleCmd("sm_hswwrb", Client_Wrbhsw, "[surftimer] prints records hsw in chat");
+	// RegConsoleCmd("sm_wrbbw", Client_Wrbbw, "[surftimer] prints records bw in chat");
+	// RegConsoleCmd("sm_bwwrb", Client_Wrbbw, "[surftimer] prints records bw in chat");
+	// RegConsoleCmd("sm_wrblg", Client_Wrblg, "[surftimer] prints records low-gravity in chat");
+	// RegConsoleCmd("sm_lgwrb", Client_Wrblg, "[surftimer] prints records low-gravity in chat");
+	// RegConsoleCmd("sm_wrbsm", Client_Wrbsm, "[surftimer] prints records slow motion in chat");
+	// RegConsoleCmd("sm_smwrb", Client_Wrbsm, "[surftimer] prints records slow motion in chat");
+	// RegConsoleCmd("sm_wrbff", Client_Wrbff, "[surftimer] prints records fast forwards in chat");
+	// RegConsoleCmd("sm_ffwrb", Client_Wrbff, "[surftimer] prints records fast forwards in chat");
 
 	// Style mtop
 	RegConsoleCmd("sm_mtopsw", Client_SWMapTop, "[surftimer] displays a local map top (sw) for a given map");
@@ -1143,10 +1143,7 @@ public Action Client_Wr(int client, int args)
 	{
 		if (args == 0)
 		{
-			if (g_fRecordMapTime == 9999999.0)
-				CPrintToChat(client, "%t", "NoRecordTop", g_szChatPrefix);
-			else
-				PrintMapRecords(client, 0);
+			PrintWorldRecordStyleSelect(client, 0);
 		}
 		else
 		{
@@ -1163,157 +1160,81 @@ public Action Client_Wr(int client, int args)
 public Action Client_Wrb(int client, int args)
 {
 	if (IsValidClient(client))
-	{
-		if (g_fBonusFastest[1] == 9999999.0)
-			CPrintToChat(client, "%t", "NoRecordTop", g_szChatPrefix);
-		else
-			PrintMapRecords(client, 99);
-	}
+		PrintWorldRecordStyleSelect(client, 1);
 	return Plugin_Handled;
 }
 
-public Action Client_Wrbsw(int client, int args)
+public void PrintWorldRecordStyleSelect(int client, int type)
 {
-	if (IsValidClient(client))
-	{
-		if (g_fStyleBonusFastest[1][1] == 9999999.0)
-			CPrintToChat(client, "%t", "NoRecordTop", g_szChatPrefix);
-		else
-			PrintMapRecords(client, 991);
-	}
-	return Plugin_Handled;
+	Menu menu = CreateMenu(PrintWorldRecordStyleSelectHandler);
+	SetMenuTitle(menu, "WR(B): Select a style\n \n");
+
+	char szType[2];
+	IntToString(type, szType, sizeof(szType));
+
+	AddMenuItem(menu, szType, "Normal");
+	AddMenuItem(menu, szType, "Sideways");
+	AddMenuItem(menu, szType, "Half-Sideways");
+	AddMenuItem(menu, szType, "Backwards");
+	AddMenuItem(menu, szType, "Low-Gravity");
+	AddMenuItem(menu, szType, "Slow Motion");
+	AddMenuItem(menu, szType, "Fast Forwards");
+
+	SetMenuExitButton(menu, true);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
 }
 
-public Action Client_Wrbhsw(int client, int args)
+public int PrintWorldRecordStyleSelectHandler(Handle menu, MenuAction action, int param1, int param2)
 {
-	if (IsValidClient(client))
+	if (action == MenuAction_Select)
 	{
-		if (g_fStyleBonusFastest[2][1] == 9999999.0)
-			CPrintToChat(client, "%t", "NoRecordTop", g_szChatPrefix);
-		else
-			PrintMapRecords(client, 992);
-	}
-	return Plugin_Handled;
-}
+		char szType[2];
+		GetMenuItem(menu, param2, szType, sizeof(szType));
+		int type = StringToInt(szType);
 
-public Action Client_Wrbbw(int client, int args)
-{
-	if (IsValidClient(client))
-	{
-		if (g_fStyleBonusFastest[3][1] == 9999999.0)
-			CPrintToChat(client, "%t", "NoRecordTop", g_szChatPrefix);
+		if (type == 0)
+		{
+			// Normal
+			if (param2 == 0)
+			{
+				// Normal
+				if (g_fRecordMapTime == 9999999.0)
+					CPrintToChat(param1, "%t", "NoRecordTop", g_szChatPrefix);
+				else
+					PrintMapRecords(param1, 0);
+			}
+			else
+			{
+				// Style
+				if (g_fRecordStyleMapTime[param2] == 9999999.0)
+					CPrintToChat(param1, "%t", "NoRecordTop", g_szChatPrefix);
+				else
+					PrintMapRecords(param1, param2);
+			}
+		}
 		else
-			PrintMapRecords(client, 993);
+		{
+			// Styles
+			if (param2 == 0)
+			{
+				// Normal
+				if (g_fBonusFastest[1] == 9999999.0)
+					CPrintToChat(param1, "%t", "NoRecordTop", g_szChatPrefix);
+				else
+					PrintMapRecords(param1, 99);
+			}
+			else
+			{
+				// Style
+				if (g_fStyleBonusFastest[param2][1] == 9999999.0)
+					CPrintToChat(param1, "%t", "NoRecordTop", g_szChatPrefix);
+				else
+					PrintMapRecords(param1, 990 + param2);
+			}
+		}
 	}
-	return Plugin_Handled;
-}
-
-public Action Client_Wrblg(int client, int args)
-{
-	if (IsValidClient(client))
-	{
-		if (g_fStyleBonusFastest[4][1] == 9999999.0)
-			CPrintToChat(client, "%t", "NoRecordTop", g_szChatPrefix);
-		else
-			PrintMapRecords(client, 994);
-	}
-	return Plugin_Handled;
-}
-
-public Action Client_Wrbsm(int client, int args)
-{
-	if (IsValidClient(client))
-	{
-		if (g_fStyleBonusFastest[5][1] == 9999999.0)
-			CPrintToChat(client, "%t", "NoRecordTop", g_szChatPrefix);
-		else
-			PrintMapRecords(client, 995);
-	}
-	return Plugin_Handled;
-}
-
-public Action Client_Wrbff(int client, int args)
-{
-	if (IsValidClient(client))
-	{
-		if (g_fStyleBonusFastest[6][1] == 9999999.0)
-			CPrintToChat(client, "%t", "NoRecordTop", g_szChatPrefix);
-		else
-			PrintMapRecords(client, 996);
-	}
-	return Plugin_Handled;
-}
-
-public Action Client_Wrsw(int client, int args)
-{
-	if (IsValidClient(client))
-	{
-		if (g_fRecordStyleMapTime[1] == 9999999.0)
-			CPrintToChat(client, "%t", "NoRecordTop", g_szChatPrefix);
-		else
-			PrintMapRecords(client, 1);
-	}
-	return Plugin_Handled;
-}
-
-public Action Client_Wrhsw(int client, int args)
-{
-	if (IsValidClient(client))
-	{
-		if (g_fRecordStyleMapTime[2] == 9999999.0)
-			CPrintToChat(client, "%t", "NoRecordTop", g_szChatPrefix);
-		else
-			PrintMapRecords(client, 2);
-	}
-	return Plugin_Handled;
-}
-
-public Action Client_Wrbw(int client, int args)
-{
-	if (IsValidClient(client))
-	{
-		if (g_fRecordStyleMapTime[3] == 9999999.0)
-			CPrintToChat(client, "%t", "NoRecordTop", g_szChatPrefix);
-		else
-			PrintMapRecords(client, 3);
-	}
-	return Plugin_Handled;
-}
-
-public Action Client_Wrlg(int client, int args)
-{
-	if (IsValidClient(client))
-	{
-		if (g_fRecordStyleMapTime[4] == 9999999.0)
-			CPrintToChat(client, "%t", "NoRecordTop", g_szChatPrefix);
-		else
-			PrintMapRecords(client, 4);
-	}
-	return Plugin_Handled;
-}
-
-public Action Client_Wrsm(int client, int args)
-{
-	if (IsValidClient(client))
-	{
-		if (g_fRecordStyleMapTime[5] == 9999999.0)
-			CPrintToChat(client, "%t", "NoRecordTop", g_szChatPrefix);
-		else
-			PrintMapRecords(client, 5);
-	}
-	return Plugin_Handled;
-}
-
-public Action Client_Wrff(int client, int args)
-{
-	if (IsValidClient(client))
-	{
-		if (g_fRecordStyleMapTime[6] == 9999999.0)
-			CPrintToChat(client, "%t", "NoRecordTop", g_szChatPrefix);
-		else
-			PrintMapRecords(client, 6);
-	}
-	return Plugin_Handled;
+	else if (action == MenuAction_End)
+		delete menu;
 }
 
 public Action Command_Tier(int client, int args)

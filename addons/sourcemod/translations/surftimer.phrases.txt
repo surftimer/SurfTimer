@@ -13,67 +13,67 @@
 	"ToogleCheckpoints1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Checkpoints disabled."
+		"en"		"{1} Checkpoints disabled"
 	}
 	"ToggleCheckpoints2"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Checkpoints Enabled."
+		"en"		"{1} Checkpoints Enabled"
 	}
 	"ToggleCheckpoints3"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Checkpoints will be enabled when you restart your timer."
+		"en"		"{1} Checkpoints will be enabled when you restart your timer"
 	}
 	"HideChat1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Hide chat enabled."
+		"en"		"{1} Hide chat enabled"
 	}
 	"HideChat2"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Hide chat disabled."
+		"en"		"{1} Hide chat disabled"
 	}
 	"HideViewModel1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Weapon viewmodel disabled."
+		"en"		"{1} Weapon viewmodel disabled"
 	}
 	"HideViewModel2"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Weapon viewmodel enabled."
+		"en"		"{1} Weapon viewmodel enabled"
 	}
 	"AdvertBonus"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} {lightgreen}Type {default}!bonus {lightgreen}to teleport to the bonus stage."
+		"en"		"{1} {lightgreen}Type {default}!bonus {lightgreen}to teleport to the bonus stage"
 	}
 	"AdvertStage"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} {lightgreen}Type {default}!wrcp {lightgreen}to see your stage times."
+		"en"		"{1} {lightgreen}Type {default}!wrcp {lightgreen}to see your stage times"
 	}
 	"ZoneVisAll"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} The zone is visible for ALL."
+		"en"		"{1} The zone is visible for ALL"
 	}
 	"ZoneVisT"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} The zone is visible for Terrorists."
+		"en"		"{1} The zone is visible for Terrorists"
 	}
 	"ZoneVisCT"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} The zone is visible for Counter-Terrorists."
+		"en"		"{1} The zone is visible for Counter-Terrorists"
 	}
 	"ZoneVisInv"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} The zone is invisible."
+		"en"		"{1} The zone is invisible"
 	}
 	"AvgTime"
 	{
@@ -88,17 +88,17 @@
 	"TimeleftMinutes"
 	{
 		"#format"	"{1:s},{2:s},{3:i}"
-		"en"		"{1} {blue}{2} {default}- {lightgreen}{3} minutes remaining."
+		"en"		"{1} {blue}{2} {default}- {lightgreen}{3} minutes remaining"
 	}
 	"TimeleftSeconds"
 	{
 		"#format"	"{1:s},{2:s},{3:i}"
-		"en"		"{1} {blue}{2} {default}- {lightgreen}{3} seconds remaining."
+		"en"		"{1} {blue}{2} {default}- {lightgreen}{3} seconds remaining"
 	}
 	"TimeleftCounter"
 	{
 		"#format"	"{1:s},{2:s},{3:i}"
-		"en"		"{1} {blue}{2} {default}- {lightgreen}{3} seconds remaining."
+		"en"		"{1} {blue}{2} {default}- {lightgreen}{3} seconds remaining"
 	}
 	"MissedMapBest"
 	{
@@ -113,7 +113,7 @@
 	"Rc_PlayerRankStart"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} {default}Refreshing profile data.."
+		"en"		"{1} {default}Refreshing profile data."
 	}
 	"Rc_PlayerRankFinished"
 	{
@@ -128,12 +128,12 @@
 	"NoPlayerTop"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} No players found."
+		"en"		"{1} No players found"
 	}
 	"NoRecordTop"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} No map times found."
+		"en"		"{1} No map times found"
 	}
 	"PrUpdateStarted"
 	{
@@ -158,12 +158,12 @@
 	"ReplayFinishingMsg"
 	{
 		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {lightgreen}{2}{default} finished with a time of ({lightgreen}{3}{default})."
+		"en"		"{1} {lightgreen}{2}{default} finished with a time of ({lightgreen}{3}{default})"
 	}
 	"ReplayFinishingMsgBonus"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s}"
-		"en"		"{1} {lightgreen}{2}{default} finished the {gold}{3}{default} with a time of ({lightgreen}{4}{default})."
+		"en"		"{1} {lightgreen}{2}{default} finished the {gold}{3}{default} with a time of ({lightgreen}{4}{default})"
 	}
 	"MapFinished1"
 	{
@@ -218,7 +218,7 @@
 	"PlayerNotFound"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} Player {2} not found."
+		"en"		"{1} Player {2} not found"
 	}
 	"ConsoleOutput"
 	{
@@ -228,7 +228,7 @@
 	"PlayerHasNoMapRecords"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} {2} doesn't have local map times."
+		"en"		"{1} {2} doesn't have local map times"
 	}
 	"NoTopRecords"
 	{
@@ -243,97 +243,97 @@
 	"Goto1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} {lightgreen}!goto{default} command is serverside disabled."
+		"en"		"{1} {lightgreen}!goto{default} command is serverside disabled"
 	}
 	"Goto2"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} You can't use {lightgreen}!goto{default} if player blocking is enabled."
+		"en"		"{1} You can't use {lightgreen}!goto{default} if player blocking is enabled"
 	}
 	"Goto3"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} You must {lightgreen}!stop{default} your timer to use !goto."
+		"en"		"{1} You must {lightgreen}!stop{default} your timer to use !goto"
 	}
 	"Goto4"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} Player {2} not found."
+		"en"		"{1} Player {2} not found"
 	}
 	"Goto5"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} Player {2} has teleported to you."
+		"en"		"{1} Player {2} has teleported to you"
 	}
 	"Goto6"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} You can't teleport to {2} because the player was crouching."
+		"en"		"{1} You can't teleport to {2} because the player was crouching"
 	}
 	"Goto7"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} You can't teleport to {2} because he/she was not on ground."
+		"en"		"{1} You can't teleport to {2} because he/she was not on ground"
 	}
 	"RadioCommandsDisabled"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Radio commands are disabled."
+		"en"		"{1} Radio commands are disabled"
 	}
 	"Hide1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Hide other players disabled."
+		"en"		"{1} Hide other players disabled"
 	}
 	"Hide2"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Hide other players enabled."
+		"en"		"{1} Hide other players enabled"
 	}
 	"Pause1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Pause function is server-sided disabled."
+		"en"		"{1} Pause function is server-sided disabled"
 	}
 	"Pause2"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Pause disabled."
+		"en"		"{1} Pause disabled"
 	}
 	"Pause3"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Pause enabled."
+		"en"		"{1} Pause enabled"
 	}
 	"QuakeSounds1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Quake sounds enabled."
+		"en"		"{1} Quake sounds enabled"
 	}
 	"QuakeSounds2"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Quake sounds disabled."
+		"en"		"{1} Quake sounds disabled"
 	}
 	"HideSpecs1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Spectator list enabled."
+		"en"		"{1} Spectator list enabled"
 	}
 	"HideSpecs2"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Spectator list disabled."
+		"en"		"{1} Spectator list disabled"
 	}
 	"AutoBhop1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} AutoBhop enabled."
+		"en"		"{1} AutoBhop enabled"
 	}
 	"AutoBhop2"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} AutoBhop disabled."
+		"en"		"{1} AutoBhop disabled"
 	}
 	"AutoBhop3"
 	{
@@ -343,7 +343,7 @@
 	"HelpMsg"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} {lightgreen}Type {default}!help {lightgreen}to get a list of timer commands."
+		"en"		"{1} {lightgreen}Type {default}!help {lightgreen}to get a list of timer commands"
 	}
 	"Disconnected1"
 	{
@@ -358,22 +358,22 @@
 	"Connected1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{default}Player {lightgreen}{1}{default} connected."
+		"en"		"{default}Player {lightgreen}{1}{default} connected"
 	}
 	"BPress1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} The server hasn't finished loading it's settings, please wait."
+		"en"		"{1} The server hasn't finished loading it's settings, please wait"
 	}
 	"BPress2"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Your settings are currently being loaded, please wait."
+		"en"		"{1} Your settings are currently being loaded, please wait"
 	}
 	"BPress3"
 	{
   		"#format"	"{1:s}"
-  		"en"		"{1} The server hasn't finished loading your settings, please wait."
+  		"en"		"{1} The server hasn't finished loading your settings, please wait"
 	}
 	"BPress4"
 	{
@@ -398,17 +398,17 @@
 	"BPress8"
 	{
   		"#format"	"{1:s},{2:i}"
-		"en"		"{1} Error saving your {orchid}stage {2} {default}time."
+		"en"		"{1} Error saving your {orchid}stage {2} {default}time"
 	}
 	"BPress9"
 	{
   		"#format"	"{1:s},{2:i}"
-		"en"		"{1} Error saving your {orchid}stage {2} {default}time."
+		"en"		"{1} Error saving your {orchid}stage {2} {default}time"
 	}
 	"MSettings1"
 	{
   		"#format"	"{1:s},{2:f}"
-		"en"		"{1} Type the maxvelocity you want to set."
+		"en"		"{1} Type the maxvelocity you want to set"
 	}
 		"MSettings2"
 	{
@@ -458,12 +458,12 @@
 	"Commands4"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} You may only use vote extend when there is 5 minutes left."
+		"en"		"{1} You may only use vote extend when there is 5 minutes left"
 	}
 	"Commands5"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Please wait until the current vote has finished."
+		"en"		"{1} Please wait until the current vote has finished"
 	}
 	"Commands6"
 	{
@@ -508,27 +508,27 @@
 	"Commands14"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} There are no bonuses in this map."
+		"en"		"{1} There are no bonuses in this map"
 	}
 	"Commands15"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} There are no bonuses in this map."
+		"en"		"{1} There are no bonuses in this map"
 	}
 	"Commands16"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} There are no bonuses in this map."
+		"en"		"{1} There are no bonuses in this map"
 	}
 	"Commands17"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} There are no bonuses in this map."
+		"en"		"{1} There are no bonuses in this map"
 	}
 	"Commands18"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Bonus tiers have not been set on this map."
+		"en"		"{1} Bonus tiers have not been set on this map"
 	}
 	"Commands19"
 	{
@@ -538,12 +538,12 @@
 	"Commands20"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Noclip disabled, use {green}!surftimer {default}to re-enable your timer."
+		"en"		"{1} Noclip disabled, use {green}!surftimer {default}to re-enable your timer"
 	}
 	"Commands21"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} No bonus found on this map."
+		"en"		"{1} No bonus found on this map"
 	}
 	"Commands22"
 	{
@@ -553,12 +553,12 @@
 	"Commands23"
 	{
   		"#format"	"{1:s},{2:i}"
-		"en"		"{1} Invalid bonus ID {2}."
+		"en"		"{1} Invalid bonus ID {2}"
 	}
 	"Commands24"
 	{
   		"#format"	"{1:s},{2:i}"
-		"en"		"{1} Invalid bonus ID {2}."
+		"en"		"{1} Invalid bonus ID {2}"
 	}
 	"Commands25"
 	{
@@ -568,7 +568,7 @@
 	"Commands26"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} No bonus found on this map."
+		"en"		"{1} No bonus found on this map"
 	}
 	"Commands27"
 	{
@@ -578,12 +578,12 @@
 	"Commands28"
 	{
   		"#format"	"{1:s},{2:i}"
-		"en"		"{1} Invalid bonus ID {2}."
+		"en"		"{1} Invalid bonus ID {2}"
 	}
 	"Commands29"
 	{
 		"#format"	"{1:s},{2:i}"
-		"en"		"{1} Invalid bonus ID {2}."
+		"en"		"{1} Invalid bonus ID {2}"
 	}
 	"Commands30"
 	{
@@ -593,27 +593,27 @@
 	"Commands31"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Timer {red}disabled."
+		"en"		"{1} Timer {red}disabled"
 	}
 	"Commands32"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Timer {green}enabled."
+		"en"		"{1} Timer {green}enabled"
 	}
 	"Commands33"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} You cannot pause with your timer stopped."
+		"en"		"{1} You cannot pause with your timer stopped"
 	}
 	"Commands34"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Are you sure you want to restart your run? Use {green}!r{default} again to restart."
+		"en"		"{1} Are you sure you want to restart your run? Use {green}!r{default} again to restart"
 	}
 	"Commands35"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} There are no bonuses in this map."
+		"en"		"{1} There are no bonuses in this map"
 	}
 	"Commands36"
 	{
@@ -623,17 +623,17 @@
 	"Commands37"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} There was a error when editing your centre hud."
+		"en"		"{1} There was a error when editing your centre hud"
 	}
 	"Commands38"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Turning on spec list on module 1 and disabling other modules will make the side hud have the old functionality."
+		"en"		"{1} Turning on spec list on module 1 and disabling other modules will make the side hud have the old functionality"
 	}
 	"Commands39"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} There was a error when editing your side hud."
+		"en"		"{1} There was a error when editing your side hud"
 	}
 	"Commands40"
 	{
@@ -643,7 +643,7 @@
 	"Commands41"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Title too long, Maximum 20 characters. (Not Including colours)."
+		"en"		"{1} Title too long, Maximum 20 characters. (Not Including colours)"
 	}
 	"Commands42"
 	{
@@ -663,47 +663,47 @@
 	"Commands45"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} This map is linear. WRCP is not available."
+		"en"		"{1} This map is linear. WRCP is not available"
 	}
 	"Commands46"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Please wait before using this command again."
+		"en"		"{1} Please wait before using this command again"
 	}
 	"Commands47"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Triggers toggled."
+		"en"		"{1} Triggers toggled"
 	}
 	"Commands48"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Map finish is now {green}enabled."
+		"en"		"{1} Map finish is now {green}enabled"
 	}
 	"Commands49"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Map finish is now {red}disabled."
+		"en"		"{1} Map finish is now {red}disabled"
 	}
 	"Commands50"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Repeat mode is now {green}enabled."
+		"en"		"{1} Repeat mode is now {green}enabled"
 	}
 	"Commands51"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Repeat mode is now {red}disabled."
+		"en"		"{1} Repeat mode is now {red}disabled"
 	}
 	"Commands52"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Fixing replay bots."
+		"en"		"{1} Fixing replay bots"
 	}
 	"Commands53"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} You have been given a knife."
+		"en"		"{1} You have been given a knife"
 	}
 	"Commands54"
 	{
@@ -713,17 +713,17 @@
 	"Commands55"
 	{
   		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} Player {lightgreen}{2} {default}not found on {lightgreen}{3}."
+		"en"		"{1} Player {lightgreen}{2} {default}not found on {lightgreen}{3}"
 	}
 	"Commands56"
 	{
   		"#format"	"{1:s},{2:s}"
-		"en"		"{1} Player {lightgreen}{2} {default}not found."
+		"en"		"{1} Player {lightgreen}{2} {default}not found"
 	}
 	"Commands57"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} You don't have access to the zones menu."
+		"en"		"{1} You don't have access to the zones menu"
 	}
 	"Commands58"
 	{
@@ -738,17 +738,17 @@
 	"Commands60"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Type the bonus number."
+		"en"		"{1} Type the bonus number"
 	}
 	"Commands61"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Type a bonus number first."
+		"en"		"{1} Type a bonus number first"
 	}
 	"Commands62"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} No players found."
+		"en"		"{1} No players found"
 	}
 	"Commands63"
 	{
@@ -778,27 +778,27 @@
 	"Commands68"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} New start position saved."
+		"en"		"{1} New start position saved"
 	}
 	"Commands69"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} You must be in a start zone to use {lightgreen}!startpos."
+		"en"		"{1} You must be in a start zone to use {lightgreen}!startpos"
 	}
 	"Commands70"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Type your message."
+		"en"		"{1} Type your message"
 	}
 	"Commands71"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Teleportation to the end zone has been disabled on this server."
+		"en"		"{1} Teleportation to the end zone has been disabled on this server"
 	}
 	"Commands72"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} You cannot use NoClip while you are dead."
+		"en"		"{1} You cannot use NoClip while you are dead"
 	}
 	"Commands73"
 	{
@@ -813,7 +813,7 @@
 	"Commands75"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Bonus not found."
+		"en"		"{1} Bonus not found"
 	}
 	"Commands76"
 	{
@@ -823,47 +823,47 @@
 	"Commands77"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Bonus not found."
+		"en"		"{1} Bonus not found"
 	}
 	"Commands78"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Zones are now {green}visible."
+		"en"		"{1} Zones are now {green}visible"
 	}
 	"Commands79"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Zones are now {red}hidden."
+		"en"		"{1} Zones are now {red}hidden"
 	}
 	"Commands80"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} A vote is already in progress."
+		"en"		"{1} A vote is already in progress"
 	}
 	"Commands81"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} A vote is already in progress."
+		"en"		"{1} A vote is already in progress"
 	}
 	"Commands82"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Your timer must be enabled to use {green}!startpos."
+		"en"		"{1} Your timer must be enabled to use {green}!startpos"
 	}
 	"Commands83"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Start position reset."
+		"en"		"{1} Start position reset"
 	}
 	"Commands84"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} You must complete the map first."
+		"en"		"{1} You must complete the map first"
 	}
 	"Commands85"
 	{
   		"#format"	"{1:s}"
-		"en"    	"{1} Player not found."
+		"en"    	"{1} Player not found"
 	}
 	"Commands86"
 	{
@@ -872,7 +872,7 @@
 	}
 	"CVote1"
 	{
-		"en"	"[SM] Vote is already in progress."
+		"en"	"[SM] Vote is already in progress"
 	}
 	"CVote2"
 	{
@@ -917,26 +917,26 @@
 	"CVote10"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Extending map by 10 minutes."
+		"en"		"{1} Extending map by 10 minutes"
 	}
 	"CVote11"
 	{
   		"#format"	"{1:s}"
-		"en"		"[SM] Changing map to {1}."
+		"en"		"[SM] Changing map to {1}"
 	}
 	"CVote12"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Vote failed."
+		"en"		"{1} Vote failed"
 	}
 	"CVote13"
 	{
   		"#format"	"{1:s}"
-		"en"		"[SM] Set next map to {1}."
+		"en"		"[SM] Set next map to {1}"
 	}
 	"CVote14"
 	{
-		"en"	"[SM] Vote failed."
+		"en"	"[SM] Vote failed"
 	}
 	"SQLTime1"
 	{
@@ -971,17 +971,17 @@
 	"SQLTwo1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Map not found."
+		"en"		"{1} Map not found"
 	}
 	"SQLTwo2"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} You must set a custom title using sm_mytitle before you can set your name colour."
+		"en"		"{1} You must set a custom title using sm_mytitle before you can set your name colour"
 	}
 	"SQLTwo3"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} You must set a custom title using sm_mytitle before you can set your text colour."
+		"en"		"{1} You must set a custom title using sm_mytitle before you can set your text colour"
 	}
 	"SQLTwo4.1"
 	{
@@ -999,37 +999,37 @@
 	"SQLTwo5"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Your join msg has been disabled."
+		"en"		"{1} Your join msg has been disabled"
 	}
 	"SQLTwo6"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} Your join msg has been set to {2}."
+		"en"		"{1} Your join msg has been set to {2}"
 	}
 	"SQLTwo7"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} No result found."
+		"en"		"{1} No result found"
 	}
 	"Admin1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Please give the zone a valid name."
+		"en"		"{1} Please give the zone a valid name"
 	}
 	"Admin2"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Zone name too long. Maximum is 128 characters."
+		"en"		"{1} Zone name too long. Maximum is 128 characters"
 	}
 	"Admin3"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Cancelled bonus renaming."
+		"en"		"{1} Cancelled bonus renaming"
 	}
 	"Admin4"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} You don't have access to the zones menu."
+		"en"		"{1} You don't have access to the zones menu"
 	}
 	"Admin5"
 	{
@@ -1039,17 +1039,17 @@
 	"Admin6"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Invalid tier number. Please choose a tier number between 1-6."
+		"en"		"{1} Invalid tier number. Please choose a tier number between 1-6"
 	}
 	"Admin7"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Spawnpoint edited."
+		"en"		"{1} Spawnpoint edited"
 	}
 	"Admin8"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Spawnpoint deleted."
+		"en"		"{1} Spawnpoint deleted"
 	}
 	"Admin9"
 	{
@@ -1059,12 +1059,12 @@
 	"Admin10"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} See console for more commands."
+		"en"		"{1} See console for more commands"
 	}
 	"Admin11"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} You don't have access to the admin menu."
+		"en"		"{1} You don't have access to the admin menu"
 	}
 	"Admin12"
 	{
@@ -1074,27 +1074,27 @@
 	"SurfZones1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} You are noclipping or have noclipped recently, timer disabled."
+		"en"		"{1} You are noclipping or have noclipped recently, timer disabled"
 	}
 	"SurfZones2"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} You don't have access to the zones menu."
+		"en"		"{1} You don't have access to the zones menu"
 	}
 	"SurfZones3"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Zones are reloaded."
+		"en"		"{1} Zones are reloaded"
 	}
 	"SurfZones4"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Please write the bonus name in chat or use {lightgreen}!cancel{default} to stop."
+		"en"		"{1} Please write the bonus name in chat or use {lightgreen}!cancel{default} to stop"
 	}
 	"SurfZones5"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Bonus Start Zone Created."
+		"en"		"{1} Bonus Start Zone Created"
 	}
 	"SurfZones6"
 	{
@@ -1104,57 +1104,57 @@
 	"SurfZones7"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Failed to save bonus, error in coordinates."
+		"en"		"{1} Failed to save bonus, error in coordinates"
 	}
 	"SurfZones8"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Zone saved."
+		"en"		"{1} Zone saved"
 	}
 	"SurfZones9"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Type the desired target name (type reset to reset)."
+		"en"		"{1} Type the desired target name (type reset to reset)"
 	}
 	"SurfZones10"
 	{
 		"#format"	"{1:s},{2:s},{3:i}"
-		"en"		"{1} Type the prespeed to be set to {lightgreen}{2}-{3}."
+		"en"		"{1} Type the prespeed to be set to {lightgreen}{2}-{3}"
 	}
 	"SurfZones11"
 	{
 		"#format"	"{1:s},{2:s},{3:f},{4:f},{5:f}"
-		"en"		"{1} Teleporting to {2} at {3} {4} {5}."
+		"en"		"{1} Teleporting to {2} at {3} {4} {5}"
 	}
 	"SurfZones12"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:s}"
-		"en"		"{1} Set {2}-{3} hook name to {4}."
+		"en"		"{1} Set {2}-{3} hook name to {4}"
 	}
 	"SurfZones13"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Zones cleared."
+		"en"		"{1} Zones cleared"
 	}
 	"Hooks1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Cancelled."
+		"en"		"{1} Cancelled"
 	}
 	"Hooks2"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Invalid Bonus."
+		"en"		"{1} Invalid Bonus"
 	}
 	"Hooks3"
 	{
 		"#format"	"{1:s},{2:i}"
-		"en"		"{1} Bonus {2} to use with hooked zones."
+		"en"		"{1} Bonus {2} to use with hooked zones"
 	}
 	"Hooks4"
 	{
 		"#format"	"{1:s},{2:s},{3:f}"
-		"en"		"{1} {2} max velocity set to {3}."
+		"en"		"{1} {2} max velocity set to {3}"
 	}
 	"Hooks5"
 	{
@@ -1184,37 +1184,37 @@
 	"Hooks10"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} You may not jump in this area."
+		"en"		"{1} You may not jump in this area"
 	}
 	"Hooks11"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} You may not crouch in this area."
+		"en"		"{1} You may not crouch in this area"
 	}
 	"Hooks12"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Style set to {green}Normal{default}, A used."
+		"en"		"{1} Style set to {green}Normal{default}, A used"
 	}
 	"Hooks13"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Style set to {green}Normal{default}, D used."
+		"en"		"{1} Style set to {green}Normal{default}, D used"
 	}
 	"Hooks14"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Style set to {green}Normal."
+		"en"		"{1} Style set to {green}Normal"
 	}
 	"Hooks15"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} {red}You may only jump once inside this zone."
+		"en"		"{1} {red}You may only jump once inside this zone"
 	}
 	"Misc1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Zonegroup not found."
+		"en"		"{1} Zonegroup not found"
 	}
 	"Misc2"
 	{
@@ -1224,7 +1224,7 @@
 	"Misc3"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} No zones found in the map."
+		"en"		"{1} No zones found in the map"
 	}
 	"Misc4"
 	{
@@ -1234,77 +1234,77 @@
 	"Misc5"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s}"
-		"en"		"{1} {lightgreen}{2} {default}holds the record with time: {lightgreen}{3} {default}on {blue}{4}{default}."
+		"en"		"{1} {yellow}{2} {default}holds the record with time: {lightgreen}{3} {default}on {blue}{4}{default}"
 	}
 	"Misc6"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
-		"en"		"{1} {lightgreen}{2} {default}holds the {gold}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}{default}."
+		"en"		"{1} {yellow}{2} {default}holds the {gold}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}{default}"
 	}
 	"Misc7"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s}"
-		"en"		"{1} {blue}{2} {default}holds the {red}sideways {default}record with time: {lightgreen}{3} {default}on {blue}{4}{default}."
+		"en"		"{1} {yellow}{2} {default}holds the {red}sideways {default}record with time: {lightgreen}{3} {default}on {blue}{4}{default}"
 	}
 	"Misc8"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s}"
-		"en"		"{1} {blue}{2} {default}holds the {red}half-sideways {default}record with time: {lightgreen}{3} {default}on {blue}{4}{default}."
+		"en"		"{1} {yellow}{2} {default}holds the {red}half-sideways {default}record with time: {lightgreen}{3} {default}on {blue}{4}{default}"
 	}
 	"Misc9"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s}"
-		"en"		"{1} {blue}{2} {default}holds the {red}backwards {default}record with time: {lightgreen}{3} {default}on {blue}{4}{default}."
+		"en"		"{1} {yellow}{2} {default}holds the {red}backwards {default}record with time: {lightgreen}{3} {default}on {blue}{4}{default}"
 	}
 	"Misc10"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s}"
-		"en"		"{1} {blue}{2} {default}holds the {red}low-gravity {default}record with time: {lightgreen}{3} {default}on {blue}{4}{default}."
+		"en"		"{1} {yellow}{2} {default}holds the {red}low-gravity {default}record with time: {lightgreen}{3} {default}on {blue}{4}{default}"
 	}
 	"Misc11"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s}"
-		"en"		"{1} {blue}{2} {default}holds the {red}slow motion {default}record with time: {lightgreen}{3} {default}on {blue}{4}{default}."
+		"en"		"{1} {yellow}{2} {default}holds the {red}slow motion {default}record with time: {lightgreen}{3} {default}on {blue}{4}{default}"
 	}
 	"Misc12"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s}"
-		"en"		"{1} {blue}{2} {default}holds the {red}fast forward {default}record with time: {lightgreen}{3} {default}on {blue}{4}{default}."
+		"en"		"{1} {yellow}{2} {default}holds the {red}fast forward {default}record with time: {lightgreen}{3} {default}on {blue}{4}{default}"
 	}
 	"Misc13"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
-		"en"		"{1} {gold}{2} {default}holds the {red}sideways {gold}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}{default}."
+		"en"		"{1} {yellow}{2} {default}holds the {red}sideways {gold}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}{default}"
 	}
 	"Misc14"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
-		"en"		"{1} {gold}{2} {default}holds the {red}half-sideways {gold}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}{default}."
+		"en"		"{1} {yellow}{2} {default}holds the {red}half-sideways {gold}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}{default}"
 	}
 	"Misc15"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
-		"en"		"{1} {gold}{2} {default}holds the {red}backwards {gold}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}{default}."
+		"en"		"{1} {yellow}{2} {default}holds the {red}backwards {gold}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}{default}"
 	}
 	"Misc16"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
-		"en"		"{1} {gold}{2} {default}holds the {red}low-gravity {gold}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}{default}."
+		"en"		"{1} {yellow}{2} {default}holds the {red}low-gravity {gold}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}{default}"
 	}
 	"Misc17"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
-		"en"		"{1} {gold}{2} {default}holds the {red}slow motion {gold}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}{default}."
+		"en"		"{1} {yellow}{2} {default}holds the {red}slow motion {gold}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}{default}"
 	}
 	"Misc18"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
-		"en"		"{1} {gold}{2} {default}holds the {red}fast forward {gold}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}{default}."
+		"en"		"{1} {yellow}{2} {default}holds the {red}fast forward {gold}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}{default}"
 	}
 	"Misc19"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} {red}Failed to save your data correctly! Please contact an admin."
+		"en"		"{1} {red}Failed to save your data correctly! Please contact an admin"
 	}
 	"Misc20"
 	{
@@ -1424,17 +1424,17 @@
 	"Misc43"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} This is a VIP feature."
+		"en"		"{1} This is a VIP feature"
 	}
 	"Misc44"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Bug report sent."
+		"en"		"{1} Bug report sent"
 	}
 	"Misc45"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Report sent."
+		"en"		"{1} Report sent"
 	}
 	"SQL1"
 	{
@@ -1444,22 +1444,22 @@
 	"SQL2"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} No bonuses found."
+		"en"		"{1} No bonuses found"
 	}
 	"SQL3"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Invalid SteamID found."
+		"en"		"{1} Invalid SteamID found"
 	}
 	"SQL4"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Bonus name succesfully changed."
+		"en"		"{1} Bonus name succesfully changed"
 	}
 	"SQL5"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Failed to create a zone, attempting a fix... Recreate the zone, please."
+		"en"		"{1} Failed to create a zone, attempting a fix... Recreate the zone, please"
 	}
 	"SQL6"
 	{
@@ -1469,7 +1469,7 @@
 	"SQL7"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Zone group deleted."
+		"en"		"{1} Zone group deleted"
 	}
 	"SQL8"
 	{
@@ -1549,12 +1549,12 @@
 	"SQL23"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} Map {blue}{2} {default}not found or is linear."
+		"en"		"{1} Map {blue}{2} {default}not found or is linear"
 	}
 	"SQL24"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} {red}No record found."
+		"en"		"{1} {red}No record found"
 	}
 	"SQL25"
 	{
@@ -1569,12 +1569,12 @@
 	"SQL27"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s}"
-		"en"		"{1} {lightgreen}{2} {default}holds the {red}{3} {default}record with time: {lightgreen}{4} {default}for {pink}Stage {5} {default}on {blue}{6}."
+		"en"		"{1} {lightgreen}{2} {default}holds the {red}{3} {default}record with time: {lightgreen}{4} {default}for {pink}Stage {5} {default}on {blue}{6}"
 	}
 	"SQL28"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} No result found for player or map."
+		"en"		"{1} No result found for player or map"
 	}
 	"SQL29"
 	{
