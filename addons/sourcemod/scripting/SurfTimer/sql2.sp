@@ -1882,3 +1882,20 @@ public int CPRMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 	if (action == MenuAction_End)
 		CloseHandle(menu);
 }
+
+public void db_updateMapRankedStatus()
+{
+	char szQuery[256];
+	if (g_bRankedMap)
+	{
+		Format(szQuery, sizeof(szQuery), "UPDATE ck_maptier SET ranked = 0 WHERE mapname = '%s';", g_szMapName);
+		g_bRankedMap = false;
+	}
+	else
+	{
+		Format(szQuery, sizeof(szQuery), "UPDATE ck_maptier SET ranked = 1 WHERE mapname = '%s';", g_szMapName);
+		g_bRankedMap = true;
+	}
+
+	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
+}

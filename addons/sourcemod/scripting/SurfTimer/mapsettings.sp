@@ -18,6 +18,14 @@ public void MapSettingsMenu(int client)
 	Format(szBuffer, sizeof(szBuffer), "Map Settings - %s\n \n", g_szMapName);
 	SetMenuTitle(menu, szBuffer);
 
+	Format(szBuffer, sizeof(szBuffer), "Tier: %d", g_iMapTier);
+	AddMenuItem(menu, "", szBuffer);
+
+	if (g_bRankedMap)
+		AddMenuItem(menu, "", "Ranked");
+	else
+		AddMenuItem(menu, "", "Unranked");
+
 	Format(szBuffer, sizeof(szBuffer), "Max Velocity: %f", GetConVarFloat(g_hMaxVelocity));
 	AddMenuItem(menu, "", szBuffer);
 
@@ -50,10 +58,21 @@ public int MapSettingsMenuHandler(Handle menu, MenuAction action, int param1, in
 		{
 			case 0:
 			{
+				// Change Map Tier
+				ChangeMapTier(param1);
+			}
+			case 1:
+			{
+				// Ranked/Unranked
+				db_updateMapRankedStatus();
+				MapSettingsMenu(param1);
+			}
+			case 2:
+			{
 				// Max Velocity
 				MaxVelocityMenu(param1);
 			}
-			case 1:
+			case 3:
 			{
 				if (g_fAnnounceRecord < 2)
 					g_fAnnounceRecord++;
@@ -62,13 +81,13 @@ public int MapSettingsMenuHandler(Handle menu, MenuAction action, int param1, in
 				db_updateMapSettings();
 				MapSettingsMenu(param1);
 			}
-			case 2:
+			case 4:
 			{
 				g_bGravityFix = !g_bGravityFix;
 				db_updateMapSettings();
 				MapSettingsMenu(param1);
 			}
-			case 3:
+			case 5:
 			{
 				db_unlimitAllStages(g_szMapName);
 			}
@@ -78,9 +97,45 @@ public int MapSettingsMenuHandler(Handle menu, MenuAction action, int param1, in
 		delete menu;
 }
 
+public void ChangeMapTier(int client)
+{
+	Menu menu = CreateMenu(ChangeMapTierHandler);
+	char szTitle[256];
+	Format(szTitle, sizeof(szTitle), "%s - Tier: %d", g_szMapName, g_iMapTier);
+	SetMenuTitle(menu, szTitle);
+
+	for (int i = 1; i < 7; i++)
+	{
+		char szMenuItem[32];
+		Format(szMenuItem, sizeof(szMenuItem), "Tier: %d", i);
+		if (i == g_iMapTier)
+			AddMenuItem(menu, "", szMenuItem, ITEMDRAW_DISABLED);
+		else
+			AddMenuItem(menu, "", szMenuItem);
+	}
+
+	SetMenuExitBackButton(menu, true);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+public int ChangeMapTierHandler(Handle menu, MenuAction action, int client, int tier)
+{
+	if (action == MenuAction_Select)
+	{
+		tier += 1;
+		g_iMapTier = tier;
+		db_insertMapTier(tier);
+		MapSettingsMenu(client);
+	}
+	else if (action == MenuAction_Cancel)
+		MapSettingsMenu(client);
+	else if (action == MenuAction_End)
+		delete menu;
+}
+
 public void MaxVelocityMenu(int client)
 {
-	Menu menu = new Menu(MaxVelocityMenuHandler);
+	Menu menu = CreateMenu(MaxVelocityMenuHandler);
 	char szTitle[128];
 	Format(szTitle, sizeof(szTitle), "Max Velocity: %f", g_fMaxVelocity);
 	SetMenuTitle(menu, szTitle);

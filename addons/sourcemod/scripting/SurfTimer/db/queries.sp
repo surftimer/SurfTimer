@@ -34,7 +34,7 @@ char sql_selectLatestRecords[] = "SELECT name, runtime, map, date FROM ck_latest
 
 // ck_maptier
 char sql_createMapTier[] = "CREATE TABLE IF NOT EXISTS ck_maptier (mapname VARCHAR(54) NOT NULL, tier INT(12), maxvelocity FLOAT NOT NULL DEFAULT '3500.0', announcerecord INT(11) NOT NULL DEFAULT '0', gravityfix INT(11) NOT NULL DEFAULT '1', PRIMARY KEY(mapname)) DEFAULT CHARSET=utf8mb4;";
-char sql_selectMapTier[] = "SELECT tier FROM ck_maptier WHERE mapname = '%s'";
+char sql_selectMapTier[] = "SELECT tier, ranked FROM ck_maptier WHERE mapname = '%s'";
 char sql_insertmaptier[] = "INSERT INTO ck_maptier (mapname, tier) VALUES ('%s', '%i');";
 char sql_updatemaptier[] = "UPDATE ck_maptier SET tier = %i WHERE mapname ='%s'";
 

@@ -1205,6 +1205,7 @@ int g_iSelectedTrigger[MAXPLAYERS + 1];
 
 // Store
 int g_iMapTier;
+bool g_bRankedMap;
 Handle g_hStore;
 
 // Late Load Linux fix
@@ -1827,7 +1828,7 @@ public void OnConfigsExecuted()
 {
 	// Get Chat Prefix
 	GetConVarString(g_hChatPrefix, g_szChatPrefix, sizeof(g_szChatPrefix));
-	
+
 	if (GetConVarBool(g_hDBMapcycle))
 		db_selectMapCycle();
 	else if (!GetConVarBool(g_hMultiServerMapcycle))

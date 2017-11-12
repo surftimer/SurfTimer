@@ -63,6 +63,11 @@ public void db_setupDatabase()
 			db_upgradeDatabase(0);
 			return;
 		}
+		else if(!SQL_FastQuery(g_hDb, "SELECT ranked FROM ck_maptier LIMIT 1"))
+		{
+			db_upgradeDatabase(1);
+			return;
+		}
 	}
 
 	SQL_UnlockDatabase(g_hDb);
@@ -128,6 +133,11 @@ public void db_upgradeDatabase(int ver)
     SQL_FastQuery(g_hDb, "UPDATE ck_maptier a, ck_mapsettings b SET a.gravityfix = b.gravityfix WHERE a.mapname = b.mapname;");
     SQL_FastQuery(g_hDb, "UPDATE ck_zones a, ck_mapsettings b SET a.prespeed = b.startprespeed WHERE a.mapname = b.mapname AND zonetype = 1;");
     SQL_FastQuery(g_hDb, "DROP TABLE ck_mapsettings;");
+  }
+  else if (ver == 1)
+  {
+	// SurfTimer v2.1 -> v2.2
+	SQL_FastQuery(g_hDb, "ALTER TABLE ck_maptier ADD COLUMN ranked INT(11) NOT NULL DEFAULT '1';");
   }
   
   SQL_UnlockDatabase(g_hDb);
@@ -3584,14 +3594,16 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 			db_viewRecordCheckpointInMap();
 		return;
 	}
+	g_bRankedMap = false;
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
 		g_bTierEntryFound = true;
 		int tier;
-
+		
 		// Format tier string
 		tier = SQL_FetchInt(hndl, 0);
+		g_bRankedMap = view_as<bool>(SQL_FetchInt(hndl, 1));
 		if (0 < tier < 7)
 		{
 			g_bTierFound = true;
