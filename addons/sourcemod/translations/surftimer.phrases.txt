@@ -123,7 +123,12 @@
 	"EarnedPoints"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:i}"
-		"en"		"{1} {purple}{2}{default} has earned {purple}{3} points{default} [{purple}{4}{default} Total]"
+		"en"		"{1} {yellow}{2}{default} has earned {purple}{3} points{default} [{purple}{4}{default} Total]"
+	}
+	"EarnedPoints2"
+	{
+		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:i}"
+		"en"		"{1} {yellow}{2}{default} has earned {purple}{3} {4} points {default} [{purple}{5}{default} Total]"
 	}
 	"NoPlayerTop"
 	{
@@ -153,67 +158,67 @@
 	"NewMapRecord"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} {lightgreen}{2} {default}has beaten the {darkblue}MAP RECORD"
+		"en"		"{1} {yellow}{2} {default}has beaten the {darkblue}MAP RECORD"
 	}
 	"ReplayFinishingMsg"
 	{
 		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {lightgreen}{2}{default} finished with a time of ({lightgreen}{3}{default})"
+		"en"		"{1} {yellow}{2}{default} finished with a time of ({lightgreen}{3}{default})"
 	}
 	"ReplayFinishingMsgBonus"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s}"
-		"en"		"{1} {lightgreen}{2}{default} finished the {gold}{3}{default} with a time of ({lightgreen}{4}{default})"
+		"en"		"{1} {yellow}{2}{default} finished the {gold}{3}{default} with a time of ({lightgreen}{4}{default})"
 	}
 	"MapFinished1"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:i},{5:i},{6:s},{7:s}"
-		"en"		"{1} {lightgreen}{2}{default} finished the {darkblue}map{default} with a time of ({lightgreen}{3}{default}). {default}rank {lightgreen}#{4}{default}/{5} {6} | record {lightgreen}{7}{default}"
+		"en"		"{1} {yellow}{2}{default} finished the {darkblue}map{default} with a time of ({lightgreen}{3}{default}). {default}rank {lightgreen}#{4}{default}/{5} {6} | record {lightgreen}{7}{default}"
 	}
 	"MapFinished3"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:i},{6:i},{7:s},{8:s}"
-		"en"		"{1} {lightgreen}{2}{default} finished the {darkblue}map{default} with a time of ({lightgreen}{3}{default}). Improving their best time by ({green}{4}{default}). {default}rank {lightgreen}#{5}{default}/{6} {7} | record {lightgreen}{8}{default}"
+		"en"		"{1} {yellow}{2}{default} finished the {darkblue}map{default} with a time of ({lightgreen}{3}{default}). Improving their best time by ({green}{4}{default}). {default}rank {lightgreen}#{5}{default}/{6} {7} | record {lightgreen}{8}{default}"
 	}
 	"MapFinished5"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:i},{6:i},{7:s},{8:s}"
-		"en"		"{1} {lightgreen}{2}{default} finished the {darkblue}map{default} with a time of ({lightgreen}{3}{default}). Missing their best time by ({red}{4}{default}). {default}rank {lightgreen}#{5}{default}/{6} {7} | record {lightgreen}{8}{default}"
+		"en"		"{1} {yellow}{2}{default} finished the {darkblue}map{default} with a time of ({lightgreen}{3}{default}). Missing their best time by ({red}{4}{default}). {default}rank {lightgreen}#{5}{default}/{6} {7} | record {lightgreen}{8}{default}"
 	}
 	"BonusFinished1"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
-		"en"		"{1} {lightgreen}{2} {default}finished the {gold}{3} {default}with a time of {red}{4} {default}. Missing their best time by {red}{5}{default}. [rank {lightgreen}#{6} {default}/ {7} | record {lightgreen}{8}{default}]"
+		"en"		"{1} {yellow}{2} {default}finished the {gold}{3} {default}with a time of {red}{4} {default}. Missing their best time by {red}{5}{default}. [rank {lightgreen}#{6} {default}/ {7} | record {lightgreen}{8}{default}]"
 	}
 	"BonusFinished2"
 	{
 		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {lightgreen}{2} {default}has beaten the {gold}{3} RECORD"
+		"en"		"{1} {yellow}{2} {default}has beaten the {gold}{3} RECORD"
 	}
 	"BonusFinished3"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
-		"en"		"{1} {lightgreen}{2} {default}finished the {gold}{3} {default}with a time of {lightgreen}{4} {default}. [rank {lightgreen}#1 {default}/ 1 | record {lightgreen}{5}{default}]"
+		"en"		"{1} {yellow}{2} {default}finished the {gold}{3} {default}with a time of {lightgreen}{4} {default}. [rank {lightgreen}#1 {default}/ 1 | record {lightgreen}{5}{default}]"
 	}
 	"BonusFinished4"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
-		"en"		"{1} {lightgreen}{2} {default}finished the {gold}{3} {default}with a time of {lightgreen}{4} {default}. Improving the best time by {lightgreen}{5} {default}. [rank {lightgreen}#{6} {default}/ {7} | record {lightgreen}{8}{default}]"
+		"en"		"{1} {yellow}{2} {default}finished the {gold}{3} {default}with a time of {lightgreen}{4} {default}. Improving the best time by {lightgreen}{5} {default}. [rank {lightgreen}#{6} {default}/ {7} | record {lightgreen}{8}{default}]"
 	}
 	"BonusFinished5"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
-		"en"		"{1} {lightgreen}{2} {default}finished the {gold}{3} {default}with a time of {lightgreen}{4} {default}. Improving the best time by {lightgreen}{5} {default}. [rank {lightgreen}#{6} {default}/ {7} | record {lightgreen}{8}{default}]"
+		"en"		"{1} {yellow}{2} {default}finished the {gold}{3} {default}with a time of {lightgreen}{4} {default}. Improving the best time by {lightgreen}{5} {default}. [rank {lightgreen}#{6} {default}/ {7} | record {lightgreen}{8}{default}]"
 	}
 	"BonusFinished6"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
-		"en"		"{1} {lightgreen}{2} {default}finished the {gold}{3} {default}with a time of {lightgreen}{4} {default}. Improving their best time by {lightgreen}{5} {default}. [rank {lightgreen}#{6} {default}/ {7} | record {lightgreen}{8}{default}]"
+		"en"		"{1} {yellow}{2} {default}finished the {gold}{3} {default}with a time of {lightgreen}{4} {default}. Improving their best time by {lightgreen}{5} {default}. [rank {lightgreen}#{6} {default}/ {7} | record {lightgreen}{8}{default}]"
 	}
 	"BonusFinished7"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:i},{6:i},{7:s}"
-		"en"		"{1} {lightgreen}{2} {default}finished the {gold}{3} {default}with a time of {lightgreen}{4}{default}. [rank {lightgreen}#{5} {default}/ {6} | record {lightgreen}{7}{default}]"
+		"en"		"{1} {yellow}{2} {default}finished the {gold}{3} {default}with a time of {lightgreen}{4}{default}. [rank {lightgreen}#{5} {default}/ {6} | record {lightgreen}{7}{default}]"
 	}
 	"PlayerNotFound"
 	{
@@ -378,17 +383,17 @@
 	"BPress4"
 	{
   		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {lightgreen}{2} {default}finished the bonus with a time of [{blue}{3}{default}] in practice mode!"
+		"en"		"{1} {yellow}{2} {default}finished the bonus with a time of [{blue}{3}{default}] in practice mode!"
 	}
 	"BPress5"
 	{
   		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {lightgreen}{2} {default}finished the map with a time of [{blue}{3}{default}] in practice mode!"
+		"en"		"{1} {yellow}{2} {default}finished the map with a time of [{blue}{3}{default}] in practice mode!"
 	}
 	"BPress6"
 	{
   		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
-		"en"		"{1} {lightgreen}{2}{default} finished the {blue}map {red}{3} {default}with a time of ({lightgreen}{4}{default}). Missing their best time by ({red}{5}{default}). [rank {lightgreen}#{6}{default}/{7} | record {lightgreen}{8}{default}]"
+		"en"		"{1} {yellow}{2}{default} finished the {blue}map {red}{3} {default}with a time of ({lightgreen}{4}{default}). Missing their best time by ({red}{5}{default}). [rank {lightgreen}#{6}{default}/{7} | record {lightgreen}{8}{default}]"
 	}
 	"BPress7"
 	{
@@ -1364,7 +1369,7 @@
 	"Misc31"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:s}"
-		"en"		"{1} {lightgreen}{2} {default}| {default}CP [{3}]: {lightgreen}{4} {default}({default}PB: {5}{default} - {6}{default})"
+		"en"		"{1} {yellow}{2} {default}| {default}CP [{3}]: {lightgreen}{4} {default}({default}PB: {5}{default} - {6}{default})"
 	}
 	"Misc32"
 	{
@@ -1374,52 +1379,52 @@
 	"Misc33"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s}"
-		"en"		"{1} {lightgreen}{2} {default}| {default}CP [{3}]: {lightgreen}{4} {default}({default}PB: {lightgreen}N/A{default} | {5}{default})"
+		"en"		"{1} {yellow}{2} {default}| {default}CP [{3}]: {lightgreen}{4} {default}({default}PB: {lightgreen}N/A{default} | {5}{default})"
 	}
 	"Misc34"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:i},{6:i},{7:s}"
-		"en"		"{1} {lightgreen}{2}{default} finished the {blue}map {red}{3} {default}with a time of ({lightgreen}{4}{default}). [rank {lightgreen}#{5}{default}/{6} | record {lightgreen}{7}{default}"
+		"en"		"{1} {yellow}{2}{default} finished the {blue}map {red}{3} {default}with a time of ({lightgreen}{4}{default}). [rank {lightgreen}#{5}{default}/{6} | record {lightgreen}{7}{default}"
 	}
 	"Misc35"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
-		"en"		"{1} {lightgreen}{2}{default} finished the {blue}map {red}{3} {default}with a time of ({lightgreen}{4}{default}). Improving their best time by ({green}{5}{default}). [rank {lightgreen}#{6}{default}/{7} | record {lightgreen}{8}{default}]"
+		"en"		"{1} {yellow}{2}{default} finished the {blue}map {red}{3} {default}with a time of ({lightgreen}{4}{default}). Improving their best time by ({green}{5}{default}). [rank {lightgreen}#{6}{default}/{7} | record {lightgreen}{8}{default}]"
 	}
 	"Misc36"
 	{
 		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {lightgreen}{2}{default} has beaten the {red}{3} {blue}MAP RECORD"
+		"en"		"{1} {yellow}{2}{default} has beaten the {red}{3} {blue}MAP RECORD"
 	}
 	"Misc37"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s}"
-		"en"		"{1} {lightgreen}{2}{default} has beaten the {red}{3} {gold}{4} RECORD"
+		"en"		"{1} {yellow}{2}{default} has beaten the {red}{3} {gold}{4} RECORD"
 	}
 	"Misc38"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s}"
-		"en"		"{1} {lightgreen}{2} {default}finished the {red}{3} {gold}{4} {default}with a time of {lightgreen}{5}{default}. [rank {lightgreen}#1 {default}/ 1 | record {lightgreen}{6}{default}]"
+		"en"		"{1} {yellow}{2} {default}finished the {red}{3} {gold}{4} {default}with a time of {lightgreen}{5}{default}. [rank {lightgreen}#1 {default}/ 1 | record {lightgreen}{6}{default}]"
 	}
 	"Misc39"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:i},{8:i},{9:s}"
-		"en"		"{1} {lightgreen}{2} {default}finished the {red}{3} {gold}{4} {default}with a time of {lightgreen}{5}{default}. Improving the best time by {lightgreen}{6}{default}. [rank {{lightgreen}}#{7} {default}/{8} | record {lightgreen}{9}{default}]"
+		"en"		"{1} {yellow}{2} {default}finished the {red}{3} {gold}{4} {default}with a time of {lightgreen}{5}{default}. Improving the best time by {lightgreen}{6}{default}. [rank {{lightgreen}}#{7} {default}/{8} | record {lightgreen}{9}{default}]"
 	}
 	"Misc40"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:i},{8:i},{9:s}"
-		"en"		"{1} {lightgreen}{2} {default}finished the {red}{3} {gold}{4} {default}with a time of {lightgreen}{5}{default}. Improving their best time by {lightgreen}{6}{default}. [rank {lightgreen}#{7} {default}/{8} | record {lightgreen}{9}{default}]"
+		"en"		"{1} {yellow}{2} {default}finished the {red}{3} {gold}{4} {default}with a time of {lightgreen}{5}{default}. Improving their best time by {lightgreen}{6}{default}. [rank {lightgreen}#{7} {default}/{8} | record {lightgreen}{9}{default}]"
 	}
 	"Misc41"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
-		"en"		"{1} {lightgreen}{2} {default}finished the {red}{3} {gold}{4} {default}with a time of {lightgreen}{5}{default}. [rank {lightgreen}#{6} {default}/{7} | record {lightgreen}{8}{default}]"
+		"en"		"{1} {yellow}{2} {default}finished the {red}{3} {gold}{4} {default}with a time of {lightgreen}{5}{default}. [rank {lightgreen}#{6} {default}/{7} | record {lightgreen}{8}{default}]"
 	}
 	"Misc42"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:i},{8:i},{9:s}"
-		"en"		"{1} {lightgreen}{2} {default}finished the {red}{3} {gold}{4} {default}with a time of {red}{5}{default}. Missing their best time by {red}{6}{default}. [rank {lightgreen}#{7} {default}/{8} | record {lightgreen}{9}{default}]"
+		"en"		"{1} {yellow}{2} {default}finished the {red}{3} {gold}{4} {default}with a time of {red}{5}{default}. Missing their best time by {red}{6}{default}. [rank {lightgreen}#{7} {default}/{8} | record {lightgreen}{9}{default}]"
 	}
 	"Misc43"
 	{
@@ -1494,7 +1499,7 @@
 	"SQL12"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:s}"
-		"en"		"{1} {lightgreen}{2} {default}| {pink}Stage {3}:{default} {lightgreen}{4} {default}({5}{default} - {6}{default})"
+		"en"		"{1} {yellow}{2} {default}| {pink}Stage {3}:{default} {lightgreen}{4} {default}({5}{default} - {6}{default})"
 	}
 	"SQL13"
 	{
@@ -1509,7 +1514,7 @@
 	"SQL15"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:i}"
-		"en"		"{1} {lightgreen}{2} {default}has beaten the {pink}STAGE {3} RECORD {lightgreen}{4} {5} {default}(Rank: {lightgreen}#1{default}/{6})"
+		"en"		"{1} {yellow}{2} {default}has beaten the {pink}STAGE {3} RECORD {lightgreen}{4} {5} {default}(Rank: {lightgreen}#1{default}/{6})"
 	}
 	"SQL16"
 	{
@@ -1519,17 +1524,17 @@
 	"SQL17"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:s},{7:i},{8:i}"
-		"en"		"{1} {lightgreen}{2} {default}| Stage {3}{default}: {lightgreen}{4} {default}({5}{default} | {6}{default}) (Rank: {lightgreen}{7}{default}/{lightgreen}{8}{default})"
+		"en"		"{1} {yellow}{2} {default}| Stage {3}{default}: {lightgreen}{4} {default}({5}{default} | {6}{default}) (Rank: {lightgreen}{7}{default}/{lightgreen}{8}{default})"
 	}
 	"SQL18"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:s}"
-		"en"		"{1} {lightgreen}{2} {default}has set a new {pink}STAGE {3} RECORD {lightgreen}{4} {default}(Rank: {lightgreen}#1{default}/1)"
+		"en"		"{1} {yellow}{2} {default}has set a new {pink}STAGE {3} RECORD {lightgreen}{4} {default}(Rank: {lightgreen}#1{default}/1)"
 	}
 	"SQL19"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:i},{5:s},{6:s},{7:i},{8:i}"
-		"en"		"{1} {lightgreen}{2} {default}has beaten the {red}{3} {pink}STAGE {4} RECORD {lightgreen}{5} {6} {default}(Rank: {lightgreen}#{7}{default}/{8})"
+		"en"		"{1} {yellow}{2} {default}has beaten the {red}{3} {pink}STAGE {4} RECORD {lightgreen}{5} {6} {default}(Rank: {lightgreen}#{7}{default}/{8})"
 	}
 	"SQL20"
 	{
@@ -1544,7 +1549,7 @@
 	"SQL22"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:i},{5:s}"
-		"en"		"{1} {lightgreen}{2} {default}has set a new {red}{3} {pink}STAGE {4} RECORD {lightgreen}{5} {default}(Rank: {lightgreen}#1{default}/1)"
+		"en"		"{1} {yellow}{2} {default}has set a new {red}{3} {pink}STAGE {4} RECORD {lightgreen}{5} {default}(Rank: {lightgreen}#1{default}/1)"
 	}
 	"SQL23"
 	{
@@ -1559,7 +1564,7 @@
 	"SQL25"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
-		"en"		"{1} {lightgreen}{2} {default}holds the record with time: {lightgreen}{3} {default}for {pink}Stage {4} {default}on {blue}{5}"
+		"en"		"{1} {yellow}{2} {default}holds the record with time: {lightgreen}{3} {default}for {pink}Stage {4} {default}on {blue}{5}"
 	}
 	"SQL26"
 	{
@@ -1569,7 +1574,7 @@
 	"SQL27"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s}"
-		"en"		"{1} {lightgreen}{2} {default}holds the {red}{3} {default}record with time: {lightgreen}{4} {default}for {pink}Stage {5} {default}on {blue}{6}"
+		"en"		"{1} {yellow}{2} {default}holds the {red}{3} {default}record with time: {lightgreen}{4} {default}for {pink}Stage {5} {default}on {blue}{6}"
 	}
 	"SQL28"
 	{
@@ -1579,42 +1584,42 @@
 	"SQL29"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:i},{5:s},{6:s},{7:s}"
-		"en"		"{1} {lightgreen}{2} {default}is ranked {lightgreen}#{3}{default}/{4} {5} with a time of {lightgreen}{6} {default}on {blue}{7}"
+		"en"		"{1} {yellow}{2} {default}is ranked {lightgreen}#{3}{default}/{4} {5} with a time of {lightgreen}{6} {default}on {blue}{7}"
 	}
 	"SQL30"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:i},{5:s},{6:s}"
-		"en"		"{1} {lightgreen}{2} {default}is ranked {lightgreen}#{3}{default}/{4} with a time of {lightgreen}{5} {default}on {blue}{6}"
+		"en"		"{1} {yellow}{2} {default}is ranked {lightgreen}#{3}{default}/{4} with a time of {lightgreen}{5} {default}on {blue}{6}"
 	}
 	"SQL31"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:i},{5:s},{6:s}"
-		"en"		"{1} {lightgreen}{2} {default}is ranked {lightgreen}#{3}{default}/{4} with a time of {lightgreen}{5} {default}on {blue}{6}"
+		"en"		"{1} {yellow}{2} {default}is ranked {lightgreen}#{3}{default}/{4} with a time of {lightgreen}{5} {default}on {blue}{6}"
 	}
 	"SQL32"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:i},{5:s},{6:s},{7:s}"
-		"en"		"{1} {lightgreen}{2} {default}is ranked {lightgreen}#{3}{default}/{4} {5} with a time of {lightgreen}{6} {default}on {blue}{7}"
+		"en"		"{1} {yellow}{2} {default}is ranked {lightgreen}#{3}{default}/{4} {5} with a time of {lightgreen}{6} {default}on {blue}{7}"
 	}
 	"SQL33"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:i},{5:s},{6:s},{7:s}"
-		"en"		"{1} {lightgreen}{2} {default}is ranked {lightgreen}#{3}{default}/{4} {5} with a time of {lightgreen}{6} {default}on {blue}{7}"
+		"en"		"{1} {yellow}{2} {default}is ranked {lightgreen}#{3}{default}/{4} {5} with a time of {lightgreen}{6} {default}on {blue}{7}"
 	}
 	"SQL34"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:i},{5:s},{6:s}"
-		"en"		"{1} {lightgreen}{2} {default}is ranked {lightgreen}#{3}{default}/{4} with a time of {lightgreen}{5} {default}on {blue}{6}"
+		"en"		"{1} {yellow}{2} {default}is ranked {lightgreen}#{3}{default}/{4} with a time of {lightgreen}{5} {default}on {blue}{6}"
 	}
 	"SQL35"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:i},{5:s},{6:s}"
-		"en"		"{1} {lightgreen}{2} {default}is ranked {lightgreen}#{3}{default}/{4} with a time of {lightgreen}{5} {default}on {blue}{6}"
+		"en"		"{1} {yellow}{2} {default}is ranked {lightgreen}#{3}{default}/{4} with a time of {lightgreen}{5} {default}on {blue}{6}"
 	}
 	"SQL36"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:i},{5:s},{6:s},{7:i}"
-		"en"		"{1} {lightgreen}{2} {default}is ranked {lightgreen}#{3}{default}/{4} with a time of {lightgreen}{5} {default}on {blue}{6} {gold}bonus {7}"
+		"en"		"{1} {yellow}{2} {default}is ranked {lightgreen}#{3}{default}/{4} with a time of {lightgreen}{5} {default}on {blue}{6} {gold}bonus {7}"
 	}
 	"SQL37"
 	{
@@ -1624,12 +1629,12 @@
 	"SQL38"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s}"
-		"en"		"{1} {lightgreen}{2} {default}holds the record with time: {lightgreen}{3} {default}on {blue}{4}"
+		"en"		"{1} {yellow}{2} {default}holds the record with time: {lightgreen}{3} {default}on {blue}{4}"
 	}
 	"SQL39"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:i},{5:i}"
-		"en"		"{1} {lightgreen}{2} {default}is ranked {lightgreen}{3}{default}/{4} with {lightgreen}{5} {default}points"
+		"en"		"{1} {yellow}{2} {default}is ranked {lightgreen}{3}{default}/{4} with {lightgreen}{5} {default}points"
 	}
 	"SQL40"
 	{

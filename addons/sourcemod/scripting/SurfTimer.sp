@@ -561,14 +561,14 @@ int g_rankArg[MAXPLAYERS + 1];
 /*----------  KSF Style Ranking Distribution  ----------*/
 char g_szRankName[MAXPLAYERS + 1][32];
 int g_rankNameChatColour[MAXPLAYERS + 1];
-int g_GroupMaps[MAX_PR_PLAYERS + 1];
-int g_Top10Maps[MAX_PR_PLAYERS + 1];
+int g_GroupMaps[MAX_PR_PLAYERS + 1][MAX_STYLES];
+int g_Top10Maps[MAX_PR_PLAYERS + 1][MAX_STYLES];
 
 // 0 = wr, 1 = wrb, 2 = wrcp
-int g_WRs[MAX_PR_PLAYERS + 1][3];
+int g_WRs[MAX_PR_PLAYERS + 1][MAX_STYLES][3];
 
 // 0 = Map Points, 1 = Bonus Points, 2 = Group Points, 3 = Map WR Points, 4 = Bonus WR Points, 5 = Top 10 Points
-int g_Points[MAX_PR_PLAYERS + 1][7];
+int g_Points[MAX_PR_PLAYERS + 1][MAX_STYLES][7];
 
 int g_ClientProfile[MAXPLAYERS + 1];
 bool g_bProfileInServer[MAXPLAYERS + 1];
@@ -1115,7 +1115,7 @@ int g_AdminMenuLastPage[MAXPLAYERS + 1];
 /*----------  Player Points  ----------*/
 
 // % of maps the client has finished
-float g_pr_finishedmaps_perc[MAX_PR_PLAYERS + 1];
+float g_pr_finishedmaps_perc[MAX_PR_PLAYERS + 1][MAX_STYLES];
 
 // Is point recalculation in progress?
 bool g_pr_RankingRecalc_InProgress;
@@ -1142,10 +1142,10 @@ int g_pr_Recalc_ClientID = 0;
 int g_pr_Recalc_AdminID = -1;
 
 // Ranked player count on server
-int g_pr_AllPlayers;
+int g_pr_AllPlayers[MAX_STYLES];
 
 // Player count with points
-int g_pr_RankedPlayers;
+int g_pr_RankedPlayers[MAX_STYLES];
 
 // Total map count in mapcycle
 int g_pr_MapCount[7];
@@ -1154,22 +1154,22 @@ int g_pr_MapCount[7];
 int g_pr_TableRowCount;
 
 // Clients points
-int g_pr_points[MAX_PR_PLAYERS + 1];
+int g_pr_points[MAX_PR_PLAYERS + 1][MAX_STYLES];
 
 // Clients points before recalculation
-int g_pr_oldpoints[MAX_PR_PLAYERS + 1];
+int g_pr_oldpoints[MAX_PR_PLAYERS + 1][MAX_STYLES];
 
 // How many maps a client has finished
-int g_pr_finishedmaps[MAX_PR_PLAYERS + 1];
+int g_pr_finishedmaps[MAX_PR_PLAYERS + 1][MAX_STYLES];
 
 // How many bonuses a client has finished
-int g_pr_finishedbonuses[MAX_PR_PLAYERS + 1];
+int g_pr_finishedbonuses[MAX_PR_PLAYERS + 1][MAX_STYLES];
 
 // How many stages a client has finished
-int g_pr_finishedstages[MAX_PR_PLAYERS + 1];
+int g_pr_finishedstages[MAX_PR_PLAYERS + 1][MAX_STYLES];
 
 // Players server rank
-int g_PlayerRank[MAXPLAYERS + 1];
+int g_PlayerRank[MAXPLAYERS + 1][MAX_STYLES];
 
 // SR's the client has
 int g_MapRecordCount[MAXPLAYERS + 1];
@@ -1450,7 +1450,7 @@ char g_szStyleFinishPrint[][] =
 	"*sideways*",
 	"*half-sideways*",
 	"*backwards*",
-	"*low-gravity*",
+	"*low gravity*",
 	"*slow motion*",
 	"*fast forwards*"
 };
@@ -2697,7 +2697,7 @@ public int Native_EmulateStopButtonPress(Handle plugin, int numParams)
 
 public int Native_GetServerRank(Handle plugin, int numParams)
 {
-	return g_PlayerRank[GetNativeCell(1)];
+	return g_PlayerRank[GetNativeCell(1)][0];
 }
 
 public int Native_SafeTeleport(Handle plugin, int numParams)

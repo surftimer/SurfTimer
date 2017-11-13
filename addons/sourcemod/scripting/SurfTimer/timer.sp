@@ -52,16 +52,20 @@ public Action PlayerRanksTimer(Handle timer)
 	{
 		if (!IsValidClient(i) || IsFakeClient(i))
 			continue;
-		db_GetPlayerRank(i);
+		db_GetPlayerRank(i, 0);
 	}
 	return Plugin_Continue;
 }
 
 // Recounts players time
-public Action UpdatePlayerProfile(Handle timer, any client)
+public Action UpdatePlayerProfile(Handle timer, Handle pack)
 {
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int style = ReadPackCell(pack);
+
 	if (IsValidClient(client) && !IsFakeClient(client))
-		db_updateStat(client);
+		db_updateStat(client, style);
 
 	return Plugin_Handled;
 }
@@ -563,4 +567,14 @@ public Action EnableJoinMsgs(Handle timer)
 	g_bEnableJoinMsgs = true;
 
 	return Plugin_Handled;
+}
+
+public Action SetArmsModel(Handle timer, any client)
+{
+	if (IsValidClient(client) && IsPlayerAlive(client))
+	{
+		char szBuffer[256];
+		GetConVarString(g_hArmModel, szBuffer, 256);
+		SetEntPropString(client, Prop_Send, "m_szArmsModel", szBuffer);
+	}
 }

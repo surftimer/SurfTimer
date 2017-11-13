@@ -310,7 +310,7 @@ public void CL_OnEndTimerPress(int client)
 			if (g_fPersonalRecord[client] == 0.0)
 			{ // Clients first record
 				g_fPersonalRecord[client] = g_fFinalTime[client];
-				g_pr_finishedmaps[client]++;
+				g_pr_finishedmaps[client][0]++;
 				g_MapTimesCount++;
 				FormatTimeFloat(1, g_fPersonalRecord[client], 3, g_szPersonalRecord[client], 64);
 
@@ -363,11 +363,12 @@ public void CL_OnEndTimerPress(int client)
 			else
 			Format(g_szTimeDifference[client], sizeof(szDiff), "+%s", szDiff);
 
-			// Check for SR
+			// If the server already has a record
 			if (g_StyleMapTimesCount[style] > 0)
-			{ // If the server already has a record
+			{
 				if (g_fFinalTime[client] < g_fRecordStyleMapTime[style])
-				{ // New fastest time in map
+				{
+					// New fastest time in map
 					g_bStyleMapSRVRecord[style][client] = true;
 					g_fRecordStyleMapTime[style] = g_fFinalTime[client];
 					Format(g_szRecordStylePlayer[style], MAX_NAME_LENGTH, "%s", szName);
@@ -375,23 +376,11 @@ public void CL_OnEndTimerPress(int client)
 					
 					// Insert latest record
 					// db_InsertLatestRecords(g_szSteamID[client], szName, g_fFinalTime[client]);
-					
-					/*if (GetConVarBool(g_hReplayBot) && !g_bPositionRestored[client] && !g_bNewReplay[client])
-					{
-					g_bNewReplay[client] = true;
-					g_fReplayTimes[0] = g_fFinalTime[client];
-					CreateTimer(3.0, ReplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
-					}*/
 				}
 			}
 			else
-			{ // Has to be the new record, since it is the first completion
-				/*if (GetConVarBool(g_hReplayBot) && !g_bPositionRestored[client] && !g_bNewReplay[client])
-				{
-				g_fReplayTimes[0] = g_fFinalTime[client];
-				g_bNewReplay[client] = true;
-				CreateTimer(3.0, ReplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
-				}*/
+			{
+				// Has to be the new record, since it is the first completion
 				g_bStyleMapSRVRecord[style][client] = true;
 				g_fRecordStyleMapTime[style] = g_fFinalTime[client];
 				Format(g_szRecordStylePlayer[style], MAX_NAME_LENGTH, "%s", szName);

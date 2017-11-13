@@ -47,8 +47,8 @@ void CreateCommands()
 	RegConsoleCmd("sm_r", Command_Restart, "[surftimer] Teleports player back to the start");
 	RegConsoleCmd("sm_restart", Command_Restart, "[surftimer] Teleports player back to the start");
 	RegConsoleCmd("sm_start", Command_Restart, "[surftimer] Teleports player back to the start");
-	RegConsoleCmd("sm_b", Command_ToBonus, "[surftimer] Teleports player back to the start");
-	RegConsoleCmd("sm_bonus", Command_ToBonus, "[surftimer] Teleports player back to the start");
+	RegConsoleCmd("sm_b", Command_ToBonus, "[surftimer] Teleports player to the start of a bonus");
+	RegConsoleCmd("sm_bonus", Command_ToBonus, "[surftimer] Teleports player to the start of a bonus");
 	RegConsoleCmd("sm_bonuses", Command_ListBonuses, "[surftimer] Displays a list of bonuses in current map");
 	RegConsoleCmd("sm_s", Command_ToStage, "[surftimer] Teleports player to the selected stage");
 	RegConsoleCmd("sm_stage", Command_ToStage, "[surftimer] Teleports player to the selected stage");
@@ -102,8 +102,8 @@ void CreateCommands()
 	RegAdminCmd("sm_ar", Command_SetAnnounceRecord, g_ZonerFlag, "[surftimer] [zoner] Set whether records will be announced on all finishes, pb only or client only");
 	RegAdminCmd("sm_gravityfix", Command_SetGravityFix, g_ZonerFlag, "[surftimer] [zoner] Toggle the gravity fix on the current map");
 	RegAdminCmd("sm_gf", Command_SetGravityFix, g_ZonerFlag, "[surftimer] [zoner] Toggle the gravity fix on the current map");
-	RegAdminCmd("sm_triggers", Command_ToggleTriggers, g_ZonerFlag, "[surftimer] [zoner] Toggle the gravity fix on the current map");
-	RegAdminCmd("sm_noclipspeed", Command_NoclipSpeed, g_ZonerFlag, "[surftimer] [zoner] Toggle the gravity fix on the current map");
+	RegAdminCmd("sm_triggers", Command_ToggleTriggers, g_ZonerFlag, "[surftimer] [zoner] Toggle display of map triggers");
+	RegAdminCmd("sm_noclipspeed", Command_NoclipSpeed, g_ZonerFlag, "[surftimer] [zoner] Changes the value of sv_noclipspeed");
 
 	// VIP Commands
 	RegAdminCmd("sm_fixbot", Admin_FixBot, g_VipFlag, "[surftimer] Toggles replay bots off and on");
@@ -151,7 +151,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_togglemapfinish", Command_ToggleMapFinish, "[surftimer] Toggles whether a player will finish a map when entering the end zone.");
 	RegConsoleCmd("sm_tmf", Command_ToggleMapFinish, "[surftimer] Toggles whether a player will finish a map when entering the end zone.");
 	RegConsoleCmd("sm_repeat", Command_Repeat, "[surftimer] Toggles whether a player will keep repeating the same stage.");
-	RegConsoleCmd("sm_rank", Command_SelectRank, "[surftimer] opens a player profile");
+	RegConsoleCmd("sm_rank", Command_SelectRank, "[surftimer] Displays a players server rank in the chat");
 	RegConsoleCmd("sm_mi", Command_MapImprovement, "[surftimer] opens map improvement points panel for map");
 	RegConsoleCmd("sm_specbot", Command_SpecBot, "[surftimer] Spectate the map bot");
 	RegConsoleCmd("sm_specbotbonus", Command_SpecBonusBot, "[surftimer] Spectate the bonus bot");
@@ -304,6 +304,7 @@ public Action sm_test(int client, int args)
 	// }
 
 	// CPrintToChat(client, "g_iSelectedTrigger[client]: %i", g_iSelectedTrigger[client]);
+	CalculatePlayerRank(client, 4);
 
 	return Plugin_Handled;
 }
@@ -1446,8 +1447,32 @@ public Action Command_ckNoClip(int client, int args)
 
 public Action Client_Top(int client, int args)
 {
-	ckTopMenu(client);
+	TopMenuStyleSelect(client);
+	//ckTopMenu(client);
 	return Plugin_Handled;
+}
+
+public void TopMenuStyleSelect(int client)
+{
+	Menu menu = CreateMenu(TopMenuStyleSelectHandler);
+	SetMenuTitle(menu, "Top Menu - Select a style\n \n");
+	AddMenuItem(menu, "", "Normal");
+	AddMenuItem(menu, "", "Sideways");
+	AddMenuItem(menu, "", "Half-Sideways");
+	AddMenuItem(menu, "", "Backwards");
+	AddMenuItem(menu, "", "Low-Gravity");
+	AddMenuItem(menu, "", "Slow Motion");
+	AddMenuItem(menu, "", "Fast Forwards");
+	SetMenuExitButton(menu, true);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+public int TopMenuStyleSelectHandler(Handle menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+		ckTopMenu(param1, param2);
+	else if (action == MenuAction_End)
+		CloseHandle(menu);
 }
 
 public Action Client_MapTop(int client, int args)
@@ -1716,9 +1741,9 @@ public void SpecPlayer(int client, int args)
 					int bestrank = 99999999;
 					for (int x = 1; x <= MaxClients; x++)
 					{
-						if (IsValidClient(x) && IsPlayerAlive(x) && x != client && !IsFakeClient(x) && g_PlayerRank[x] > 0)
-							if (g_PlayerRank[x] <= bestrank)
-							bestrank = g_PlayerRank[x];
+						if (IsValidClient(x) && IsPlayerAlive(x) && x != client && !IsFakeClient(x) && g_PlayerRank[x][0] > 0)
+							if (g_PlayerRank[x][0] <= bestrank)
+							bestrank = g_PlayerRank[x][0];
 					}
 					char szMenu[128];
 					Format(szMenu, 128, "Highest ranked player (#%i)", bestrank);
@@ -1792,9 +1817,9 @@ public int SpecMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 			{
 				if (IsValidClient(i) && IsPlayerAlive(i) && i != param1 && !IsFakeClient(i))
 				{
-					if (g_PlayerRank[i] <= bestrank)
+					if (g_PlayerRank[i][0] <= bestrank)
 					{
-						bestrank = g_PlayerRank[i];
+						bestrank = g_PlayerRank[i][0];
 						playerid = i;
 						count++;
 					}
@@ -2597,16 +2622,21 @@ public void Action_UnNoClip(int client)
 	return;
 }
 
-public void ckTopMenu(int client)
+public void ckTopMenu(int client, int style)
 {
 	g_MenuLevel[client] = -1;
 	Menu cktopmenu = CreateMenu(TopMenuHandler);
-	SetMenuTitle(cktopmenu, "Top Menu\n------------------------------\n");
-	if (GetConVarBool(g_hPointSystem))
-		AddMenuItem(cktopmenu, "Top 100 Players", "Top 100 Players");
-	AddMenuItem(cktopmenu, "Map Top", "Map Top");
 
-	AddMenuItem(cktopmenu, "Bonus Top", "Bonus Top", !g_bhasBonus);
+	char szTitle[128], szStyle[2];
+	Format(szTitle, sizeof(szTitle), "Top Menu - %s\n------------------------------\n", g_szStyleMenuPrint[style]);
+	SetMenuTitle(cktopmenu, szTitle);
+	IntToString(style, szStyle, sizeof(szStyle));
+
+	if (GetConVarBool(g_hPointSystem))
+		AddMenuItem(cktopmenu, szStyle, "Top 100 Players");
+
+	AddMenuItem(cktopmenu, szStyle, "Map Top");
+	AddMenuItem(cktopmenu, szStyle, "Bonus Top", !g_bhasBonus);
 
 	SetMenuOptionFlags(cktopmenu, MENUFLAG_BUTTON_EXIT);
 	DisplayMenu(cktopmenu, client, MENU_TIME_FOREVER);
@@ -2616,23 +2646,14 @@ public int TopMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_Select)
 	{
-		if (GetConVarBool(g_hPointSystem))
+		char szBuffer[2];
+		GetMenuItem(menu, param2, szBuffer, sizeof(szBuffer));
+		int style = StringToInt(szBuffer);
+		switch (param2)
 		{
-			switch (param2)
-			{
-				case 0:db_selectTopPlayers(param1);
-				case 1:db_selectTopSurfers(param1, g_szMapName);
-				case 2:BonusTopMenu(param1);
-			}
-		}
-		else
-		{
-			switch (param2)
-			{
-				case 0:db_selectTopProRecordHolders(param1);
-				case 1:db_selectTopSurfers(param1, g_szMapName);
-				case 2:BonusTopMenu(param1);
-			}
+			case 0:db_selectTopPlayers(param1, style);
+			case 1:db_selectTopSurfers(param1, g_szMapName);
+			case 2:BonusTopMenu(param1);
 		}
 	}
 	else

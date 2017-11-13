@@ -151,11 +151,13 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		if (GetConVarBool(g_hPlayerSkinChange) && (GetClientTeam(client) > 1))
 		{
 			char szBuffer[256];
-			GetConVarString(g_hArmModel, szBuffer, 256);
-			SetEntPropString(client, Prop_Send, "m_szArmsModel", szBuffer);
+			// GetConVarString(g_hArmModel, szBuffer, 256);
+			// SetEntPropString(client, Prop_Send, "m_szArmsModel", szBuffer);
 
 			GetConVarString(g_hPlayerModel, szBuffer, 256);
 			SetEntityModel(client, szBuffer);
+			CreateTimer(1.0, SetArmsModel, client, TIMER_FLAG_NO_MAPCHANGE);
+			//SetEntPropString(client, Prop_Send, "m_szArmsModel", "models/weapons/ct_arms.mdl");
 		}
 
 		// 1st Spawn & T/CT

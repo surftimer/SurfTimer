@@ -1364,7 +1364,13 @@ public void SetClientDefaults(int client)
 	g_MenuLevel[client] = -1;
 	g_AttackCounter[client] = 0;
 	g_SpecTarget[client] = -1;
-	g_pr_points[client] = 0;
+
+	for (int i = 0; i < MAX_STYLES; i++)
+	{
+		g_pr_points[client][i] = 0;
+		g_PlayerRank[client][i] = 99999;
+	}
+
 	g_fCurrentRunTime[client] = -1.0;
 	g_fPlayerCordsLastPosition[client] = view_as<float>( { 0.0, 0.0, 0.0 } );
 	g_fLastChatMessage[client] = GetGameTime();
@@ -1374,7 +1380,6 @@ public void SetClientDefaults(int client)
 	g_fPauseTime[client] = 0.0;
 	g_MapRank[client] = 99999;
 	g_OldMapRank[client] = 99999;
-	g_PlayerRank[client] = 99999;
 	g_fProfileMenuLastQuery[client] = GameTime;
 	Format(g_szPlayerPanelText[client], 512, "");
 	Format(g_pr_rankname[client], 128, "");
@@ -1616,6 +1621,7 @@ public void InitPrecache()
 {
 	// db_precacheCustomSounds();
 
+	// Timer finish sounds
 	AddFileToDownloadsTable(UNSTOPPABLE_SOUND_PATH);
 	FakePrecacheSound(UNSTOPPABLE_RELATIVE_SOUND_PATH);
 	AddFileToDownloadsTable(PRO_FULL_SOUND_PATH);
@@ -1624,7 +1630,6 @@ public void InitPrecache()
 	FakePrecacheSound(PRO_RELATIVE_SOUND_PATH);
 	AddFileToDownloadsTable(CP_FULL_SOUND_PATH);
 	FakePrecacheSound(CP_RELATIVE_SOUND_PATH);
-	// fluffys
 	AddFileToDownloadsTable(WRCP_FULL_SOUND_PATH);
 	FakePrecacheSound(WRCP_RELATIVE_SOUND_PATH);
 	AddFileToDownloadsTable(WR_FULL_SOUND_PATH);
@@ -1643,14 +1648,17 @@ public void InitPrecache()
 	GetConVarString(g_hReplayBotPlayerModel, szBuffer, 256);
 	AddFileToDownloadsTable(szBuffer);
 	PrecacheModel(szBuffer, true);
+
 	// Replay Arm Model
 	GetConVarString(g_hReplayBotArmModel, szBuffer, 256);
 	AddFileToDownloadsTable(szBuffer);
 	PrecacheModel(szBuffer, true);
+
 	// Player Arm Model
-	// GetConVarString(g_hArmModel, szBuffer, 256);
-	// AddFileToDownloadsTable(szBuffer);
-	// PrecacheModel(szBuffer, true);
+	GetConVarString(g_hArmModel, szBuffer, 256);
+	AddFileToDownloadsTable(szBuffer);
+	PrecacheModel(szBuffer, true);
+
 	// Player Model
 	GetConVarString(g_hPlayerModel, szBuffer, 256);
 	AddFileToDownloadsTable(szBuffer);
@@ -1659,6 +1667,10 @@ public void InitPrecache()
 	g_BeamSprite = PrecacheModel("materials/sprites/laserbeam.vmt", true);
 	g_HaloSprite = PrecacheModel("materials/sprites/halo.vmt", true);
 	PrecacheModel(ZONE_MODEL);
+
+	// Preache default arm models
+	PrecacheModel("models/weapons/t_arms.mdl", true); 
+	PrecacheModel("models/weapons/ct_arms.mdl", true); 
 }
 
 
@@ -1928,8 +1940,13 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 
 		if (g_MapRank[client] == 99999 && IsValidClient(client))
 			CPrintToChat(client, "%t", "Misc19", g_szChatPrefix);
-
-		CreateTimer(0.0, UpdatePlayerProfile, client, TIMER_FLAG_NO_MAPCHANGE);
+		
+		Handle pack;
+		int style = 0;
+		CreateDataTimer(1.0, UpdatePlayerProfile, pack, TIMER_FLAG_NO_MAPCHANGE);
+		WritePackCell(pack, GetClientUserId(client));
+		WritePackCell(pack, style);
+		// CreateTimer(0.0, UpdatePlayerProfile, client, TIMER_FLAG_NO_MAPCHANGE);
 
 		if (g_bMapFirstRecord[client] || g_bMapPBRecord[client] || g_bMapSRVRecord[client])
 			CheckMapRanks(client);
@@ -2491,8 +2508,8 @@ public void SetPlayerRank(int client)
 			GetClientName(client, szName, sizeof(szName));
 			CRemoveColors(szName, sizeof(szName));
 
-			int rank = g_PlayerRank[client];
-			int points = g_pr_points[client];
+			int rank = g_PlayerRank[client][0];
+			int points = g_pr_points[client][0];
 
 			int RankValue[SkillGroup];
 			int index = GetSkillgroupIndex(rank, points);
@@ -2527,12 +2544,12 @@ public int GetSkillgroupIndex(int rank, int points)
 		}
 		else if (RankValue[RankBot] > -1 && RankValue[RankTop] > -1)
 		{
-			if (rank >= RankValue[RankBot] && rank <= RankValue[RankTop])
+			if (rank >= RankValue[RankBot] && rank < RankValue[RankTop])
 				return i;
 		}
 		else if (RankValue[PointsBot] > -1 && RankValue[PointsTop] > -1)
 		{
-			if (points >= RankValue[PointsBot] && points <= RankValue[PointsTop])
+			if (points >= RankValue[PointsBot] && points < RankValue[PointsTop])
 				return i;
 		}
 		else if (RankValue[PointReq] > -1)
@@ -2540,7 +2557,7 @@ public int GetSkillgroupIndex(int rank, int points)
 			if (i == (size - 1)) // Last Rank
 			{
 				if (points >= RankValue[PointReq])
-				return i;
+					return i;
 			}
 			else if (i == 0) // First Rank
 			{
@@ -2553,7 +2570,7 @@ public int GetSkillgroupIndex(int rank, int points)
 				GetArrayArray(g_hSkillGroups, (i+1), RankValueNext[0]);
 				if (RankValueNext[PointReq] > -1)
 				{
-					if (points >= RankValue[PointReq] && points <= RankValueNext[PointReq])
+					if (points >= RankValue[PointReq] && points < RankValueNext[PointReq])
 						return i;
 				}
 				else if (RankValueNext[RankReq] > -1)
@@ -2906,17 +2923,17 @@ public void SpecListMenuDead(int client) // What Spectators see
 			// Rank
 			if (GetConVarBool(g_hPointSystem))
 			{
-				if (g_pr_points[ObservedUser] != 0)
+				if (g_pr_points[ObservedUser][0] != 0)
 				{
 					char szRank[32];
-					if (g_PlayerRank[ObservedUser] > g_pr_RankedPlayers)
+					if (g_PlayerRank[ObservedUser][0] > g_pr_RankedPlayers[0])
 						Format(szRank, 32, "-");
 					else
-						Format(szRank, 32, "%i", g_PlayerRank[ObservedUser]);
-					Format(szPlayerRank, 32, "Rank: #%s/%i", szRank, g_pr_RankedPlayers);
+						Format(szRank, 32, "%i", g_PlayerRank[ObservedUser][0]);
+					Format(szPlayerRank, 32, "Rank: #%s/%i", szRank, g_pr_RankedPlayers[0]);
 				}
 				else
-					Format(szPlayerRank, 32, "Rank: NA / %i", g_pr_RankedPlayers);
+					Format(szPlayerRank, 32, "Rank: NA / %i", g_pr_RankedPlayers[0]);
 			}
 
 			if (g_fPersonalRecord[ObservedUser] > 0.0)
@@ -3999,8 +4016,11 @@ stock void StyleFinishedMsgs(int client, int style)
 				}
 			}
 		}
+
 		if (g_StyleMapRank[style][client] == 99999 && IsValidClient(client))
-		CPrintToChat(client, "%t", "Misc19", g_szChatPrefix);
+			CPrintToChat(client, "%t", "Misc19", g_szChatPrefix);
+
+		CalculatePlayerRank(client, style);
 		return;
 	}
 }
@@ -4054,9 +4074,11 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 	}
 
 	CheckBonusStyleRanks(client, zGroup, style);
-	if (rank == 9999999 && IsValidClient(client))
-	CPrintToChat(client, "%t", "Misc19", g_szChatPrefix);
 
+	if (rank == 9999999 && IsValidClient(client))
+		CPrintToChat(client, "%t", "Misc19", g_szChatPrefix);
+
+	CalculatePlayerRank(client, style);
 	return;
 }
 
