@@ -23,7 +23,7 @@
 #include <dhooks>
 #include <mapchooser>
 #include <sdktools>
-#include <store>
+// #include <store>
 #include <discord>
 #include <sourcecomms>
 #include <surftimer>
@@ -1193,7 +1193,7 @@ int g_iSelectedTrigger[MAXPLAYERS + 1];
 // Store
 int g_iMapTier;
 bool g_bRankedMap;
-Handle g_hStore;
+// Handle g_hStore;
 
 // Late Load Linux fix
 Handle g_cvar_sv_hibernate_when_empty = INVALID_HANDLE;
@@ -1813,8 +1813,8 @@ public void OnMapEnd()
 
 	CloseHandle(g_mTriggerMultipleMenu);
 
-	if (g_hStore != null)
-		CloseHandle(g_hStore);
+	// if (g_hStore != null)
+	// 	CloseHandle(g_hStore);
 
 	if (g_hDestinations != null)
 		CloseHandle(g_hDestinations);
@@ -2659,7 +2659,7 @@ public void OnPluginStart()
 public void OnAllPluginsLoaded()
 {
 	// Check if store is running
-	g_hStore = FindPluginByFile("store.smx");
+	// g_hStore = FindPluginByFile("store.smx");
 }
 
 /*======  End of Events  ======*/

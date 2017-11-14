@@ -63,7 +63,7 @@ public void db_setupDatabase()
 			db_upgradeDatabase(0);
 			return;
 		}
-		else if(!SQL_FastQuery(g_hDb, "SELECT ranked FROM ck_maptier LIMIT 1"))
+		else if(!SQL_FastQuery(g_hDb, "SELECT ranked FROM ck_maptier LIMIT 1") || !SQL_FastQuery(g_hDb, "SELECT style FROM ck_playerrank LIMIT 1;"))
 		{
 			db_upgradeDatabase(1);
 			return;
@@ -372,7 +372,6 @@ public void RecalcPlayerRank(int client, char steamid[128])
 //
 public void CalculatePlayerRank(int client, int style)
 {
-	CPrintToChat(client, "%d", style);
 	char szQuery[255];
 	char szSteamId[32];
 	// Take old points into memory, so at the end you can show how much the points changed
@@ -1610,7 +1609,6 @@ public int ProfileMenuHandler(Handle menu, MenuAction action, int client, int it
 				{
 					g_bRecalcRankInProgess[client] = true;
 					CPrintToChat(client, "%t", "Rc_PlayerRankStart", g_szChatPrefix);
-					CPrintToChat(client, "%d", g_ProfileStyleSelect[client]);
 					CalculatePlayerRank(client, g_ProfileStyleSelect[client]);
 				}
 			}
