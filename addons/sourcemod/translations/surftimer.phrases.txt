@@ -120,6 +120,11 @@
 		"#format"	"{1:s},{2:i}"
 		"en"		"{1} {default}Profile refreshed. [{purple}{2}{default}]"
 	}
+	"Rc_PlayerRankFinished2"
+	{
+		"#format"	"{1:s},{2:s},{3:i}"
+		"en"		"{1} {red}{2} {default}Profile refreshed. [{purple}{3}{default}]"
+	}
 	"EarnedPoints"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:i}"
@@ -663,7 +668,7 @@
 	"Commands44"
 	{
   		"#format"	"{1:s}"
-		"en"		"{1} Available Colours: {darkred} {lightred} {red} {green} {limegreen} {mossgreen} {darkblue} {lightblue} {blue} {pink} {purple} {orange} {yellow} {darkgrey} {grey} {white}"
+		"en"		"{1} Available Colours: {darkred}darkred {lightred}lightred {red}red {green}green {lime}lime {lightgreen}lightgreen {darkblue}darkblue {lightblue}lightblue {blue}blue {pink}pink {purple}purple {orange}orange {yellow}yellow {grey}grey {grey2}grey2 {default}default"
 	}
 	"Commands45"
 	{
@@ -1639,6 +1644,6 @@
 	"SQL40"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} No result found for {lightgreen}{2}"
+		"en"		"{1} No result found for {yellow}{2}"
 	}
 }

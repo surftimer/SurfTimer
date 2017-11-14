@@ -430,14 +430,7 @@ bool g_bCustomTitleAccess[MAXPLAYERS + 1] = false;
 bool g_bUpdatingColours[MAXPLAYERS + 1];
 // char g_szsText[MAXPLAYERS + 1];
 
-/*----------  Profile Menu  ----------*/
-int g_BonusRecordCount[MAXPLAYERS + 1];
-int g_totalBonusTimes[MAXPLAYERS + 1];
-// Handle g_FinishedMapsMenu;
-
 // to be used with sm_p, stage sr
-int g_StageRecordCount[MAXPLAYERS + 1];
-int g_totalStageTimes[MAXPLAYERS +1];
 int g_pr_BonusCount;
 int g_totalMapsCompleted[MAXPLAYERS + 1];
 int g_mapsCompletedLoop[MAXPLAYERS + 1];
@@ -531,7 +524,7 @@ int g_StyleStageSelect[MAXPLAYERS + 1];
 
 // Style Profiles
 int g_ProfileStyleSelect[MAXPLAYERS + 1];
-int g_totalStyleMapTimes[MAXPLAYERS + 1];
+//int g_totalStyleMapTimes[MAXPLAYERS + 1];
 
 /*----------  Player Settings  ----------*/
 bool g_bTimerEnabled[MAXPLAYERS + 1];
@@ -1086,9 +1079,6 @@ float g_fPlayerCordsRestore[MAXPLAYERS + 1][3];
 // Used in restoring players angle
 float g_fPlayerAnglesRestore[MAXPLAYERS + 1][3];
 
-/*----------  Menus  ----------*/
-Menu g_menuTopSurfersMenu[MAXPLAYERS + 1] = null;
-
 // Last time profile was queried by player, spam protection
 float g_fProfileMenuLastQuery[MAXPLAYERS + 1];
 
@@ -1170,9 +1160,6 @@ int g_pr_finishedstages[MAX_PR_PLAYERS + 1][MAX_STYLES];
 
 // Players server rank
 int g_PlayerRank[MAXPLAYERS + 1][MAX_STYLES];
-
-// SR's the client has
-int g_MapRecordCount[MAXPLAYERS + 1];
 
 // Used to update client's name in database
 char g_pr_szName[MAX_PR_PLAYERS + 1][64];
@@ -1475,6 +1462,17 @@ char g_szStyleMenuPrint[][] =
 	"Low-Gravity",
 	"Slow Motion",
 	"Fast Forward"
+};
+
+char g_szStyleAcronyms[][] =
+{
+	"n",
+	"sw",
+	"hsw",
+	"bw",
+	"lg",
+	"sm",
+	"ff"
 };
 
 char EntityList[][] = 													// Disable entities that often break maps

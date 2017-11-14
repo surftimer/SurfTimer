@@ -233,18 +233,18 @@ void CreateCommands()
 	// RegConsoleCmd("sm_ffwrcp", Client_FFWrcp, "[surftimer] displays fast forwards stage times for map");
 
 	// Style Profiles
-	RegConsoleCmd("sm_psw", Client_SWProfile, "[surftimer] opens a player sw profile");
-	RegConsoleCmd("sm_swp", Client_SWProfile, "[surftimer] opens a player sw profile");
-	RegConsoleCmd("sm_phsw", Client_HSWProfile, "[surftimer] opens a player hsw profile");
-	RegConsoleCmd("sm_hswp", Client_HSWProfile, "[surftimer] opens a player hsw profile");
-	RegConsoleCmd("sm_pbw", Client_BWProfile, "[surftimer] opens a player bw profile");
-	RegConsoleCmd("sm_bwp", Client_BWProfile, "[surftimer] opens a player bw profile");
-	RegConsoleCmd("sm_plg", Client_LGProfile, "[surftimer] opens a player low-gravity profile");
-	RegConsoleCmd("sm_lgp", Client_LGProfile, "[surftimer] opens a player low-gravity profile");
-	RegConsoleCmd("sm_psm", Client_SMProfile, "[surftimer] opens a player slow motion profile");
-	RegConsoleCmd("sm_smp", Client_SMProfile, "[surftimer] opens a player slow motion profile");
-	RegConsoleCmd("sm_pff", Client_FFProfile, "[surftimer] opens a player fast forwards profile");
-	RegConsoleCmd("sm_ffp", Client_FFProfile, "[surftimer] opens a player fast forwards profile");
+	// RegConsoleCmd("sm_psw", Client_SWProfile, "[surftimer] opens a player sw profile");
+	// RegConsoleCmd("sm_swp", Client_SWProfile, "[surftimer] opens a player sw profile");
+	// RegConsoleCmd("sm_phsw", Client_HSWProfile, "[surftimer] opens a player hsw profile");
+	// RegConsoleCmd("sm_hswp", Client_HSWProfile, "[surftimer] opens a player hsw profile");
+	// RegConsoleCmd("sm_pbw", Client_BWProfile, "[surftimer] opens a player bw profile");
+	// RegConsoleCmd("sm_bwp", Client_BWProfile, "[surftimer] opens a player bw profile");
+	// RegConsoleCmd("sm_plg", Client_LGProfile, "[surftimer] opens a player low-gravity profile");
+	// RegConsoleCmd("sm_lgp", Client_LGProfile, "[surftimer] opens a player low-gravity profile");
+	// RegConsoleCmd("sm_psm", Client_SMProfile, "[surftimer] opens a player slow motion profile");
+	// RegConsoleCmd("sm_smp", Client_SMProfile, "[surftimer] opens a player slow motion profile");
+	// RegConsoleCmd("sm_pff", Client_FFProfile, "[surftimer] opens a player fast forwards profile");
+	// RegConsoleCmd("sm_ffp", Client_FFProfile, "[surftimer] opens a player fast forwards profile");
 
 	// Bans & Mutes
 	RegConsoleCmd("sm_bans", Client_ShowBans, "[surftimer] displays a menu with the recent bans");
@@ -1470,7 +1470,10 @@ public void TopMenuStyleSelect(int client)
 public int TopMenuStyleSelectHandler(Handle menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_Select)
+	{
+		g_ProfileStyleSelect[param1] = param2;
 		ckTopMenu(param1, param2);
+	}
 	else if (action == MenuAction_End)
 		CloseHandle(menu);
 }
@@ -1513,9 +1516,15 @@ public int MapTopMenuSelectStyleHandler(Handle menu, MenuAction action, int para
 		char szMapName[128];
 		GetMenuItem(menu, param2, szMapName, sizeof(szMapName));
 		if (param2 == 0)
+		{
+			g_ProfileStyleSelect[param1] = 0;
 			db_selectMapTopSurfers(param1, szMapName);
+		}
 		else
+		{
+			g_ProfileStyleSelect[param1] = param2;
 			db_selectStyleMapTopSurfers(param1, szMapName, param2);
+		}
 	}
 	else if (action == MenuAction_End)
 		delete menu;
@@ -1866,155 +1875,6 @@ public int SpecMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 		}
 }
 
-public void ProfileMenu(int client, int args, int style)
-{
-	// spam protection
-	float diff = GetGameTime() - g_fProfileMenuLastQuery[client];
-	if (diff < 0.5)
-	{
-		g_bSelectProfile[client] = false;
-		return;
-	}
-	g_fProfileMenuLastQuery[client] = GetGameTime();
-	g_ProfileStyleSelect[client] = style;
-
-	char szArg[MAX_NAME_LENGTH];
-	// no argument
-	if (args == 0)
-	{
-		char szPlayerName[MAX_NAME_LENGTH];
-		Menu menu = CreateMenu(ProfileSelectMenuHandler);
-		SetMenuTitle(menu, "Profile Menu\n------------------------------\n");
-		GetClientName(client, szPlayerName, MAX_NAME_LENGTH);
-		AddMenuItem(menu, szPlayerName, szPlayerName);
-		int playerCount = 1;
-		for (int i = 1; i <= MaxClients; i++)
-		{
-			if (IsValidClient(i) && i != client && !IsFakeClient(i))
-			{
-				GetClientName(i, szPlayerName, MAX_NAME_LENGTH);
-				AddMenuItem(menu, szPlayerName, szPlayerName);
-				playerCount++;
-			}
-		}
-		g_bSelectProfile[client] = true;
-		SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
-		DisplayMenu(menu, client, MENU_TIME_FOREVER);
-		return;
-	}
-	else
-	{
-		if (args != -1)
-		{
-			g_bSelectProfile[client] = false;
-			Format(g_szProfileName[client], MAX_NAME_LENGTH, "");
-			for (int i = 1; i < 20; i++)
-			{
-				GetCmdArg(i, szArg, MAX_NAME_LENGTH);
-				if (!StrEqual(szArg, "", false))
-				{
-					if (i == 1)
-						Format(g_szProfileName[client], MAX_NAME_LENGTH, "%s", szArg);
-					else
-						Format(g_szProfileName[client], MAX_NAME_LENGTH, "%s %s", g_szProfileName[client], szArg);
-				}
-			}
-		}
-	}
-	// player ingame? new name?
-	if (args != 0 && !StrEqual(g_szProfileName[client], "", false))
-	{
-		bool bPlayerFound = false;
-		char szSteamId2[32];
-		char szName[MAX_NAME_LENGTH];
-		char szName2[MAX_NAME_LENGTH];
-		for (int i = 1; i <= MaxClients; i++)
-		{
-			if (IsValidClient(i) && !IsFakeClient(i))
-			{
-				GetClientName(i, szName, MAX_NAME_LENGTH);
-				StringToUpper(szName);
-				Format(szName2, MAX_NAME_LENGTH, "%s", g_szProfileName[client]);
-				if ((StrContains(szName, szName2, false) != -1))
-				{
-					bPlayerFound = true;
-					GetClientAuthId(i, AuthId_Steam2, szSteamId2, MAX_NAME_LENGTH, true);
-					// GetClientAuthString(i, szSteamId2, 32);
-					g_ClientProfile[client] = i;
-					g_bProfileInServer[client] = true;
-					continue;
-				}
-			}
-		}
-		if (style == 0)
-		{
-			if (bPlayerFound)
-			{
-				g_bProfileInServer[client] = true;
-				db_viewPlayerRank(client, szSteamId2);
-			}
-			else
-			{
-				g_bProfileInServer[client] = false;
-				db_viewPlayerProfile1(client, g_szProfileName[client]);
-			}
-		}
-		else
-		{
-			if (bPlayerFound)
-			{
-				db_viewPlayerRankStyle(client, szSteamId2, style);
-			}
-			else
-			{
-				db_viewPlayerStyleProfile1(client, g_szProfileName[client], style);
-			}
-		}
-	}
-}
-
-public int ProfileSelectMenuHandler(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Select)
-	{
-		char info[32];
-		char szPlayerName[MAX_NAME_LENGTH];
-		GetMenuItem(menu, param2, info, sizeof(info));
-
-		for (int i = 1; i <= MaxClients; i++)
-		{
-			if (IsValidClient(i))
-			{
-				GetClientName(i, szPlayerName, MAX_NAME_LENGTH);
-				if (StrEqual(info, szPlayerName))
-				{
-					Format(g_szProfileName[param1], MAX_NAME_LENGTH, "%s", szPlayerName);
-					char szSteamId[32];
-					GetClientAuthId(i, AuthId_Steam2, szSteamId, MAX_NAME_LENGTH, true);
-					g_ClientProfile[param1] = i;
-					// GetClientAuthString(i, szSteamId, 32);
-					// fluffys comeback style menu
-					int style = g_ProfileStyleSelect[param1];
-					if (style == 0)
-					{
-						g_bProfileInServer[param1] = true;
-						db_viewPlayerRank(param1, szSteamId);
-					}
-					else
-						db_viewPlayerRankStyle(param1, szSteamId, style);
-				}
-			}
-		}
-	}
-	else
-		if (action == MenuAction_End)
-	{
-		if (IsValidClient(param1))
-			g_bSelectProfile[param1] = false;
-		CloseHandle(menu);
-	}
-}
-
 public Action Client_AutoBhop(int client, int args)
 {
 	AutoBhop(client);
@@ -2229,56 +2089,169 @@ public void displayRanksMenu(int client)
 
 public int ShowRanksMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 {
-	/*if (action == MenuAction_Select)
-	{
-
-	}
-	else if (action == MenuAction_End)
+	if (action == MenuAction_End)
 	{
 		CloseHandle(menu);
-	}*/
+	}
 }
 
 public Action Client_Profile(int client, int args)
 {
-	ProfileMenu(client, args, 0);
+	// spam protection
+	float diff = GetGameTime() - g_fProfileMenuLastQuery[client];
+	if (diff < 0.5)
+	{
+		g_bSelectProfile[client] = false;
+		return Plugin_Handled;
+	}
+
+	// Search for a players profile in the database
+	char szName[MAX_NAME_LENGTH], szBuffer[MAX_NAME_LENGTH];
+	int style = -1;
+	Format(szName, sizeof(szName), "");
+
+	// Add all arguments to the same string for names with spaces
+	if (args > 0)
+	{
+		for (int i = 1; i < 20; i++)
+		{
+			GetCmdArg(i, szBuffer, MAX_NAME_LENGTH);
+			if (!StrEqual(szBuffer, "", false))
+			{
+				if (i == 1)
+				{
+					style = GetStyleIndex(szBuffer);
+					if (style == -1)
+						Format(szName, sizeof(szName), "%s", szBuffer);
+				}
+				else if (i == 2 && style > -1)
+					Format(szName, sizeof(szName), "%s", szBuffer);
+				else
+					Format(szName, MAX_NAME_LENGTH, "%s %s", szName, szBuffer);
+			}
+		}
+	}
+
+	// Select which style 
+	ProfileMenuStyleSelect(client, style, szName);
 	return Plugin_Handled;
 }
 
-public Action Client_SWProfile(int client, int args)
+public void ProfileMenuStyleSelect(int client, int style, char szName[MAX_NAME_LENGTH])
 {
-	ProfileMenu(client, args, 1);
-	return Plugin_Handled;
+	if (style == -1)
+	{
+		Menu menu = CreateMenu(ProfileMenuStyleSelectHandler);
+		SetMenuTitle(menu, "Profile Menu - Select a style");
+		AddMenuItem(menu, szName, "Normal");
+		AddMenuItem(menu, szName, "Sideways");
+		AddMenuItem(menu, szName, "Half-Sideways");
+		AddMenuItem(menu, szName, "Backwards");
+		AddMenuItem(menu, szName, "Low-Gravity");
+		AddMenuItem(menu, szName, "Slow Motion");
+		AddMenuItem(menu, szName, "Fast Forwards");
+		SetMenuExitButton(menu, true);
+		DisplayMenu(menu, client, MENU_TIME_FOREVER);
+	}
+	else
+		ProfileMenu2(client, style, szName, "");
 }
 
-public Action Client_HSWProfile(int client, int args)
+public int ProfileMenuStyleSelectHandler(Handle menu, MenuAction action, int param1, int param2)
 {
-	ProfileMenu(client, args, 2);
-	return Plugin_Handled;
+	if (action == MenuAction_Select)
+	{
+		char szName[MAX_NAME_LENGTH];
+		GetMenuItem(menu, param2, szName, sizeof(szName));
+		ProfileMenu2(param1, param2, szName, "");
+	}
+	else if (action == MenuAction_End)
+		delete menu;
 }
 
-public Action Client_BWProfile(int client, int args)
+public void ProfileMenu2(int client, int style, char szName[MAX_NAME_LENGTH], char szSteamId3[32])
 {
-	ProfileMenu(client, args, 3);
-	return Plugin_Handled;
+	g_ProfileStyleSelect[client] = style;
+
+	// No Name found, get list of clients in server
+	if (StrEqual(szName, "", false) && StrEqual(szSteamId3, ""))
+	{
+		char szPlayerName[MAX_NAME_LENGTH];
+		Menu menu = CreateMenu(ProfilePlayerSelectMenuHandler);
+		SetMenuTitle(menu, "Profile Menu - Choose a player\n------------------------------\n");
+		GetClientName(client, szPlayerName, sizeof(szPlayerName));
+		AddMenuItem(menu, szPlayerName, szPlayerName);
+		for (int i = i; i <= MaxClients; i++)
+		{
+			if (IsValidClient(i) && !IsFakeClient(i) && i != client)
+			{
+				GetClientName(i, szPlayerName, sizeof(szPlayerName));
+				AddMenuItem(menu, szPlayerName, szPlayerName);
+			}
+		}
+		g_bSelectProfile[client] = true;
+		SetMenuExitButton(menu, true);
+		DisplayMenu(menu, client, MENU_TIME_FOREVER);
+		return;
+	}
+	else
+	{
+		// If provided with a steamid
+		if (!StrEqual(szSteamId3, ""))
+		{
+			db_viewPlayerProfile(client, style, szSteamId3, true, "");
+			return;
+		}
+
+		// Name provided, search for player on server
+		bool bPlayerFound = false;
+		g_bProfileInServer[client] = false;
+		char szSteamId[32];
+		char szBuffer[MAX_NAME_LENGTH];
+		for (int i = 1; i <= MaxClients; i++)
+		{
+			if (IsValidClient(i) && !IsFakeClient(i))
+			{
+				GetClientName(i, szBuffer, sizeof(szBuffer));
+				if (StrContains(szBuffer, szName, false) != -1)
+				{
+					bPlayerFound = true;
+					GetClientAuthId(i, AuthId_Steam2, szSteamId, 32, true);
+					g_ClientProfile[client] = i;
+					g_bProfileInServer[client] = true;
+					break;
+				}
+			}
+		}
+
+		db_viewPlayerProfile(client, style, szSteamId, bPlayerFound, szName);
+	}
 }
 
-public Action Client_LGProfile(int client, int args)
+public int ProfilePlayerSelectMenuHandler(Handle menu, MenuAction action, int param1, int param2)
 {
-	ProfileMenu(client, args, 4);
-	return Plugin_Handled;
-}
-
-public Action Client_SMProfile(int client, int args)
-{
-	ProfileMenu(client, args, 5);
-	return Plugin_Handled;
-}
-
-public Action Client_FFProfile(int client, int args)
-{
-	ProfileMenu(client, args, 6);
-	return Plugin_Handled;
+	if (action == MenuAction_Select)
+	{
+		char szPlayerName[MAX_NAME_LENGTH];
+		char szBuffer[MAX_NAME_LENGTH];
+		char szSteamId[32];
+		GetMenuItem(menu, param2, szPlayerName, sizeof(szPlayerName));
+		for (int i = 0; i < MaxClients; i++)
+		{
+			if (IsValidClient(i) && !IsFakeClient(i))
+			{
+				GetClientName(i, szBuffer, sizeof(szBuffer));
+				if (StrEqual(szPlayerName, szBuffer))
+				{
+					GetClientAuthId(i, AuthId_Steam2, szSteamId, 32, true);
+					db_viewPlayerProfile(param1, g_ProfileStyleSelect[param1], szSteamId, true, szPlayerName);
+					break;	
+				}
+			}
+		}
+	}
+	else if (action == MenuAction_End)
+		delete menu;
 }
 
 public Action Client_Pause(int client, int args)
@@ -3587,6 +3560,7 @@ public int WrcpStyleSelectMenuHandler(Handle menu, MenuAction action, int param1
 {
 	if (action == MenuAction_Select)
 	{
+		g_ProfileStyleSelect[param1] = param2;
 		if (StrEqual(g_szMapName, g_szWrcpMapSelect[param1]))
 			WrcpMenu(param1, 0, param2);
 		else

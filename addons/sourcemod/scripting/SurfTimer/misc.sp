@@ -4270,6 +4270,8 @@ public void diffForHumans(int unix, char[] buffer, int size, int type)
 		else
 		{
 			secs = unix;
+			if (secs < 1)
+				secs = 1;
 			Format(buffer, size, "%d second%s ago", secs, secs==1?"":"s");
 		}
 	}
@@ -4600,4 +4602,25 @@ public void SetDefaultTitle(int client, const char szTitle[256])
 	g_bEnforceTitle[client] = true;
 	Format(g_szEnforcedTitle[client], sizeof(g_szEnforcedTitle), szTitle);
 	CreateTimer(1.0, SetClanTag, client, TIMER_FLAG_NO_MAPCHANGE);
+}
+
+public int GetStyleIndex(char[] szBuffer)
+{
+	for (int i = 0; i < sizeof(g_szStyleAcronyms); i++)
+		if (StrEqual(szBuffer, g_szStyleAcronyms[i]))
+			return i;
+
+	return -1;
+}
+
+public void FormatPercentage(float perc, char[] buffer, int size)
+{
+	if (perc < 10.0)
+		Format(buffer, size, "%.1f", perc);
+	else if (perc == 100.0)
+		Format(buffer, size, "100.0");
+	else if (perc > 100.0)
+		Format(buffer, size, "100.0");
+	else
+		Format(buffer, size, "%.1f", perc);
 }
