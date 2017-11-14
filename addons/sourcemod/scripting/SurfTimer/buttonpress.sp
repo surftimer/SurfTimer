@@ -650,13 +650,13 @@ public void CL_OnEndTimerPress(int client)
 	db_deleteTmp(client);
 
 	// Give Credits
-	if (g_hStore != INVALID_HANDLE && GetPluginStatus(g_hStore) == Plugin_Running)
-	{
-		int totalCredits = (wrCredits + fcCredits + pbCredits + slowCredits);
-		int credits = Store_GetClientCredits(client);
-		Store_SetClientCredits(client, credits + totalCredits);
-		CPrintToChat(client, "%t", "BPress7", g_szChatPrefix, totalCredits);
-	}
+	// if (g_hStore != INVALID_HANDLE && GetPluginStatus(g_hStore) == Plugin_Running)
+	// {
+	// 	int totalCredits = (wrCredits + fcCredits + pbCredits + slowCredits);
+	// 	int credits = Store_GetClientCredits(client);
+	// 	Store_SetClientCredits(client, credits + totalCredits);
+	// 	CPrintToChat(client, "%t", "BPress7", g_szChatPrefix, totalCredits);
+	// }
 }
 
 // Start Timer

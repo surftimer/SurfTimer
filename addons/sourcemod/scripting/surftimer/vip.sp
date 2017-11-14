@@ -235,16 +235,16 @@ public void db_insertVipCallback(Handle owner, Handle hndl, const char[] error, 
 		db_CheckVIPAdmin(client, szSteamId);
 
 		// Give Credits to client
-		if (g_hStore != INVALID_HANDLE && GetPluginStatus(g_hStore) == Plugin_Running)
-		{
-			int newCredits;
-			if (iVip == 1)
-			newCredits = 2999;
-			else if (iVip == 2)
-			newCredits = 5999;
+		// if (g_hStore != INVALID_HANDLE && GetPluginStatus(g_hStore) == Plugin_Running)
+		// {
+		// 	int newCredits;
+		// 	if (iVip == 1)
+		// 	newCredits = 2999;
+		// 	else if (iVip == 2)
+		// 	newCredits = 5999;
 
-			Store_SetClientCredits(client, Store_GetClientCredits(client) + newCredits);
-		}
+		// 	Store_SetClientCredits(client, Store_GetClientCredits(client) + newCredits);
+		// }
 	}
 }
 
