@@ -1570,7 +1570,7 @@ public void sql_selectPlayerProfileCallback(Handle owner, Handle hndl, const cha
 		if (GetConVarBool(g_hCountry))
 			Format(szTitle, 1024, "%s-------------------------------------\n%s\nCountry: %s\n \n%s\n", szTop, szSteamId, szCountry, g_pr_szrank[client]);
 		else
-			Format(szTitle, 1024, "%s-------------------------------------\n%s\n \n%s", szTop, g_pr_szrank[client]);
+			Format(szTitle, 1024, "%s-------------------------------------\n%s\n \n%s", szTop, szSteamId, g_pr_szrank[client]);
 
 		Menu menu = CreateMenu(ProfileMenuHandler);
 		SetMenuTitle(menu, szTitle);
@@ -2829,7 +2829,7 @@ public void db_deleteTmp(int client)
 {
 	char szQuery[256];
 	if (!IsValidClient(client))
-	return;
+		return;
 	Format(szQuery, 256, sql_deletePlayerTmp, g_szSteamID[client]);
 	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, client, DBPrio_Low);
 }
