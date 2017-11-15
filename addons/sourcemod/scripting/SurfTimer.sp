@@ -41,8 +41,8 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "2.1.1"
-#define PLUGIN_VERSION 211
+#define VERSION "2.2"
+#define PLUGIN_VERSION 220
 
 // Database Definitions
 #define MYSQL 0
@@ -68,21 +68,21 @@
 #define PINK 0x0E
 #define LIGHTRED 0x0F
 
-// Paths
+// Paths for folders and files
 #define CK_REPLAY_PATH "data/replays/"
 #define MULTI_SERVER_MAPCYCLE "configs/surftimer/multi_server_mapcycle.txt"
 #define CUSTOM_TITLE_PATH "configs/surftimer/custom_chat_titles.txt"
 #define SKILLGROUP_PATH "configs/surftimer/skillgroups.cfg"
+#define DEFAULT_TITLES_WHITELIST_PATH "configs/surftimer/default_titles_whitelist.txt"
+#define DEFAULT_TITLES_PATH "configs/surftimer/default_titles.txt"
+
+// Paths for sounds
 #define PRO_FULL_SOUND_PATH "sound/quake/holyshit.mp3"
 #define PRO_RELATIVE_SOUND_PATH "*quake/holyshit.mp3"
 #define CP_FULL_SOUND_PATH "sound/quake/wickedsick.mp3"
 #define CP_RELATIVE_SOUND_PATH "*quake/wickedsick.mp3"
 #define UNSTOPPABLE_SOUND_PATH "sound/quake/unstoppable.mp3"
 #define UNSTOPPABLE_RELATIVE_SOUND_PATH "*quake/unstoppable.mp3"
-#define DEFAULT_TITLES_WHITELIST_PATH "configs/surftimer/default_titles_whitelist.txt"
-#define DEFAULT_TITLES_PATH "configs/surftimer/default_titles.txt"
-
-// fluffys
 #define WR_FULL_SOUND_PATH "sound/surftimer/wr/1/valve_logo_music.mp3"
 #define WR_RELATIVE_SOUND_PATH "*surftimer/wr/1/valve_logo_music.mp3"
 #define WR2_FULL_SOUND_PATH "sound/surftimer/wr/2/valve_logo_music.mp3"
@@ -95,6 +95,7 @@
 #define WRCP_RELATIVE_SOUND_PATH "*surftimer/wow_fast.mp3"
 #define DISCOTIME_FULL_SOUND_PATH "sound/surftimer/discotime.mp3"
 #define DISCOTIME_RELATIVE_SOUND_PATH "*/surftimer/discotime.mp3"
+
 #define MAX_STYLES 7
 
 #define VOTE_NO "###no###"
@@ -944,7 +945,7 @@ char g_szWrcpReplayTime[CPLIMIT][128];
 int g_BonusBotCount;
 int g_iCurrentBonusReplayIndex;
 int g_iBonusToReplay[MAXZONEGROUPS + 1];
-float g_fReplayTimes[MAXZONEGROUPS];
+float g_fReplayTimes[MAXZONEGROUPS][MAX_STYLES];
 
 /*----------  Misc  ----------*/
 
@@ -1299,6 +1300,19 @@ Handle g_TriggerMultipleList;
 // Chat Prefix
 char g_szChatPrefix[64];
 ConVar g_hChatPrefix = null;
+
+// Play Replay command
+bool g_bManualReplayPlayback;
+bool g_bManualBonusReplayPlayback;
+bool g_bManualStageReplayPlayback;
+int g_iManualReplayCount;
+int g_iManualBonusReplayCount;
+int g_iManualStageReplayCount;
+int g_iSelectedReplayType;
+int g_iSelectedReplayBonus;
+int g_iSelectedReplayStage;
+int g_iSelectedReplayStyle;
+int g_iSelectedBonusReplayStyle;
 
 /*===================================
 =         Predefined Arrays         =
@@ -2334,7 +2348,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 						g_InfoBot = -1;
 						KickClient(i);
 						char szBuffer[64];
-						if (g_bMapReplay)
+						if (g_bMapReplay[0])
 							count++;
 						if (g_BonusBotCount > 0)
 							count++;

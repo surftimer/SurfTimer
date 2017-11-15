@@ -880,6 +880,11 @@
   		"#format"	"{1:s}"
 		"en"		"{1} g_hTriggerMultiple is null!"
 	}
+	"BotInUse"
+	{
+		"#format" 	"{1:s},{2:s}"
+		"en"		"{1} {darkred}{2} Replay Bot already in use"
+	}
 	"CVote1"
 	{
 		"en"	"[SM] Vote is already in progress"

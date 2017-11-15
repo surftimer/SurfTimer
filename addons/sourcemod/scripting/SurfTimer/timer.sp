@@ -277,13 +277,14 @@ public Action ReplayTimer(Handle timer, any userid)
 {
 	int client = GetClientOfUserId(userid);
 	if (IsValidClient(client) && !IsFakeClient(client))
-		SaveRecording(client, 0);
+		SaveRecording(client, 0, 0);
 	else
 		g_bNewReplay[client] = false;
 
 
 	return Plugin_Handled;
 }
+
 public Action BonusReplayTimer(Handle timer, Handle pack)
 {
 	ResetPack(pack);
@@ -291,7 +292,37 @@ public Action BonusReplayTimer(Handle timer, Handle pack)
 	int zGrp = ReadPackCell(pack);
 
 	if (IsValidClient(client) && !IsFakeClient(client))
-		SaveRecording(client, zGrp);
+		SaveRecording(client, zGrp, 0);
+	else
+		g_bNewBonus[client] = false;
+
+
+	return Plugin_Handled;
+}
+
+public Action StyleReplayTimer(Handle timer, Handle pack)
+{
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int style = ReadPackCell(pack);
+
+	if (IsValidClient(client) && !IsFakeClient(client))
+		SaveRecording(client, 0, style);
+	else
+		g_bNewReplay[client] = false;
+
+	return Plugin_Handled;
+}
+
+public Action StyleBonusReplayTimer(Handle timer, Handle pack)
+{
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int zGrp = ReadPackCell(pack);
+	int style = ReadPackCell(pack);
+
+	if (IsValidClient(client) && !IsFakeClient(client))
+		SaveRecording(client, zGrp, style);
 	else
 		g_bNewBonus[client] = false;
 
@@ -577,4 +608,18 @@ public Action SetArmsModel(Handle timer, any client)
 		GetConVarString(g_hArmModel, szBuffer, 256);
 		SetEntPropString(client, Prop_Send, "m_szArmsModel", szBuffer);
 	}
+}
+
+public Action SpecBot(Handle timer, Handle pack)
+{
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int bot = ReadPackCell(pack);
+
+	ChangeClientTeam(client, 1);
+	SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", bot);
+	SetEntProp(client, Prop_Send, "m_iObserverMode", 4);
+	g_bWrcpTimeractivated[client] = false;
+
+	return Plugin_Handled;
 }

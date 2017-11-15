@@ -162,48 +162,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_style", Client_SelectStyle, "[surftimer] open style select menu.");
 	RegConsoleCmd("sm_styles", Client_SelectStyle, "[surftimer] open style select menu.");
 
-	// Style WR
-	// RegConsoleCmd("sm_wrsw", Client_Wrsw, "[surftimer] prints records sw in chat");
-	// RegConsoleCmd("sm_swwr", Client_Wrsw, "[surftimer] prints records sw in chat");
-	// RegConsoleCmd("sm_wrhsw", Client_Wrhsw, "[surftimer] prints records hsw in chat");
-	// RegConsoleCmd("sm_hswwr", Client_Wrhsw, "[surftimer] prints records hsw in chat");
-	// RegConsoleCmd("sm_wrbw", Client_Wrbw, "[surftimer] prints records bw in chat");
-	// RegConsoleCmd("sm_bwwr", Client_Wrbw, "[surftimer] prints records bw in chat");
-	// RegConsoleCmd("sm_wrlg", Client_Wrlg, "[surftimer] prints records low-gravity in chat");
-	// RegConsoleCmd("sm_lgwr", Client_Wrlg, "[surftimer] prints records low-gravity in chat");
-	// RegConsoleCmd("sm_wrsm", Client_Wrsm, "[surftimer] prints records slow motion in chat");
-	// RegConsoleCmd("sm_smwr", Client_Wrsm, "[surftimer] prints records slow motion in chat");
-	// RegConsoleCmd("sm_wrff", Client_Wrff, "[surftimer] prints records fast forwards in chat");
-	// RegConsoleCmd("sm_ffwr", Client_Wrff, "[surftimer] prints records fast forwards in chat");
-
-	// Style WRB
-	// RegConsoleCmd("sm_wrbsw", Client_Wrbsw, "[surftimer] prints records sw in chat");
-	// RegConsoleCmd("sm_swwrb", Client_Wrbsw, "[surftimer] prints records sw in chat");
-	// RegConsoleCmd("sm_wrbhsw", Client_Wrbhsw, "[surftimer] prints records hsw in chat");
-	// RegConsoleCmd("sm_hswwrb", Client_Wrbhsw, "[surftimer] prints records hsw in chat");
-	// RegConsoleCmd("sm_wrbbw", Client_Wrbbw, "[surftimer] prints records bw in chat");
-	// RegConsoleCmd("sm_bwwrb", Client_Wrbbw, "[surftimer] prints records bw in chat");
-	// RegConsoleCmd("sm_wrblg", Client_Wrblg, "[surftimer] prints records low-gravity in chat");
-	// RegConsoleCmd("sm_lgwrb", Client_Wrblg, "[surftimer] prints records low-gravity in chat");
-	// RegConsoleCmd("sm_wrbsm", Client_Wrbsm, "[surftimer] prints records slow motion in chat");
-	// RegConsoleCmd("sm_smwrb", Client_Wrbsm, "[surftimer] prints records slow motion in chat");
-	// RegConsoleCmd("sm_wrbff", Client_Wrbff, "[surftimer] prints records fast forwards in chat");
-	// RegConsoleCmd("sm_ffwrb", Client_Wrbff, "[surftimer] prints records fast forwards in chat");
-
-	// Style mtop
-	// RegConsoleCmd("sm_mtopsw", Client_SWMapTop, "[surftimer] displays a local map top (sw) for a given map");
-	// RegConsoleCmd("sm_swmtop", Client_SWMapTop, "[surftimer] displays a local map top (sw) for a given map");
-	// RegConsoleCmd("sm_mtophsw", Client_HSWMapTop, "[surftimer] displays a local map top (hsw) for a given map");
-	// RegConsoleCmd("sm_hswmtop", Client_HSWMapTop, "[surftimer] displays a local map top (hsw) for a given map");
-	// RegConsoleCmd("sm_mtopbw", Client_BWMapTop, "[surftimer] displays a local map top (bw) for a given map");
-	// RegConsoleCmd("sm_bwmtop", Client_BWMapTop, "[surftimer] displays a local map top (bw) for a given map");
-	// RegConsoleCmd("sm_mtoplg", Client_LGMapTop, "[surftimer] displays a local map top (low-gravity) for a given map");
-	// RegConsoleCmd("sm_lgmtop", Client_LGMapTop, "[surftimer] displays a local map top (low-gravity) for a given map");
-	// RegConsoleCmd("sm_mtopsm", Client_SMMapTop, "[surftimer] displays a local map top (slow motion) for a given map");
-	// RegConsoleCmd("sm_smmtop", Client_SMMapTop, "[surftimer] displays a local map top (slow motion) for a given map");
-	// RegConsoleCmd("sm_mtopff", Client_FFMapTop, "[surftimer] displays a local map top (fast forwards) for a given map");
-	// RegConsoleCmd("sm_ffmtop", Client_FFMapTop, "[surftimer] displays a local map top (fast forwards) for a given map");
-
 	// style btop if i ever get around to it
 	/*RegConsoleCmd("sm_btopsw", Client_SWBonusTop, "[surftimer] displays a local bonus top (sw) for a given map");
 	RegConsoleCmd("sm_swbtop", Client_SWBonusTop, "[surftimer] displays a local bonus top (sw) for a given map");
@@ -217,34 +175,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_smbtop", Client_SMBonusTop, "[surftimer] displays a local bonus top (slow motion) for a given map");
 	RegConsoleCmd("sm_btopff", Client_FFBonusTop, "[surftimer] displays a local bonus top (fast forwards) for a given map");
 	RegConsoleCmd("sm_ffbtop", Client_FFBonusTop, "[surftimer] displays a local bonus top (fast forwards) for a given map");*/
-
-	// Style WRCP
-	// RegConsoleCmd("sm_wrcpsw", Client_SWWrcp, "[surftimer] displays sideways stage times for map");
-	// RegConsoleCmd("sm_swwrcp", Client_SWWrcp, "[surftimer] displays sideways stage times for map");
-	// RegConsoleCmd("sm_wrcphsw", Client_HSWWrcp, "[surftimer] displays half-sideways stage times for map");
-	// RegConsoleCmd("sm_hswwrcp", Client_HSWWrcp, "[surftimer] displays half-sideways stage times for map");
-	// RegConsoleCmd("sm_wrcpbw", Client_BWWrcp, "[surftimer] displays backwards stage times for map");
-	// RegConsoleCmd("sm_bwwrcp", Client_BWWrcp, "[surftimer] displays backwards stage times for map");
-	// RegConsoleCmd("sm_wrcplg", Client_LGWrcp, "[surftimer] displays low-gravity stage times for map");
-	// RegConsoleCmd("sm_lgwrcp", Client_LGWrcp, "[surftimer] displays low-gravity stage times for map");
-	// RegConsoleCmd("sm_wrcpsm", Client_SMWrcp, "[surftimer] displays slow motion stage times for map");
-	// RegConsoleCmd("sm_smwrcp", Client_SMWrcp, "[surftimer] displays slow motion stage times for map");
-	// RegConsoleCmd("sm_wrcpff", Client_FFWrcp, "[surftimer] displays fast forwards stage times for map");
-	// RegConsoleCmd("sm_ffwrcp", Client_FFWrcp, "[surftimer] displays fast forwards stage times for map");
-
-	// Style Profiles
-	// RegConsoleCmd("sm_psw", Client_SWProfile, "[surftimer] opens a player sw profile");
-	// RegConsoleCmd("sm_swp", Client_SWProfile, "[surftimer] opens a player sw profile");
-	// RegConsoleCmd("sm_phsw", Client_HSWProfile, "[surftimer] opens a player hsw profile");
-	// RegConsoleCmd("sm_hswp", Client_HSWProfile, "[surftimer] opens a player hsw profile");
-	// RegConsoleCmd("sm_pbw", Client_BWProfile, "[surftimer] opens a player bw profile");
-	// RegConsoleCmd("sm_bwp", Client_BWProfile, "[surftimer] opens a player bw profile");
-	// RegConsoleCmd("sm_plg", Client_LGProfile, "[surftimer] opens a player low-gravity profile");
-	// RegConsoleCmd("sm_lgp", Client_LGProfile, "[surftimer] opens a player low-gravity profile");
-	// RegConsoleCmd("sm_psm", Client_SMProfile, "[surftimer] opens a player slow motion profile");
-	// RegConsoleCmd("sm_smp", Client_SMProfile, "[surftimer] opens a player slow motion profile");
-	// RegConsoleCmd("sm_pff", Client_FFProfile, "[surftimer] opens a player fast forwards profile");
-	// RegConsoleCmd("sm_ffp", Client_FFProfile, "[surftimer] opens a player fast forwards profile");
 
 	// Bans & Mutes
 	RegConsoleCmd("sm_bans", Client_ShowBans, "[surftimer] displays a menu with the recent bans");
@@ -269,6 +199,10 @@ void CreateCommands()
 
 	// reload map
 	RegAdminCmd("sm_rm", Command_ReloadMap, ADMFLAG_ROOT, "[surftimer] Reloads the current map");
+
+	// Play record
+	RegConsoleCmd("sm_replay", Command_PlayRecord, "[surftimer] Set the replay bot to replay a run");
+	RegConsoleCmd("sm_replays", Command_PlayRecord, "[surftimer] Set the replay bot to replay a run");
 }
 
 void CreateCommandListeners()
@@ -304,7 +238,10 @@ public Action sm_test(int client, int args)
 	// }
 
 	// CPrintToChat(client, "g_iSelectedTrigger[client]: %i", g_iSelectedTrigger[client]);
-	CalculatePlayerRank(client, 4);
+	for (int i = 0; i < MAX_STYLES; i++)
+	{
+		CPrintToChat(client, "g_fReplayTimes[0][%d]: %f", i, g_fReplayTimes[0][i]);
+	}
 
 	return Plugin_Handled;
 }
@@ -4951,4 +4888,265 @@ public Action Command_ReloadMap(int client, int args)
 {
 	ServerCommand("changelevel %s", g_szMapName);
 	return Plugin_Handled;
+}
+
+public Action Command_PlayRecord(int client, int args)
+{
+	if (GetConVarBool(g_hPlayReplayVipOnly))
+	{
+		if (!g_bVip[client])
+		{
+			CReplyToCommand(client, "%t", "Misc43", g_szChatPrefix);
+			return Plugin_Handled;
+		}
+	}
+
+	PlayRecordMenu(client);
+	return Plugin_Handled;
+}
+
+public void PlayRecordMenu(int client)
+{
+	Menu menu = CreateMenu(PlayRecordTypeMenuHandler);
+	SetMenuTitle(menu, "Play Record: Select a type");
+
+	// Check for map replay
+	if (g_bMapReplay[0])
+		AddMenuItem(menu, "", "Map Replay");
+	else
+		AddMenuItem(menu, "", "Map Replay", ITEMDRAW_DISABLED);
+
+	// Check for bonus replay
+	for (int i = 1; i < MAXZONEGROUPS; i++)
+	{
+		if (g_bMapBonusReplay[i][0])
+		{
+			AddMenuItem(menu, "", "Bonus Replay");
+			break;
+		}
+
+		if (i == MAXZONEGROUPS - 1)
+			AddMenuItem(menu, "", "Bonus Replay", ITEMDRAW_DISABLED);
+	}
+
+	// Check for stage replay
+	if (g_TotalStages > 0)
+	{
+		for (int i = 1; i <= g_TotalStages; i++)
+		{
+			if (g_bStageReplay[i])
+			{
+				AddMenuItem(menu, "", "Stage Replay");
+				break;
+			}
+			
+			if (i == g_TotalStages)
+				AddMenuItem(menu, "", "Stage Replay", ITEMDRAW_DISABLED);
+		}
+	}
+	else
+		AddMenuItem(menu, "", "Stage Replay", ITEMDRAW_DISABLED);
+
+	SetMenuExitButton(menu, true);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+public int PlayRecordTypeMenuHandler(Handle menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		if (g_bManualReplayPlayback && g_bManualBonusReplayPlayback)
+		{
+			switch (param2)
+			{
+				case 1: CPrintToChat(param1, "%t", "BotInUse", g_szChatPrefix, "Bonus");
+				case 2: CPrintToChat(param1, "%t", "BotInUse", g_szChatPrefix, "Stage");
+				default: CPrintToChat(param1, "%t", "BotInUse", g_szChatPrefix, "Map");
+			}
+		}
+		else
+			ChooseReplayMenu(param1, param2);
+	}
+	else if (action == MenuAction_End)
+		delete menu;
+}
+
+public void ChooseReplayMenu(int client, int type)
+{
+	Menu menu = CreateMenu(PlayRecordMenuHandler);
+	char szTitle[128], szItem[128], szBuffer[128];
+	if (type == 0)
+	{
+		Format(szTitle, sizeof(szTitle), "Play Record: Map Replay");
+		AddMenuItem(menu, "map", "Map Replay");
+ 		for (int i = 1; i < MAX_STYLES; i++)
+		{
+			if (g_bMapReplay[i])
+			{
+				Format(szItem, sizeof(szItem), "Map - %s", g_szStyleMenuPrint[i]);
+				Format(szBuffer, sizeof(szBuffer), "map-style-%d", i);
+				AddMenuItem(menu, szBuffer, szItem);
+			}
+		}
+	}
+	else if (type == 1)
+	{
+		Format(szTitle, sizeof(szTitle), "Play Record: Bonus Replay");
+		for (int i = 1; i < g_mapZoneGroupCount; i++)
+		{
+			if (g_bMapBonusReplay[i][0])
+			{
+				Format(szItem, sizeof(szItem), "Bonus %d", i);
+				Format(szBuffer, sizeof(szBuffer), "bonus-%d", i);
+				AddMenuItem(menu, szBuffer, szItem);
+			}
+		}
+
+		for (int i = 1; i < g_mapZoneGroupCount; i++)
+		{
+			for (int j = 1; j < MAX_STYLES; j++)
+			{
+				if (g_bMapBonusReplay[i][j])
+				{
+					Format(szItem, sizeof(szItem), "Bonus %d - %s", i, g_szStyleMenuPrint[j]);
+					Format(szBuffer, sizeof(szBuffer), "bonus-%d-style-%d", i, j);
+					AddMenuItem(menu, szBuffer, szItem);
+				}
+			}
+		}
+	}
+	else if (type == 2)
+	{
+		Format(szTitle, sizeof(szTitle), "Play Record: Stage Replay");
+		for (int i = 1; i <= g_TotalStages; i++)
+		{
+			Format(szItem, sizeof(szItem), "Stage %d Replay", i);
+			Format(szBuffer, sizeof(szBuffer), "stage-%d", i);
+			AddMenuItem(menu, szBuffer, szItem);
+		}
+	}
+
+	SetMenuTitle(menu, szTitle);
+	SetMenuExitBackButton(menu, true);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char szBuffer[128];
+		GetMenuItem(menu, param2, szBuffer, sizeof(szBuffer));
+
+		int bot;
+		bool bSpec = true;
+
+		// Did the client select a map replay?
+		if ((StrContains(szBuffer, "map", false)) != -1)
+		{
+			if (g_bManualReplayPlayback)
+			{
+				bSpec = false;
+				CPrintToChat(param1, "%t", "BotInUse", g_szChatPrefix, "Map");
+			}
+			else
+			{
+				g_iSelectedReplayType = 0;
+				bot = g_RecordBot;
+
+				// Check for style replay
+				if ((StrContains(szBuffer, "style", false)) != -1)
+				{
+					g_iManualReplayCount = 0;
+					g_bManualReplayPlayback = true;
+					char szBuffer2[2][128];
+					ExplodeString(szBuffer, "style-", szBuffer2, 2, sizeof(szBuffer2));
+					int style = StringToInt(szBuffer2[1]);
+					g_iSelectedReplayStyle = style;
+					PlayRecord(bot, 0, style);
+				}
+				else
+				{
+					g_bManualReplayPlayback = true;
+					g_iManualReplayCount = 99;
+					g_iSelectedReplayStyle = 0;
+					PlayRecord(bot, 0, 0);
+				}
+			}
+		}
+		else if ((StrContains(szBuffer, "bonus", false)) != -1)
+		{
+			if (g_bManualBonusReplayPlayback)
+			{
+				bSpec = false;
+				CPrintToChat(param1, "%t", "BotInUse", g_szChatPrefix, "Bonus");
+			}
+			else
+			{
+				g_iSelectedReplayType = 1;
+				bot = g_BonusBot;
+				int bonus;
+
+				// Check which bonus
+				char szBuffer2[2][128];
+				ExplodeString(szBuffer, "bonus-", szBuffer2, 2, sizeof(szBuffer2));
+				bonus = StringToInt(szBuffer2[1]);
+
+				// Check for style replay
+				if ((StrContains(szBuffer, "style", false)) != -1)
+				{
+					g_iManualBonusReplayCount = 0;
+					g_bManualBonusReplayPlayback = true;
+					ExplodeString(szBuffer, "style-", szBuffer2, 2, sizeof(szBuffer2));
+					int style = StringToInt(szBuffer2[1]);
+					g_iSelectedBonusReplayStyle = style;
+					PlayRecord(bot, bonus, style);
+				}
+				else
+				{
+					g_bManualBonusReplayPlayback = true;
+					g_iManualBonusReplayCount = 99;
+					g_iSelectedBonusReplayStyle = 0;
+					PlayRecord(bot, bonus, 0);
+				}
+			}
+		}
+		else if ((StrContains(szBuffer, "stage", false)) != -1)
+		{
+			if (g_bManualStageReplayPlayback)
+			{
+				bSpec = false;
+				CPrintToChat(param1, "%t", "BotInUse", g_szChatPrefix, "Stage");
+			}
+			else
+			{
+				g_iSelectedReplayType = 2;
+				bot = g_WrcpBot;
+				int stage;
+
+				// Check which stage
+				char szBuffer2[2][128];
+				ExplodeString(szBuffer, "stage-", szBuffer2, 2, sizeof(szBuffer2));
+				stage = StringToInt(szBuffer2[1]);
+
+				g_bManualStageReplayPlayback = true;
+				g_iManualStageReplayCount = 0;
+				g_iSelectedReplayStage = stage;
+				PlayRecord(bot, -stage, 0);
+			}
+		}
+
+		if (bSpec)
+		{
+			// Delay the switch to spec so the client sees the new bot name
+			Handle pack;
+			CreateDataTimer(0.2, SpecBot, pack);
+			WritePackCell(pack, GetClientUserId(param1));
+			WritePackCell(pack, bot);
+		}
+	}
+	else if (action == MenuAction_Cancel)
+		PlayRecordMenu(param1);
+	else if (action == MenuAction_End)
+		delete menu;
 }

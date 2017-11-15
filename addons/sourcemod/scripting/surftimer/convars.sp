@@ -35,9 +35,9 @@ ConVar g_hWrcpBot = null;
 ConVar g_hBackupReplays = null;									// Back up replay bots?
 ConVar g_hReplaceReplayTime = null;								// Replace replay times, even if not SR
 ConVar g_hTeleToStartWhenSettingsLoaded = null;
-bool g_bMapReplay;												// Why two bools?
+bool g_bMapReplay[MAX_STYLES];									// Why two bools?
 ConVar g_hBonusBot = null;										// Bonus bot?
-bool g_bMapBonusReplay[MAXZONEGROUPS];
+bool g_bMapBonusReplay[MAXZONEGROUPS][MAX_STYLES];
 ConVar g_hColoredNames = null;									// Colored names in chat?
 ConVar g_hPauseServerside = null;								// Allow !pause?
 ConVar g_hAutoBhopConVar = null;								// Allow autobhop?
@@ -95,6 +95,7 @@ ConVar g_hCalladminDiscord = null;								// Web hook link to allow players to c
 ConVar g_hSidewaysBlockKeys = null;
 ConVar g_hEnforceDefaultTitles = null;
 ConVar g_hWrcpPoints = null;
+ConVar g_hPlayReplayVipOnly = null;
 
 void CreateConVars()
 {
@@ -318,6 +319,9 @@ void CreateConVars()
 
 	// WRCP Points
 	g_hWrcpPoints = CreateConVar("ck_wrcp_points", "0", "Sets the amount of points a player should get for a WRCP, 0 to disable");
+
+	// Play Replay
+	g_hPlayReplayVipOnly = CreateConVar("ck_play_replay_vip_only", "1", "Sets whether the sm_replay command will be VIP only Disable/Enable");
 
 	// Server Name
 	g_hHostName = FindConVar("hostname");

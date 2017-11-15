@@ -33,7 +33,7 @@ void setBotQuota()
 
 	// Check how many bots are needed
 	int count = 0;
-	if (g_bMapReplay)
+	if (g_bMapReplay[0])
 		count++;
 	if (GetConVarBool(g_hInfoBot))
 		count++;
@@ -3011,8 +3011,16 @@ public void SpecListMenuDead(int client) // What Spectators see
 							Format(g_szPlayerPanelText[client], 512, "Bonus Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \nBonus\n", g_szBonusName, g_szBonusTime, count, sSpecs);
 						else if (ObservedUser == g_WrcpBot)
 						{
-							int stage = g_StageReplayCurrentStage;
-							Format(g_szPlayerPanelText[client], 512, "Stage: %i Replay (%i)\n%s (%s)\n \nSpecs (%i):\n%s\n", g_StageReplayCurrentStage, g_StageReplaysLoop, g_szWrcpReplayName[stage],  g_szWrcpReplayTime[stage], count, sSpecs);
+							if (g_bManualStageReplayPlayback)
+							{
+								int stage = g_iSelectedReplayStage; 
+								Format(g_szPlayerPanelText[client], 512, "Stage: %i Replay (%i)\n%s (%s)\n \nSpecs (%i):\n%s\n", stage, g_iManualStageReplayCount + 1, g_szWrcpReplayName[stage],  g_szWrcpReplayTime[stage], count, sSpecs);
+							}
+							else
+							{
+								int stage = g_StageReplayCurrentStage;
+								Format(g_szPlayerPanelText[client], 512, "Stage: %i Replay (%i)\n%s (%s)\n \nSpecs (%i):\n%s\n", g_StageReplayCurrentStage, g_StageReplaysLoop, g_szWrcpReplayName[stage],  g_szWrcpReplayTime[stage], count, sSpecs);
+							}
 						}
 
 					}

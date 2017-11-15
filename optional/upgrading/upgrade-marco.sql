@@ -29,6 +29,7 @@ DROP COLUMN `btier10`,
 ADD COLUMN `maxvelocity` float NOT NULL DEFAULT 3500 AFTER `tier`,
 ADD COLUMN `announcerecord` int(11) NOT NULL DEFAULT 0 AFTER `maxvelocity`,
 ADD COLUMN `gravityfix` int(11) NOT NULL DEFAULT 1 AFTER `announcerecord`,
+ADD COLUMN `ranked` int(11) NOT NULL DEFAULT 1 AFTER `gravityfix`,
 ADD INDEX `tier` (mapname, tier),
 ADD INDEX `mapsettings` (mapname, maxvelocity, announcerecord, gravityfix);
 
@@ -61,6 +62,7 @@ CREATE TABLE `ck_playeroptions2` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE `ck_playerrank`
+DROP PRIMARY KEY,
 DROP COLUMN `winratio`,
 DROP COLUMN `pointsratio`,
 DROP COLUMN `multiplier`,
@@ -84,7 +86,9 @@ ADD COLUMN `joined` int(64) NOT NULL AFTER `lastseen`,
 ADD COLUMN `timealive` int(64) NOT NULL DEFAULT 0 AFTER `joined`,
 ADD COLUMN `timespec` int(64) NOT NULL DEFAULT 0 AFTER `timealive`,
 ADD COLUMN `connections` int(64) NOT NULL DEFAULT 1 AFTER `timespec`,
-ADD COLUMN `readchangelog` int(11) NOT NULL DEFAULT 0 AFTER `connections`;
+ADD COLUMN `readchangelog` int(11) NOT NULL DEFAULT 0 AFTER `connections`,
+ADD COLUMN `style` int(11) NOT NULL DEFAULT 0 AFTER `readchangelog`,
+ADD PRIMARY KEY (steamid, style);
 
 ALTER TABLE `ck_playertimes`
 DROP PRIMARY KEY,
