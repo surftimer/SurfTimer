@@ -5097,7 +5097,7 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 				{
 					g_iManualBonusReplayCount = 0;
 					g_bManualBonusReplayPlayback = true;
-					ExplodeString(szBuffer, "style-", szBuffer2, 2, sizeof(szBuffer2));
+					ExplodeString(szBuffer, "style-", szBuffer2, 2, 128);
 					int style = StringToInt(szBuffer2[1]);
 					g_iSelectedBonusReplayStyle = style;
 					PlayRecord(bot, bonus, style);
@@ -5126,7 +5126,7 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 
 				// Check which stage
 				char szBuffer2[2][128];
-				ExplodeString(szBuffer, "stage-", szBuffer2, 2, sizeof(szBuffer2));
+				ExplodeString(szBuffer, "stage-", szBuffer2, 2, 128);
 				stage = StringToInt(szBuffer2[1]);
 
 				g_bManualStageReplayPlayback = true;
