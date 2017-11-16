@@ -483,7 +483,7 @@
 	"Commands7"
 	{
   		"#format"	"{1:s},{2:d}"
-		"en"		"{1} sm_tele #%d"
+		"en"		"{1} sm_tele #{2}"
 	}
 	"Commands8"
 	{
