@@ -1231,11 +1231,6 @@ int g_iServerID;
 int g_iLastID;
 bool g_bHasLatestID;
 
-// Comms Vote Menu
-int g_iCommsVoteCaller;
-int g_iCommsVoteType[MAXPLAYERS + 1];
-int g_iCommsVoteTarget[MAXPLAYERS + 1];
-
 // Show Triggers https://forums.alliedmods.net/showthread.php?t=290356
 int g_iTriggerTransmitCount;
 bool g_bShowTriggers[MAXPLAYERS + 1];

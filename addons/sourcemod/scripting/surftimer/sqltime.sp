@@ -17,16 +17,15 @@ public void SQL_ViewPlayerInfoCallback(Handle owner, Handle hndl, const char[] e
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
 		char szSteamId[32], szName[MAX_NAME_LENGTH], szCountry[128], szSteamId64[64];
-		int lastSeenUnix, joinUnix, connections, timeAlive, timeSpec;
 		SQL_FetchString(hndl, 0, szSteamId, 32);
 		SQL_FetchString(hndl, 1, szSteamId64, 64);
 		SQL_FetchString(hndl, 2, szName, sizeof(szName));
 		SQL_FetchString(hndl, 3, szCountry, sizeof(szCountry));
-		lastSeenUnix = SQL_FetchInt(hndl, 4);
-		joinUnix = SQL_FetchInt(hndl, 5);
-		connections = SQL_FetchInt(hndl, 6);
-		timeAlive = SQL_FetchInt(hndl, 7);
-		timeSpec = SQL_FetchInt(hndl, 8);
+		int lastSeenUnix = SQL_FetchInt(hndl, 4);
+		int joinUnix = SQL_FetchInt(hndl, 5);
+		int connections = SQL_FetchInt(hndl, 6);
+		int timeAlive = SQL_FetchInt(hndl, 7);
+		int timeSpec = SQL_FetchInt(hndl, 8);
 
 		// Format Joined Time
 		char szTime[128];

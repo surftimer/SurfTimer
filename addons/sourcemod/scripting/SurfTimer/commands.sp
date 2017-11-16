@@ -117,8 +117,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_ve", Command_VoteExtend, "[surftimer] [vip] Vote to extend the map");
 	RegConsoleCmd("sm_colours", Command_ListColours, "[surftimer] Lists available colours for sm_mytitle and sm_namecolour");
 	RegConsoleCmd("sm_toggletitle", Command_ToggleTitle, "[surftimer] [vip] VIPs can toggle their title.");
-	RegConsoleCmd("sm_votemute", Command_VoteMute, "[surftimer] [vip] starts a vote to mute a client");
-	RegConsoleCmd("sm_votegag", Command_VoteGag, "[surftimer] [vip] starts a vote to gag a client");
 	RegConsoleCmd("sm_joinmsg", Command_JoinMsg, "[surftimer] [vip] Allows a vip to set their join msg");
 
 	// Automatic Donate Commands
@@ -175,11 +173,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_smbtop", Client_SMBonusTop, "[surftimer] displays a local bonus top (slow motion) for a given map");
 	RegConsoleCmd("sm_btopff", Client_FFBonusTop, "[surftimer] displays a local bonus top (fast forwards) for a given map");
 	RegConsoleCmd("sm_ffbtop", Client_FFBonusTop, "[surftimer] displays a local bonus top (fast forwards) for a given map");*/
-
-	// Bans & Mutes
-	RegConsoleCmd("sm_bans", Client_ShowBans, "[surftimer] displays a menu with the recent bans");
-	RegConsoleCmd("sm_mutes", Client_ShowComms, "[surftimer] displays a menu with the recent mutes or gags");
-	RegConsoleCmd("sm_gags", Client_ShowComms, "[surftimer] displays a menu with the recent mutes or gags");
 
 	// Test
 	RegAdminCmd("sm_test", sm_test, ADMFLAG_ROOT);
@@ -4576,179 +4569,6 @@ public int HookZoneTypeHandler(Menu menu, MenuAction action, int param1, int par
 	}
 }
 
-public Action Client_ShowBans(int client, int args)
-{
-	if (IsValidClient(client) && !IsFakeClient(client))
-		db_selectAllBans(client);
-
-	return Plugin_Handled;
-}
-
-public Action Client_ShowComms(int client, int args)
-{
-	if (IsValidClient(client) && !IsFakeClient(client))
-		db_selectAllComms(client);
-
-	return Plugin_Handled;
-}
-
-public Action Command_VoteMute(int client, int args)
-{
-	if (IsValidClient(client) && IsPlayerVip(client))
-	{
-		if (IsVoteInProgress())
-		{
-			CReplyToCommand(client, "%t", "Commands80", g_szChatPrefix);
-			return Plugin_Handled;
-		}
-		CommsVoteMenu(client, 0);
-	}
-	return Plugin_Handled;
-}
-
-
-public Action Command_VoteGag(int client, int args)
-{
-	if (IsValidClient(client) && IsPlayerVip(client))
-	{
-		if (IsVoteInProgress())
-		{
-			CReplyToCommand(client, "%t", "Commands81", g_szChatPrefix);
-			return Plugin_Handled;
-		}
-		CommsVoteMenu(client, 1);
-	}
-	return Plugin_Handled;
-}
-
-public void CommsVoteMenu(int client, int type)
-{
-	Menu menu = CreateMenu(CommsVoteMenuHandler);
-	if (type == 0)
-		SetMenuTitle(menu, "Choose a player to Vote Mute");
-	else
-		SetMenuTitle(menu, "Choose a player to Vote Gag");
-
-	// Add Players
-	int playerCount = 0;
-	char szPlayerName[MAX_NAME_LENGTH];
-	for (int i = 1; i <= MaxClients; i++)
-	{
-		if (IsValidClient(i) && i != client && !IsFakeClient(i))
-		{
-			GetClientName(i, szPlayerName, MAX_NAME_LENGTH);
-			AddMenuItem(menu, szPlayerName, szPlayerName);
-			playerCount++;
-		}
-	}
-
-	if (playerCount > 0)
-	{
-		g_iCommsVoteType[client] = type;
-		SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
-		DisplayMenu(menu, client, MENU_TIME_FOREVER);
-	}
-	else
-	{
-		CPrintToChat(client, "%t", "Commands62", g_szChatPrefix);
-	}
-}
-
-public int CommsVoteMenuHandler(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Select)
-	{
-		char info[32];
-		char szPlayerName[MAX_NAME_LENGTH], szName[MAX_NAME_LENGTH];
-		GetClientName(param1, szName, MAX_NAME_LENGTH);
-		GetMenuItem(menu, param2, info, sizeof(info));
-
-		for (int i = 1; i <= MaxClients; i++)
-		{
-			if (IsValidClient(i) && IsPlayerAlive(i) && i != param1)
-			{
-				GetClientName(i, szPlayerName, MAX_NAME_LENGTH);
-				if (StrEqual(info, szPlayerName))
-				{
-					g_iCommsVoteTarget[param1] = i;
-					g_iCommsVoteCaller = param1;
-					int type = g_iCommsVoteType[param1];
-					char szMenuTitle[128];
-					if (type == 0) // Vote Mute
-					Format(szMenuTitle, sizeof(szMenuTitle), "Mute %s?", szPlayerName);
-					else
-					Format(szMenuTitle, sizeof(szMenuTitle), "Gag %s?", szPlayerName);
-
-					Menu menu2 = CreateMenu(CommsVoteHandle);
-					SetMenuTitle(menu2, szMenuTitle);
-					AddMenuItem(menu2, "yes", "Yes");
-					AddMenuItem(menu2, "no", "No");
-					SetMenuExitButton(menu2, false);
-					VoteMenuToAll(menu2, 20);
-
-					if (type == 0)
-					CPrintToChatAll("%t", "Commands63", g_szChatPrefix, szPlayerName, szName);
-					else
-					CPrintToChatAll("%t", "Commands64", g_szChatPrefix, szPlayerName, szName);
-
-					break;
-				}
-			}
-		}
-	}
-	else if (action == MenuAction_End)
-	CloseHandle(menu);
-}
-
-public int CommsVoteHandle(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_VoteEnd)
-	{
-		char item[64], display[64];
-		float percent, limit;
-		int votes, totalVotes;
-
-		menu.GetItem(param1, item, sizeof(item), _, display, sizeof(display));
-		GetMenuVoteInfo(param2, votes, totalVotes);
-
-		if (strcmp(item, VOTE_NO) == 0 && param1 == 1)
-		votes = totalVotes - votes;
-
-		percent = FloatDiv(float(votes),float(totalVotes));
-		limit = 0.75;
-
-		/* 0=yes, 1=no */
-		if ((strcmp(item, VOTE_YES) == 0 && FloatCompare(percent,limit) < 0 && param1 == 0) || (strcmp(item, VOTE_NO) == 0 && param1 == 1))
-		{
-			CPrintToChatAll("%t", "Commands65", g_szChatPrefix, RoundToNearest(100.0*limit), RoundToNearest(100.0*percent), totalVotes);
-		}
-		else
-		{
-			int client = g_iCommsVoteCaller;
-			int type = g_iCommsVoteType[client];
-			int target = g_iCommsVoteTarget[client];
-			char szReason[512], szName[MAX_NAME_LENGTH], szSteamID[32], szTargetName[MAX_NAME_LENGTH];
-			GetClientName(client, szName, MAX_NAME_LENGTH);
-			GetClientName(target, szTargetName, MAX_NAME_LENGTH);
-			GetClientAuthId(client, AuthId_Steam2, szSteamID, 32, true);
-			if (type == 0) // Vote Mute
-			{
-				CPrintToChatAll("%t", "Commands66", g_szChatPrefix, szTargetName, RoundToNearest(100.0*percent), totalVotes);
-				Format(szReason, sizeof(szReason), "Muted via vote mute started by %s - %s", szName, szSteamID);
-				SourceComms_SetClientMute(target, true, 10, true, szReason);
-			}
-			else // Vote Gag
-			{
-				CPrintToChatAll("%t", "Commands67", g_szChatPrefix, szTargetName, RoundToNearest(100.0*percent), PERCENT, totalVotes);
-				Format(szReason, sizeof(szReason), "Gagged via vote gag started by %s - %s", szName, szSteamID);
-				SourceComms_SetClientGag(target, true, 10, true, szReason);
-			}
-		}
-	}
-	else if (action == MenuAction_End)
-	CloseHandle(menu);
-}
-
 // Startpos Goose
 public Action Command_Startpos(int client, int args)
 {
@@ -5020,9 +4840,12 @@ public void ChooseReplayMenu(int client, int type)
 		Format(szTitle, sizeof(szTitle), "Play Record: Stage Replay");
 		for (int i = 1; i <= g_TotalStages; i++)
 		{
-			Format(szItem, sizeof(szItem), "Stage %d Replay", i);
-			Format(szBuffer, sizeof(szBuffer), "stage-%d", i);
-			AddMenuItem(menu, szBuffer, szItem);
+			if (g_bStageReplay[i])
+			{
+				Format(szItem, sizeof(szItem), "Stage %d Replay", i);
+				Format(szBuffer, sizeof(szBuffer), "stage-%d", i);
+				AddMenuItem(menu, szBuffer, szItem);
+			}
 		}
 	}
 
