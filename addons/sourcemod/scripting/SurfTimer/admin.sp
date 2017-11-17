@@ -374,7 +374,6 @@ public void ckAdminMenu(int client)
 								DisplayMenuAtItem(adminmenu, client, 36, MENU_TIME_FOREVER);
 }
 
-
 public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_Select)
