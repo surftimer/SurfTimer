@@ -5029,21 +5029,24 @@ public void sql_selectRankedPlayersCallback(Handle owner, Handle hndl, const cha
 				CreateTimer(0.1, RefreshAdminMenu, g_pr_Recalc_AdminID, TIMER_FLAG_NO_MAPCHANGE);
 			}
 		}
+
 		if (MAX_PR_PLAYERS != data && g_pr_TableRowCount > data)
-		x = 66 + data;
+			x = 66 + data;
 		else
-		x = 66 + g_pr_TableRowCount;
+			x = 66 + g_pr_TableRowCount;
 
 		if (g_pr_TableRowCount > MAX_PR_PLAYERS)
-		g_pr_TableRowCount = MAX_PR_PLAYERS;
+			g_pr_TableRowCount = MAX_PR_PLAYERS;
 
 		if (x > MAX_PR_PLAYERS)
-		x = MAX_PR_PLAYERS - 1;
+			x = MAX_PR_PLAYERS - 1;
+
 		if (IsValidClient(g_pr_Recalc_AdminID) && g_bManualRecalc)
 		{
 			int max = MAX_PR_PLAYERS - 66;
 			PrintToConsole(g_pr_Recalc_AdminID, " \n>> Recalculation started! (Only Top %i because of performance reasons)", max);
 		}
+
 		while (SQL_FetchRow(hndl))
 		{
 			if (i <= x)
@@ -5056,13 +5059,11 @@ public void sql_selectRankedPlayersCallback(Handle owner, Handle hndl, const cha
 				i++;
 			}
 			if (i == x)
-			{
 				CalculatePlayerRank(66, 0);
-			}
 		}
 	}
 	else
-	PrintToConsole(g_pr_Recalc_AdminID, " \n>> No valid players found!");
+		PrintToConsole(g_pr_Recalc_AdminID, " \n>> No valid players found!");
 }
 
 public void db_Cleanup()

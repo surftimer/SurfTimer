@@ -150,13 +150,13 @@ public Action Admin_ckPanel(int client, int args)
 	if ((GetUserFlagBits(client) & g_AdminMenuFlag))
 	{
 		CPrintToChat(client, "%t", "Admin10", g_szChatPrefix);
-		PrintToConsole(client, "\n[Surftimer Admin]\n");
-		PrintToConsole(client, "\n sm_refreshprofile <steamid> (recalculates player profile for given steamid)\n sm_deleteproreplay <mapname> (Deletes pro replay file for a given map)\n sm_deletetpreplay <mapname> (Deletes tp replay file for a given map)\n ");
-		PrintToConsole(client, "\n sm_zones (Open up the zonee modification menu)\n sm_insertmapzones (Inserts premade map zones into the servers database. ONLY RUN THIS ONCE!)\n sm_insertmaptiers (Inserts premade map tier information into the servers database. ONLY RUN THIS ONCE!)\n");
-		PrintToConsole(client, "[PLAYER RANKING]\n sm_resetranks (Drops playerrank table)\n sm_resetextrapoints (Resets given extra points for all players)\n");
-		PrintToConsole(client, "[PLAYER TIMES]\n sm_resettimes (Drops playertimes table)\n sm_resetmaptimes <map> (Resets player times for given map)\n sm_resetplayertimes <steamid> [<map>] (Resets players times + extra points for given steamid with or without given map.)\n");
-		PrintToConsole(client, "sm_resetplayertime <steamid> <map> (Resets map time for given steamid and map)\n");
-		PrintToConsole(client, "sm_deletecheckpoints (Deletes all checkpoint times in the current map)\n sm_deletebonus (Deletes all bonus times in the current map)\n \n");
+		// PrintToConsole(client, "\n[Surftimer Admin]\n");
+		// PrintToConsole(client, "\n sm_refreshprofile <steamid> (recalculates player profile for given steamid)\n sm_deleteproreplay <mapname> (Deletes pro replay file for a given map)\n sm_deletetpreplay <mapname> (Deletes tp replay file for a given map)\n ");
+		// PrintToConsole(client, "\n sm_zones (Open up the zonee modification menu)\n sm_insertmapzones (Inserts premade map zones into the servers database. ONLY RUN THIS ONCE!)\n sm_insertmaptiers (Inserts premade map tier information into the servers database. ONLY RUN THIS ONCE!)\n");
+		// PrintToConsole(client, "[PLAYER RANKING]\n sm_resetranks (Drops playerrank table)\n sm_resetextrapoints (Resets given extra points for all players)\n");
+		// PrintToConsole(client, "[PLAYER TIMES]\n sm_resettimes (Drops playertimes table)\n sm_resetmaptimes <map> (Resets player times for given map)\n sm_resetplayertimes <steamid> [<map>] (Resets players times + extra points for given steamid with or without given map.)\n");
+		// PrintToConsole(client, "sm_resetplayertime <steamid> <map> (Resets map time for given steamid and map)\n");
+		// PrintToConsole(client, "sm_deletecheckpoints (Deletes all checkpoint times in the current map)\n sm_deletebonus (Deletes all bonus times in the current map)\n \n");
 	}
 	
 	return Plugin_Handled;
