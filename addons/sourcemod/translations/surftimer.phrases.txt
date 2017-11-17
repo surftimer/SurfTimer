@@ -442,12 +442,12 @@
 	}
 	"MSettings6"
 	{
-  		"#format"	"{1:s},{2:s}"
+  		"#format"	"{1:s}"
 		"en"		"{1} Usage: sm_gravityfix <0/1> (0 Disabled, 1 Enabled) (Gravity Fix currently {green}enabled{default})"
 	}
 	"MSettings7"
 	{
-  		"#format"	"{1:s},{2:f}"
+  		"#format"	"{1:s}"
 		"en"		"{1} Usage: sm_gravityfix <0/1> (0 Disabled, 1 Enabled) (Gravity Fix currently {red}disabled{default})"
 	}
 	"Commands1"
