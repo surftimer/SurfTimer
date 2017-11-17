@@ -5015,11 +5015,12 @@ public void sql_selectRankedPlayersCallback(Handle owner, Handle hndl, const cha
 		if (g_pr_TableRowCount == 0)
 		{
 			for (int c = 1; c <= MaxClients; c++)
-			if (1 <= c <= MaxClients && IsValidEntity(c) && IsValidClient(c))
-			{
-				if (g_bManualRecalc)
-				CPrintToChat(c, "%t", "PrUpdateFinished", g_szChatPrefix);
-			}
+				if (1 <= c <= MaxClients && IsValidEntity(c) && IsValidClient(c))
+				{
+					if (g_bManualRecalc)
+					CPrintToChat(c, "%t", "PrUpdateFinished", g_szChatPrefix);
+				}
+				
 			g_bManualRecalc = false;
 			g_pr_RankingRecalc_InProgress = false;
 
