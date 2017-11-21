@@ -231,10 +231,12 @@ public Action sm_test(int client, int args)
 	// }
 
 	// CPrintToChat(client, "g_iSelectedTrigger[client]: %i", g_iSelectedTrigger[client]);
-	for (int i = 0; i < MAX_STYLES; i++)
-	{
-		CPrintToChat(client, "g_fReplayTimes[0][%d]: %f", i, g_fReplayTimes[0][i]);
-	}
+	// for (int i = 0; i < MAX_STYLES; i++)
+	// {
+	// 	CPrintToChat(client, "g_fReplayTimes[0][%d]: %f", i, g_fReplayTimes[0][i]);
+	// }
+	CPrintToChat(client, "%s", g_szSoundPathWR);
+	CPrintToChat(client, "%s", g_szRelativeSoundPathWR);
 
 	return Plugin_Handled;
 }

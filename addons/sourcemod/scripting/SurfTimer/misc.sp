@@ -1550,7 +1550,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", WR2_RELATIVE_SOUND_PATH);
+				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathWR);
 				ClientCommand(i, buffer);
 			}
 		}
@@ -1561,7 +1561,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", TOP10_RELATIVE_SOUND_PATH);
+				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathTop);
 				ClientCommand(i, buffer);
 			}
 		}
@@ -1610,7 +1610,7 @@ public void PlayWRCPRecord(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", WRCP_RELATIVE_SOUND_PATH);
+				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathWRCP);
 				ClientCommand(i, buffer);
 			}
 		}
@@ -1619,31 +1619,33 @@ public void PlayWRCPRecord(int iRecordtype)
 
 public void InitPrecache()
 {
+	char szBuffer[256];
 	// db_precacheCustomSounds();
 
 	// Timer finish sounds
-	AddFileToDownloadsTable(UNSTOPPABLE_SOUND_PATH);
-	FakePrecacheSound(UNSTOPPABLE_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(PRO_FULL_SOUND_PATH);
-	FakePrecacheSound(PRO_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(PRO_FULL_SOUND_PATH);
-	FakePrecacheSound(PRO_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(CP_FULL_SOUND_PATH);
-	FakePrecacheSound(CP_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(WRCP_FULL_SOUND_PATH);
-	FakePrecacheSound(WRCP_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(WR_FULL_SOUND_PATH);
-	FakePrecacheSound(WR_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(WR2_FULL_SOUND_PATH);
-	FakePrecacheSound(WR2_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(PR_FULL_SOUND_PATH);
-	FakePrecacheSound(PR_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(TOP10_FULL_SOUND_PATH);
-	FakePrecacheSound(TOP10_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(DISCOTIME_FULL_SOUND_PATH);
-	FakePrecacheSound(DISCOTIME_RELATIVE_SOUND_PATH);
+	// AddFileToDownloadsTable(UNSTOPPABLE_SOUND_PATH);
+	// FakePrecacheSound(UNSTOPPABLE_RELATIVE_SOUND_PATH);
+	// AddFileToDownloadsTable(PRO_FULL_SOUND_PATH);
+	// FakePrecacheSound(PRO_RELATIVE_SOUND_PATH);
+	// AddFileToDownloadsTable(CP_FULL_SOUND_PATH);
+	// FakePrecacheSound(CP_RELATIVE_SOUND_PATH);
+	
+	GetConVarString(g_hSoundPathWR, szBuffer, sizeof(szBuffer));
+	AddFileToDownloadsTable(szBuffer);
+	FakePrecacheSound(szBuffer);
 
-	char szBuffer[256];
+	GetConVarString(g_hSoundPathPB, szBuffer, sizeof(szBuffer));
+	AddFileToDownloadsTable(szBuffer);
+	FakePrecacheSound(szBuffer);
+
+	GetConVarString(g_hSoundPathTop, szBuffer, sizeof(szBuffer));
+	AddFileToDownloadsTable(szBuffer);
+	FakePrecacheSound(szBuffer);
+
+	GetConVarString(g_hSoundPathWRCP, szBuffer, sizeof(szBuffer));
+	AddFileToDownloadsTable(szBuffer);
+	FakePrecacheSound(szBuffer);
+
 	// Replay Player Model
 	GetConVarString(g_hReplayBotPlayerModel, szBuffer, 256);
 	AddFileToDownloadsTable(szBuffer);
