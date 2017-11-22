@@ -264,7 +264,7 @@ void CreateConVars()
 		g_AdminMenuFlag = ADMFLAG_ROOT;
 	}
 	else
-	g_AdminMenuFlag = FlagToBit(bufferFlag);
+		g_AdminMenuFlag = FlagToBit(bufferFlag);
 	HookConVarChange(g_hAdminMenuFlag, OnSettingChanged);
 
 	g_hZonerFlag = CreateConVar("ck_zoner_flag", "z", "Zoner status will automatically be granted to players with this flag. If the convar is invalid or not set, z (root) will be used by default.", FCVAR_NOTIFY);
@@ -272,11 +272,11 @@ void CreateConVars()
 	validFlag = FindFlagByChar(szFlag[0], bufferFlag);
 	if (!validFlag)
 	{
-		PrintToServer("Surftimer | Invalid flag for ck_zoner_flag.");
+		LogError("Surftimer | Invalid flag for ck_zoner_flag, using ADMFLAG_ROOT");
 		g_ZonerFlag = ADMFLAG_ROOT;
 	}
 	else
-	g_ZonerFlag = FlagToBit(bufferFlag);
+		g_ZonerFlag = FlagToBit(bufferFlag);
 	HookConVarChange(g_hZonerFlag, OnSettingChanged);
 
 	// Map Setting ConVars

@@ -4634,3 +4634,23 @@ public void FormatPercentage(float perc, char[] buffer, int size)
 	else
 		Format(buffer, size, "%.1f", perc);
 }
+
+public bool IsPlayerZoner(int client)
+{
+	if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		if ((GetUserFlagBits(client) & g_ZonerFlag) || (GetUserFlagBits(client) & ADMFLAG_ROOT) || g_bZoner[client])
+			return true;
+	}
+	return false;
+}
+
+public bool IsPlayerTimerAdmin(int client)
+{
+	if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		if ((GetUserFlagBits(client) & g_AdminMenuFlag) || (GetUserFlagBits(client) & ADMFLAG_ROOT))
+			return true;
+	}
+	return false;
+}

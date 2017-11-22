@@ -2492,7 +2492,8 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 		Format(color, 28, "%s", newValue[0]);
 		StringRGBtoInt(color, g_iZoneColors[0]);
 	}
-	else if (convar == g_hZonerFlag) {
+	else if (convar == g_hZonerFlag) 
+	{
 		AdminFlag flag;
 		bool validFlag;
 		validFlag = FindFlagByChar(newValue[0], flag);

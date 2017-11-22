@@ -916,22 +916,21 @@ public void ZoneMenu(int client)
 	if (!IsValidClient(client))
 		return;
 
-	if (!(GetUserFlagBits(client) & g_ZonerFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT) && !g_bZoner[client])
+	if (IsPlayerZoner(client))
 	{
-		CPrintToChat(client, "%t", "SurfZones2", g_szChatPrefix);
-		return;
+		resetSelection(client);
+		Menu ckZoneMenu = new Menu(Handle_ZoneMenu);
+		ckZoneMenu.SetTitle("Zones");
+		ckZoneMenu.AddItem("", "Create a Zone");
+		ckZoneMenu.AddItem("", "Edit Zones");
+		ckZoneMenu.AddItem("", "Save Zones");
+		ckZoneMenu.AddItem("", "Edit Zone Settings");
+		ckZoneMenu.AddItem("", "Reload Zones");
+		ckZoneMenu.ExitButton = true;
+		ckZoneMenu.Display(client, MENU_TIME_FOREVER);
 	}
-
-	resetSelection(client);
-	Menu ckZoneMenu = new Menu(Handle_ZoneMenu);
-	ckZoneMenu.SetTitle("Zones");
-	ckZoneMenu.AddItem("", "Create a Zone");
-	ckZoneMenu.AddItem("", "Edit Zones");
-	ckZoneMenu.AddItem("", "Save Zones");
-	ckZoneMenu.AddItem("", "Edit Zone Settings");
-	ckZoneMenu.AddItem("", "Reload Zones");
-	ckZoneMenu.ExitButton = true;
-	ckZoneMenu.Display(client, MENU_TIME_FOREVER);
+	else
+		CPrintToChat(client, "%t", "SurfZones2", g_szChatPrefix);
 }
 
 public int Handle_ZoneMenu(Handle tMenu, MenuAction action, int client, int item)

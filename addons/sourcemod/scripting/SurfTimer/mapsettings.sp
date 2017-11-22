@@ -7,6 +7,9 @@ public void setMapSettings()
 
 public Action Admin_MapSettings(int client, int args)
 {
+	if (IsPlayerZoner(client))
+		return Plugin_Handled;
+
 	MapSettingsMenu(client);
 	return Plugin_Handled;
 }
@@ -186,7 +189,7 @@ public Action Command_SetMaxVelocity(int client, int args)
 	if (!IsValidClient(client))
 	return Plugin_Handled;
 
-	if (!CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+	if (!IsPlayerZoner(client))
 		return Plugin_Handled;
 
 	char arg[128];
@@ -210,7 +213,7 @@ public Action Command_SetAnnounceRecord(int client, int args)
 	if (!IsValidClient(client))
 	return Plugin_Handled;
 
-	if (!CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+	if (!IsPlayerZoner(client))
 		return Plugin_Handled;
 
 	char arg[128];
@@ -234,7 +237,7 @@ public Action Command_SetGravityFix(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	if (!CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+	if (!IsPlayerZoner(client))
 		return Plugin_Handled;
 
 	if (args == 0)

@@ -82,28 +82,27 @@ void CreateCommands()
 	RegConsoleCmd("sm_normal", Command_normalMode, "[surftimer] Switches player back to normal mode.");
 	RegConsoleCmd("sm_n", Command_normalMode, "[surftimer] Switches player back to normal mode.");
 
-	RegAdminCmd("sm_ckadmin", Admin_ckPanel, g_AdminMenuFlag, "[surftimer] Displays the surftimer admin menu panel");
-	RegAdminCmd("sm_refreshprofile", Admin_RefreshProfile, g_AdminMenuFlag, "[surftimer] Recalculates player profile for given steam id");
+	RegConsoleCmd("sm_ckadmin", Admin_ckPanel, "[surftimer] Displays the surftimer admin menu panel");
+	RegConsoleCmd("sm_refreshprofile", Admin_RefreshProfile, "[surftimer] Recalculates player profile for given steam id");
 
-	RegAdminCmd("sm_clearassists", Admin_ClearAssists, g_AdminMenuFlag, "[surftimer] Clears assist points (map progress) from all players");
+	RegConsoleCmd("sm_clearassists", Admin_ClearAssists, "[surftimer] Clears assist points (map progress) from all players");
 
-	// DB Map Settings && Zoners
-	RegAdminCmd("sm_zones", Command_Zones, g_ZonerFlag, "[surftimer] [zoner] Opens up the zone creation menu.");
-	RegAdminCmd("sm_hookzone", Command_HookZones, g_ZonerFlag, "[surftimer] [zoner] Opens up zone hook creation menu.");
-	RegAdminCmd("sm_addmaptier", Admin_insertMapTier, g_ZonerFlag, "[surftimer] [zoner] Changes maps tier");
-	RegAdminCmd("sm_amt", Admin_insertMapTier, g_ZonerFlag, "[surftimer] [zoner] Changes maps tier");
-	RegAdminCmd("sm_addspawn", Admin_insertSpawnLocation, g_ZonerFlag, "[surftimer] [zoner] Changes the position !r takes players to");
-	RegAdminCmd("sm_delspawn", Admin_deleteSpawnLocation, g_ZonerFlag, "[surftimer] [zoner] Removes custom !r position");
-	RegAdminCmd("sm_mapsettings", Admin_MapSettings, g_ZonerFlag, "[surftimer] [zoner] Displays menu containing various options to change map settings");
-	RegAdminCmd("sm_ms", Admin_MapSettings, g_ZonerFlag, "[surftimer] [zoner] Displays menu containing various options to change map settings");
-	RegAdminCmd("sm_maxvelocity", Command_SetMaxVelocity, g_ZonerFlag, "[surftimer] [zoner] Set the current maps maxvelocity");
-	RegAdminCmd("sm_mv", Command_SetMaxVelocity, g_ZonerFlag, "[surftimer] [zoner] Set the current maps max velocity");
-	RegAdminCmd("sm_announcerecord", Command_SetAnnounceRecord, g_ZonerFlag, "[surftimer] [zoner] Set whether records will be announced on all finishes, pb only or client only");
-	RegAdminCmd("sm_ar", Command_SetAnnounceRecord, g_ZonerFlag, "[surftimer] [zoner] Set whether records will be announced on all finishes, pb only or client only");
-	RegAdminCmd("sm_gravityfix", Command_SetGravityFix, g_ZonerFlag, "[surftimer] [zoner] Toggle the gravity fix on the current map");
-	RegAdminCmd("sm_gf", Command_SetGravityFix, g_ZonerFlag, "[surftimer] [zoner] Toggle the gravity fix on the current map");
-	RegAdminCmd("sm_triggers", Command_ToggleTriggers, g_ZonerFlag, "[surftimer] [zoner] Toggle display of map triggers");
-	RegAdminCmd("sm_noclipspeed", Command_NoclipSpeed, g_ZonerFlag, "[surftimer] [zoner] Changes the value of sv_noclipspeed");
+	RegConsoleCmd("sm_zones", Command_Zones, "[surftimer] [zoner] Opens up the zone creation menu.");
+	RegConsoleCmd("sm_hookzone", Command_HookZones, "[surftimer] [zoner] Opens up zone hook creation menu.");
+	RegConsoleCmd("sm_addmaptier", Admin_insertMapTier, "[surftimer] [zoner] Changes maps tier");
+	RegConsoleCmd("sm_amt", Admin_insertMapTier, "[surftimer] [zoner] Changes maps tier");
+	RegConsoleCmd("sm_addspawn", Admin_insertSpawnLocation, "[surftimer] [zoner] Changes the position !r takes players to");
+	RegConsoleCmd("sm_delspawn", Admin_deleteSpawnLocation, "[surftimer] [zoner] Removes custom !r position");
+	RegConsoleCmd("sm_mapsettings", Admin_MapSettings, "[surftimer] [zoner] Displays menu containing various options to change map settings");
+	RegConsoleCmd("sm_ms", Admin_MapSettings, "[surftimer] [zoner] Displays menu containing various options to change map settings");
+	RegConsoleCmd("sm_maxvelocity", Command_SetMaxVelocity, "[surftimer] [zoner] Set the current maps maxvelocity");
+	RegConsoleCmd("sm_mv", Command_SetMaxVelocity, "[surftimer] [zoner] Set the current maps max velocity");
+	RegConsoleCmd("sm_announcerecord", Command_SetAnnounceRecord, "[surftimer] [zoner] Set whether records will be announced on all finishes, pb only or client only");
+	RegConsoleCmd("sm_ar", Command_SetAnnounceRecord, "[surftimer] [zoner] Set whether records will be announced on all finishes, pb only or client only");
+	RegConsoleCmd("sm_gravityfix", Command_SetGravityFix, "[surftimer] [zoner] Toggle the gravity fix on the current map");
+	RegConsoleCmd("sm_gf", Command_SetGravityFix, "[surftimer] [zoner] Toggle the gravity fix on the current map");
+	RegConsoleCmd("sm_triggers", Command_ToggleTriggers, "[surftimer] [zoner] Toggle display of map triggers");
+	RegConsoleCmd("sm_noclipspeed", Command_NoclipSpeed, "[surftimer] [zoner] Changes the value of sv_noclipspeed");
 
 	// VIP Commands
 	RegAdminCmd("sm_fixbot", Admin_FixBot, g_VipFlag, "[surftimer] Toggles replay bots off and on");
@@ -175,7 +174,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_ffbtop", Client_FFBonusTop, "[surftimer] displays a local bonus top (fast forwards) for a given map");*/
 
 	// Test
-	RegAdminCmd("sm_test", sm_test, ADMFLAG_ROOT);
+	RegAdminCmd("sm_test", sm_test, ADMFLAG_CUSTOM6);
 	RegAdminCmd("sm_vel", Client_GetVelocity, ADMFLAG_ROOT);
 	RegAdminCmd("sm_targetname", Client_TargetName, ADMFLAG_ROOT);
 
@@ -235,8 +234,9 @@ public Action sm_test(int client, int args)
 	// {
 	// 	CPrintToChat(client, "g_fReplayTimes[0][%d]: %f", i, g_fReplayTimes[0][i]);
 	// }
-	CPrintToChat(client, "%s", g_szSoundPathWR);
-	CPrintToChat(client, "%s", g_szRelativeSoundPathWR);
+	// CPrintToChat(client, "%s", g_szSoundPathWR);
+	// CPrintToChat(client, "%s", g_szRelativeSoundPathWR);
+	CPrintToChat(client, "%d", g_ZonerFlag);
 
 	return Plugin_Handled;
 }
@@ -4110,7 +4110,7 @@ public Action Command_GiveKnife(int client, int args)
 
 public Action Command_NoclipSpeed(int client, int args)
 {
-	if (!CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+	if (!IsPlayerZoner(client))
 		return Plugin_Handled;
 
 	if (args == 0)
@@ -4319,7 +4319,7 @@ public Action Command_HookZones(int client, int args)
 
 public void HookZonesMenu(int client)
 {
-	if (!(GetUserFlagBits(client) & g_ZonerFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT) && !g_bZoner[client])
+	if (!IsPlayerZoner(client))
 	{
 		CPrintToChat(client, "%t", "Commands57", g_szChatPrefix);
 		return;
