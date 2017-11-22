@@ -1532,7 +1532,7 @@ public void SetCashState()
 
 public void PlayRecordSound(int iRecordtype)
 {
-	char buffer[255];
+	char buffer[PLATFORM_MAX_PATH];
 	if (iRecordtype == 1)
 	{
 		for (int i = 1; i <= GetMaxClients(); i++)
