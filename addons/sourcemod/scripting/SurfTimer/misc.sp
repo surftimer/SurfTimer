@@ -1539,7 +1539,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", WR_RELATIVE_SOUND_PATH);
+				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathWR);
 				ClientCommand(i, buffer);
 			}
 		}
@@ -1582,7 +1582,7 @@ public void PlayRecordSound(int iRecordtype)
 public void PlayUnstoppableSound(int client)
 {
 	char buffer[255];
-	Format(buffer, sizeof(buffer), "play %s", PR_RELATIVE_SOUND_PATH);
+	Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathPB);
 	if (!IsFakeClient(client) && g_bEnableQuakeSounds[client])
 		ClientCommand(client, buffer);
 	// Spec Stop Sound
