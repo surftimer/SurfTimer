@@ -1632,19 +1632,19 @@ public void InitPrecache()
 	
 	GetConVarString(g_hSoundPathWR, szBuffer, sizeof(szBuffer));
 	AddFileToDownloadsTable(szBuffer);
-	FakePrecacheSound(szBuffer);
+	FakePrecacheSound(g_szRelativeSoundPathWR);
 
 	GetConVarString(g_hSoundPathPB, szBuffer, sizeof(szBuffer));
 	AddFileToDownloadsTable(szBuffer);
-	FakePrecacheSound(szBuffer);
+	FakePrecacheSound(g_szRelativeSoundPathPB);
 
 	GetConVarString(g_hSoundPathTop, szBuffer, sizeof(szBuffer));
 	AddFileToDownloadsTable(szBuffer);
-	FakePrecacheSound(szBuffer);
+	FakePrecacheSound(g_szRelativeSoundPathTop);
 
 	GetConVarString(g_hSoundPathWRCP, szBuffer, sizeof(szBuffer));
 	AddFileToDownloadsTable(szBuffer);
-	FakePrecacheSound(szBuffer);
+	FakePrecacheSound(g_szRelativeSoundPathWRCP);
 
 	// Replay Player Model
 	GetConVarString(g_hReplayBotPlayerModel, szBuffer, 256);
