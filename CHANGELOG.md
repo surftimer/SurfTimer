@@ -1,4 +1,27 @@
-# v2.1 (Latest)
+# v2.2 (Latest)
+* Added point system explanation
+* Added tier option to map settings menu
+* Added ranked option to map settings menu
+* Added style ranking system (points for styles)
+* Added style sub-menu to commands such as `sm_wr` `sm_wrb` `sm_mtop` `sm_wrcp`
+* Fixed up profile menus for new style rankings
+* Removed credits being given out when finishing a map
+* Added `sm_replay` which allows players to play a replay of any style
+* Added ConVar `ck_play_replay_vip_only` sets whether the `sm_replay` command can only be used by VIPs (Disable/Enable)
+* Fixed a issue with manual recalcuation
+* Various translation file fixes
+* Fixed zoner and adminmenu flag ConVars not working
+* Added ConVar to change the sound for wr `ck_sp_wr`
+* Added ConVar to change the sound for top 10 `ck_sp_top`
+* Added ConVar to change the sound for pb `ck_sp_pb`
+* Added ConVar to change the sound for wrcp `ck_sp_wrcp`
+* Removed constant call to `db_viewTotalStages` causing database slowdowns
+###### Changes by aveniccii (thanks)
+* Changed All PrintToChat & ReplyToCommand to CPrintToChat & CReplyToCommand
+* Moved (almost) every CPrintToChat & CReplyToCommand to the translation file
+* Regulated tabs and spaces throughout the files
+* Added configurable chat prefix option
+## v2.1
 * Added default titles which can be edited via `addons/sourcemod/config/surftimer/default_titles.txt`
 * Added new ConVar `ck_enforce_default_titles` which sets whether to enforce default titles on players
 * Added default titles whitelist which will whitelist players from being forced to use their default title `addons/sourcemod/config/surftimer/default_titles_whitelist.txt`
