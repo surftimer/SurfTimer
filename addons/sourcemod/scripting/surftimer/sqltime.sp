@@ -29,7 +29,7 @@ public void SQL_ViewPlayerInfoCallback(Handle owner, Handle hndl, const char[] e
 
 		// Format Joined Time
 		char szTime[128];
-		FormatTime(szTime, sizeof(szTime), "%d %h %Y", joinUnix);
+		FormatTime(szTime, sizeof(szTime), "%d %b %Y", joinUnix);
 
 		// Format Last Seen Time
 		int unix = GetTime();
