@@ -1,4 +1,4 @@
-# SurfTimer v2.1 CS:GO
+# SurfTimer v2.2 CS:GO
 [Read the changes](CHANGELOG.md)
 
 ## Backstory

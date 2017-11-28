@@ -35,12 +35,11 @@ public void CreateZoneEntity(int zoneIndex)
 					GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", position);
 					GetEntPropVector(iEnt, Prop_Send, "m_vecMins", fMins);
 					GetEntPropVector(iEnt, Prop_Send, "m_vecMaxs", fMaxs);
-					
 
 					g_mapZones[zoneIndex][CenterPoint][0] = position[0];
 					g_mapZones[zoneIndex][CenterPoint][1] = position[1];
 					g_mapZones[zoneIndex][CenterPoint][2] = position[2];
-					//g_mapZones[zoneIndex][zoneType]
+					// g_mapZones[zoneIndex][zoneType]
 
 					for (int j = 0; j < 3; j++)
 					{
@@ -114,14 +113,14 @@ public void CreateZoneEntity(int zoneIndex)
 				// Have the mins always be negative
 				for(int i = 0; i < 3; i++){
 					fMins[i] = fMins[i] - fMiddle[i];
-					if(fMins[i] > 0.0)
+					if (fMins[i] > 0.0)
 						fMins[i] *= -1.0;
 				}
 
 				// And the maxs always be positive
 				for(int i = 0; i < 3; i++){
 					fMaxs[i] = fMaxs[i] - fMiddle[i];
-					if(fMaxs[i] < 0.0)
+					if (fMaxs[i] < 0.0)
 						fMaxs[i] *= -1.0;
 				}
 
@@ -133,7 +132,6 @@ public void CreateZoneEntity(int zoneIndex)
 				iEffects |= 0x020;
 				SetEntProp(iEnt, Prop_Send, "m_fEffects", iEffects);
 
-
 				SDKHook(iEnt, SDKHook_StartTouch, StartTouchTrigger);
 				SDKHook(iEnt, SDKHook_EndTouch, EndTouchTrigger);
 			}
@@ -144,8 +142,8 @@ public void CreateZoneEntity(int zoneIndex)
 		}
 	}
 }
-// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 
+// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 public Action StartTouchTrigger(int caller, int activator)
 {
 	// Ignore dead players
@@ -227,7 +225,7 @@ public Action StartTouchTrigger(int caller, int activator)
 			StartTouch(activator, action);
 		}
 		else
-			if (action[0] == 6 || action[0] == 7 || action[0] == 8 || action[0] == 0 || action[0] == 9 || action[0] == 10 || action[0] == 11) // Allow MISC zones regardless of zonegroup //fluffys add nojump, noduck
+			if (action[0] == 6 || action[0] == 7 || action[0] == 8 || action[0] == 0 || action[0] == 9 || action[0] == 10 || action[0] == 11) // Allow MISC zones regardless of zonegroup // fluffys add nojump, noduck
 				StartTouch(activator, action);
 	}
 
@@ -248,7 +246,7 @@ public Action EndTouchTrigger(int caller, int activator)
 	}
 
 	// Reset Prehop Limit
-	//g_bJumpedInZone[activator] = false;
+	// g_bJumpedInZone[activator] = false;
 
 	char sTargetName[256];
 	int action[3];
@@ -265,7 +263,7 @@ public Action EndTouchTrigger(int caller, int activator)
 	action[1] = g_mapZones[id][zoneTypeId];
 	action[2] = g_mapZones[id][zoneGroup];
 
-	if (action[2] != g_iClientInZone[activator][2] || action[0] == 6 || action[0] == 8 || action[0] != g_iClientInZone[activator][0]) // Ignore end touches in other zonegroups, zones that teleports away or multiple zones on top of each other //fluffys
+	if (action[2] != g_iClientInZone[activator][2] || action[0] == 6 || action[0] == 8 || action[0] != g_iClientInZone[activator][0]) // Ignore end touches in other zonegroups, zones that teleports away or multiple zones on top of each other // fluffys
 		return Plugin_Handled;
 
 	// End touch
@@ -278,7 +276,7 @@ public void StartTouch(int client, int action[3])
 {
 	if (IsValidClient(client))
 	{
-		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0) //fluffys: NoBhop(9), NoCrouch(10)
+		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0) // fluffys: NoBhop(9), NoCrouch(10)
 
 		if (action[0] == 0) // Stop Zone
 		{
@@ -307,24 +305,24 @@ public void StartTouch(int client, int action[3])
 		}
 		else if (action[0] == 2) // End Zone
 		{
-			if (g_iClientInZone[client][2] == action[2]) //  Cant end bonus timer in this zone && in the having the same timer on
+			if (g_iClientInZone[client][2] == action[2]) // Cant end bonus timer in this zone && in the having the same timer on
 			{
-				//fluffys gravity
-				if(g_iCurrentStyle[client] != 4)//low grav
+				// fluffys gravity
+				if (g_iCurrentStyle[client] != 4) // low grav
 					ResetGravity(client);
 				
 				g_bInJump[client] = false;
 				g_bInDuck[client] = false;
 
-				//fluffys wrcps
-				if(g_bhasStages)
+				// fluffys wrcps
+				if (g_bhasStages)
 				{
 					float time = g_fCurrentRunTime[client];
 					g_bWrcpEndZone[client] = true;
 					CL_OnEndWrcpTimerPress(client, time);
 				}
 
-				if(g_bToggleMapFinish[client])
+				if (g_bToggleMapFinish[client])
 					CL_OnEndTimerPress(client);
 			}
 			else
@@ -354,7 +352,7 @@ public void StartTouch(int client, int action[3])
 				// * Practice CPs
 			}
 			else
-			{  // Setting valid to false, in case of checkers
+			{ // Setting valid to false, in case of checkers
 				g_bValidRun[client] = false;
 
 				// Announcing checkpoint
@@ -370,15 +368,15 @@ public void StartTouch(int client, int action[3])
 					float time2 = g_fCurrentWrcpRunTime[client];
 					CL_OnEndWrcpTimerPress(client, time2);
 
-					if(g_iCurrentStyle[client] == 0)
+					if (g_iCurrentStyle[client] == 0)
 						Checkpoint(client, action[1], g_iClientInZone[client][2], time);
 
 					lastCheckpoint[g_iClientInZone[client][2]][client] = action[1];
 				}
-				else if(!g_bTimerRunning[client])
+				else if (!g_bTimerRunning[client])
 					g_iCurrentStyle[client] = g_iInitalStyle[client];
 
-				if(g_bWrcpTimeractivated[client])
+				if (g_bWrcpTimeractivated[client])
 					g_bWrcpTimeractivated[client] = false;
 			}
 		}
@@ -388,7 +386,7 @@ public void StartTouch(int client, int action[3])
 			{
 				g_iCurrentCheckpoint[client]++;
 				// Announcing checkpoint in linear maps
-				if(g_iCurrentStyle[client] == 0)
+				if (g_iCurrentStyle[client] == 0)
 				{
 					float time = g_fCurrentRunTime[client];
 					Checkpoint(client, action[1], g_iClientInZone[client][2], time);
@@ -409,18 +407,18 @@ public void StartTouch(int client, int action[3])
 			if (!g_bValidRun[client])
 				Command_Teleport(client, 1);
 		}
-		else if (action[0] == 9) //fluffys nobhop
+		else if (action[0] == 9) // fluffys nobhop
 		{
 			g_bInJump[client] = true;
 		}
-		else if (action[0] == 10) //fluffys noduck
+		else if (action[0] == 10) // fluffys noduck
 		{
 			g_bInDuck[client] = true;
 		}
 		else if (action[0] == 11) // MaxSpeed
 		{
 			g_bInMaxSpeed[client] = true;
-			//PrintToChat(client, "Inside MaxSpeed zone");
+			// CPrintToChat(client, "Inside MaxSpeed zone");
 		}
 	}
 }
@@ -442,9 +440,9 @@ public void EndTouch(int client, int action[3])
 		// float currentspeed = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0) + Pow(CurVelVec[2], 2.0));
 		// float xy = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0));
 		// float z = SquareRoot(Pow(CurVelVec[2], 2.0));
-		// PrintToChat(client, "XY: %f Z: %f XYZ: %f", xy, z, currentspeed);
-		// PrintToChat(client, "%f", CurVelVec);
-		// PrintToChat(client, "%f %f %f", CurVelVec[0], CurVelVec[1], CurVelVec[2]);
+		// CPrintToChat(client, "XY: %f Z: %f XYZ: %f", xy, z, currentspeed);
+		// CPrintToChat(client, "%f", CurVelVec);
+		// CPrintToChat(client, "%f %f %f", CurVelVec[0], CurVelVec[1], CurVelVec[2]);
 
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 		if (action[0] == 1 || action[0] == 5)
@@ -463,29 +461,30 @@ public void EndTouch(int client, int action[3])
 					// NoClip check
 					if (g_bNoClip[client] || (!g_bNoClip[client] && (GetGameTime() - g_fLastTimeNoClipUsed[client]) < 3.0))
 					{
-						PrintToChat(client, " %cSurftimer %c| You are noclipping or have noclipped recently, timer disabled.", LIMEGREEN, WHITE);
+						CPrintToChat(client, "%t", "SurfZones1", g_szChatPrefix);
 						ClientCommand(client, "play buttons\\button10.wav");
-						//fluffys
-						//ClientCommand(client, "sm_stuck");
+						// fluffys
+						// ClientCommand(client, "sm_stuck");
 					}
 					else
 					{
-						if(g_bhasStages && g_bTimerEnabled[client])
-							CL_OnStartWrcpTimerPress(client); //fluffys only start stage timer if not in prac mode
+						if (g_bhasStages && g_bTimerEnabled[client])
+							CL_OnStartWrcpTimerPress(client); // fluffys only start stage timer if not in prac mode
 
-						if(g_bTimerEnabled[client])
+						if (g_bTimerEnabled[client])
 							CL_OnStartTimerPress(client);
 					}
 
-					//fluffys
-					if(!g_bNoClip[client])
+					// fluffys
+					if (!g_bNoClip[client])
 						g_bInStartZone[client] = false;
 
 					g_bValidRun[client] = false;
 				}
 			}
 		}
-		else if(action[0] == 3) //fluffys stage
+		// fluffys
+		else if (action[0] == 3) // fluffys stage
 		{
 			// targetname filters
 			if (StrEqual(g_szMapName, "surf_treespam") && g_Stage[g_iClientInZone[client][2]][client] == 4)
@@ -506,21 +505,22 @@ public void EndTouch(int client, int action[3])
 
 			g_bInStageZone[client] = false;
 
-			if(!g_bPracticeMode[client] && g_bTimerEnabled[client])
+			if (!g_bPracticeMode[client] && g_bTimerEnabled[client])
 				CL_OnStartWrcpTimerPress(client);
+
 		}
-		else if (action[0] == 9) //fluffys nojump
+		else if (action[0] == 9) // fluffys nojump
 		{
 			g_bInJump[client] = false;
 		}
-		else if (action[0] == 10) //fluffys noduck
+		else if (action[0] == 10) // fluffys noduck
 		{
 			g_bInDuck[client] = false;
 		}
 		else if (action[0] == 11) // MaxSpeed zone
 		{
 			g_bInMaxSpeed[client] = false;
-		//	PrintToChat(client, "Left MaxSpeed zone");
+		// 	CPrintToChat(client, "Left MaxSpeed zone");
 		}
 
 		// Set client location
@@ -641,7 +641,7 @@ public Action BeamBoxAll(Handle timer, any data)
 			{
 				if (GetConVarInt(g_hZoneDisplayType) == 0 && !g_bShowZones[p] && g_Editing[p] == 0)
 				{
-					//if (GetConVarInt(g_hZoneDisplayType) < 1)
+					// if (GetConVarInt(g_hZoneDisplayType) < 1)
 						continue;
 				}
 
@@ -649,7 +649,7 @@ public Action BeamBoxAll(Handle timer, any data)
 				{
 					if (GetConVarInt(g_hZoneDisplayType) == 0 && !g_bShowZones[p])
 						continue;
-						
+
 					if ( g_mapZones[i][Vis] == 2 ||  g_mapZones[i][Vis] == 3)
 					{
 						if (GetClientTeam(p) ==  g_mapZones[i][Vis] && g_ClientSelectedZone[p] != i)
@@ -792,7 +792,7 @@ public void BeamBox_OnPlayerRunCmd(int client)
 
 stock void TE_SendBeamBoxToClient(int client, float uppercorner[3], float bottomcorner[3], int ModelIndex, int HaloIndex, int StartFrame, int FrameRate, float Life, float Width, float EndWidth, int FadeLength, float Amplitude, const int Color[4], int Speed, int type, int zoneid = -1)
 {
-	//0 = Do not display zones, 1 = Display the lower edges of zones, 2 = Display whole zone
+	// 0 = Do not display zones, 1 = Display the lower edges of zones, 2 = Display whole zone
 	if (!IsValidClient(client) || GetConVarInt(g_hZoneDisplayType) < 1 && !g_bShowZones[client] && g_Editing[client] == 0 && g_iSelectedTrigger[client] == -1)
 		return;
 
@@ -824,11 +824,11 @@ stock void TE_SendBeamBoxToClient(int client, float uppercorner[3], float bottom
 		// Send beams to client
 		// https://forums.alliedmods.net/showpost.php?p=2006539&postcount=8
 		for (int i = 0, i2 = 3; i2 >= 0; i+=i2--)
-	  {
-	    for(int j = 1; j <= 7; j += (j / 2) + 1)
-	    {
-	      if(j != 7-i)
-	      {
+		{
+		for(int j = 1; j <= 7; j += (j / 2) + 1)
+			{
+				if (j != 7-i)
+				{
 					TE_SetupBeamPoints(corners[i], corners[j], ModelIndex, HaloIndex, StartFrame, FrameRate, Life, Width, EndWidth, FadeLength, Amplitude, Color, Speed);
 					TE_SendToClient(client);
 				}
@@ -910,33 +910,28 @@ stock void TE_SendBeamBoxToClient(int client, float uppercorner[3], float bottom
 	}
 }
 
-//
 // !zones menu starts here
-//
 public void ZoneMenu(int client)
 {
 	if (!IsValidClient(client))
 		return;
 
-	if (!(GetUserFlagBits(client) & g_ZonerFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT) && !g_bZoner[client])
+	if (IsPlayerZoner(client))
 	{
-		PrintToChat(client, " %cSurftimer %c| You don't have access to the zones menu.", LIMEGREEN, WHITE);
-		return;
+		resetSelection(client);
+		Menu ckZoneMenu = new Menu(Handle_ZoneMenu);
+		ckZoneMenu.SetTitle("Zones");
+		ckZoneMenu.AddItem("", "Create a Zone");
+		ckZoneMenu.AddItem("", "Edit Zones");
+		ckZoneMenu.AddItem("", "Save Zones");
+		ckZoneMenu.AddItem("", "Edit Zone Settings");
+		ckZoneMenu.AddItem("", "Reload Zones");
+		ckZoneMenu.ExitButton = true;
+		ckZoneMenu.Display(client, MENU_TIME_FOREVER);
 	}
-
-	resetSelection(client);
-	Menu ckZoneMenu = new Menu(Handle_ZoneMenu);
-	ckZoneMenu.SetTitle("Zones");
-	ckZoneMenu.AddItem("", "Create a Zone");
-	ckZoneMenu.AddItem("", "Edit Zones");
-	ckZoneMenu.AddItem("", "Save Zones");
-	ckZoneMenu.AddItem("", "Edit Zone Settings");
-	ckZoneMenu.AddItem("", "Reload Zones");
-	ckZoneMenu.ExitButton = true;
-	ckZoneMenu.Display(client, MENU_TIME_FOREVER);
+	else
+		CPrintToChat(client, "%t", "SurfZones2", g_szChatPrefix);
 }
-
-
 
 public int Handle_ZoneMenu(Handle tMenu, MenuAction action, int client, int item)
 {
@@ -972,7 +967,7 @@ public int Handle_ZoneMenu(Handle tMenu, MenuAction action, int client, int item
 				{
 					// Reload Zones
 					db_selectMapZones();
-					PrintToChat(client, "Zones are reloaded");
+					CPrintToChat(client, "%t", "SurfZones3", g_szChatPrefix);
 					resetSelection(client);
 					ZoneMenu(client);
 				}
@@ -984,6 +979,7 @@ public int Handle_ZoneMenu(Handle tMenu, MenuAction action, int client, int item
 		}
 	}
 }
+
 public void EditZoneGroup(int client)
 {
 	Menu editZoneGroupMenu = new Menu(h_editZoneGroupMenu);
@@ -1038,7 +1034,7 @@ public void ListBonusGroups(int client)
 
 	char listGroupName[256], ZoneId[64], Id[64];
 	if (g_mapZoneGroupCount > 1)
-	{  // Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
+	{ // Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 		for (int i = 1; i < g_mapZoneGroupCount; ++i)
 		{
 			Format(ZoneId, sizeof(ZoneId), "%s", g_szZoneGroupName[i]);
@@ -1128,7 +1124,6 @@ public void checkForMissclick(int client)
 	h_checkForMissclick.AddItem("3", "YES");
 	h_checkForMissclick.AddItem("4", "NO");
 
-
 	h_checkForMissclick.ExitButton = true;
 	h_checkForMissclick.Display(client, MENU_TIME_FOREVER);
 }
@@ -1162,7 +1157,7 @@ public void listZonesInGroup(int client)
 {
 	Menu h_listBonusZones = new Menu(Handler_listBonusZones);
 	if (g_mapZoneCountinGroup[g_CurrentSelectedZoneGroup[client]] > 0)
-	{  // Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
+	{ // Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 		char listZoneName[256], ZoneId[64], Id[64];
 		for (int i = 0; i < g_mapZonesCount; ++i)
 		{
@@ -1212,15 +1207,15 @@ public int Handler_listBonusZones(Handle tMenu, MenuAction action, int client, i
 	}
 }
 
-
 public void renameBonusGroup(int client)
 {
 	if (!IsValidClient(client))
 		return;
 
-	PrintToChat(client, " %cSurftimer %c| Please write the bonus name in chat or use %c!cancel%c to stop.", LIMEGREEN, WHITE, LIMEGREEN, WHITE);
+	CPrintToChat(client, "%t", "SurfZones4", g_szChatPrefix);
 	g_ClientRenamingZone[client] = true;
 }
+
 // Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 public void SelectBonusZoneType(int client)
 {
@@ -1355,7 +1350,7 @@ public int H_CreateBonusFirst(Handle tMenu, MenuAction action, int client, int i
 						return;
 
 					g_Editing[client] = 2;
-					PrintToChat(client, " %cSurftimer %c| Bonus Start Zone Created", LIMEGREEN, WHITE);
+					CPrintToChat(client, "%t", "SurfZones5", g_szChatPrefix);
 					EndBonusZoneCreation(client);
 				}
 			}
@@ -1433,10 +1428,10 @@ public void SaveBonusZones(int client)
 		int id2 = g_mapZonesCount + 1;
 		db_insertZone(g_mapZonesCount, 1, 0, g_fBonusStartPos[client][0][0], g_fBonusStartPos[client][0][1], g_fBonusStartPos[client][0][2], g_fBonusStartPos[client][1][0], g_fBonusStartPos[client][1][1], g_fBonusStartPos[client][1][2], 0, 0, g_mapZoneGroupCount);
 		db_insertZone(id2, 2, 0, g_fBonusEndPos[client][0][0], g_fBonusEndPos[client][0][1], g_fBonusEndPos[client][0][2], g_fBonusEndPos[client][1][0], g_fBonusEndPos[client][1][1], g_fBonusEndPos[client][1][2], 0, 0, g_mapZoneGroupCount);
-		PrintToChat(client, " %cSurftimer %c| Bonus Saved!", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "SurfZones6", g_szChatPrefix);
 	}
 	else
-		PrintToChat(client, " %cSurftimer %c| Failed to Save Bonus, error in coordinates", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "SurfZones7", g_szChatPrefix);
 
 	resetSelection(client);
 	ZoneMenu(client);
@@ -1460,7 +1455,7 @@ public void SelectNormalZoneType(int client)
 	}
 	else if (g_mapZonesTypeCount[g_CurrentSelectedZoneGroup[client]][3] == 0 && g_mapZonesTypeCount[g_CurrentSelectedZoneGroup[client]][4] > 0)
 		SelectNormalZoneMenu.AddItem("4", "Checkpoint");
-	
+
 	SelectNormalZoneMenu.AddItem("hook", "Hook Zone");
 
 	SelectNormalZoneMenu.ExitButton = true;
@@ -1575,7 +1570,7 @@ public void SelectMiscZoneType(int client)
 	SelectZoneMenu.AddItem("6", "TeleToStart");
 	SelectZoneMenu.AddItem("7", "Validator");
 	SelectZoneMenu.AddItem("8", "Checker");
-	//fluffys add antijump and antiduck zones to menu
+	// fluffys add antijump and antiduck zones to menu
 	SelectZoneMenu.AddItem("9", "AntiJump");
 	SelectZoneMenu.AddItem("10", "AntiDuck");
 	SelectZoneMenu.AddItem("11", "MaxSpeed");
@@ -1641,7 +1636,7 @@ public void ListZones(int client, bool mapzones)
 
 	char listZoneName[256], ZoneId[64], Id[64];
 	if (g_mapZonesCount > 0)
-	{  // Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0) //fluffys AntiJump (9), AntiDuck (10)
+	{ // Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0) // fluffys AntiJump (9), AntiDuck (10)
 		if (mapzones)
 		{
 			for (int i = 0; i < g_mapZonesCount; ++i)
@@ -1800,8 +1795,8 @@ public void EditorMenu(int client)
 			Format(szMenuItem, sizeof(szMenuItem), "Prespeed: %f", g_mapZones[g_ClientSelectedZone[client]][preSpeed]);
 			editMenu.AddItem("", szMenuItem);
 		}
-		
 	}
+
 	editMenu.ExitButton = true;
 	editMenu.Display(client, MENU_TIME_FOREVER);
 }
@@ -1873,7 +1868,7 @@ public int MenuHandler_Editor(Handle tMenu, MenuAction action, int client, int i
 						db_insertZone(g_mapZonesCount, g_CurrentZoneType[client], g_mapZonesTypeCount[g_CurrentSelectedZoneGroup[client]][g_CurrentZoneType[client]], g_Positions[client][0][0], g_Positions[client][0][1], g_Positions[client][0][2], g_Positions[client][1][0], g_Positions[client][1][1], g_Positions[client][1][2], 0, 0, g_CurrentSelectedZoneGroup[client]);
 						g_bEditZoneType[client] = false;
 					}
-					PrintToChat(client, "Zone saved");
+					CPrintToChat(client, "%t", "SurfZones8", g_szChatPrefix);
 					resetSelection(client);
 					ZoneMenu(client);
 				}
@@ -1911,7 +1906,7 @@ public int MenuHandler_Editor(Handle tMenu, MenuAction action, int client, int i
 				{
 					// Set Target Name
 					g_iWaitingForResponse[client] = 5;
-					CPrintToChat(client, "{lime}Surftimer {default}| Type the desired target name (type reset to reset)");
+					CPrintToChat(client, "%t", "SurfZones9", g_szChatPrefix);
 				}
 				case 10:
 				{
@@ -1953,8 +1948,7 @@ public void resetSelection(int client)
 	g_CurrentZoneType[client] = -1;
 	g_bEditZoneType[client] = false;
 
-
-	float resetArray[] =  { -1.0, -1.0, -1.0 };
+	float resetArray[] = { -1.0, -1.0, -1.0 };
 	Array_Copy(resetArray, g_Positions[client][0], 3);
 	Array_Copy(resetArray, g_Positions[client][1], 3);
 	Array_Copy(resetArray, g_fBonusEndPos[client][0], 3);
@@ -2080,7 +2074,7 @@ public int MenuHandler_Prespeed(Handle tMenu, MenuAction action, int client, int
 			float prespeed = StringToFloat(szPrespeed);
 			if (prespeed == -1.0)
 			{
-				CPrintToChat(client, "{lime}Surftimer {default}| Type the prespeed to be set to {lightgreen}%s-%i", g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId]);
+				CPrintToChat(client, "%t", "SurfZones10", g_szChatPrefix, g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId]);
 				g_iWaitingForResponse[client] = 0;
 				return;
 			}
@@ -2166,7 +2160,7 @@ public int ZoneHookHandler(Handle menu, MenuAction action, int param1, int param
 				GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", position);
 				GetClientEyeAngles(param1, angles);
 
-				CPrintToChat(param1, "{lime}Surftimer {default}| Teleporting to %s at %f %f %f", szTriggerName, position[0],	position[1], position[2]);
+				CPrintToChat(param1, "%t", "SurfZones11", g_szChatPrefix, szTriggerName, position[0], position[1], position[2]);
 
 				teleportEntitySafe(param1, position, angles, view_as<float>( { 0.0, 0.0, -100.0 } ), true);
 				SelectTrigger(param1, index);
@@ -2220,7 +2214,7 @@ public int ZoneHookHandler(Handle menu, MenuAction action, int param1, int param
 
 				Format(g_mapZones[g_ClientSelectedZone[param1]][hookName], sizeof(g_mapZones), szTriggerName);
 
-				CPrintToChat(param1, "{lime}Surftimer {default}| Set %s-%i hook name to %s", g_szZoneDefaultNames[g_CurrentZoneType[param1]], g_mapZones[g_ClientSelectedZone[param1]][zoneTypeId], szTriggerName);
+				CPrintToChat(param1, "%t", "SurfZones12", g_szChatPrefix, g_szZoneDefaultNames[g_CurrentZoneType[param1]], g_mapZones[g_ClientSelectedZone[param1]][zoneTypeId], szTriggerName);
 				SelectTrigger(param1, index);
 			}
 			case 2: // Back
@@ -2282,7 +2276,7 @@ public int MenuHandler_ClearZones(Handle tMenu, MenuAction action, int client, i
 				}
 				g_mapZonesCount = 0;
 				db_deleteMapZones();
-				PrintToChat(client, "Zones cleared");
+				CPrintToChat(client, "%t", "SurfZones13", g_szChatPrefix);
 				RemoveZones();
 			}
 			resetSelection(client);
@@ -2294,7 +2288,6 @@ public int MenuHandler_ClearZones(Handle tMenu, MenuAction action, int client, i
 		}
 	}
 }
-
 
 stock void GetMiddleOfABox(const float vec1[3], const float vec2[3], float buffer[3])
 {

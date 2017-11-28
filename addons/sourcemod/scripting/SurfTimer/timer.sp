@@ -8,7 +8,7 @@ public Action reloadRank(Handle timer, any client)
 public Action AnnounceMap(Handle timer, any client)
 {
 	if (IsValidClient(client))
-		PrintToChat(client, g_sTierString);
+		CPrintToChat(client, "%t", "Timer1", g_szChatPrefix, g_sTierString);
 
 	AnnounceTimer[client] = null;
 	return Plugin_Handled;
@@ -52,18 +52,20 @@ public Action PlayerRanksTimer(Handle timer)
 	{
 		if (!IsValidClient(i) || IsFakeClient(i))
 			continue;
-		db_GetPlayerRank(i);
+		db_GetPlayerRank(i, 0);
 	}
 	return Plugin_Continue;
 }
 
-//
 // Recounts players time
-//
-public Action UpdatePlayerProfile(Handle timer, any client)
+public Action UpdatePlayerProfile(Handle timer, Handle pack)
 {
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int style = ReadPackCell(pack);
+
 	if (IsValidClient(client) && !IsFakeClient(client))
-		db_updateStat(client);
+		db_updateStat(client, style);
 
 	return Plugin_Handled;
 }
@@ -105,7 +107,7 @@ public Action CKTimer1(Handle timer)
 		{
 			if (IsPlayerAlive(client))
 			{
-				//1st team join + in-game
+				// 1st team join + in-game
 				if (g_bFirstTeamJoin[client])
 				{
 					g_bFirstTeamJoin[client] = false;
@@ -161,26 +163,26 @@ public Action CKTimer2(Handle timer)
 			GetMapTimeLeft(timeleft);
 			switch (timeleft)
 			{
-				case 1800:PrintToChatAll("%t", "TimeleftMinutes", LIMEGREEN, WHITE, BLUE, g_szMapName, WHITE, MOSSGREEN, timeleft / 60);
-				case 1200:PrintToChatAll("%t", "TimeleftMinutes", LIMEGREEN, WHITE, BLUE, g_szMapName, WHITE, MOSSGREEN, timeleft / 60);
-				case 600:PrintToChatAll("%t", "TimeleftMinutes", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft / 60);
-				case 300:PrintToChatAll("%t", "TimeleftMinutes", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft / 60);
-				case 120:PrintToChatAll("%t", "TimeleftMinutes", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft / 60);
-				case 60:PrintToChatAll("%t", "TimeleftSeconds", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft);
-				case 30:PrintToChatAll("%t", "TimeleftSeconds", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft);
-				case 15:PrintToChatAll("%t", "TimeleftSeconds", LIMEGREEN, WHITE, BLUE, g_szMapName,  WHITE, MOSSGREEN, timeleft);
-				case  - 1:PrintToChatAll("%t", "TimeleftCounter", LIMEGREEN, WHITE, BLUE, g_szMapName, WHITE, MOSSGREEN, 3);
-				case  - 2:PrintToChatAll("%t", "TimeleftCounter", LIMEGREEN, WHITE, BLUE, g_szMapName, WHITE, MOSSGREEN, 2);
+				case 1800:CPrintToChatAll("%t", "TimeleftMinutes", g_szChatPrefix, g_szMapName, timeleft / 60);
+				case 1200:CPrintToChatAll("%t", "TimeleftMinutes", g_szChatPrefix, g_szMapName, timeleft / 60);
+				case 600:CPrintToChatAll("%t", "TimeleftMinutes", g_szChatPrefix, g_szMapName, timeleft / 60);
+				case 300:CPrintToChatAll("%t", "TimeleftMinutes", g_szChatPrefix, g_szMapName, timeleft / 60);
+				case 120:CPrintToChatAll("%t", "TimeleftMinutes", g_szChatPrefix, g_szMapName, timeleft / 60);
+				case 60:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
+				case 30:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
+				case 15:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
+				case  - 1:CPrintToChatAll("%t", "TimeleftCounter", g_szChatPrefix, g_szMapName, 3);
+				case  - 2:CPrintToChatAll("%t", "TimeleftCounter", g_szChatPrefix, g_szMapName, 2);
 				case  - 3:
 				{
 					if (!g_bRoundEnd)
 					{
 						g_bRoundEnd = true;
 						ServerCommand("mp_ignore_round_win_conditions 0");
-						PrintToChatAll("%t", "TimeleftCounter", LIMEGREEN, WHITE, BLUE, g_szMapName, WHITE, MOSSGREEN, 1);
+						CPrintToChatAll("%t", "TimeleftCounter", g_szChatPrefix, g_szMapName, 1);
 						char szNextMap[128];
 						GetNextMap(szNextMap, 128);
-						PrintToChatAll(" %cSurftimer %c| Nextmap: %c%s", LIMEGREEN, WHITE, BLUE, szNextMap);
+						CPrintToChatAll("%t", "Timer2", g_szChatPrefix, szNextMap);
 						CreateTimer(1.0, TerminateRoundTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 					}
 				}
@@ -190,12 +192,12 @@ public Action CKTimer2(Handle timer)
 			{
 				char szNextMap[128];
 				GetNextMap(szNextMap, 128);
-				PrintToChatAll(" %cSurftimer %c| Nextmap: %c%s", LIMEGREEN, WHITE, BLUE, szNextMap);
+				CPrintToChatAll("%t", "Timer2", g_szChatPrefix, szNextMap);
 			}
 		}
 	}
 
-	//info bot name
+	// info bot name
 	SetInfoBotName(g_InfoBot);
 
 	int i;
@@ -204,17 +206,17 @@ public Action CKTimer2(Handle timer)
 		if (!IsValidClient(i) || i == g_InfoBot)
 			continue;
 
-		//overlay check
+		// overlay check
 		if (g_bOverlay[i] && GetGameTime() - g_fLastOverlay[i] > 5.0)
 			g_bOverlay[i] = false;
 
-		//stop replay to prevent server crashes because of a massive recording array (max. 2h)
+		// stop replay to prevent server crashes because of a massive recording array (max. 2h)
 		if (g_hRecording[i] != null && g_fCurrentRunTime[i] > 6720.0)
 		{
 			StopRecording(i);
 		}
 
-		//Scoreboard
+		// Scoreboard
 		if (!g_bPause[i])
 		{
 			float fltime;
@@ -235,13 +237,13 @@ public Action CKTimer2(Handle timer)
 
 		if (IsPlayerAlive(i))
 		{
-			//spec hud
+			// spec hud
 			if (g_bSpecListOnly[i])
 				SpecListMenuAlive(i);
 			else if (g_bSideHud[i])
 				SideHudAlive(i);
 
-			//Last Cords & Angles
+			// Last Cords & Angles
 			GetClientAbsOrigin(i, g_fPlayerCordsLastPosition[i]);
 			GetClientEyeAngles(i, g_fPlayerAnglesLastPosition[i]);
 		}
@@ -249,7 +251,7 @@ public Action CKTimer2(Handle timer)
 			SpecListMenuDead(i);
 	}
 
-	//clean weapons on ground
+	// clean weapons on ground
 	int maxEntities;
 	maxEntities = GetMaxEntities();
 	char classx[20];
@@ -275,13 +277,14 @@ public Action ReplayTimer(Handle timer, any userid)
 {
 	int client = GetClientOfUserId(userid);
 	if (IsValidClient(client) && !IsFakeClient(client))
-		SaveRecording(client, 0);
+		SaveRecording(client, 0, 0);
 	else
 		g_bNewReplay[client] = false;
 
 
 	return Plugin_Handled;
 }
+
 public Action BonusReplayTimer(Handle timer, Handle pack)
 {
 	ResetPack(pack);
@@ -289,7 +292,37 @@ public Action BonusReplayTimer(Handle timer, Handle pack)
 	int zGrp = ReadPackCell(pack);
 
 	if (IsValidClient(client) && !IsFakeClient(client))
-		SaveRecording(client, zGrp);
+		SaveRecording(client, zGrp, 0);
+	else
+		g_bNewBonus[client] = false;
+
+
+	return Plugin_Handled;
+}
+
+public Action StyleReplayTimer(Handle timer, Handle pack)
+{
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int style = ReadPackCell(pack);
+
+	if (IsValidClient(client) && !IsFakeClient(client))
+		SaveRecording(client, 0, style);
+	else
+		g_bNewReplay[client] = false;
+
+	return Plugin_Handled;
+}
+
+public Action StyleBonusReplayTimer(Handle timer, Handle pack)
+{
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int zGrp = ReadPackCell(pack);
+	int style = ReadPackCell(pack);
+
+	if (IsValidClient(client) && !IsFakeClient(client))
+		SaveRecording(client, zGrp, style);
 	else
 		g_bNewBonus[client] = false;
 
@@ -334,10 +367,10 @@ public Action SetClanTag(Handle timer, any client)
 			CS_SetClientClanTag(client, g_pr_rankname[client]);
 	}
 
-	//new rank
+	// new rank
 	if (oldrank && GetConVarBool(g_hPointSystem))
 		if (!StrEqual(g_pr_rankname[client], old_pr_rankname, false) && IsValidClient(client))
-			CPrintToChat(client, "%t", "SkillGroup", LIMEGREEN, WHITE, GRAY, GRAY, g_pr_chat_coloredrank[client]);
+			CPrintToChat(client, "%t", "SkillGroup", g_szChatPrefix, g_pr_chat_coloredrank[client]);
 
 	return Plugin_Handled;
 }
@@ -366,11 +399,9 @@ public Action WelcomeMsgTimer(Handle timer, any client)
 public Action HelpMsgTimer(Handle timer, any client)
 {
 	if (IsValidClient(client) && !IsFakeClient(client))
-		PrintToChat(client, "%t", "HelpMsg", LIMEGREEN, WHITE, MOSSGREEN, WHITE, MOSSGREEN);
-
+		CPrintToChat(client, "%t", "HelpMsg", g_szChatPrefix);
 	return Plugin_Handled;
 }
-
 
 public Action AdvertTimer(Handle timer)
 {
@@ -379,22 +410,22 @@ public Action AdvertTimer(Handle timer)
 	{
 		if (g_bhasBonus)
 		{
-			PrintToChatAll("%t", "AdvertBonus", LIMEGREEN, WHITE, MOSSGREEN, WHITE, MOSSGREEN);
+			CPrintToChatAll("%t", "AdvertBonus", g_szChatPrefix);
 		}
 		else if (g_bhasStages)
 		{
-			PrintToChatAll("%t", "AdvertStage", LIMEGREEN, WHITE, MOSSGREEN, WHITE, MOSSGREEN);
+			CPrintToChatAll("%t", "AdvertStage", g_szChatPrefix);
 		}
 	}
 	else
 	{
 		if (g_bhasStages)
 		{
-			PrintToChatAll("%t", "AdvertStage", LIMEGREEN, WHITE, MOSSGREEN, WHITE, MOSSGREEN);
+			CPrintToChatAll("%t", "AdvertStage", g_szChatPrefix);
 		}
 		else if (g_bhasBonus)
 		{
-			PrintToChatAll("%t", "AdvertBonus", LIMEGREEN, WHITE, MOSSGREEN, WHITE, MOSSGREEN);
+			CPrintToChatAll("%t", "AdvertBonus", g_szChatPrefix);
 		}
 	}
 	return Plugin_Continue;
@@ -418,8 +449,8 @@ public Action CenterMsgTimer(Handle timer, any client)
 		{
 			g_fLastOverlay[client] = GetGameTime();
 			g_bOverlay[client] = true;
-			//fluffys
-			//PrintHintText(client, "%t", "PositionRestored");
+			// fluffys
+			// PrintHintText(client, "%t", "PositionRestored");
 		}
 		g_bRestorePositionMsg[client] = false;
 	}
@@ -448,7 +479,7 @@ public Action HideHud(Handle timer, any client)
 		// ViewModel
 		Client_SetDrawViewModel(client, g_bViewModel[client]);
 
-		// Crosshair and chat
+		// Crosshair and Chat
 		if (g_bViewModel[client])
 		{
 			// Display
@@ -480,7 +511,7 @@ public Action LoadPlayerSettings(Handle timer)
 	return Plugin_Handled;
 }
 
-//fluffys
+// fluffys
 public Action StartJumpZonePrintTimer(Handle timer, any client)
 {
 	g_bJumpZoneTimer[client] = false;
@@ -524,7 +555,7 @@ public Action PlayTimeTimer(Handle timer)
 		{
 			int team = GetClientTeam(i);
 
-			if(team == 2 || team == 3)
+			if (team == 2 || team == 3)
 			{
 				g_iPlayTimeAliveSession[i]++;
 			}
@@ -565,6 +596,30 @@ public Action CenterSpeedDisplayTimer(Handle timer, any client)
 public Action EnableJoinMsgs(Handle timer)
 {
 	g_bEnableJoinMsgs = true;
+
+	return Plugin_Handled;
+}
+
+public Action SetArmsModel(Handle timer, any client)
+{
+	if (IsValidClient(client) && IsPlayerAlive(client))
+	{
+		char szBuffer[256];
+		GetConVarString(g_hArmModel, szBuffer, 256);
+		SetEntPropString(client, Prop_Send, "m_szArmsModel", szBuffer);
+	}
+}
+
+public Action SpecBot(Handle timer, Handle pack)
+{
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int bot = ReadPackCell(pack);
+
+	ChangeClientTeam(client, 1);
+	SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", bot);
+	SetEntProp(client, Prop_Send, "m_iObserverMode", 4);
+	g_bWrcpTimeractivated[client] = false;
 
 	return Plugin_Handled;
 }

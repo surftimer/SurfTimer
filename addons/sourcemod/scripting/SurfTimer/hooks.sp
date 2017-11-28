@@ -6,8 +6,8 @@
 void CreateHooks()
 {
 	HookUserMessage(GetUserMessageId("SendPlayerItemFound"), ItemFoundMsg, true);
-	
-	//hooks
+
+	// Hooks
 	HookEvent("player_spawn", Event_OnPlayerSpawn, EventHookMode_Post);
 	HookEvent("player_death", Event_OnPlayerDeath);
 	HookEvent("round_start", Event_OnRoundStart, EventHookMode_PostNoCopy);
@@ -17,7 +17,7 @@ void CreateHooks()
 	HookEvent("player_team", Event_OnPlayerTeam, EventHookMode_Post);
 	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
 	HookEvent("player_jump", Event_PlayerJump);
-	//HookEvent("player_disconnect", Event_PlayerDisconnect);
+	// HookEvent("player_disconnect", Event_PlayerDisconnect);
 
 	// AddNormalSoundHook(OnNormalSoundPlayed);
 
@@ -50,7 +50,7 @@ public Action SayText2(UserMsg msg_id, Handle bf, int[] players, int playersNum,
 	return Plugin_Continue;
 }
 
-//attack spam protection
+// Attack Spam Protection
 public Action Event_OnFire(Handle event, const char[] name, bool dontBroadcast)
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
@@ -74,7 +74,7 @@ public Action Event_OnFire(Handle event, const char[] name, bool dontBroadcast)
 	}
 }
 
-// - PlayerSpawn -
+// Player Spawns
 public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
@@ -85,24 +85,24 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		g_bFirstTimerStart[client] = true;
 		SetEntityMoveType(client, MOVETYPE_WALK);
 		SetEntityRenderMode(client, RENDER_NORMAL);
-		//fluffys
+		// fluffys
 		g_bInJump[client] = false;
 		g_bInDuck[client] = false;
 
-		if(g_iCurrentStyle[client] == 4) //4 low gravity
+		if (g_iCurrentStyle[client] == 4) // 4 low gravity
 			SetEntityGravity(client, 0.5);
-		else if(g_iCurrentStyle[client] == 5)//5 slowmo
+		else if (g_iCurrentStyle[client] == 5)// 5 slowmo
 			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 0.5);
-		else if(g_iCurrentStyle[client] == 6)//6 fastforward
+		else if (g_iCurrentStyle[client] == 6)// 6 fastforward
 			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.5);
 
-		if(g_iCurrentStyle[client] < 4) //0 normal, 1 hsw, 2 sw, 3 bw
+		if (g_iCurrentStyle[client] < 4) // 0 normal, 1 hsw, 2 sw, 3 bw
 		{
-			SetEntityGravity(client, 1.0); //normal gravity
-			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0); //normal speed
+			SetEntityGravity(client, 1.0); // normal gravity
+			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0); // normal speed
 		}
 
-		//strip weapons
+		// Strip Weapons
 		if ((GetClientTeam(client) > 1) && IsValidClient(client))
 		{
 			StripAllWeapons(client);
@@ -113,13 +113,13 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 				SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
 		}
 
-		//NoBlock
+		// NoBlock
 		if (GetConVarBool(g_hCvarNoBlock))
 			SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
 		else
 			SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 5, 4, true);
 
-		//botmimic2
+		// Botmimic2
 		if (g_hBotMimicsRecord[client] != null && IsFakeClient(client))
 		{
 			g_BotMimicTick[client] = 0;
@@ -136,29 +136,31 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 				CS_SetClientClanTag(client, "WRB Replay");
 			else if (client == g_WrcpBot)
 				CS_SetClientClanTag(client, "WRCP Replay");
-			
+
 			if (client == g_RecordBot || client == g_BonusBot || client == g_WrcpBot)
 			{
 				// Disabling noclip, makes the bot bug, look into later
-				//SetEntityMoveType(client, MOVETYPE_NOCLIP);
+				// SetEntityMoveType(client, MOVETYPE_NOCLIP);
 				SetEntityGravity(client, 0.0);
 			}
 
 			return Plugin_Continue;
 		}
 
-		//change player skin
+		// Change Player Skin
 		if (GetConVarBool(g_hPlayerSkinChange) && (GetClientTeam(client) > 1))
 		{
 			char szBuffer[256];
-			GetConVarString(g_hArmModel, szBuffer, 256);
-			SetEntPropString(client, Prop_Send, "m_szArmsModel", szBuffer);
+			// GetConVarString(g_hArmModel, szBuffer, 256);
+			// SetEntPropString(client, Prop_Send, "m_szArmsModel", szBuffer);
 
 			GetConVarString(g_hPlayerModel, szBuffer, 256);
 			SetEntityModel(client, szBuffer);
+			CreateTimer(1.0, SetArmsModel, client, TIMER_FLAG_NO_MAPCHANGE);
+			//SetEntPropString(client, Prop_Send, "m_szArmsModel", "models/weapons/ct_arms.mdl");
 		}
 
-		//1st spawn & t/ct
+		// 1st Spawn & T/CT
 		if (g_bFirstSpawn[client] && (GetClientTeam(client) > 1))
 		{
 			float fLocation[3];
@@ -182,10 +184,10 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 			g_bFirstSpawn[client] = false;
 		}
 
-		//get start pos for challenge
+		// Get Start Position For Challenge
 		GetClientAbsOrigin(client, g_fSpawnPosition[client]);
 
-		//restore position
+		// Restore Position
 		if (!g_specToStage[client])
 		{
 
@@ -210,7 +212,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 						g_fStartTime[client] = -1.0;
 						g_fCurrentRunTime[client] = -1.0;
 
-						// Spawn client to the start zone.
+						// Spawn Client To The Start Zone.
 						if (GetConVarBool(g_hSpawnToStartZone))
 							Command_Restart(client, 1);
 					}
@@ -226,16 +228,16 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 			g_specToStage[client] = false;
 		}
 
-		//hide radar
+		// Hide Radar
 		CreateTimer(0.0, HideHud, client, TIMER_FLAG_NO_MAPCHANGE);
 
-		//set clantag
+		// Set Clantag
 		CreateTimer(1.5, SetClanTag, client, TIMER_FLAG_NO_MAPCHANGE);
 
-		//set speclist
+		// Set Speclist
 		Format(g_szPlayerPanelText[client], 512, "");
 
-		//get speed & origin
+		// Get Speed & Origin
 		g_fLastSpeed[client] = GetSpeed(client);
 	}
 	else if (IsFakeClient(client)) 
@@ -252,7 +254,7 @@ public void PlayerSpawn(int client)
 
 public Action Say_Hook(int client, const char[] command, int argc)
 {
-	//Call Admin - Own Reason
+	// Call Admin - Own Reason
 	if (g_bClientOwnReason[client])
 	{
 		g_bClientOwnReason[client] = false;
@@ -280,12 +282,11 @@ public Action Say_Hook(int client, const char[] command, int argc)
 			if (BaseComm_IsClientGagged(client))
 			return Plugin_Handled;
 
-		//blocked commands
+		// Blocked Commands
 		for (int i = 0; i < sizeof(g_BlockedChatText); i++)
 		{
 			if (StrEqual(g_BlockedChatText[i], sText, true))
 			{
-
 				return Plugin_Handled;
 			}
 		}
@@ -296,7 +297,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 			// Check if client is cancelling
 			if (StrEqual(sText, "cancel"))
 			{
-				CPrintToChat(client, "{lime}Surftimer {default}| Cancelled");
+				CPrintToChat(client, "%t", "Hooks1", g_szChatPrefix);
 				g_iWaitingForResponse[client] = -1;
 				return Plugin_Handled;
 			}
@@ -330,11 +331,11 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					int zgrp = StringToInt(sText);
 					if (zgrp < 1 || zgrp > 35)
 					{
-						PrintToChat(client, " %cSurftimer %c| Invalid Bonus", LIMEGREEN, WHITE);
+						CPrintToChat(client, "%t", "Hooks2", g_szChatPrefix);
 						return Plugin_Handled;
 					}
 					g_iZonegroupHook[client] = zgrp;
-					PrintToChat(client, " %cSurftimer %c| Bonus %i to use with hooked zones", LIMEGREEN, WHITE, zgrp);
+					CPrintToChat(client, "%t", "Hooks3", g_szChatPrefix, zgrp);
 				}
 				case 4:
 				{
@@ -345,7 +346,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					g_fMaxVelocity = maxvelocity;
 					db_updateMapSettings();
 					MaxVelocityMenu(client);
-					CPrintToChat(client, "{lime}Surftimer {default}| %s max velocity set to %f", g_szMapName, maxvelocity);
+					CPrintToChat(client, "%t", "Hooks4", g_szChatPrefix, g_szMapName, maxvelocity);
 				}
 				case 5:
 				{
@@ -355,7 +356,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 
 					Format(g_mapZones[g_ClientSelectedZone[client]][targetName], sizeof(g_mapZones), "%s", sText);
 
-					CPrintToChat(client, "{lime}Surftimer {default}| %s-%i set to {lime}%s", g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId], sText);
+					CPrintToChat(client, "%t", "Hooks5", g_szChatPrefix, g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId], sText);
 
 					EditorMenu(client);
 				}
@@ -364,15 +365,15 @@ public Action Say_Hook(int client, const char[] command, int argc)
 			return Plugin_Handled;
 		}
 
-		// !s and !stage commands
+		// !s & !stage Commands
 		if (StrContains(sText, "!s", false) == 0 || StrContains(sText, "!stage", false) == 0)
 			return Plugin_Handled;
 
-		// !b and !bonus commands
+		// !b & !bonus Commands
 		if (StrContains(sText, "!b", false) == 0 || StrContains(sText, "!bonus", false) == 0)
 			return Plugin_Handled;
 
-		// maptier
+		// Maptier
 		if (StrContains(sText, "!map", false) == 0)
 		{
 			if (CheckCommandAccess(client, "sm_map", ADMFLAG_RESERVATION))
@@ -386,7 +387,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 				return Plugin_Handled;
 		}
 
-		//empty message
+		// Empty Message
 		if (StrEqual(sText, " ") || !sText[0])
 			return Plugin_Handled;
 
@@ -395,10 +396,10 @@ public Action Say_Hook(int client, const char[] command, int argc)
 
 		parseColorsFromString(sText, 1024);
 
-		/*if(g_bDbCustomTitleInUse[client])
+		/*if (g_bDbCustomTitleInUse[client])
 			Format(sText, 1024, "%s%s", g_szTextColoured[client], sText);*/
 
-		//lowercase
+		// Lowercase
 		if ((sText[0] == '/') || (sText[0] == '!'))
 		{
 			if (IsCharUpper(sText[1]))
@@ -410,11 +411,11 @@ public Action Say_Hook(int client, const char[] command, int argc)
 			}
 		}
 
-		// hide ! commands
+		// Hide ! commands
 		if (StrContains(sText, "!", false) == 0)
 		return Plugin_Handled;
 
-		//chat trigger?
+		// Chat Trigger?
 		if ((IsChatTrigger() && sText[0] == '/') || (sText[0] == '@' && (GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)))
 		{
 			return Plugin_Continue;
@@ -424,7 +425,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		GetClientName(client, szName, 64);
 		CRemoveColors(szName, 64);
 
-		//log the chat of the player to the server so that tools such as HLSW/HLSTATX see it and also it remains logged in the log file
+		// log the chat of the player to the server so that tools such as HLSW/HLSTATX see it and also it remains logged in the log file
 		WriteChatLog(client, "say", sText);
 		PrintToServer("%s: %s", szName, sText);
 
@@ -432,9 +433,8 @@ public Action Say_Hook(int client, const char[] command, int argc)
 			Format(szName, sizeof(szName), "%s%s", g_pr_namecolour[client], szName);
 		else if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
 			setNameColor(szName, g_iCustomColours[client][0], 64);
-			//fluffys
 
-		if(GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client] && g_bHasCustomTextColour[client])
+		if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client] && g_bHasCustomTextColour[client])
 			setTextColor(sText, g_iCustomColours[client][1], 1024);
 
 		if (GetClientTeam(client) == 1)
@@ -450,9 +450,9 @@ public Action Say_Hook(int client, const char[] command, int argc)
 			if (GetConVarBool(g_hCountry) && (GetConVarBool(g_hPointSystem)))
 			{
 				if (IsPlayerAlive(client))
-					CPrintToChatAll("{green}%s{default} %s {teamcolor}%s{default}: %s", g_szCountryCode[client], szChatRank, szName, sText);
+					CPrintToChatAll("%t", "Hooks6", g_szCountryCode[client], szChatRank, szName, sText);
 				else
-					CPrintToChatAll("*DEAD* {green}%s{default} %s %s{default}: %s", g_szCountryCode[client], szChatRank, szName, sText);
+					CPrintToChatAll("%t", "Hooks7", g_szCountryCode[client], szChatRank, szName, sText);
 				return Plugin_Handled;
 			}
 			else
@@ -460,9 +460,9 @@ public Action Say_Hook(int client, const char[] command, int argc)
 				if (GetConVarBool(g_hPointSystem))
 				{
 					if (IsPlayerAlive(client))
-						CPrintToChatAll("%s {teamcolor}%s{default}: %s", szChatRank, szName, sText);
+						CPrintToChatAll("%t", "Hooks8", szChatRank, szName, sText);
 					else
-						CPrintToChatAll("*DEAD* %s %s{default}: %s", szChatRank, szName, sText);
+						CPrintToChatAll("%t", "Hooks9", szChatRank, szName, sText);
 					return Plugin_Handled;
 				}
 			}
@@ -512,7 +512,7 @@ public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontB
 		GetEventString(event, "reason", disconnectReason, sizeof(disconnectReason));
 		for (int i = 1; i <= MaxClients; i++)
 			if (IsValidClient(i) && i != client && !IsFakeClient(i))
-				PrintToChat(i, "%t", "Disconnected1", WHITE, MOSSGREEN, szName, WHITE, disconnectReason);
+				CPrintToChat(i, "%t", "Disconnected1", szName, disconnectReason);
 		return Plugin_Handled;
 	}
 	else
@@ -603,7 +603,7 @@ public Action Event_OnRoundStart(Handle event, const char[] name, bool dontBroad
 		SDKHook(iEnt, SDKHook_EndTouch, OnEndTouchPushTrigger);
 	}
 
-	//fluffys gravity
+	// fluffys gravity
 	iEnt = -1;
 	while ((iEnt = FindEntityByClassname(iEnt, "trigger_gravity")) != -1)
 	{
@@ -659,14 +659,14 @@ public Action OnTouchPushTrigger(int entity, int other)
 	{
 		if (IsFakeClient(other))
 			return Plugin_Handled;
-			
-		//Takes a new additional teleport to increase acuraccy for bot recordings.
+
+		// Takes a new additional teleport to increase acuraccy for bot recordings.
 		if (g_hRecording[other] != null && !IsFakeClient(other))
 		{
 			g_createAdditionalTeleport[other] = true;
 		}
 
-		//fluffys
+		// fluffys
 		g_bInPushTrigger[other] = true;
 
 		if (IsValidEntity(entity))
@@ -705,7 +705,7 @@ public Action OnEndTouchGravityTrigger(int entity, int other)
 {
 	if (IsValidClient(other) && !IsFakeClient(other))
 	{
-		if(!g_bNoClip[other] && GetConVarBool(g_hGravityFix))
+		if (!g_bNoClip[other] && GetConVarBool(g_hGravityFix))
 			return Plugin_Handled;
 	}
 	return Plugin_Continue;
@@ -739,8 +739,9 @@ public Action Hook_OnTakeDamage(int victim, int &attacker, int &inflictor, float
 	return Plugin_Continue;
 }
 
-//thx to TnTSCS (player slap stops timer)
-//https://forums.alliedmods.net/showthread.php?t=233966
+
+// thx to TnTSCS (player slap stops timer)
+// https://forums.alliedmods.net/showthread.php?t=233966
 public Action OnLogAction(Handle source, Identity ident, int client, int target, const char[] message)
 {
 	if ((1 > target > MaxClients))
@@ -761,23 +762,23 @@ public Action OnLogAction(Handle source, Identity ident, int client, int target,
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
-	//fluffys
+	// fluffys
 	if (buttons & IN_JUMP && g_bInJump[client] == true && !g_bInStartZone[client] && !g_bInStageZone[client])
 	{
 		if (!g_bJumpZoneTimer[client])
 		{
 			CreateTimer(1.0, StartJumpZonePrintTimer, client);
-			CPrintToChat(client, "{lime}Surftimer {default}| {darkred}You may not jump in this area");
+			CPrintToChat(client, "%t", "Hooks10", g_szChatPrefix);
 			TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, view_as<float>( { 0.0, 0.0, 0.0} ));
 			SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, 0.0 } ));
 			g_bJumpZoneTimer[client] = true;
 		}
 	}
-	else if(buttons & IN_DUCK && g_bInDuck[client] == true)
+	else if (buttons & IN_DUCK && g_bInDuck[client] == true)
 	{
-		CPrintToChat(client, "{lime}Surftimer {default}| {darkred}You may not crouch in this area");
+		CPrintToChat(client, "%t", "Hooks11", g_szChatPrefix);
 	}
-	else if(buttons & IN_DUCK && g_bInPushTrigger[client] == true)
+	else if (buttons & IN_DUCK && g_bInPushTrigger[client] == true)
 	{
 		buttons &= ~IN_DUCK;
 		g_bInPushTrigger[client] = false;
@@ -788,22 +789,22 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	}
 
 	/*------ Styles ------*/
-	if(g_iCurrentStyle[client] == 1) 	//Sideways
+	if (g_iCurrentStyle[client] == 1) 	// Sideways
 	{
-		if(!g_bInStartZone[client] && !g_bInStageZone[client])
+		if (!g_bInStartZone[client] && !g_bInStageZone[client])
 		{
 			if (!GetConVarBool(g_hSidewaysBlockKeys))
 			{
-				if(buttons & IN_MOVELEFT)
+				if (buttons & IN_MOVELEFT)
 				{
 					g_iCurrentStyle[client] = 0;
-					PrintToChat(client, " %cSurftimer %c| Style set to %cNormal%c, A used.", LIMEGREEN, WHITE, GREEN, WHITE);
+					CPrintToChat(client, "%t", "Hooks12", g_szChatPrefix);
 				}
 
-				if(buttons & IN_MOVERIGHT)
+				if (buttons & IN_MOVERIGHT)
 				{
 					g_iCurrentStyle[client] = 0;
-					PrintToChat(client, " %cSurftimer %c| Style set to %cNormal%c, D used.", LIMEGREEN, WHITE, GREEN, WHITE);
+					CPrintToChat(client, "%t", "Hooks13", g_szChatPrefix);
 				}
 			}
 			else
@@ -822,9 +823,9 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 			}
 		}
 	}
-	else if(g_iCurrentStyle[client] == 2) // Half-sideways
+	else if (g_iCurrentStyle[client] == 2) // Half-sideways
 	{
-		if(!g_bInStartZone[client] && !g_bInStageZone[client])
+		if (!g_bInStartZone[client] && !g_bInStageZone[client])
 		{
 			if (buttons & IN_BACK && !(buttons & IN_MOVELEFT || buttons & IN_MOVERIGHT))
 			{
@@ -833,7 +834,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 				{
 					g_iCurrentStyle[client] = 0;
 					g_KeyCount[client] = 0;
-					PrintToChat(client, " %cSurftimer %c| Style set to %cNormal.", LIMEGREEN, WHITE, GREEN);
+					CPrintToChat(client, "%t", "Hooks14", g_szChatPrefix);
 				}
 			}
 			else if (buttons & IN_BACK && (buttons & IN_MOVELEFT || buttons & IN_MOVERIGHT))
@@ -842,11 +843,11 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 			if (buttons & IN_FORWARD && !(buttons & IN_MOVELEFT || buttons & IN_MOVERIGHT))
 				{
 					g_KeyCount[client]++;
-					if(g_KeyCount[client] == 60)
+					if (g_KeyCount[client] == 60)
 					{
 						g_iCurrentStyle[client] = 0;
 						g_KeyCount[client] = 0;
-						PrintToChat(client, " %cSurftimer %c| Style set to %cNormal.", LIMEGREEN, WHITE, GREEN);
+						CPrintToChat(client, "%t", "Hooks14", g_szChatPrefix);
 					}
 				}
 			else if (buttons & IN_FORWARD && (buttons & IN_MOVELEFT || buttons & IN_MOVERIGHT))
@@ -855,11 +856,11 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 			if (buttons & IN_MOVELEFT && !(buttons & IN_FORWARD || buttons & IN_BACK))
 				{
 					g_KeyCount[client]++;
-					if(g_KeyCount[client] == 60)
+					if (g_KeyCount[client] == 60)
 					{
 						g_iCurrentStyle[client] = 0;
 						g_KeyCount[client] = 0;
-						PrintToChat(client, " %cSurftimer %c| Style set to %cNormal.", LIMEGREEN, WHITE, GREEN);
+						CPrintToChat(client, "%t", "Hooks14", g_szChatPrefix);
 					}
 				}
 			else if (buttons & IN_MOVELEFT && (buttons & IN_FORWARD || buttons & IN_BACK))
@@ -868,49 +869,49 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 			if (buttons & IN_MOVERIGHT && !(buttons & IN_FORWARD || buttons & IN_BACK))
 				{
 					g_KeyCount[client]++;
-					if(g_KeyCount[client] == 60)
+					if (g_KeyCount[client] == 60)
 					{
 						g_iCurrentStyle[client] = 0;
 						g_KeyCount[client] = 0;
-						PrintToChat(client, " %cSurftimer %c| Style set to %cNormal.", LIMEGREEN, WHITE, GREEN);
+						CPrintToChat(client, "%t", "Hooks14", g_szChatPrefix);
 					}
 				}
 				else if (buttons & IN_MOVELEFT && (buttons & IN_FORWARD || buttons & IN_BACK))
 					g_KeyCount[client] = 0;
 		}
 	}
-	else if(g_iCurrentStyle[client] == 3)    //Backwards
+	else if (g_iCurrentStyle[client] == 3)    // Backwards
 	{
 		float eye[3];
 		float velocity[3];
-		
+
 		GetClientEyeAngles(client, eye);
-		
+
 		eye[0] = Cosine( DegToRad( eye[1] ) );
 		eye[1] = Sine( DegToRad( eye[1] ) );
 		eye[2] = 0.0;
-		
+
 		GetEntPropVector(client, Prop_Data, "m_vecVelocity", velocity);
-		
+
 		velocity[2] = 0.0;
-		
+
 		float len = SquareRoot( velocity[0] * velocity[0] + velocity[1] * velocity[1] );
-		
+
 		velocity[0] /= len;
 		velocity[1] /= len;
-		
+
 		float val = GetVectorDotProduct( eye, velocity );
-		
-		//PrintToChat(client, "%.2f", val); //for testing
-		
-		if(!g_bInStartZone[client] && !g_bInStageZone[client] && val > -0.75)
+
+		// CPrintToChat(client, "%.2f", val); // for testing
+
+		if (!g_bInStartZone[client] && !g_bInStageZone[client] && val > -0.75)
 		{
 			g_KeyCount[client]++;
-			if(g_KeyCount[client] == 60)
+			if (g_KeyCount[client] == 60)
 			{
 				g_iCurrentStyle[client] = 0;
 				g_KeyCount[client] = 0;
-				PrintToChat(client, "%cSurftimer %c| Style set to %cNormal.", LIMEGREEN, WHITE, GREEN);
+				CPrintToChat(client, "%t", "Hooks14", g_szChatPrefix);
 			}
 		}
 		else if (!g_bInStartZone[client] && !g_bInStageZone[client] && val < -0.75)
@@ -929,30 +930,30 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 
 		float vMaxs[3];
 		GetEntPropVector(client, Prop_Send, "m_vecMaxs", vMaxs);
-		
+
 		// Fix weird shit that made people go through the roof
 		vPos[2] += 1.0;
 		vMaxs[2] -= 1.0;
-		
+
 		float vEndPos[3];
-		
+
 		// Take account for the client already being stuck
 		vEndPos[0] = vPos[0];
 		vEndPos[1] = vPos[1];
 		vEndPos[2] = vPos[2] - g_fMaxVelocity;
-		
+
 		TR_TraceHullFilter(vPos, vEndPos, vMins, vMaxs, MASK_PLAYERSOLID_BRUSHONLY, TraceRayDontHitSelf, client);
-		
-		if(TR_DidHit())
+
+		if (TR_DidHit())
 		{
 			// Gets the normal vector of the surface under the player
 			float vPlane[3], vRealEndPos[3];
-			
+
 			TR_GetPlaneNormal(INVALID_HANDLE, vPlane);
 			TR_GetEndPosition(vRealEndPos);
-			
+
 			// Check if client is on a surf ramp, and if he is stuck
-			if(0.7 > vPlane[2] && vPos[2] - vRealEndPos[2] < 0.975)
+			if (0.7 > vPlane[2] && vPos[2] - vRealEndPos[2] < 0.975)
 			{
 				// Player was stuck, lets put him back on the ramp
 				TeleportEntity(client, vRealEndPos, NULL_VECTOR, NULL_VECTOR);
@@ -960,9 +961,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		}
 	}
 
-	//Backwards
-
-
+	// Backwards
 
 	if (g_bRoundEnd || !IsValidClient(client))
 		return Plugin_Continue;
@@ -978,7 +977,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		float newVelocity[3];
 		// Slope Boost Fix by Mev, & Blacky
 		// https://forums.alliedmods.net/showthread.php?t=266888
-		//if (GetConVarBool(g_hSlopeFixEnable) == true)
+		// if (GetConVarBool(g_hSlopeFixEnable) == true)
 		if (GetConVarBool(g_hSlopeFixEnable) == true && !IsFakeClient(client))
 		{
 			g_vLast[client][0] = g_vCurrent[client][0];
@@ -1100,41 +1099,41 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 			float fAbsVelocity[3];
 			GetEntPropVector(client, Prop_Data, "m_vecAbsVelocity", fAbsVelocity);
 
-			if(SquareRoot(Pow(fAbsVelocity[0], 2.0) + Pow(fAbsVelocity[1], 2.0)) > 0.0)
+			if (SquareRoot(Pow(fAbsVelocity[0], 2.0) + Pow(fAbsVelocity[1], 2.0)) > 0.0)
 			{
 				float fTempAngle = angles[1];
 
 				float fAngles[3];
 				GetVectorAngles(fAbsVelocity, fAngles);
 
-				if(fTempAngle < 0.0)
+				if (fTempAngle < 0.0)
 				{
 					fTempAngle += 360.0;
 				}
 
 				float fDirectionAngle = (fTempAngle - fAngles[1]);
 
-				if(fDirectionAngle < 0.0)
+				if (fDirectionAngle < 0.0)
 				{
 					fDirectionAngle = -fDirectionAngle;
 				}
 
 				if (g_iCurrentStyle[client] != 2)
 				{
-					if(fDirectionAngle < 22.5 || fDirectionAngle > 337.5)
+					if (fDirectionAngle < 22.5 || fDirectionAngle > 337.5)
 					{
 						g_iTotalMeasures[client]++;
 
-						if((fAngle > 0.0 && vel[1] < 0.0) || (fAngle < 0.0 && vel[1] > 0.0))
+						if ((fAngle > 0.0 && vel[1] < 0.0) || (fAngle < 0.0 && vel[1] > 0.0))
 						{
 							g_iGoodGains[client]++;
 						}
 					}
-					else if((fDirectionAngle > 67.5 && fDirectionAngle < 112.5) || (fDirectionAngle > 247.5 && fDirectionAngle < 292.5))
+					else if ((fDirectionAngle > 67.5 && fDirectionAngle < 112.5) || (fDirectionAngle > 247.5 && fDirectionAngle < 292.5))
 					{
 						g_iTotalMeasures[client]++;
 
-						if(vel[0] != 0.0)
+						if (vel[0] != 0.0)
 						{
 							g_iGoodGains[client]++;
 						}
@@ -1168,7 +1167,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 
 		speed = GetSpeed(client);
 
-		//menu refreshing
+		// Menu Refreshing
 		CheckRun(client);
 
 		AutoBhopFunction(client, buttons);
@@ -1235,7 +1234,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	return Plugin_Continue;
 }
 
-//dhooks
+// DHooks
 public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 {
 
@@ -1253,7 +1252,6 @@ public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 		g_bFixingRamp[client] = false;
 		return MRES_Ignored;
 	}
-
 
 	// This one is currently mimicing something.
 	if (g_hBotMimicsRecord[client] != null)
@@ -1319,7 +1317,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if (client == 0 && !IsPlayerAlive(client) && !IsClientObserver(client))
 		return Plugin_Continue;
-	
+
 	int zoneid = g_iClientInZone[client][3];
 	if (zoneid < 0)
 		zoneid = 0;
@@ -1338,7 +1336,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 						g_bJumpedInZone[client] = true;
 						g_bResetOneJump[client] = true;
 						g_fJumpedInZoneTime[client] = GetGameTime();
-						//PrintToChat(client, "First Time: %f", g_fJumpedInZoneTime[client]);
+						// CPrintToChat(client, "First Time: %f", g_fJumpedInZoneTime[client]);
 						CreateTimer(1.0, ResetOneJump, client, TIMER_FLAG_NO_MAPCHANGE);
 					}
 					else
@@ -1346,12 +1344,12 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 						g_bResetOneJump[client] = false;
 						float time = GetGameTime();
 						float time2 = time - g_fJumpedInZoneTime[client];
-						//PrintToChat(client, "Second Time: %f", time);
-						//PrintToChat(client, "Second Time - First Time = %f", time2);
+						// CPrintToChat(client, "Second Time: %f", time);
+						// CPrintToChat(client, "Second Time - First Time = %f", time2);
 						g_bJumpedInZone[client] = false;
 						if (time2 <= 0.9)
 						{
-							PrintToChat(client, " %cSurftimer %c| %cYou may only jump once inside this zone", LIMEGREEN, WHITE, DARKRED, WHITE, YELLOW, WHITE);
+							CPrintToChat(client, "%t", "Hooks15", g_szChatPrefix);
 							Handle pack;
 							CreateDataTimer(0.05, DelayedVelocityCap, pack);
 							WritePackCell(pack, client);
@@ -1432,7 +1430,7 @@ public Action Hook_FootstepCheck(int clients[64], int &numClients, char sample[P
 				}
 			}
 			EmitSound(clients, numClients, sample, entity);
-			//return Plugin_Changed;
+			// return Plugin_Changed;
 
 			return Plugin_Stop;
 		}

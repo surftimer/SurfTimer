@@ -1,4 +1,4 @@
-//sm_pr command
+// sm_pr command
 public void db_viewPlayerPr(int client, char szSteamId[32], char szMapName[128])
 {
 	char szQuery[1024];
@@ -13,7 +13,7 @@ public void db_viewPlayerPr(int client, char szSteamId[32], char szMapName[128])
 	StringToUpper(szUpper);
 	StringToUpper(szUpper2);
 
-	if(StrEqual(szUpper, szUpper2)) // is the mapname the current map?
+	if (StrEqual(szUpper, szUpper2)) // is the mapname the current map?
 	{
 		WritePackString(pack, szMapName);
 		WritePackCell(pack, g_TotalStages);
@@ -54,7 +54,7 @@ public void SQL_ViewMapNamePrCallback(Handle owner, Handle hndl, const char[] er
 	else
 	{
 		CloseHandle(pack);
-		PrintToChat(client, " %cSurftimer %c| Map not found");
+		CPrintToChat(client, "%t", "SQLTwo1", g_szChatPrefix);
 	}
 }
 
@@ -92,7 +92,6 @@ public void SQL_ViewPlayerPrMapInfoCallback(Handle owner, Handle hndl, const cha
 		CloseHandle(pack);
 	}
 }
-
 
 public void SQL_ViewPlayerPrMaptimeCallback(Handle owner, Handle hndl, const char[] error, any pack)
 {
@@ -137,7 +136,7 @@ public void SQL_ViewPlayerPrMaptimeCallback(Handle owner, Handle hndl, const cha
 		time = -1.0;
 	}
 
-	//PrintToChat(client, "total: %i , runtimepro: %f", total, time);
+	// CPrintToChat(client, "total: %i , runtimepro: %f", total, time);
 
 	WritePackFloat(pack, time);
 	WritePackCell(pack, total);
@@ -267,9 +266,7 @@ public int PrMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 	}
 }
 
-//
 // VIP
-//
 
 // fluffys start vip & admins
 
@@ -413,7 +410,7 @@ public void SQL_checkCustomPlayerNameColourCallback(Handle owner, Handle hndl, c
 	}
 	else
 	{
-		PrintToChat(client, "You must set a custom title using sm_mytitle before you can set your name colour.");
+		CPrintToChat(client, "%t", "SQLTwo2", g_szChatPrefix);
 	}
 }
 
@@ -451,7 +448,7 @@ public void SQL_checkCustomPlayerTextColourCallback(Handle owner, Handle hndl, c
 	}
 	else
 	{
-		PrintToChat(client, "You must set a custom title using sm_mytitle before you can set your text colour.");
+		CPrintToChat(client, "%t", "SQLTwo3", g_szChatPrefix);
 	}
 }
 
@@ -509,7 +506,6 @@ public void db_updateCustomPlayerNameColour(int client, char[] szSteamID, char[]
 	WritePackCell(pack, client);
 	WritePackString(pack, szSteamID);
 
-
 	char szQuery[512];
 	Format(szQuery, 512, "UPDATE `ck_vipadmins` SET `namecolour` = '%s' WHERE `steamid` = '%s';", arg, szSteamID);
 	SQL_TQuery(g_hDb, SQL_updateCustomPlayerNameColourCallback, szQuery, pack, DBPrio_Low);
@@ -532,7 +528,6 @@ public void db_updateCustomPlayerTextColour(int client, char[] szSteamID, char[]
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackString(pack, szSteamID);
-
 
 	char szQuery[512];
 	Format(szQuery, 512, "UPDATE `ck_vipadmins` SET `textcolour` = '%s' WHERE `steamid` = '%s';", arg, szSteamID);
@@ -558,7 +553,7 @@ public void db_toggleCustomPlayerTitle(int client, char[] szSteamID)
 	WritePackString(pack, szSteamID);
 
 	char szQuery[512];
-	if(g_bDbCustomTitleInUse[client])
+	if (g_bDbCustomTitleInUse[client])
 	{
 		Format(szQuery, 512, "UPDATE `ck_vipadmins` SET `inuse` = '0' WHERE `steamid` = '%s';", szSteamID);
 	}
@@ -619,7 +614,7 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 		g_bdbHasCustomTitle[client] = true;
 		SQL_FetchString(hndl, 0, g_szCustomTitleColoured[client], sizeof(g_szCustomTitleColoured));
 
-		//fluffys temp fix for scoreboard
+		// fluffys temp fix for scoreboard
 		// int RankValue[SkillGroup];
 		// int index = GetSkillgroupIndex(g_pr_rank[client], g_pr_points[client]);
 		// GetArrayArray(g_hSkillGroups, index, RankValue[0]);
@@ -635,7 +630,7 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 			SQL_FetchString(hndl, 6, g_szCustomJoinMsg[client], sizeof(g_szCustomJoinMsg));
 		else
 			Format(g_szCustomJoinMsg[client], sizeof(g_szCustomJoinMsg), "none");
-		
+
 		// SQL_FetchString(hndl, 7, g_szCustomSounds[client][0], sizeof(g_szCustomSounds));
 		// SQL_FetchString(hndl, 8, g_szCustomSounds[client][1], sizeof(g_szCustomSounds));
 		// SQL_FetchString(hndl, 9, g_szCustomSounds[client][2], sizeof(g_szCustomSounds));
@@ -648,7 +643,7 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 		{
 			g_bDbCustomTitleInUse[client] = true;
 			g_iCustomColours[client][0] = SQL_FetchInt(hndl, 1);
-			//setNameColor(szName, g_szdbCustomNameColour[client], 64);
+			// setNameColor(szName, g_szdbCustomNameColour[client], 64);
 
 			g_iCustomColours[client][1] = SQL_FetchInt(hndl, 2);
 			g_bHasCustomTextColour[client] = true;
@@ -695,19 +690,19 @@ public void db_viewPlayerColours(int client, char szSteamId[32], int type)
 
 public void SQL_ViewPlayerColoursCallback(Handle owner, Handle hndl, const char[] error, any data)
 {
-  if (hndl == null)
-  {
-    LogError("[surftimer] SQL Error (SQL_ViewPlayerColoursCallback): %s", error);
-    return;
-  }
+	if (hndl == null)
+	{
+		LogError("[surftimer] SQL Error (SQL_ViewPlayerColoursCallback): %s", error);
+		return;
+	}
 
-  ResetPack(data);
-  int client = ReadPackCell(data);
-  int type = ReadPackCell(data); // 0 = name colour, 1 = text colour
-  CloseHandle(data);
+	ResetPack(data);
+	int client = ReadPackCell(data);
+	int type = ReadPackCell(data); // 0 = name colour, 1 = text colour
+	CloseHandle(data);
 
-  if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-  {
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	{
 		char szSteamId[32];
 		int colour[2];
 
@@ -719,7 +714,7 @@ public void SQL_ViewPlayerColoursCallback(Handle owner, Handle hndl, const char[
 		char szColour[32];
 		getColourName(client, szColour, 32, colour[type]);
 
-    // change title menu
+		// change title menu
 		char szTitle[1024];
 		char szType[32];
 		switch (type)
@@ -759,62 +754,62 @@ public void SQL_ViewPlayerColoursCallback(Handle owner, Handle hndl, const char[
 
 		changeColoursMenu.ExitButton = true;
 		changeColoursMenu.Display(client, MENU_TIME_FOREVER);
-  }
+	}
 }
 
 public int changeColoursMenuHandler(Handle menu, MenuAction action, int client, int item)
 {
-  if (action == MenuAction_Select)
-  {
-    char szType[32];
-    int type;
-    GetMenuItem(menu, item, szType, sizeof(szType));
-    if (StrEqual(szType, "name"))
-      type = 0;
-    else if (StrEqual(szType, "text"))
-      type = 1;
+	if (action == MenuAction_Select)
+	{
+		char szType[32];
+		int type;
+		GetMenuItem(menu, item, szType, sizeof(szType));
+		if (StrEqual(szType, "name"))
+			type = 0;
+		else if (StrEqual(szType, "text"))
+			type = 1;
 
-    switch (item)
-    {
-      case 0:db_updateColours(client, g_szSteamID[client], 0, type);
-      case 1:db_updateColours(client, g_szSteamID[client], 1, type);
-      case 2:db_updateColours(client, g_szSteamID[client], 2, type);
-      case 3:db_updateColours(client, g_szSteamID[client], 3, type);
-      case 4:db_updateColours(client, g_szSteamID[client], 4, type);
-      case 5:db_updateColours(client, g_szSteamID[client], 5, type);
-      case 6:db_updateColours(client, g_szSteamID[client], 6, type);
-      case 7:db_updateColours(client, g_szSteamID[client], 7, type);
-      case 8:db_updateColours(client, g_szSteamID[client], 8, type);
-      case 9:db_updateColours(client, g_szSteamID[client], 9, type);
-      case 10:db_updateColours(client, g_szSteamID[client], 10, type);
-      case 11:db_updateColours(client, g_szSteamID[client], 11, type);
-      case 12:db_updateColours(client, g_szSteamID[client], 12, type);
-      case 13:db_updateColours(client, g_szSteamID[client], 13, type);
-      case 14:db_updateColours(client, g_szSteamID[client], 14, type);
-      case 15:db_updateColours(client, g_szSteamID[client], 15, type);
-    }
-  }
-  else
-  if (action == MenuAction_Cancel)
-  {
-    CustomTitleMenu(client);
-  }
-  else if (action == MenuAction_End)
-  {
-    CloseHandle(menu);
-  }
+		switch (item)
+		{
+			case 0:db_updateColours(client, g_szSteamID[client], 0, type);
+			case 1:db_updateColours(client, g_szSteamID[client], 1, type);
+			case 2:db_updateColours(client, g_szSteamID[client], 2, type);
+			case 3:db_updateColours(client, g_szSteamID[client], 3, type);
+			case 4:db_updateColours(client, g_szSteamID[client], 4, type);
+			case 5:db_updateColours(client, g_szSteamID[client], 5, type);
+			case 6:db_updateColours(client, g_szSteamID[client], 6, type);
+			case 7:db_updateColours(client, g_szSteamID[client], 7, type);
+			case 8:db_updateColours(client, g_szSteamID[client], 8, type);
+			case 9:db_updateColours(client, g_szSteamID[client], 9, type);
+			case 10:db_updateColours(client, g_szSteamID[client], 10, type);
+			case 11:db_updateColours(client, g_szSteamID[client], 11, type);
+			case 12:db_updateColours(client, g_szSteamID[client], 12, type);
+			case 13:db_updateColours(client, g_szSteamID[client], 13, type);
+			case 14:db_updateColours(client, g_szSteamID[client], 14, type);
+			case 15:db_updateColours(client, g_szSteamID[client], 15, type);
+		}
+	}
+	else
+	if (action == MenuAction_Cancel)
+	{
+		CustomTitleMenu(client);
+	}
+	else if (action == MenuAction_End)
+	{
+		CloseHandle(menu);
+	}
 }
 
 public void db_updateColours(int client, char szSteamId[32], int newColour, int type)
 {
-  char szQuery[512];
-  switch (type)
+	char szQuery[512];
+	switch (type)
 	{
 		case 0: Format(szQuery, 512, "UPDATE ck_vipadmins SET namecolour = %i WHERE steamid = '%s';", newColour, szSteamId);
 		case 1: Format(szQuery, 512, "UPDATE ck_vipadmins SET textcolour = %i WHERE steamid = '%s';", newColour, szSteamId);
 	}
 
-  SQL_TQuery(g_hDb, SQL_UpdatePlayerColoursCallback, szQuery, client, DBPrio_Low);
+	SQL_TQuery(g_hDb, SQL_UpdatePlayerColoursCallback, szQuery, client, DBPrio_Low);
 }
 
 public void SQL_UpdatePlayerColoursCallback(Handle owner, Handle hndl, const char[] error, any client)
@@ -830,682 +825,6 @@ public void SQL_UpdatePlayerColoursCallback(Handle owner, Handle hndl, const cha
 }
 
 // fluffys end custom titles
-
-// Show Bans
-public void db_selectAllBans(int client)
-{
-	char szQuery[128];
-	Format(szQuery, 128, "SELECT name, created, length, RemoveType, bid FROM sb_bans ORDER BY created DESC;");
-	SQL_TQuery(g_hDb, SQL_selectAllBansCallback, szQuery, client, DBPrio_Low);
-}
-
-public void SQL_selectAllBansCallback(Handle owner, Handle hndl, const char[] error, any client)
-{
-	if (hndl == null)
-	{
-		LogError("[surftimer] SQL Error (SQL_selectAllBansCallback): %s ", error);
-	}
-
-	if (SQL_HasResultSet(hndl))
-	{
-		char szName[128], szRemoveType[3], szBanned[256], szBan[512], szBid[65];
-		int created, length, time, banned, bid;
-
-		Menu menu = CreateMenu(AllBansMenuHandler);
-		SetMenuTitle(menu, "Recent Bans");
-					
-		while (SQL_FetchRow(hndl))
-		{
-			SQL_FetchString(hndl, 0, szName, sizeof(szName));
-			created = SQL_FetchInt(hndl, 1);
-			length = SQL_FetchInt(hndl, 2);
-			SQL_FetchString(hndl, 3, szRemoveType, sizeof(szRemoveType));
-			bid = SQL_FetchInt(hndl, 4);
-
-			if (StrEqual("E", szRemoveType))
-				Format(szBan, sizeof(szBan), "[Expired]");
-			else if (StrEqual("U", szRemoveType))
-				Format(szBan, sizeof(szBan), "[Unbanned]");
-			else if (length > 0)
-				Format(szBan, sizeof(szBan), "[Temp]");
-			else if (length == 0)
-				Format(szBan, sizeof(szBan), "[Perm]");
-			
-			time = GetTime();
-			banned = time - created;
-			diffForHumans(banned, szBanned, sizeof(szBanned), 1);
-
-			IntToString(bid, szBid, sizeof(szBid));
-			Format(szBan, sizeof(szBan), "%s %s - %s", szBan, szName, szBanned);
-
-			AddMenuItem(menu, szBid, szBan);
-		}
-
-		SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
-		DisplayMenu(menu, client, MENU_TIME_FOREVER);
-	}
-}
-
-public int AllBansMenuHandler(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Select)
-	{
-		char szBid[65];
-		GetMenuItem(menu, param2, szBid, sizeof(szBid));
-		db_selectBan(param1, szBid);
-	}
-	else if (action == MenuAction_End)
-		CloseHandle(menu);
-}
-
-
-// Show Ban
-public void db_selectBan(int client, char szBid[65])
-{
-	int bid = StringToInt(szBid);
-	Handle pack = CreateDataPack();
-	WritePackCell(pack, client);
-	WritePackCell(pack, bid);
-
-	char szQuery[512];
-	Format(szQuery, 512, "SELECT a.bid, a.name, a.authid, a.created, a.ends, a.length, a.reason, a.aid, a.RemovedBy, a.RemoveType, a.RemovedOn, a.ureason, b.user AS banner, b.authid AS bannerSteamId, c.user AS unbanner, c.authid AS unbannerSteamId FROM sb_bans a INNER JOIN sb_admins b ON a.aid = b.aid INNER JOIN sb_admins c ON a.RemovedBy = c.aid WHERE bid = %i;", bid);
-	SQL_TQuery(g_hDb, SQL_selectBanCallback, szQuery, pack, DBPrio_Low);
-}
-
-public void SQL_selectBanCallback(Handle owner, Handle hndl, const char[] error, any pack)
-{
-	if (hndl == null)
-	{
-		LogError("[surftimer] SQL Error (SQL_selectBanCallback): %s", error);
-	}
-
-	ResetPack(pack);
-	int client = ReadPackCell(pack);
-	int bid = ReadPackCell(pack);
-	CloseHandle(pack);
-
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-	{
-		bid = SQL_FetchInt(hndl, 0);
-		char szName[128], szSteamId[32];
-		SQL_FetchString(hndl, 1, szName, sizeof(szName));
-		SQL_FetchString(hndl, 2, szSteamId, sizeof(szSteamId));
-		int created = SQL_FetchInt(hndl, 3);
-		int ends = SQL_FetchInt(hndl, 4);
-		int length = SQL_FetchInt(hndl, 5);
-		char szReason[1024], szRemoveType[3], szBanner[128], szBannerSteamid[128];
-		SQL_FetchString(hndl, 6, szReason, sizeof(szReason));
-		SQL_FetchString(hndl, 12, szBanner, sizeof(szBanner));
-		SQL_FetchString(hndl, 13, szBannerSteamid, sizeof(szBannerSteamid));
-
-		// if ban has been removed some how
-		if (!SQL_IsFieldNull(hndl, 9))
-		{
-			SQL_FetchString(hndl, 9, szRemoveType, sizeof(szRemoveType));
-			int removedOn = SQL_FetchInt(hndl, 10);
-			char szUnbanReason[1024], szUnbanner[128], szUnbannerSteamid[128];
-			SQL_FetchString(hndl, 11, szUnbanReason, sizeof(szUnbanReason));
-			SQL_FetchString(hndl, 14, szUnbanner, sizeof(szUnbanner));
-			SQL_FetchString(hndl, 15, szUnbannerSteamid, sizeof(szUnbannerSteamid));
-
-			char szTitle[128], szBanType[512], szStatus[128], szPlayer[256], szSteamID[256], szBanned[512], szDate[256], szAdmin[512], szBanReason[1024], szExpires[512], szExpireDate[256], szBanLength[128], szLength[256], szUnbanDate[256];
-			Format(szTitle, sizeof(szTitle), "[Ban ID: #%i]", bid);
-
-			// Ban Type
-			if (length > 0)
-			{
-				Format(szBanType, sizeof(szBanType), "Ban Type: Temporary Ban\n");
-				// Expire Date / Unban Date
-				FormatTime(szExpires, sizeof(szExpires), "%d %h %Y %I:%M %p", ends);
-				// Ban Length
-				totalTimeForHumans(length, szBanLength, sizeof(szBanLength));
-				Format(szLength, sizeof(szLength), "Length: %s", szBanLength);
-			}
-			else if (length == 0)
-			{
-				Format(szBanType, sizeof(szBanType), "Ban Type: Permanent Ban\n");
-				// Expire Date
-				Format(szExpires, sizeof(szExpires), "Never", szExpires);
-				// Ban Length
-				Format(szLength, sizeof(szLength), "Length: Permanent", szBanLength);
-			}
-
-			// Ban Status
-			if (StrEqual(szRemoveType, "E"))
-			{
-				Format(szStatus, sizeof(szStatus), "Status: Expired");
-				// Expire Date
-				Format(szExpireDate, sizeof(szExpireDate), "Expire Date: %s", szExpires);
-			}
-			else if (StrEqual(szRemoveType, "U"))
-			{
-				Format(szStatus, sizeof(szStatus), "Status: Unbanned");
-				// Unban Date
-				FormatTime(szUnbanDate, sizeof(szUnbanDate), "%d %h %Y %I:%M %p", removedOn);
-				Format(szExpireDate, sizeof(szExpireDate), "Unbanned Date: %s", szUnbanDate);
-			}
-
-			// Banned Player
-			Format(szPlayer, sizeof(szPlayer), "Banned Player: %s", szName);
-			Format(szSteamID, sizeof(szSteamID), "SteamID: %s", szSteamId);
-
-			// Banned Date
-			FormatTime(szBanned, sizeof(szBanned), "%d %h %Y %I:%M %p", created);
-			Format(szDate, sizeof(szDate), "Banned Date: %s", szBanned);
-
-			// Banned by admin
-			Format(szAdmin, sizeof(szAdmin), "Banned By: %s (%s)", szBanner, szBannerSteamid);
-
-			// Banned Reason
-			Format(szBanReason, sizeof(szBanReason), "Reason: %s", szReason);
-
-			Handle panel = CreatePanel();
-			SetPanelTitle(panel, szTitle);
-			DrawPanelText(panel, " ");
-			DrawPanelText(panel, szBanType);
-			DrawPanelText(panel, szStatus);
-			DrawPanelText(panel, " ");
-			DrawPanelText(panel, szPlayer);
-			DrawPanelText(panel, szSteamID);
-			DrawPanelText(panel, " ");
-			DrawPanelText(panel, szDate);
-			DrawPanelText(panel, szAdmin);
-			DrawPanelText(panel, szLength);
-			DrawPanelText(panel, " ");
-			DrawPanelText(panel, szBanReason);
-			DrawPanelText(panel, " ");
-			if (StrEqual(szRemoveType, "U"))
-			{
-				char szUnbanText[256], szUnbanReasonText[2048];
-				Format(szUnbanText, sizeof(szUnbanText), "Unbanned By: %s (%s)", szUnbanner, szUnbannerSteamid);
-				Format(szUnbanReasonText, sizeof(szUnbanReasonText), "Unban Reason: %s", szUnbanReason);
-				DrawPanelText(panel, szUnbanText);
-				DrawPanelText(panel, szExpireDate);
-				DrawPanelText(panel, szUnbanReasonText);
-			}
-			else
-				DrawPanelText(panel, szExpireDate);
-			DrawPanelText(panel, " ");
-			DrawPanelItem(panel, "Back");
-			DrawPanelItem(panel, "Exit");
-			SendPanelToClient(panel, client, BanPanelHandler, 10000);
-			CloseHandle(panel);
-		}
-	}
-	else
-	{
-		char szQuery[512];
-		Format(szQuery, 512, "SELECT a.bid, a.name, a.authid, a.created, a.ends, a.length, a.reason, a.aid, b.user, b.authid FROM sb_bans a INNER JOIN sb_admins b ON a.aid = b.aid WHERE bid = %i;", bid);
-		SQL_TQuery(g_hDb, SQL_selectBanCallback2, szQuery, client, DBPrio_Low);
-	}
-}
-
-public void SQL_selectBanCallback2(Handle owner, Handle hndl, const char[] error, any client)
-{
-	if (hndl == null)
-	{
-		LogError("[surftimer] SQL Error (SQL_selectBanCallback2): %s", error);
-	}
-
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-	{
-		int bid = SQL_FetchInt(hndl, 0);
-		char szName[128], szSteamId[32];
-		SQL_FetchString(hndl, 1, szName, sizeof(szName));
-		SQL_FetchString(hndl, 2, szSteamId, sizeof(szSteamId));
-		int created = SQL_FetchInt(hndl, 3);
-		int ends = SQL_FetchInt(hndl, 4);
-		int length = SQL_FetchInt(hndl, 5);
-		char szReason[1024], szBanner[128], szBannerSteamid[128];
-		//char szRemoveType[3];
-		SQL_FetchString(hndl, 6, szReason, sizeof(szReason));
-		SQL_FetchString(hndl, 8, szBanner, sizeof(szBanner));
-		SQL_FetchString(hndl, 9, szBannerSteamid, sizeof(szBannerSteamid));
-
-		char szTitle[128], szBanType[512], szStatus[128], szPlayer[256], szSteamID[256], szBanned[512], szDate[256], szAdmin[512], szBanReason[1024], szExpires[512], szExpireDate[256], szBanLength[128], szLength[256];
-		Format(szTitle, sizeof(szTitle), "[Ban ID: #%i]", bid);
-
-		// Ban Type
-		if (length > 0)
-		{
-			Format(szBanType, sizeof(szBanType), "Ban Type: Temporary Ban\n");
-			// Expire Date / Unban Date
-			FormatTime(szExpires, sizeof(szExpires), "%d %h %Y %I:%M %p", ends);
-			// Ban Length
-			totalTimeForHumans(length, szBanLength, sizeof(szBanLength));
-			Format(szLength, sizeof(szLength), "Length: %s", szBanLength);
-		}
-		else if (length == 0)
-		{
-			Format(szBanType, sizeof(szBanType), "Ban Type: Permanent Ban\n");
-			// Expire Date
-			Format(szExpires, sizeof(szExpires), "Never", szExpires);
-			// Ban Length
-			Format(szLength, sizeof(szLength), "Length: Permanent", szBanLength);
-		}
-
-		// Banned Player
-		Format(szPlayer, sizeof(szPlayer), "Banned Player: %s", szName);
-		Format(szSteamID, sizeof(szSteamID), "SteamID: %s", szSteamId);
-
-		// Banned Date
-		FormatTime(szBanned, sizeof(szBanned), "%d %h %Y %I:%M %p", created);
-		Format(szDate, sizeof(szDate), "Banned Date: %s", szBanned);
-
-		// Banned by admin
-		Format(szAdmin, sizeof(szAdmin), "Banned By: %s (%s)", szBanner, szBannerSteamid);
-
-		// Banned Reason
-		Format(szBanReason, sizeof(szBanReason), "Reason: %s", szReason);
-		
-		// Expire Date
-		Format(szExpireDate, sizeof(szExpireDate), "Expire Date: %s", szExpires);
-
-		Handle panel = CreatePanel();
-		SetPanelTitle(panel, szTitle);
-		DrawPanelText(panel, " ");
-		DrawPanelText(panel, szBanType);
-		DrawPanelText(panel, szStatus);
-		DrawPanelText(panel, " ");
-		DrawPanelText(panel, szPlayer);
-		DrawPanelText(panel, szSteamID);
-		DrawPanelText(panel, " ");
-		DrawPanelText(panel, szDate);
-		DrawPanelText(panel, szAdmin);
-		DrawPanelText(panel, szLength);
-		DrawPanelText(panel, " ");
-		DrawPanelText(panel, szBanReason);
-		DrawPanelText(panel, " ");
-		DrawPanelText(panel, szExpireDate);
-		DrawPanelText(panel, " ");
-		DrawPanelItem(panel, "Back");
-		DrawPanelItem(panel, "Exit");
-		SendPanelToClient(panel, client, BanPanelHandler, 10000);
-		CloseHandle(panel);
-	}
-}
-
-public int BanPanelHandler(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Select)
-	{
-		if (param2 == 1)
-			db_selectAllBans(param1);
-	}
-	else if (action == MenuAction_End)
-		CloseHandle(menu);
-}
-
-// Show Bans
-public void db_selectAllComms(int client)
-{
-	char szQuery[128];
-	Format(szQuery, 128, "SELECT name, created, length, RemoveType, bid, type FROM sb_comms ORDER BY created DESC;");
-	SQL_TQuery(g_hDb, SQL_selectAllCommsCallback, szQuery, client, DBPrio_Low);
-}
-
-public void SQL_selectAllCommsCallback(Handle owner, Handle hndl, const char[] error, any client)
-{
-	if (hndl == null)
-	{
-		LogError("[surftimer] SQL Error (SQL_selectAllCommsCallback): %s ", error);
-	}
-
-	if (SQL_HasResultSet(hndl))
-	{
-		char szName[128], szRemoveType[3], szBanned[256], szBan[512], szBid[65];
-		int created, length, time, banned, bid, type;
-
-		Menu menu = CreateMenu(AllCommsMenuHandler);
-		SetMenuTitle(menu, "Recent Mutes/Gags");
-					
-		while (SQL_FetchRow(hndl))
-		{
-			SQL_FetchString(hndl, 0, szName, sizeof(szName));
-			created = SQL_FetchInt(hndl, 1);
-			length = SQL_FetchInt(hndl, 2);
-			SQL_FetchString(hndl, 3, szRemoveType, sizeof(szRemoveType));
-			bid = SQL_FetchInt(hndl, 4);
-			type = SQL_FetchInt(hndl, 5);
-
-			if (StrEqual("E", szRemoveType))
-				Format(szBan, sizeof(szBan), "[Expired]");
-			else if (StrEqual("U", szRemoveType) && type == 1)
-				Format(szBan, sizeof(szBan), "[Unmuted]");
-			else if (StrEqual("U", szRemoveType) && type == 2)
-				Format(szBan, sizeof(szBan), "[Ungagged]");
-			else if (length > 0 && type == 1)
-				Format(szBan, sizeof(szBan), "[Temp Mute]"); 
-			else if (length > 0 && type == 2)
-				Format(szBan, sizeof(szBan), "[Temp Gag]");
-			else if (length == 0 && type == 1)
-				Format(szBan, sizeof(szBan), "[Perm Mute]");
-			else if (length == 0 && type == 2)
-				Format(szBan, sizeof(szBan), "[Perm Gag]");
-			
-			time = GetTime();
-			banned = time - created;
-			diffForHumans(banned, szBanned, sizeof(szBanned), 1);
-
-			IntToString(bid, szBid, sizeof(szBid));
-			Format(szBan, sizeof(szBan), "%s %s - %s", szBan, szName, szBanned);
-
-			AddMenuItem(menu, szBid, szBan);
-		}
-
-		SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
-		DisplayMenu(menu, client, MENU_TIME_FOREVER);
-	}
-}
-
-public int AllCommsMenuHandler(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Select)
-	{
-		char szBid[65];
-		GetMenuItem(menu, param2, szBid, sizeof(szBid));
-		db_selectComm(param1, szBid);
-	}
-	else if (action == MenuAction_End)
-		CloseHandle(menu);
-}
-
-
-// Show Mute / Gag
-public void db_selectComm(int client, char szBid[65])
-{
-	int bid = StringToInt(szBid);
-	Handle pack = CreateDataPack();
-	WritePackCell(pack, client);
-	WritePackCell(pack, bid);
-
-	char szQuery[512];
-	Format(szQuery, 512, "SELECT a.bid, a.name, a.authid, a.created, a.ends, a.length, a.reason, a.aid, a.RemovedBy, a.RemoveType, a.RemovedOn, a.ureason, b.user AS banner, b.authid AS bannerSteamId, c.user AS unbanner, c.authid AS unbannerSteamId, a.type FROM sb_comms a INNER JOIN sb_admins b ON a.aid = b.aid INNER JOIN sb_admins c ON a.RemovedBy = c.aid WHERE bid = %i;", bid);
-	SQL_TQuery(g_hDb, SQL_selectCommCallback, szQuery, pack, DBPrio_Low);
-}
-
-public void SQL_selectCommCallback(Handle owner, Handle hndl, const char[] error, any pack)
-{
-	if (hndl == null)
-	{
-		LogError("[surftimer] SQL Error (SQL_selectCommCallback): %s", error);
-	}
-
-	ResetPack(pack);
-	int client = ReadPackCell(pack);
-	int bid = ReadPackCell(pack);
-	CloseHandle(pack);
-
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-	{
-		bid = SQL_FetchInt(hndl, 0);
-		char szName[128], szSteamId[32];
-		SQL_FetchString(hndl, 1, szName, sizeof(szName));
-		SQL_FetchString(hndl, 2, szSteamId, sizeof(szSteamId));
-		int created = SQL_FetchInt(hndl, 3);
-		int ends = SQL_FetchInt(hndl, 4);
-		int length = SQL_FetchInt(hndl, 5);
-		char szReason[1024], szRemoveType[3], szBanner[128], szBannerSteamid[128];
-		SQL_FetchString(hndl, 6, szReason, sizeof(szReason));
-		SQL_FetchString(hndl, 12, szBanner, sizeof(szBanner));
-		SQL_FetchString(hndl, 13, szBannerSteamid, sizeof(szBannerSteamid));
-		int type = SQL_FetchInt(hndl, 16);
-
-		// if ban has been removed some how
-		if (!SQL_IsFieldNull(hndl, 9))
-		{
-			SQL_FetchString(hndl, 9, szRemoveType, sizeof(szRemoveType));
-			int removedOn = SQL_FetchInt(hndl, 10);
-			char szUnbanReason[1024], szUnbanner[128], szUnbannerSteamid[128];
-			SQL_FetchString(hndl, 11, szUnbanReason, sizeof(szUnbanReason));
-			SQL_FetchString(hndl, 14, szUnbanner, sizeof(szUnbanner));
-			SQL_FetchString(hndl, 15, szUnbannerSteamid, sizeof(szUnbannerSteamid));
-
-			char szTitle[128], szBanType[512], szStatus[128], szPlayer[256], szSteamID[256], szBanned[512], szDate[256], szAdmin[512], szBanReason[1024], szExpires[512], szExpireDate[256], szBanLength[128], szLength[256], szUnbanDate[256];
-			Format(szTitle, sizeof(szTitle), "[Comm ID: #%i]", bid);
-
-			// Ban Type
-			if (length > 0)
-			{
-				if (type == 1)
-					Format(szBanType, sizeof(szBanType), "Type: Temporary Mute");
-				else
-					Format(szBanType, sizeof(szBanType), "Type: Temporary Gag");
-
-				// Expire Date / Unban Date
-				FormatTime(szExpires, sizeof(szExpires), "%d %h %Y %I:%M %p", ends);
-				// Ban Length
-				totalTimeForHumans(length, szBanLength, sizeof(szBanLength));
-				Format(szLength, sizeof(szLength), "Length: %s", szBanLength);
-			}
-			else if (length == 0)
-			{
-				if (type == 1)
-					Format(szBanType, sizeof(szBanType), "Type: Permanent Mute\n");
-				else
-					Format(szBanType, sizeof(szBanType), "Type: Permanent Gag\n");
-
-				// Expire Date
-				Format(szExpires, sizeof(szExpires), "Never", szExpires);
-				// Ban Length
-				Format(szLength, sizeof(szLength), "Length: Permanent", szBanLength);
-			}
-
-			// Ban Status
-			if (StrEqual(szRemoveType, "E"))
-			{
-				Format(szStatus, sizeof(szStatus), "Status: Expired");
-				// Expire Date
-				Format(szExpireDate, sizeof(szExpireDate), "Expire Date: %s", szExpires);
-			}
-			else if (StrEqual(szRemoveType, "U"))
-			{
-				// Unban Date
-				FormatTime(szUnbanDate, sizeof(szUnbanDate), "%d %h %Y %I:%M %p", removedOn);
-
-				if (type == 1)
-				{
-					Format(szExpireDate, sizeof(szExpireDate), "Unmuted Date: %s", szUnbanDate);
-					Format(szStatus, sizeof(szStatus), "Status: Unmuted");
-				}
-				else if (type == 2)
-				{
-					Format(szExpireDate, sizeof(szExpireDate), "Ungagged Date: %s", szUnbanDate);
-					Format(szStatus, sizeof(szStatus), "Status: Ungagged");
-				}
-			}
-
-			if (type == 1)
-			{
-				// Banned Player
-				Format(szPlayer, sizeof(szPlayer), "Muted Player: %s", szName);
-				Format(szSteamID, sizeof(szSteamID), "SteamID: %s", szSteamId);
-
-				// Banned Date
-				FormatTime(szBanned, sizeof(szBanned), "%d %h %Y %I:%M %p", created);
-				Format(szDate, sizeof(szDate), "Muted Date: %s", szBanned);
-
-				// Banned by admin
-				Format(szAdmin, sizeof(szAdmin), "Muted By: %s (%s)", szBanner, szBannerSteamid);
-			}
-			else if (type == 2)
-			{
-				// Banned Player
-				Format(szPlayer, sizeof(szPlayer), "Gagged Player: %s", szName);
-				Format(szSteamID, sizeof(szSteamID), "SteamID: %s", szSteamId);
-
-				// Banned Date
-				FormatTime(szBanned, sizeof(szBanned), "%d %h %Y %I:%M %p", created);
-				Format(szDate, sizeof(szDate), "Gagged Date: %s", szBanned);
-
-				// Banned by admin
-				Format(szAdmin, sizeof(szAdmin), "Gagged By: %s (%s)", szBanner, szBannerSteamid);
-			}
-
-			// Banned Reason
-			Format(szBanReason, sizeof(szBanReason), "Reason: %s", szReason);
-
-			Handle panel = CreatePanel();
-			SetPanelTitle(panel, szTitle);
-			DrawPanelText(panel, " ");
-			DrawPanelText(panel, szBanType);
-			DrawPanelText(panel, szStatus);
-			DrawPanelText(panel, " ");
-			DrawPanelText(panel, szPlayer);
-			DrawPanelText(panel, szSteamID);
-			DrawPanelText(panel, " ");
-			DrawPanelText(panel, szDate);
-			DrawPanelText(panel, szAdmin);
-			DrawPanelText(panel, szLength);
-			DrawPanelText(panel, " ");
-			DrawPanelText(panel, szBanReason);
-			DrawPanelText(panel, " ");
-			if (StrEqual(szRemoveType, "U"))
-			{
-				char szUnbanText[256], szUnbanReasonText[2048];
-				if (type == 1)
-				{
-					Format(szUnbanText, sizeof(szUnbanText), "Unmuted By: %s (%s)", szUnbanner, szUnbannerSteamid);
-					Format(szUnbanReasonText, sizeof(szUnbanReasonText), "Unmute Reason: %s", szUnbanReason);
-				}
-				else if (type == 2)
-				{
-					Format(szUnbanText, sizeof(szUnbanText), "Ungagged By: %s (%s)", szUnbanner, szUnbannerSteamid);
-					Format(szUnbanReasonText, sizeof(szUnbanReasonText), "Ungag Reason: %s", szUnbanReason);
-				}
-				DrawPanelText(panel, szUnbanText);
-				DrawPanelText(panel, szExpireDate);
-				DrawPanelText(panel, szUnbanReasonText);
-			}
-			else
-				DrawPanelText(panel, szExpireDate);
-			DrawPanelText(panel, " ");
-			DrawPanelItem(panel, "Back");
-			DrawPanelItem(panel, "Exit");
-			SendPanelToClient(panel, client, CommsPanelHandler, 10000);
-			CloseHandle(panel);
-		}
-	}
-	else
-	{
-		char szQuery[512];
-		Format(szQuery, 512, "SELECT a.bid, a.name, a.authid, a.created, a.ends, a.length, a.reason, a.aid, b.user, b.authid, a.type FROM sb_comms a INNER JOIN sb_admins b ON a.aid = b.aid WHERE bid = %i;", bid);
-		SQL_TQuery(g_hDb, SQL_selectCommCallback2, szQuery, client, DBPrio_Low);
-	}
-}
-
-public void SQL_selectCommCallback2(Handle owner, Handle hndl, const char[] error, any client)
-{
-	if (hndl == null)
-	{
-		LogError("[surftimer] SQL Error (SQL_selectCommCallback2): %s", error);
-	}
-
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-	{
-		int bid = SQL_FetchInt(hndl, 0);
-		char szName[128], szSteamId[32];
-		SQL_FetchString(hndl, 1, szName, sizeof(szName));
-		SQL_FetchString(hndl, 2, szSteamId, sizeof(szSteamId));
-		int created = SQL_FetchInt(hndl, 3);
-		int ends = SQL_FetchInt(hndl, 4);
-		int length = SQL_FetchInt(hndl, 5);
-		char szReason[1024], szBanner[128], szBannerSteamid[128];
-		//char szRemoveType[3];
-		SQL_FetchString(hndl, 6, szReason, sizeof(szReason));
-		SQL_FetchString(hndl, 8, szBanner, sizeof(szBanner));
-		SQL_FetchString(hndl, 9, szBannerSteamid, sizeof(szBannerSteamid));
-		int type = SQL_FetchInt(hndl, 10);
-
-		char szTitle[128], szBanType[512], szStatus[128], szPlayer[256], szSteamID[256], szBanned[512], szDate[256], szAdmin[512], szBanReason[1024], szExpires[512], szExpireDate[256], szBanLength[128], szLength[256];
-		Format(szTitle, sizeof(szTitle), "[Comm ID: #%i]", bid);
-
-		// Ban Type
-		if (length > 0)
-		{
-			if (type == 1)
-				Format(szBanType, sizeof(szBanType), "Mute Type: Temporary Mute\n");
-			else if (type == 2)
-				Format(szBanType, sizeof(szBanType), "Gag Type: Temporary Gag\n");
-
-			// Expire Date / Unban Date
-			FormatTime(szExpires, sizeof(szExpires), "%d %h %Y %I:%M %p", ends);
-			// Ban Length
-			totalTimeForHumans(length, szBanLength, sizeof(szBanLength));
-			Format(szLength, sizeof(szLength), "Length: %s", szBanLength);
-		}
-		else if (length == 0)
-		{
-			if (type == 1)
-				Format(szBanType, sizeof(szBanType), "Mute Type: Permanent Mute\n");
-			else if (type == 2)
-				Format(szBanType, sizeof(szBanType), "Gag Type: Permanent Gag\n");
-
-			// Expire Date
-			Format(szExpires, sizeof(szExpires), "Never", szExpires);
-			// Ban Length
-			Format(szLength, sizeof(szLength), "Length: Permanent", szBanLength);
-		}
-
-		// Banned Date
-		FormatTime(szBanned, sizeof(szBanned), "%d %h %Y %I:%M %p", created);
-
-		// Banned Player
-		if (type == 1)
-		{
-			Format(szPlayer, sizeof(szPlayer), "Muted Player: %s", szName);
-			Format(szDate, sizeof(szDate), "Muted Date: %s", szBanned);
-			Format(szAdmin, sizeof(szAdmin), "Muted By: %s (%s)", szBanner, szBannerSteamid);
-		}
-		else if (type == 2)
-		{
-			Format(szPlayer, sizeof(szPlayer), "Gagged Player: %s", szName);
-			Format(szDate, sizeof(szDate), "Gagged Date: %s", szBanned);
-			Format(szAdmin, sizeof(szAdmin), "Gagged By: %s (%s)", szBanner, szBannerSteamid);
-		}
-
-		Format(szSteamID, sizeof(szSteamID), "SteamID: %s", szSteamId);
-
-		// Banned Reason
-		Format(szBanReason, sizeof(szBanReason), "Reason: %s", szReason);
-		
-		// Expire Date
-		Format(szExpireDate, sizeof(szExpireDate), "Expire Date: %s", szExpires);
-
-		Handle panel = CreatePanel();
-		SetPanelTitle(panel, szTitle);
-		DrawPanelText(panel, " ");
-		DrawPanelText(panel, szBanType);
-		DrawPanelText(panel, szStatus);
-		DrawPanelText(panel, " ");
-		DrawPanelText(panel, szPlayer);
-		DrawPanelText(panel, szSteamID);
-		DrawPanelText(panel, " ");
-		DrawPanelText(panel, szDate);
-		DrawPanelText(panel, szAdmin);
-		DrawPanelText(panel, szLength);
-		DrawPanelText(panel, " ");
-		DrawPanelText(panel, szBanReason);
-		DrawPanelText(panel, " ");
-		DrawPanelText(panel, szExpireDate);
-		DrawPanelText(panel, " ");
-		DrawPanelItem(panel, "Back");
-		DrawPanelItem(panel, "Exit");
-		SendPanelToClient(panel, client, CommsPanelHandler, 10000);
-		CloseHandle(panel);
-	}
-}
-
-public int CommsPanelHandler(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Select)
-	{
-		if (param2 == 1)
-			db_selectAllComms(param1);
-	}
-	else if (action == MenuAction_End)
-		CloseHandle(menu);
-}
 
 // WR Announcements
 public void db_selectAnnouncements()
@@ -1586,9 +905,9 @@ public void SQL_CheckAnnouncementsCallback(Handle owner, Handle hndl, const char
 			{
 				// Send Server Announcement
 				g_iLastID = id;
-				CPrintToChatAll("{darkred}-----------------------ANNOUNCEMENT-----------------------");
-				CPrintToChatAll("{lime}Surftimer {default}| {yellow}%s {default}has beaten the {yellow}%s {default}map record in the {lime}%s {default}server with a time of {lime}%s", szName, szMapName, szServerName, szTime);
-				CPrintToChatAll("{darkred}-----------------------------------------------------------------");
+				CPrintToChatAll("%t", "SQLTwo4.1");
+				CPrintToChatAll("%t", "SQLTwo4.2", g_szChatPrefix, szName, szMapName, szServerName, szTime);
+				CPrintToChatAll("%t", "SQLTwo4.3");
 			}
 		}
 	}
@@ -1629,7 +948,7 @@ public void SQL_SelectMapCycleCallback(Handle owner, Handle hndl, const char[] e
 				tier = 1;
 
 			g_pr_MapCount[tier]++;
-			PushArrayString(g_MapList, szMapname);	
+			PushArrayString(g_MapList, szMapname);
 		}
 	}
 }
@@ -1651,9 +970,9 @@ public void SQL_SetJoinMsgCallback(Handle owner, Handle hndl, const char[] error
 	}
 
 	if (StrEqual(g_szCustomJoinMsg[client], "none"))
-		PrintToChat(client, " %cSurftimer %c| Your join msg has been disabled", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "SQLTwo5", g_szChatPrefix);
 	else
-		CPrintToChat(client, " %cSurftimer %c| Your join msg has been set to %s", LIMEGREEN, WHITE, g_szCustomJoinMsg[client]);
+		CPrintToChat(client, "%t", "SQLTwo6", g_szChatPrefix, g_szCustomJoinMsg[client]);
 }
 
 // public void db_precacheCustomSounds()
@@ -1707,7 +1026,7 @@ public void db_selectCPR(int client, int rank, const char szMapName[128], const 
 	WritePackCell(pack, client);
 	WritePackCell(pack, rank);
 	WritePackString(pack, szSteamId);
-	
+
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `steamid` = '%s' AND `mapname` LIKE '%c%s%c' AND style = 0", g_szSteamID[client], PERCENT, szMapName, PERCENT);
 	SQL_TQuery(g_hDb, SQL_SelectCPRTimeCallback, szQuery, pack, DBPrio_Low);
@@ -1732,16 +1051,15 @@ public void SQL_SelectCPRTimeCallback(Handle owner, Handle hndl, const char[] er
 
 		char szQuery[512];
 		Format(szQuery, sizeof(szQuery), "SELECT cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20, cp21, cp22, cp23, cp24, cp25, cp26, cp27, cp28, cp29, cp30, cp31, cp32, cp33, cp34, cp35 FROM ck_checkpoints WHERE steamid = '%s' AND mapname LIKE '%c%s%c' AND zonegroup = 0;", g_szSteamID[client], PERCENT, g_szCPRMapName[client], PERCENT);
-		PrintToChat(client, "%s", g_szCPRMapName[client]);
+		CPrintToChat(client, "%s", g_szCPRMapName[client]);
 		SQL_TQuery(g_hDb, SQL_SelectCPRCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
 	{
-		PrintToChat(client, " %cSurftimer %c| No result found", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "SQLTwo7", g_szChatPrefix);
 		CloseHandle(pack);
 	}
 }
-
 
 public void SQL_SelectCPRCallback(Handle owner, Handle hndl, const char[] error, any pack)
 {
@@ -1767,7 +1085,7 @@ public void SQL_SelectCPRCallback(Handle owner, Handle hndl, const char[] error,
 	{
 		ResetPack(pack);
 		int client = ReadPackCell(pack);
-		PrintToChat(client, "2", LIMEGREEN, WHITE);
+		CPrintToChat(client, "2", LIMEGREEN, WHITE);
 	}
 }
 
@@ -1803,7 +1121,7 @@ public void SQL_SelectCPRTargetCallback(Handle owner, Handle hndl, const char[] 
 	{
 		ResetPack(pack);
 		int client = ReadPackCell(pack);
-		
+
 		char szSteamId[32];
 		SQL_FetchString(hndl, 0, szSteamId, sizeof(szSteamId));
 		SQL_FetchString(hndl, 1, g_szTargetCPR[client], sizeof(g_szTargetCPR));
@@ -1814,7 +1132,7 @@ public void SQL_SelectCPRTargetCallback(Handle owner, Handle hndl, const char[] 
 	{
 		ResetPack(pack);
 		int client = ReadPackCell(pack);
-		PrintToChat(client, "3", LIMEGREEN, WHITE);
+		CPrintToChat(client, "3", LIMEGREEN, WHITE);
 	}
 }
 
@@ -1822,7 +1140,7 @@ public void db_selectCPRTargetCPs(const char[] szSteamId, any pack)
 {
 	ResetPack(pack);
 	int client = ReadPackCell(pack);
-	
+
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), "SELECT cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20, cp21, cp22, cp23, cp24, cp25, cp26, cp27, cp28, cp29, cp30, cp31, cp32, cp33, cp34, cp35 FROM ck_checkpoints WHERE steamid = '%s' AND mapname LIKE '%c%s%c' AND zonegroup = 0;", szSteamId, PERCENT, g_szCPRMapName[client], PERCENT);
 	SQL_TQuery(g_hDb, SQL_SelectCPRTargetCPsCallback, szQuery, pack, DBPrio_Low);
@@ -1864,7 +1182,7 @@ public void SQL_SelectCPRTargetCPsCallback(Handle owner, Handle hndl, const char
 			Format(szItem, sizeof(szItem), "CP %i: %s (%s)", i, szCPR, szCompared);
 			AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
 		}
-		
+
 		char szTime[32], szCompared2[32];
 		float compared = g_fClientCPs[client][0] - g_fTargetTime[client];
 		FormatTimeFloat(client, g_fClientCPs[client][0], 3, szTime, sizeof(szTime));
@@ -1878,7 +1196,7 @@ public void SQL_SelectCPRTargetCPsCallback(Handle owner, Handle hndl, const char
 	{
 		ResetPack(pack);
 		int client = ReadPackCell(pack);
-		PrintToChat(client, "4", LIMEGREEN, WHITE);
+		CPrintToChat(client, "4", LIMEGREEN, WHITE);
 	}
 	CloseHandle(pack);
 }
@@ -1887,4 +1205,21 @@ public int CPRMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_End)
 		CloseHandle(menu);
+}
+
+public void db_updateMapRankedStatus()
+{
+	char szQuery[256];
+	if (g_bRankedMap)
+	{
+		Format(szQuery, sizeof(szQuery), "UPDATE ck_maptier SET ranked = 0 WHERE mapname = '%s';", g_szMapName);
+		g_bRankedMap = false;
+	}
+	else
+	{
+		Format(szQuery, sizeof(szQuery), "UPDATE ck_maptier SET ranked = 1 WHERE mapname = '%s';", g_szMapName);
+		g_bRankedMap = true;
+	}
+
+	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
 }

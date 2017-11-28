@@ -5,20 +5,20 @@ public void Admin_renameZone(int client, const char[] name)
 		g_ClientRenamingZone[client] = false;
 		return;
 	}
-	//avoid unnecessary calls by checking the first cell first. If it's 0 -> \0 then negating it will make the if check pass -> return
+	// avoid unnecessary calls by checking the first cell first. If it's 0 -> \0 then negating it will make the if check pass -> return
 	if (!name[0] || StrEqual(name, " ") || StrEqual(name, ""))
 	{
-		PrintToChat(client, " %cSurftimer %c| Please give the zone a valid name.", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin1", g_szChatPrefix);
 		return;
 	}
 	if (strlen(name) > 128)
 	{
-		PrintToChat(client, " %cSurftimer %c| Zone name too long. Maximum is 128 characters.", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin2", g_szChatPrefix);
 		return;
 	}
-	if (StrEqual(name, "!cancel", false)) //false -> non sensitive
+	if (StrEqual(name, "!cancel", false)) // false -> non sensitive
 	{
-		PrintToChat(client, " %cSurftimer %c| Cancelled bonus renaming.", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin3", g_szChatPrefix);
 		g_ClientRenamingZone[client] = false;
 		ListBonusSettings(client);
 		return;
@@ -55,15 +55,15 @@ public Action Admin_insertMapTier(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	if (!(GetUserFlagBits(client) & g_ZonerFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT) && !g_bZoner[client])
+	if (!IsPlayerZoner(client))
 	{
-		PrintToChat(client, " %cSurftimer %c| You don't have access to the zones menu.", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin4", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 
 	if (args == 0)
 	{
-		ReplyToCommand(client, " %cSurftimer%c | Usage: sm_addmaptier <Tier>", LIMEGREEN, WHITE);
+		CReplyToCommand(client, "%t", "Admin5", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 	else
@@ -75,7 +75,7 @@ public Action Admin_insertMapTier(int client, int args)
 		if (tier < 7 && tier > 0)
 			db_insertMapTier(tier);
 		else
-			PrintToChat(client, " %cSurftimer %c| Invalid tier number. Please choose a tier number between 1-6.", LIMEGREEN, WHITE);
+			CPrintToChat(client, "%t", "Admin6", g_szChatPrefix);
 	}
 	return Plugin_Handled;
 }
@@ -85,7 +85,7 @@ public Action Admin_insertSpawnLocation(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	if (!g_bZoner[client] && !CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+	if (!IsPlayerZoner(client))
 		return Plugin_Handled;
 
 	float SpawnLocation[3];
@@ -101,12 +101,12 @@ public Action Admin_insertSpawnLocation(int client, int args)
 	if (g_bGotSpawnLocation[g_iClientInZone[client][2]][1])
 	{
 		db_updateSpawnLocations(SpawnLocation, SpawnAngle, Velocity, g_iClientInZone[client][2]);
-		PrintToChat(client, " %cSurftimer %c| Spawnpoint edited", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin7", g_szChatPrefix);
 	}
 	else
 	{
 		db_insertSpawnLocations(SpawnLocation, SpawnAngle, Velocity, g_iClientInZone[client][2]);
-		PrintToChat(client, " %cSurftimer %c| Spawnpoint added", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin8", g_szChatPrefix);
 	}
 
 	return Plugin_Handled;
@@ -117,29 +117,34 @@ public Action Admin_deleteSpawnLocation(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	if (!CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+	if (!IsPlayerZoner(client))
 		return Plugin_Handled;
 
 	if (g_bGotSpawnLocation[g_iClientInZone[client][2]][1])
 	{
 		db_deleteSpawnLocations(g_iClientInZone[client][2]);
-		PrintToChat(client, " %cSurftimer %c| Spawnpoint deleted", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin9", g_szChatPrefix);
 	}
 	else
-		PrintToChat(client, " %cSurftimer %c| No spawnpoint to delete!", LIMEGREEN, WHITE);
+		CPrintToChat(client, "%t", "Admin9", g_szChatPrefix);
 
 	return Plugin_Handled;
 }
 
 public Action Admin_ClearAssists(int client, int args)
 {
+	if (IsPlayerTimerAdmin(client))
+		return Plugin_Handled;
+
 	for (int i = 1; i <= MAXPLAYERS; i++)
+	{
 		if (IsValidClient(i))
 		{
 			CS_SetClientAssists(i, 0);
 			g_fMaxPercCompleted[0] = 0.0;
 			CS_SetMVPCount(i, 0);
 		}
+	}
 
 	return Plugin_Handled;
 }
@@ -147,18 +152,6 @@ public Action Admin_ClearAssists(int client, int args)
 public Action Admin_ckPanel(int client, int args)
 {
 	ckAdminMenu(client);
-	if ((GetUserFlagBits(client) & g_AdminMenuFlag))
-	{
-		PrintToChat(client, " %cSurftimer %c| See console for more commands", LIMEGREEN, WHITE);
-		PrintToConsole(client, "\n[Surftimer Admin]\n");
-		PrintToConsole(client, "\n sm_refreshprofile <steamid> (recalculates player profile for given steamid)\n sm_deleteproreplay <mapname> (Deletes pro replay file for a given map)\n sm_deletetpreplay <mapname> (Deletes tp replay file for a given map)\n ");
-		PrintToConsole(client, "\n sm_zones (Open up the zonee modification menu)\n sm_insertmapzones (Inserts premade map zones into the servers database. ONLY RUN THIS ONCE!)\n sm_insertmaptiers (Inserts premade map tier information into the servers database. ONLY RUN THIS ONCE!)\n");
-		PrintToConsole(client, "[PLAYER RANKING]\n sm_resetranks (Drops playerrank table)\n sm_resetextrapoints (Resets given extra points for all players)\n");
-		PrintToConsole(client, "[PLAYER TIMES]\n sm_resettimes (Drops playertimes table)\n sm_resetmaptimes <map> (Resets player times for given map)\n sm_resetplayertimes <steamid> [<map>] (Resets players times + extra points for given steamid with or without given map.)\n");
-		PrintToConsole(client, " sm_resetplayertime <steamid> <map> (Resets map time for given steamid and map)\n");
-		PrintToConsole(client, "sm_deletecheckpoints (Deletes all checkpoint times in the current map)\n sm_deletebonus (Deletes all bonus times in the current map)\n \n");
-
-	}
 	return Plugin_Handled;
 }
 
@@ -167,213 +160,214 @@ public void ckAdminMenu(int client)
 	if (!IsValidClient(client))
 		return;
 
-	if (!(GetUserFlagBits(client) & g_AdminMenuFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT))
+	if (IsPlayerTimerAdmin(client))
 	{
-		PrintToChat(client, " %cSurftimer %c| You don't have access to the admin menu.", LIMEGREEN, WHITE);
+		char szTmp[128];
+
+		Handle adminmenu = CreateMenu(AdminPanelHandler);
+		if (IsPlayerZoner(client))
+			Format(szTmp, sizeof(szTmp), "Surftimer %s Admin Menu (full access)", VERSION);
+		else
+			Format(szTmp, sizeof(szTmp), "Surftimer %s Admin Menu (limited access)", VERSION);
+		SetMenuTitle(adminmenu, szTmp);
+
+		if (!g_pr_RankingRecalc_InProgress)
+			AddMenuItem(adminmenu, "[1.] Recalculate player ranks", "[1.] Recalculate player ranks");
+		else
+			AddMenuItem(adminmenu, "[1.] Recalculate player ranks", "[1.] Stop the recalculation");
+
+		AddMenuItem(adminmenu, "", "", ITEMDRAW_SPACER);
+
+		int menuItemNumber = 2;
+
+		if (IsPlayerZoner(client))
+		{
+			Format(szTmp, sizeof(szTmp), "[%i.] Edit or create zones", menuItemNumber);
+			AddMenuItem(adminmenu, szTmp, szTmp);
+		}
+		else
+		{
+			Format(szTmp, sizeof(szTmp), "[%i.] Edit or create zones", menuItemNumber);
+			AddMenuItem(adminmenu, szTmp, szTmp, ITEMDRAW_DISABLED);
+		}
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hCvarGodMode))
+			Format(szTmp, sizeof(szTmp), "[%i.] Godmode  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Godmode  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hCvarNoBlock))
+			Format(szTmp, sizeof(szTmp), "[%i.] Noblock  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Noblock  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hAutoRespawn))
+			Format(szTmp, sizeof(szTmp), "[%i.] Autorespawn  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Autorespawn  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hCleanWeapons))
+			Format(szTmp, sizeof(szTmp), "[%i.] Strip weapons  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Strip weapons  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hcvarRestore))
+			Format(szTmp, sizeof(szTmp), "[%i.] Restore function  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Restore function  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hPauseServerside))
+			Format(szTmp, sizeof(szTmp), "[%i.] !pause command -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] !pause command  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hGoToServer))
+			Format(szTmp, sizeof(szTmp), "[%i.] !goto command  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] !goto command  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hRadioCommands))
+			Format(szTmp, sizeof(szTmp), "[%i.] Radio commands  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Radio commands  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		/*if (GetConVarBool(g_hAutoTimer))
+			Format(szTmp, sizeof(szTmp), "[%i.] Timer starts at spawn  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Timer starts at spawn  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;*/
+
+		if (GetConVarBool(g_hReplayBot))
+			Format(szTmp, sizeof(szTmp), "[%i.] Replay bot  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Replay bot  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hPointSystem))
+			Format(szTmp, sizeof(szTmp), "[%i.] Player point system  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Player point system  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hCountry))
+			Format(szTmp, sizeof(szTmp), "[%i.] Player country tag  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Player country tag  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hPlayerSkinChange))
+			Format(szTmp, sizeof(szTmp), "[%i.] Allow custom models  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Allow custom models  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hNoClipS))
+			Format(szTmp, sizeof(szTmp), "[%i.] +noclip  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] +noclip (admin/vip excluded)  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hAutoBhopConVar))
+			Format(szTmp, sizeof(szTmp), "[%i.] Auto bunnyhop (only surf_/bhop_ maps)  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Auto bunnyhop  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hMapEnd))
+			Format(szTmp, sizeof(szTmp), "[%i.] Allow map changes  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[i.] Allow map changes  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hConnectMsg))
+			Format(szTmp, sizeof(szTmp), "[%i.] Connect message  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Connect message  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hDisconnectMsg))
+			Format(szTmp, sizeof(szTmp), "[%i.] Disconnect message - Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Disconnect message - Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hInfoBot))
+			Format(szTmp, sizeof(szTmp), "[%i.] Info bot  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Info bot  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hAttackSpamProtection))
+			Format(szTmp, sizeof(szTmp), "[%i.] Attack spam protection  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Attack spam protection  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		if (GetConVarBool(g_hAllowRoundEndCvar))
+			Format(szTmp, sizeof(szTmp), "[%i.] Allow to end the current round  -  Enabled", menuItemNumber);
+		else
+			Format(szTmp, sizeof(szTmp), "[%i.] Allow to end the current round  -  Disabled", menuItemNumber);
+		AddMenuItem(adminmenu, szTmp, szTmp);
+		menuItemNumber++;
+
+		SetMenuExitButton(adminmenu, true);
+		SetMenuOptionFlags(adminmenu, MENUFLAG_BUTTON_EXIT);
+		if (g_AdminMenuLastPage[client] < 6)
+			DisplayMenuAtItem(adminmenu, client, 0, MENU_TIME_FOREVER);
+		else
+			if (g_AdminMenuLastPage[client] < 12)
+				DisplayMenuAtItem(adminmenu, client, 6, MENU_TIME_FOREVER);
+			else
+				if (g_AdminMenuLastPage[client] < 18)
+					DisplayMenuAtItem(adminmenu, client, 12, MENU_TIME_FOREVER);
+				else
+					if (g_AdminMenuLastPage[client] < 24)
+						DisplayMenuAtItem(adminmenu, client, 18, MENU_TIME_FOREVER);
+					else
+						if (g_AdminMenuLastPage[client] < 30)
+							DisplayMenuAtItem(adminmenu, client, 24, MENU_TIME_FOREVER);
+						else
+							if (g_AdminMenuLastPage[client] < 36)
+								DisplayMenuAtItem(adminmenu, client, 30, MENU_TIME_FOREVER);
+							else
+								if (g_AdminMenuLastPage[client] < 42)
+									DisplayMenuAtItem(adminmenu, client, 36, MENU_TIME_FOREVER);
+	}
+	else
+	{
+		CPrintToChat(client, "%t", "Admin11", g_szChatPrefix);
 		return;
 	}
-
-	char szTmp[128];
-
-	Handle adminmenu = CreateMenu(AdminPanelHandler);
-	if (GetUserFlagBits(client) & g_ZonerFlag)
-		Format(szTmp, sizeof(szTmp), "Surftimer %s Admin Menu (full access)", VERSION);
-	else
-		Format(szTmp, sizeof(szTmp), "Surftimer %s Admin Menu (limited access)", VERSION);
-	SetMenuTitle(adminmenu, szTmp);
-
-	if (!g_pr_RankingRecalc_InProgress)
-		AddMenuItem(adminmenu, "[1.] Recalculate player ranks", "[1.] Recalculate player ranks");
-	else
-		AddMenuItem(adminmenu, "[1.] Recalculate player ranks", "[1.] Stop the recalculation");
-
-	AddMenuItem(adminmenu, "", "", ITEMDRAW_SPACER);
-
-	int menuItemNumber = 2;
-
-	if (GetUserFlagBits(client) & g_ZonerFlag)
-	{
-		Format(szTmp, sizeof(szTmp), "[%i.] Edit or create zones", menuItemNumber);
-		AddMenuItem(adminmenu, szTmp, szTmp);
-	}
-	else
-	{
-		Format(szTmp, sizeof(szTmp), "[%i.] Edit or create zones", menuItemNumber);
-		AddMenuItem(adminmenu, szTmp, szTmp, ITEMDRAW_DISABLED);
-	}
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hCvarGodMode))
-		Format(szTmp, sizeof(szTmp), "[%i.] Godmode  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Godmode  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hCvarNoBlock))
-		Format(szTmp, sizeof(szTmp), "[%i.] Noblock  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Noblock  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hAutoRespawn))
-		Format(szTmp, sizeof(szTmp), "[%i.] Autorespawn  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Autorespawn  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hCleanWeapons))
-		Format(szTmp, sizeof(szTmp), "[%i.] Strip weapons  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Strip weapons  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hcvarRestore))
-		Format(szTmp, sizeof(szTmp), "[%i.] Restore function  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Restore function  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hPauseServerside))
-		Format(szTmp, sizeof(szTmp), "[%i.] !pause command -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] !pause command  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hGoToServer))
-		Format(szTmp, sizeof(szTmp), "[%i.] !goto command  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] !goto command  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hRadioCommands))
-		Format(szTmp, sizeof(szTmp), "[%i.] Radio commands  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Radio commands  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	/*if (GetConVarBool(g_hAutoTimer))
-		Format(szTmp, sizeof(szTmp), "[%i.] Timer starts at spawn  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Timer starts at spawn  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;*/
-
-	if (GetConVarBool(g_hReplayBot))
-		Format(szTmp, sizeof(szTmp), "[%i.] Replay bot  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Replay bot  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hPointSystem))
-		Format(szTmp, sizeof(szTmp), "[%i.] Player point system  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Player point system  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hCountry))
-		Format(szTmp, sizeof(szTmp), "[%i.] Player country tag  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Player country tag  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hPlayerSkinChange))
-		Format(szTmp, sizeof(szTmp), "[%i.] Allow custom models  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Allow custom models  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hNoClipS))
-		Format(szTmp, sizeof(szTmp), "[%i.] +noclip  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] +noclip (admin/vip excluded)  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hAutoBhopConVar))
-		Format(szTmp, sizeof(szTmp), "[%i.] Auto bunnyhop (only surf_/bhop_ maps)  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Auto bunnyhop  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hMapEnd))
-		Format(szTmp, sizeof(szTmp), "[%i.] Allow map changes  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[i.] Allow map changes  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hConnectMsg))
-		Format(szTmp, sizeof(szTmp), "[%i.] Connect message  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Connect message  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hDisconnectMsg))
-		Format(szTmp, sizeof(szTmp), "[%i.] Disconnect message - Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Disconnect message - Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hInfoBot))
-		Format(szTmp, sizeof(szTmp), "[%i.] Info bot  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Info bot  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hAttackSpamProtection))
-		Format(szTmp, sizeof(szTmp), "[%i.] Attack spam protection  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Attack spam protection  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	if (GetConVarBool(g_hAllowRoundEndCvar))
-		Format(szTmp, sizeof(szTmp), "[%i.] Allow to end the current round  -  Enabled", menuItemNumber);
-	else
-		Format(szTmp, sizeof(szTmp), "[%i.] Allow to end the current round  -  Disabled", menuItemNumber);
-	AddMenuItem(adminmenu, szTmp, szTmp);
-	menuItemNumber++;
-
-	SetMenuExitButton(adminmenu, true);
-	SetMenuOptionFlags(adminmenu, MENUFLAG_BUTTON_EXIT);
-	if (g_AdminMenuLastPage[client] < 6)
-		DisplayMenuAtItem(adminmenu, client, 0, MENU_TIME_FOREVER);
-	else
-		if (g_AdminMenuLastPage[client] < 12)
-			DisplayMenuAtItem(adminmenu, client, 6, MENU_TIME_FOREVER);
-		else
-			if (g_AdminMenuLastPage[client] < 18)
-				DisplayMenuAtItem(adminmenu, client, 12, MENU_TIME_FOREVER);
-			else
-				if (g_AdminMenuLastPage[client] < 24)
-					DisplayMenuAtItem(adminmenu, client, 18, MENU_TIME_FOREVER);
-				else
-					if (g_AdminMenuLastPage[client] < 30)
-						DisplayMenuAtItem(adminmenu, client, 24, MENU_TIME_FOREVER);
-					else
-						if (g_AdminMenuLastPage[client] < 36)
-							DisplayMenuAtItem(adminmenu, client, 30, MENU_TIME_FOREVER);
-						else
-							if (g_AdminMenuLastPage[client] < 42)
-								DisplayMenuAtItem(adminmenu, client, 36, MENU_TIME_FOREVER);
 }
-
 
 public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int param2)
 {
@@ -386,7 +380,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 			{
 				if (!g_pr_RankingRecalc_InProgress)
 				{
-					PrintToChat(param1, "%t", "PrUpdateStarted", LIMEGREEN, WHITE);
+					CPrintToChat(param1, "%t", "PrUpdateStarted", g_szChatPrefix);
 					g_bManualRecalc = true;
 					g_pr_Recalc_AdminID = param1;
 					RefreshPlayerRankTable(MAX_PR_PLAYERS);
@@ -397,7 +391,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 						g_bProfileRecalc[i] = false;
 					g_bManualRecalc = false;
 					g_pr_RankingRecalc_InProgress = false;
-					PrintToChat(param1, "%t", "StopRecalculation", LIMEGREEN, WHITE);
+					CPrintToChat(param1, "%t", "StopRecalculation", g_szChatPrefix);
 				}
 			}
 
@@ -578,7 +572,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 
 	if (action == MenuAction_End)
 	{
-		//test
+		// Test
 		if (IsValidClient(param1))
 		{
 			if (menu != null)
@@ -589,9 +583,12 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 
 public Action Admin_RefreshProfile(int client, int args)
 {
+	if (!IsPlayerTimerAdmin(client))
+		return Plugin_Handled;
+
 	if (args == 0)
 	{
-		ReplyToCommand(client, " %cSurftimer%c | Usage: sm_refreshprofile <steamid>", LIMEGREEN, WHITE);
+		CReplyToCommand(client, "%t", "Admin12", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 	if (args > 0)
