@@ -5636,6 +5636,7 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 		WritePackFloat(pack, g_fFinalWrcpTime[data]);
 		WritePackCell(pack, style);
 		WritePackCell(pack, stage);
+		WritePackCell(pack, 1);
 		WritePackCell(pack, data);
 
 		if (style == 0)
@@ -5668,6 +5669,7 @@ public void db_updateWrcpRecord(int client, int style, int stage)
 	WritePackFloat(pack, g_fFinalWrcpTime[client]);
 	WritePackCell(pack, style);
 	WritePackCell(pack, stage);
+	WritePackCell(pack, 0);
 	WritePackCell(pack, client);
 
 	char szQuery[1024];
@@ -5694,11 +5696,6 @@ public void SQL_UpdateWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 	int style = ReadPackCell(data);
 	int stage = ReadPackCell(data);
 
-	if (g_TotalStageRecords[stage] > 0) // fluffys FIXME
-		db_viewTotalStageRecords();
-	else if (g_TotalStageStyleRecords[style][stage] > 0)
-		db_viewTotalStageRecords();
-
 	// Find out how many times are are faster than the players time
 	char szQuery[512];
 	if (style == 0)
@@ -5722,8 +5719,17 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 	float time = ReadPackFloat(data);
 	int style = ReadPackCell(data);
 	int stage = ReadPackCell(data);
+	bool bInsert = view_as<bool>(ReadPackCell(data));
 	int client = ReadPackCell(data);
 	CloseHandle(data);
+
+	if (bInsert) // fluffys FIXME
+	{
+		if (style == 0)
+			g_TotalStageRecords[stage]++;
+		else
+			g_TotalStageStyleRecords[style][stage]++;
+	}
 
 	if (stage == 0)
 		return;
@@ -5731,19 +5737,15 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 	// Get players rank, 9999999 = error
 	int stagerank = 9999999;
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-	{
-		stagerank = SQL_FetchInt(hndl, 0)+1;
-	}
+		stagerank = SQL_FetchInt(hndl, 0) + 1;
 
 	if (stage > g_TotalStages) // Hack Fix for multiple end zone issue
 		stage = g_TotalStages;
 
 	if (style == 0)
 		g_StageRank[client][stage] = stagerank;
-	else if (style != 0)
+	else
 		g_StyleStageRank[style][client][stage] = stagerank;
-
-	db_viewTotalStageRecords();
 
 	// Get client name
 	char szName[MAX_NAME_LENGTH];
@@ -5791,8 +5793,8 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 		{ // If the server already has a record
 
 			if (g_fFinalWrcpTime[client] < g_fStageRecord[stage] && g_fFinalWrcpTime[client] > 0.0)
-			{ // New fastest time in map
-				db_viewTotalStageRecords();
+			{ 
+				// New fastest time in map
 				g_bStageSRVRecord[client][stage] = true;
 				g_fStageRecord[stage] = g_fFinalTime[client];
 				Format(g_szStageRecordPlayer[stage], MAX_NAME_LENGTH, "%s", szName);
@@ -5805,18 +5807,16 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			}
 			else
 			{
-				db_viewTotalStageRecords();
-
-				char szSpecMessage[512];
-
 				CPrintToChat(client, "%t", "SQL16", g_szChatPrefix, stage, g_szFinalWrcpTime[client], szDiff, sz_srDiff, g_StageRank[client][stage], g_TotalStageRecords[stage]);
 
+				char szSpecMessage[512];
 				Format(szSpecMessage, sizeof(szSpecMessage), "%t", "SQL17", g_szChatPrefix, szName, stage, g_szFinalWrcpTime[client], szDiff, sz_srDiff, g_StageRank[client][stage], g_TotalStageRecords[stage]);
 				CheckpointToSpec(client, szSpecMessage);
 			}
 		}
 		else
-		{ // Has to be the new record, since it is the first completion
+		{
+			// Has to be the new record, since it is the first completion
 			g_bStageSRVRecord[client][stage] = true;
 			g_fStageRecord[stage] = g_fFinalTime[client];
 			Format(g_szStageRecordPlayer[stage], MAX_NAME_LENGTH, "%s", szName);
@@ -5831,11 +5831,11 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 	else if (style != 0) // styles
 	{
 		if (g_TotalStageStyleRecords[style][stage] > 0)
-		{ // If the server already has a record
-
+		{
+			// If the server already has a record
 			if (g_fFinalWrcpTime[client] < g_fStyleStageRecord[style][stage] && g_fFinalWrcpTime[client] > 0.0)
-			{ // New fastest time in map
-				db_viewTotalStageRecords();
+			{
+				// New fastest time in map
 				g_bStageSRVRecord[client][stage] = true;
 				g_fStyleStageRecord[style][stage] = g_fFinalTime[client];
 				Format(g_szStyleStageRecordPlayer[style][stage], MAX_NAME_LENGTH, "%s", szName);
@@ -5846,17 +5846,16 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			}
 			else
 			{
-				db_viewTotalStageRecords();
+				CPrintToChat(client, "%t", "SQL20", g_szChatPrefix, stage, g_szStyleFinishPrint[style], g_szFinalWrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
 
 				char szSpecMessage[512];
-
-				CPrintToChat(client, "%t", "SQL20", g_szChatPrefix, stage, g_szStyleFinishPrint[style], g_szFinalWrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
 				Format(szSpecMessage, sizeof(szSpecMessage), "%t", "SQL21", g_szChatPrefix, stage, g_szStyleFinishPrint[style], g_szFinalWrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
 				CheckpointToSpec(client, szSpecMessage);
 			}
 		}
 		else
-		{ // Has to be the new record, since it is the first completion
+		{
+			// Has to be the new record, since it is the first completion
 			g_bStageSRVRecord[client][stage] = true;
 			g_fStyleStageRecord[style][stage] = g_fFinalTime[client];
 			Format(g_szStyleStageRecordPlayer[style][stage], MAX_NAME_LENGTH, "%s", szName);
