@@ -1849,7 +1849,7 @@ public void db_selectBonusesInMapCallback(Handle owner, Handle hndl, const char[
 		SQL_FetchString(hndl, 2, BonusName, 128);
 
 		if (!BonusName[0])
-		Format(BonusName, 128, "BONUS %i", zGrp);
+			Format(BonusName, 128, "bonus %i", zGrp);
 
 		Format(MenuID, 248, "%s-%i", mapname, zGrp);
 
@@ -1862,7 +1862,7 @@ public void db_selectBonusesInMapCallback(Handle owner, Handle hndl, const char[
 			zGrp = SQL_FetchInt(hndl, 1);
 
 			if (StrEqual(BonusName, "NULL", false))
-			Format(BonusName, 128, "BONUS %i", zGrp);
+				Format(BonusName, 128, "bonus %i", zGrp);
 
 			Format(MenuID, 248, "%s-%i", mapname, zGrp);
 
@@ -3739,9 +3739,7 @@ public void db_checkAndFixZoneIdsCallback(Handle owner, Handle hndl, const char[
 public void ZoneDefaultName(int zonetype, int zonegroup, char zName[128])
 {
 	if (zonegroup > 0)
-	{
-		Format(zName, 64, "BONUS %i", zonegroup);
-	}
+		Format(zName, 64, "bonus %i", zonegroup);
 	else
 	if (-1 < zonetype < ZONEAMOUNT)
 	Format(zName, 128, "%s %i", g_szZoneDefaultNames[zonetype], zonegroup);
@@ -4201,7 +4199,7 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 						{
 							g_bhasBonus = true;
 							Format(g_mapZones[g_mapZonesCount][zoneName], 128, "BonusStart-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
-							Format(g_szZoneGroupName[g_mapZones[g_mapZonesCount][zoneGroup]], 128, "BONUS %i", g_mapZones[g_mapZonesCount][zoneGroup]);
+							Format(g_szZoneGroupName[g_mapZones[g_mapZonesCount][zoneGroup]], 128, "bonus %i", g_mapZones[g_mapZonesCount][zoneGroup]);
 						}
 						else
 						Format(g_mapZones[g_mapZonesCount][zoneName], 128, "Start-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
@@ -4909,7 +4907,7 @@ public void db_viewUnfinishedMapsCallback(Handle owner, Handle hndl, const char[
 						SQL_FetchString(hndl, 2, zName, 128);
 
 						if (!zName[0])
-						Format(zName, 128, "BONUS %i", zGrp);
+							Format(zName, 128, "bonus %i", zGrp);
 
 						if (bonusUnfinished)
 						Format(unfinishedBonusBuffer, 772, "%s, %s", unfinishedBonusBuffer, zName);
