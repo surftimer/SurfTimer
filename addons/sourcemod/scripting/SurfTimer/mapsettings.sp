@@ -7,7 +7,7 @@ public void setMapSettings()
 
 public Action Admin_MapSettings(int client, int args)
 {
-	if (IsPlayerZoner(client))
+	if (!IsPlayerZoner(client))
 		return Plugin_Handled;
 
 	MapSettingsMenu(client);
