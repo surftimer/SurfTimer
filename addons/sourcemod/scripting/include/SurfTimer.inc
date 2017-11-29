@@ -87,6 +87,15 @@ native bool:surftimer_SafeTeleport(client, Float:fDestination[3], Float:fAngle[3
 forward Action:surftimer_OnMapFinished(client, Float:fRunTime, String:sRunTime[54], rank, total);
 
 /**
+ * Called when a player recieves a checkpoint either via a stage or checkpoint zone
+ *
+ * @param client     Player index.
+ * @return           Plugin_Handled; to stop the player from searching.
+ */
+forward Action:surftimer_OnCheckpoint(client, Float:fRunTime, String:sRunTime[54], Float:fPbCp, String:sPbDiff[16], Float:fSrCp, String:sSrDiff[16]);
+
+
+/**
  * Called when a player finishes a bonus
  *
  * @param client     Player index.

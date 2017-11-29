@@ -236,7 +236,11 @@ public Action sm_test(int client, int args)
 	// }
 	// CPrintToChat(client, "%s", g_szSoundPathWR);
 	// CPrintToChat(client, "%s", g_szRelativeSoundPathWR);
-	CPrintToChat(client, "%d", g_ZonerFlag);
+	// CPrintToChat(client, "%d", g_ZonerFlag);
+	int unix = GetTime();
+	char sTime[128];
+	FormatTime(sTime, sizeof(sTime), "%d %b %Y", unix);
+	PrintToChat(client, sTime);
 
 	return Plugin_Handled;
 }

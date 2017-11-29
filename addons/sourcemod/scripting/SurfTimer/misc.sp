@@ -3915,6 +3915,22 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		char szTime[32];
 		FormatTimeFloat(client, time, 3, szTime, 32);
 
+		// Checkpoint forward
+		//forward Action:surftimer_OnCheckpoint(client, Float:fRunTime, String:sRunTime[54], Float:fPbCp, String:sPbDiff[16], Float:fSrCp, String:sSrDiff[16]);
+		Call_StartForward(g_MapCheckpointForward);
+
+		/* Push parameters one at a time */
+		Call_PushCell(client);
+		Call_PushFloat(time);
+		Call_PushString(szTime);
+		Call_PushFloat(g_fCheckpointTimesRecord[zonegroup][client][zone]);
+		Call_PushString(szDiff_colorless);
+		Call_PushFloat(g_fCheckpointServerRecord[zonegroup][zone]);
+		Call_PushString(sz_srDiff_colorless);
+
+		/* Finish the call, get the result */
+		Call_Finish();
+
 		if (g_bCheckpointsEnabled[client])
 			CPrintToChat(client, "%t", "Misc30", g_szChatPrefix, g_iClientInZone[client][1] + 1, szTime, szDiff, sz_srDiff);
 
@@ -3935,6 +3951,20 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 
 			char szTime[32];
 			FormatTimeFloat(client, time, 3, szTime, 32);
+
+			Call_StartForward(g_MapCheckpointForward);
+
+			/* Push parameters one at a time */
+			Call_PushCell(client);
+			Call_PushFloat(time);
+			Call_PushString(szTime);
+			Call_PushFloat(-1.0);
+			Call_PushString("N/A");
+			Call_PushFloat(g_fCheckpointServerRecord[zonegroup][zone]);
+			Call_PushString(sz_srDiff_colorless);
+
+			/* Finish the call, get the result */
+			Call_Finish();
 
 			if (percent > -1.0)
 			{
