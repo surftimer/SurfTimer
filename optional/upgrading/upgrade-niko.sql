@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `ck_announcements` (
  `mapname` varchar(128) NOT NULL,
  `time` varchar(32) NOT NULL,
  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE `ck_bonus`
 DROP PRIMARY KEY,
@@ -58,9 +58,10 @@ CREATE TABLE `ck_playeroptions2` (
  `module4s` int(11) NOT NULL DEFAULT '0',
  `module5s` int(11) NOT NULL DEFAULT '0',
  PRIMARY KEY (`steamid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE `ck_playerrank`
+DROP PRIMARY KEY,
 DROP COLUMN `winratio`,
 DROP COLUMN `pointsratio`,
 DROP COLUMN `multiplier`,
@@ -116,7 +117,7 @@ CREATE TABLE IF NOT EXISTS `ck_vipadmins` (
  `active` int(11) NOT NULL DEFAULT '1',
  PRIMARY KEY (`steamid`),
  KEY `vip` (`steamid`,`vip`,`admin`,`zoner`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `ck_wrcps` (
  `steamid` varchar(32) NOT NULL DEFAULT '',
@@ -127,7 +128,7 @@ CREATE TABLE IF NOT EXISTS `ck_wrcps` (
  `style` int(11) NOT NULL DEFAULT '0',
  PRIMARY KEY (`steamid`,`mapname`,`stage`,`style`),
  KEY `stagerank` (`mapname`,`runtimepro`,`stage`,`style`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE `ck_zones`
 ADD COLUMN `hookname` varchar(128) NULL DEFAULT 'None' AFTER `zonename`,
