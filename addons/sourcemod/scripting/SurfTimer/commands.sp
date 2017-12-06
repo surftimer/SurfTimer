@@ -2557,14 +2557,25 @@ public int TopMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 		int style = StringToInt(szBuffer);
 		switch (param2)
 		{
-			case 0:db_selectTopPlayers(param1, style);
-			case 1:db_selectTopSurfers(param1, g_szMapName);
-			case 2:BonusTopMenu(param1);
+			case 0: db_selectTopPlayers(param1, style);
+			case 1: SelectMapTop(param1, style);
+			case 2: BonusTopMenu(param1);
 		}
 	}
 	else
 		if (action == MenuAction_End)
 		CloseHandle(menu);
+}
+
+public void SelectMapTop(int client, int style)
+{
+	if (IsValidClient(client))
+	{
+		if (style > 0)
+			db_selectStyleMapTopSurfers(client, g_szMapName, style);
+		else
+			db_selectTopSurfers(client, g_szMapName);
+	}
 }
 
 public void BonusTopMenu(int client)
