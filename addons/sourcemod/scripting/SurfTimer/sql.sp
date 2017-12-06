@@ -55,7 +55,7 @@ public void db_setupDatabase()
 		db_createTables();
 		return;
 	}
-	else 
+	else
 	{
 		// Check for db upgrades
 		if (!SQL_FastQuery(g_hDb, "SELECT prespeed FROM ck_zones LIMIT 1"))
@@ -2176,9 +2176,9 @@ public void db_updateRecordPro(int client)
 	char szUName[MAX_NAME_LENGTH];
 
 	if (IsValidClient(client))
-	GetClientName(client, szUName, MAX_NAME_LENGTH);
+		GetClientName(client, szUName, MAX_NAME_LENGTH);
 	else
-	return;
+		return;
 
 	// Also updating name in database, escape string
 	char szName[MAX_NAME_LENGTH * 2 + 1];
@@ -2491,7 +2491,6 @@ public void db_viewTop10Records(int client, char szSteamId[32], int type)
 	else if (IsClientInGame(client))
 		CPrintToChat(client, "%t", "SQL3", g_szChatPrefix);
 }
-
 
 public void SQL_ViewTop10RecordsCallback(Handle owner, Handle hndl, const char[] error, any pack)
 {
@@ -7481,10 +7480,6 @@ public void db_SelectPlayersBonusRankCallback(Handle owner, Handle hndl, const c
 		rank = SQL_GetRowCount(hndl);
 
 		CPrintToChatAll("%t", "SQL36", g_szChatPrefix, playername, rank, g_totalPlayerTimes[client], g_szRuntimepro[client], mapname, bonus);
-	}
-	else
-	{
-		CloseHandle(pack);
 	}
 }
 
