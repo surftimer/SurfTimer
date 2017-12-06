@@ -1316,7 +1316,7 @@ public void sql_selectRankedPlayersRankCallback(Handle owner, Handle hndl, const
 	{
 		g_PlayerRank[client][style] = SQL_GetRowCount(hndl);
 
-		if (GetConVarInt(g_hPrestigeRank) != 0)
+		if (style == 0 && GetConVarInt(g_hPrestigeRank) > 0)
 		{
 			if (g_PlayerRank[client][0] > GetConVarInt(g_hPrestigeRank))
 				KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
@@ -1336,6 +1336,8 @@ public void sql_selectRankedPlayersRankCallback(Handle owner, Handle hndl, const
 		}
 		// CS_SetClientContributionScore(client, (g_pr_AllPlayers - SQL_GetRowCount(hndl)));
 	}
+	else if (GetConVarInt(g_hPrestigeRank) > 0)
+		KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
 
 	if (!g_bSettingsLoaded[client] && style == (MAX_STYLES - 1))
 	{
