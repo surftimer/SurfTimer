@@ -2582,7 +2582,7 @@ public int GetSkillgroupIndex(int rank, int points)
 				}
 				else if (RankValueNext[RankTop] > -1)
 				{
-					if (points >= RankValue[PointReq] && rank > RankValueNext[RankTop])
+					if (points >= RankValue[PointReq])
 						return i;
 				}
 			}
