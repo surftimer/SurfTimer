@@ -797,7 +797,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		// g_fFinalWrcpTime[client] = g_fStartWrcpTime[client] - time2;
 		if (g_fFinalWrcpTime[client] <= 0.0)
 		{
-			CPrintToChat(client, "%t", "BPress8", g_szChatPrefix, stage);
+			CPrintToChat(client, "%t", "ErrorStageTime", g_szChatPrefix, stage);
 			return;
 		}
 
@@ -849,7 +849,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		g_fFinalWrcpTime[client] = GetGameTime() - g_fStartWrcpTime[client];
 		if (g_fFinalWrcpTime[client] <= 0.0)
 		{
-			CPrintToChat(client, "%t", "BPress9", g_szChatPrefix, stage);
+			CPrintToChat(client, "%t", "ErrorStageTime", g_szChatPrefix, stage);
 			return;
 		}
 

@@ -32,7 +32,7 @@ public Action start_vote(int client, int args)
 
 	if (IsVoteInProgress())
 	{
-		CPrintToChat(client, "%t", "CVote1");
+		CPrintToChat(client, "%t", "VoteInProgress", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 	else if (args < 1)
@@ -54,7 +54,7 @@ public Action start_vote(int client, int args)
 		AddMenuItem(menu, "no", "No");
 		SetMenuExitButton(menu, false);
 		VoteMenuToAll(menu, 20);
-		CPrintToChatAll("%t", "CVote3", g_szChatPrefix, szPlayerName);
+		CPrintToChatAll("%t", "VoteStartedBy", g_szChatPrefix, szPlayerName);
 	}
 	else if (strcmp(votetype, "changemap", false) == 0 && strcmp(mapnameforvote, "", false) == 0)
 	{
@@ -120,11 +120,11 @@ public int Handle_VoteMenuExtend(Menu menu, MenuAction action, int param1, int p
 		/* 0=yes, 1=no */
 		if ((strcmp(item, VOTE_YES) == 0 && FloatCompare(percent,limit) < 0 && param1 == 0) || (strcmp(item, VOTE_NO) == 0 && param1 == 1))
 		{
-			CPrintToChatAll("%t", "CVote8", g_szChatPrefix, RoundToNearest(100.0*limit), PERCENT, RoundToNearest(100.0*percent), PERCENT, totalVotes);
+			CPrintToChatAll("%t", "CVote8", g_szChatPrefix, RoundToNearest(100.0*limit), RoundToNearest(100.0*percent), totalVotes);
 		}
 		else
 		{
-			CPrintToChatAll("%t", "CVote9", g_szChatPrefix, RoundToNearest(100.0*percent), PERCENT, totalVotes);
+			CPrintToChatAll("%t", "CVote9", g_szChatPrefix, RoundToNearest(100.0*percent), totalVotes);
 			CPrintToChatAll("%t", "CVote10", g_szChatPrefix);
 			extendMap(600);
 		}
@@ -143,7 +143,7 @@ public int Handle_VoteMenuChangeMap(Menu menu, MenuAction action, int param1, in
 		if (param1 == 0) // yes
 		{
 			CreateTimer(5.0, Change_Map, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
-			CPrintToChatAll("%t", "CVote11", mapnameforvote);
+			CPrintToChatAll("%t", "CVote11", g_szChatPrefix, mapnameforvote);
 		}
 		else // No
 		{
@@ -172,11 +172,11 @@ public int Handle_VoteMenuSetNextMap(Menu menu, MenuAction action, int param1, i
 		if (param1 == 0) // yes
 		{
 			ServerCommand("sm_setnextmap %s", mapnameforvote);
-			CPrintToChatAll("%t", "CVote13", mapnameforvote);
+			CPrintToChatAll("%t", "CVote13", g_szChatPrefix, mapnameforvote);
 		}
 		else // No
 		{
-			CPrintToChatAll("%t", "CVote14");
+			CPrintToChatAll("%t", "CVote14", g_szChatPrefix);
 		}
 	}
 }

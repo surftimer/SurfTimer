@@ -4,7 +4,7 @@ public Action VIP_GiveVip(int client, int args)
 	// sm_givevip steamid viplvl
 	if (args == 0)
 	{
-		CReplyToCommand(client, "%t", "VIP1", g_szChatPrefix, QUOTE, QUOTE, QUOTE, QUOTE);
+		CReplyToCommand(client, "%t", "VIP1", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 
@@ -30,7 +30,7 @@ public Action VIP_RemoveVip(int client, int args)
 	// sm_removevip steamid
 	if (args == 0)
 	{
-		CReplyToCommand(client, "%t", "VIP2", g_szChatPrefix, QUOTE, QUOTE);
+		CReplyToCommand(client, "%t", "VIP2", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 
@@ -46,7 +46,7 @@ public Action VIP_GiveCredits(int client, int args)
 	// sm_addcredits steamid
 	if (args != 2)
 	{
-		CReplyToCommand(client, "%t", "VIP3", g_szChatPrefix, QUOTE, QUOTE, QUOTE, QUOTE);
+		CReplyToCommand(client, "%t", "VIP3", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 

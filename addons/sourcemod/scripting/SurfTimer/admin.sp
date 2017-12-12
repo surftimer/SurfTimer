@@ -43,7 +43,7 @@ public void OnAdminMenuReady(Handle topmenu)
 public int TopMenuHandler2(Handle topmenu, TopMenuAction action, TopMenuObject object_id, int param, char[] buffer, int maxlength)
 {
 	if (action == TopMenuAction_DisplayOption)
-		Format(buffer, maxlength, "surftimer");
+		Format(buffer, maxlength, "SurfTimer");
 
 	else
 		if (action == TopMenuAction_SelectOption)
@@ -57,7 +57,7 @@ public Action Admin_insertMapTier(int client, int args)
 
 	if (!(GetUserFlagBits(client) & g_ZonerFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT) && !g_bZoner[client])
 	{
-		CPrintToChat(client, "%t", "Admin4", g_szChatPrefix);
+		CPrintToChat(client, "%t", "NoZoneAccess", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 
@@ -150,7 +150,7 @@ public Action Admin_ckPanel(int client, int args)
 	if ((GetUserFlagBits(client) & g_AdminMenuFlag))
 	{
 		CPrintToChat(client, "%t", "Admin10", g_szChatPrefix);
-		PrintToConsole(client, "\n[Surftimer Admin]\n");
+		PrintToConsole(client, "\n[SurfTimer Admin]\n");
 		PrintToConsole(client, "\n sm_refreshprofile <steamid> (recalculates player profile for given steamid)\n sm_deleteproreplay <mapname> (Deletes pro replay file for a given map)\n sm_deletetpreplay <mapname> (Deletes tp replay file for a given map)\n ");
 		PrintToConsole(client, "\n sm_zones (Open up the zonee modification menu)\n sm_insertmapzones (Inserts premade map zones into the servers database. ONLY RUN THIS ONCE!)\n sm_insertmaptiers (Inserts premade map tier information into the servers database. ONLY RUN THIS ONCE!)\n");
 		PrintToConsole(client, "[PLAYER RANKING]\n sm_resetranks (Drops playerrank table)\n sm_resetextrapoints (Resets given extra points for all players)\n");
@@ -177,9 +177,9 @@ public void ckAdminMenu(int client)
 
 	Handle adminmenu = CreateMenu(AdminPanelHandler);
 	if (GetUserFlagBits(client) & g_ZonerFlag)
-		Format(szTmp, sizeof(szTmp), "Surftimer %s Admin Menu (full access)", VERSION);
+		Format(szTmp, sizeof(szTmp), "SurfTimer %s Admin Menu (full access)", VERSION);
 	else
-		Format(szTmp, sizeof(szTmp), "Surftimer %s Admin Menu (limited access)", VERSION);
+		Format(szTmp, sizeof(szTmp), "SurfTimer %s Admin Menu (limited access)", VERSION);
 	SetMenuTitle(adminmenu, szTmp);
 
 	if (!g_pr_RankingRecalc_InProgress)

@@ -2504,7 +2504,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 
 		if (!validFlag)
 		{
-			PrintToServer("Surftimer | Invalid flag for ck_zoner_flag");
+			PrintToServer("SurfTimer | Invalid flag for ck_zoner_flag");
 			g_ZonerFlag = ADMFLAG_ROOT;
 		}
 		else
@@ -2518,7 +2518,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 
 		if (!validFlag)
 		{
-			PrintToServer("Surftimer | Invalid flag for ck_adminmenu_flag");
+			PrintToServer("SurfTimer | Invalid flag for ck_adminmenu_flag");
 			g_AdminMenuFlag = ADMFLAG_ROOT;
 		}
 		else
@@ -2558,7 +2558,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 
 		if (!validFlag)
 		{
-			LogError("Surftimer | Invalid flag for ck_vip_flag");
+			LogError("SurfTimer | Invalid flag for ck_vip_flag");
 			g_VipFlag = ADMFLAG_RESERVATION;
 		}
 		else
