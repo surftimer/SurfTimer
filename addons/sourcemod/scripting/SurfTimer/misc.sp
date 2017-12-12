@@ -4377,7 +4377,7 @@ public void sendDiscordAnnouncement(char szName[32], char szMapName[128], char s
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("Surftimer Records");
+	hook.SetUsername("SurfTimer Records");
 
 	MessageEmbed Embed = new MessageEmbed();
 
@@ -4487,7 +4487,7 @@ public void SendBugReport(int client)
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("Surftimer Bugtracker");
+	hook.SetUsername("SurfTimer Bugtracker");
 
 	MessageEmbed Embed = new MessageEmbed();
 
@@ -4523,7 +4523,7 @@ public void CallAdmin(int client, char[] sText)
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("Surftimer Calladmin");
+	hook.SetUsername("SurfTimer Calladmin");
 
 	MessageEmbed Embed = new MessageEmbed();
 

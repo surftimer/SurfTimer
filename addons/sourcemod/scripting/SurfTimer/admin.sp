@@ -43,7 +43,7 @@ public void OnAdminMenuReady(Handle topmenu)
 public int TopMenuHandler2(Handle topmenu, TopMenuAction action, TopMenuObject object_id, int param, char[] buffer, int maxlength)
 {
 	if (action == TopMenuAction_DisplayOption)
-		Format(buffer, maxlength, "surftimer");
+		Format(buffer, maxlength, "SurfTimer");
 
 	else
 		if (action == TopMenuAction_SelectOption)
@@ -57,7 +57,7 @@ public Action Admin_insertMapTier(int client, int args)
 
 	if (!IsPlayerZoner(client))
 	{
-		CPrintToChat(client, "%t", "Admin4", g_szChatPrefix);
+		CPrintToChat(client, "%t", "NoZoneAccess", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 
