@@ -1532,14 +1532,14 @@ public void SetCashState()
 
 public void PlayRecordSound(int iRecordtype)
 {
-	char buffer[255];
+	char buffer[PLATFORM_MAX_PATH];
 	if (iRecordtype == 1)
 	{
 		for (int i = 1; i <= GetMaxClients(); i++)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", WR_RELATIVE_SOUND_PATH);
+				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathWR);
 				ClientCommand(i, buffer);
 			}
 		}
@@ -1550,7 +1550,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", WR2_RELATIVE_SOUND_PATH);
+				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathWR);
 				ClientCommand(i, buffer);
 			}
 		}
@@ -1561,7 +1561,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", TOP10_RELATIVE_SOUND_PATH);
+				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathTop);
 				ClientCommand(i, buffer);
 			}
 		}
@@ -1582,7 +1582,7 @@ public void PlayRecordSound(int iRecordtype)
 public void PlayUnstoppableSound(int client)
 {
 	char buffer[255];
-	Format(buffer, sizeof(buffer), "play %s", PR_RELATIVE_SOUND_PATH);
+	Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathPB);
 	if (!IsFakeClient(client) && g_bEnableQuakeSounds[client])
 		ClientCommand(client, buffer);
 	// Spec Stop Sound
@@ -1610,7 +1610,7 @@ public void PlayWRCPRecord(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", WRCP_RELATIVE_SOUND_PATH);
+				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathWRCP);
 				ClientCommand(i, buffer);
 			}
 		}
@@ -1619,31 +1619,33 @@ public void PlayWRCPRecord(int iRecordtype)
 
 public void InitPrecache()
 {
+	char szBuffer[256];
 	// db_precacheCustomSounds();
 
 	// Timer finish sounds
-	AddFileToDownloadsTable(UNSTOPPABLE_SOUND_PATH);
-	FakePrecacheSound(UNSTOPPABLE_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(PRO_FULL_SOUND_PATH);
-	FakePrecacheSound(PRO_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(PRO_FULL_SOUND_PATH);
-	FakePrecacheSound(PRO_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(CP_FULL_SOUND_PATH);
-	FakePrecacheSound(CP_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(WRCP_FULL_SOUND_PATH);
-	FakePrecacheSound(WRCP_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(WR_FULL_SOUND_PATH);
-	FakePrecacheSound(WR_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(WR2_FULL_SOUND_PATH);
-	FakePrecacheSound(WR2_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(PR_FULL_SOUND_PATH);
-	FakePrecacheSound(PR_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(TOP10_FULL_SOUND_PATH);
-	FakePrecacheSound(TOP10_RELATIVE_SOUND_PATH);
-	AddFileToDownloadsTable(DISCOTIME_FULL_SOUND_PATH);
-	FakePrecacheSound(DISCOTIME_RELATIVE_SOUND_PATH);
+	// AddFileToDownloadsTable(UNSTOPPABLE_SOUND_PATH);
+	// FakePrecacheSound(UNSTOPPABLE_RELATIVE_SOUND_PATH);
+	// AddFileToDownloadsTable(PRO_FULL_SOUND_PATH);
+	// FakePrecacheSound(PRO_RELATIVE_SOUND_PATH);
+	// AddFileToDownloadsTable(CP_FULL_SOUND_PATH);
+	// FakePrecacheSound(CP_RELATIVE_SOUND_PATH);
+	
+	GetConVarString(g_hSoundPathWR, szBuffer, sizeof(szBuffer));
+	AddFileToDownloadsTable(szBuffer);
+	FakePrecacheSound(g_szRelativeSoundPathWR);
 
-	char szBuffer[256];
+	GetConVarString(g_hSoundPathPB, szBuffer, sizeof(szBuffer));
+	AddFileToDownloadsTable(szBuffer);
+	FakePrecacheSound(g_szRelativeSoundPathPB);
+
+	GetConVarString(g_hSoundPathTop, szBuffer, sizeof(szBuffer));
+	AddFileToDownloadsTable(szBuffer);
+	FakePrecacheSound(g_szRelativeSoundPathTop);
+
+	GetConVarString(g_hSoundPathWRCP, szBuffer, sizeof(szBuffer));
+	AddFileToDownloadsTable(szBuffer);
+	FakePrecacheSound(g_szRelativeSoundPathWRCP);
+
 	// Replay Player Model
 	GetConVarString(g_hReplayBotPlayerModel, szBuffer, 256);
 	AddFileToDownloadsTable(szBuffer);
@@ -2575,12 +2577,12 @@ public int GetSkillgroupIndex(int rank, int points)
 				}
 				else if (RankValueNext[RankReq] > -1)
 				{
-					if (points >= RankValue[PointReq] && rank < RankValueNext[RankReq])
+					if (points >= RankValue[PointReq] && rank > RankValueNext[RankReq])
 						return i;
 				}
 				else if (RankValueNext[RankTop] > -1)
 				{
-					if (points >= RankValue[PointReq] && rank < RankValueNext[RankTop])
+					if (points >= RankValue[PointReq])
 						return i;
 				}
 			}
@@ -3913,6 +3915,22 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		char szTime[32];
 		FormatTimeFloat(client, time, 3, szTime, 32);
 
+		// Checkpoint forward
+		//forward Action:surftimer_OnCheckpoint(client, Float:fRunTime, String:sRunTime[54], Float:fPbCp, String:sPbDiff[16], Float:fSrCp, String:sSrDiff[16]);
+		Call_StartForward(g_MapCheckpointForward);
+
+		/* Push parameters one at a time */
+		Call_PushCell(client);
+		Call_PushFloat(time);
+		Call_PushString(szTime);
+		Call_PushFloat(g_fCheckpointTimesRecord[zonegroup][client][zone]);
+		Call_PushString(szDiff_colorless);
+		Call_PushFloat(g_fCheckpointServerRecord[zonegroup][zone]);
+		Call_PushString(sz_srDiff_colorless);
+
+		/* Finish the call, get the result */
+		Call_Finish();
+
 		if (g_bCheckpointsEnabled[client])
 			CPrintToChat(client, "%t", "Misc30", g_szChatPrefix, g_iClientInZone[client][1] + 1, szTime, szDiff, sz_srDiff);
 
@@ -3933,6 +3951,20 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 
 			char szTime[32];
 			FormatTimeFloat(client, time, 3, szTime, 32);
+
+			Call_StartForward(g_MapCheckpointForward);
+
+			/* Push parameters one at a time */
+			Call_PushCell(client);
+			Call_PushFloat(time);
+			Call_PushString(szTime);
+			Call_PushFloat(-1.0);
+			Call_PushString("N/A");
+			Call_PushFloat(g_fCheckpointServerRecord[zonegroup][zone]);
+			Call_PushString(sz_srDiff_colorless);
+
+			/* Finish the call, get the result */
+			Call_Finish();
 
 			if (percent > -1.0)
 			{
@@ -4631,4 +4663,24 @@ public void FormatPercentage(float perc, char[] buffer, int size)
 		Format(buffer, size, "100.0");
 	else
 		Format(buffer, size, "%.1f", perc);
+}
+
+public bool IsPlayerZoner(int client)
+{
+	if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		if ((GetUserFlagBits(client) & g_ZonerFlag) || (GetUserFlagBits(client) & ADMFLAG_ROOT) || g_bZoner[client])
+			return true;
+	}
+	return false;
+}
+
+public bool IsPlayerTimerAdmin(int client)
+{
+	if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		if ((GetUserFlagBits(client) & g_AdminMenuFlag) || (GetUserFlagBits(client) & ADMFLAG_ROOT))
+			return true;
+	}
+	return false;
 }

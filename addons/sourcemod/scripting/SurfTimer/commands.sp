@@ -82,43 +82,40 @@ void CreateCommands()
 	RegConsoleCmd("sm_normal", Command_normalMode, "[surftimer] Switches player back to normal mode.");
 	RegConsoleCmd("sm_n", Command_normalMode, "[surftimer] Switches player back to normal mode.");
 
-	RegAdminCmd("sm_ckadmin", Admin_ckPanel, g_AdminMenuFlag, "[surftimer] Displays the surftimer admin menu panel");
-	RegAdminCmd("sm_refreshprofile", Admin_RefreshProfile, g_AdminMenuFlag, "[surftimer] Recalculates player profile for given steam id");
+	RegConsoleCmd("sm_ckadmin", Admin_ckPanel, "[surftimer] Displays the surftimer admin menu panel");
+	RegConsoleCmd("sm_refreshprofile", Admin_RefreshProfile, "[surftimer] Recalculates player profile for given steam id");
 
-	RegAdminCmd("sm_clearassists", Admin_ClearAssists, g_AdminMenuFlag, "[surftimer] Clears assist points (map progress) from all players");
+	RegConsoleCmd("sm_clearassists", Admin_ClearAssists, "[surftimer] Clears assist points (map progress) from all players");
 
-	// DB Map Settings && Zoners
-	RegAdminCmd("sm_zones", Command_Zones, g_ZonerFlag, "[surftimer] [zoner] Opens up the zone creation menu.");
-	RegAdminCmd("sm_hookzone", Command_HookZones, g_ZonerFlag, "[surftimer] [zoner] Opens up zone hook creation menu.");
-	RegAdminCmd("sm_addmaptier", Admin_insertMapTier, g_ZonerFlag, "[surftimer] [zoner] Changes maps tier");
-	RegAdminCmd("sm_amt", Admin_insertMapTier, g_ZonerFlag, "[surftimer] [zoner] Changes maps tier");
-	RegAdminCmd("sm_addspawn", Admin_insertSpawnLocation, g_ZonerFlag, "[surftimer] [zoner] Changes the position !r takes players to");
-	RegAdminCmd("sm_delspawn", Admin_deleteSpawnLocation, g_ZonerFlag, "[surftimer] [zoner] Removes custom !r position");
-	RegAdminCmd("sm_mapsettings", Admin_MapSettings, g_ZonerFlag, "[surftimer] [zoner] Displays menu containing various options to change map settings");
-	RegAdminCmd("sm_ms", Admin_MapSettings, g_ZonerFlag, "[surftimer] [zoner] Displays menu containing various options to change map settings");
-	RegAdminCmd("sm_maxvelocity", Command_SetMaxVelocity, g_ZonerFlag, "[surftimer] [zoner] Set the current maps maxvelocity");
-	RegAdminCmd("sm_mv", Command_SetMaxVelocity, g_ZonerFlag, "[surftimer] [zoner] Set the current maps max velocity");
-	RegAdminCmd("sm_announcerecord", Command_SetAnnounceRecord, g_ZonerFlag, "[surftimer] [zoner] Set whether records will be announced on all finishes, pb only or client only");
-	RegAdminCmd("sm_ar", Command_SetAnnounceRecord, g_ZonerFlag, "[surftimer] [zoner] Set whether records will be announced on all finishes, pb only or client only");
-	RegAdminCmd("sm_gravityfix", Command_SetGravityFix, g_ZonerFlag, "[surftimer] [zoner] Toggle the gravity fix on the current map");
-	RegAdminCmd("sm_gf", Command_SetGravityFix, g_ZonerFlag, "[surftimer] [zoner] Toggle the gravity fix on the current map");
-	RegAdminCmd("sm_triggers", Command_ToggleTriggers, g_ZonerFlag, "[surftimer] [zoner] Toggle display of map triggers");
-	RegAdminCmd("sm_noclipspeed", Command_NoclipSpeed, g_ZonerFlag, "[surftimer] [zoner] Changes the value of sv_noclipspeed");
+	RegConsoleCmd("sm_zones", Command_Zones, "[surftimer] [zoner] Opens up the zone creation menu.");
+	RegConsoleCmd("sm_hookzone", Command_HookZones, "[surftimer] [zoner] Opens up zone hook creation menu.");
+	RegConsoleCmd("sm_addmaptier", Admin_insertMapTier, "[surftimer] [zoner] Changes maps tier");
+	RegConsoleCmd("sm_amt", Admin_insertMapTier, "[surftimer] [zoner] Changes maps tier");
+	RegConsoleCmd("sm_addspawn", Admin_insertSpawnLocation, "[surftimer] [zoner] Changes the position !r takes players to");
+	RegConsoleCmd("sm_delspawn", Admin_deleteSpawnLocation, "[surftimer] [zoner] Removes custom !r position");
+	RegConsoleCmd("sm_mapsettings", Admin_MapSettings, "[surftimer] [zoner] Displays menu containing various options to change map settings");
+	RegConsoleCmd("sm_ms", Admin_MapSettings, "[surftimer] [zoner] Displays menu containing various options to change map settings");
+	RegConsoleCmd("sm_maxvelocity", Command_SetMaxVelocity, "[surftimer] [zoner] Set the current maps maxvelocity");
+	RegConsoleCmd("sm_mv", Command_SetMaxVelocity, "[surftimer] [zoner] Set the current maps max velocity");
+	RegConsoleCmd("sm_announcerecord", Command_SetAnnounceRecord, "[surftimer] [zoner] Set whether records will be announced on all finishes, pb only or client only");
+	RegConsoleCmd("sm_ar", Command_SetAnnounceRecord, "[surftimer] [zoner] Set whether records will be announced on all finishes, pb only or client only");
+	RegConsoleCmd("sm_gravityfix", Command_SetGravityFix, "[surftimer] [zoner] Toggle the gravity fix on the current map");
+	RegConsoleCmd("sm_gf", Command_SetGravityFix, "[surftimer] [zoner] Toggle the gravity fix on the current map");
+	RegConsoleCmd("sm_triggers", Command_ToggleTriggers, "[surftimer] [zoner] Toggle display of map triggers");
+	RegConsoleCmd("sm_noclipspeed", Command_NoclipSpeed, "[surftimer] [zoner] Changes the value of sv_noclipspeed");
 
 	// VIP Commands
 	RegAdminCmd("sm_fixbot", Admin_FixBot, g_VipFlag, "[surftimer] Toggles replay bots off and on");
 
 	RegConsoleCmd("sm_vip", Command_Vip, "[surftimer] [vip] Displays the VIP menu to client");
-	RegConsoleCmd("sm_mytitle", Command_PlayerTitle, "[surftimer] [vip] VIPs can set their own custom title into a db.");
-	RegConsoleCmd("sm_title", Command_PlayerTitle, "[surftimer] [vip] VIPs can set their own custom title into a db.");
-	RegConsoleCmd("sm_customtitle", Command_SetDbTitle, "[surftimer] [vip] VIPs can set their own custom title into a db.");
-	RegConsoleCmd("sm_namecolour", Command_SetDbNameColour, "[surftimer] [vip] VIPs can set their own custom name colour into the db.");
-	RegConsoleCmd("sm_textcolour", Command_SetDbTextColour, "[surftimer] [vip] VIPs can set their own custom text colour into the db.");
+	RegConsoleCmd("sm_mytitle", Command_PlayerTitle, "[surftimer] [vip] Displays a menu to the player showing their custom title and allowing them to change their colours");
+	RegConsoleCmd("sm_title", Command_PlayerTitle, "[surftimer] [vip] Displays a menu to the player showing their custom title and allowing them to change their colours");
+	RegConsoleCmd("sm_customtitle", Command_SetDbTitle, "[surftimer] [vip] VIPs can set their own custom title into a db");
+	RegConsoleCmd("sm_namecolour", Command_SetDbNameColour, "[surftimer] [vip] VIPs can set their own custom name colour into the db");
+	RegConsoleCmd("sm_textcolour", Command_SetDbTextColour, "[surftimer] [vip] VIPs can set their own custom text colour into the db");
 	RegConsoleCmd("sm_ve", Command_VoteExtend, "[surftimer] [vip] Vote to extend the map");
 	RegConsoleCmd("sm_colours", Command_ListColours, "[surftimer] Lists available colours for sm_mytitle and sm_namecolour");
 	RegConsoleCmd("sm_toggletitle", Command_ToggleTitle, "[surftimer] [vip] VIPs can toggle their title.");
-	RegConsoleCmd("sm_votemute", Command_VoteMute, "[surftimer] [vip] starts a vote to mute a client");
-	RegConsoleCmd("sm_votegag", Command_VoteGag, "[surftimer] [vip] starts a vote to gag a client");
 	RegConsoleCmd("sm_joinmsg", Command_JoinMsg, "[surftimer] [vip] Allows a vip to set their join msg");
 
 	// Automatic Donate Commands
@@ -176,13 +173,8 @@ void CreateCommands()
 	RegConsoleCmd("sm_btopff", Client_FFBonusTop, "[surftimer] displays a local bonus top (fast forwards) for a given map");
 	RegConsoleCmd("sm_ffbtop", Client_FFBonusTop, "[surftimer] displays a local bonus top (fast forwards) for a given map");*/
 
-	// Bans & Mutes
-	RegConsoleCmd("sm_bans", Client_ShowBans, "[surftimer] displays a menu with the recent bans");
-	RegConsoleCmd("sm_mutes", Client_ShowComms, "[surftimer] displays a menu with the recent mutes or gags");
-	RegConsoleCmd("sm_gags", Client_ShowComms, "[surftimer] displays a menu with the recent mutes or gags");
-
 	// Test
-	RegAdminCmd("sm_test", sm_test, ADMFLAG_ROOT);
+	RegAdminCmd("sm_test", sm_test, ADMFLAG_CUSTOM6);
 	RegAdminCmd("sm_vel", Client_GetVelocity, ADMFLAG_ROOT);
 	RegAdminCmd("sm_targetname", Client_TargetName, ADMFLAG_ROOT);
 
@@ -2543,14 +2535,25 @@ public int TopMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 		int style = StringToInt(szBuffer);
 		switch (param2)
 		{
-			case 0:db_selectTopPlayers(param1, style);
-			case 1:db_selectTopSurfers(param1, g_szMapName);
-			case 2:BonusTopMenu(param1);
+			case 0: db_selectTopPlayers(param1, style);
+			case 1: SelectMapTop(param1, style);
+			case 2: BonusTopMenu(param1);
 		}
 	}
 	else
 		if (action == MenuAction_End)
 		CloseHandle(menu);
+}
+
+public void SelectMapTop(int client, int style)
+{
+	if (IsValidClient(client))
+	{
+		if (style > 0)
+			db_selectStyleMapTopSurfers(client, g_szMapName, style);
+		else
+			db_selectTopSurfers(client, g_szMapName);
+	}
 }
 
 public void BonusTopMenu(int client)
@@ -4097,7 +4100,7 @@ public Action Command_GiveKnife(int client, int args)
 
 public Action Command_NoclipSpeed(int client, int args)
 {
-	if (!CheckCommandAccess(client, "", ADMFLAG_CUSTOM2))
+	if (!IsPlayerZoner(client))
 		return Plugin_Handled;
 
 	if (args == 0)
@@ -4306,7 +4309,7 @@ public Action Command_HookZones(int client, int args)
 
 public void HookZonesMenu(int client)
 {
-	if (!(GetUserFlagBits(client) & g_ZonerFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT) && !g_bZoner[client])
+	if (!IsPlayerZoner(client))
 	{
 		CPrintToChat(client, "%t", "NoZoneAccess", g_szChatPrefix);
 		return;
@@ -4556,179 +4559,6 @@ public int HookZoneTypeHandler(Menu menu, MenuAction action, int param1, int par
 			delete menu;
 		}
 	}
-}
-
-public Action Client_ShowBans(int client, int args)
-{
-	if (IsValidClient(client) && !IsFakeClient(client))
-		db_selectAllBans(client);
-
-	return Plugin_Handled;
-}
-
-public Action Client_ShowComms(int client, int args)
-{
-	if (IsValidClient(client) && !IsFakeClient(client))
-		db_selectAllComms(client);
-
-	return Plugin_Handled;
-}
-
-public Action Command_VoteMute(int client, int args)
-{
-	if (IsValidClient(client) && IsPlayerVip(client))
-	{
-		if (IsVoteInProgress())
-		{
-			CReplyToCommand(client, "%t", "VoteInProgress", g_szChatPrefix);
-			return Plugin_Handled;
-		}
-		CommsVoteMenu(client, 0);
-	}
-	return Plugin_Handled;
-}
-
-
-public Action Command_VoteGag(int client, int args)
-{
-	if (IsValidClient(client) && IsPlayerVip(client))
-	{
-		if (IsVoteInProgress())
-		{
-			CReplyToCommand(client, "%t", "VoteInProgress", g_szChatPrefix);
-			return Plugin_Handled;
-		}
-		CommsVoteMenu(client, 1);
-	}
-	return Plugin_Handled;
-}
-
-public void CommsVoteMenu(int client, int type)
-{
-	Menu menu = CreateMenu(CommsVoteMenuHandler);
-	if (type == 0)
-		SetMenuTitle(menu, "Choose a player to Vote Mute");
-	else
-		SetMenuTitle(menu, "Choose a player to Vote Gag");
-
-	// Add Players
-	int playerCount = 0;
-	char szPlayerName[MAX_NAME_LENGTH];
-	for (int i = 1; i <= MaxClients; i++)
-	{
-		if (IsValidClient(i) && i != client && !IsFakeClient(i))
-		{
-			GetClientName(i, szPlayerName, MAX_NAME_LENGTH);
-			AddMenuItem(menu, szPlayerName, szPlayerName);
-			playerCount++;
-		}
-	}
-
-	if (playerCount > 0)
-	{
-		g_iCommsVoteType[client] = type;
-		SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
-		DisplayMenu(menu, client, MENU_TIME_FOREVER);
-	}
-	else
-	{
-		CPrintToChat(client, "%t", "NoPlayerTop", g_szChatPrefix);
-	}
-}
-
-public int CommsVoteMenuHandler(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Select)
-	{
-		char info[32];
-		char szPlayerName[MAX_NAME_LENGTH], szName[MAX_NAME_LENGTH];
-		GetClientName(param1, szName, MAX_NAME_LENGTH);
-		GetMenuItem(menu, param2, info, sizeof(info));
-
-		for (int i = 1; i <= MaxClients; i++)
-		{
-			if (IsValidClient(i) && IsPlayerAlive(i) && i != param1)
-			{
-				GetClientName(i, szPlayerName, MAX_NAME_LENGTH);
-				if (StrEqual(info, szPlayerName))
-				{
-					g_iCommsVoteTarget[param1] = i;
-					g_iCommsVoteCaller = param1;
-					int type = g_iCommsVoteType[param1];
-					char szMenuTitle[128];
-					if (type == 0) // Vote Mute
-					Format(szMenuTitle, sizeof(szMenuTitle), "Mute %s?", szPlayerName);
-					else
-					Format(szMenuTitle, sizeof(szMenuTitle), "Gag %s?", szPlayerName);
-
-					Menu menu2 = CreateMenu(CommsVoteHandle);
-					SetMenuTitle(menu2, szMenuTitle);
-					AddMenuItem(menu2, "yes", "Yes");
-					AddMenuItem(menu2, "no", "No");
-					SetMenuExitButton(menu2, false);
-					VoteMenuToAll(menu2, 20);
-
-					if (type == 0)
-					CPrintToChatAll("%t", "Commands63", g_szChatPrefix, szPlayerName, szName);
-					else
-					CPrintToChatAll("%t", "Commands64", g_szChatPrefix, szPlayerName, szName);
-
-					break;
-				}
-			}
-		}
-	}
-	else if (action == MenuAction_End)
-	CloseHandle(menu);
-}
-
-public int CommsVoteHandle(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_VoteEnd)
-	{
-		char item[64], display[64];
-		float percent, limit;
-		int votes, totalVotes;
-
-		menu.GetItem(param1, item, sizeof(item), _, display, sizeof(display));
-		GetMenuVoteInfo(param2, votes, totalVotes);
-
-		if (strcmp(item, VOTE_NO) == 0 && param1 == 1)
-		votes = totalVotes - votes;
-
-		percent = FloatDiv(float(votes),float(totalVotes));
-		limit = 0.75;
-
-		/* 0=yes, 1=no */
-		if ((strcmp(item, VOTE_YES) == 0 && FloatCompare(percent,limit) < 0 && param1 == 0) || (strcmp(item, VOTE_NO) == 0 && param1 == 1))
-		{
-			CPrintToChatAll("%t", "Commands65", g_szChatPrefix, RoundToNearest(100.0*limit), RoundToNearest(100.0*percent), totalVotes);
-		}
-		else
-		{
-			int client = g_iCommsVoteCaller;
-			int type = g_iCommsVoteType[client];
-			int target = g_iCommsVoteTarget[client];
-			char szReason[512], szName[MAX_NAME_LENGTH], szSteamID[32], szTargetName[MAX_NAME_LENGTH];
-			GetClientName(client, szName, MAX_NAME_LENGTH);
-			GetClientName(target, szTargetName, MAX_NAME_LENGTH);
-			GetClientAuthId(client, AuthId_Steam2, szSteamID, 32, true);
-			if (type == 0) // Vote Mute
-			{
-				CPrintToChatAll("%t", "Commands66", g_szChatPrefix, szTargetName, RoundToNearest(100.0*percent), totalVotes);
-				Format(szReason, sizeof(szReason), "Muted via vote mute started by %s - %s", szName, szSteamID);
-				SourceComms_SetClientMute(target, true, 10, true, szReason);
-			}
-			else // Vote Gag
-			{
-				CPrintToChatAll("%t", "Commands67", g_szChatPrefix, szTargetName, RoundToNearest(100.0*percent), totalVotes);
-				Format(szReason, sizeof(szReason), "Gagged via vote gag started by %s - %s", szName, szSteamID);
-				SourceComms_SetClientGag(target, true, 10, true, szReason);
-			}
-		}
-	}
-	else if (action == MenuAction_End)
-	CloseHandle(menu);
 }
 
 // Startpos Goose
@@ -5002,9 +4832,12 @@ public void ChooseReplayMenu(int client, int type)
 		Format(szTitle, sizeof(szTitle), "Play Record: Stage Replay");
 		for (int i = 1; i <= g_TotalStages; i++)
 		{
-			Format(szItem, sizeof(szItem), "Stage %d Replay", i);
-			Format(szBuffer, sizeof(szBuffer), "stage-%d", i);
-			AddMenuItem(menu, szBuffer, szItem);
+			if (g_bStageReplay[i])
+			{
+				Format(szItem, sizeof(szItem), "Stage %d Replay", i);
+				Format(szBuffer, sizeof(szBuffer), "stage-%d", i);
+				AddMenuItem(menu, szBuffer, szItem);
+			}
 		}
 	}
 

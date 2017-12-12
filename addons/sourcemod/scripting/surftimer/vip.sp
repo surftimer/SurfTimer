@@ -209,10 +209,10 @@ public void db_insertVipCallback(Handle owner, Handle hndl, const char[] error, 
 	}
 
 	char szSteamId[128];
-	int iVip;
+	// int iVip;
 	ResetPack(pack);
 	ReadPackString(pack, szSteamId, 128);
-	iVip = ReadPackCell(pack);
+	// iVip = ReadPackCell(pack);
 	CloseHandle(pack);
 
 	// Find Client

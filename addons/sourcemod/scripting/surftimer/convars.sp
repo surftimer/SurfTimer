@@ -96,6 +96,18 @@ ConVar g_hSidewaysBlockKeys = null;
 ConVar g_hEnforceDefaultTitles = null;
 ConVar g_hWrcpPoints = null;
 ConVar g_hPlayReplayVipOnly = null;
+ConVar g_hSoundPathWR = null;
+char g_szSoundPathWR[PLATFORM_MAX_PATH];
+char g_szRelativeSoundPathWR[PLATFORM_MAX_PATH];
+ConVar g_hSoundPathTop = null;
+char g_szSoundPathTop[PLATFORM_MAX_PATH];
+char g_szRelativeSoundPathTop[PLATFORM_MAX_PATH];
+ConVar g_hSoundPathPB = null;
+char g_szSoundPathPB[PLATFORM_MAX_PATH];
+char g_szRelativeSoundPathPB[PLATFORM_MAX_PATH];
+ConVar g_hSoundPathWRCP = null;
+char g_szSoundPathWRCP[PLATFORM_MAX_PATH];
+char g_szRelativeSoundPathWRCP[PLATFORM_MAX_PATH];
 
 void CreateConVars()
 {
@@ -252,7 +264,7 @@ void CreateConVars()
 		g_AdminMenuFlag = ADMFLAG_ROOT;
 	}
 	else
-	g_AdminMenuFlag = FlagToBit(bufferFlag);
+		g_AdminMenuFlag = FlagToBit(bufferFlag);
 	HookConVarChange(g_hAdminMenuFlag, OnSettingChanged);
 
 	g_hZonerFlag = CreateConVar("ck_zoner_flag", "z", "Zoner status will automatically be granted to players with this flag. If the convar is invalid or not set, z (root) will be used by default.", FCVAR_NOTIFY);
@@ -260,11 +272,11 @@ void CreateConVars()
 	validFlag = FindFlagByChar(szFlag[0], bufferFlag);
 	if (!validFlag)
 	{
-		PrintToServer("SurfTimer | Invalid flag for ck_zoner_flag.");
+		LogError("Surftimer | Invalid flag for ck_zoner_flag, using ADMFLAG_ROOT");
 		g_ZonerFlag = ADMFLAG_ROOT;
 	}
 	else
-	g_ZonerFlag = FlagToBit(bufferFlag);
+		g_ZonerFlag = FlagToBit(bufferFlag);
 	HookConVarChange(g_hZonerFlag, OnSettingChanged);
 
 	// Map Setting ConVars
@@ -323,6 +335,67 @@ void CreateConVars()
 	// Play Replay
 	g_hPlayReplayVipOnly = CreateConVar("ck_play_replay_vip_only", "1", "Sets whether the sm_replay command will be VIP only Disable/Enable");
 
+	// Sound Convars
+	g_hSoundPathWR = CreateConVar("ck_sp_wr", "sound/surftimer/wr/2/valve_logo_music.mp3", "Set the sound path for the WR sound");
+	HookConVarChange(g_hSoundPathWR, OnSettingChanged);
+	GetConVarString(g_hSoundPathWR, g_szSoundPathWR, sizeof(g_szSoundPathWR));
+	if (FileExists(g_szSoundPathWR))
+	{
+		char sBuffer[2][PLATFORM_MAX_PATH];
+		ExplodeString(g_szSoundPathWR, "sound/", sBuffer, 2, PLATFORM_MAX_PATH);
+		Format(g_szRelativeSoundPathWR, sizeof(g_szRelativeSoundPathWR), "*%s", sBuffer[1]);
+	}
+	else
+	{
+		Format(g_szSoundPathWR, sizeof(g_szSoundPathWR), WR2_FULL_SOUND_PATH);
+		Format(g_szRelativeSoundPathWR, sizeof(g_szRelativeSoundPathWR), WR2_RELATIVE_SOUND_PATH);
+	}
+
+	g_hSoundPathTop = CreateConVar("ck_sp_top", "sound/surftimer/top10/valve_logo_music.mp3", "Set the sound path for the Top 10 sound");
+	HookConVarChange(g_hSoundPathTop, OnSettingChanged);
+	GetConVarString(g_hSoundPathTop, g_szSoundPathTop, sizeof(g_szSoundPathTop));
+	if (FileExists(g_szSoundPathTop))
+	{
+		char sBuffer[2][PLATFORM_MAX_PATH];
+		ExplodeString(g_szSoundPathTop, "sound/", sBuffer, 2, PLATFORM_MAX_PATH);
+		Format(g_szRelativeSoundPathTop, sizeof(g_szRelativeSoundPathTop), "*%s", sBuffer[1]);
+	}
+	else
+	{
+		Format(g_szSoundPathTop, sizeof(g_szSoundPathTop), TOP10_FULL_SOUND_PATH);
+		Format(g_szRelativeSoundPathTop, sizeof(g_szRelativeSoundPathTop), TOP10_RELATIVE_SOUND_PATH);
+	}
+
+	g_hSoundPathPB = CreateConVar("ck_sp_pb", "sound/surftimer/pr/valve_logo_music.mp3", "Set the sound path for the PB sound");
+	HookConVarChange(g_hSoundPathPB, OnSettingChanged);
+	GetConVarString(g_hSoundPathPB, g_szSoundPathPB, sizeof(g_szSoundPathPB));
+	if (FileExists(g_szSoundPathPB))
+	{
+		char sBuffer[2][PLATFORM_MAX_PATH];
+		ExplodeString(g_szSoundPathPB, "sound/", sBuffer, 2, PLATFORM_MAX_PATH);
+		Format(g_szRelativeSoundPathPB, sizeof(g_szRelativeSoundPathPB), "*%s", sBuffer[1]);
+	}
+	else
+	{
+		Format(g_szSoundPathPB, sizeof(g_szSoundPathPB), PR_FULL_SOUND_PATH);
+		Format(g_szRelativeSoundPathPB, sizeof(g_szRelativeSoundPathPB), PR_RELATIVE_SOUND_PATH);
+	}
+
+	g_hSoundPathWRCP = CreateConVar("ck_sp_wrcp", "sound/physics/glass/glass_bottle_break2.wav", "Set the sound path for the WRCP sound");
+	HookConVarChange(g_hSoundPathWRCP, OnSettingChanged);
+	GetConVarString(g_hSoundPathWRCP, g_szSoundPathWRCP, sizeof(g_szSoundPathWRCP));
+	if (FileExists(g_szSoundPathWRCP))
+	{
+		char sBuffer[2][PLATFORM_MAX_PATH];
+		ExplodeString(g_szSoundPathWRCP, "sound/", sBuffer, 2, PLATFORM_MAX_PATH);
+		Format(g_szRelativeSoundPathWRCP, sizeof(g_szRelativeSoundPathWRCP), "*%s", sBuffer[1]);
+	}
+	else
+	{
+		Format(g_szSoundPathWRCP, sizeof(g_szSoundPathWRCP), "sound/physics/glass/glass_bottle_break2.wav");
+		Format(g_szRelativeSoundPathWRCP, sizeof(g_szRelativeSoundPathWRCP), "*physics/glass/glass_bottle_break2.wav");
+	}
+	
 	// Server Name
 	g_hHostName = FindConVar("hostname");
 	HookConVarChange(g_hHostName, OnSettingChanged);
