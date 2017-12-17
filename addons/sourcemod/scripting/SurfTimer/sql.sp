@@ -144,6 +144,65 @@ public void db_upgradeDatabase(int ver)
   SQL_UnlockDatabase(g_hDb);
 }
 
+/* Admin Delete Menu */
+
+public void sql_NoAction(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == INVALID_HANDLE)
+	{
+		PrintToServer("Error %s", error);
+	}
+}
+public void sql_DeleteMenuView(Handle owner, Handle hndl, const char[] error, any data)
+{
+	int client = GetClientFromSerial(data);
+	
+	Menu editing = new Menu(callback_DeleteRecord);
+	editing.SetTitle("[%s] Records Editing Menu - Viewing %s\n► Editing %s record.\n► Press the menu item to delete the record.\n ", MENU_PREFIX, g_EditingMap[client], g_EditTypes[g_SelectedEditOption[client]]);
+	
+	char menuFormat[88];
+	FormatEx(menuFormat, sizeof(menuFormat), "Style: %s\n► Press the menu item to change the style.\n ", g_EditStyles[g_SelectedStyle[client]]);
+	editing.AddItem("0", menuFormat);
+	
+	if(g_SelectedEditOption[client] > 0)
+	{
+		FormatEx(menuFormat, sizeof(menuFormat), "%s: %i\n► Press the menu item to change the %s.\n ", g_SelectedEditOption[client] == 1 ? "Stage":"Type", g_SelectedType[client], g_SelectedEditOption[client] == 1 ? "stage":"type");
+		editing.AddItem("0", menuFormat);
+	}
+	
+	if (hndl == INVALID_HANDLE)
+	{
+		PrintToServer("Error %s", error);
+	}
+	else if (!SQL_GetRowCount(hndl))
+	{
+		editing.AddItem("1", "No records found");
+		editing.Display(client, MENU_TIME_FOREVER);
+	}
+	else
+	{
+		char playerName[32], steamID[32];
+		float runTime;
+		
+		char menuFormatz[128];
+		
+		while (SQL_FetchRow(hndl))
+		{
+			SQL_FetchString(hndl, 0, steamID, 32);
+			SQL_FetchString(hndl, 1, playerName, 32);
+			runTime = SQL_FetchFloat(hndl, 2);
+			
+			FormatEx(menuFormat, sizeof(menuFormat), "%s [%s] - %.5f", playerName, steamID, runTime);
+			ReplaceString(playerName, 32, ";;;", ""); // make sure the client dont has this in their name.
+			
+			FormatEx(menuFormatz, 128, "%s;;;%s;;;%.5f", playerName, steamID, runTime);
+			editing.AddItem(menuFormatz, menuFormat);
+		}
+		editing.Display(client, MENU_TIME_FOREVER);
+	}
+}
+
+
 /*==================================
 =          SPAWN LOCATION          =
 ==================================*/

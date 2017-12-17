@@ -101,6 +101,8 @@
 #define VOTE_NO "###no###"
 #define VOTE_YES "###yes###"
 
+#define MENU_PREFIX "SurfTimer"
+
 // Checkpoint Definitions
 // Maximum amount of checkpoints in a map
 #define CPLIMIT 37
@@ -1310,6 +1312,19 @@ int g_iSelectedReplayStage;
 int g_iSelectedReplayStyle;
 int g_iSelectedBonusReplayStyle;
 
+/* Admin delete menu */
+
+char g_EditingMap[MAXPLAYERS + 1][256];
+int g_SelectedEditOption[MAXPLAYERS + 1];
+int g_SelectedStyle[MAXPLAYERS + 1];
+int g_SelectedType[MAXPLAYERS + 1];
+
+bool g_ChatSelecting[MAXPLAYERS + 1];
+
+char g_EditTypes[][] =  { "Main", "Stage", "Bonus" };
+char g_EditStyles[][] =  { "Normal", "Sideways", "Half-Sideways", "Backwards", "Normal-Ranked", "Low-Gravity", "Slow Motion", "Fast Forward"};
+
+
 /*===================================
 =         Predefined Arrays         =
 ===================================*/
@@ -1505,13 +1520,14 @@ char RadioCMDS[][] = 													// Disable radio commands
 =              Includes              =
 ====================================*/
 
+
 #include "surftimer/convars.sp"
 #include "surftimer/misc.sp"
+#include "surftimer/sql.sp"
 #include "surftimer/admin.sp"
 #include "surftimer/commands.sp"
 #include "surftimer/hooks.sp"
 #include "surftimer/buttonpress.sp"
-#include "surftimer/sql.sp"
 #include "surftimer/sql2.sp"
 #include "surftimer/sqltime.sp"
 #include "surftimer/timer.sp"

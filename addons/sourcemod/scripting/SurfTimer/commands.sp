@@ -195,6 +195,208 @@ void CreateCommands()
 	// Play record
 	RegConsoleCmd("sm_replay", Command_PlayRecord, "[surftimer] Set the replay bot to replay a run");
 	RegConsoleCmd("sm_replays", Command_PlayRecord, "[surftimer] Set the replay bot to replay a run");
+	RegAdminCmd("sm_deleterecords", cmd_Records, ADMFLAG_ROOT, "[SurfTimer] Delete records");
+}
+public Action cmd_Records(int client, int args)
+{
+	if(args > 0)
+	{
+		char sqlStripped[128];
+		GetCmdArg(1, sqlStripped[client], 128);
+		SQL_EscapeString(g_hDb, sqlStripped, g_EditingMap[client], 256);
+	}
+	else
+	{ 	
+		GetCurrentMap(g_EditingMap[client], 256);
+	}
+	
+	ShowMainDeleteMenu(client);
+	return Plugin_Handled;
+}
+
+public void ShowMainDeleteMenu(int client)
+{
+	Menu editing = new Menu(callback_Record);
+	editing.SetTitle("[%s] Records Editing Menu - Viewing %s\n► Select the type of the record you would like to delete.\n ", MENU_PREFIX, g_EditingMap[client]);
+	
+	editing.AddItem("0", "Main Record");
+	editing.AddItem("1", "Stage Record");
+	editing.AddItem("2", "Bonus Record");
+	
+	editing.Display(client, MENU_TIME_FOREVER);
+}
+
+public int callback_Record(Menu menu, MenuAction action, int client, int key)
+{
+	if(action == MenuAction_Select)
+	{
+		g_SelectedEditOption[client] = key;
+		g_SelectedStyle[client] = 0;
+		g_SelectedType[client] = 1;
+		
+		char szQuery[512];
+		
+		switch(key)
+		{
+			case 0:
+			{
+				FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_playertimes", g_EditingMap[client], g_SelectedStyle[client], "", "runtimepro");
+			}
+			case 1:
+			{
+				char stageQuery[32];
+				FormatEx(stageQuery, 32, "AND stage='%i' ", g_SelectedType[client]);
+				FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_wrcps", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtimepro");
+			}
+			case 2:
+			{
+				char stageQuery[32];
+				FormatEx(stageQuery, 32, "AND zonegroup='%i' ", g_SelectedType[client]);
+				FormatEx(szQuery, 512, sql_MainEditQuery, "runtime", "ck_bonus", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtime");
+			}
+		}
+		
+		PrintToServer(szQuery);
+		SQL_TQuery(g_hDb, sql_DeleteMenuView, szQuery, GetClientSerial(client));
+	}
+	else if(action == MenuAction_End)
+		delete menu;
+}
+
+public int callback_DeleteRecord(Menu menu, MenuAction action, int client, int key)
+{
+	if(action == MenuAction_Select)
+	{
+		if(key == 0)
+		{
+			if(g_SelectedStyle[client] < MAX_STYLES)
+				g_SelectedStyle[client]++;
+			else
+				g_SelectedStyle[client] = 0;
+			
+			char szQuery[512];
+			
+			switch(g_SelectedEditOption[client])
+			{
+				case 0:
+				{
+					FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_playertimes", g_EditingMap[client], g_SelectedStyle[client], "", "runtimepro");
+				}
+				case 1:
+				{
+					char stageQuery[32];
+					FormatEx(stageQuery, 32, "AND stage='%i' ", g_SelectedType[client]);
+					FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_wrcps", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtimepro");
+				}
+				case 2:
+				{
+					char stageQuery[32];
+					FormatEx(stageQuery, 32, "AND zonegroup='%i' ", g_SelectedType[client]);
+					FormatEx(szQuery, 512, sql_MainEditQuery, "runtime", "ck_bonus", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtime");
+				}
+			}
+		
+			
+			PrintToServer(szQuery);
+			SQL_TQuery(g_hDb, sql_DeleteMenuView, szQuery, GetClientSerial(client));
+			return 0;
+		}
+	
+		if(g_SelectedEditOption[client] > 0 && key == 1)
+		{
+			g_ChatSelecting[client] = true;
+			PrintToChat(client, " \x05SurfTimer\x01 | Type new value in the chat, or \x05-1\x01 to cancel.");
+			return 0;
+		}
+	
+		
+		char menuItem[128];
+		menu.GetItem(key, menuItem, 128);
+		
+		char recordsBreak[3][32];
+		ExplodeString(menuItem, ";;;", recordsBreak, sizeof(recordsBreak), sizeof(recordsBreak[]));
+		
+		Menu confirm = new Menu(callback_Confirm);
+		confirm.SetTitle("[%s] Records Editing Menu - Accept Menu\n► Deleting %s [%s] %s record.\n ", MENU_PREFIX, recordsBreak[0], recordsBreak[1], recordsBreak[2]);
+		
+		confirm.AddItem("0", "No");
+		confirm.AddItem(recordsBreak[1], "Yes");
+		
+		confirm.Display(client, MENU_TIME_FOREVER);
+		
+		return 0;
+	}
+	else if (action == MenuAction_Cancel)
+	{
+		if (key == MenuCancel_Exit)
+		{
+			ShowMainDeleteMenu(client);
+		}
+	}
+	else if(action == MenuAction_End)
+		delete menu;
+		
+	return 0;
+}
+public int callback_Confirm(Menu menu, MenuAction action, int client, int key)
+{
+	if(action == MenuAction_Select)
+	{
+		if(key == 1)
+		{
+			char steamID[32];
+			menu.GetItem(key, steamID, 32);
+			
+			char szQuery[512];
+			
+			switch(g_SelectedEditOption[client])
+			{
+				case 0:
+				{
+					FormatEx(szQuery, 512, sql_MainDeleteQeury, "ck_playertimes", g_EditingMap[client], g_SelectedStyle[client], steamID, "");
+				}
+				case 1:
+				{
+					char stageQuery[32];
+					FormatEx(stageQuery, 32, "AND stage='%i'", g_SelectedType[client]);
+					FormatEx(szQuery, 512, sql_MainDeleteQeury, "ck_wrcps", g_EditingMap[client], g_SelectedStyle[client], steamID, stageQuery);
+				}
+				case 2:
+				{
+					char zoneQuery[32];
+					FormatEx(zoneQuery, 32, "AND zonegroup='%i'", g_SelectedType[client]);
+					FormatEx(szQuery, 512, sql_MainDeleteQeury, "ck_bonus", g_EditingMap[client], g_SelectedStyle[client], steamID, zoneQuery);
+				}
+			}
+			SQL_TQuery(g_hDb, sql_NoAction, szQuery);
+			
+			// Looking for online player to refresh his record after deleting it.
+			char player_steamID[32];
+			for(int i=1; i <= MaxClients; i++)
+			{
+				if(!IsClientInGame(i))
+					continue;
+					
+				GetClientAuthId(i, AuthId_Steam2, player_steamID, 32, true);
+				if(StrEqual(player_steamID,steamID))
+				{
+					g_bSettingsLoaded[client] = false;
+					g_bLoadingSettings[client] = true;
+					g_iSettingToLoad[client] = 0;
+					LoadClientSetting(client, g_iSettingToLoad[client]);
+					break;
+				}
+			}
+			
+			db_GetMapRecord_Pro();
+			PrintToServer(szQuery);
+			
+			PrintToChat(client, " \x05SurfTimer\x01 | Record deleted.");
+		}
+
+	}
+	else if(action == MenuAction_End)
+		delete menu;
 }
 
 void CreateCommandListeners()
