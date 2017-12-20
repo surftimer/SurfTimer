@@ -1524,7 +1524,7 @@ public void sql_selectRankedPlayersRankCallback(Handle owner, Handle hndl, const
 		}
 		// CS_SetClientContributionScore(client, (g_pr_AllPlayers - SQL_GetRowCount(hndl)));
 	}
-	else if (GetConVarInt(g_hPrestigeRank) > 0)
+	else if (style == 0 && GetConVarInt(g_hPrestigeRank) > 0)
 		KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
 
 	if (!g_bSettingsLoaded[client] && style == (MAX_STYLES - 1))
@@ -3375,7 +3375,7 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 	{
 		g_bTierEntryFound = true;
 		int tier;
-		
+
 		// Format tier string
 		tier = SQL_FetchInt(hndl, 0);
 		g_bRankedMap = view_as<bool>(SQL_FetchInt(hndl, 1));
@@ -3383,16 +3383,16 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 		{
 			g_bTierFound = true;
 			g_iMapTier = tier;
-			Format(g_sTierString, 512, "%c%s %c| ", LIMEGREEN, g_szMapName, GREEN);
+			Format(g_sTierString, 512, "%c%s %c- ", BLUE, g_szMapName, WHITE);
 			switch (tier)
 			{
-				case 1:Format(g_sTierString, 512, "%s%cTier %i %c| ", g_sTierString, GRAY, tier, GREEN);
-				case 2:Format(g_sTierString, 512, "%s%cTier %i %c| ", g_sTierString, LIGHTBLUE, tier, GREEN);
-				case 3:Format(g_sTierString, 512, "%s%cTier %i %c| ", g_sTierString, BLUE, tier, GREEN);
-				case 4:Format(g_sTierString, 512, "%s%cTier %i %c| ", g_sTierString, DARKBLUE, tier, GREEN);
-				case 5:Format(g_sTierString, 512, "%s%cTier %i %c| ", g_sTierString, RED, tier, GREEN);
-				case 6:Format(g_sTierString, 512, "%s%cTier %i %c| ", g_sTierString, DARKRED, tier, GREEN);
-				default:Format(g_sTierString, 512, "%s%cTier %i %c| ", g_sTierString, GRAY, tier, GREEN);
+				case 1:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, GRAY, tier, WHITE);
+				case 2:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, LIGHTBLUE, tier, WHITE);
+				case 3:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, BLUE, tier, WHITE);
+				case 4:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, DARKBLUE, tier, WHITE);
+				case 5:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, RED, tier, WHITE);
+				case 6:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, DARKRED, tier, WHITE);
+				default:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, GRAY, tier, WHITE);
 			}
 			if (g_bhasStages)
 				Format(g_sTierString, 512, "%s%c%i Stages", g_sTierString, MOSSGREEN, (g_mapZonesTypeCount[0][3] + 1));
@@ -3401,9 +3401,9 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 
 			if (g_bhasBonus)
 				if (g_mapZoneGroupCount > 2)
-					Format(g_sTierString, 512, "%s %c|%c %i Bonuses", g_sTierString, GREEN, ORANGE, (g_mapZoneGroupCount - 1));
+					Format(g_sTierString, 512, "%s %c-%c %i Bonuses", g_sTierString, WHITE, ORANGE, (g_mapZoneGroupCount - 1));
 				else
-					Format(g_sTierString, 512, "%s %c|%c Bonus", g_sTierString, GREEN, ORANGE, (g_mapZoneGroupCount - 1));
+					Format(g_sTierString, 512, "%s %c-%c Bonus", g_sTierString, WHITE, ORANGE, (g_mapZoneGroupCount - 1));
 		}
 	}
 	else

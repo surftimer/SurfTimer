@@ -2577,12 +2577,12 @@ public int GetSkillgroupIndex(int rank, int points)
 				}
 				else if (RankValueNext[RankReq] > -1)
 				{
-					if (points >= RankValue[PointReq] && rank < RankValueNext[RankReq])
+					if (points >= RankValue[PointReq] && rank > RankValueNext[RankReq])
 						return i;
 				}
 				else if (RankValueNext[RankTop] > -1)
 				{
-					if (points >= RankValue[PointReq] && rank < RankValueNext[RankTop])
+					if (points >= RankValue[PointReq])
 						return i;
 				}
 			}
@@ -4377,7 +4377,7 @@ public void sendDiscordAnnouncement(char szName[32], char szMapName[128], char s
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("Surftimer Records");
+	hook.SetUsername("SurfTimer Records");
 
 	MessageEmbed Embed = new MessageEmbed();
 
@@ -4487,7 +4487,7 @@ public void SendBugReport(int client)
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("Surftimer Bugtracker");
+	hook.SetUsername("SurfTimer Bugtracker");
 
 	MessageEmbed Embed = new MessageEmbed();
 
@@ -4523,7 +4523,7 @@ public void CallAdmin(int client, char[] sText)
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("Surftimer Calladmin");
+	hook.SetUsername("SurfTimer Calladmin");
 
 	MessageEmbed Embed = new MessageEmbed();
 

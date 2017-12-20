@@ -930,7 +930,7 @@ public void ZoneMenu(int client)
 		ckZoneMenu.Display(client, MENU_TIME_FOREVER);
 	}
 	else
-		CPrintToChat(client, "%t", "SurfZones2", g_szChatPrefix);
+		CPrintToChat(client, "%t", "NoZoneAccess", g_szChatPrefix);
 }
 
 public int Handle_ZoneMenu(Handle tMenu, MenuAction action, int client, int item)
@@ -2160,7 +2160,7 @@ public int ZoneHookHandler(Handle menu, MenuAction action, int param1, int param
 				GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", position);
 				GetClientEyeAngles(param1, angles);
 
-				CPrintToChat(param1, "%t", "SurfZones11", g_szChatPrefix, szTriggerName, position[0], position[1], position[2]);
+				CPrintToChat(param1, "%t", "TeleportingTo", g_szChatPrefix, szTriggerName, position[0], position[1], position[2]);
 
 				teleportEntitySafe(param1, position, angles, view_as<float>( { 0.0, 0.0, -100.0 } ), true);
 				SelectTrigger(param1, index);
