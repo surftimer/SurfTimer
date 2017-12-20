@@ -146,27 +146,20 @@ public void db_upgradeDatabase(int ver)
 
 /* Admin Delete Menu */
 
-public void sql_NoAction(Handle owner, Handle hndl, const char[] error, any data)
-{
-	if (hndl == INVALID_HANDLE)
-	{
-		PrintToServer("Error %s", error);
-	}
-}
 public void sql_DeleteMenuView(Handle owner, Handle hndl, const char[] error, any data)
 {
 	int client = GetClientFromSerial(data);
 	
 	Menu editing = new Menu(callback_DeleteRecord);
-	editing.SetTitle("[%s] Records Editing Menu - Viewing %s\n► Editing %s record.\n► Press the menu item to delete the record.\n ", MENU_PREFIX, g_EditingMap[client], g_EditTypes[g_SelectedEditOption[client]]);
+	editing.SetTitle("%s Records Editing Menu - %s\n► Editing %s record\n► Press the menu item to delete the record\n ", g_szMenuPrefix, g_EditingMap[client], g_EditTypes[g_SelectedEditOption[client]]);
 	
 	char menuFormat[88];
-	FormatEx(menuFormat, sizeof(menuFormat), "Style: %s\n► Press the menu item to change the style.\n ", g_EditStyles[g_SelectedStyle[client]]);
+	FormatEx(menuFormat, sizeof(menuFormat), "Style: %s\n► Press the menu item to change the style\n ", g_EditStyles[g_SelectedStyle[client]]);
 	editing.AddItem("0", menuFormat);
 	
 	if(g_SelectedEditOption[client] > 0)
 	{
-		FormatEx(menuFormat, sizeof(menuFormat), "%s: %i\n► Press the menu item to change the %s.\n ", g_SelectedEditOption[client] == 1 ? "Stage":"Type", g_SelectedType[client], g_SelectedEditOption[client] == 1 ? "stage":"type");
+		FormatEx(menuFormat, sizeof(menuFormat), "%s: %i\n► Press the menu item to change the %s\n ", g_SelectedEditOption[client] == 1 ? "Stage":"Bonus", g_SelectedType[client], g_SelectedEditOption[client] == 1 ? "stage":"bonus");
 		editing.AddItem("0", menuFormat);
 	}
 	
@@ -176,30 +169,166 @@ public void sql_DeleteMenuView(Handle owner, Handle hndl, const char[] error, an
 	}
 	else if (!SQL_GetRowCount(hndl))
 	{
-		editing.AddItem("1", "No records found");
+		editing.AddItem("1", "No records found", ITEMDRAW_DISABLED);
 		editing.Display(client, MENU_TIME_FOREVER);
 	}
 	else
 	{
 		char playerName[32], steamID[32];
 		float runTime;
-		
 		char menuFormatz[128];
-		
+		int i = 0;
 		while (SQL_FetchRow(hndl))
 		{
+			i++;
 			SQL_FetchString(hndl, 0, steamID, 32);
 			SQL_FetchString(hndl, 1, playerName, 32);
 			runTime = SQL_FetchFloat(hndl, 2);
-			
-			FormatEx(menuFormat, sizeof(menuFormat), "%s [%s] - %.5f", playerName, steamID, runTime);
+			char szRunTime[128];
+			FormatTimeFloat(data, runTime, 3, szRunTime, sizeof(szRunTime));
+			FormatEx(menuFormat, sizeof(menuFormat), "Rank: %d ► %s - %s", i, playerName, szRunTime);
 			ReplaceString(playerName, 32, ";;;", ""); // make sure the client dont has this in their name.
 			
-			FormatEx(menuFormatz, 128, "%s;;;%s;;;%.5f", playerName, steamID, runTime);
+			FormatEx(menuFormatz, 128, "%s;;;%s;;;%s", playerName, steamID, szRunTime);
 			editing.AddItem(menuFormatz, menuFormat);
 		}
 		editing.Display(client, MENU_TIME_FOREVER);
 	}
+}
+
+public int callback_DeleteRecord(Menu menu, MenuAction action, int client, int key)
+{
+	if(action == MenuAction_Select)
+	{
+		if(key == 0)
+		{
+			if(g_SelectedStyle[client] < MAX_STYLES - 1)
+				g_SelectedStyle[client]++;
+			else
+				g_SelectedStyle[client] = 0;
+			
+			char szQuery[512];
+			
+			switch(g_SelectedEditOption[client])
+			{
+				case 0:
+				{
+					FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_playertimes", g_EditingMap[client], g_SelectedStyle[client], "", "runtimepro");
+				}
+				case 1:
+				{
+					char stageQuery[32];
+					FormatEx(stageQuery, 32, "AND stage='%i' ", g_SelectedType[client]);
+					FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_wrcps", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtimepro");
+				}
+				case 2:
+				{
+					char stageQuery[32];
+					FormatEx(stageQuery, 32, "AND zonegroup='%i' ", g_SelectedType[client]);
+					FormatEx(szQuery, 512, sql_MainEditQuery, "runtime", "ck_bonus", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtime");
+				}
+			}
+		
+			
+			PrintToServer(szQuery);
+			SQL_TQuery(g_hDb, sql_DeleteMenuView, szQuery, GetClientSerial(client));
+			return 0;
+		}
+	
+		if(g_SelectedEditOption[client] > 0 && key == 1)
+		{
+			g_iWaitingForResponse[client] = 6;
+			CPrintToChat(client, "%t", "DeleteRecordsNewValue", g_szChatPrefix);
+			return 0;
+		}
+	
+		
+		char menuItem[128];
+		menu.GetItem(key, menuItem, 128);
+		
+		char recordsBreak[3][32];
+		ExplodeString(menuItem, ";;;", recordsBreak, sizeof(recordsBreak), sizeof(recordsBreak[]));
+		
+		Menu confirm = new Menu(callback_Confirm);
+		confirm.SetTitle("%s Records Editing Menu - Confirm Deletion\n► Deleting %s [%s] %s record\n ", g_szMenuPrefix, recordsBreak[0], recordsBreak[1], recordsBreak[2]);
+		
+		confirm.AddItem("0", "No");
+		confirm.AddItem(recordsBreak[1], "Yes\n \n► This cannot be undone");
+		
+		confirm.Display(client, MENU_TIME_FOREVER);
+		
+		return 0;
+	}
+	else if (action == MenuAction_Cancel)
+	{
+		if (key == MenuCancel_Exit)
+			ShowMainDeleteMenu(client);
+	}
+	else if(action == MenuAction_End)
+		delete menu;
+		
+	return 0;
+}
+
+public int callback_Confirm(Menu menu, MenuAction action, int client, int key)
+{
+	if(action == MenuAction_Select)
+	{
+		if(key == 1)
+		{
+			char steamID[32];
+			menu.GetItem(key, steamID, 32);
+			
+			char szQuery[512];
+			
+			switch(g_SelectedEditOption[client])
+			{
+				case 0:
+				{
+					FormatEx(szQuery, 512, sql_MainDeleteQeury, "ck_playertimes", g_EditingMap[client], g_SelectedStyle[client], steamID, "");
+				}
+				case 1:
+				{
+					char stageQuery[32];
+					FormatEx(stageQuery, 32, "AND stage='%i'", g_SelectedType[client]);
+					FormatEx(szQuery, 512, sql_MainDeleteQeury, "ck_wrcps", g_EditingMap[client], g_SelectedStyle[client], steamID, stageQuery);
+				}
+				case 2:
+				{
+					char zoneQuery[32];
+					FormatEx(zoneQuery, 32, "AND zonegroup='%i'", g_SelectedType[client]);
+					FormatEx(szQuery, 512, sql_MainDeleteQeury, "ck_bonus", g_EditingMap[client], g_SelectedStyle[client], steamID, zoneQuery);
+				}
+			}
+			SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
+			
+			// Looking for online player to refresh his record after deleting it.
+			char player_steamID[32];
+			for(int i=1; i <= MaxClients; i++)
+			{
+				if (!IsValidClient(i) || IsFakeClient(client))
+					continue;
+					
+				GetClientAuthId(i, AuthId_Steam2, player_steamID, 32, true);
+				if(StrEqual(player_steamID,steamID))
+				{
+					g_bSettingsLoaded[client] = false;
+					g_bLoadingSettings[client] = true;
+					g_iSettingToLoad[client] = 0;
+					LoadClientSetting(client, g_iSettingToLoad[client]);
+					break;
+				}
+			}
+			
+			db_GetMapRecord_Pro();
+			PrintToServer(szQuery);
+			
+			CPrintToChat(client, "%t", "DeleteRecordsDeletion", g_szChatPrefix);
+		}
+
+	}
+	else if(action == MenuAction_End)
+		delete menu;
 }
 
 

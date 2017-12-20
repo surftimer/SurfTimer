@@ -101,8 +101,6 @@
 #define VOTE_NO "###no###"
 #define VOTE_YES "###yes###"
 
-#define MENU_PREFIX "SurfTimer"
-
 // Checkpoint Definitions
 // Maximum amount of checkpoints in a map
 #define CPLIMIT 37
@@ -1297,6 +1295,7 @@ Handle g_TriggerMultipleList;
 
 // Chat Prefix
 char g_szChatPrefix[64];
+char g_szMenuPrefix[64];
 ConVar g_hChatPrefix = null;
 
 // Play Replay command
@@ -1319,10 +1318,8 @@ int g_SelectedEditOption[MAXPLAYERS + 1];
 int g_SelectedStyle[MAXPLAYERS + 1];
 int g_SelectedType[MAXPLAYERS + 1];
 
-bool g_ChatSelecting[MAXPLAYERS + 1];
-
 char g_EditTypes[][] =  { "Main", "Stage", "Bonus" };
-char g_EditStyles[][] =  { "Normal", "Sideways", "Half-Sideways", "Backwards", "Normal-Ranked", "Low-Gravity", "Slow Motion", "Fast Forward"};
+char g_EditStyles[][] =  { "Normal", "Sideways", "Half-Sideways", "Backwards", "Low-Gravity", "Slow Motion", "Fast Forward"};
 
 
 /*===================================
@@ -1852,6 +1849,8 @@ public void OnConfigsExecuted()
 {
 	// Get Chat Prefix
 	GetConVarString(g_hChatPrefix, g_szChatPrefix, sizeof(g_szChatPrefix));
+	GetConVarString(g_hChatPrefix, g_szMenuPrefix, sizeof(g_szMenuPrefix));
+	CRemoveColors(g_szMenuPrefix, sizeof(g_szMenuPrefix));
 
 	if (GetConVarBool(g_hDBMapcycle))
 		db_selectMapCycle();
@@ -2117,6 +2116,8 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 	if (convar == g_hChatPrefix)
 	{
 		GetConVarString(g_hChatPrefix, g_szChatPrefix, sizeof(g_szChatPrefix));
+		GetConVarString(g_hChatPrefix, g_szMenuPrefix, sizeof(g_szMenuPrefix));
+		CRemoveColors(g_szMenuPrefix, sizeof(g_szMenuPrefix));
 	}
 	if (convar == g_hReplayBot)
 	{
