@@ -195,6 +195,74 @@ void CreateCommands()
 	// Play record
 	RegConsoleCmd("sm_replay", Command_PlayRecord, "[surftimer] Set the replay bot to replay a run");
 	RegConsoleCmd("sm_replays", Command_PlayRecord, "[surftimer] Set the replay bot to replay a run");
+
+	// Delete records
+	RegAdminCmd("sm_deleterecords", Command_DeleteRecords, g_ZonerFlag, "[SurfTimer] [Zoner] Delete records");
+	RegAdminCmd("sm_dr", Command_DeleteRecords, g_ZonerFlag, "[SurfTimer] [Zoner] Delete records");
+}
+
+public Action Command_DeleteRecords(int client, int args)
+{
+	if(args > 0)
+	{
+		char sqlStripped[128];
+		GetCmdArg(1, sqlStripped[client], 128);
+		SQL_EscapeString(g_hDb, sqlStripped, g_EditingMap[client], 256);
+	}
+	else
+		Format(g_EditingMap[client], 256, g_szMapName);
+	
+	ShowMainDeleteMenu(client);
+	return Plugin_Handled;
+}
+
+public void ShowMainDeleteMenu(int client)
+{
+	Menu editing = new Menu(ShowMainDeleteMenuHandler);
+	editing.SetTitle("%s Records Editing Menu - %s\n► Select the type of the record you would like to delete\n ", g_szMenuPrefix, g_EditingMap[client]);
+	
+	editing.AddItem("0", "Map Record");
+	editing.AddItem("1", "Stage Record");
+	editing.AddItem("2", "Bonus Record");
+	
+	editing.Display(client, MENU_TIME_FOREVER);
+}
+
+public int ShowMainDeleteMenuHandler(Menu menu, MenuAction action, int client, int key)
+{
+	if(action == MenuAction_Select)
+	{
+		g_SelectedEditOption[client] = key;
+		g_SelectedStyle[client] = 0;
+		g_SelectedType[client] = 1;
+		
+		char szQuery[512];
+		
+		switch(key)
+		{
+			case 0:
+			{
+				FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_playertimes", g_EditingMap[client], g_SelectedStyle[client], "", "runtimepro");
+			}
+			case 1:
+			{
+				char stageQuery[32];
+				FormatEx(stageQuery, 32, "AND stage='%i' ", g_SelectedType[client]);
+				FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_wrcps", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtimepro");
+			}
+			case 2:
+			{
+				char stageQuery[32];
+				FormatEx(stageQuery, 32, "AND zonegroup='%i' ", g_SelectedType[client]);
+				FormatEx(szQuery, 512, sql_MainEditQuery, "runtime", "ck_bonus", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtime");
+			}
+		}
+		
+		PrintToServer(szQuery);
+		SQL_TQuery(g_hDb, sql_DeleteMenuView, szQuery, GetClientSerial(client));
+	}
+	else if(action == MenuAction_End)
+		delete menu;
 }
 
 void CreateCommandListeners()

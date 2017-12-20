@@ -1651,4 +1651,14 @@
 		"#format"	"{1:s},{2:s}"
 		"en"		"{1} No result found for {yellow}{2}"
 	}
+	"DeleteRecordsNewValue"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Type new value in the chat, or {darkred}cancel{default} to cancel"
+	}
+	"DeleteRecordsDeletion"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Record deleted"
+	}
 }

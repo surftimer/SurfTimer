@@ -1295,6 +1295,7 @@ Handle g_TriggerMultipleList;
 
 // Chat Prefix
 char g_szChatPrefix[64];
+char g_szMenuPrefix[64];
 ConVar g_hChatPrefix = null;
 
 // Play Replay command
@@ -1309,6 +1310,17 @@ int g_iSelectedReplayBonus;
 int g_iSelectedReplayStage;
 int g_iSelectedReplayStyle;
 int g_iSelectedBonusReplayStyle;
+
+/* Admin delete menu */
+
+char g_EditingMap[MAXPLAYERS + 1][256];
+int g_SelectedEditOption[MAXPLAYERS + 1];
+int g_SelectedStyle[MAXPLAYERS + 1];
+int g_SelectedType[MAXPLAYERS + 1];
+
+char g_EditTypes[][] =  { "Main", "Stage", "Bonus" };
+char g_EditStyles[][] =  { "Normal", "Sideways", "Half-Sideways", "Backwards", "Low-Gravity", "Slow Motion", "Fast Forward"};
+
 
 /*===================================
 =         Predefined Arrays         =
@@ -1505,13 +1517,14 @@ char RadioCMDS[][] = 													// Disable radio commands
 =              Includes              =
 ====================================*/
 
+
 #include "surftimer/convars.sp"
 #include "surftimer/misc.sp"
+#include "surftimer/sql.sp"
 #include "surftimer/admin.sp"
 #include "surftimer/commands.sp"
 #include "surftimer/hooks.sp"
 #include "surftimer/buttonpress.sp"
-#include "surftimer/sql.sp"
 #include "surftimer/sql2.sp"
 #include "surftimer/sqltime.sp"
 #include "surftimer/timer.sp"
@@ -1836,6 +1849,8 @@ public void OnConfigsExecuted()
 {
 	// Get Chat Prefix
 	GetConVarString(g_hChatPrefix, g_szChatPrefix, sizeof(g_szChatPrefix));
+	GetConVarString(g_hChatPrefix, g_szMenuPrefix, sizeof(g_szMenuPrefix));
+	CRemoveColors(g_szMenuPrefix, sizeof(g_szMenuPrefix));
 
 	if (GetConVarBool(g_hDBMapcycle))
 		db_selectMapCycle();
@@ -2101,6 +2116,8 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 	if (convar == g_hChatPrefix)
 	{
 		GetConVarString(g_hChatPrefix, g_szChatPrefix, sizeof(g_szChatPrefix));
+		GetConVarString(g_hChatPrefix, g_szMenuPrefix, sizeof(g_szMenuPrefix));
+		CRemoveColors(g_szMenuPrefix, sizeof(g_szMenuPrefix));
 	}
 	if (convar == g_hReplayBot)
 	{

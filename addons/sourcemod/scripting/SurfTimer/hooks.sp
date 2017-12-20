@@ -280,7 +280,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 	{
 		if (client > 0)
 			if (BaseComm_IsClientGagged(client))
-			return Plugin_Handled;
+				return Plugin_Handled;
 
 		// Blocked Commands
 		for (int i = 0; i < sizeof(g_BlockedChatText); i++)
@@ -360,7 +360,35 @@ public Action Say_Hook(int client, const char[] command, int argc)
 
 					EditorMenu(client);
 				}
+				case 6:
+				{
+					g_SelectedType[client] = StringToInt(sText);
+					char szQuery[512];
+
+					switch(g_SelectedEditOption[client])
+					{
+						case 0:
+						{
+							FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_playertimes", g_EditingMap[client], g_SelectedStyle[client], "", "runtimepro");
+						}
+						case 1:
+						{
+							char stageQuery[32];
+							FormatEx(stageQuery, 32, "AND stage='%i' ", g_SelectedType[client]);
+							FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_wrcps", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtimepro");
+						}
+						case 2:
+						{
+							char stageQuery[32];
+							FormatEx(stageQuery, 32, "AND zonegroup='%i' ", g_SelectedType[client]);
+							FormatEx(szQuery, 512, sql_MainEditQuery, "runtime", "ck_bonus", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtime");
+						}
+					}
+
+					SQL_TQuery(g_hDb, sql_DeleteMenuView, szQuery, GetClientSerial(client));
+				}
 			}
+
 			g_iWaitingForResponse[client] = -1;
 			return Plugin_Handled;
 		}
