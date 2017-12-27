@@ -1195,9 +1195,8 @@ public void Stage_StartRecording(int client)
 
 public void Stage_SaveRecording(int client, int stage, char[] time)
 {
-	if (!IsValidClient(client) || g_hRecording[client] == null) {
+	if (!IsValidClient(client) || g_hRecording[client] == null) 
 		return;
-	}
 
 	char szName[MAX_NAME_LENGTH];
 	GetClientName(client, szName, MAX_NAME_LENGTH);
@@ -1207,9 +1206,7 @@ public void Stage_SaveRecording(int client, int stage, char[] time)
 	// Check if the default record folder exists?
 	BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s", CK_REPLAY_PATH);
 	if (!DirExists(sPath2))
-	{
 		CreateDirectory(sPath2, 511);
-	}
 
 	BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s%s_stage_%d.rec", CK_REPLAY_PATH, g_szMapName, stage);
 
@@ -1263,7 +1260,5 @@ public void Stage_SaveRecording(int client, int stage, char[] time)
 
 	WriteRecordToDisk(sPath2, iHeader);
 	if (g_bSavingWrcpReplay[client])
-	{
 		g_bSavingWrcpReplay[client] = false;
-	}
 }

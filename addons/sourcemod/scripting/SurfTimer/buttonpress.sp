@@ -754,29 +754,20 @@ public void CL_OnStartWrcpTimerPress(int client)
 public void CL_OnEndWrcpTimerPress(int client, float time2)
 {
 	if (!IsValidClient(client))
-	return;
+		return;
 
 	// Print bot finishing message to spectators
-	if (IsFakeClient(client) && g_bWrcpTimeractivated[client] || IsFakeClient(client))
+	if (IsFakeClient(client))
 	{
 		g_bWrcpTimeractivated[client] = false;
 		return;
 	}
 
+	int stage = g_Stage[0][client] - 1;
+
 	// Get Client Name
 	char szName[MAX_NAME_LENGTH];
 	GetClientName(client, szName, MAX_NAME_LENGTH);
-
-
-	// if (g_bWrcpEndZone[client])
-	// {
-	// 	g_CurrentStage[client] += 1;
-	// 	g_bWrcpEndZone[client] = false;
-	// }
-	// else
-	// 	g_CurrentStage[client] = g_Stage[g_iClientInZone[client][2]][client] - 1;
-
-	int stage = g_Stage[0][client] - 1;
 
 	if (g_bWrcpEndZone[client])
 	{

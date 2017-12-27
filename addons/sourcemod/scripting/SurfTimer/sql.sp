@@ -338,7 +338,7 @@ public int callback_Confirm(Menu menu, MenuAction action, int client, int key)
 
 public void db_deleteSpawnLocations(int zGrp)
 {
-	g_bGotSpawnLocation[zGrp][0] = false;
+	g_bGotSpawnLocation[zGrp][1] = false;
 	char szQuery[128];
 	Format(szQuery, 128, sql_deleteSpawnLocations, g_szMapName, zGrp);
 	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, 1, DBPrio_Low);
@@ -408,9 +408,9 @@ public void db_selectSpawnLocationsCallback(Handle owner, Handle hndl, const cha
 			g_fSpawnVelocity[SQL_FetchInt(hndl, 10)][SQL_FetchInt(hndl, 11)][2] = SQL_FetchFloat(hndl, 9);
 		}
 	}
+
 	if (!g_bServerDataLoaded)
-	db_ClearLatestRecords();
-	return;
+		db_ClearLatestRecords();
 }
 
 /*===================================

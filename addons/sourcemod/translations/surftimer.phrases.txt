@@ -965,6 +965,11 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Spawnpoint edited"
 	}
+	"SpawnAdded"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Spawnpoint added"
+	}
 	"Admin8"
 	{
 		"#format"	"{1:s}"

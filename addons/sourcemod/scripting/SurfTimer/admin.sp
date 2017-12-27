@@ -82,10 +82,7 @@ public Action Admin_insertMapTier(int client, int args)
 
 public Action Admin_insertSpawnLocation(int client, int args)
 {
-	if (!IsValidClient(client))
-		return Plugin_Handled;
-
-	if (!IsPlayerZoner(client))
+	if (!IsValidClient(client) || !IsPlayerZoner(client))
 		return Plugin_Handled;
 
 	float SpawnLocation[3];
@@ -106,24 +103,23 @@ public Action Admin_insertSpawnLocation(int client, int args)
 	else
 	{
 		db_insertSpawnLocations(SpawnLocation, SpawnAngle, Velocity, g_iClientInZone[client][2]);
-		CPrintToChat(client, "%t", "Admin8", g_szChatPrefix);
+		CPrintToChat(client, "%t", "SpawnAdded", g_szChatPrefix);
 	}
+	
+	CPrintToChat(client, "%f : %f : %f : %i", SpawnLocation, SpawnAngle, Velocity, g_iClientInZone[client][2]);
 
 	return Plugin_Handled;
 }
 
 public Action Admin_deleteSpawnLocation(int client, int args)
 {
-	if (!IsValidClient(client))
-		return Plugin_Handled;
-
-	if (!IsPlayerZoner(client))
+	if (!IsValidClient(client) || !IsPlayerZoner(client))
 		return Plugin_Handled;
 
 	if (g_bGotSpawnLocation[g_iClientInZone[client][2]][1])
 	{
 		db_deleteSpawnLocations(g_iClientInZone[client][2]);
-		CPrintToChat(client, "%t", "Admin9", g_szChatPrefix);
+		CPrintToChat(client, "%t", "Admin8", g_szChatPrefix);
 	}
 	else
 		CPrintToChat(client, "%t", "Admin9", g_szChatPrefix);
