@@ -63,6 +63,8 @@ public void CL_OnStartTimerPress(int client)
 		g_iGoodGains[client] = 0;
 		g_iTotalMeasures[client] = 0;
 		g_iCurrentCheckpoint[client] = 0;
+		g_iCheckpointsPassed[client] = 0;
+		g_bIsValidRun[client] = false;
 
 		if (!IsFakeClient(client))
 		{

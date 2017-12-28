@@ -4305,6 +4305,7 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 		g_bhasStages = false;
 		g_bhasBonus = false;
 		g_mapZoneGroupCount = 0; // 1 = No Bonus, 2 = Bonus, >2 = Multiple bonuses
+		g_iTotalCheckpoints = 0;
 
 		for (int i = 0; i < MAXZONES; i++)
 		{
@@ -4349,6 +4350,10 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 			g_mapZones[g_mapZonesCount][Team] = SQL_FetchInt(hndl, 10);
 			g_mapZones[g_mapZonesCount][zoneGroup] = SQL_FetchInt(hndl, 11);
 
+			// Total amount of checkpoints
+			if (g_mapZones[g_mapZonesCount][zoneType] == 4)
+				g_iTotalCheckpoints++;
+
 
 			/**
 			* Initialize error checking
@@ -4388,7 +4393,7 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 						{
 							g_bhasBonus = true;
 							Format(g_mapZones[g_mapZonesCount][zoneName], 128, "BonusStart-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
-							Format(g_szZoneGroupName[g_mapZones[g_mapZonesCount][zoneGroup]], 128, "bonus %i", g_mapZones[g_mapZonesCount][zoneGroup]);
+							Format(g_szZoneGroupName[g_mapZones[g_mapZonesCount][zoneGroup]], 128, "Bonus %i", g_mapZones[g_mapZonesCount][zoneGroup]);
 						}
 						else
 						Format(g_mapZones[g_mapZonesCount][zoneName], 128, "Start-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
@@ -4436,12 +4441,10 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 					case 1:
 					{
 						if (g_mapZones[g_mapZonesCount][zoneGroup] > 0)
-						g_bhasBonus = true;
+							g_bhasBonus = true;
 						Format(g_szZoneGroupName[g_mapZones[g_mapZonesCount][zoneGroup]], 128, "%s", g_mapZones[g_mapZonesCount][zoneName]);
 					}
-					case 3:
-					g_bhasStages = true;
-
+					case 3: g_bhasStages = true;
 				}
 			}
 
@@ -4531,16 +4534,12 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 
 		// Set mapzone count in group
 		for (int x = 0; x < g_mapZoneGroupCount; x++)
-		for (int k = 0; k < ZONEAMOUNT; k++)
-		if (g_mapZonesTypeCount[x][k] > 0)
-		g_mapZoneCountinGroup[x]++;
+			for (int k = 0; k < ZONEAMOUNT; k++)
+				if (g_mapZonesTypeCount[x][k] > 0)
+					g_mapZoneCountinGroup[x]++;
 
 		if (!g_bServerDataLoaded)
-		{
 			db_GetMapRecord_Pro();
-		}
-
-		return;
 	}
 }
 
@@ -4552,9 +4551,7 @@ public void sql_zoneFixCallback(Handle owner, Handle hndl, const char[] error, a
 		return;
 	}
 	if (zongeroup == -1)
-	{
 		db_selectMapZones();
-	}
 	else
 	{
 		char szQuery[258];

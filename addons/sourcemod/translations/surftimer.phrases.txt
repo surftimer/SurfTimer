@@ -1560,4 +1560,9 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Record deleted"
 	}
+	"InvalidRun"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"{1} {darkred}You must pass all {2} to finish your run"
+	}
 }

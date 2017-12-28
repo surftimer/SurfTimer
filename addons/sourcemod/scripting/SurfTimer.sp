@@ -1321,6 +1321,10 @@ int g_SelectedType[MAXPLAYERS + 1];
 char g_EditTypes[][] =  { "Main", "Stage", "Bonus" };
 char g_EditStyles[][] =  { "Normal", "Sideways", "Half-Sideways", "Backwards", "Low-Gravity", "Slow Motion", "Fast Forward"};
 
+// Checkpoint/Stage enforcer
+int g_iTotalCheckpoints;
+int g_iCheckpointsPassed[MAXPLAYERS + 1];
+bool g_bIsValidRun[MAXPLAYERS + 1];
 
 /*===================================
 =         Predefined Arrays         =

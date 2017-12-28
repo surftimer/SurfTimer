@@ -108,6 +108,7 @@ char g_szRelativeSoundPathPB[PLATFORM_MAX_PATH];
 ConVar g_hSoundPathWRCP = null;
 char g_szSoundPathWRCP[PLATFORM_MAX_PATH];
 char g_szRelativeSoundPathWRCP[PLATFORM_MAX_PATH];
+ConVar g_hMustPassCheckpoints = null;
 
 void CreateConVars()
 {
@@ -395,7 +396,9 @@ void CreateConVars()
 		Format(g_szSoundPathWRCP, sizeof(g_szSoundPathWRCP), "sound/physics/glass/glass_bottle_break2.wav");
 		Format(g_szRelativeSoundPathWRCP, sizeof(g_szRelativeSoundPathWRCP), "*physics/glass/glass_bottle_break2.wav");
 	}
-	
+
+	g_hMustPassCheckpoints = CreateConVar("ck_enforce_checkpoints", "1", "Sets whether a player must pass all checkpoints to finish their run. Enable/Disable");
+
 	// Server Name
 	g_hHostName = FindConVar("hostname");
 	HookConVarChange(g_hHostName, OnSettingChanged);

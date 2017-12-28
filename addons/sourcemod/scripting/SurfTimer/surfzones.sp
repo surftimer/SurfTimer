@@ -323,7 +323,18 @@ public void StartTouch(int client, int action[3])
 				}
 
 				if (g_bToggleMapFinish[client])
-					CL_OnEndTimerPress(client);
+				{
+					if (GetConVarBool(g_hMustPassCheckpoints))
+					{
+						if (g_bIsValidRun[client])
+							CL_OnEndTimerPress(client);
+						else
+							CPrintToChat(client, "%t", "InvalidRun", g_szChatPrefix, g_bhasStages ? "stages" : "checkpoints");
+					}
+					else
+						CL_OnEndTimerPress(client);
+				}
+
 			}
 			else
 			{
@@ -367,6 +378,11 @@ public void StartTouch(int client, int action[3])
 					float time = g_fCurrentRunTime[client];
 					float time2 = g_fCurrentWrcpRunTime[client];
 					CL_OnEndWrcpTimerPress(client, time2);
+					
+					// Stage enforcer
+					g_iCheckpointsPassed[client]++;
+					if (g_iCheckpointsPassed[client] == g_TotalStages)
+						g_bIsValidRun[client] = true;
 
 					if (g_iCurrentStyle[client] == 0)
 						Checkpoint(client, action[1], g_iClientInZone[client][2], time);
@@ -385,6 +401,12 @@ public void StartTouch(int client, int action[3])
 			if (action[1] != lastCheckpoint[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] == action[2])
 			{
 				g_iCurrentCheckpoint[client]++;
+
+				// Checkpoint enforcer
+				g_iCheckpointsPassed[client]++;
+				if (g_iCheckpointsPassed[client] == g_iTotalCheckpoints)
+					g_bIsValidRun[client] = true;
+
 				// Announcing checkpoint in linear maps
 				if (g_iCurrentStyle[client] == 0)
 				{
