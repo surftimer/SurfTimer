@@ -4354,7 +4354,6 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 			if (g_mapZones[g_mapZonesCount][zoneType] == 4)
 				g_iTotalCheckpoints++;
 
-
 			/**
 			* Initialize error checking
 			* 0 = zone not found

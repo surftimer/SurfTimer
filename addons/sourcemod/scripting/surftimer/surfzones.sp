@@ -324,7 +324,7 @@ public void StartTouch(int client, int action[3])
 
 				if (g_bToggleMapFinish[client])
 				{
-					if (GetConVarBool(g_hMustPassCheckpoints))
+					if (GetConVarBool(g_hMustPassCheckpoints) && g_iTotalCheckpoints > 0)
 					{
 						if (g_bIsValidRun[client])
 							CL_OnEndTimerPress(client);
@@ -401,11 +401,14 @@ public void StartTouch(int client, int action[3])
 			if (action[1] != lastCheckpoint[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] == action[2])
 			{
 				g_iCurrentCheckpoint[client]++;
-
+				
 				// Checkpoint enforcer
-				g_iCheckpointsPassed[client]++;
-				if (g_iCheckpointsPassed[client] == g_iTotalCheckpoints)
-					g_bIsValidRun[client] = true;
+				if (GetConVarBool(g_hMustPassCheckpoints) && g_iTotalCheckpoints > 0)
+				{
+					g_iCheckpointsPassed[client]++;
+					if (g_iCheckpointsPassed[client] == g_iTotalCheckpoints)
+						g_bIsValidRun[client] = true;
+				}
 
 				// Announcing checkpoint in linear maps
 				if (g_iCurrentStyle[client] == 0)
