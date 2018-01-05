@@ -666,8 +666,7 @@ public void sql_CalcuatePlayerRankCallback(Handle owner, Handle hndl, const char
 			g_iPlayTimeAlive[client] = 0;
 			g_iPlayTimeSpec[client] = 0;
 
-			if (style != 0)
-				CalculatePlayerRank(client, style);
+			CalculatePlayerRank(client, style);
 		}
 	}
 }
@@ -2342,22 +2341,22 @@ public void sql_selectRecordCallback(Handle owner, Handle hndl, const char[] err
 	else
 	{ // No record found from database - Let's insert
 
-	// Escape name for SQL injection protection
-	char szName[MAX_NAME_LENGTH * 2 + 1], szUName[MAX_NAME_LENGTH];
-	GetClientName(data, szUName, MAX_NAME_LENGTH);
-	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH);
+		// Escape name for SQL injection protection
+		char szName[MAX_NAME_LENGTH * 2 + 1], szUName[MAX_NAME_LENGTH];
+		GetClientName(data, szUName, MAX_NAME_LENGTH);
+		SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH);
 
-	// Move required information in datapack
-	Handle pack = CreateDataPack();
-	WritePackFloat(pack, g_fFinalTime[data]);
-	WritePackCell(pack, data);
+		// Move required information in datapack
+		Handle pack = CreateDataPack();
+		WritePackFloat(pack, g_fFinalTime[data]);
+		WritePackCell(pack, data);
 
-	// "INSERT INTO ck_playertimes (steamid, mapname, name, runtimepro, style) VALUES('%s', '%s', '%s', '%f', %i);";
-	Format(szQuery, 512, sql_insertPlayerTime, g_szSteamID[data], g_szMapName, szName, g_fFinalTime[data], 0);
-	SQL_TQuery(g_hDb, SQL_UpdateRecordProCallback, szQuery, pack, DBPrio_Low);
+		// "INSERT INTO ck_playertimes (steamid, mapname, name, runtimepro, style) VALUES('%s', '%s', '%s', '%f', %i);";
+		Format(szQuery, 512, sql_insertPlayerTime, g_szSteamID[data], g_szMapName, szName, g_fFinalTime[data], 0);
+		SQL_TQuery(g_hDb, SQL_UpdateRecordProCallback, szQuery, pack, DBPrio_Low);
 
-	g_bInsertNewTime = true;
-}
+		g_bInsertNewTime = true;
+	}
 }
 
 // If latest record was faster than old - Update time
@@ -2905,7 +2904,7 @@ public void SQL_SelectPlayerCallback(Handle owner, Handle hndl, const char[] err
 	}
 
 	if (!SQL_HasResultSet(hndl) && !SQL_FetchRow(hndl) && !IsValidClient(data))
-	db_insertPlayer(data);
+		db_insertPlayer(data);
 }
 
 public void db_insertPlayer(int client)
