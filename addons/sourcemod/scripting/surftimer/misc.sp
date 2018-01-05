@@ -1945,7 +1945,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		
 		Handle pack;
 		int style = 0;
-		CreateDataTimer(1.0, UpdatePlayerProfile, pack, TIMER_FLAG_NO_MAPCHANGE);
+		CreateDataTimer(2.0, UpdatePlayerProfile, pack, TIMER_FLAG_NO_MAPCHANGE);
 		WritePackCell(pack, GetClientUserId(client));
 		WritePackCell(pack, style);
 		// CreateTimer(0.0, UpdatePlayerProfile, client, TIMER_FLAG_NO_MAPCHANGE);
@@ -4373,6 +4373,7 @@ public void sendDiscordAnnouncement(char szName[32], char szMapName[128], char s
 	GetConVarString(g_hRecordAnnounceDiscord, webhook, 1024);
 	if (StrEqual(webhook, ""))
 		return;
+
 	// Send Discord Announcement
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;

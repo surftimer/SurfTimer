@@ -319,11 +319,11 @@ void CreateConVars()
 	HookConVarChange(g_hServerID, OnSettingChanged);
 
 	// Discord
-	g_hRecordAnnounceDiscord = CreateConVar("ck_announce_records_discord", "Web hook link to announce records to discord, keep empty to disable");
+	g_hRecordAnnounceDiscord = CreateConVar("ck_announce_records_discord", "", "Web hook link to announce records to discord, keep empty to disable");
 
-	g_hReportBugsDiscord = CreateConVar("ck_report_discord", "Web hook link to report bugs to discord, keep empty to disable");
+	g_hReportBugsDiscord = CreateConVar("ck_report_discord", "", "Web hook link to report bugs to discord, keep empty to disable");
 
-	g_hCalladminDiscord = CreateConVar("ck_calladmin_discord", "Web hook link to allow players to call admin to discord, keep empty to disable");
+	g_hCalladminDiscord = CreateConVar("ck_calladmin_discord", "", "Web hook link to allow players to call admin to discord, keep empty to disable");
 
 	g_hSidewaysBlockKeys = CreateConVar("ck_sideways_block_keys", "0", "Changes the functionality of sideways, 1 will block keys, 0 will change the clients style to normal if not surfing sideways");
 
