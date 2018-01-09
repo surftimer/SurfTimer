@@ -829,8 +829,8 @@ public void SQL_UpdatePlayerColoursCallback(Handle owner, Handle hndl, const cha
 // WR Announcements
 public void db_selectAnnouncements()
 {
-	char szQuery[128];
-	Format(szQuery, 128, "SELECT id FROM ck_announcements WHERE server != '%s' AND id > %d", g_sServerName, g_iLastID);
+	char szQuery[1024];
+	Format(szQuery, 1024, "SELECT id FROM ck_announcements WHERE server != '%s' AND id > %d", g_sServerName, g_iLastID);
 	SQL_TQuery(g_hDb, SQL_SelectAnnouncementsCallback, szQuery, 1, DBPrio_Low);
 }
 
