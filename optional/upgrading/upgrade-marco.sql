@@ -131,6 +131,7 @@ DROP COLUMN `date`,
 DROP COLUMN `startspeed`,
 CHANGE `map` `mapname` varchar(32),
 CHANGE `runtime` `runtimepro` float DEFAULT -1,
+ADD COLUMN `name` varchar(32) NULL DEFAULT NULL AFTER `steamid`,
 ADD COLUMN `style` int(11) NOT NULL DEFAULT 0 AFTER `stage`,
 ADD PRIMARY KEY (steamid, mapname, stage, style),
 ADD INDEX `stagerank` (mapname, runtimepro, stage, style);
