@@ -54,12 +54,20 @@ native Float:surftimer_GetCurrentTime(client);
 native bool:surftimer_IsClientVip(client);
 
 /**
- * Gets the server rank of a client
+ * Gets the rank of a client
  *
  * @param client     Client's id
- * @return           Server rank as an int
+ * @return           Rank as an int / -1 on failure
  */
-native surftimer_GetServerRank(client);
+native surftimer_GetPlayerRank(client);
+
+/**
+ * Gets the clients points
+ *
+ * @param client     Client's id
+ * @return           points as an int / -1 on failure
+ */
+native surftimer_GetPlayerPoints(client);
 
 /**
  * Safely teleports the client. Does not trigger end touches

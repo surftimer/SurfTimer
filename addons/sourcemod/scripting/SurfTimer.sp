@@ -2785,11 +2785,6 @@ public int Native_EmulateStopButtonPress(Handle plugin, int numParams)
 	CL_OnEndTimerPress(GetNativeCell(1));
 }
 
-public int Native_GetServerRank(Handle plugin, int numParams)
-{
-	return g_PlayerRank[GetNativeCell(1)][0];
-}
-
 public int Native_SafeTeleport(Handle plugin, int numParams)
 {
 	int client = GetNativeCell(1);
@@ -2817,6 +2812,24 @@ public int Native_IsClientVip(Handle plugin, int numParams)
 		return false;
 }
 
+public int Native_GetPlayerRank(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	if (IsValidClient(client) && !IsFakeClient(client))
+		return g_PlayerRank[client][0];
+	else
+		return -1;
+}
+
+public int Native_GetPlayerPoints(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	if (IsValidClient(client) && !IsFakeClient(client))
+		return g_pr_points[client][0];
+	else
+		return -1;
+}
+
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
 	RegPluginLibrary("surftimer");
@@ -2825,7 +2838,8 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	CreateNative("surftimer_EmulateStartButtonPress", Native_EmulateStartButtonPress);
 	CreateNative("surftimer_EmulateStopButtonPress", Native_EmulateStopButtonPress);
 	CreateNative("surftimer_GetCurrentTime", Native_GetCurrentTime);
-	CreateNative("surftimer_GetServerRank", Native_GetServerRank);
+	CreateNative("surftimer_GetPlayerRank", Native_GetPlayerRank);
+	CreateNative("surftimer_GetPlayerPoints", Native_GetPlayerPoints);
 	CreateNative("surftimer_SafeTeleport", Native_SafeTeleport);
 	CreateNative("surftimer_IsClientVip", Native_IsClientVip);
 	MarkNativeAsOptional("Store_GetClientCredits");
