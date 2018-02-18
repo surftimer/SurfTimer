@@ -1257,6 +1257,7 @@ char g_szSaveLocClientName[MAX_LOCS][MAX_NAME_LENGTH];
 int g_iLastSaveLocIdClient[MAXPLAYERS + 1];
 float g_fLastCheckpointMade[MAXPLAYERS + 1];
 int g_iSaveLocUnix[MAX_LOCS]; // [loc id]
+int g_iMenuPosition[MAXPLAYERS + 1];
 
 char g_sServerName[256];
 ConVar g_hHostName = null;
@@ -1325,6 +1326,9 @@ char g_EditStyles[][] =  { "Normal", "Sideways", "Half-Sideways", "Backwards", "
 int g_iTotalCheckpoints;
 int g_iCheckpointsPassed[MAXPLAYERS + 1];
 bool g_bIsValidRun[MAXPLAYERS + 1];
+
+// Prestige
+bool g_bPrestigeCheck[MAXPLAYERS + 1];
 
 /*===================================
 =         Predefined Arrays         =

@@ -584,6 +584,13 @@ public Action Command_SaveLocList(int client, int args)
 		return Plugin_Handled;
 	}
 
+	SaveLocMenu(client);
+
+	return Plugin_Handled;
+}
+
+public void SaveLocMenu(int client)
+{
 	Menu menu = CreateMenu(SaveLocListHandler);
 	SetMenuTitle(menu, "Save Locs");
 	char szBuffer[128];
@@ -598,22 +605,45 @@ public Action Command_SaveLocList(int client, int args)
 		IntToString(i, szId, 32);
 		AddMenuItem(menu, szId, szItem);
 	}
-	SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
-	DisplayMenu(menu, client, MENU_TIME_FOREVER);
 
-	return Plugin_Handled;
+	int pos = g_iMenuPosition[client];
+	if (pos < 6)
+		pos = 0;
+	else if (pos < 12)
+		pos = 6;
+	else if (pos < 18)
+		pos = 12;
+	else if (pos < 24)
+		pos = 18;
+	else if (pos < 30)
+		pos = 24;
+	else if (pos < 36)
+		pos = 30;
+	else if (pos < 42)
+		pos = 36;
+	else if (pos < 48)
+		pos = 42;
+	else if (pos < 54)
+		pos = 48;
+	else if (pos < 60)
+		pos = 54;
+	SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
+	DisplayMenuAtItem(menu, client, pos, MENU_TIME_FOREVER);
 }
 
 public int SaveLocListHandler(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_Select)
 	{
+		g_iMenuPosition[param1] = param2;
 		char szId[32];
 		GetMenuItem(menu, param2, szId, 32);
 		int id = StringToInt(szId);
 		CPrintToChat(param1, "%t", "Commands13", g_szChatPrefix, id);
 		TeleportToSaveloc(param1, id);
 	}
+	else if (action == MenuAction_Cancel)
+		SaveLocMenu(param1);
 	else if (action == MenuAction_End)
 		CloseHandle(menu);
 }

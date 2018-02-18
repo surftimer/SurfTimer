@@ -365,12 +365,40 @@ public Action SetClanTag(Handle timer, any client)
 	{
 		char tag[154];
 		Format(tag, 154, "%s | %s", g_szCountryCode[client], g_pr_rankname[client]);
+		if (g_iCurrentStyle[client] > 0)
+		{
+			char szStyle[128];
+			Format(szStyle, sizeof(szStyle), g_szStyleAcronyms[g_iCurrentStyle[client]]);
+			StringToUpper(szStyle);
+			Format(szStyle, sizeof(szStyle), "%s-", szStyle);
+			ReplaceString(tag, sizeof(tag), "{style}", szStyle);
+		}
+		else
+			ReplaceString(tag, sizeof(tag), "{style}", "");
+
 		CS_SetClientClanTag(client, tag);
 	}
 	else
 	{
 		if (GetConVarBool(g_hPointSystem))
-			CS_SetClientClanTag(client, g_pr_rankname[client]);
+		{
+			char tag[154];
+			Format(tag, 154, "%s", g_pr_rankname[client]);
+			
+			// Replace {style} with style
+			if (g_iCurrentStyle[client] > 0)
+			{
+				char szStyle[128];
+				Format(szStyle, sizeof(szStyle), g_szStyleAcronyms[g_iCurrentStyle[client]]);
+				StringToUpper(szStyle);
+				Format(szStyle, sizeof(szStyle), "%s-", szStyle);
+				ReplaceString(tag, sizeof(tag), "{style}", szStyle);
+			}
+			else
+				ReplaceString(tag, sizeof(tag), "{style}", "");
+
+			CS_SetClientClanTag(client, tag);
+		}
 	}
 
 	// new rank

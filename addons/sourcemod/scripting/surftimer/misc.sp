@@ -1474,6 +1474,8 @@ public void SetClientDefaults(int client)
 	g_bEnforceTitle[client] = false;
 
 	g_iWaitingForResponse[client] = -1;
+
+	g_iMenuPosition[client] = 0;
 }
 
 // public void clearPlayerCheckPoints(int client)
@@ -2510,8 +2512,9 @@ public void SetPlayerRank(int client)
 			GetClientName(client, szName, sizeof(szName));
 			CRemoveColors(szName, sizeof(szName));
 
-			int rank = g_PlayerRank[client][0];
-			int points = g_pr_points[client][0];
+			int style = g_iCurrentStyle[client];
+			int rank = g_PlayerRank[client][style];
+			int points = g_pr_points[client][style];
 
 			int RankValue[SkillGroup];
 			int index = GetSkillgroupIndex(rank, points);

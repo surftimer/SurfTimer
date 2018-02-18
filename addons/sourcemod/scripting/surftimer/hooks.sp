@@ -474,6 +474,16 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		{
 			char szChatRank[1024];
 			Format(szChatRank, 1024, "%s", g_pr_chat_coloredrank[client]);
+			if (g_iCurrentStyle[client] > 0)
+			{
+				char szStyle[128];
+				Format(szStyle, sizeof(szStyle), g_szStyleAcronyms[g_iCurrentStyle[client]]);
+				StringToUpper(szStyle);
+				Format(szStyle, sizeof(szStyle), "%s-", szStyle);
+				ReplaceString(szChatRank, sizeof(szChatRank), "{style}", szStyle);
+			}
+			else
+				ReplaceString(szChatRank, sizeof(szChatRank), "{style}", "");
 
 			if (GetConVarBool(g_hCountry) && (GetConVarBool(g_hPointSystem)))
 			{

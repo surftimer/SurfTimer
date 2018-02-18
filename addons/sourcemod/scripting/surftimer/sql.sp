@@ -1369,6 +1369,7 @@ public void db_viewPlayerPoints(int client)
 		g_pr_points[client][i] = 0;
 	}
 	
+	g_bPrestigeCheck[client] = false;
 	g_iPlayTimeAlive[client] = 0;
 	g_iPlayTimeSpec[client] = 0;
 	g_iTotalConnections[client] = 1;
@@ -1502,11 +1503,24 @@ public void sql_selectRankedPlayersRankCallback(Handle owner, Handle hndl, const
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
 		g_PlayerRank[client][style] = SQL_GetRowCount(hndl);
-
-		if (style == 0 && GetConVarInt(g_hPrestigeRank) > 0)
+		if (GetConVarInt(g_hPrestigeRank) > 0)
 		{
-			if (g_PlayerRank[client][0] > GetConVarInt(g_hPrestigeRank))
-				KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
+			if (GetConVarBool(g_hPrestigeStyles))
+			{
+				if (style == 0)
+				{
+					if (g_PlayerRank[client][0] > GetConVarInt(g_hPrestigeRank))
+						KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
+				}
+			}
+			else
+			{
+				if (g_PlayerRank[client][style] < GetConVarInt(g_hPrestigeRank))
+					g_bPrestigeCheck[client] = true;
+
+				if (style == MAX_STYLES && g_bPrestigeCheck[client] == false)
+					KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
+			}
 		}
 
 		// Custom Title Access
