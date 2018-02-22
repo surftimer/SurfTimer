@@ -767,7 +767,6 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 	}
 
 	int stage = g_WrcpStage[client];
-
 	// Get Client Name
 	char szName[MAX_NAME_LENGTH];
 	GetClientName(client, szName, MAX_NAME_LENGTH);
@@ -780,6 +779,8 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 
 	if (stage > g_TotalStages) // Hack Fix for multiple end zone issue
 		stage = g_TotalStages;
+	else if (stage < 1)
+		stage = 1;
 
 	if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0)
 	{
