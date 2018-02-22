@@ -1383,6 +1383,7 @@ public void SetClientDefaults(int client)
 	g_fProfileMenuLastQuery[client] = GameTime;
 	Format(g_szPlayerPanelText[client], 512, "");
 	Format(g_pr_rankname[client], 128, "");
+	Format(g_pr_rankname_style[client], 32, "");
 	g_PlayerChatRank[client] = -1;
 	g_bValidRun[client] = false;
 	g_fMaxPercCompleted[client] = 0.0;
@@ -2521,7 +2522,11 @@ public void SetPlayerRank(int client)
 			GetArrayArray(g_hSkillGroups, index, RankValue[0]);
 			
 			Format(g_pr_chat_coloredrank[client], 128, RankValue[RankNameColored]);
+			Format(g_pr_chat_coloredrank_style[client], 128, RankValue[RankNameColored]);
+			ReplaceString(g_pr_chat_coloredrank[client], 128, "{style}", "");
+			Format(g_pr_rankname_style[client], 128, RankValue[RankName]);
 			Format(g_pr_rankname[client], 128, RankValue[RankName]);
+			ReplaceString(g_pr_rankname[client], 128, "{style}", "");
 			Format(g_szRankName[client], sizeof(g_szRankName), RankValue[RankName]);
 			Format(g_pr_namecolour[client], 32, RankValue[NameColour]);
 		}

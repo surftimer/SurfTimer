@@ -472,15 +472,17 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		}
 		else
 		{
-			char szChatRank[1024];
+			char szChatRank[1024], szChatRank2[1024];
 			Format(szChatRank, 1024, "%s", g_pr_chat_coloredrank[client]);
+			Format(szChatRank2, 1024, "%s", g_pr_chat_coloredrank_style[client]);
 			if (g_iCurrentStyle[client] > 0)
 			{
 				char szStyle[128];
 				Format(szStyle, sizeof(szStyle), g_szStyleAcronyms[g_iCurrentStyle[client]]);
 				StringToUpper(szStyle);
 				Format(szStyle, sizeof(szStyle), "%s-", szStyle);
-				ReplaceString(szChatRank, sizeof(szChatRank), "{style}", szStyle);
+				ReplaceString(szChatRank2, sizeof(szChatRank2), "{style}", szStyle);
+				Format(szChatRank, sizeof(szChatRank), "%s", szChatRank2);
 			}
 			else
 				ReplaceString(szChatRank, sizeof(szChatRank), "{style}", "");

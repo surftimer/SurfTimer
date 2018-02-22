@@ -1029,8 +1029,10 @@ int g_PlayerChatRank[MAXPLAYERS + 1];
 
 // Clients rank, colored, used in chat
 char g_pr_chat_coloredrank[MAXPLAYERS + 1][256];
+char g_pr_chat_coloredrank_style[MAXPLAYERS + 1][256];
 
 // Client's rank, non-colored, used in clantag
+char g_pr_rankname_style[MAXPLAYERS + 1][32];
 char g_pr_rankname[MAXPLAYERS + 1][32];
 char g_pr_namecolour[MAXPLAYERS + 1][32];
 

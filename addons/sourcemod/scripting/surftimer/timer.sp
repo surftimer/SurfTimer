@@ -364,7 +364,7 @@ public Action SetClanTag(Handle timer, any client)
 	if (GetConVarBool(g_hCountry))
 	{
 		char tag[154];
-		Format(tag, 154, "%s | %s", g_szCountryCode[client], g_pr_rankname[client]);
+		Format(tag, 154, "%s | %s", g_szCountryCode[client], g_pr_rankname_style[client]);
 		if (g_iCurrentStyle[client] > 0)
 		{
 			char szStyle[128];
@@ -383,7 +383,7 @@ public Action SetClanTag(Handle timer, any client)
 		if (GetConVarBool(g_hPointSystem))
 		{
 			char tag[154];
-			Format(tag, 154, "%s", g_pr_rankname[client]);
+			Format(tag, 154, "%s", g_pr_rankname_style[client]);
 			
 			// Replace {style} with style
 			if (g_iCurrentStyle[client] > 0)
