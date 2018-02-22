@@ -68,6 +68,10 @@ public void db_setupDatabase()
 			db_upgradeDatabase(1);
 			return;
 		}
+		else if (!SQL_FastQuery(g_hDb, "SELECT wrcppoints FROM ck_playerrank LIMIT 1"))
+		{
+			db_upgradeDatabase(2);
+		}
 	}
 
 	SQL_UnlockDatabase(g_hDb);
@@ -139,6 +143,10 @@ public void db_upgradeDatabase(int ver)
 	// SurfTimer v2.1 -> v2.2
 	SQL_FastQuery(g_hDb, "ALTER TABLE ck_maptier ADD COLUMN ranked INT(11) NOT NULL DEFAULT '1';");
 	SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank DROP PRIMARY KEY, ADD COLUMN style INT(11) NOT NULL DEFAULT '0', ADD PRIMARY KEY (steamid, style);");
+  }
+  else if (ver == 2)
+  {
+	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN wrcppoints INT(11) NOT NULL DEFAULT 0;");
   }
   
   SQL_UnlockDatabase(g_hDb);
@@ -574,6 +582,7 @@ public void CalculatePlayerRank(int client, int style)
 	g_Points[client][style][3] = 0; // Map WR Points
 	g_Points[client][style][4] = 0; // Bonus WR Points
 	g_Points[client][style][5] = 0; // Top 10 Points
+	g_Points[client][style][6] = 0; // WRCP Points
 	// g_GroupPoints[client][0] // G1 Points
 	// g_GroupPoints[client][1] // G2 Points
 	// g_GroupPoints[client][2] // G3 Points
@@ -878,7 +887,7 @@ public void sql_CountFinishedStagesCallback(Handle owner, Handle hndl, const cha
 						if (wrcpPoints > 0)
 						{
 							g_pr_points[client][style] += wrcpPoints;
-							g_Points[client][style][4] += wrcpPoints;
+							g_Points[client][style][6] += wrcpPoints;
 						}
 					}
 					break;
@@ -1238,7 +1247,7 @@ public void db_updatePoints(int client, int style)
 	if (client > MAXPLAYERS && g_pr_RankingRecalc_InProgress || client > MAXPLAYERS && g_bProfileRecalc[client])
 	{
 		SQL_EscapeString(g_hDb, g_pr_szName[client], szName, MAX_NAME_LENGTH * 2 + 1);
-		Format(szQuery, 512, sql_updatePlayerRankPoints, szName, g_pr_points[client][style], g_Points[client][style][3], g_Points[client][style][4], g_Points[client][style][5], g_Points[client][style][2], g_Points[client][style][0], g_Points[client][style][1], g_pr_finishedmaps[client][style], g_pr_finishedbonuses[client][style], g_pr_finishedstages[client][style], g_WRs[client][style][0], g_WRs[client][style][1], g_WRs[client][style][2], g_Top10Maps[client][style], g_GroupMaps[client][style], g_pr_szSteamID[client], style);
+		Format(szQuery, 512, sql_updatePlayerRankPoints, szName, g_pr_points[client][style], g_Points[client][style][3], g_Points[client][style][4], g_Points[client][style][6], g_Points[client][style][5], g_Points[client][style][2], g_Points[client][style][0], g_Points[client][style][1], g_pr_finishedmaps[client][style], g_pr_finishedbonuses[client][style], g_pr_finishedstages[client][style], g_WRs[client][style][0], g_WRs[client][style][1], g_WRs[client][style][2], g_Top10Maps[client][style], g_GroupMaps[client][style], g_pr_szSteamID[client], style);
 		SQL_TQuery(g_hDb, sql_updatePlayerRankPointsCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
@@ -1248,7 +1257,7 @@ public void db_updatePoints(int client, int style)
 			GetClientName(client, szName, MAX_NAME_LENGTH);
 			GetClientAuthId(client, AuthId_Steam2, szSteamId, MAX_NAME_LENGTH, true);
 			// GetClientAuthString(client, szSteamId, MAX_NAME_LENGTH);
-			Format(szQuery, 512, sql_updatePlayerRankPoints2, szName, g_pr_points[client][style], g_Points[client][style][3], g_Points[client][style][4], g_Points[client][style][5], g_Points[client][style][2], g_Points[client][style][0], g_Points[client][style][1], g_pr_finishedmaps[client][style], g_pr_finishedbonuses[client][style], g_pr_finishedstages[client][style], g_WRs[client][style][0], g_WRs[client][style][1], g_WRs[client][style][2], g_Top10Maps[client][style], g_GroupMaps[client][style], g_szCountry[client], szSteamId, style);
+			Format(szQuery, 512, sql_updatePlayerRankPoints2, szName, g_pr_points[client][style], g_Points[client][style][3], g_Points[client][style][4], g_Points[client][style][6], g_Points[client][style][5], g_Points[client][style][2], g_Points[client][style][0], g_Points[client][style][1], g_pr_finishedmaps[client][style], g_pr_finishedbonuses[client][style], g_pr_finishedstages[client][style], g_WRs[client][style][0], g_WRs[client][style][1], g_WRs[client][style][2], g_Top10Maps[client][style], g_GroupMaps[client][style], g_szCountry[client], szSteamId, style);
 			SQL_TQuery(g_hDb, sql_updatePlayerRankPointsCallback, szQuery, pack, DBPrio_Low);
 		}
 	}
@@ -1635,7 +1644,7 @@ public void sql_selectPlayerRankCallback (Handle owner, Handle hndl, const char[
 	{
 		WritePackCell(pack, SQL_GetRowCount(hndl));
 
-		// "SELECT steamid, steamid64, name, country, points, wrpoints, wrbpoints, top10points, groupspoints, mappoints, bonuspoints, finishedmapspro, finishedbonuses, finishedstages, wrs, wrbs, wrcps, top10s, groups, lastseen FROM ck_playerrank WHERE steamid = '%s' AND style = '%i';";
+		// "SELECT steamid, steamid64, name, country, points, wrpoints, wrbpoints, wrcppoints, top10points, groupspoints, mappoints, bonuspoints, finishedmapspro, finishedbonuses, finishedstages, wrs, wrbs, wrcps, top10s, groups, lastseen FROM ck_playerrank WHERE steamid = '%s' AND style = '%i';";
 		char szQuery[512];
 		Format(szQuery, sizeof(szQuery), sql_selectPlayerProfile, szSteamId, style);
 		SQL_TQuery(g_hDb, sql_selectPlayerProfileCallback, szQuery, pack, DBPrio_Low);
@@ -1665,7 +1674,7 @@ public void sql_selectPlayerProfileCallback(Handle owner, Handle hndl, const cha
 	int rank = ReadPackCell(pack);
 	CloseHandle(pack);
 
-	// "SELECT steamid, steamid64, name, country, points, wrpoints, wrbpoints, top10points, groupspoints, mappoints, bonuspoints, finishedmapspro, finishedbonuses, finishedstages, wrs, wrbs, wrcps, top10s, groups, lastseen FROM ck_playerrank WHERE steamid = '%s' AND style = '%i';";
+	// "SELECT steamid, steamid64, name, country, points, wrpoints, wrbpoints, wrcppoints top10points, groupspoints, mappoints, bonuspoints, finishedmapspro, finishedbonuses, finishedstages, wrs, wrbs, wrcps, top10s, groups, lastseen FROM ck_playerrank WHERE steamid = '%s' AND style = '%i';";
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
@@ -1679,19 +1688,20 @@ public void sql_selectPlayerProfileCallback(Handle owner, Handle hndl, const cha
 		int points = SQL_FetchInt(hndl, 4);
 		int wrPoints = SQL_FetchInt(hndl, 5);
 		int wrbPoints = SQL_FetchInt(hndl, 6);
-		int top10Points = SQL_FetchInt(hndl, 7);
-		int groupPoints = SQL_FetchInt(hndl, 8);
-		int mapPoints = SQL_FetchInt(hndl, 9);
-		int bonusPoints = SQL_FetchInt(hndl, 10);
-		int finishedMaps = SQL_FetchInt(hndl, 11);
-		int finishedBonuses = SQL_FetchInt(hndl, 12);
-		int finishedStages = SQL_FetchInt(hndl, 13);
-		int wrs = SQL_FetchInt(hndl, 14);
-		int wrbs = SQL_FetchInt(hndl, 15);
-		int wrcps = SQL_FetchInt(hndl, 16);
-		int top10s = SQL_FetchInt(hndl, 17);
-		int groups = SQL_FetchInt(hndl, 18);
-		int lastseen = SQL_FetchInt(hndl, 19);
+		int wrcpPoints = SQL_FetchInt(hndl, 7);
+		int top10Points = SQL_FetchInt(hndl, 8);
+		int groupPoints = SQL_FetchInt(hndl, 9);
+		int mapPoints = SQL_FetchInt(hndl, 10);
+		int bonusPoints = SQL_FetchInt(hndl, 11);
+		int finishedMaps = SQL_FetchInt(hndl, 12);
+		int finishedBonuses = SQL_FetchInt(hndl, 13);
+		int finishedStages = SQL_FetchInt(hndl, 14);
+		int wrs = SQL_FetchInt(hndl, 15);
+		int wrbs = SQL_FetchInt(hndl, 16);
+		int wrcps = SQL_FetchInt(hndl, 17);
+		int top10s = SQL_FetchInt(hndl, 18);
+		int groups = SQL_FetchInt(hndl, 19);
+		int lastseen = SQL_FetchInt(hndl, 20);
 
 		if (finishedMaps > g_pr_MapCount[0])
 			finishedMaps = g_pr_MapCount[0];
@@ -1726,6 +1736,7 @@ public void sql_selectPlayerProfileCallback(Handle owner, Handle hndl, const cha
 		GetArrayArray(g_hSkillGroups, index, RankValue[0]);
 		char szSkillGroup[128];
 		Format(szSkillGroup, sizeof(szSkillGroup), RankValue[RankName]);
+		ReplaceString(szSkillGroup, sizeof(szSkillGroup), "{style}", "");
 
 		char szRank[32];
 		if (rank > g_pr_RankedPlayers[0] || points == 0)
@@ -1753,7 +1764,10 @@ public void sql_selectPlayerProfileCallback(Handle owner, Handle hndl, const cha
 		else
 			Format(szTop10Points, 128, "Top10: %i - [%i]", top10s, top10Points);
 
-		Format(szStagePc, 128, "Stages: %i/%i (%s%c)", finishedStages, g_pr_StageCount, szSPerc, PERCENT);
+		if (wrcpPoints > 0)
+			Format(szStagePc, 128, "Stages: %i/%i [0+%d] (%s%c)", finishedStages, g_pr_StageCount, wrcpPoints, szSPerc, PERCENT);
+		else
+			Format(szStagePc, 128, "Stages: %i/%i [0] (%s%c)", finishedStages, g_pr_StageCount, szSPerc, PERCENT);
 
 		Format(szMiPc, 128, "Map Improvement Pts: %i - [%i]", groups, groupPoints);
 

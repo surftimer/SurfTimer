@@ -562,7 +562,7 @@ int g_Top10Maps[MAX_PR_PLAYERS + 1][MAX_STYLES];
 // 0 = wr, 1 = wrb, 2 = wrcp
 int g_WRs[MAX_PR_PLAYERS + 1][MAX_STYLES][3];
 
-// 0 = Map Points, 1 = Bonus Points, 2 = Group Points, 3 = Map WR Points, 4 = Bonus WR Points, 5 = Top 10 Points
+// 0 = Map Points, 1 = Bonus Points, 2 = Group Points, 3 = Map WR Points, 4 = Bonus WR Points, 5 = Top 10 Points, 6 = WRCP Points
 int g_Points[MAX_PR_PLAYERS + 1][MAX_STYLES][7];
 
 int g_ClientProfile[MAXPLAYERS + 1];
