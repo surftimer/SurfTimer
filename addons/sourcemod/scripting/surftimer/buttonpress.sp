@@ -747,6 +747,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 			g_fCurrentWrcpRunTime[client] = 0.0;
 			g_bWrcpTimeractivated[client] = true;
 			g_bNotTeleporting[client] = true;
+			g_WrcpStage[client] = g_Stage[0][client];
 			Stage_StartRecording(client);
 		}
 	}
@@ -765,7 +766,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		return;
 	}
 
-	int stage = g_Stage[0][client] - 1;
+	int stage = g_WrcpStage[client];
 
 	// Get Client Name
 	char szName[MAX_NAME_LENGTH];

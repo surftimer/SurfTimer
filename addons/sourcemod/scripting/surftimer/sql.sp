@@ -5983,6 +5983,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 		Format(sz_srDiff, 128, "%c%cWR: %c+%s%c", YELLOW, WHITE, RED, sz_srDiff, YELLOW);
 
 	// Check for SR
+	bool newRecordHolder = false;
 	if (style == 0)
 	{
 		if (g_TotalStageRecords[stage] > 0)
@@ -5992,10 +5993,11 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			{ 
 				// New fastest time in map
 				g_bStageSRVRecord[client][stage] = true;
+				if (g_fWrcpRecord[client][stage][0] != g_fStageRecord[stage])
+					newRecordHolder = true;
 				g_fStageRecord[stage] = g_fFinalTime[client];
 				Format(g_szStageRecordPlayer[stage], MAX_NAME_LENGTH, "%s", szName);
 				FormatTimeFloat(1, g_fStageRecord[stage], 3, g_szRecordStageTime[stage], 64);
-
 				CPrintToChatAll("%t", "SQL15", g_szChatPrefix, szName, stage, g_szFinalWrcpTime[client], sz_srDiff, g_TotalStageRecords[stage]);
 				g_bSavingWrcpReplay[client] = true;
 				// Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
@@ -6013,6 +6015,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 		else
 		{
 			// Has to be the new record, since it is the first completion
+			newRecordHolder = true;
 			g_bStageSRVRecord[client][stage] = true;
 			g_fStageRecord[stage] = g_fFinalTime[client];
 			Format(g_szStageRecordPlayer[stage], MAX_NAME_LENGTH, "%s", szName);
@@ -6033,6 +6036,9 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			{
 				// New fastest time in map
 				g_bStageSRVRecord[client][stage] = true;
+				if (g_fWrcpRecord[client][stage][style] != g_fStyleStageRecord[style][stage])
+					newRecordHolder = true;
+
 				g_fStyleStageRecord[style][stage] = g_fFinalTime[client];
 				Format(g_szStyleStageRecordPlayer[style][stage], MAX_NAME_LENGTH, "%s", szName);
 				FormatTimeFloat(1, g_fStyleStageRecord[style][stage], 3, g_szStyleRecordStageTime[style][stage], 64);
@@ -6053,12 +6059,45 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 		{
 			// Has to be the new record, since it is the first completion
 			g_bStageSRVRecord[client][stage] = true;
+			newRecordHolder = true;
 			g_fStyleStageRecord[style][stage] = g_fFinalTime[client];
 			Format(g_szStyleStageRecordPlayer[style][stage], MAX_NAME_LENGTH, "%s", szName);
 			FormatTimeFloat(1, g_fStyleStageRecord[style][stage], 3, g_szStyleRecordStageTime[style][stage], 64);
 
 			CPrintToChatAll("%t", "SQL22", g_szChatPrefix, szName, g_szStyleRecordPrint[style], stage, g_szFinalWrcpTime[client]);
 			PlayWRCPRecord(1);
+		}
+	}
+
+	// Check if new record and if someone else had the old record, if so give them points
+	if (g_bStageSRVRecord[client][stage])
+	{
+		int points = GetConVarInt(g_hWrcpPoints);
+		if (style == 0)
+		{
+			if (newRecordHolder)
+			{
+				if (points > 0)
+				{
+					g_pr_oldpoints[client][0] = g_pr_points[client][0];
+					g_pr_points[client][0] += points;
+					int diff = g_pr_points[client][0] - g_pr_oldpoints[client][0];
+					CPrintToChat(client, "%t", "EarnedPoints", g_szChatPrefix, szName, diff, g_pr_points[client][0]);
+				}
+			}
+		}
+		else
+		{
+			if (newRecordHolder)
+			{
+				if (points > 0)
+				{
+					g_pr_oldpoints[client][style] = g_pr_points[client][style];
+					g_pr_points[client][style] += points;
+					int diff = g_pr_points[client][style] - g_pr_oldpoints[client][style];
+					CPrintToChat(client, "%t", "EarnedPoints2", g_szChatPrefix, szName, diff, g_szStyleFinishPrint[style], g_pr_points[client][style]);
+				}
+			}
 		}
 	}
 

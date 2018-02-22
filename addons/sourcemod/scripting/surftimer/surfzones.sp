@@ -169,7 +169,7 @@ public Action StartTouchTrigger(int caller, int activator)
 	if (g_bTimerRunning[activator])
 	{
 		if (action[0] < 6 && g_bInBonus[activator])
-		{
+		{ 
 			if (action[2] != g_iInBonus[activator])
 				return Plugin_Handled;
 		}
@@ -189,10 +189,13 @@ public Action StartTouchTrigger(int caller, int activator)
 	}
 	else
 	{
-		if (action[2] > 0)
-			g_bInBonus[activator] = true;
-		else
+		if (!g_bInBonus[activator] && action[2] > 0)
+		{
 			g_bInBonus[activator] = false;
+			return Plugin_Handled;
+		}
+		else if (action[2] > 0)
+			g_bInBonus[activator] = true;
 	}
 
 	if (g_bUsingStageTeleport[activator])

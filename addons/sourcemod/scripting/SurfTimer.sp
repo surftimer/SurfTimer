@@ -256,6 +256,7 @@ bool g_bShowZones[MAXPLAYERS + 1];
 
 // Which stage is the client in
 int g_Stage[MAXZONEGROUPS][MAXPLAYERS + 1];
+int g_WrcpStage[MAXPLAYERS + 1];
 
 bool g_bhasStages;
 

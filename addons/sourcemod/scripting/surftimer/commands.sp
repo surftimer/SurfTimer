@@ -285,6 +285,10 @@ void CreateCommandListeners()
 
 public Action sm_test(int client, int args)
 {
+	if (g_bInBonus[client])
+		CPrintToChatAll("true - %d", g_iInBonus[client]);
+	else
+		CPrintToChatAll("false");
 	return Plugin_Handled;
 }
 
@@ -832,7 +836,8 @@ public int MenuHandler_SelectBonus(Menu sMenu, MenuAction action, int client, in
 			char aID[3];
 			GetMenuItem(sMenu, item, aID, sizeof(aID));
 			int zoneGrp = StringToInt(aID);
-
+			g_bInBonus[client] = true;
+			g_iInBonus[client] = zoneGrp;
 			teleportClient(client, zoneGrp, 1, true);
 		}
 		case MenuAction_End:
@@ -888,6 +893,8 @@ public Action Command_ToBonus(int client, int args)
 	else
 		zoneGrp = 1;
 
+	g_bInBonus[client] = true;
+	g_iInBonus[client] = zoneGrp;
 	teleportClient(client, zoneGrp, 1, true);
 	return Plugin_Handled;
 }

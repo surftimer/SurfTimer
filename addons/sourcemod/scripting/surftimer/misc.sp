@@ -2988,10 +2988,10 @@ public void SpecListMenuDead(int client) // What Spectators see
 					else
 					{
 						if (ObservedUser == g_RecordBot)
-							Format(g_szPlayerPanelText[client], 512, "[Map Record Replay]\nTime: PAUSED\nTickrate: %s\nSpecs: %i\n\n%s\n", szTick, count, szStage);
+							Format(g_szPlayerPanelText[client], 512, "[Map Record Replay]\nPAUSED\nTickrate: %s\nSpecs: %i\n\n%s\n", szTick, count, szStage);
 						else
 							if (ObservedUser == g_BonusBot)
-								Format(g_szPlayerPanelText[client], 512, "[%s Record Replay]\nTime: PAUSED\nTickrate: %s\nSpecs: %i\n\nBonus\n", g_szZoneGroupName[g_iClientInZone[g_BonusBot][2]], szTick, count);
+								Format(g_szPlayerPanelText[client], 512, "[%s Record Replay]\nPAUSED\nTickrate: %s\nSpecs: %i\n\nBonus\n", g_szZoneGroupName[g_iClientInZone[g_BonusBot][2]], szTick, count);
 					}
 				}
 				else
@@ -3292,7 +3292,7 @@ public void CenterHudDead(int client)
 				Format(timerText, 32, "%s ", g_szStyleHud[ObservedUser]);
 				// fluffys come back here
 
-			PrintHintText(client, "<font face=''>%sTime: <font color='#00ff00'>%s</font>\nSpeed: <font color='#66bbff'>%i</font> u/s\nKeys: %s", timerText, obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
+			PrintHintText(client, "<font face=''>%s <font color='#00ff00'>%s</font>\nSpeed: <font color='#66bbff'>%i</font> u/s\nKeys: %s", timerText, obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
 		}
 	}
 	else
@@ -3327,44 +3327,44 @@ public void CenterHudAlive(int client)
 					if (g_bPause[client])
 					{
 						// Paused
-						Format(module[i], 128, "Time: <font color='#FFFF00'>%s</font>", pAika);
+						Format(module[i], 128, "<font color='#FFFF00'>%s       </font>", pAika);
 					}
 					else if (g_bPracticeMode[client])
 					{
 						// Prac mode
-						Format(module[i], 128, "Time: <font color='#ffffff'>[P]: %s</font>", pAika);
+						Format(module[i], 128, "<font color='#ffffff'>[P]: %s       </font>", pAika);
 					}
 					else if (g_bInBonus[client])
 					{
 						// In Bonus
-						Format(module[i], 128, "Time: <font color='#ff8200'>%s</font>", pAika);
+						Format(module[i], 128, "<font color='#ff8200'>%s       </font>", pAika);
 					}
 					else if (g_bMissedMapBest[client] && g_fPersonalRecord[client] > 0.0)
 					{
 						// Missed Personal Best time
-						Format(module[i], 128, "Time: <font color='#fd0000'>%s</font>", pAika);
+						Format(module[i], 128, "<font color='#fd0000'>%s       </font>", pAika);
 					}
 					else if (g_fPersonalRecord[client] < 0.1)
 					{
 						// No Personal Best on map
-						Format(module[i], 128, "Time: <font color='#0089ff'>%s</font>", pAika);
+						Format(module[i], 128, "<font color='#0089ff'>%s       </font>", pAika);
 					}
 					else
 					{
 						// Hasn't missed Personal Best yet
-						Format(module[i], 128, "Time: <font color='#00ff00'>%s</font>", pAika);
+						Format(module[i], 128, "<font color='#00ff00'>%s       </font>", pAika);
 					}
 				}
 				else if (g_bWrcpTimeractivated[client] && !g_bPracticeMode[client])
 				{
 					FormatTimeFloat(client, g_fCurrentWrcpRunTime[client], 3, pAika, 128);
-					Format(module[i], 128, "Time: <font color='#bd00ff'>%s</font>", pAika);
+					Format(module[i], 128, "<font color='#bd00ff'>%s       </font>", pAika);
 				}
 				else if (!g_bTimerEnabled[client])
-					Format(module[i], 128, "Time: <font color='#FFFF00'>Disabled</font>");
+					Format(module[i], 128, "<font color='#FFFF00'>Disabled       </font>");
 				else
 				{
-					Format(module[i], 128, "Time: <font color='#FF0000'>00:00:00</font>");
+					Format(module[i], 128, "<font color='#FF0000'>00:00:00       </font>");
 				}
 
 				if (g_iCurrentStyle[client] != 0)
