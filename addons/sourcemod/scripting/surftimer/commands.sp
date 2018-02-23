@@ -645,11 +645,10 @@ public int SaveLocListHandler(Menu menu, MenuAction action, int param1, int para
 		int id = StringToInt(szId);
 		CPrintToChat(param1, "%t", "Commands13", g_szChatPrefix, id);
 		TeleportToSaveloc(param1, id);
-	}
-	else if (action == MenuAction_Cancel)
 		SaveLocMenu(param1);
+	}
 	else if (action == MenuAction_End)
-		CloseHandle(menu);
+		delete menu;
 }
 
 // public Action Command_goToPlayerCheckpoint(int client, int args)
@@ -2088,6 +2087,7 @@ public void displayRanksMenu(int client)
 	for (int i = 0; i < GetArraySize(g_hSkillGroups); i++)
 	{
 		GetArrayArray(g_hSkillGroups, i, RankValue[0]);
+		ReplaceString(RankValue[RankName], sizeof(RankValue), "{style}", "");
 		if (RankValue[PointsBot] > -1 && RankValue[PointsTop] > -1)
 			Format(ChatLine, 512, "%i-%i Points: %s", RankValue[PointsBot], RankValue[PointsTop], RankValue[RankName]);
 		else if (RankValue[PointReq] > -1)

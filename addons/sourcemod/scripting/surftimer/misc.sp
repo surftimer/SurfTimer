@@ -2493,6 +2493,8 @@ public void SetPlayerRank(int client)
 	if (g_bEnforceTitle[client])
 	{
 		// g_iEnforceTitleType[client], 0 = chat, 1 = scoreboard, 2 = both
+		int style = g_iCurrentStyle[client];
+		ReplaceString(g_szEnforcedTitle[client], sizeof(g_szEnforcedTitle), "{style}", g_szStyleAcronyms[style]);
 		if (g_iEnforceTitleType[client] == 0 || g_iEnforceTitleType[client] == 2)
 			Format(g_pr_chat_coloredrank[client], 256, g_szEnforcedTitle[client]);
 
