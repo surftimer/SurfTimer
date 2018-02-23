@@ -146,7 +146,7 @@ public void db_upgradeDatabase(int ver)
   }
   else if (ver == 2)
   {
-	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN wrcppoints INT(11) NOT NULL DEFAULT 0;");
+	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN wrcppoints INT(11) NOT NULL DEFAULT 0 AFTER `wrbpoints`;");
   }
   
   SQL_UnlockDatabase(g_hDb);
