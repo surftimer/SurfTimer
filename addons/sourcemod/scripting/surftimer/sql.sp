@@ -1936,6 +1936,7 @@ public void sql_selectMapRecordCallback(Handle owner, Handle hndl, const char[] 
 		if (!g_bServerDataLoaded)
 		{
 			db_viewMapProRankCount();
+			CreateTimer(3.0, RefreshZonesTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 		}
 		return;
 	}
@@ -1996,6 +1997,7 @@ public void sql_selectMapRecordCallback(Handle owner, Handle hndl, const char[] 
 	if (!g_bServerDataLoaded)
 	{
 		db_viewMapProRankCount();
+		CreateTimer(3.0, RefreshZonesTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 	}
 	return;
 }
@@ -3238,7 +3240,10 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 		db_UpdateLastSeen(client);
 
 		if (GetConVarBool(g_hTeleToStartWhenSettingsLoaded))
+		{
 			Command_Restart(client, 1);
+			CreateTimer(0.1, RestartPlayer, client);
+		}
 
 		// Seach for next client to load
 		for (int i = 1; i < MAXPLAYERS + 1; i++)
@@ -7874,7 +7879,7 @@ public void db_selectPlayerRankUnknownCallback(Handle owner, Handle hndl, const 
 
 		char szQuery[1024];
 		// "SELECT name FROM ck_playerrank WHERE points >= (SELECT points FROM ck_playerrank WHERE steamid = '%s') ORDER BY points";
-		Format(szQuery, 512, sql_selectRankedPlayersRank, szSteamId);
+		Format(szQuery, 512, sql_selectRankedPlayersRank, 0, szSteamId, 0);
 		SQL_TQuery(g_hDb, db_getPlayerRankUnknownCallback, szQuery, pack, DBPrio_Low);
 	}
 	else

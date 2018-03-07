@@ -30,6 +30,12 @@ public Action RefreshZoneSettings(Handle timer, any client)
 	return Plugin_Handled;
 }
 
+public Action RefreshZonesTimer(Handle timer)
+{
+	RefreshZones();
+	return Plugin_Handled;
+}
+
 public Action SetPlayerWeapons(Handle timer, any client)
 {
 	if ((GetClientTeam(client) > 1) && IsValidClient(client))
@@ -656,4 +662,10 @@ public Action SpecBot(Handle timer, Handle pack)
 	g_bWrcpTimeractivated[client] = false;
 
 	return Plugin_Handled;
+}
+
+public Action RestartPlayer(Handle timer, any client)
+{
+	if (IsValidClient(client))
+		Command_Restart(client, 1);
 }

@@ -14,7 +14,7 @@ public void CreateZoneEntity(int zoneIndex)
 
 	Format(sZoneName, sizeof(sZoneName), "%s", g_mapZones[zoneIndex][zoneName]);
 	Format(szHookName, sizeof(szHookName), "%s", g_mapZones[zoneIndex][hookName]);
-
+	CPrintToChatAll(szHookName);
 	if (!StrEqual(szHookName, "None"))
 	{
 		int iEnt;
@@ -146,6 +146,7 @@ public void CreateZoneEntity(int zoneIndex)
 // Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 public Action StartTouchTrigger(int caller, int activator)
 {
+	CPrintToChatAll("test1");
 	// Ignore dead players
 	if (!IsValidClient(activator))
 		return Plugin_Handled;
@@ -168,15 +169,25 @@ public Action StartTouchTrigger(int caller, int activator)
 	// Hack fix to allow bonus zones to sit on top of start zones, e.g surf_aircontrol_ksf bonus 1
 	if (g_bTimerRunning[activator])
 	{
+		CPrintToChatAll("test1");
 		if (action[0] < 6 && g_bInBonus[activator])
-		{ 
+		{
+			CPrintToChatAll("test2");
 			if (action[2] != g_iInBonus[activator])
+			{
+				CPrintToChatAll("test3");
 				return Plugin_Handled;
+			}
 		}
 		else
 		{
+			CPrintToChatAll("test4");
 			if (!g_bInBonus[activator] && action[2] > 0)
+			{
+				CPrintToChatAll("test5");
 				return Plugin_Handled;
+			}
+
 			else if (StrEqual(g_szMapName, "surf_christmas2") && !g_bUsingStageTeleport[activator])
 			{
 				if (action[0] == 3)
@@ -232,6 +243,7 @@ public Action StartTouchTrigger(int caller, int activator)
 				StartTouch(activator, action);
 	}
 
+	CPrintToChatAll("test6");
 	return Plugin_Handled;
 }
 

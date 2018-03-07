@@ -2556,12 +2556,12 @@ public int GetSkillgroupIndex(int rank, int points)
 		}
 		else if (RankValue[RankBot] > -1 && RankValue[RankTop] > -1)
 		{
-			if (rank >= RankValue[RankBot] && rank < RankValue[RankTop])
+			if (rank >= RankValue[RankBot] && rank <= RankValue[RankTop])
 				return i;
 		}
 		else if (RankValue[PointsBot] > -1 && RankValue[PointsTop] > -1)
 		{
-			if (points >= RankValue[PointsBot] && points < RankValue[PointsTop])
+			if (points >= RankValue[PointsBot] && points <= RankValue[PointsTop])
 				return i;
 		}
 		else if (RankValue[PointReq] > -1)
@@ -2587,7 +2587,7 @@ public int GetSkillgroupIndex(int rank, int points)
 				}
 				else if (RankValueNext[RankReq] > -1)
 				{
-					if (points >= RankValue[PointReq] && rank > RankValueNext[RankReq])
+					if (points >= RankValue[PointReq] && rank >= RankValueNext[RankReq])
 						return i;
 				}
 				else if (RankValueNext[RankTop] > -1)
