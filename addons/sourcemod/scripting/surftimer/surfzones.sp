@@ -14,7 +14,7 @@ public void CreateZoneEntity(int zoneIndex)
 
 	Format(sZoneName, sizeof(sZoneName), "%s", g_mapZones[zoneIndex][zoneName]);
 	Format(szHookName, sizeof(szHookName), "%s", g_mapZones[zoneIndex][hookName]);
-	CPrintToChatAll(szHookName);
+
 	if (!StrEqual(szHookName, "None"))
 	{
 		int iEnt;
@@ -26,7 +26,7 @@ public void CreateZoneEntity(int zoneIndex)
 			{
 				char szTriggerName[128];
 				GetEntPropString(iEnt, Prop_Send, "m_iName", szTriggerName, 128, 0);
-
+				// GetEntityClassname(iEnt, szClassName, sizeof(szClassName));
 				if (StrEqual(szHookName, szTriggerName))
 				{
 					Format(sZoneName, sizeof(sZoneName), "sm_ckZoneHooked %i", zoneIndex);
@@ -73,10 +73,11 @@ public void CreateZoneEntity(int zoneIndex)
 					}
 
 					DispatchKeyValue(iEnt, "targetname", sZoneName);
-					//DispatchKeyValue(iEnt, "m_iClassname", "hooked");
 
 					SDKHook(iEnt, SDKHook_StartTouch, StartTouchTrigger);
 					SDKHook(iEnt, SDKHook_EndTouch, EndTouchTrigger);
+
+					DispatchKeyValue(iEnt, "m_iClassname", "hooked");
 				}
 			}
 		}
@@ -146,7 +147,6 @@ public void CreateZoneEntity(int zoneIndex)
 // Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 public Action StartTouchTrigger(int caller, int activator)
 {
-	CPrintToChatAll("test1");
 	// Ignore dead players
 	if (!IsValidClient(activator))
 		return Plugin_Handled;
@@ -169,22 +169,17 @@ public Action StartTouchTrigger(int caller, int activator)
 	// Hack fix to allow bonus zones to sit on top of start zones, e.g surf_aircontrol_ksf bonus 1
 	if (g_bTimerRunning[activator])
 	{
-		CPrintToChatAll("test1");
 		if (action[0] < 6 && g_bInBonus[activator])
 		{
-			CPrintToChatAll("test2");
 			if (action[2] != g_iInBonus[activator])
 			{
-				CPrintToChatAll("test3");
 				return Plugin_Handled;
 			}
 		}
 		else
 		{
-			CPrintToChatAll("test4");
 			if (!g_bInBonus[activator] && action[2] > 0)
 			{
-				CPrintToChatAll("test5");
 				return Plugin_Handled;
 			}
 
@@ -243,7 +238,6 @@ public Action StartTouchTrigger(int caller, int activator)
 				StartTouch(activator, action);
 	}
 
-	CPrintToChatAll("test6");
 	return Plugin_Handled;
 }
 
@@ -2362,12 +2356,11 @@ stock void RemoveZones()
 			 && GetEntPropString(i, Prop_Data, "m_iName", sClassName, sizeof(sClassName))
 			 && StrContains(sClassName, "sm_ckZone") != -1)
 		{
-			SDKUnhook(i, SDKHook_StartTouch, StartTouchTrigger);
-			SDKUnhook(i, SDKHook_EndTouch, EndTouchTrigger);
-			
 			// Don't destroy hooked zone entities
 			if (StrContains(sClassName, "sm_ckZoneHooked") == -1)
 			{
+				SDKUnhook(i, SDKHook_StartTouch, StartTouchTrigger);
+				SDKUnhook(i, SDKHook_EndTouch, EndTouchTrigger);
 				AcceptEntityInput(i, "Disable");
 				AcceptEntityInput(i, "Kill");
 			}

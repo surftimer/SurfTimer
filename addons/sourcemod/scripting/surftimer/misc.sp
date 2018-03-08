@@ -101,7 +101,8 @@ public void loadAllClientSettings()
 			break;
 		}
 	}
-
+	
+	// RefreshZones();
 	g_bServerDataLoaded = true;
 }
 
