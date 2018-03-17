@@ -72,6 +72,10 @@ public void db_setupDatabase()
 		{
 			db_upgradeDatabase(2);
 		}
+		else if (!SQL_FastQuery(g_hDb, "SELECT teleside FROM ck_playeroptions LIMIT 1"))
+		{
+			db_upgradeDatabase(3);
+		}
 	}
 
 	SQL_UnlockDatabase(g_hDb);
@@ -147,6 +151,11 @@ public void db_upgradeDatabase(int ver)
   else if (ver == 2)
   {
 	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN wrcppoints INT(11) NOT NULL DEFAULT 0 AFTER `wrbpoints`;");
+  }
+  else if (ver == 3)
+  {
+	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER centrehud;");
+	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_spawnlocations DROP PRIMARY KEY, ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER stage, ADD PRIMARY KEY (mapname, zonegroup, stage, teleside);");
   }
   
   SQL_UnlockDatabase(g_hDb);
@@ -344,26 +353,26 @@ public int callback_Confirm(Menu menu, MenuAction action, int client, int key)
 =          SPAWN LOCATION          =
 ==================================*/
 
-public void db_deleteSpawnLocations(int zGrp)
+public void db_deleteSpawnLocations(int zGrp, int teleside)
 {
-	g_bGotSpawnLocation[zGrp][1] = false;
+	g_bGotSpawnLocation[zGrp][1][teleside] = false;
 	char szQuery[128];
-	Format(szQuery, 128, sql_deleteSpawnLocations, g_szMapName, zGrp);
+	Format(szQuery, 128, sql_deleteSpawnLocations, g_szMapName, zGrp, teleside);
 	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, 1, DBPrio_Low);
 }
 
 
-public void db_updateSpawnLocations(float position[3], float angle[3], float vel[3], int zGrp)
+public void db_updateSpawnLocations(float position[3], float angle[3], float vel[3], int zGrp, int teleside)
 {
 	char szQuery[512];
-	Format(szQuery, 512, sql_updateSpawnLocations, position[0], position[1], position[2], angle[0], angle[1], angle[2], vel[0], vel[1], vel[2], g_szMapName, zGrp);
+	Format(szQuery, 512, sql_updateSpawnLocations, position[0], position[1], position[2], angle[0], angle[1], angle[2], vel[0], vel[1], vel[2], g_szMapName, zGrp, teleside);
 	SQL_TQuery(g_hDb, db_editSpawnLocationsCallback, szQuery, zGrp, DBPrio_Low);
 }
 
-public void db_insertSpawnLocations(float position[3], float angle[3], float vel[3], int zGrp)
+public void db_insertSpawnLocations(float position[3], float angle[3], float vel[3], int zGrp, int teleside)
 {
 	char szQuery[512];
-	Format(szQuery, 512, sql_insertSpawnLocations, g_szMapName, position[0], position[1], position[2], angle[0], angle[1], angle[2], vel[0], vel[1], vel[2], zGrp);
+	Format(szQuery, 512, sql_insertSpawnLocations, g_szMapName, position[0], position[1], position[2], angle[0], angle[1], angle[2], vel[0], vel[1], vel[2], zGrp, teleside);
 	SQL_TQuery(g_hDb, db_editSpawnLocationsCallback, szQuery, zGrp, DBPrio_Low);
 }
 
@@ -382,7 +391,10 @@ public void db_selectSpawnLocations()
 	for (int s = 0; s < CPLIMIT; s++)
 	{
 		for (int i = 0; i < MAXZONEGROUPS; i++)
-			g_bGotSpawnLocation[i][s] = false;
+		{
+			g_bGotSpawnLocation[i][s][0] = false;
+			g_bGotSpawnLocation[i][s][1] = false;
+		}
 	}
 
 	char szQuery[254];
@@ -404,16 +416,20 @@ public void db_selectSpawnLocationsCallback(Handle owner, Handle hndl, const cha
 	{
 		while (SQL_FetchRow(hndl))
 		{
-			g_bGotSpawnLocation[SQL_FetchInt(hndl, 10)][SQL_FetchInt(hndl, 11)] = true;
-			g_fSpawnLocation[SQL_FetchInt(hndl, 10)][SQL_FetchInt(hndl, 11)][0] = SQL_FetchFloat(hndl, 1);
-			g_fSpawnLocation[SQL_FetchInt(hndl, 10)][SQL_FetchInt(hndl, 11)][1] = SQL_FetchFloat(hndl, 2);
-			g_fSpawnLocation[SQL_FetchInt(hndl, 10)][SQL_FetchInt(hndl, 11)][2] = SQL_FetchFloat(hndl, 3);
-			g_fSpawnAngle[SQL_FetchInt(hndl, 10)][SQL_FetchInt(hndl, 11)][0] = SQL_FetchFloat(hndl, 4);
-			g_fSpawnAngle[SQL_FetchInt(hndl, 10)][SQL_FetchInt(hndl, 11)][1] = SQL_FetchFloat(hndl, 5);
-			g_fSpawnAngle[SQL_FetchInt(hndl, 10)][SQL_FetchInt(hndl, 11)][2] = SQL_FetchFloat(hndl, 6);
-			g_fSpawnVelocity[SQL_FetchInt(hndl, 10)][SQL_FetchInt(hndl, 11)][0] = SQL_FetchFloat(hndl, 7);
-			g_fSpawnVelocity[SQL_FetchInt(hndl, 10)][SQL_FetchInt(hndl, 11)][1] = SQL_FetchFloat(hndl, 8);
-			g_fSpawnVelocity[SQL_FetchInt(hndl, 10)][SQL_FetchInt(hndl, 11)][2] = SQL_FetchFloat(hndl, 9);
+			int zonegroup = SQL_FetchInt(hndl, 10);
+			int stage = SQL_FetchInt(hndl, 11);
+			int teleside = SQL_FetchInt(hndl, 12);
+
+			g_bGotSpawnLocation[zonegroup][stage][teleside] = true;
+			g_fSpawnLocation[zonegroup][stage][teleside][0] = SQL_FetchFloat(hndl, 1);
+			g_fSpawnLocation[zonegroup][stage][teleside][1] = SQL_FetchFloat(hndl, 2);
+			g_fSpawnLocation[zonegroup][stage][teleside][2] = SQL_FetchFloat(hndl, 3);
+			g_fSpawnAngle[zonegroup][stage][teleside][0] = SQL_FetchFloat(hndl, 4);
+			g_fSpawnAngle[zonegroup][stage][teleside][1] = SQL_FetchFloat(hndl, 5);
+			g_fSpawnAngle[zonegroup][stage][teleside][2] = SQL_FetchFloat(hndl, 6);
+			g_fSpawnVelocity[zonegroup][stage][teleside][0] = SQL_FetchFloat(hndl, 7);
+			g_fSpawnVelocity[zonegroup][stage][teleside][1] = SQL_FetchFloat(hndl, 8);
+			g_fSpawnVelocity[zonegroup][stage][teleside][2] = SQL_FetchFloat(hndl, 9);
 		}
 	}
 
@@ -5425,18 +5441,19 @@ public void db_viewPlayerOptionsCallback(Handle owner, Handle hndl, const char[]
 		g_SpeedMode[client] = SQL_FetchInt(hndl, 8);
 		g_bCenterSpeedDisplay[client] = view_as<bool>(SQL_FetchInt(hndl, 9));
 		g_bCentreHud[client] = view_as<bool>(SQL_FetchInt(hndl, 10));
-		g_iCentreHudModule[client][0] = SQL_FetchInt(hndl, 11);
-		g_iCentreHudModule[client][1] = SQL_FetchInt(hndl, 12);
-		g_iCentreHudModule[client][2] = SQL_FetchInt(hndl, 13);
-		g_iCentreHudModule[client][3] = SQL_FetchInt(hndl, 14);
-		g_iCentreHudModule[client][4] = SQL_FetchInt(hndl, 15);
-		g_iCentreHudModule[client][5] = SQL_FetchInt(hndl, 16);
-		g_bSideHud[client] = view_as<bool>(SQL_FetchInt(hndl, 17));
-		g_iSideHudModule[client][0] = SQL_FetchInt(hndl, 18);
-		g_iSideHudModule[client][1] = SQL_FetchInt(hndl, 19);
-		g_iSideHudModule[client][2] = SQL_FetchInt(hndl, 20);
-		g_iSideHudModule[client][3] = SQL_FetchInt(hndl, 21);
-		g_iSideHudModule[client][4] = SQL_FetchInt(hndl, 22);
+		g_iTeleSide[client] = SQL_FetchInt(hndl, 11);
+		g_iCentreHudModule[client][0] = SQL_FetchInt(hndl, 12);
+		g_iCentreHudModule[client][1] = SQL_FetchInt(hndl, 13);
+		g_iCentreHudModule[client][2] = SQL_FetchInt(hndl, 14);
+		g_iCentreHudModule[client][3] = SQL_FetchInt(hndl, 15);
+		g_iCentreHudModule[client][4] = SQL_FetchInt(hndl, 16);
+		g_iCentreHudModule[client][5] = SQL_FetchInt(hndl, 17);
+		g_bSideHud[client] = view_as<bool>(SQL_FetchInt(hndl, 18));
+		g_iSideHudModule[client][0] = SQL_FetchInt(hndl, 19);
+		g_iSideHudModule[client][1] = SQL_FetchInt(hndl, 20);
+		g_iSideHudModule[client][2] = SQL_FetchInt(hndl, 21);
+		g_iSideHudModule[client][3] = SQL_FetchInt(hndl, 22);
+		g_iSideHudModule[client][4] = SQL_FetchInt(hndl, 23);
 
 		// Functionality for normal spec list
 		if (g_iSideHudModule[client][0] == 5 && (g_iSideHudModule[client][1] == 0 && g_iSideHudModule[client][2] == 0 && g_iSideHudModule[client][3] == 0 && g_iSideHudModule[client][4] == 0))
@@ -5468,6 +5485,7 @@ public void db_viewPlayerOptionsCallback(Handle owner, Handle hndl, const char[]
 		g_SpeedMode[client] = 0;
 		g_bCenterSpeedDisplay[client] = false;
 		g_bCentreHud[client] = true;
+		g_iTeleSide[client] = 0;
 		g_iCentreHudModule[client][0] = 1;
 		g_iCentreHudModule[client][1] = 2;
 		g_iCentreHudModule[client][2] = 3;
@@ -5501,7 +5519,7 @@ public void db_updatePlayerOptions(int client)
 	// "UPDATE ck_playeroptions2 SET timer = %i, hide = %i, sounds = %i, chat = %i, viewmodel = %i, autobhop = %i, checkpoints = %i, centrehud = %i, module1c = %i, module2c = %i, module3c = %i, module4c = %i, module5c = %i, module6c = %i, sidehud = %i, module1s = %i, module2s = %i, module3s = %i, module4s = %i, module5s = %i where steamid = '%s'";
 	if (g_bSettingsLoaded[client] && g_bServerDataLoaded && g_bLoadedModules[client])
 	{
-		Format(szQuery, 1024, sql_updatePlayerOptions, BooltoInt(g_bTimerEnabled[client]), BooltoInt(g_bHide[client]), BooltoInt(g_bEnableQuakeSounds[client]),  BooltoInt(g_bHideChat[client]),  BooltoInt(g_bViewModel[client]),  BooltoInt(g_bAutoBhopClient[client]),  BooltoInt(g_bCheckpointsEnabled[client]),  g_SpeedGradient[client], g_SpeedMode[client], BooltoInt(g_bCenterSpeedDisplay[client]), BooltoInt(g_bCentreHud[client]), g_iCentreHudModule[client][0], g_iCentreHudModule[client][1], g_iCentreHudModule[client][2], g_iCentreHudModule[client][3], g_iCentreHudModule[client][4], g_iCentreHudModule[client][5],  BooltoInt(g_bSideHud[client]), g_iSideHudModule[client][0], g_iSideHudModule[client][1], g_iSideHudModule[client][2], g_iSideHudModule[client][3], g_iSideHudModule[client][4], g_szSteamID[client]);
+		Format(szQuery, 1024, sql_updatePlayerOptions, BooltoInt(g_bTimerEnabled[client]), BooltoInt(g_bHide[client]), BooltoInt(g_bEnableQuakeSounds[client]),  BooltoInt(g_bHideChat[client]),  BooltoInt(g_bViewModel[client]),  BooltoInt(g_bAutoBhopClient[client]),  BooltoInt(g_bCheckpointsEnabled[client]),  g_SpeedGradient[client], g_SpeedMode[client], BooltoInt(g_bCenterSpeedDisplay[client]), BooltoInt(g_bCentreHud[client]), g_iTeleSide[client], g_iCentreHudModule[client][0], g_iCentreHudModule[client][1], g_iCentreHudModule[client][2], g_iCentreHudModule[client][3], g_iCentreHudModule[client][4], g_iCentreHudModule[client][5],  BooltoInt(g_bSideHud[client]), g_iSideHudModule[client][0], g_iSideHudModule[client][1], g_iSideHudModule[client][2], g_iSideHudModule[client][3], g_iSideHudModule[client][4], g_szSteamID[client]);
 		SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, client, DBPrio_Low);
 	}
 }

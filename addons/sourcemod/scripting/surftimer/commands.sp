@@ -1975,6 +1975,17 @@ void CenterSpeedDisplay(int client, bool menu = false)
 		MiscellaneousOptions(client);
 }
 
+void TeleSide(int client, bool menu = false)
+{
+	if (g_iTeleSide[client] == 0)
+		g_iTeleSide[client]++;
+	else
+		g_iTeleSide[client] = 0;
+	
+	if (menu)
+		MiscellaneousOptions(client);
+}
+
 public Action Client_Hide(int client, int args)
 {
 	HideMethod(client);
@@ -3207,11 +3218,11 @@ public void MiscellaneousOptions(int client)
 	else
 		AddMenuItem(menu, "", "[OFF] Timer Sounds");
 	
-	// Hide Weapon
-	if (g_bViewModel[client])
-		AddMenuItem(menu, "", "[OFF] Hide Weapon");
+	// Tele Side
+	if (g_iTeleSide[client] == 0)
+		AddMenuItem(menu, "", "[LEFT] Start Side");
 	else
-		AddMenuItem(menu, "", "[ON] Hide Weapon");
+		AddMenuItem(menu, "", "[RIGHT] Start Side");
 
 	// Speed Gradient
 	if (g_SpeedGradient[client] == 0)
@@ -3243,6 +3254,13 @@ public void MiscellaneousOptions(int client)
 	else
 		AddMenuItem(menu, "", "[OFF] Hide Chat");
 
+	// Hide Weapon
+	if (g_bViewModel[client])
+		AddMenuItem(menu, "", "[OFF] Hide Weapon");
+	else
+		AddMenuItem(menu, "", "[ON] Hide Weapon");
+	
+
 	SetMenuExitBackButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
 }
@@ -3255,11 +3273,12 @@ public int MiscellaneousOptionsHandler(Menu menu, MenuAction action, int param1,
 		{
 			case 0: HideMethod(param1, true);
 			case 1: QuakeSounds(param1, true);
-			case 2: HideViewModel(param1, true);
+			case 2: TeleSide(param1, true);
 			case 3: SpeedGradient(param1, true);
 			case 4: SpeedMode(param1, true);
 			case 5: CenterSpeedDisplay(param1, true);
 			case 6: HideChat(param1, true);
+			case 7: HideViewModel(param1, true);
 		}
 	}
 	else if (action == MenuAction_Cancel)

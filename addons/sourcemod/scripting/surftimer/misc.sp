@@ -191,6 +191,9 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 		realZone = 0;
 	else
 		realZone = zone;
+	
+	// Check clients tele side
+	int teleside = g_iTeleSide[client];
 
 	if (g_bStartposUsed[client][zonegroup])
 	{
@@ -222,7 +225,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 			return;
 		}
 	}
-	else if (g_bGotSpawnLocation[zonegroup][realZone])
+	else if (g_bGotSpawnLocation[zonegroup][realZone][teleside])
 	{
 		// Check if teleporting to bonus
 		if (zonegroup > 0)
@@ -242,7 +245,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 			if (stopTime)
 				Client_Stop(client, 0);
 
-			Array_Copy(g_fSpawnLocation[zonegroup][realZone], g_fTeleLocation[client], 3);
+			Array_Copy(g_fSpawnLocation[zonegroup][realZone][teleside], g_fTeleLocation[client], 3);
 
 			g_specToStage[client] = true;
 			g_bRespawnPosition[client] = false;
@@ -265,7 +268,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 				g_bInStageZone[client] = false;
 			}
 
-			teleportEntitySafe(client, g_fSpawnLocation[zonegroup][realZone], g_fSpawnAngle[zonegroup][realZone], g_fSpawnVelocity[zonegroup][realZone], stopTime);
+			teleportEntitySafe(client, g_fSpawnLocation[zonegroup][realZone][teleside], g_fSpawnAngle[zonegroup][realZone][teleside], g_fSpawnVelocity[zonegroup][realZone][teleside], stopTime);
 
 			return;
 		}

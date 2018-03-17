@@ -261,10 +261,10 @@ int g_WrcpStage[MAXPLAYERS + 1];
 bool g_bhasStages;
 
 /*----------  Spawn Locations  ----------*/
-float g_fSpawnLocation[MAXZONEGROUPS][CPLIMIT][3];
-float g_fSpawnAngle[MAXZONEGROUPS][CPLIMIT][3];
-float g_fSpawnVelocity[MAXZONEGROUPS][CPLIMIT][3];
-bool g_bGotSpawnLocation[MAXZONEGROUPS][CPLIMIT];
+float g_fSpawnLocation[MAXZONEGROUPS][CPLIMIT][2][3];
+float g_fSpawnAngle[MAXZONEGROUPS][CPLIMIT][2][3];
+float g_fSpawnVelocity[MAXZONEGROUPS][CPLIMIT][2][3];
+bool g_bGotSpawnLocation[MAXZONEGROUPS][CPLIMIT][2];
 
 /*----------  Bonus Variables  ----------*/
 
@@ -776,6 +776,9 @@ int g_iCentreHudModule[MAXPLAYERS + 1][6];
 bool g_bSpecListOnly[MAXPLAYERS + 1];
 bool g_bSideHud[MAXPLAYERS + 1];
 int g_iSideHudModule[MAXPLAYERS + 1][5];
+
+// Custom tele side
+int g_iTeleSide[MAXPLAYERS + 1];
 
 /*----------  Run Variables  ----------*/
 
