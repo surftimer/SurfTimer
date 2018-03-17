@@ -333,7 +333,7 @@ public void StartTouch(int client, int action[3])
 
 				if (g_bToggleMapFinish[client])
 				{
-					if (GetConVarBool(g_hMustPassCheckpoints) && g_iTotalCheckpoints > 0)
+					if (GetConVarBool(g_hMustPassCheckpoints) && g_iTotalCheckpoints > 0 && action[2] == 0)
 					{
 						if (g_bIsValidRun[client])
 							CL_OnEndTimerPress(client);

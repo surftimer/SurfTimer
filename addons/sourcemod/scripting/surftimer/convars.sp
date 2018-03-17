@@ -110,6 +110,7 @@ ConVar g_hSoundPathWRCP = null;
 char g_szSoundPathWRCP[PLATFORM_MAX_PATH];
 char g_szRelativeSoundPathWRCP[PLATFORM_MAX_PATH];
 ConVar g_hMustPassCheckpoints = null;
+ConVar g_hSlayOnRoundEnd = null;
 
 void CreateConVars()
 {
@@ -399,6 +400,8 @@ void CreateConVars()
 	}
 
 	g_hMustPassCheckpoints = CreateConVar("ck_enforce_checkpoints", "1", "Sets whether a player must pass all checkpoints to finish their run. Enable/Disable");
+
+	g_hSlayOnRoundEnd = CreateConVar("ck_slay_on_round_end", "1", "If enabled, all players will be slain on round end. If disabled all players timers will be stopped on round end");
 
 	// Server Name
 	g_hHostName = FindConVar("hostname");

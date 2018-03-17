@@ -1743,7 +1743,7 @@ public void OnMapStart()
 	if (g_hTriggerMultiple != null)
 		CloseHandle(g_hTriggerMultiple);
 
-	g_hTriggerMultiple = CreateArray(128);
+	g_hTriggerMultiple = CreateArray(256);
 	while ((iEnt = FindEntityByClassname(iEnt, "trigger_multiple")) != -1)
 	{
 		PushArrayCell(g_hTriggerMultiple, iEnt);

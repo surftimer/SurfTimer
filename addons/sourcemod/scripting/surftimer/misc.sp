@@ -1478,6 +1478,10 @@ public void SetClientDefaults(int client)
 	g_iWaitingForResponse[client] = -1;
 
 	g_iMenuPosition[client] = 0;
+
+	// Set default stage maybe
+	for (int i = 0; i < MAXZONEGROUPS; i++)
+		g_Stage[i][client] = 1;
 }
 
 // public void clearPlayerCheckPoints(int client)
@@ -3622,11 +3626,21 @@ public void SideHudAlive(int client)
 				else
 					Format(szWR, 128, "%s", g_szLastSRDifference[client]);
 				char szWRHolder[64];
-				if (g_iClientInZone[client][2] == 0)
-					Format(szWRHolder, 64, g_szRecordPlayer);
-				else
-					Format(szWRHolder, 64, g_szBonusFastest[g_iClientInZone[client][2]]);
+				if (style == 0)
+				{
+					if (g_iClientInZone[client][2] == 0)
+						Format(szWRHolder, 64, g_szRecordPlayer);
+					else
+						Format(szWRHolder, 64, g_szBonusFastest[g_iClientInZone[client][2]]);
 
+				}
+				else
+				{
+					if (g_iClientInZone[client][2] == 0)
+						Format(szWRHolder, 64, g_szRecordPlayer);
+					else
+						Format(szWRHolder, 64, g_szBonusFastest[g_iClientInZone[client][2]]);
+				}
 				Format(szModule[i], 256, "%s\nby %s", szWR, szWRHolder);
 
 				if ((i + 1) != moduleCount)

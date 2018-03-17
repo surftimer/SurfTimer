@@ -418,10 +418,16 @@ public Action SetClanTag(Handle timer, any client)
 public Action TerminateRoundTimer(Handle timer)
 {
 	CS_TerminateRound(1.0, CSRoundEnd_CTWin, true);
+	bool bSlay = GetConVarBool(g_hSlayOnRoundEnd);
 	for (int i = 0; i <= MaxClients; i++)
 	{
 		if (IsValidClient(i) && !IsFakeClient(i))
-			ForcePlayerSuicide(i);
+		{
+			if (bSlay)
+				ForcePlayerSuicide(i);
+			else
+				Client_Stop(i, 1);
+		}
 	}
 	return Plugin_Handled;
 }

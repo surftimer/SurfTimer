@@ -4088,14 +4088,14 @@ public int db_deleteZonesInGroup(int client)
 	Format(szQuery, 258, sql_deleteZonesInGroup, g_szMapName, g_CurrentSelectedZoneGroup[client]);
 	SQL_AddQuery(h_DeleteZoneGroup, szQuery);
 
-	Format(szQuery, 258, "UPDATE ck_zones SET zonegroup = zonegroup-1 WHERE zonegroup > %i AND mapname = '%s';", g_CurrentSelectedZoneGroup[client], g_szMapName);
-	SQL_AddQuery(h_DeleteZoneGroup, szQuery);
+	// Format(szQuery, 258, "UPDATE ck_zones SET zonegroup = zonegroup-1 WHERE zonegroup > %i AND mapname = '%s';", g_CurrentSelectedZoneGroup[client], g_szMapName);
+	// SQL_AddQuery(h_DeleteZoneGroup, szQuery);
 
 	Format(szQuery, 258, "DELETE FROM ck_bonus WHERE zonegroup = %i AND mapname = '%s';", g_CurrentSelectedZoneGroup[client], g_szMapName);
 	SQL_AddQuery(h_DeleteZoneGroup, szQuery);
 
-	Format(szQuery, 258, "UPDATE ck_bonus SET zonegroup = zonegroup-1 WHERE zonegroup > %i AND mapname = '%s';", g_CurrentSelectedZoneGroup[client], g_szMapName);
-	SQL_AddQuery(h_DeleteZoneGroup, szQuery);
+	// Format(szQuery, 258, "UPDATE ck_bonus SET zonegroup = zonegroup-1 WHERE zonegroup > %i AND mapname = '%s';", g_CurrentSelectedZoneGroup[client], g_szMapName);
+	// SQL_AddQuery(h_DeleteZoneGroup, szQuery);
 
 	SQL_ExecuteTransaction(g_hDb, h_DeleteZoneGroup, SQLTxn_ZoneGroupRemovalSuccess, SQLTxn_ZoneGroupRemovalFailed, client);
 
@@ -5672,7 +5672,7 @@ public int FinishedMapsMenuHandler(Handle menu, MenuAction action, int client, i
 public void db_selectTotalBonusCount()
 {
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT COUNT(DISTINCT `mapname`, `zonetypeid`) FROM `ck_zones` WHERE `zonetypeid` = 0 AND `zonegroup` > 0");
+	Format(szQuery, 512, "SELECT COUNT(DISTINCT `mapname`, `zonetypeid`, `zonegroup`) FROM `ck_zones` WHERE `zonetypeid` = 0 AND `zonegroup` > 0");
 	SQL_TQuery(g_hDb, sql_selectTotalBonusCountCallback, szQuery, DBPrio_Low);
 }
 
@@ -6383,7 +6383,7 @@ public void sql_viewWrcpMapRecordCallback(Handle owner, Handle hndl, const char[
 public void db_selectStageTopSurfers(int client, char info[32], char mapname[128])
 {
 	char szQuery[1024];
-	Format(szQuery, 1024, "SELECT db2.steamid, db1.name, db2.runtimepro as overall, db1.steamid, db2.mapname FROM ck_wrcps as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname = '%s' AND db2.runtimepro > -1.0 AND db2.stage = %i AND db2.style = 0 ORDER BY overall ASC LIMIT 50;", mapname, info);
+	Format(szQuery, 1024, "SELECT db2.steamid, db1.name, db2.runtimepro as overall, db1.steamid, db2.mapname FROM ck_wrcps as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname = '%s' AND db2.runtimepro > -1.0 AND db2.stage = %i AND db1.style = 0 AND db2.style = 0 ORDER BY overall ASC LIMIT 50;", mapname, info);
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	// WritePackCell(pack, stage);
