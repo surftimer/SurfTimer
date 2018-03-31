@@ -285,10 +285,7 @@ void CreateCommandListeners()
 
 public Action sm_test(int client, int args)
 {
-	if (g_bInBonus[client])
-		CPrintToChatAll("true - %d", g_iInBonus[client]);
-	else
-		CPrintToChatAll("false");
+	CPrintToChatAll("%d", g_iMapTier);
 	return Plugin_Handled;
 }
 

@@ -2841,6 +2841,96 @@ public int Native_GetPlayerPoints(Handle plugin, int numParams)
 		return -1;
 }
 
+public int Native_GetPlayerSkillgroup(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	char str[256];
+	GetNativeString(2, str, 256);
+	if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		Format(str, sizeof(str), g_pr_chat_coloredrank[client]);
+		SetNativeString(2, str, 256, true);
+	}
+	else
+	{
+		Format(str, sizeof(str), "Unranked");
+		SetNativeString(2, str, 256, true);
+	}
+}
+
+public int Native_GetPlayerNameColored(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	char str[256];
+	GetNativeString(2, str, 256);
+	if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		GetClientName(client, str, sizeof(str));
+		Format(str, sizeof(str), "%s%s",  g_pr_namecolour[client], str);
+		SetNativeString(2, str, 256, true);
+	}
+	else
+	{
+		Format(str, sizeof(str), "invalid");
+		SetNativeString(2, str, 256, true);
+	}
+}
+
+public int Native_GetMapData(Handle plugin, int numParams)
+{
+	char name[MAX_NAME_LENGTH], time[64];
+	GetNativeString(1, name, MAX_NAME_LENGTH);
+	GetNativeString(2, time, 64);
+
+	Format(name, sizeof(name), g_szRecordPlayer);
+	Format(time, sizeof(time), g_szRecordMapTime);
+	SetNativeString(1, name, sizeof(name), true);
+	SetNativeString(2, time, sizeof(time), true);
+
+	return g_MapTimesCount;
+}
+
+public int Native_GetPlayerData(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	int rank = 99999;
+	if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		char szTime[64], szCountry[16];
+
+		GetNativeString(1, szTime, 64);
+		rank = GetNativeCell(2);
+		GetNativeString(3, szCountry, 16);
+
+		if (g_fPersonalRecord[client] > 0.0)
+			Format(szTime, 64, "%s", g_szPersonalRecord[client]);
+		else
+			Format(szTime, 64, "N/A");
+		
+		Format(szCountry, sizeof(szCountry), g_szCountryCode[client]);
+
+		rank = g_MapRank[client];
+
+		SetNativeString(2, szTime, sizeof(szTime), true);
+		SetNativeString(4, szCountry, sizeof(szCountry), true);
+	}
+
+	return rank;
+}
+
+public int Native_GetMapTier(Handle plugin, int numParams)
+{
+	return g_iMapTier;
+}
+
+public int Native_GetMapStages(Handle plugin, int numParams)
+{
+	int stages = 0;
+	if (g_bhasStages)
+		stages = g_mapZonesTypeCount[0][3] + 1;
+	return stages;
+}
+
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
 	RegPluginLibrary("surftimer");
@@ -2851,6 +2941,12 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	CreateNative("surftimer_GetCurrentTime", Native_GetCurrentTime);
 	CreateNative("surftimer_GetPlayerRank", Native_GetPlayerRank);
 	CreateNative("surftimer_GetPlayerPoints", Native_GetPlayerPoints);
+	CreateNative("surftimer_GetPlayerSkillgroup", Native_GetPlayerSkillgroup);
+	CreateNative("surftimer_GetPlayerNameColored", Native_GetPlayerNameColored);
+	CreateNative("surftimer_GetMapData", Native_GetMapData);
+	CreateNative("surftimer_GetPlayerData", Native_GetPlayerData);
+	CreateNative("surftimer_GetMapTier", Native_GetMapTier);
+	CreateNative("surftimer_GetMapStages", Native_GetMapStages);
 	CreateNative("surftimer_SafeTeleport", Native_SafeTeleport);
 	CreateNative("surftimer_IsClientVip", Native_IsClientVip);
 	MarkNativeAsOptional("Store_GetClientCredits");
