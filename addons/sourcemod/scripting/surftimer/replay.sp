@@ -407,13 +407,24 @@ public void PlayRecord(int client, int type, int style)
 
 	char buffer[256];
 	char sPath[256];
+	
+	int bonus;
+	if (type > 0)
+	{
+		if (g_iCurrentBonusReplayIndex == 99)
+			bonus = type;
+		else
+			bonus = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
+	
+		g_iCurrentlyPlayingBonus = bonus;
+	}
 
 	if (style == 0)
 	{
 		if (type == 0)
 			Format(sPath, sizeof(sPath), "%s%s.rec", CK_REPLAY_PATH, g_szMapName);
-		else if (type == 1)
-			Format(sPath, sizeof(sPath), "%s%s_bonus_%d.rec", CK_REPLAY_PATH, g_szMapName, g_iBonusToReplay[g_iCurrentBonusReplayIndex]);
+		else if (type > 0)
+			Format(sPath, sizeof(sPath), "%s%s_bonus_%d.rec", CK_REPLAY_PATH, g_szMapName, bonus);
 		else if (type < 0)
 			Format(sPath, sizeof(sPath), "%s%s_stage_%d.rec", CK_REPLAY_PATH, g_szMapName, (type * -1));
 	}
@@ -421,8 +432,8 @@ public void PlayRecord(int client, int type, int style)
 	{
 		if (type == 0)
 			Format(sPath, sizeof(sPath), "%s%s_style_%d.rec", CK_REPLAY_PATH, g_szMapName, style);
-		else if (type == 1)
-			Format(sPath, sizeof(sPath), "%s%s_bonus_%d_style_%d.rec", CK_REPLAY_PATH, g_szMapName, g_iBonusToReplay[g_iCurrentBonusReplayIndex], style);
+		else if (type > 0)
+			Format(sPath, sizeof(sPath), "%s%s_bonus_%d_style_%d.rec", CK_REPLAY_PATH, g_szMapName, bonus, style);
 		else if (type < 0)
 			Format(sPath, sizeof(sPath), "%s%s_stage_%d_style_%d.rec", CK_REPLAY_PATH, g_szMapName, (type * -1), style);
 	}
@@ -461,6 +472,7 @@ public void PlayRecord(int client, int type, int style)
 		Format(g_szWrcpReplayTime[stage], sizeof(g_szWrcpReplayTime), "%s", iFileHeader[view_as<int>(FH_Time)]);
 		Format(g_szWrcpReplayName[stage], sizeof(g_szWrcpReplayName), "%s", iFileHeader[view_as<int>(FH_Playername)]);
 		Format(buffer, sizeof(buffer), "S%d %s (%s)", stage, g_szWrcpReplayName[stage], g_szWrcpReplayTime[stage]);
+		g_iCurrentlyPlayingStage = stage;
 		CS_SetClientClanTag(client, "WRCP Replay");
 		SetClientName(client, buffer);
 	}
@@ -925,104 +937,105 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 
 		if (g_BotMimicTick[client] >= g_BotMimicRecordTickCount[client] || g_bReplayAtEnd[client])
 		{
-			if (!g_bReplayAtEnd[client])
+			if (client == g_BonusBot)
 			{
-				if (client == g_BonusBot)
+				if (g_bManualBonusReplayPlayback)
 				{
-					if (g_bManualBonusReplayPlayback)
-					{
-						if (g_iManualBonusReplayCount < 1)
-							g_iManualBonusReplayCount++;
-						else
-						{
-							g_iManualBonusReplayCount = 0;
-							g_bManualBonusReplayPlayback = false;
-							g_iCurrentBonusReplayIndex = 0;
-							PlayRecord(g_BonusBot, 1, 0);
-							g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
-						}
-					}
+					if (g_iManualBonusReplayCount < 1)
+						g_iManualBonusReplayCount++;
 					else
 					{
-						// Call to load another replay
-						if (g_iCurrentBonusReplayIndex < (g_BonusBotCount-1))
-							g_iCurrentBonusReplayIndex++;
-						else
-							g_iCurrentBonusReplayIndex = 0;
-
+						g_iManualBonusReplayCount = 0;
+						g_bManualBonusReplayPlayback = false;
+						g_iCurrentBonusReplayIndex = 0;
 						PlayRecord(g_BonusBot, 1, 0);
 						g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
 					}
 				}
-				else if (client == g_WrcpBot)
+				else
 				{
-					if (g_bManualStageReplayPlayback)
-					{
-						if (g_iManualStageReplayCount < 2)
-							g_iManualStageReplayCount++;
-						else
-						{
-							g_iManualStageReplayCount = 0;
-							g_bManualStageReplayPlayback = false;
-							g_StageReplaysLoop = 3;
-							PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0);
-						}
-					}
+					// Call to load another replay
+					if (g_iCurrentBonusReplayIndex < (g_BonusBotCount-1))
+						g_iCurrentBonusReplayIndex++;
+					else
+						g_iCurrentBonusReplayIndex = 0;
+
+					PlayRecord(g_BonusBot, 1, 0);
+					g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
+				}
+			}
+			else if (client == g_RecordBot)
+			{
+				if (g_bManualReplayPlayback)
+				{
+					if (g_iManualReplayCount < 1)
+						g_iManualReplayCount++;
 					else
 					{
-						bool found = false;
-						if (g_StageReplaysLoop == 3)
+						g_iManualReplayCount = 0;
+						g_bManualReplayPlayback = false;
+						PlayRecord(g_RecordBot, 0, 0);
+					}
+				}
+			}
+			else if (client == g_WrcpBot)
+			{
+				if (g_bManualStageReplayPlayback)
+				{
+					if (g_iManualStageReplayCount < 2)
+						g_iManualStageReplayCount++;
+					else
+					{
+						g_iManualStageReplayCount = 0;
+						g_bManualStageReplayPlayback = false;
+						g_StageReplaysLoop = 3;
+						PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0);
+					}
+				}
+				else
+				{
+					bool found = false;
+					if (g_StageReplaysLoop == 3)
+					{
+						char sPath2[256];
+						for (int i = 1; i <= g_TotalStages; i++)
 						{
-							char sPath2[256];
+							if (i <= g_StageReplayCurrentStage)
+								continue;
+
+							BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s%s_stage_%d.rec", CK_REPLAY_PATH, g_szMapName, i);
+
+							if (FileExists(sPath2))
+							{
+								g_StageReplayCurrentStage = i;
+								g_StageReplaysLoop = 0;
+								found = true;
+								break;
+							}
+						}
+
+						if (!found)
+						{
 							for (int i = 1; i <= g_TotalStages; i++)
 							{
-								if (i <= g_StageReplayCurrentStage)
-									continue;
-
 								BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s%s_stage_%d.rec", CK_REPLAY_PATH, g_szMapName, i);
-
 								if (FileExists(sPath2))
 								{
 									g_StageReplayCurrentStage = i;
 									g_StageReplaysLoop = 0;
-									found = true;
 									break;
 								}
 							}
-
-							if (!found)
-							{
-								for (int i = 1; i <= g_TotalStages; i++)
-								{
-									BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s%s_stage_%d.rec", CK_REPLAY_PATH, g_szMapName, i);
-									if (FileExists(sPath2))
-									{
-										g_StageReplayCurrentStage = i;
-										g_StageReplaysLoop = 0;
-										break;
-									}
-								}
-							}
-						}
-
-						g_StageReplaysLoop++;
-						PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0);
-					}
-				}
-				else if (client == g_RecordBot)
-				{
-					if (g_bManualReplayPlayback)
-					{
-						if (g_iManualReplayCount < 1)
-							g_iManualReplayCount++;
-						else
-						{
-							g_iManualReplayCount = 0;
-							g_bManualReplayPlayback = false;
-							PlayRecord(g_RecordBot, 0, 0);
 						}
 					}
+
+					g_StageReplaysLoop++;
+					PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0);
 				}
+			}
+
+			if (!g_bReplayAtEnd[client])
+			{
 				g_fReplayRestarted[client] = GetEngineTime();
 				SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 0.0);
 				g_bReplayAtEnd[client] = true;
@@ -1075,7 +1088,12 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			{
 				int bonus = g_iSelectedReplayBonus;
 				if (g_iSelectedReplayType == 1 && g_iSelectedBonusReplayStyle == 0)
-					Format(sPath, sizeof(sPath), "%s%s_bonus_%d.rec", CK_REPLAY_PATH, g_szMapName, g_iBonusToReplay[g_iCurrentBonusReplayIndex]);
+				{
+					if (g_iCurrentBonusReplayIndex != 99)
+						Format(sPath, sizeof(sPath), "%s%s_bonus_%d.rec", CK_REPLAY_PATH, g_szMapName, g_iBonusToReplay[g_iCurrentBonusReplayIndex]);
+					else
+						Format(sPath, sizeof(sPath), "%s%s_bonus_%d.rec", CK_REPLAY_PATH, g_szMapName, g_iManualBonusToReplay);
+				}
 				else if (g_iSelectedReplayType == 1 && g_iSelectedBonusReplayStyle > 0)
 					Format(sPath, sizeof(sPath), "%s%s_bonus_%d_style_%d.rec", CK_REPLAY_PATH, g_szMapName, bonus, g_iSelectedBonusReplayStyle);
 			}

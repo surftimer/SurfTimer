@@ -951,6 +951,10 @@ int g_BonusBotCount;
 int g_iCurrentBonusReplayIndex;
 int g_iBonusToReplay[MAXZONEGROUPS + 1];
 float g_fReplayTimes[MAXZONEGROUPS][MAX_STYLES];
+int g_iManualBonusToReplay;
+int g_iCurrentlyPlayingBonus;
+
+int g_iCurrentlyPlayingStage;
 
 /*----------  Misc  ----------*/
 

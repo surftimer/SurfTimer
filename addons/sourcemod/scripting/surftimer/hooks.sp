@@ -89,6 +89,10 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		g_bInJump[client] = false;
 		g_bInDuck[client] = false;
 
+		// Set stage to 1 on spawn cause why not
+		g_WrcpStage[client] = 1;
+		g_Stage[0][client] = 1;
+
 		if (g_iCurrentStyle[client] == 4) // 4 low gravity
 			SetEntityGravity(client, 0.5);
 		else if (g_iCurrentStyle[client] == 5)// 5 slowmo

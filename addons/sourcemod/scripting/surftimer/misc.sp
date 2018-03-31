@@ -3282,8 +3282,20 @@ public void CenterHudDead(int client)
 				Format(sResult, sizeof(sResult), "%s <font color='#00ff00'>+R</font>", sResult);
 			else
 				Format(sResult, sizeof(sResult), "%s __", sResult);
-
-			if (g_bTimerRunning[ObservedUser])
+			
+			if (IsFakeClient(ObservedUser))
+			{
+				if (ObservedUser == g_RecordBot)
+					Format(obsAika, sizeof(obsAika), "<font color='#FFFF00'>%s</font>", g_szReplayTime);
+				else if (ObservedUser == g_BonusBot)
+					Format(obsAika, sizeof(obsAika), "<font color='#FFFF00'>%s</font>", g_szBonusTime);
+				else if (ObservedUser == g_WrcpBot)
+					Format(obsAika, sizeof(obsAika), "<font color='#FFFF00'>%s</font>", g_szWrcpReplayTime[g_iCurrentlyPlayingStage]);
+				
+				PrintHintText(client, "<font face=''>%s\nSpeed: <font color='#66bbff'>%i</font> u/s\nKeys: %s", obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
+				return;
+			}
+			else if (g_bTimerRunning[ObservedUser])
 			{
 				obsTimer = GetGameTime() - g_fStartTime[ObservedUser] - g_fPauseTime[ObservedUser];
 				FormatTimeFloat(client, obsTimer, 3, obsAika, sizeof(obsAika));

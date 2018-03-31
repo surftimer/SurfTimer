@@ -4976,7 +4976,6 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 
 		int bot;
 		bool bSpec = true;
-
 		// Did the client select a map replay?
 		if ((StrContains(szBuffer, "map", false)) != -1)
 		{
@@ -5027,7 +5026,6 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 				char szBuffer2[2][128];
 				ExplodeString(szBuffer, "bonus-", szBuffer2, 2, sizeof(szBuffer2));
 				bonus = StringToInt(szBuffer2[1]);
-
 				// Check for style replay
 				if ((StrContains(szBuffer, "style", false)) != -1)
 				{
@@ -5036,6 +5034,8 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 					ExplodeString(szBuffer, "style-", szBuffer2, 2, 128);
 					int style = StringToInt(szBuffer2[1]);
 					g_iSelectedBonusReplayStyle = style;
+					g_iCurrentBonusReplayIndex = 99;
+					g_iManualBonusToReplay = bonus;
 					PlayRecord(bot, bonus, style);
 				}
 				else
@@ -5043,6 +5043,8 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 					g_bManualBonusReplayPlayback = true;
 					g_iManualBonusReplayCount = 99;
 					g_iSelectedBonusReplayStyle = 0;
+					g_iCurrentBonusReplayIndex = 99;
+					g_iManualBonusToReplay = bonus;
 					PlayRecord(bot, bonus, 0);
 				}
 			}
@@ -5071,7 +5073,6 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 				PlayRecord(bot, -stage, 0);
 			}
 		}
-
 		if (bSpec)
 		{
 			// Delay the switch to spec so the client sees the new bot name
