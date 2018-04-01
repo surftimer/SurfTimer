@@ -50,7 +50,7 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Type {lightgreen}!bonus {default}to teleport to the bonus stage"
 	}
-	"AdvertStage"
+	"AdvertWRCP"
 	{
 		"#format"	"{1:s}"
 		"en"		"{1} Type {lightgreen}!wrcp {default}to see your stage times"
@@ -128,12 +128,12 @@
 	"EarnedPoints"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:i}"
-		"en"		"{1} {yellow}{2}{default} has earned {purple}{3} points{default} [{purple}{4}{default} Total]"
+		"en"		"{1} {yellow}{2}{default} has earned {purple}{3} {default}points [{purple}{4}{default} Total]"
 	}
 	"EarnedPoints2"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:i}"
-		"en"		"{1} {yellow}{2}{default} has earned {purple}{3} {4} points {default} [{purple}{5}{default} Total]"
+		"en"		"{1} {yellow}{2}{default} has earned {purple}{3} {red}{4} {default}points [{purple}{5}{default} Total]"
 	}
 	"NoPlayerTop"
 	{
@@ -1543,7 +1543,7 @@
 	"SQL39"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:i},{5:i}"
-		"en"		"{1} {yellow}{2} {default}is ranked {lightgreen}{3}{default}/{4} with {lightgreen}{5} {default}points"
+		"en"		"{1} {yellow}{2} {default}is ranked {lightgreen}{3}/{4} {default}with {purple}{5} {default}points"
 	}
 	"SQL40"
 	{

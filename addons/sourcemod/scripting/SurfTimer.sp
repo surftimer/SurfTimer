@@ -56,12 +56,12 @@
 #define DARKRED 0x02
 #define PURPLE 0x03
 #define GREEN 0x04
-#define MOSSGREEN 0x05
+#define LIGHTGREEN 0x05
 #define LIMEGREEN 0x06
 #define RED 0x07
-#define ORANGE 0x10
 #define GRAY 0x08
 #define YELLOW 0x09
+#define ORANGE 0x10
 #define DARKGREY 0x0A
 #define BLUE 0x0B
 #define DARKBLUE 0x0C
@@ -1193,7 +1193,7 @@ bool g_bReportSuccess[MAXPLAYERS + 1];
 float g_fSpawnPosition[MAXPLAYERS + 1][3];
 
 // Chat Colors in String Format
-char szWHITE[12], szDARKRED[12], szPURPLE[12], szGREEN[12], szMOSSGREEN[12], szLIMEGREEN[12], szRED[12], szGRAY[12], szYELLOW[12], szDARKGREY[12], szBLUE[12], szDARKBLUE[12], szLIGHTBLUE[12], szPINK[12], szLIGHTRED[12], szORANGE[12];
+char szWHITE[12], szDARKRED[12], szPURPLE[12], szGREEN[12], szLIGHTGREEN[12], szLIMEGREEN[12], szRED[12], szGRAY[12], szYELLOW[12], szDARKGREY[12], szBLUE[12], szDARKBLUE[12], szLIGHTBLUE[12], szPINK[12], szLIGHTRED[12], szORANGE[12];
 
 // hook zones
 Handle g_hTriggerMultiple;
@@ -1473,26 +1473,15 @@ char UnallowedTitles[][] =
 	"SUPER VIP"
 };
 
-char g_szStyleFinishPrint[][] =
-{
-	"",
-	"*sideways*",
-	"*half-sideways*",
-	"*backwards*",
-	"*low gravity*",
-	"*slow motion*",
-	"*fast forwards*"
-};
-
 char g_szStyleRecordPrint[][] =
 {
 	"",
-	"*SIDEWAYS*",
-	"*HALF-SIDEWAYS*",
-	"*BACKWARDS*",
-	"*LOW GRAVITY*",
-	"*SLOW MOTION*",
-	"*FAST FORWARD*"
+	"*Sideways*",
+	"*Half-Sideways*",
+	"*Backwards*",
+	"*Low-Gravity*",
+	"*Slow Motion*",
+	"*Fast Forward*"
 };
 
 char g_szStyleMenuPrint[][] =
@@ -2747,7 +2736,7 @@ public void OnPluginStart()
 	Format(szDARKRED, 12, "%c", DARKRED);
 	Format(szPURPLE, 12, "%c", PURPLE);
 	Format(szGREEN, 12, "%c", GREEN);
-	Format(szMOSSGREEN, 12, "%c", MOSSGREEN);
+	Format(szLIGHTGREEN, 12, "%c", LIGHTGREEN);
 	Format(szLIMEGREEN, 12, "%c", LIMEGREEN);
 	Format(szRED, 12, "%c", RED);
 	Format(szGRAY, 12, "%c", GRAY);
