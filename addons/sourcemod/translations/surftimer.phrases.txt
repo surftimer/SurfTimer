@@ -1565,4 +1565,9 @@
 		"#format"	"{1:s},{2:s}"
 		"en"		"{1} {darkred}You must pass all {2} to finish your run"
 	}
+	"NoMapFound"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"{1} {blue}{2} {default}not found"
+	}
 }

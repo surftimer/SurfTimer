@@ -406,18 +406,18 @@ public Action Say_Hook(int client, const char[] command, int argc)
 			return Plugin_Handled;
 
 		// Maptier
-		if (StrContains(sText, "!map", false) == 0)
-		{
-			if (CheckCommandAccess(client, "sm_map", ADMFLAG_RESERVATION))
-			{
-				char mapname[1024];
-				mapname = sText;
-				ReplaceString(mapname, 1024, "!map ", "", false);
-				db_selectMapName(mapname);
-			}
-			else
-				return Plugin_Handled;
-		}
+		// if (StrContains(sText, "!map", false) == 0)
+		// {
+		// 	if (CheckCommandAccess(client, "sm_map", ADMFLAG_RESERVATION))
+		// 	{
+		// 		char mapname[1024];
+		// 		mapname = sText;
+		// 		ReplaceString(mapname, 1024, "!map ", "", false);
+		// 		db_selectMapName(mapname);
+		// 	}
+		// 	else
+		// 		return Plugin_Handled;
+		// }
 
 		// Empty Message
 		if (StrEqual(sText, " ") || !sText[0])
@@ -807,18 +807,7 @@ public Action OnLogAction(Handle source, Identity ident, int client, int target,
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
 	// fluffys
-	if (buttons & IN_JUMP && g_bInJump[client] == true && !g_bInStartZone[client] && !g_bInStageZone[client])
-	{
-		if (!g_bJumpZoneTimer[client])
-		{
-			CreateTimer(1.0, StartJumpZonePrintTimer, client);
-			CPrintToChat(client, "%t", "Hooks10", g_szChatPrefix);
-			TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, view_as<float>( { 0.0, 0.0, 0.0} ));
-			SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, 0.0 } ));
-			g_bJumpZoneTimer[client] = true;
-		}
-	}
-	else if (buttons & IN_DUCK && g_bInDuck[client] == true)
+	if (buttons & IN_DUCK && g_bInDuck[client] == true)
 	{
 		CPrintToChat(client, "%t", "Hooks11", g_szChatPrefix);
 	}
@@ -1369,6 +1358,20 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 	if (IsValidClient(client) && !IsFakeClient(client))
 	{
 		// Prehop limit in zone
+		if (g_bInJump[client] == true && !g_bInStartZone[client] && !g_bInStageZone[client])
+		{
+			if (!g_bJumpZoneTimer[client])
+			{
+				CreateTimer(1.0, StartJumpZonePrintTimer, client);
+				CPrintToChat(client, "%t", "Hooks10", g_szChatPrefix);
+				Handle pack;
+				CreateDataTimer(0.05, DelayedVelocityCap, pack);
+				WritePackCell(pack, client);
+				WritePackFloat(pack, 0.0);
+				g_bJumpZoneTimer[client] = true;
+			}
+		}
+
 		if (GetConVarBool(g_hOneJumpLimit))
 		{
 			if (g_bInStartZone[client] || g_bInStageZone[client])

@@ -4725,3 +4725,33 @@ public bool IsPlayerTimerAdmin(int client)
 	}
 	return false;
 }
+
+// public void getMapName(char[] szMapName, int size)
+// {
+// 	bool bFound = false;
+// 	bool bPossible;
+// 	char szMapName2[128], szMapName3[128];
+// 	// Check that the map is in the mapcycle
+// 	for (int i = 0; i < GetArraySize(g_MapList); i++)
+// 	{
+// 		// Exact Match
+// 		if (StrEqual(szMapName, szMapName2, false))
+// 		{
+// 			Format(szMapName, size, szMapName2);
+// 			bFound = true;
+// 			break;
+// 		}
+
+// 		// Possible match e.g surf_me or surf_forbidden_tomb
+// 		if (StrContains(szMapName, szMapName2, false) == -1)
+// 		{
+// 			Format(szMapName3, sizeof(szMapName3), szMapName2);
+// 			bPossible = true;
+// 		}
+// 	}
+
+// 	if (!bFound && bPossible)
+// 	{
+// 		Format(szMapName, sizeof(szMapName), szMapName3);
+// 	}
+// }

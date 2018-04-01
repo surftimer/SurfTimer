@@ -10,6 +10,7 @@
 ====================================*/
 
 #include <sourcemod>
+// #include <regex>
 #include <sdkhooks>
 #include <adminmenu>
 #include <cstrike>
@@ -952,8 +953,6 @@ int g_iCurrentBonusReplayIndex;
 int g_iBonusToReplay[MAXZONEGROUPS + 1];
 float g_fReplayTimes[MAXZONEGROUPS][MAX_STYLES];
 int g_iManualBonusToReplay;
-int g_iCurrentlyPlayingBonus;
-
 int g_iCurrentlyPlayingStage;
 
 /*----------  Misc  ----------*/
@@ -1339,6 +1338,9 @@ bool g_bIsValidRun[MAXPLAYERS + 1];
 
 // Prestige
 bool g_bPrestigeCheck[MAXPLAYERS + 1];
+
+// Menus mapname
+char g_szMapNameFromDatabase[MAXPLAYERS + 1][128];
 
 /*===================================
 =         Predefined Arrays         =

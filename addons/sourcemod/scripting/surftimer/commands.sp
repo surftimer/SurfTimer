@@ -1527,16 +1527,17 @@ public int MapTopMenuSelectStyleHandler(Handle menu, MenuAction action, int para
 	{
 		char szMapName[128];
 		GetMenuItem(menu, param2, szMapName, sizeof(szMapName));
-		if (param2 == 0)
-		{
-			g_ProfileStyleSelect[param1] = 0;
-			db_selectMapTopSurfers(param1, szMapName);
-		}
-		else
-		{
-			g_ProfileStyleSelect[param1] = param2;
-			db_selectStyleMapTopSurfers(param1, szMapName, param2);
-		}
+		db_selectMapNameEquals(param1, szMapName, param2);
+		// if (param2 == 0)
+		// {
+		// 	g_ProfileStyleSelect[param1] = 0;
+		// 	db_selectMapTopSurfers(param1, szMapName);
+		// }
+		// else
+		// {
+		// 	g_ProfileStyleSelect[param1] = param2;
+		// 	db_selectStyleMapTopSurfers(param1, szMapName, param2);
+		// }
 	}
 	else if (action == MenuAction_End)
 		delete menu;

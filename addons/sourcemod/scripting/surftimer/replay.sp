@@ -407,7 +407,7 @@ public void PlayRecord(int client, int type, int style)
 
 	char buffer[256];
 	char sPath[256];
-	
+
 	int bonus;
 	if (type > 0)
 	{
@@ -415,8 +415,6 @@ public void PlayRecord(int client, int type, int style)
 			bonus = type;
 		else
 			bonus = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
-	
-		g_iCurrentlyPlayingBonus = bonus;
 	}
 
 	if (style == 0)

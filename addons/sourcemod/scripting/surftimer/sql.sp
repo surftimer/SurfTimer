@@ -1537,13 +1537,15 @@ public void sql_selectRankedPlayersRankCallback(Handle owner, Handle hndl, const
 					if (g_PlayerRank[client][0] > GetConVarInt(g_hPrestigeRank))
 						KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
 				}
+
+				if (style == MAX_STYLES && g_bPrestigeCheck[client] == false)
+					KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
 			}
 			else
 			{
-				if (g_PlayerRank[client][style] < GetConVarInt(g_hPrestigeRank))
+				if (g_PlayerRank[client][0] < GetConVarInt(g_hPrestigeRank))
 					g_bPrestigeCheck[client] = true;
-
-				if (style == MAX_STYLES && g_bPrestigeCheck[client] == false)
+				else
 					KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
 			}
 		}
@@ -2034,193 +2036,12 @@ public void db_selectMapTopSurfers(int client, char mapname[128])
 	char szQuery[1024];
 	char type[128];
 	type = "normal";
-	if (StrEqual(mapname, "surf_me"))
-		Format(szQuery, 1024, sql_selectTopSurfers3, mapname);
-	else
-		Format(szQuery, 1024, sql_selectTopSurfers2, PERCENT, mapname, PERCENT);
+	Format(szQuery, 1024, sql_selectTopSurfers3, mapname);
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackString(pack, mapname);
 	WritePackString(pack, type);
 	SQL_TQuery(g_hDb, sql_selectTopSurfersCallback, szQuery, pack, DBPrio_Low);
-}
-
-
-// BONUS
-public void db_selectBonusesInMap(int client, char mapname[128])
-{
-	// SELECT mapname, zonegroup, zonename FROM `ck_zones` WHERE mapname LIKE '%c%s%c' AND zonegroup > 0 GROUP BY zonegroup;
-	char szQuery[512];
-	Format(szQuery, 512, sql_selectBonusesInMap, PERCENT, mapname, PERCENT);
-	SQL_TQuery(g_hDb, db_selectBonusesInMapCallback, szQuery, client, DBPrio_Low);
-}
-
-public void db_selectBonusesInMapCallback(Handle owner, Handle hndl, const char[] error, any client)
-{
-	if (hndl == null)
-	{
-		LogError("[Surftimer] SQL Error (db_selectBonusesInMapCallback): %s", error);
-		return;
-	}
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-	{
-		char mapname[128], MenuTitle[248], BonusName[128], MenuID[248];
-		int zGrp;
-
-		if (SQL_GetRowCount(hndl) == 1)
-		{
-			SQL_FetchString(hndl, 0, mapname, 128);
-			db_selectBonusTopSurfers(client, mapname, SQL_FetchInt(hndl, 1));
-			return;
-		}
-
-		Menu listBonusesinMapMenu = new Menu(MenuHandler_SelectBonusinMap);
-
-		SQL_FetchString(hndl, 0, mapname, 128);
-		zGrp = SQL_FetchInt(hndl, 1);
-		Format(MenuTitle, 248, "Choose a Bonus in %s", mapname);
-		listBonusesinMapMenu.SetTitle(MenuTitle);
-
-		SQL_FetchString(hndl, 2, BonusName, 128);
-
-		if (!BonusName[0])
-			Format(BonusName, 128, "bonus %i", zGrp);
-
-		Format(MenuID, 248, "%s-%i", mapname, zGrp);
-
-		listBonusesinMapMenu.AddItem(MenuID, BonusName);
-
-
-		while (SQL_FetchRow(hndl))
-		{
-			SQL_FetchString(hndl, 2, BonusName, 128);
-			zGrp = SQL_FetchInt(hndl, 1);
-
-			if (StrEqual(BonusName, "NULL", false))
-				Format(BonusName, 128, "bonus %i", zGrp);
-
-			Format(MenuID, 248, "%s-%i", mapname, zGrp);
-
-			listBonusesinMapMenu.AddItem(MenuID, BonusName);
-		}
-
-		listBonusesinMapMenu.ExitButton = true;
-		listBonusesinMapMenu.Display(client, 60);
-	}
-	else
-	{
-		CPrintToChat(client, "%t", "SQL2", g_szChatPrefix);
-		return;
-	}
-}
-
-public int MenuHandler_SelectBonusinMap(Handle sMenu, MenuAction action, int client, int item)
-{
-	switch (action)
-	{
-		case MenuAction_Select:
-		{
-			char aID[248];
-			char splits[2][128];
-			GetMenuItem(sMenu, item, aID, sizeof(aID));
-			ExplodeString(aID, "-", splits, sizeof(splits), sizeof(splits[]));
-
-			db_selectBonusTopSurfers(client, splits[0], StringToInt(splits[1]));
-		}
-		case MenuAction_End:
-		{
-			delete sMenu;
-		}
-	}
-}
-
-public void db_selectBonusTopSurfers(int client, char mapname[128], int zGrp)
-{
-	char szQuery[1024];
-	Format(szQuery, 1024, sql_selectTopBonusSurfers, PERCENT, mapname, PERCENT, zGrp);
-	Handle pack = CreateDataPack();
-	WritePackCell(pack, client);
-	WritePackString(pack, mapname);
-	WritePackCell(pack, zGrp);
-	SQL_TQuery(g_hDb, sql_selectTopBonusSurfersCallback, szQuery, pack, DBPrio_Low);
-}
-
-public void sql_selectTopBonusSurfersCallback(Handle owner, Handle hndl, const char[] error, any data)
-{
-	if (hndl == null)
-	{
-		LogError("[Surftimer] SQL Error (sql_selectTopBonusSurfersCallback): %s", error);
-		return;
-	}
-
-	ResetPack(data);
-	int client = ReadPackCell(data);
-	char szMap[128];
-	ReadPackString(data, szMap, 128);
-	int zGrp = ReadPackCell(data);
-	CloseHandle(data);
-
-	char szFirstMap[128], szValue[128], szName[64], szSteamID[32], lineBuf[256], title[256];
-	float time;
-	bool bduplicat = false;
-	Handle stringArray = CreateArray(100);
-	Menu topMenu;
-
-	topMenu = new Menu(MapMenuHandler1);
-
-	topMenu.Pagination = 5;
-
-	if (SQL_HasResultSet(hndl))
-	{
-		int i = 1;
-		while (SQL_FetchRow(hndl))
-		{
-			bduplicat = false;
-			SQL_FetchString(hndl, 0, szSteamID, 32);
-			SQL_FetchString(hndl, 1, szName, 64);
-			time = SQL_FetchFloat(hndl, 2);
-			SQL_FetchString(hndl, 4, szMap, 128);
-			if (i == 1 || (i > 1 && StrEqual(szFirstMap, szMap)))
-			{
-				int stringArraySize = GetArraySize(stringArray);
-				for (int x = 0; x < stringArraySize; x++)
-				{
-					GetArrayString(stringArray, x, lineBuf, sizeof(lineBuf));
-					if (StrEqual(lineBuf, szName, false))
-					bduplicat = true;
-				}
-				if (bduplicat == false && i < 51)
-				{
-					char szTime[32];
-					FormatTimeFloat(client, time, 3, szTime, sizeof(szTime));
-					if (time < 3600.0)
-					Format(szTime, 32, "   %s", szTime);
-					if (i == 100)
-					Format(szValue, 128, "[%i.] %s |    » %s", i, szTime, szName);
-					if (i >= 10)
-					Format(szValue, 128, "[%i.] %s |    » %s", i, szTime, szName);
-					else
-					Format(szValue, 128, "[0%i.] %s |    » %s", i, szTime, szName);
-					topMenu.AddItem(szSteamID, szValue, ITEMDRAW_DEFAULT);
-					PushArrayString(stringArray, szName);
-					if (i == 1)
-					Format(szFirstMap, 128, "%s", szMap);
-					i++;
-				}
-			}
-		}
-		if (i == 1)
-		{
-			CPrintToChat(client, "%t", "NoTopRecords", g_szChatPrefix, szMap);
-		}
-	}
-	else
-	CPrintToChat(client, "%t", "NoTopRecords", g_szChatPrefix, szMap);
-	Format(title, 256, "Top 50 Times on %s (B %i) \n    Rank    Time               Player", szFirstMap, zGrp);
-	topMenu.SetTitle(title);
-	topMenu.OptionFlags = MENUFLAG_BUTTON_EXIT;
-	topMenu.Display(client, MENU_TIME_FOREVER);
-	CloseHandle(stringArray);
 }
 
 public void sql_selectTopSurfersCallback(Handle owner, Handle hndl, const char[] error, any data)
@@ -2318,6 +2139,184 @@ public void sql_selectTopSurfersCallback(Handle owner, Handle hndl, const char[]
 	SetMenuTitle(menu, title);
 	SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+
+// BONUS
+public void db_selectBonusesInMap(int client, char mapname[128])
+{
+	// SELECT mapname, zonegroup, zonename FROM `ck_zones` WHERE mapname LIKE '%c%s%c' AND zonegroup > 0 GROUP BY zonegroup;
+	char szQuery[512];
+	Format(szQuery, 512, sql_selectBonusesInMap, PERCENT, mapname, PERCENT);
+	SQL_TQuery(g_hDb, db_selectBonusesInMapCallback, szQuery, client, DBPrio_Low);
+}
+
+public void db_selectBonusesInMapCallback(Handle owner, Handle hndl, const char[] error, any client)
+{
+	if (hndl == null)
+	{
+		LogError("[Surftimer] SQL Error (db_selectBonusesInMapCallback): %s", error);
+		return;
+	}
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	{
+		char mapname[128], MenuTitle[248], BonusName[128], MenuID[248];
+		int zGrp;
+
+		if (SQL_GetRowCount(hndl) == 1)
+		{
+			SQL_FetchString(hndl, 0, mapname, 128);
+			db_selectBonusTopSurfers(client, mapname, SQL_FetchInt(hndl, 1));
+			return;
+		}
+
+		Menu listBonusesinMapMenu = new Menu(MenuHandler_SelectBonusinMap);
+
+		SQL_FetchString(hndl, 0, mapname, 128);
+		zGrp = SQL_FetchInt(hndl, 1);
+		Format(MenuTitle, 248, "Choose a Bonus in %s", mapname);
+		listBonusesinMapMenu.SetTitle(MenuTitle);
+
+		SQL_FetchString(hndl, 2, BonusName, 128);
+
+		if (!BonusName[0])
+			Format(BonusName, 128, "bonus %i", zGrp);
+
+		Format(MenuID, 248, "%s-%i", mapname, zGrp);
+
+		listBonusesinMapMenu.AddItem(MenuID, BonusName);
+
+
+		while (SQL_FetchRow(hndl))
+		{
+			SQL_FetchString(hndl, 2, BonusName, 128);
+			zGrp = SQL_FetchInt(hndl, 1);
+
+			if (StrEqual(BonusName, "NULL", false))
+				Format(BonusName, 128, "bonus %i", zGrp);
+
+			Format(MenuID, 248, "%s-%i", mapname, zGrp);
+
+			listBonusesinMapMenu.AddItem(MenuID, BonusName);
+		}
+
+		listBonusesinMapMenu.ExitButton = true;
+		listBonusesinMapMenu.Display(client, 60);
+	}
+	else
+	{
+		CPrintToChat(client, "%t", "SQL2", g_szChatPrefix);
+		return;
+	}
+}
+
+public int MenuHandler_SelectBonusinMap(Handle sMenu, MenuAction action, int client, int item)
+{
+	switch (action)
+	{
+		case MenuAction_Select:
+		{
+			char aID[248];
+			char splits[2][128];
+			GetMenuItem(sMenu, item, aID, sizeof(aID));
+			ExplodeString(aID, "-", splits, sizeof(splits), sizeof(splits[]));
+
+			db_selectBonusTopSurfers(client, splits[0], StringToInt(splits[1]));
+		}
+		case MenuAction_End:
+		{
+			delete sMenu;
+		}
+	}
+}
+
+public void db_selectBonusTopSurfers(int client, char mapname[128], int zGrp)
+{
+	char szQuery[1024];
+	Format(szQuery, 1024, sql_selectTopBonusSurfers, mapname, zGrp);
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackString(pack, mapname);
+	WritePackCell(pack, zGrp);
+	SQL_TQuery(g_hDb, sql_selectTopBonusSurfersCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void sql_selectTopBonusSurfersCallback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogError("[Surftimer] SQL Error (sql_selectTopBonusSurfersCallback): %s", error);
+		return;
+	}
+
+	ResetPack(data);
+	int client = ReadPackCell(data);
+	char szMap[128];
+	ReadPackString(data, szMap, 128);
+	int zGrp = ReadPackCell(data);
+	CloseHandle(data);
+
+	char szFirstMap[128], szValue[128], szName[64], szSteamID[32], lineBuf[256], title[256];
+	float time;
+	bool bduplicat = false;
+	Handle stringArray = CreateArray(100);
+	Menu topMenu;
+
+	topMenu = new Menu(MapMenuHandler1);
+
+	topMenu.Pagination = 5;
+
+	if (SQL_HasResultSet(hndl))
+	{
+		int i = 1;
+		while (SQL_FetchRow(hndl))
+		{
+			bduplicat = false;
+			SQL_FetchString(hndl, 0, szSteamID, 32);
+			SQL_FetchString(hndl, 1, szName, 64);
+			time = SQL_FetchFloat(hndl, 2);
+			SQL_FetchString(hndl, 4, szMap, 128);
+			if (i == 1 || (i > 1 && StrEqual(szFirstMap, szMap)))
+			{
+				int stringArraySize = GetArraySize(stringArray);
+				for (int x = 0; x < stringArraySize; x++)
+				{
+					GetArrayString(stringArray, x, lineBuf, sizeof(lineBuf));
+					if (StrEqual(lineBuf, szName, false))
+					bduplicat = true;
+				}
+				if (bduplicat == false && i < 51)
+				{
+					char szTime[32];
+					FormatTimeFloat(client, time, 3, szTime, sizeof(szTime));
+					if (time < 3600.0)
+					Format(szTime, 32, "   %s", szTime);
+					if (i == 100)
+					Format(szValue, 128, "[%i.] %s |    » %s", i, szTime, szName);
+					if (i >= 10)
+					Format(szValue, 128, "[%i.] %s |    » %s", i, szTime, szName);
+					else
+					Format(szValue, 128, "[0%i.] %s |    » %s", i, szTime, szName);
+					topMenu.AddItem(szSteamID, szValue, ITEMDRAW_DEFAULT);
+					PushArrayString(stringArray, szName);
+					if (i == 1)
+					Format(szFirstMap, 128, "%s", szMap);
+					i++;
+				}
+			}
+		}
+		if (i == 1)
+		{
+			CPrintToChat(client, "%t", "NoTopRecords", g_szChatPrefix, szMap);
+		}
+	}
+	else
+	CPrintToChat(client, "%t", "NoTopRecords", g_szChatPrefix, szMap);
+	Format(title, 256, "Top 50 Times on %s (B %i) \n    Rank    Time               Player", szFirstMap, zGrp);
+	topMenu.SetTitle(title);
+	topMenu.OptionFlags = MENUFLAG_BUTTON_EXIT;
+	topMenu.Display(client, MENU_TIME_FOREVER);
+	CloseHandle(stringArray);
 }
 
 public void db_currentRunRank(int client)
@@ -6674,28 +6673,6 @@ public void sql_viewTotalStageRecordsCallback(Handle owner, Handle hndl, const c
 		db_selectTotalBonusCount();
 }
 
-public void db_selectMapName(char[] mapname)
-{
-	char szQuery[1028];
-	Format(szQuery, 1028, "SELECT `mapname` FROM `ck_maptier` WHERE `mapname` LIKE '%c%s%c' LIMIT 0, 1", PERCENT, mapname, PERCENT);
-	SQL_TQuery(g_hDb, sql_SelectMapNameCallBack, szQuery, DBPrio_Low);
-}
-
-public void sql_SelectMapNameCallBack(Handle owner, Handle hndl, const char[] error, any pack)
-{
-	if (hndl == null)
-	{
-		LogError("[Surftimer] SQL Error (sql_SelectMapNameCallBack): %s", error);
-	}
-
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-	{
-		char mapname[128];
-		SQL_FetchString(hndl, 0, mapname, sizeof(mapname));
-		ServerCommand("sm_rcon sm_setnextmap %s", mapname);
-	}
-}
-
 // Styles for maps
 public void db_selectStyleRecord(int client, int style)
 {
@@ -8321,4 +8298,132 @@ public void db_selectMapCurrentImprovementCallback(Handle owner, Handle hndl, co
 
 	if (!g_bServerDataLoaded)
 		db_selectAnnouncements();
+}
+
+public void db_selectMapNameEquals(int client, char[] szMapName, int style)
+{
+	char szQuery[256];
+	Format(szQuery, sizeof(szQuery), "SELECT DISTINCT mapname FROM ck_zones WHERE mapname = '%s' LIMIT 1;", szMapName);
+
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackCell(pack, style);
+	WritePackString(pack, szMapName);
+
+	SQL_TQuery(g_hDb, sql_selectMapNameEqualsCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void sql_selectMapNameEqualsCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[Surftimer] SQL Error (sql_selectMapNameEqualsCallback): %s", error);
+		return;
+	}
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	int style = ReadPackCell(pack);
+	char szMapName[128];
+	ReadPackString(pack, szMapName, sizeof(szMapName));
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	{
+		SQL_FetchString(hndl, 0, g_szMapNameFromDatabase[client], sizeof(g_szMapNameFromDatabase));
+		if (style == 0)
+		{
+			g_ProfileStyleSelect[client] = 0;
+			db_selectMapTopSurfers(client, g_szMapNameFromDatabase[client]);
+		}
+		else
+		{
+			g_ProfileStyleSelect[client] = style;
+			db_selectStyleMapTopSurfers(client, g_szMapNameFromDatabase[client], style);
+		}
+	}
+	else
+	{
+		Format(g_szMapNameFromDatabase[client], sizeof(g_szMapNameFromDatabase), "invalid");
+		char szQuery[256];
+		Format(szQuery, sizeof(szQuery), "SELECT DISTINCT mapname FROM ck_zones WHERE mapname LIKE '%c%s%c';", PERCENT, szMapName, PERCENT);
+		SQL_TQuery(g_hDb, sql_selectMapNameLikeCallback, szQuery, pack, DBPrio_Low);
+	}
+}
+
+public void sql_selectMapNameLikeCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[Surftimer] SQL Error (sql_selectMapNameLikeCallback): %s", error);
+		return;
+	}
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	int style = ReadPackCell(pack);
+	char szMapName[128];
+	ReadPackString(pack, szMapName, sizeof(szMapName));
+	CloseHandle(pack);
+
+	if (SQL_HasResultSet(hndl))
+	{
+		int count = SQL_GetRowCount(hndl);
+		if (count > 1)
+		{
+			char szMapName2[128];
+			Menu menu = CreateMenu(ChooseMapMenuHandler);
+			g_ProfileStyleSelect[client] = style;
+
+			while (SQL_FetchRow(hndl))
+			{
+				SQL_FetchString(hndl, 0, szMapName2, sizeof(szMapName2));
+				AddMenuItem(menu, szMapName2, szMapName2);
+			}
+
+			SetMenuTitle(menu, "Choose a map:");
+			SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
+			DisplayMenu(menu, client, MENU_TIME_FOREVER);
+		}
+		else
+		{
+			if (SQL_FetchRow(hndl))
+			{
+				SQL_FetchString(hndl, 0, g_szMapNameFromDatabase[client], sizeof(g_szMapNameFromDatabase));
+				if (style == 0)
+				{
+					g_ProfileStyleSelect[client] = 0;
+					db_selectMapTopSurfers(client, g_szMapNameFromDatabase[client]);
+				}
+				else
+				{
+					g_ProfileStyleSelect[client] = style;
+					db_selectStyleMapTopSurfers(client, g_szMapNameFromDatabase[client], style);
+				}
+			}
+			else
+				CPrintToChat(client, "%t", "NoMapFound", g_szChatPrefix, szMapName);
+		}
+	}
+	else
+		CPrintToChat(client, "%t", "NoMapFound", g_szChatPrefix, szMapName);
+}
+
+public int ChooseMapMenuHandler(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		GetMenuItem(menu, param2, g_szMapNameFromDatabase[param1], sizeof(g_szMapNameFromDatabase));
+		int style = g_ProfileStyleSelect[param1];
+		if (style == 0)
+		{
+			g_ProfileStyleSelect[param1] = 0;
+			db_selectMapTopSurfers(param1, g_szMapNameFromDatabase[param1]);
+		}
+		else
+		{
+			db_selectStyleMapTopSurfers(param1, g_szMapNameFromDatabase[param1], style);
+		}
+	}
+	else if (action == MenuAction_End)
+		delete menu;
 }
