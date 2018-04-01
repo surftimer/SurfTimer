@@ -243,6 +243,10 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 
 		// Get Speed & Origin
 		g_fLastSpeed[client] = GetSpeed(client);
+		
+		// Give Player Kevlar + Helment
+		GivePlayerItem( client, "item_assaultsuit");
+		
 	}
 	else if (IsFakeClient(client)) 
 	{

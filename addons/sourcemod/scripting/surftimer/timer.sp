@@ -460,14 +460,14 @@ public Action AdvertTimer(Handle timer)
 		}
 		else if (g_bhasStages)
 		{
-			CPrintToChatAll("%t", "AdvertStage", g_szChatPrefix);
+			CPrintToChatAll("%t", "AdvertWRCP", g_szChatPrefix);
 		}
 	}
 	else
 	{
 		if (g_bhasStages)
 		{
-			CPrintToChatAll("%t", "AdvertStage", g_szChatPrefix);
+			CPrintToChatAll("%t", "AdvertWRCP", g_szChatPrefix);
 		}
 		else if (g_bhasBonus)
 		{

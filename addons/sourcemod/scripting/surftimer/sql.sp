@@ -1370,7 +1370,7 @@ public void sql_updatePlayerRankPointsCallback(Handle owner, Handle hndl, const 
 						if (style == 0)
 							CPrintToChat(i, "%t", "EarnedPoints", g_szChatPrefix, szName, diff, g_pr_points[data][0]);
 						else
-							CPrintToChat(i, "%t", "EarnedPoints2", g_szChatPrefix, szName, diff, g_szStyleFinishPrint[style], g_pr_points[data][style]);
+							CPrintToChat(i, "%t", "EarnedPoints2", g_szChatPrefix, szName, diff, g_szStyleRecordPrint[style], g_pr_points[data][style]);
 					}
 				}
 			}
@@ -3443,7 +3443,7 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 				default:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, GRAY, tier, WHITE);
 			}
 			if (g_bhasStages)
-				Format(g_sTierString, 512, "%s%c%i Stages", g_sTierString, MOSSGREEN, (g_mapZonesTypeCount[0][3] + 1));
+				Format(g_sTierString, 512, "%s%c%i Stages", g_sTierString, LIGHTGREEN, (g_mapZonesTypeCount[0][3] + 1));
 			else
 				Format(g_sTierString, 512, "%s%cLinear", g_sTierString, LIMEGREEN);
 
@@ -5815,9 +5815,9 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 	FormatTimeFloat(data, fDiff, 3, szDiff, 128);
 
 	if (fDiff > 0)
-		Format(szDiff, 128, "%cPB: %c-%s%c", WHITE, GREEN, szDiff, YELLOW);
+		Format(szDiff, 128, "%cPB: %c-%s%c", WHITE, GREEN, szDiff, WHITE);
 	else
-		Format(szDiff, 128, "%cPB: %c+%s%c", WHITE, RED, szDiff, YELLOW);
+		Format(szDiff, 128, "%cPB: %c+%s%c", WHITE, RED, szDiff, WHITE);
 
 	// SR
 	if (style == 0)
@@ -5828,9 +5828,9 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 	FormatTimeFloat(data, f_srDiff, 3, sz_srDiff, 128);
 
 	if (f_srDiff > 0)
-		Format(sz_srDiff, 128, "%c%cWR: %c-%s%c", YELLOW, WHITE, GREEN, sz_srDiff, YELLOW);
+		Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, GREEN, sz_srDiff, WHITE);
 	else
-		Format(sz_srDiff, 128, "%c%cWR: %c+%s%c", YELLOW, WHITE, RED, sz_srDiff, YELLOW);
+		Format(sz_srDiff, 128, "%cWR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
 
 	// Found old time from database
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
@@ -5855,8 +5855,8 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 			}
 			else if (style != 0) // styles
 			{
-				CPrintToChat(data, "%t", "SQL13", g_szChatPrefix, stage, g_szStyleFinishPrint[style], g_szFinalWrcpTime[data], sz_srDiff, g_StyleStageRank[style][data][stage], g_TotalStageStyleRecords[style][stage]);
-				Format(szSpecMessage, sizeof(szSpecMessage), "%t", "SQL14", g_szChatPrefix, stage, g_szStyleFinishPrint[style], g_szFinalWrcpTime[data], sz_srDiff, g_StyleStageRank[style][data][stage], g_TotalStageStyleRecords[style][stage]);
+				CPrintToChat(data, "%t", "SQL13", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalWrcpTime[data], sz_srDiff, g_StyleStageRank[style][data][stage], g_TotalStageStyleRecords[style][stage]);
+				Format(szSpecMessage, sizeof(szSpecMessage), "%t", "SQL14", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalWrcpTime[data], sz_srDiff, g_StyleStageRank[style][data][stage], g_TotalStageStyleRecords[style][stage]);
 			}
 			CheckpointToSpec(data, szSpecMessage);
 
@@ -6009,13 +6009,13 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 	if (g_fWrcpRecord[client][stage][style] != -1.0) // Existing stage time
 	{
 		if (fDiff > 0)
-			Format(szDiff, 128, "%cPB: %c-%s%c", WHITE, GREEN, szDiff, YELLOW);
+			Format(szDiff, 128, "%cPB: %c-%s%c", WHITE, GREEN, szDiff, WHITE);
 		else
-			Format(szDiff, 128, "%cPB: %c+%s%c", WHITE, RED, szDiff, YELLOW);
+			Format(szDiff, 128, "%cPB: %c+%s%c", WHITE, RED, szDiff, WHITE);
 	}
 	else
 	{
-		Format(szDiff, 128, "%cPB: %c%s%c", WHITE, LIMEGREEN, g_szFinalWrcpTime[client], YELLOW);
+		Format(szDiff, 128, "%cPB: %c%s%c", WHITE, LIMEGREEN, g_szFinalWrcpTime[client], WHITE);
 	}
 
 	// SR
@@ -6028,9 +6028,9 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 	FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
 
 	if (f_srDiff > 0)
-		Format(sz_srDiff, 128, "%c%cWR: %c-%s%c", YELLOW, WHITE, GREEN, sz_srDiff, YELLOW);
+		Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, GREEN, sz_srDiff, WHITE);
 	else
-		Format(sz_srDiff, 128, "%c%cWR: %c+%s%c", YELLOW, WHITE, RED, sz_srDiff, YELLOW);
+		Format(sz_srDiff, 128, "%cWR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
 
 	// Check for SR
 	bool newRecordHolder = false;
@@ -6098,10 +6098,10 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			}
 			else
 			{
-				CPrintToChat(client, "%t", "SQL20", g_szChatPrefix, stage, g_szStyleFinishPrint[style], g_szFinalWrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
+				CPrintToChat(client, "%t", "SQL20", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalWrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
 
 				char szSpecMessage[512];
-				Format(szSpecMessage, sizeof(szSpecMessage), "%t", "SQL21", g_szChatPrefix, stage, g_szStyleFinishPrint[style], g_szFinalWrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
+				Format(szSpecMessage, sizeof(szSpecMessage), "%t", "SQL21", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalWrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
 				CheckpointToSpec(client, szSpecMessage);
 			}
 		}
@@ -6145,7 +6145,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 					g_pr_oldpoints[client][style] = g_pr_points[client][style];
 					g_pr_points[client][style] += points;
 					int diff = g_pr_points[client][style] - g_pr_oldpoints[client][style];
-					CPrintToChat(client, "%t", "EarnedPoints2", g_szChatPrefix, szName, diff, g_szStyleFinishPrint[style], g_pr_points[client][style]);
+					CPrintToChat(client, "%t", "EarnedPoints2", g_szChatPrefix, szName, diff, g_szStyleRecordPrint[style], g_pr_points[client][style]);
 				}
 			}
 		}
@@ -7236,7 +7236,7 @@ public void sql_viewWrcpStyleMapRecordCallback(Handle owner, Handle hndl, const 
 		runtimepro = SQL_FetchFloat(hndl, 1);
 		FormatTimeFloat(0, runtimepro, 3, szRuntimepro, 64);
 
-		CPrintToChat(client, "%t", "SQL27", g_szChatPrefix, szName, g_szStyleFinishPrint[style], szRuntimepro, g_szWrcpMapSelect[client], g_szMapName);
+		CPrintToChat(client, "%t", "SQL27", g_szChatPrefix, szName, g_szStyleRecordPrint[style], szRuntimepro, g_szWrcpMapSelect[client], g_szMapName);
 		return;
 	}
 	else

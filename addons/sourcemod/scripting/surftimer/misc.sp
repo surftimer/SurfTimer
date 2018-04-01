@@ -740,7 +740,7 @@ public void addColorToString(char[] StringToAdd, int size)
 	ReplaceString(StringToAdd, size, "{green}", szGREEN, false);
 	ReplaceString(StringToAdd, size, "{lime}", szLIMEGREEN, false);
 	ReplaceString(StringToAdd, size, "{blue}", szBLUE, false);
-	ReplaceString(StringToAdd, size, "{mossgreen}", szMOSSGREEN, false);
+	ReplaceString(StringToAdd, size, "{lightgreen}", szLIGHTGREEN, false);
 	ReplaceString(StringToAdd, size, "{red}", szRED, false);
 	ReplaceString(StringToAdd, size, "{grey}", szGRAY, false);
 	ReplaceString(StringToAdd, size, "{gray}", szGRAY, false);
@@ -753,7 +753,7 @@ public void addColorToString(char[] StringToAdd, int size)
 	ReplaceString(StringToAdd, size, "{darkgrey}", szDARKGREY, false);
 	ReplaceString(StringToAdd, size, "{darkgray}", szDARKGREY, false);
 	ReplaceString(StringToAdd, size, "{limegreen}", szLIMEGREEN, false);
-	ReplaceString(StringToAdd, size, "{mossgreen}", szMOSSGREEN, false);
+	ReplaceString(StringToAdd, size, "{lightgreen}", szLIGHTGREEN, false);
 	ReplaceString(StringToAdd, size, "{darkblue}", szDARKBLUE, false);
 	ReplaceString(StringToAdd, size, "{lime}", szLIMEGREEN, false);
 	ReplaceString(StringToAdd, size, "{orange}", szORANGE, false);
@@ -771,7 +771,7 @@ public int getFirstColor(char[] StringToSearch)
 		return 3;
 	else if (StrContains(StringToSearch, "{blue}", false) != -1)
 		return 4;
-	else if (StrContains(StringToSearch, "{olive}", false) != -1 || StrContains(StringToSearch, "{mossgreen}", false) != -1)
+	else if (StrContains(StringToSearch, "{olive}", false) != -1 || StrContains(StringToSearch, "{lightgreen}", false) != -1)
 		return 5;
 	else if (StrContains(StringToSearch, "{red}", false) != -1)
 		return 6;
@@ -812,7 +812,7 @@ public void setNameColor(char[] ClientName, int index, int size)
 		case 4:
 			Format(ClientName, size, "%c%s", BLUE, ClientName);
 		case 5:
-			Format(ClientName, size, "%c%s", MOSSGREEN, ClientName);
+			Format(ClientName, size, "%c%s", LIGHTGREEN, ClientName);
 		case 6:
 			Format(ClientName, size, "%c%s", RED, ClientName);
 		case 7:
@@ -853,7 +853,7 @@ public void setTextColor(char[] ClientText, int index, int size)
 		case 4:
 			Format(ClientText, size, "%c%s", BLUE, ClientText);
 		case 5:
-			Format(ClientText, size, "%c%s", MOSSGREEN, ClientText);
+			Format(ClientText, size, "%c%s", LIGHTGREEN, ClientText);
 		case 6:
 			Format(ClientText, size, "%c%s", RED, ClientText);
 		case 7:
@@ -885,7 +885,7 @@ public void parseColorsFromString(char[] ParseString, int size)
 	ReplaceString(ParseString, size, "{green}", "", false);
 	ReplaceString(ParseString, size, "{lime}", "", false);
 	ReplaceString(ParseString, size, "{blue}", "", false);
-	ReplaceString(ParseString, size, "{mossgreen}", "", false);
+	ReplaceString(ParseString, size, "{lightgreen}", "", false);
 	ReplaceString(ParseString, size, "{red}", "", false);
 	ReplaceString(ParseString, size, "{grey}", "", false);
 	ReplaceString(ParseString, size, "{gray}", "", false);
@@ -898,7 +898,7 @@ public void parseColorsFromString(char[] ParseString, int size)
 	ReplaceString(ParseString, size, "{darkgrey}", "", false);
 	ReplaceString(ParseString, size, "{darkgray}", "", false);
 	ReplaceString(ParseString, size, "{limegreen}", "", false);
-	ReplaceString(ParseString, size, "{mossgreen}", "", false);
+	ReplaceString(ParseString, size, "{lightgreen}", "", false);
 	ReplaceString(ParseString, size, "{darkblue}", "", false);
 	ReplaceString(ParseString, size, "{lime}", "", false);
 	ReplaceString(ParseString, size, "{orange}", "", false);
@@ -3871,7 +3871,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		if (f_srDiff > 0)
 		{
 			Format(sz_srDiff_colorless, 128, "-%s", sz_srDiff);
-			Format(sz_srDiff, 128, "%c%cWR: %c-%s%c", YELLOW, WHITE, GREEN, sz_srDiff, YELLOW);
+			Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, GREEN, sz_srDiff, WHITE);
 			if (zonegroup > 0)
 				Format(g_szLastSRDifference[client], 64, "WR: <font color='#00ff00'>%s</font>", sz_srDiff_colorless);
 			else
@@ -3881,7 +3881,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		else
 		{
 			Format(sz_srDiff_colorless, 128, "+%s", sz_srDiff);
-			Format(sz_srDiff, 128, "%c%cWR: %c+%s%c", YELLOW, WHITE, RED, sz_srDiff, YELLOW);
+			Format(sz_srDiff, 128, "%cWR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
 			if (zonegroup > 0)
 				Format(g_szLastSRDifference[client], 64, "WR: <font color='#FF0000'>%s</font>", sz_srDiff_colorless);
 			else if (g_iCurrentStyle[client] > 0)
@@ -3892,7 +3892,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		g_fLastDifferenceTime[client] = GetGameTime();
 	}
 	else
-		Format(sz_srDiff, 128, "%c%cWR: %cN/A%c", YELLOW, WHITE, MOSSGREEN, WHITE);
+		Format(sz_srDiff, 128, "%cWR: %cN/A%c", WHITE, LIGHTGREEN, WHITE);
 
 
 	// Get client name for spectators
@@ -4066,13 +4066,13 @@ stock void StyleFinishedMsgs(int client, int style)
 				{
 					if (g_bStyleMapFirstRecord[style][client]) // 1st time finishing
 					{
-						CPrintToChat(i, "%t", "Misc34", g_szChatPrefix, szName, g_szStyleFinishPrint[style], g_szFinalTime[client], g_StyleMapRank[style][client], count, g_szRecordStyleMapTime[style]);
+						CPrintToChat(i, "%t", "Misc34", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szFinalTime[client], g_StyleMapRank[style][client], count, g_szRecordStyleMapTime[style]);
 					}
 					else
 					if (g_bStyleMapPBRecord[style][client]) // Own record
 					{
 						PlayUnstoppableSound(client);
-						CPrintToChat(i, "%t", "Misc35", g_szChatPrefix, szName, g_szStyleFinishPrint[style], g_szFinalTime[client], g_szTimeDifference[client], g_StyleMapRank[style][client], count, g_szRecordStyleMapTime[style]);
+						CPrintToChat(i, "%t", "Misc35", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szFinalTime[client], g_szTimeDifference[client], g_StyleMapRank[style][client], count, g_szRecordStyleMapTime[style]);
 					}
 
 					if (g_bStyleMapSRVRecord[style][client])
@@ -4130,27 +4130,27 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 	{
 		CPrintToChatAll("%t", "Misc37", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szZoneGroupName[zGroup]);
 		if (g_tmpBonusCount[zGroup] == 0)
-			CPrintToChatAll("%t", "Misc38", g_szChatPrefix, szName, g_szStyleFinishPrint[style], g_szZoneGroupName[zGroup], g_szFinalTime[client], g_szFinalTime[client]);
+			CPrintToChatAll("%t", "Misc38", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szZoneGroupName[zGroup], g_szFinalTime[client], g_szFinalTime[client]);
 		else
-			CPrintToChatAll("%t", "Misc39", g_szChatPrefix, szName, g_szStyleFinishPrint[style], g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szFinalTime[client]);
+			CPrintToChatAll("%t", "Misc39", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szFinalTime[client]);
 	}
 	if (g_bBonusPBRecord[client] && g_bBonusSRVRecord[client])
 	{
 		CPrintToChatAll("%t", "Misc37", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szZoneGroupName[zGroup]);
-		CPrintToChatAll("%t", "Misc39", g_szChatPrefix, szName, g_szStyleFinishPrint[style], g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szFinalTime[client]);
+		CPrintToChatAll("%t", "Misc39", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szFinalTime[client]);
 	}
 	if (g_bBonusPBRecord[client] && !g_bBonusSRVRecord[client])
 	{
 		PlayUnstoppableSound(client);
-		CPrintToChatAll("%t", "Misc40", g_szChatPrefix, szName, g_szStyleFinishPrint[style], g_szZoneGroupName[zGroup], g_szFinalTime[client], g_szBonusTimeDifference[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szStyleBonusFastestTime[style][zGroup]);
+		CPrintToChatAll("%t", "Misc40", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szZoneGroupName[zGroup], g_szFinalTime[client], g_szBonusTimeDifference[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szStyleBonusFastestTime[style][zGroup]);
 	}
 	if (g_bBonusFirstRecord[client] && !g_bBonusSRVRecord[client])
 	{
-		CPrintToChatAll("%t", "Misc41", g_szChatPrefix, szName, g_szStyleFinishPrint[style], g_szZoneGroupName[zGroup], g_szFinalTime[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szStyleBonusFastestTime[style][zGroup]);
+		CPrintToChatAll("%t", "Misc41", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szZoneGroupName[zGroup], g_szFinalTime[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szStyleBonusFastestTime[style][zGroup]);
 	}
 	if (!g_bBonusSRVRecord[client] && !g_bBonusFirstRecord[client] && !g_bBonusPBRecord[client])
 	{
-		CPrintToChatAll("%t", "Misc42", g_szChatPrefix, szName, g_szStyleFinishPrint[style], g_szZoneGroupName[zGroup], g_szFinalTime[client], g_szBonusTimeDifference[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szStyleBonusFastestTime[style][zGroup]);
+		CPrintToChatAll("%t", "Misc42", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szZoneGroupName[zGroup], g_szFinalTime[client], g_szBonusTimeDifference[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szStyleBonusFastestTime[style][zGroup]);
 	}
 
 	CheckBonusStyleRanks(client, zGroup, style);
@@ -4262,7 +4262,7 @@ public void getColourName(int client, char[] buffer, int length, int colour)
 		case 2: Format(buffer, length, "Green");
 		case 3: Format(buffer, length, "Limegreen");
 		case 4: Format(buffer, length, "Blue");
-		case 5: Format(buffer, length, "Mossgreen");
+		case 5: Format(buffer, length, "Lightgreen");
 		case 6: Format(buffer, length, "Red");
 		case 7: Format(buffer, length, "Grey");
 		case 8: Format(buffer, length, "Yellow");

@@ -27,11 +27,11 @@ void CreateCommands()
 	RegConsoleCmd("sm_profile", Client_Profile, "[surftimer] opens a player profile");
 	RegConsoleCmd("sm_options", Client_OptionMenu, "[surftimer] opens options menu");
 	RegConsoleCmd("sm_top", Client_Top, "[surftimer] displays top rankings (Top 100 Players, Top 50 overall)");
-	RegConsoleCmd("sm_topSurfers", Client_Top, "[surftimer] displays top rankings (Top 100 Players, Top 50 overall)");
+	RegConsoleCmd("sm_topsurfers", Client_Top, "[surftimer] displays top rankings (Top 100 Players, Top 50 overall)");
 	RegConsoleCmd("sm_bonustop", Client_BonusTop, "[surftimer] displays top rankings of the bonus");
 	RegConsoleCmd("sm_btop", Client_BonusTop, "[surftimer] displays top rankings of the bonus");
 	RegConsoleCmd("sm_stop", Client_Stop, "[surftimer] stops your timer");
-	RegConsoleCmd("sm_ranks", Client_Ranks, "[surftimer] prints in chat the available player ranks");
+	RegConsoleCmd("sm_ranks", Client_Ranks, "[surftimer] Displays a menu with available player ranks");
 	RegConsoleCmd("sm_pause", Client_Pause, "[surftimer] on/off pause (timer on hold and movement frozen)");
 	RegConsoleCmd("sm_latest", Client_Latest, "[surftimer] shows latest map records");
 	RegConsoleCmd("sm_rr", Client_Latest, "[surftimer] shows latest map records");
@@ -75,9 +75,10 @@ void CreateCommands()
 	RegConsoleCmd("sm_tele", Command_goToPlayerCheckpoint, "[surftimer] Teleports player to his last checkpoint");
 	RegConsoleCmd("sm_prac", Command_goToPlayerCheckpoint, "[surftimer] Teleports player to his last checkpoint");
 	RegConsoleCmd("sm_practice", Command_goToPlayerCheckpoint, "[surftimer] Teleports player to his last checkpoint");
+	RegConsoleCmd("sm_loadloc", Command_goToPlayerCheckpoint, "[surftimer] Teleports player to his last checkpoint");
 
 	RegConsoleCmd("sm_cp", Command_createPlayerCheckpoint, "[surftimer] Creates a checkpoint, where the player can teleport back to");
-	RegConsoleCmd("sm_checkpoint", Command_createPlayerCheckpoint, "[surftimer] Creates a eckpoint, where the player can teleport back to");
+	RegConsoleCmd("sm_checkpoint", Command_createPlayerCheckpoint, "[surftimer] Creates a checkpoint, where the player can teleport back to");
 	// RegConsoleCmd("sm_undo", Command_undoPlayerCheckpoint, "[surftimer] Undoes the players lchast checkpoint.");
 	RegConsoleCmd("sm_normal", Command_normalMode, "[surftimer] Switches player back to normal mode.");
 	RegConsoleCmd("sm_n", Command_normalMode, "[surftimer] Switches player back to normal mode.");
@@ -132,7 +133,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_goback", Command_GoBack, "[surftimer] Go back a stage");
 	RegConsoleCmd("sm_mtop", Client_MapTop, "[surftimer] displays local map top for a given map");
 	RegConsoleCmd("sm_p", Client_Profile, "[surftimer] opens a player profile");
-	RegConsoleCmd("sm_kp", Client_OptionMenu, "[surftimer] opens options menu");
 	RegConsoleCmd("sm_timer", Client_OptionMenu, "[surftimer] opens options menu");
 	RegConsoleCmd("sm_surftimer", Client_OptionMenu, "[surftimer] opens options menu");
 	RegConsoleCmd("sm_bhoptimer", Client_OptionMenu, "[surftimer] opens options menu");
@@ -675,7 +675,7 @@ public int SaveLocListHandler(Menu menu, MenuAction action, int param1, int para
 // 		DispatchKeyValue(client, "targetname", g_szCheckpointTargetname[client]);
 // 	}
 // 	else
-// 		CPrintToChat(client, "%t", "PracticeStartError", g_szChatPrefix, MOSSGREEN);
+// 		CPrintToChat(client, "%t", "PracticeStartError", g_szChatPrefix, LIGHTGREEN);
 
 // 	return Plugin_Handled;
 // }
@@ -713,7 +713,7 @@ public int SaveLocListHandler(Menu menu, MenuAction action, int param1, int para
 // 		CPrintToChat(client, "%t", "PracticeUndo", g_szChatPrefix);
 // 	}
 // 	else
-// 		CPrintToChat(client, "%t", "PracticeUndoError", g_szChatPrefix, MOSSGREEN);
+// 		CPrintToChat(client, "%t", "PracticeUndoError", g_szChatPrefix, LIGHTGREEN);
 
 // 	return Plugin_Handled;
 // }
@@ -3420,7 +3420,7 @@ public Action Command_SetDbNameColour(int client, int args)
 		{
 			arg = "4";
 		}
-		else if (StrContains(upperArg, "{MOSSGREEN}", false)!=-1)
+		else if (StrContains(upperArg, "{LIGHTGREEN}", false)!=-1)
 		{
 		 	arg = "5";
 		}
@@ -3513,7 +3513,7 @@ public Action Command_SetDbTextColour(int client, int args)
 		{
 			arg = "4";
 		}
-		else if (StrContains(upperArg, "{MOSSGREEN}", false)!=-1 || StrContains(upperArg, "{OLIVE}", false)!=-1)
+		else if (StrContains(upperArg, "{LIGHTGREEN}", false)!=-1 || StrContains(upperArg, "{OLIVE}", false)!=-1)
 		{
 		 	arg = "5";
 		}
