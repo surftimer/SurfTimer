@@ -1052,7 +1052,6 @@ public void SQL_SelectCPRTimeCallback(Handle owner, Handle hndl, const char[] er
 
 		char szQuery[512];
 		Format(szQuery, sizeof(szQuery), "SELECT cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20, cp21, cp22, cp23, cp24, cp25, cp26, cp27, cp28, cp29, cp30, cp31, cp32, cp33, cp34, cp35 FROM ck_checkpoints WHERE steamid = '%s' AND mapname LIKE '%c%s%c' AND zonegroup = 0;", g_szSteamID[client], PERCENT, g_szCPRMapName[client], PERCENT);
-		CPrintToChat(client, "%s", g_szCPRMapName[client]);
 		SQL_TQuery(g_hDb, SQL_SelectCPRCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
@@ -1081,12 +1080,6 @@ public void SQL_SelectCPRCallback(Handle owner, Handle hndl, const char[] error,
 			g_fClientCPs[client][i] = SQL_FetchFloat(hndl, i - 1);
 		}
 		db_selectCPRTarget(pack);
-	}
-	else
-	{
-		ResetPack(pack);
-		int client = ReadPackCell(pack);
-		CPrintToChat(client, "2", LIMEGREEN, WHITE);
 	}
 }
 
@@ -1128,12 +1121,6 @@ public void SQL_SelectCPRTargetCallback(Handle owner, Handle hndl, const char[] 
 		SQL_FetchString(hndl, 1, g_szTargetCPR[client], sizeof(g_szTargetCPR));
 		g_fTargetTime[client] = SQL_FetchFloat(hndl, 3);
 		db_selectCPRTargetCPs(szSteamId, pack);
-	}
-	else
-	{
-		ResetPack(pack);
-		int client = ReadPackCell(pack);
-		CPrintToChat(client, "3", LIMEGREEN, WHITE);
 	}
 }
 
@@ -1193,12 +1180,7 @@ public void SQL_SelectCPRTargetCPsCallback(Handle owner, Handle hndl, const char
 		SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
 		DisplayMenu(menu, client, MENU_TIME_FOREVER);
 	}
-	else
-	{
-		ResetPack(pack);
-		int client = ReadPackCell(pack);
-		CPrintToChat(client, "4", LIMEGREEN, WHITE);
-	}
+
 	CloseHandle(pack);
 }
 

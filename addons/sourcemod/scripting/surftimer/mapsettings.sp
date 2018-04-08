@@ -227,7 +227,6 @@ public Action Command_SetAnnounceRecord(int client, int args)
 	float setting = StringToFloat(arg);
 	g_fAnnounceRecord = setting;
 	db_updateMapSettings();
-	CPrintToChat(client, "%t", "MSettings5", g_szChatPrefix);
 
 	return Plugin_Handled;
 }

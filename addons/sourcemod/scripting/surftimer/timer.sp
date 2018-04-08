@@ -117,7 +117,6 @@ public Action CKTimer1(Handle timer)
 				if (g_bFirstTeamJoin[client])
 				{
 					g_bFirstTeamJoin[client] = false;
-					CreateTimer(0.0, StartMsgTimer, client, TIMER_FLAG_NO_MAPCHANGE);
 					CreateTimer(10.0, WelcomeMsgTimer, client, TIMER_FLAG_NO_MAPCHANGE);
 					CreateTimer(70.0, HelpMsgTimer, client, TIMER_FLAG_NO_MAPCHANGE);
 				}
@@ -176,7 +175,7 @@ public Action CKTimer2(Handle timer)
 				case 120:CPrintToChatAll("%t", "TimeleftMinutes", g_szChatPrefix, g_szMapName, timeleft / 60);
 				case 60:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
 				case 30:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
-				case 15:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
+				case 10:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
 				case  - 1:CPrintToChatAll("%t", "TimeleftCounter", g_szChatPrefix, g_szMapName, 3);
 				case  - 2:CPrintToChatAll("%t", "TimeleftCounter", g_szChatPrefix, g_szMapName, 2);
 				case  - 3:
@@ -475,16 +474,6 @@ public Action AdvertTimer(Handle timer)
 		}
 	}
 	return Plugin_Continue;
-}
-
-public Action StartMsgTimer(Handle timer, any client)
-{
-	if (IsValidClient(client) && !IsFakeClient(client))
-	{
-		PrintMapRecords(client, 0);
-		PrintMapRecords(client, 99);
-	}
-	return Plugin_Handled;
 }
 
 public Action CenterMsgTimer(Handle timer, any client)

@@ -176,7 +176,7 @@ public int Handle_VoteMenuSetNextMap(Menu menu, MenuAction action, int param1, i
 		}
 		else // No
 		{
-			CPrintToChatAll("%t", "CVote14", g_szChatPrefix);
+			CPrintToChatAll("%t", "CVote12", g_szChatPrefix);
 		}
 	}
 }

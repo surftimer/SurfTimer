@@ -84,13 +84,6 @@ public void CL_OnStartTimerPress(int client)
 				g_bMissedBonusBest[client] = false;
 
 			}
-
-			// If starting the timer for the first time, print average times
-			if (g_bFirstTimerStart[client])
-			{
-				g_bFirstTimerStart[client] = false;
-				Client_Avg(client, 0);
-			}
 		}
 	}
 
