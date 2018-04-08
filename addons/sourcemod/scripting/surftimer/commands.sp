@@ -16,7 +16,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_bhop", Client_AutoBhop, "[surftimer] on/off autobhop");
 	RegConsoleCmd("sm_flashlight", Client_Flashlight, "[surftimer] on/off flashlight");
 	RegConsoleCmd("sm_maptop", Client_MapTop, "[surftimer] displays local map top for a given map");
-	RegConsoleCmd("sm_hidespecs", Client_HideSpecs, "[surftimer] hides spectators from menu/panel");
 	RegConsoleCmd("sm_wr", Client_Wr, "[surftimer] prints records wr in chat");
 	RegConsoleCmd("sm_wrb", Client_Wrb, "[surftimer] prints records wrb in chat");
 	RegConsoleCmd("sm_spec", Client_Spec, "[surftimer] chooses a player who you want to spectate and switch you to spectators");
@@ -197,8 +196,8 @@ void CreateCommands()
 	RegConsoleCmd("sm_replays", Command_PlayRecord, "[surftimer] Set the replay bot to replay a run");
 
 	// Delete records
-	RegAdminCmd("sm_deleterecords", Command_DeleteRecords, g_ZonerFlag, "[SurfTimer] [Zoner] Delete records");
-	RegAdminCmd("sm_dr", Command_DeleteRecords, g_ZonerFlag, "[SurfTimer] [Zoner] Delete records");
+	RegAdminCmd("sm_deleterecords", Command_DeleteRecords, g_ZonerFlag, "[surftimer] [zoner] Delete records");
+	RegAdminCmd("sm_dr", Command_DeleteRecords, g_ZonerFlag, "[surftimer] [zoner] Delete records");
 }
 
 public Action Command_DeleteRecords(int client, int args)
@@ -581,7 +580,7 @@ public Action Command_SaveLocList(int client, int args)
 {
 	if (g_iSaveLocCount < 1)
 	{
-		CPrintToChat(client, "%t", "Commands12", g_szChatPrefix);
+		CPrintToChat(client, "%t", "Commands11", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 
@@ -797,7 +796,7 @@ public void ListBonuses(int client, int type)
 	}
 	else
 	{
-		CPrintToChat(client, "%t", "NoBonusInMap", g_szChatPrefix);
+		CPrintToChat(client, "%t", "NoBonusOnMap", g_szChatPrefix);
 		return;
 	}
 
@@ -850,7 +849,7 @@ public Action Command_ToBonus(int client, int args)
 
 	if (g_mapZoneGroupCount < 2)
 	{
-		CPrintToChat(client, "%t", "NoBonusInMap", g_szChatPrefix);
+		CPrintToChat(client, "%t", "NoBonusOnMap", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 
@@ -924,7 +923,7 @@ public void ListStages(int client, int zonegroup)
 		}
 		if (amount == 0)
 		{
-			AddMenuItem(sMenu, "", "The map is linear.", ITEMDRAW_DISABLED);
+			CPrintToChat(client, "%t", "Commands87", g_szChatPrefix);
 		}
 		else
 		{
@@ -1554,7 +1553,7 @@ public Action Client_BonusTop(int client, int args)
 		case 0: { // !btop
 			if (g_mapZoneGroupCount == 1)
 			{
-				CPrintToChat(client, "%t", "NoBonusFound", g_szChatPrefix);
+				CPrintToChat(client, "%t", "NoBonusOnMap", g_szChatPrefix);
 				CPrintToChat(client, "%t", "BTopUsage", g_szChatPrefix);
 				return Plugin_Handled;
 			}
@@ -1631,7 +1630,7 @@ public Action Client_SWBonusTop(int client, int args)
 		case 0: { // !btop
 			if (g_mapZoneGroupCount == 1)
 			{
-				CPrintToChat(client, "%t", "NoBonusFound", g_szChatPrefix);
+				CPrintToChat(client, "%t", "NoBonusOnMap", g_szChatPrefix);
 				CPrintToChat(client, "%t", "BTopUsage", g_szChatPrefix);
 				return Plugin_Handled;
 			}
@@ -1988,9 +1987,9 @@ public Action Client_Hide(int client, int args)
 {
 	HideMethod(client);
 	if (!g_bHide[client])
-		CPrintToChat(client, "%t", "Hide1", g_szChatPrefix);
+		CPrintToChat(client, "%t", "HidePlayers1", g_szChatPrefix);
 	else
-		CPrintToChat(client, "%t", "Hide2", g_szChatPrefix);
+		CPrintToChat(client, "%t", "HidePlayers2", g_szChatPrefix);
 	return Plugin_Handled;
 }
 
@@ -2347,21 +2346,6 @@ public void PauseMethod(int client)
 	}
 }
 
-public Action Client_HideSpecs(int client, int args)
-{
-	HideSpecs(client);
-	if (g_bShowSpecs[client] == true)
-		CPrintToChat(client, "%t", "HideSpecs1", g_szChatPrefix);
-	else
-		CPrintToChat(client, "%t", "HideSpecs2", g_szChatPrefix);
-	return Plugin_Handled;
-}
-
-public void HideSpecs(int client)
-{
-	g_bShowSpecs[client] = !g_bShowSpecs[client];
-}
-
 public int GoToMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_Select)
@@ -2382,7 +2366,7 @@ public int GoToMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 				{
 					if (i == MaxClients)
 					{
-						CPrintToChat(param1, "%t", "Goto4", g_szChatPrefix, szPlayerName);
+						CPrintToChat(param1, "%t", "PlayerNotFound", g_szChatPrefix, szPlayerName);
 						Client_GoTo(param1, 0);
 					}
 				}
@@ -2688,7 +2672,7 @@ public void BonusTopMenu(int client)
 		}
 		else
 		{
-			CPrintToChat(client, "%t", "NoBonusInMap", g_szChatPrefix);
+			CPrintToChat(client, "%t", "NoBonusOnMap", g_szChatPrefix);
 			return;
 		}
 
@@ -3992,7 +3976,7 @@ public Action Command_SelectBonusTime(int client, int args)
 			}
 			else if (g_mapZoneGroupCount == 1)
 			{
-				CReplyToCommand(client, "%t", "BonusNotFound", g_szChatPrefix);
+				CReplyToCommand(client, "%t", "NoBonusOnMap", g_szChatPrefix);
 				return Plugin_Handled;
 			}
 
@@ -4058,7 +4042,7 @@ public Action Command_SelectBonusTime(int client, int args)
 				}
 				else if (g_mapZoneGroupCount == 1)
 				{
-					CReplyToCommand(client, "%t", "BonusNotFound", g_szChatPrefix);
+					CReplyToCommand(client, "%t", "NoBonusOnMap", g_szChatPrefix);
 					return Plugin_Handled;
 				}
 
