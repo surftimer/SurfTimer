@@ -284,7 +284,7 @@ void CreateCommandListeners()
 
 public Action sm_test(int client, int args)
 {
-	CPrintToChatAll("%d", g_iMapTier);
+	CPrintToChatAll("stage: %d : wrcp: %d", g_Stage[0][client], g_WrcpStage[client]);
 	return Plugin_Handled;
 }
 

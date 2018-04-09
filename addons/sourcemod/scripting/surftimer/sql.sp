@@ -742,59 +742,59 @@ public void sql_CountFinishedBonusCallback(Handle owner, Handle hndl, const char
 					{
 						case 1:
 						{
-							g_pr_points[client][style] += 200;
-							g_Points[client][style][4] += 200;
+							g_pr_points[client][style] += 500;
+							g_Points[client][style][4] += 500;
 							wrbs++;
 						}
 						case 2:
 						{
-							g_pr_points[client][style] += 190;
-							g_Points[client][style][1] += 190;
+							g_pr_points[client][style] += 450;
+							g_Points[client][style][1] += 450;
 						}
 						case 3:
 						{
-							g_pr_points[client][style] += 180;
-							g_Points[client][style][1] += 180;
+							g_pr_points[client][style] += 400;
+							g_Points[client][style][1] += 400;
 						}
 						case 4:
 						{
-							g_pr_points[client][style] += 170;
-							g_Points[client][style][1] += 170;
+							g_pr_points[client][style] += 350;
+							g_Points[client][style][1] += 350;
 						}
 						case 5:
+						{
+							g_pr_points[client][style] += 300;
+							g_Points[client][style][1] += 300;
+						}
+						case 6:
+						{
+							g_pr_points[client][style] += 250;
+							g_Points[client][style][1] += 250;
+						}
+						case 7:
+						{
+							g_pr_points[client][style] += 200;
+							g_Points[client][style][1] += 200;
+						}
+						case 8:
 						{
 							g_pr_points[client][style] += 150;
 							g_Points[client][style][1] += 150;
 						}
-						case 6:
-						{
-							g_pr_points[client][style] += 140;
-							g_Points[client][style][1] += 140;
-						}
-						case 7:
-						{
-							g_pr_points[client][style] += 135;
-							g_Points[client][style][1] += 135;
-						}
-						case 8:
-						{
-							g_pr_points[client][style] += 120;
-							g_Points[client][style][1] += 120;
-						}
 						case 9:
 						{
-							g_pr_points[client][style] += 115;
-							g_Points[client][style][1] += 115;
+							g_pr_points[client][style] += 125;
+							g_Points[client][style][1] += 125;
 						}
 						case 10:
 						{
-							g_pr_points[client][style] += 105;
-							g_Points[client][style][1] += 105;
+							g_pr_points[client][style] += 100;
+							g_Points[client][style][1] += 100;
 						}
 						case 11:
 						{
-							g_pr_points[client][style] += 100;
-							g_Points[client][style][1] += 100;
+							g_pr_points[client][style] += 95;
+							g_Points[client][style][1] += 95;
 						}
 						case 12:
 						{
@@ -808,8 +808,8 @@ public void sql_CountFinishedBonusCallback(Handle owner, Handle hndl, const char
 						}
 						case 14:
 						{
-							g_pr_points[client][style] += 75;
-							g_Points[client][style][1] += 75;
+							g_pr_points[client][style] += 70;
+							g_Points[client][style][1] += 70;
 						}
 						case 15:
 						{
@@ -840,6 +840,11 @@ public void sql_CountFinishedBonusCallback(Handle owner, Handle hndl, const char
 						{
 							g_pr_points[client][style] += 10;
 							g_Points[client][style][1] += 10;
+						}
+						default:
+						{
+							g_pr_points[client][style] += 5;
+							g_Points[client][style][1] += 5;
 						}
 					}
 					break;
@@ -1040,41 +1045,45 @@ public void sql_CountFinishedMapsCallback(Handle owner, Handle hndl, const char[
 					{
 						wrpoints = ((float(totalplayers) * 1.75) / 6);
 						wrpoints += 58.5;
+						if (wrpoints < 500.0)
+							wrpoints = 500.0;
 					}
 					else if (tier == 2)
 					{
 						wrpoints = ((float(totalplayers) * 2.8) / 5);
 						wrpoints += 82.15;
+						if (wrpoints < 750.0)
+							wrpoints = 750.0;
 					}
 					else if (tier == 3)
 					{
 						wrpoints = ((float(totalplayers) * 3.5) / 4);
-						if (wrpoints < 300)
-							wrpoints = 350.0;
+						if (wrpoints < 1000.0)
+							wrpoints = 1000.0;
 						else
 							wrpoints += 117;
 					}
 					else if (tier == 4)
 					{
 						wrpoints = ((float(totalplayers) * 5.74) / 4);
-						if (wrpoints < 400)
-							wrpoints = 400.0;
+						if (wrpoints < 1500.0)
+							wrpoints = 1500.0;
 						else
 							wrpoints += 164.25;
 					}
 					else if (tier == 5)
 					{
 						wrpoints = ((float(totalplayers) * 7) / 4);
-						if (wrpoints < 500)
-							wrpoints = 500.0;
+						if (wrpoints < 2000.0)
+							wrpoints = 2000.0;
 						else
 							wrpoints += 234;
 					}
 					else if (tier == 6)
 					{
 						wrpoints = ((float(totalplayers) * 14) / 4);
-						if (wrpoints < 600)
-							wrpoints = 600.0;
+						if (wrpoints < 3000.0)
+							wrpoints = 3000.0;
 						else
 							wrpoints += 328;
 					}
@@ -4020,8 +4029,8 @@ public void db_insertZone(int zoneid, int zonetype, int zonetypeid, float pointa
 	else
 	Format(zName, 128, g_szZoneGroupName[zonegroup]);
 
-	// "INSERT INTO ck_zones (mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename) VALUES ('%s', '%i', '%i', '%i', '%f', '%f', '%f', '%f', '%f', '%f', '%i', '%i', '%i', '%s')";
-	Format(szQuery, 1024, sql_insertZones, g_szMapName, zoneid, zonetype, zonetypeid, pointax, pointay, pointaz, pointbx, pointby, pointbz, vis, team, zonegroup, zName, "None", "player", 1, 350);
+	// char sql_insertZones[] = "INSERT INTO ck_zones (mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename, hookname, targetname, onejumplimit, prespeed) VALUES ('%s', '%i', '%i', '%i', '%f', '%f', '%f', '%f', '%f', '%f', '%i', '%i', '%i','%s','%s','%s',%i,%f)";
+	Format(szQuery, 1024, sql_insertZones, g_szMapName, zoneid, zonetype, zonetypeid, pointax, pointay, pointaz, pointbx, pointby, pointbz, vis, team, zonegroup, zName, "None", "player", 1, 250.0);
 	SQL_TQuery(g_hDb, SQL_insertZonesCallback, szQuery, 1, DBPrio_Low);
 }
 
@@ -8047,41 +8056,45 @@ public void db_selectMapImprovementCallback(Handle owner, Handle hndl, const cha
 		{
 			wrpoints = ((float(totalplayers) * 1.75) / 6);
 			wrpoints += 58.5;
+			if (wrpoints < 500.0)
+				wrpoints = 500.0;
 		}
 		else if (tier == 2)
 		{
 			wrpoints = ((float(totalplayers) * 2.8) / 5);
 			wrpoints += 82.15;
+			if (wrpoints < 750.0)
+				wrpoints = 750.0;
 		}
 		else if (tier == 3)
 		{
 			wrpoints = ((float(totalplayers) * 3.5) / 4);
-			if (wrpoints < 300)
-				wrpoints = 350.0;
+			if (wrpoints < 1000.0)
+				wrpoints = 1000.0;
 			else
 				wrpoints += 117;
 		}
 		else if (tier == 4)
 		{
 			wrpoints = ((float(totalplayers) * 5.74) / 4);
-			if (wrpoints < 400)
-				wrpoints = 400.0;
+			if (wrpoints < 1500.0)
+				wrpoints = 1500.0;
 			else
 				wrpoints += 164.25;
 		}
 		else if (tier == 5)
 		{
 			wrpoints = ((float(totalplayers) * 7) / 4);
-			if (wrpoints < 500)
-				wrpoints = 500.0;
+			if (wrpoints < 2000.0)
+				wrpoints = 2000.0;
 			else
 				wrpoints += 234;
 		}
 		else if (tier == 6)
 		{
 			wrpoints = ((float(totalplayers) * 14) / 4);
-			if (wrpoints < 600)
-				wrpoints = 600.0;
+			if (wrpoints < 3000.0)
+				wrpoints = 3000.0;
 			else
 				wrpoints += 328;
 		}

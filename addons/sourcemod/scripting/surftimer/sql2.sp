@@ -169,13 +169,17 @@ public void SQL_ViewPlayerPrMaptimeCallback2(Handle owner, Handle hndl, const ch
 
 	int target = g_iPrTarget[client];
 	int stage;
-	int stagerank = 1;
-	int totalcompletes = 1;
+	int stagerank[CPLIMIT];
+	int totalcompletes[CPLIMIT];
 	int totalstages = 0;
 	float stagetime[CPLIMIT];
 
 	for (int i = 1; i < CPLIMIT; i++)
+	{
 		stagetime[i] = -1.0;
+		stagerank[i] = 0;
+		totalcompletes[i] = 0;
+	}
 
 	if (SQL_HasResultSet(hndl))
 	{
@@ -184,8 +188,8 @@ public void SQL_ViewPlayerPrMaptimeCallback2(Handle owner, Handle hndl, const ch
 			totalstages++;
 			stage = SQL_FetchInt(hndl, 4);
 			stagetime[stage] = SQL_FetchFloat(hndl, 3);
-			stagerank = SQL_FetchInt(hndl, 5);
-			totalcompletes = SQL_FetchInt(hndl, 6);
+			stagerank[stage] = SQL_FetchInt(hndl, 5);
+			totalcompletes[stage] = SQL_FetchInt(hndl, 6);
 		}
 	}
 
@@ -215,7 +219,11 @@ public void SQL_ViewPlayerPrMaptimeCallback2(Handle owner, Handle hndl, const ch
 	if (StrEqual(szMapName, g_szMapName))
 	{
 		g_totalBonusesPr[client] = g_mapZoneGroupCount;
-		g_totalStagesPr[client] = g_TotalStages;
+
+		if (g_bhasStages)
+			g_totalStagesPr[client] = g_TotalStages;
+		else
+			g_totalStagesPr[client] = 0;
 	}
 
 	if (g_totalStagesPr[client] > 0)
@@ -225,7 +233,7 @@ public void SQL_ViewPlayerPrMaptimeCallback2(Handle owner, Handle hndl, const ch
 			if (stagetime[i] != -1.0)
 			{
 				FormatTimeFloat(0, stagetime[i], 3, szRuntimestages[i], 64);
-				Format(szStageInfo[i], 256, "Stage %i: %s\nRank: %i/%i\n \n", i, szRuntimestages[i], stagerank, totalcompletes);
+				Format(szStageInfo[i], 256, "Stage %i: %s\nRank: %i/%i\n \n", i, szRuntimestages[i], stagerank[i], totalcompletes[i]);
 			}
 			else
 			{

@@ -1342,6 +1342,11 @@ bool g_bPrestigeCheck[MAXPLAYERS + 1];
 // Menus mapname
 char g_szMapNameFromDatabase[MAXPLAYERS + 1][128];
 
+// New speed limit variables
+bool g_bInBhop[MAXPLAYERS + 1];
+bool g_bFirstJump[MAXPLAYERS + 1];
+int g_iLastJump[MAXPLAYERS + 1];
+
 /*===================================
 =         Predefined Arrays         =
 ===================================*/
@@ -2752,6 +2757,9 @@ public void OnPluginStart()
 	// Server Announcements
 	g_bHasLatestID = false;
 	g_iLastID = 0;
+
+	// https://forums.alliedmods.net/showthread.php?t=300549
+	HookUserMessage(GetUserMessageId("VGUIMenu"), TeamMenuHook, true);
 }
 
 public void OnAllPluginsLoaded()

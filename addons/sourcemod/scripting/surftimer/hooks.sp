@@ -625,6 +625,7 @@ public Action Event_OnRoundEnd(Handle event, const char[] name, bool dontBroadca
 
 public void OnPlayerThink(int entity)
 {
+	LimitSpeedNew(entity);
 	SetEntPropEnt(entity, Prop_Send, "m_bSpotted", 0);
 }
 
@@ -1376,7 +1377,46 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 			}
 		}
 
-		if (GetConVarBool(g_hOneJumpLimit))
+		if (GetConVarInt(g_hLimitSpeedType) == 1)
+		{
+			int time = GetTime();
+			int cTime = time - g_iLastJump[client];
+			if (!g_bInBhop[client])
+			{
+				if (g_bFirstJump[client])
+				{
+					if (cTime > 1)
+					{
+						g_bFirstJump[client] = false;
+						g_iLastJump[client] = GetTime();
+					}
+					else
+					{
+						g_iLastJump[client] = GetTime();
+						g_bInBhop[client] = true;
+					}
+				}
+				else
+				{
+					g_iLastJump[client] = GetTime();
+					g_bFirstJump[client] = true;
+				}
+			}
+			else
+			{
+				if (cTime > 1)
+				{
+					g_bInBhop[client] = false;
+					g_iLastJump[client] = GetTime();
+				}
+				else
+				{
+					g_iLastJump[client] = GetTime();
+				}
+			}
+		}
+
+		if (GetConVarBool(g_hOneJumpLimit) && GetConVarInt(g_hLimitSpeedType) == 0)
 		{
 			if (g_bInStartZone[client] || g_bInStageZone[client])
 			{
@@ -1530,4 +1570,20 @@ public Action Hook_ShotgunShot(const char[] te_name, const int[] players, int nu
   // TE_Send(newClients, newTotal, delay);
 
 	// return Plugin_Stop;
+}
+
+// https://forums.alliedmods.net/showthread.php?t=300549
+public Action TeamMenuHook(UserMsg msg_id, Protobuf msg, const int[] players, int playersNum, bool reliable, bool init)
+{
+	char buffermsg[64];
+	PbReadString(msg, "name", buffermsg, sizeof(buffermsg));
+
+	if (StrEqual(buffermsg, "team", true))
+	{
+		int client = players[0];
+		int team = GetRandomInt(2, 3);
+		ChangeClientTeam(client, team);
+	}
+
+	return Plugin_Continue;
 }
