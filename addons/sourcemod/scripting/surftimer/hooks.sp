@@ -1278,6 +1278,10 @@ public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 
 	if (!IsValidClient(client))
 		return MRES_Ignored;
+	
+	// prespeed
+	if (!IsFakeClient(client))
+		g_bInBhop[client] = true;
 
 	if (g_bPushing[client])
 	{
