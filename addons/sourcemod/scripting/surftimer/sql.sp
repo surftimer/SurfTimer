@@ -7744,7 +7744,7 @@ public void db_SelectPlayersBonusRankCallback(Handle owner, Handle hndl, const c
 		int rank;
 		rank = SQL_GetRowCount(hndl);
 
-		CPrintToChatAll("%t", "SQL36", g_szChatPrefix, playername, rank, g_totalPlayerTimes[client], g_szRuntimepro[client], mapname, bonus);
+		CPrintToChatAll("%t", "SQL36", g_szChatPrefix, playername, rank, g_totalPlayerTimes[client], g_szRuntimepro[client], bonus, mapname);
 	}
 }
 
