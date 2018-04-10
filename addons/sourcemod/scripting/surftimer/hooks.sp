@@ -625,7 +625,9 @@ public Action Event_OnRoundEnd(Handle event, const char[] name, bool dontBroadca
 
 public void OnPlayerThink(int entity)
 {
-	LimitSpeedNew(entity);
+	if (IsValidClient(entity) && !IsFakeClient(entity))
+		LimitSpeedNew(entity);
+		
 	SetEntPropEnt(entity, Prop_Send, "m_bSpotted", 0);
 }
 
@@ -1281,7 +1283,7 @@ public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 	
 	// prespeed
 	if (!IsFakeClient(client))
-		g_bInBhop[client] = true;
+		g_bInTelehop[client] = true;
 
 	if (g_bPushing[client])
 	{

@@ -1343,6 +1343,7 @@ bool g_bPrestigeCheck[MAXPLAYERS + 1];
 char g_szMapNameFromDatabase[MAXPLAYERS + 1][128];
 
 // New speed limit variables
+bool g_bInTelehop[MAXPLAYERS + 1];
 bool g_bInBhop[MAXPLAYERS + 1];
 bool g_bFirstJump[MAXPLAYERS + 1];
 int g_iLastJump[MAXPLAYERS + 1];
