@@ -1290,6 +1290,10 @@ public void LimitSpeedNew(int client)
 	
 	if (GetConVarInt(g_hLimitSpeedType) == 0 || !g_bInStartZone[client] && !g_bInStageZone[client])
 		return;
+
+	// Check if the map has zones
+	if (g_mapZonesCount <= 0)
+		return;
 	
 	float speedCap = 0.0;
 	speedCap = g_mapZones[g_iClientInZone[client][3]][preSpeed];
@@ -1317,7 +1321,7 @@ public void LimitSpeedNew(int client)
 		fVel[1] = FloatMul(fVel[1], scale);
 
 		// Impart new velocity onto player
-		if (g_bInBhop[client] || (speedCap == 250.0 && speed >= 320.0))
+		if (g_bInBhop[client] || (speedCap == 250.0 && speed >= 500.0))
 			TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fVel);
 	}
 }
