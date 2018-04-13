@@ -1285,14 +1285,10 @@ public void LimitSpeed(int client)
 
 public void LimitSpeedNew(int client)
 {
-	if (!IsValidClient(client) || !IsPlayerAlive(client) || IsFakeClient(client) || g_bPracticeMode[client] || g_mapZonesTypeCount[g_iClientInZone[client][2]][2] == 0 || g_iClientInZone[client][3] < 0 || g_iClientInZone[client][0] == 2 || g_iClientInZone[client][0] == 4 || g_iClientInZone[client][0] >= 6 || GetConVarInt(g_hLimitSpeedType) == 0)
+	if (!IsValidClient(client) || !IsPlayerAlive(client) || IsFakeClient(client) || g_mapZonesCount <= 0 || g_bPracticeMode[client] || g_mapZonesTypeCount[g_iClientInZone[client][2]][2] == 0 || g_iClientInZone[client][3] < 0 || g_iClientInZone[client][0] == 2 || g_iClientInZone[client][0] == 4 || g_iClientInZone[client][0] >= 6 || GetConVarInt(g_hLimitSpeedType) == 0)
 		return;
 	
 	if (GetConVarInt(g_hLimitSpeedType) == 0 || !g_bInStartZone[client] && !g_bInStageZone[client])
-		return;
-
-	// Check if the map has zones
-	if (g_mapZonesCount <= 0)
 		return;
 	
 	float speedCap = 0.0;
@@ -1300,6 +1296,7 @@ public void LimitSpeedNew(int client)
 
 	if (GetEntityFlags(client) & FL_ONGROUND || speedCap == 0.0)
 	{
+		g_bInTelehop[client] = false;
 		return;
 	}
 
@@ -1321,8 +1318,10 @@ public void LimitSpeedNew(int client)
 		fVel[1] = FloatMul(fVel[1], scale);
 
 		// Impart new velocity onto player
-		if (g_bInBhop[client] || (speedCap == 250.0 && speed >= 500.0))
+		if (g_bInBhop[client] || g_bInTelehop[client])
+		{
 			TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fVel);
+		}
 	}
 }
 

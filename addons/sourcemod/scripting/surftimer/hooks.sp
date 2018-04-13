@@ -620,6 +620,7 @@ public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)
 public Action Event_OnRoundEnd(Handle event, const char[] name, bool dontBroadcast)
 {
 	g_bRoundEnd = true;
+	UnhookEntityOutput("trigger_teleport", "OnEndTouch", OnTouchTriggerTeleport);
 	return Plugin_Continue;
 }
 
@@ -627,7 +628,7 @@ public void OnPlayerThink(int entity)
 {
 	if (IsValidClient(entity) && !IsFakeClient(entity))
 		LimitSpeedNew(entity);
-		
+
 	SetEntPropEnt(entity, Prop_Send, "m_bSpotted", 0);
 }
 
@@ -660,6 +661,9 @@ public Action Event_OnRoundStart(Handle event, const char[] name, bool dontBroad
 	{
 		SDKHook(iEnt, SDKHook_EndTouch, OnEndTouchGravityTrigger);
 	}
+
+	// Hook trigger_teleport
+	HookEntityOutput("trigger_teleport", "OnEndTouch", OnTouchTriggerTeleport);
 
 	// Hook zones
 	iEnt = -1;
@@ -758,6 +762,15 @@ public Action OnEndTouchGravityTrigger(int entity, int other)
 	{
 		if (!g_bNoClip[other] && GetConVarBool(g_hGravityFix))
 			return Plugin_Handled;
+	}
+	return Plugin_Continue;
+}
+
+public Action OnTouchTriggerTeleport(char[] output, int caller, int activator, float delay)
+{
+	if (IsValidClient(activator) && !IsFakeClient(activator))
+	{
+		g_bInTelehop[activator] = true;
 	}
 	return Plugin_Continue;
 }
@@ -1277,13 +1290,8 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 // DHooks
 public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 {
-
 	if (!IsValidClient(client))
 		return MRES_Ignored;
-	
-	// prespeed
-	if (!IsFakeClient(client))
-		g_bInTelehop[client] = true;
 
 	if (g_bPushing[client])
 	{
@@ -1579,17 +1587,17 @@ public Action Hook_ShotgunShot(const char[] te_name, const int[] players, int nu
 }
 
 // https://forums.alliedmods.net/showthread.php?t=300549
-public Action TeamMenuHook(UserMsg msg_id, Protobuf msg, const int[] players, int playersNum, bool reliable, bool init)
-{
-	char buffermsg[64];
-	PbReadString(msg, "name", buffermsg, sizeof(buffermsg));
+// public Action TeamMenuHook(UserMsg msg_id, Protobuf msg, const int[] players, int playersNum, bool reliable, bool init)
+// {
+// 	char buffermsg[64];
+// 	PbReadString(msg, "name", buffermsg, sizeof(buffermsg));
 
-	if (StrEqual(buffermsg, "team", true))
-	{
-		int client = players[0];
-		int team = GetRandomInt(2, 3);
-		ChangeClientTeam(client, team);
-	}
+// 	if (StrEqual(buffermsg, "team", true))
+// 	{
+// 		int client = players[0];
+// 		int team = GetRandomInt(2, 3);
+// 		ChangeClientTeam(client, team);
+// 	}
 
-	return Plugin_Continue;
-}
+// 	return Plugin_Continue;
+// }

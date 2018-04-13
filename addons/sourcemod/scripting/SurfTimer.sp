@@ -1979,7 +1979,7 @@ public void OnClientPutInServer(int client)
 	GetCountry(client);
 
 	if (LibraryExists("dhooks"))
-	DHookEntity(g_hTeleport, false, client);
+		DHookEntity(g_hTeleport, false, client);
 
 	// Get SteamID
 	GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], MAX_NAME_LENGTH, true);
@@ -2727,6 +2727,8 @@ public void OnPluginStart()
 		DHookAddParam(g_hTeleport, HookParamType_Bool);
 	}
 
+	HookEntityOutput("trigger_teleport", "OnEndTouch", OnTouchTriggerTeleport);
+
 	// Forwards
 	g_MapFinishForward = CreateGlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell);
 	g_MapCheckpointForward = CreateGlobalForward("surftimer_OnCheckpoint", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String);
@@ -2760,7 +2762,7 @@ public void OnPluginStart()
 	g_iLastID = 0;
 
 	// https://forums.alliedmods.net/showthread.php?t=300549
-	HookUserMessage(GetUserMessageId("VGUIMenu"), TeamMenuHook, true);
+	// HookUserMessage(GetUserMessageId("VGUIMenu"), TeamMenuHook, true);
 }
 
 public void OnAllPluginsLoaded()

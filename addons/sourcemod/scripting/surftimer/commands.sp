@@ -285,6 +285,7 @@ void CreateCommandListeners()
 public Action sm_test(int client, int args)
 {
 	CPrintToChatAll("stage: %d : wrcp: %d", g_Stage[0][client], g_WrcpStage[client]);
+	CPrintToChatAll("zoneid: %d", g_iClientInZone[client][3]);
 	return Plugin_Handled;
 }
 
