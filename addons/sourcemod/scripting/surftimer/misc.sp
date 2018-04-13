@@ -1314,9 +1314,10 @@ public void LimitSpeedNew(int client)
 		if (GetEntityFlags(client) & FL_ONGROUND)
 		{
 			g_iTicksOnGround[client]++;
-			if (g_iTicksOnGround[client] > 60)
+			if (g_iTicksOnGround[client] > 30)
 			{
 				g_bInTelehop[client] = false;
+				g_bNewStage[client] = false;
 				return;
 			}
 		}
@@ -1327,7 +1328,7 @@ public void LimitSpeedNew(int client)
 		fVel[1] = FloatMul(fVel[1], scale);
 
 		// Impart new velocity onto player
-		if (g_bInBhop[client] || g_bInTelehop[client])
+		if (g_bInBhop[client] || g_bInTelehop[client] || g_bNewStage[client])
 		{
 			TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fVel);
 		}

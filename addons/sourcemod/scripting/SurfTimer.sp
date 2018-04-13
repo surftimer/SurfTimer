@@ -1348,6 +1348,7 @@ bool g_bInBhop[MAXPLAYERS + 1];
 bool g_bFirstJump[MAXPLAYERS + 1];
 int g_iLastJump[MAXPLAYERS + 1];
 int g_iTicksOnGround[MAXPLAYERS + 1];
+bool g_bNewStage[MAXPLAYERS + 1];
 
 /*===================================
 =         Predefined Arrays         =

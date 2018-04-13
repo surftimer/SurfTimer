@@ -372,7 +372,8 @@ public void StartTouch(int client, int action[3])
 				// * Practice CPs
 			}
 			else
-			{ // Setting valid to false, in case of checkers
+			{ 
+				// Setting valid to false, in case of checkers
 				g_bValidRun[client] = false;
 
 				// Announcing checkpoint
@@ -381,6 +382,8 @@ public void StartTouch(int client, int action[3])
 					// Make sure the player is not going backwards
 					if ((action[1] + 2) < g_Stage[g_iClientInZone[client][2]][client])
 						g_bWrcpTimeractivated[client] = false;
+					else
+						g_bNewStage[client] = true;
 
 					g_Stage[g_iClientInZone[client][2]][client] = (action[1] + 2);
 
