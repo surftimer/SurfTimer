@@ -186,6 +186,8 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	g_bInJump[client] = false;
 	g_bFirstJump[client] = false;
 	g_bInBhop[client] = false;
+	g_iTicksOnGround[client] = 0;
+	g_bInTelehop[client] = false;
 
 	// Check for spawn locations
 	int realZone;
@@ -1294,11 +1296,8 @@ public void LimitSpeedNew(int client)
 	float speedCap = 0.0;
 	speedCap = g_mapZones[g_iClientInZone[client][3]][preSpeed];
 
-	if (GetEntityFlags(client) & FL_ONGROUND || speedCap == 0.0)
-	{
-		g_bInTelehop[client] = false;
+	if (speedCap == 0.0)
 		return;
-	}
 
 	float fVel[3];
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
@@ -1312,6 +1311,16 @@ public void LimitSpeedNew(int client)
 	 // A scale < 1 indicates a magnitude > limit
 	if (scale < 1.0)
 	{
+		if (GetEntityFlags(client) & FL_ONGROUND)
+		{
+			g_iTicksOnGround[client]++;
+			if (g_iTicksOnGround[client] > 60)
+			{
+				g_bInTelehop[client] = false;
+				return;
+			}
+		}
+
 		// Reduce each vector by the appropriate amount
 		float speed = SquareRoot(Pow(fVel[0], 2.0) + Pow(fVel[1], 2.0));
 		fVel[0] = FloatMul(fVel[0], scale);

@@ -1393,6 +1393,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 
 		if (GetConVarInt(g_hLimitSpeedType) == 1)
 		{
+			g_iTicksOnGround[client] = 0;
 			int time = GetTime();
 			int cTime = time - g_iLastJump[client];
 			if (!g_bInBhop[client])
