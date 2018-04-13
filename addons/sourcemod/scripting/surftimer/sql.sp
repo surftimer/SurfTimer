@@ -742,49 +742,49 @@ public void sql_CountFinishedBonusCallback(Handle owner, Handle hndl, const char
 					{
 						case 1:
 						{
-							g_pr_points[client][style] += 500;
-							g_Points[client][style][4] += 500;
+							g_pr_points[client][style] += 250;
+							g_Points[client][style][4] += 250;
 							wrbs++;
 						}
 						case 2:
 						{
-							g_pr_points[client][style] += 450;
-							g_Points[client][style][1] += 450;
+							g_pr_points[client][style] += 235;
+							g_Points[client][style][1] += 235;
 						}
 						case 3:
 						{
-							g_pr_points[client][style] += 400;
-							g_Points[client][style][1] += 400;
+							g_pr_points[client][style] += 220;
+							g_Points[client][style][1] += 220;
 						}
 						case 4:
 						{
-							g_pr_points[client][style] += 350;
-							g_Points[client][style][1] += 350;
+							g_pr_points[client][style] += 205;
+							g_Points[client][style][1] += 205;
 						}
 						case 5:
 						{
-							g_pr_points[client][style] += 300;
-							g_Points[client][style][1] += 300;
+							g_pr_points[client][style] += 190;
+							g_Points[client][style][1] += 190;
 						}
 						case 6:
 						{
-							g_pr_points[client][style] += 250;
-							g_Points[client][style][1] += 250;
+							g_pr_points[client][style] += 175;
+							g_Points[client][style][1] += 175;
 						}
 						case 7:
 						{
-							g_pr_points[client][style] += 200;
-							g_Points[client][style][1] += 200;
+							g_pr_points[client][style] += 160;
+							g_Points[client][style][1] += 160;
 						}
 						case 8:
 						{
-							g_pr_points[client][style] += 150;
-							g_Points[client][style][1] += 150;
+							g_pr_points[client][style] += 145;
+							g_Points[client][style][1] += 145;
 						}
 						case 9:
 						{
-							g_pr_points[client][style] += 125;
-							g_Points[client][style][1] += 125;
+							g_pr_points[client][style] += 130;
+							g_Points[client][style][1] += 130;
 						}
 						case 10:
 						{
@@ -1045,45 +1045,45 @@ public void sql_CountFinishedMapsCallback(Handle owner, Handle hndl, const char[
 					{
 						wrpoints = ((float(totalplayers) * 1.75) / 6);
 						wrpoints += 58.5;
-						if (wrpoints < 500.0)
-							wrpoints = 500.0;
+						if (wrpoints < 250.0)
+							wrpoints = 250.0;
 					}
 					else if (tier == 2)
 					{
 						wrpoints = ((float(totalplayers) * 2.8) / 5);
 						wrpoints += 82.15;
-						if (wrpoints < 750.0)
-							wrpoints = 750.0;
+						if (wrpoints < 500.0)
+							wrpoints = 500.0;
 					}
 					else if (tier == 3)
 					{
 						wrpoints = ((float(totalplayers) * 3.5) / 4);
-						if (wrpoints < 1000.0)
-							wrpoints = 1000.0;
+						if (wrpoints < 750.0)
+							wrpoints = 750.0;
 						else
 							wrpoints += 117;
 					}
 					else if (tier == 4)
 					{
 						wrpoints = ((float(totalplayers) * 5.74) / 4);
-						if (wrpoints < 1500.0)
-							wrpoints = 1500.0;
+						if (wrpoints < 1000.0)
+							wrpoints = 1000.0;
 						else
 							wrpoints += 164.25;
 					}
 					else if (tier == 5)
 					{
 						wrpoints = ((float(totalplayers) * 7) / 4);
-						if (wrpoints < 2000.0)
-							wrpoints = 2000.0;
+						if (wrpoints < 1250.0)
+							wrpoints = 1250.0;
 						else
 							wrpoints += 234;
 					}
 					else if (tier == 6)
 					{
 						wrpoints = ((float(totalplayers) * 14) / 4);
-						if (wrpoints < 3000.0)
-							wrpoints = 3000.0;
+						if (wrpoints < 1500.0)
+							wrpoints = 1500.0;
 						else
 							wrpoints += 328;
 					}
@@ -8056,45 +8056,45 @@ public void db_selectMapImprovementCallback(Handle owner, Handle hndl, const cha
 		{
 			wrpoints = ((float(totalplayers) * 1.75) / 6);
 			wrpoints += 58.5;
-			if (wrpoints < 500.0)
-				wrpoints = 500.0;
+			if (wrpoints < 250.0)
+				wrpoints = 250.0;
 		}
 		else if (tier == 2)
 		{
 			wrpoints = ((float(totalplayers) * 2.8) / 5);
 			wrpoints += 82.15;
-			if (wrpoints < 750.0)
-				wrpoints = 750.0;
+			if (wrpoints < 500.0)
+				wrpoints = 500.0;
 		}
 		else if (tier == 3)
 		{
 			wrpoints = ((float(totalplayers) * 3.5) / 4);
-			if (wrpoints < 1000.0)
-				wrpoints = 1000.0;
+			if (wrpoints < 750.0)
+				wrpoints = 750.0;
 			else
 				wrpoints += 117;
 		}
 		else if (tier == 4)
 		{
 			wrpoints = ((float(totalplayers) * 5.74) / 4);
-			if (wrpoints < 1500.0)
-				wrpoints = 1500.0;
+			if (wrpoints < 1000.0)
+				wrpoints = 1000.0;
 			else
 				wrpoints += 164.25;
 		}
 		else if (tier == 5)
 		{
 			wrpoints = ((float(totalplayers) * 7) / 4);
-			if (wrpoints < 2000.0)
-				wrpoints = 2000.0;
+			if (wrpoints < 1250.0)
+				wrpoints = 1250.0;
 			else
 				wrpoints += 234;
 		}
 		else if (tier == 6)
 		{
 			wrpoints = ((float(totalplayers) * 14) / 4);
-			if (wrpoints < 3000.0)
-				wrpoints = 3000.0;
+			if (wrpoints < 1500.0)
+				wrpoints = 1500.0;
 			else
 				wrpoints += 328;
 		}
