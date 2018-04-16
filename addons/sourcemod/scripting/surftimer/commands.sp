@@ -984,7 +984,7 @@ public Action Command_ToStage(int client, int args)
 	else
 	{
 		char arg1[3];
-		g_bInStartZone[client] = false;
+		// g_bInStartZone[client] = false;
 		g_bUsingStageTeleport[client] = true;
 		GetCmdArg(1, arg1, sizeof(arg1));
 		int StageId = StringToInt(arg1);

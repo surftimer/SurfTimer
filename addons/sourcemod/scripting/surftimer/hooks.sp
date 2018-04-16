@@ -770,6 +770,7 @@ public Action OnTouchTriggerTeleport(char[] output, int caller, int activator, f
 {
 	if (IsValidClient(activator) && !IsFakeClient(activator))
 	{
+		g_iTicksOnGround[activator] = 0;
 		g_bInTelehop[activator] = true;
 	}
 	return Plugin_Continue;
@@ -1393,6 +1394,9 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 
 		if (GetConVarInt(g_hLimitSpeedType) == 1)
 		{
+			if (!g_bInStartZone[client] && !g_bInStageZone[client])
+				return Plugin_Continue;
+
 			g_iTicksOnGround[client] = 0;
 			int time = GetTime();
 			int cTime = time - g_iLastJump[client];

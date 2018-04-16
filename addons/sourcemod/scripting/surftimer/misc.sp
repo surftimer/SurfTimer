@@ -188,6 +188,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	g_bInBhop[client] = false;
 	g_iTicksOnGround[client] = 0;
 	g_bInTelehop[client] = false;
+	g_bNewStage[client] = false;
 
 	// Check for spawn locations
 	int realZone;
@@ -195,6 +196,11 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 		realZone = 0;
 	else
 		realZone = zone;
+	
+	if (realZone > 1)
+		g_bInStageZone[client] = true;
+	else if (realZone == 1)
+		g_bInStartZone[client] = true;
 	
 	// Check clients tele side
 	int teleside = g_iTeleSide[client];
@@ -1314,12 +1320,17 @@ public void LimitSpeedNew(int client)
 		if (GetEntityFlags(client) & FL_ONGROUND)
 		{
 			g_iTicksOnGround[client]++;
-			if (g_iTicksOnGround[client] > 30)
+			if (g_iTicksOnGround[client] > 60)
 			{
 				g_bInTelehop[client] = false;
 				g_bNewStage[client] = false;
 				return;
 			}
+		}
+
+		if (g_bInStageZone[client] && g_bNewStage[client])
+		{
+			return;
 		}
 
 		// Reduce each vector by the appropriate amount
@@ -1328,7 +1339,7 @@ public void LimitSpeedNew(int client)
 		fVel[1] = FloatMul(fVel[1], scale);
 
 		// Impart new velocity onto player
-		if (g_bInBhop[client] || g_bInTelehop[client] || g_bNewStage[client])
+		if (g_bInBhop[client] || g_bInTelehop[client])
 		{
 			TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fVel);
 		}
@@ -2683,7 +2694,7 @@ stock Action PrintSpecMessageAll(int client)
 	Format(szChatRank, 64, "%s", g_pr_chat_coloredrank[client]);
 
 	if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
-		setNameColor(szName, g_rankNameChatColour[client], 64);
+		Format(szName, sizeof(szName), "%s%s", g_pr_namecolour[client], szName);
 	else if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
 		setNameColor(szName, g_iCustomColours[client][0], 64);
 	// fluffys
