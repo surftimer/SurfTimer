@@ -1302,7 +1302,7 @@ public void LimitSpeedNew(int client)
 	float speedCap = 0.0;
 	speedCap = g_mapZones[g_iClientInZone[client][3]][preSpeed];
 
-	if (speedCap == 0.0)
+	if (speedCap <= 0.0)
 		return;
 
 	float fVel[3];
@@ -1330,6 +1330,7 @@ public void LimitSpeedNew(int client)
 
 		if (g_bInStageZone[client] && g_bNewStage[client])
 		{
+			g_bNewStage[client] = false;
 			return;
 		}
 
