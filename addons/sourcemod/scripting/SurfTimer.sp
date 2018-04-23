@@ -2729,7 +2729,7 @@ public void OnPluginStart()
 		DHookAddParam(g_hTeleport, HookParamType_Bool);
 	}
 
-	HookEntityOutput("trigger_teleport", "OnEndTouch", OnTouchTriggerTeleport);
+	HookEntityOutput("trigger_teleport", "OnStartTouch", OnTouchTriggerTeleport);
 
 	// Forwards
 	g_MapFinishForward = CreateGlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell);

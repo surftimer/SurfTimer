@@ -90,8 +90,11 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		g_bInDuck[client] = false;
 
 		// Set stage to 1 on spawn cause why not
-		g_WrcpStage[client] = 1;
-		g_Stage[0][client] = 1;
+		if (!g_bRespawnPosition[client])
+		{
+			g_WrcpStage[client] = 1;
+			g_Stage[0][client] = 1;
+		}
 
 		if (g_iCurrentStyle[client] == 4) // 4 low gravity
 			SetEntityGravity(client, 0.5);
@@ -620,7 +623,7 @@ public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)
 public Action Event_OnRoundEnd(Handle event, const char[] name, bool dontBroadcast)
 {
 	g_bRoundEnd = true;
-	UnhookEntityOutput("trigger_teleport", "OnEndTouch", OnTouchTriggerTeleport);
+	// UnhookEntityOutput("trigger_teleport", "OnStartTouch", OnTouchTriggerTeleport);
 	return Plugin_Continue;
 }
 
@@ -663,7 +666,7 @@ public Action Event_OnRoundStart(Handle event, const char[] name, bool dontBroad
 	}
 
 	// Hook trigger_teleport
-	HookEntityOutput("trigger_teleport", "OnEndTouch", OnTouchTriggerTeleport);
+	HookEntityOutput("trigger_teleport", "OnStartTouch", OnTouchTriggerTeleport);
 
 	// Hook zones
 	iEnt = -1;
