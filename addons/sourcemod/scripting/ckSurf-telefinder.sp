@@ -8,7 +8,7 @@
 #include <sourcemod>
 #include <sdktools>
 #include <cstrike>
-#include <ckSurf>
+#include <surftimer>
 
 EngineVersion g_Game;
 
@@ -17,7 +17,7 @@ int g_iEntIndex[MAXPLAYERS + 1];
 
 public Plugin myinfo = 
 {
-	name = "[ckSurf] Teleport Destination Finder",
+	name = "[surftimer] Teleport Destination Finder",
 	author = PLUGIN_AUTHOR,
 	description = "Teleports clients using !cktele to info_teleport_destinations",
 	version = PLUGIN_VERSION,
@@ -32,7 +32,7 @@ public void OnPluginStart()
 		SetFailState("This plugin is for CSGO/CSS only.");	
 	}
 	
-	RegAdminCmd("sm_cktele", TeleToInfo, ADMFLAG_ROOT, "[ckSurf] Teleport client to a teleport destination in the map");
+	RegAdminCmd("sm_cktele", TeleToInfo, ADMFLAG_ROOT, "[surftimer] Teleport client to a teleport destination in the map");
 
 }
 
@@ -85,7 +85,7 @@ public Action TeleToInfo(int client, int args)
 		float position[3];
 		GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", position);
 
-		ckSurf_SafeTeleport(client, position, NULL_VECTOR, NULL_VECTOR, true);
+		surftimer_SafeTeleport(client, position, NULL_VECTOR, NULL_VECTOR, true);
 
 		ReplyToCommand(client, "[CK] Teleporting to entity at %f, %f, %f", position[0], position[1], position[2]);
 	}
