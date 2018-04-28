@@ -1343,12 +1343,12 @@ bool g_bPrestigeCheck[MAXPLAYERS + 1];
 char g_szMapNameFromDatabase[MAXPLAYERS + 1][128];
 
 // New speed limit variables
-bool g_bInTelehop[MAXPLAYERS + 1];
 bool g_bInBhop[MAXPLAYERS + 1];
 bool g_bFirstJump[MAXPLAYERS + 1];
 int g_iLastJump[MAXPLAYERS + 1];
 int g_iTicksOnGround[MAXPLAYERS + 1];
 bool g_bNewStage[MAXPLAYERS + 1];
+bool g_bLeftZone[MAXPLAYERS + 1];
 
 /*===================================
 =         Predefined Arrays         =
@@ -2728,8 +2728,6 @@ public void OnPluginStart()
 		DHookAddParam(g_hTeleport, HookParamType_VectorPtr);
 		DHookAddParam(g_hTeleport, HookParamType_Bool);
 	}
-
-	HookEntityOutput("trigger_teleport", "OnStartTouch", OnTouchTriggerTeleport);
 
 	// Forwards
 	g_MapFinishForward = CreateGlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell);

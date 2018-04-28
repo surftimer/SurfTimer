@@ -150,6 +150,8 @@ public Action StartTouchTrigger(int caller, int activator)
 	// Ignore dead players
 	if (!IsValidClient(activator))
 		return Plugin_Handled;
+	
+	// g_bLeftZone[activator] = false;
 
 	char sTargetName[256];
 	int action[3];
@@ -246,6 +248,9 @@ public Action EndTouchTrigger(int caller, int activator)
 	// Ignore dead players
 	if (!IsValidClient(activator))
 		return Plugin_Handled;
+	
+	// For new speed limiter
+	g_bLeftZone[activator] = true;
 
 	// Ignore if teleporting out of the zone
 	if (g_bIgnoreZone[activator])

@@ -665,9 +665,6 @@ public Action Event_OnRoundStart(Handle event, const char[] name, bool dontBroad
 		SDKHook(iEnt, SDKHook_EndTouch, OnEndTouchGravityTrigger);
 	}
 
-	// Hook trigger_teleport
-	HookEntityOutput("trigger_teleport", "OnStartTouch", OnTouchTriggerTeleport);
-
 	// Hook zones
 	iEnt = -1;
 	g_hTriggerMultiple = CreateArray(128);
@@ -765,16 +762,6 @@ public Action OnEndTouchGravityTrigger(int entity, int other)
 	{
 		if (!g_bNoClip[other] && GetConVarBool(g_hGravityFix))
 			return Plugin_Handled;
-	}
-	return Plugin_Continue;
-}
-
-public Action OnTouchTriggerTeleport(char[] output, int caller, int activator, float delay)
-{
-	if (IsValidClient(activator) && !IsFakeClient(activator))
-	{
-		g_iTicksOnGround[activator] = 0;
-		g_bInTelehop[activator] = true;
 	}
 	return Plugin_Continue;
 }

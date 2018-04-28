@@ -1045,6 +1045,8 @@ public Action Command_Restart(int client, int args)
 	g_bWrcpTimeractivated[client] = false;
 	g_bInStageZone[client] = false;
 	g_bInStartZone[client] = true;
+	g_bLeftZone[client] = false;
+	g_bInBhop[client] = false;
 
 	teleportClient(client, 0, 1, true);
 	return Plugin_Handled;

@@ -187,7 +187,6 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	g_bFirstJump[client] = false;
 	g_bInBhop[client] = false;
 	g_iTicksOnGround[client] = 0;
-	g_bInTelehop[client] = false;
 	g_bNewStage[client] = false;
 
 	// Check for spawn locations
@@ -1317,21 +1316,22 @@ public void LimitSpeedNew(int client)
 	 // A scale < 1 indicates a magnitude > limit
 	if (scale < 1.0)
 	{
+		if (g_bInStageZone[client] && g_bNewStage[client])
+		{
+			g_bNewStage[client] = false;
+			g_bLeftZone[client] = false;
+			return;
+		}
+		
 		if (GetEntityFlags(client) & FL_ONGROUND)
 		{
 			g_iTicksOnGround[client]++;
 			if (g_iTicksOnGround[client] > 60)
 			{
-				g_bInTelehop[client] = false;
 				g_bNewStage[client] = false;
+				g_bLeftZone[client] = false;
 				return;
 			}
-		}
-
-		if (g_bInStageZone[client] && g_bNewStage[client])
-		{
-			g_bNewStage[client] = false;
-			return;
 		}
 
 		// Reduce each vector by the appropriate amount
@@ -1340,7 +1340,7 @@ public void LimitSpeedNew(int client)
 		fVel[1] = FloatMul(fVel[1], scale);
 
 		// Impart new velocity onto player
-		if (g_bInBhop[client] || g_bInTelehop[client])
+		if (g_bInBhop[client] || g_bLeftZone[client])
 		{
 			TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fVel);
 		}
@@ -1553,7 +1553,6 @@ public void SetClientDefaults(int client)
 		g_Stage[i][client] = 1;
 	
 	g_bInBhop[client] = false;
-	g_bInTelehop[client] = false;
 }
 
 // public void clearPlayerCheckPoints(int client)
