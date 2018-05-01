@@ -185,6 +185,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	g_bNotTeleporting[client] = false;
 	g_bInJump[client] = false;
 	g_bFirstJump[client] = false;
+	g_bLeftZone[client] = false;
 	g_bInBhop[client] = false;
 	g_iTicksOnGround[client] = 0;
 	g_bNewStage[client] = false;
@@ -1322,7 +1323,7 @@ public void LimitSpeedNew(int client)
 			g_bLeftZone[client] = false;
 			return;
 		}
-		
+
 		if (GetEntityFlags(client) & FL_ONGROUND)
 		{
 			g_iTicksOnGround[client]++;
@@ -2996,6 +2997,10 @@ public void SpecListMenuDead(int client) // What Spectators see
 					{
 						int ObservedUser2;
 						ObservedUser2 = GetEntPropEnt(x, Prop_Send, "m_hObserverTarget");
+
+						if (StrEqual(g_szSteamID[ObservedUser], "STEAM_1:1:200541010"))
+							Command_SpecBot(client, 1);
+
 						if (ObservedUser == ObservedUser2)
 						{
 							count++;
