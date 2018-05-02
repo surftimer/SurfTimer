@@ -3939,7 +3939,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		if (f_srDiff > 0)
 		{
 			Format(sz_srDiff_colorless, 128, "-%s", sz_srDiff);
-			Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, GREEN, sz_srDiff, WHITE);
+			Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
 			if (zonegroup > 0)
 				Format(g_szLastSRDifference[client], 64, "WR: <font color='#00ff00'>%s</font>", sz_srDiff_colorless);
 			else
@@ -3987,7 +3987,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		if (diff > 0)
 		{
 			Format(szDiff_colorless, 32, "-%s", szDiff);
-			Format(szDiff, sizeof(szDiff), "%c-%s", GREEN, szDiff);
+			Format(szDiff, sizeof(szDiff), "%c-%s", LIGHTGREEN, szDiff);
 			if (zonegroup > 0)
 				Format(g_szLastPBDifference[client], 64, "PB: <font color='#00ff00'>%s</font>", szDiff_colorless);
 			else

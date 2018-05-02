@@ -3620,7 +3620,7 @@ public void WrcpMenu(int client, int args, int style)
 	{
 		if (!g_bhasStages)
 		{
-			CPrintToChat(client, "%t", "Commands45", g_szChatPrefix);
+			CPrintToChat(client, "%t", "Commands87", g_szChatPrefix);
 			return;
 		}
 
@@ -4198,10 +4198,9 @@ public Action Admin_FixBot(int client, int args)
 
 public Action Command_GiveKnife(int client, int args)
 {
-	if (IsPlayerAlive(client)) // client is alive
+	if (IsPlayerAlive(client))
 	{
 		GivePlayerItem(client, "weapon_knife");
-		CPrintToChat(client, "%t", "Commands53", g_szChatPrefix);
 	}
 
 	return Plugin_Handled;
