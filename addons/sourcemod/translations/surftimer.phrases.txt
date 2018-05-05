@@ -3,12 +3,12 @@
 	"PracticeNormal"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Normal mode activated. Change to teleport mode by writing {lightgreen}!prac"
+		"en"		"{1} Normal mode activated. Change to practice mode by writing {lightgreen}!tele"
 	}
 	"PracticeInStartZone"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Can't make a checkpoint inside the start zone!"
+		"en"		"{1} You can't make a checkpoint inside the start zone!"
 	}
 	"ToogleCheckpoints1"
 	{
@@ -18,7 +18,7 @@
 	"ToggleCheckpoints2"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Checkpoints Enabled"
+		"en"		"{1} Checkpoints enabled"
 	}
 	"ToggleCheckpoints3"
 	{
@@ -88,7 +88,7 @@
 	"SkillGroup"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} You are now ranked as {orange}{2}"
+		"en"		"{1} You are now ranked as {2}"
 	}
 	"Rc_PlayerRankStart"
 	{
@@ -218,17 +218,12 @@
 	"PlayerHasNoMapRecords"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} {2} doesn't have local map times"
+		"en"		"{1} {yellow}{2} {default}doesn't have any map times"
 	}
 	"NoTopRecords"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} No local times found on {2}"
-	}
-	"NoMapRecords"
-	{
-		"#format"	"{1:s},{2:s}"
-		"en"		"{1} No local map times found on {2}"
+		"en"		"{1} No map times found for {blue}{2}"
 	}
 	"Goto1"
 	{
@@ -300,16 +295,6 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Quake sounds disabled"
 	}
-	"HideSpecs1"
-	{
-		"#format"	"{1:s}"
-		"en"		"{1} Spectator list enabled"
-	}
-	"HideSpecs2"
-	{
-		"#format"	"{1:s}"
-		"en"		"{1} Spectator list disabled"
-	}
 	"AutoBhop1"
 	{
 		"#format"	"{1:s}"
@@ -374,11 +359,6 @@
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
 		"en"		"{1} {yellow}{2}{default} finished {red}{3} {default}in {lightgreen}{4}{default}. Missing their best time by [{red}{5}{default}]. [Rank: {lightgreen}{6}/{7} {default}| Record: {lightgreen}{8}{default}]"
-	}
-	"BPress7" //come back aven
-	{
-		"#format"	"{1:s},{2:d}"
-		"en"		"{1} You have earned {lightgreen}{2} {default}credits"
 	}
 	"ErrorStageTime"
 	{
@@ -468,7 +448,7 @@
 	"Commands11"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} There are no save locs, use sm_saveloc to make one"
+		"en"		"{1} There are no saved locations, use sm_saveloc to make one"
 	}
 	"Commands13"
 	{
@@ -560,11 +540,6 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Available Colours: {darkred}darkred {lightred}lightred {red}red {green}green {lime}lime {lightgreen}lightgreen {darkblue}darkblue {lightblue}lightblue {blue}blue {pink}pink {purple}purple {orange}orange {yellow}yellow {grey}grey {grey2}grey2 {default}default"
 	}
-	"Commands45"
-	{
-		"#format"	"{1:s}"
-		"en"		"{1} This is a linear map. WRCP is not available"
-	}
 	"Commands46"
 	{
 		"#format"	"{1:s}"
@@ -599,11 +574,6 @@
 	{
 		"#format"	"{1:s}"
 		"en"		"{1} Fixing replay bots"
-	}
-	"Commands53"
-	{
-		"#format"	"{1:s}"
-		"en"		"{1} You have been given a knife"
 	}
 	"Commands54"
 	{
@@ -1251,12 +1221,12 @@
 	"Misc36"
 	{
 		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {yellow}{2}{default} beat the {red}{3} {default}map record"
+		"en"		"{1} {yellow}{2}{default} beat the {red}{3} {default}map record!"
 	}
 	"Misc37"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s}"
-		"en"		"{1} {yellow}{2}{default} beat the [{orange}{3}{default}] {red}{4} {default}record"
+		"en"		"{1} {yellow}{2}{default} beat the [{orange}{3}{default}] {red}{4} {default}record!"
 	}
 	"Misc38"
 	{
@@ -1371,7 +1341,7 @@
 	"SQL15"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:i}"
-		"en"		"{1} {yellow}{2} {default}has beaten the {purple}STAGE {3} RECORD {lightgreen}{4} {5} {default}[Rank: {lightgreen}1/{6}{default}]"
+		"en"		"{1} {yellow}{2} {default}beat the [{purple}Stage {3}{default}] record! {lightgreen}{4} {5} {default}[Rank: {lightgreen}1/{6}{default}]"
 	}
 	"SQL16"
 	{
@@ -1386,12 +1356,12 @@
 	"SQL18"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:s}"
-		"en"		"{1} {yellow}{2} {default}has set a new {purple}STAGE {3} RECORD {lightgreen}{4} {default}[Rank: {lightgreen}1/1{default}]"
+		"en"		"{1} {yellow}{2} {default}has set a new [{purple}Stage {3}{default}] record! {lightgreen}{4} {default}[Rank: {lightgreen}1/1{default}]"
 	}
 	"SQL19"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:i},{5:s},{6:s},{7:i},{8:i}"
-		"en"		"{1} {yellow}{2} {default}has beaten the {red}{3} {purple}STAGE {4} RECORD {lightgreen}{5} {6} {default}[Rank: {lightgreen}{7}/{8}{default}]"
+		"en"		"{1} {yellow}{2} {default}beat the {red}{3}{default} [{purple}Stage {4}{default}] record! {lightgreen}{5} {6} {default}[Rank: {lightgreen}{7}/{8}{default}]"
 	}
 	"SQL20"
 	{
@@ -1406,7 +1376,7 @@
 	"SQL22"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:i},{5:s}"
-		"en"		"{1} {yellow}{2} {default}has set a new {red}{3} {purple}STAGE {4} RECORD {lightgreen}{5} {default}[Rank: {lightgreen}1/1{default}]"
+		"en"		"{1} {yellow}{2} {default}has set a new {red}{3} {default}[{purple}Stage {4}{default}] record! {lightgreen}{5} {default}[Rank: {lightgreen}1/1{default}]"
 	}
 	"SQL23"
 	{
@@ -1478,7 +1448,7 @@
 		"#format"	"{1:s},{2:s},{3:i},{4:i},{5:s},{6:i},{7:s}"
 		"en"		"{1} {yellow}{2} {default}is ranked {lightgreen}{3}/{4} {default}with a time of {lightgreen}{5} {default}for {orange}bonus {6} {default}on {blue}{7}"
 	}
-	"SQL37" //come back aven // see NoMapFound
+	"NoMapFound"
 	{
 		"#format"	"{1:s},{2:s}"
 		"en"		"{1} No result found for {blue}{2}"
@@ -1491,7 +1461,7 @@
 	"SQL39"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:i},{5:i}"
-		"en"		"{1} {yellow}{2} {default}is ranked {lightgreen}{3}/{4} {default}with {purple}{5} {default}points"
+		"en"		"{1} {yellow}{2} {default}is ranked {lightgreen}{3}/{4} {default}with {lightgreen}{5} {default}points"
 	}
 	"SQL40"
 	{
@@ -1512,10 +1482,5 @@
 	{
 		"#format"	"{1:s},{2:s}"
 		"en"		"{1} {darkred}You must pass all {2} to finish your run"
-	}
-	"NoMapFound"
-	{
-		"#format"	"{1:s},{2:s}"
-		"en"		"{1} {blue}{2} {default}not found"
 	}
 }

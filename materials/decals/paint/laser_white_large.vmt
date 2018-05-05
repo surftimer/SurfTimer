@@ -1,7 +1,0 @@
-"UnlitGeneric"
-{
-    "$basetexture" "decals/paint/laser_white"
-    "$decal" 1
-    "$decalscale" 1.2
-    "$translucent" 1
-}

@@ -742,71 +742,6 @@ public void readMapycycle()
 	return;
 }
 
-public void addColorToString(char[] StringToAdd, int size)
-{
-	ReplaceString(StringToAdd, size, "{default}", szWHITE, false);
-	ReplaceString(StringToAdd, size, "{white}", szWHITE, false);
-	ReplaceString(StringToAdd, size, "{darkred}", szDARKRED, false);
-	ReplaceString(StringToAdd, size, "{green}", szGREEN, false);
-	ReplaceString(StringToAdd, size, "{lime}", szLIMEGREEN, false);
-	ReplaceString(StringToAdd, size, "{blue}", szBLUE, false);
-	ReplaceString(StringToAdd, size, "{lightgreen}", szLIGHTGREEN, false);
-	ReplaceString(StringToAdd, size, "{red}", szRED, false);
-	ReplaceString(StringToAdd, size, "{grey}", szGRAY, false);
-	ReplaceString(StringToAdd, size, "{gray}", szGRAY, false);
-	ReplaceString(StringToAdd, size, "{yellow}", szYELLOW, false);
-	ReplaceString(StringToAdd, size, "{lightblue}", szLIGHTBLUE, false);
-	ReplaceString(StringToAdd, size, "{darkblue}", szDARKBLUE, false);
-	ReplaceString(StringToAdd, size, "{pink}", szPINK, false);
-	ReplaceString(StringToAdd, size, "{lightred}", szLIGHTRED, false);
-	ReplaceString(StringToAdd, size, "{purple}", szPURPLE, false);
-	ReplaceString(StringToAdd, size, "{darkgrey}", szDARKGREY, false);
-	ReplaceString(StringToAdd, size, "{darkgray}", szDARKGREY, false);
-	ReplaceString(StringToAdd, size, "{limegreen}", szLIMEGREEN, false);
-	ReplaceString(StringToAdd, size, "{lightgreen}", szLIGHTGREEN, false);
-	ReplaceString(StringToAdd, size, "{darkblue}", szDARKBLUE, false);
-	ReplaceString(StringToAdd, size, "{lime}", szLIMEGREEN, false);
-	ReplaceString(StringToAdd, size, "{orange}", szORANGE, false);
-}
-
-public int getFirstColor(char[] StringToSearch)
-{
-	if (StrContains(StringToSearch, "{default}", false) != -1 || StrContains(StringToSearch, "{white}", false) != -1)
-		return 0;
-	else if (StrContains(StringToSearch, "{darkred}", false) != -1)
-		return 1;
-	else if (StrContains(StringToSearch, "{green}", false) != -1)
-		return 2;
-	else if (StrContains(StringToSearch, "{lightgreen}", false) != -1 || StrContains(StringToSearch, "{limegreen}", false) != -1 || StrContains(StringToSearch, "{lime}", false) != -1)
-		return 3;
-	else if (StrContains(StringToSearch, "{blue}", false) != -1)
-		return 4;
-	else if (StrContains(StringToSearch, "{olive}", false) != -1 || StrContains(StringToSearch, "{lightgreen}", false) != -1)
-		return 5;
-	else if (StrContains(StringToSearch, "{red}", false) != -1)
-		return 6;
-	else if (StrContains(StringToSearch, "{grey}", false) != -1)
-		return 7;
-	else if (StrContains(StringToSearch, "{yellow}", false) != -1)
-		return 8;
-	else if (StrContains(StringToSearch, "{lightblue}", false) != -1)
-		return 9;
-	else if (StrContains(StringToSearch, "{steelblue}", false) != -1 || StrContains(StringToSearch, "{darkblue}", false) != -1)
-		return 10;
-	else if (StrContains(StringToSearch, "{pink}", false) != -1)
-		return 11;
-	else if (StrContains(StringToSearch, "{lightred}", false) != -1)
-		return 12;
-	else if (StrContains(StringToSearch, "{purple}", false) != -1)
-		return 13;
-	else if (StrContains(StringToSearch, "{darkgrey}", false) != -1 || StrContains(StringToSearch, "{darkgray}", false) != -1)
-		return 14;
-	else if (StrContains(StringToSearch, "{orange}", false) != -1)
-		return 15;
-	else
-		return 0;
-}
-
 public void setNameColor(char[] ClientName, int index, int size)
 {
 	switch (index)
@@ -843,8 +778,6 @@ public void setNameColor(char[] ClientName, int index, int size)
 			Format(ClientName, size, "%c%s", DARKGREY, ClientName);
 		case 15:
 			Format(ClientName, size, "%c%s", ORANGE, ClientName);
-		/*default:
-			Format(ClientName, size, "%c%s", WHITE, ClientName);*/
 	}
 }
 
@@ -908,9 +841,6 @@ public void parseColorsFromString(char[] ParseString, int size)
 	ReplaceString(ParseString, size, "{darkgrey}", "", false);
 	ReplaceString(ParseString, size, "{darkgray}", "", false);
 	ReplaceString(ParseString, size, "{limegreen}", "", false);
-	ReplaceString(ParseString, size, "{lightgreen}", "", false);
-	ReplaceString(ParseString, size, "{darkblue}", "", false);
-	ReplaceString(ParseString, size, "{lime}", "", false);
 	ReplaceString(ParseString, size, "{orange}", "", false);
 	ReplaceString(ParseString, size, "{olive}", "", false);
 }
@@ -2535,9 +2465,6 @@ public void SetSkillGroups()
 				RankValue[RankTop] = rankTop;
 				RankValue[RankReq] = rank;
 
-				// Replace colors on name
-				//addColorToString(sRankNameColored, 128);
-
 				// Remove colors from rank name
 				CRemoveColors(sRankName, 128);
 
@@ -3944,7 +3871,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		if (f_srDiff > 0)
 		{
 			Format(sz_srDiff_colorless, 128, "-%s", sz_srDiff);
-			Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, GREEN, sz_srDiff, WHITE);
+			Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
 			if (zonegroup > 0)
 				Format(g_szLastSRDifference[client], 64, "WR: <font color='#00ff00'>%s</font>", sz_srDiff_colorless);
 			else
@@ -3992,7 +3919,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		if (diff > 0)
 		{
 			Format(szDiff_colorless, 32, "-%s", szDiff);
-			Format(szDiff, sizeof(szDiff), "%c-%s", GREEN, szDiff);
+			Format(szDiff, sizeof(szDiff), "%c-%s", LIGHTGREEN, szDiff);
 			if (zonegroup > 0)
 				Format(g_szLastPBDifference[client], 64, "PB: <font color='#00ff00'>%s</font>", szDiff_colorless);
 			else
