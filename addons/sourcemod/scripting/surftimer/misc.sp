@@ -4466,7 +4466,7 @@ bool IsPlayerVip(int client, bool admin = true, bool reply = true)
 {
 	if (admin)
 	{
-		if (CheckCommandAccess(client, "", ADMFLAG_GENERIC))
+		if (CheckCommandAccess(client, "", ADMFLAG_ROOT))
 			return true;
 	}
 
