@@ -3,7 +3,7 @@
 	"PracticeNormal"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Normal mode activated. Change to teleport mode by writing {lightgreen}!prac"
+		"en"		"{1} Normal mode activated. Change to practice mode by writing {lightgreen}!tele"
 	}
 	"PracticeInStartZone"
 	{
@@ -18,7 +18,7 @@
 	"ToggleCheckpoints2"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Checkpoints Enabled"
+		"en"		"{1} Checkpoints enabled"
 	}
 	"ToggleCheckpoints3"
 	{
@@ -88,7 +88,7 @@
 	"SkillGroup"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} You are now ranked as {orange}{2}"
+		"en"		"{1} You are now ranked as {2}"
 	}
 	"Rc_PlayerRankStart"
 	{

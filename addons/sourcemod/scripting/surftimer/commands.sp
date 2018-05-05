@@ -78,7 +78,9 @@ void CreateCommands()
 
 	RegConsoleCmd("sm_cp", Command_createPlayerCheckpoint, "[surftimer] Creates a checkpoint, where the player can teleport back to");
 	RegConsoleCmd("sm_checkpoint", Command_createPlayerCheckpoint, "[surftimer] Creates a checkpoint, where the player can teleport back to");
-	// RegConsoleCmd("sm_undo", Command_undoPlayerCheckpoint, "[surftimer] Undoes the players lchast checkpoint.");
+	RegConsoleCmd("sm_saveloc", Command_createPlayerCheckpoint, "[surftimer] Creates a checkpoint, where the player can teleport back to");
+	RegConsoleCmd("sm_savelocs", Command_SaveLocList);
+	RegConsoleCmd("sm_loclist", Command_SaveLocList);
 	RegConsoleCmd("sm_normal", Command_normalMode, "[surftimer] Switches player back to normal mode.");
 	RegConsoleCmd("sm_n", Command_normalMode, "[surftimer] Switches player back to normal mode.");
 
@@ -133,11 +135,9 @@ void CreateCommands()
 	RegConsoleCmd("sm_mtop", Client_MapTop, "[surftimer] displays local map top for a given map");
 	RegConsoleCmd("sm_p", Client_Profile, "[surftimer] opens a player profile");
 	RegConsoleCmd("sm_timer", Client_OptionMenu, "[surftimer] opens options menu");
+	RegConsoleCmd("sm_toggletimer", Client_ToggleTimer, "[surftimer] toggles timer on and off");
 	RegConsoleCmd("sm_surftimer", Client_OptionMenu, "[surftimer] opens options menu");
 	RegConsoleCmd("sm_bhoptimer", Client_OptionMenu, "[surftimer] opens options menu");
-	RegConsoleCmd("sm_saveloc", Command_createPlayerCheckpoint, "[surftimer] Creates a checkpoint, where the player can teleport back to");
-	RegConsoleCmd("sm_savelocs", Command_SaveLocList);
-	RegConsoleCmd("sm_loclist", Command_SaveLocList);
 	RegConsoleCmd("sm_knife", Command_GiveKnife, "[surftimer] Give players a knife");
 
 	// New Commands
@@ -2009,15 +2009,8 @@ public Action Client_Latest(int client, int args)
 	return Plugin_Handled;
 }
 
-public Action Client_Showsettings(int client, int args)
-{
-	ShowSrvSettings(client);
-	return Plugin_Handled;
-}
-
 public Action Client_Help(int client, int args)
 {
-	// HelpPanel(client);
 	// taken from adminhelp.sp
 	Menu menu = CreateMenu(HelpMenuHandler);
 	SetMenuTitle(menu, "Help Menu\n \n");
@@ -2695,140 +2688,6 @@ public int BonusTopMenuHandler(Menu menu, MenuAction action, int param1, int par
 	}
 }
 
-public void HelpPanel(int client)
-{
-	Handle panel = CreatePanel();
-	char title[64];
-	Format(title, 64, "Help (1/4)");
-	DrawPanelText(panel, title);
-	DrawPanelText(panel, " ");
-	DrawPanelText(panel, "!help - opens this menu");
-	DrawPanelText(panel, "!help2 - explanation of the ranking system");
-	DrawPanelText(panel, "!menu - checkpoint menu");
-	DrawPanelText(panel, "!options - player options menu");
-	DrawPanelText(panel, "!top - top menu");
-	DrawPanelText(panel, "!latest - prints in console the last map records");
-	DrawPanelText(panel, "!profile/!ranks - opens your profile");
-	DrawPanelText(panel, " ");
-	DrawPanelItem(panel, "next page");
-	DrawPanelItem(panel, "exit");
-	SendPanelToClient(panel, client, HelpPanelHandler, 10000);
-	CloseHandle(panel);
-}
-
-public int HelpPanelHandler(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Select)
-	{
-		if (param2 == 1)
-			HelpPanel2(param1);
-	}
-}
-
-public int HelpPanel2(int client)
-{
-	Handle panel = CreatePanel();
-	char szTmp[64];
-	Format(szTmp, 64, "Help (2/4)");
-	DrawPanelText(panel, szTmp);
-	DrawPanelText(panel, " ");
-	DrawPanelText(panel, "!start/!r - go back to start");
-	DrawPanelText(panel, "!stop - stops the timer");
-	DrawPanelText(panel, "!pause - on/off pause");
-	DrawPanelText(panel, "!usp - spawns a usp silencer");
-	DrawPanelText(panel, "!spec [<name>] - select a player you want to watch");
-	DrawPanelText(panel, "!goto [<name>] - teleports you to a given player");
-	DrawPanelText(panel, "!showsettings - shows plugin settings");
-	DrawPanelText(panel, " ");
-	DrawPanelItem(panel, "previous page");
-	DrawPanelItem(panel, "next page");
-	DrawPanelItem(panel, "exit");
-	SendPanelToClient(panel, client, HelpPanel2Handler, 10000);
-	CloseHandle(panel);
-}
-
-public int HelpPanel2Handler(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Select)
-	{
-		if (param2 == 1)
-			HelpPanel(param1);
-		else
-			if (param2 == 2)
-			HelpPanel3(param1);
-	}
-}
-
-public void HelpPanel3(int client)
-{
-	Handle panel = CreatePanel();
-	char szTmp[64];
-	Format(szTmp, 64, "Help (3/4)");
-	DrawPanelText(panel, szTmp);
-	DrawPanelText(panel, " ");
-	DrawPanelText(panel, "!maptop <mapname> - displays map top for a given map");
-	DrawPanelText(panel, "!flashlight - on/off flashlight");
-	DrawPanelText(panel, "!ranks - prints in chat the available ranks");
-	DrawPanelText(panel, "!measure - allows you to measure the distance between 2 points");
-	DrawPanelText(panel, "!language - opens the language menu");
-	DrawPanelText(panel, "!wr - prints in chat the record of the current map");
-	DrawPanelText(panel, "!avg - prints in chat the average map time");
-	DrawPanelText(panel, "!stuck / !back - teleports player back to the start of the stage. Does not stop timer");
-	DrawPanelText(panel, "!avg - !");
-	DrawPanelText(panel, " ");
-	DrawPanelItem(panel, "previous page");
-	DrawPanelItem(panel, "exit");
-	SendPanelToClient(panel, client, HelpPanel3Handler, 10000);
-	CloseHandle(panel);
-}
-
-public int HelpPanel3Handler(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Select)
-	{
-		if (param2 == 1)
-			HelpPanel2(param1);
-		else
-			if (param2 == 2)
-			HelpPanel4(param1);
-	}
-}
-
-public void HelpPanel4(int client)
-{
-	Handle panel = CreatePanel();
-	char szTmp[64];
-	Format(szTmp, 64, "Help (4/4)");
-	DrawPanelText(panel, szTmp);
-	DrawPanelText(panel, " ");
-	DrawPanelText(panel, "!cp - Creates a checkpoint to use in practice mode.");
-	DrawPanelText(panel, "!tele / !teleport / !practice / !prac - Starts practice mode");
-	DrawPanelText(panel, "!undo - Undoes your latest checkpoint");
-	DrawPanelText(panel, " ");
-	DrawPanelItem(panel, "previous page");
-	DrawPanelItem(panel, "exit");
-	SendPanelToClient(panel, client, HelpPanel4Handler, 10000);
-	CloseHandle(panel);
-}
-
-public int HelpPanel4Handler(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Select)
-	{
-		if (param2 == 1)
-			HelpPanel2(param1);
-	}
-}
-
-public void ShowSrvSettings(int client)
-{
-	PrintToConsole(client, " ");
-	PrintToConsole(client, "-----------------");
-	PrintToConsole(client, "settings");
-	PrintToConsole(client, "-------------------------------------");
-	CPrintToChat(client, "%t", "ConsoleOutput", g_szChatPrefix);
-}
-
 public void OptionMenu(int client)
 {
 	Menu optionmenu = CreateMenu(OptionMenuHandler);
@@ -3388,7 +3247,7 @@ public Action Command_SetDbNameColour(int client, int args)
 		char upperArg[128];
 		upperArg = arg;
 		StringToUpper(upperArg);
-		if (StrContains(upperArg, "{WHITE}", false)!=-1 || StrContains(upperArg, "{DEFAULT}")!=-1)
+		if (StrContains(upperArg, "{DEFAULT}", false)!=-1 || StrContains(upperArg, "{WHITE}")!=-1)
 		{
 			arg = "0";
 		}
@@ -3400,7 +3259,7 @@ public Action Command_SetDbNameColour(int client, int args)
 		{
 			arg = "2";
 		}
-		else if (StrContains(upperArg, "{LIMEGREEN}", false)!=-1)
+		else if (StrContains(upperArg, "{LIMEGREEN}", false)!=-1 || StrContains(upperArg, "{LIME}")!=-1)
 		{
 			arg = "3";
 		}
@@ -3416,7 +3275,7 @@ public Action Command_SetDbNameColour(int client, int args)
 		{
 			arg = "6";
 		}
-		else if (StrContains(upperArg, "{GREY}", false)!=-1)
+		else if (StrContains(upperArg, "{GREY}", false)!=-1 || StrContains(upperArg, "{GRAY}")!=-1)
 		{
 			arg = "7";
 		}
@@ -3444,7 +3303,7 @@ public Action Command_SetDbNameColour(int client, int args)
 		{
 			arg = "13";
 		}
-		else if (StrContains(upperArg, "{DARKGREY}", false)!=-1)
+		else if (StrContains(upperArg, "{DARKGREY}", false)!=-1 || StrContains(upperArg, "{DARKGRAY}")!=-1)
 		{
 			arg = "14";
 		}
@@ -3481,7 +3340,7 @@ public Action Command_SetDbTextColour(int client, int args)
 		char upperArg[128];
 		upperArg = arg;
 		StringToUpper(upperArg);
-		if (StrContains(upperArg, "{WHITE}", false)!=-1 || StrContains(upperArg, "{DEFAULT}")!=-1)
+		if (StrContains(upperArg, "{DEFAULT}", false)!=-1 || StrContains(upperArg, "{WHITE}")!=-1)
 		{
 			arg = "0";
 		}
@@ -3509,7 +3368,7 @@ public Action Command_SetDbTextColour(int client, int args)
 		{
 			arg = "6";
 		}
-		else if (StrContains(upperArg, "{GREY}", false)!=-1)
+		else if (StrContains(upperArg, "{GREY}", false)!=-1 || StrContains(upperArg, "{GRAY}")!=-1)
 		{
 			arg = "7";
 		}
@@ -3537,7 +3396,7 @@ public Action Command_SetDbTextColour(int client, int args)
 		{
 			arg = "13";
 		}
-		else if (StrContains(upperArg, "{DARKGREY}", false)!=-1)
+		else if (StrContains(upperArg, "{DARKGREY}", false)!=-1 || StrContains(upperArg, "{DARKGRAY}")!=-1)
 		{
 			arg = "14";
 		}
