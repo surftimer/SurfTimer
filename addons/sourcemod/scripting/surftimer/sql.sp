@@ -5823,7 +5823,7 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 	FormatTimeFloat(data, fDiff, 3, szDiff, 128);
 
 	if (fDiff > 0)
-		Format(szDiff, 128, "%cPB: %c-%s%c", WHITE, GREEN, szDiff, WHITE);
+		Format(szDiff, 128, "%cPB: %c-%s%c", WHITE, LIGHTGREEN, szDiff, WHITE);
 	else
 		Format(szDiff, 128, "%cPB: %c+%s%c", WHITE, RED, szDiff, WHITE);
 
@@ -5836,7 +5836,7 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 	FormatTimeFloat(data, f_srDiff, 3, sz_srDiff, 128);
 
 	if (f_srDiff > 0)
-		Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, GREEN, sz_srDiff, WHITE);
+		Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
 	else
 		Format(sz_srDiff, 128, "%cWR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
 
@@ -6017,7 +6017,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 	if (g_fWrcpRecord[client][stage][style] != -1.0) // Existing stage time
 	{
 		if (fDiff > 0)
-			Format(szDiff, 128, "%cPB: %c-%s%c", WHITE, GREEN, szDiff, WHITE);
+			Format(szDiff, 128, "%cPB: %c-%s%c", WHITE, LIGHTGREEN, szDiff, WHITE);
 		else
 			Format(szDiff, 128, "%cPB: %c+%s%c", WHITE, RED, szDiff, WHITE);
 	}
@@ -6036,7 +6036,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 	FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
 
 	if (f_srDiff > 0)
-		Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, GREEN, sz_srDiff, WHITE);
+		Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
 	else
 		Format(sz_srDiff, 128, "%cWR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
 
@@ -7795,7 +7795,7 @@ public void db_selectMapRecordTimeCallback(Handle owner, Handle hndl, const char
 
 		if (StrEqual(szMapName, "NULL"))
 		{
-			CPrintToChat(client, "%t", "SQL37", g_szChatPrefix, szMapNameArg);
+			CPrintToChat(client, "%t", "NoMapFound", g_szChatPrefix, szMapNameArg);
 		}
 		else
 		{
@@ -7806,7 +7806,7 @@ public void db_selectMapRecordTimeCallback(Handle owner, Handle hndl, const char
 	}
 	else
 	{
-		CPrintToChat(client, "%t", "SQL37", g_szChatPrefix, szMapNameArg);
+		CPrintToChat(client, "%t", "NoMapFound", g_szChatPrefix, szMapNameArg);
 	}
 }
 
