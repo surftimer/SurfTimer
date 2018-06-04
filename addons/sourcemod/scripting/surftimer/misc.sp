@@ -2494,13 +2494,27 @@ public void SetPlayerRank(int client)
 		return;
 	}
 
+	int style = g_iCurrentStyle[client];
+	int rank = g_PlayerRank[client][style];
+	int points = g_pr_points[client][style];
+
+	int RankValue[SkillGroup];
+	int index = GetSkillgroupIndex(rank, points);
+	GetArrayArray(g_hSkillGroups, index, RankValue[0]);
+
 	if (g_bEnforceTitle[client])
 	{
 		// g_iEnforceTitleType[client], 0 = chat, 1 = scoreboard, 2 = both
-		int style = g_iCurrentStyle[client];
 		ReplaceString(g_szEnforcedTitle[client], sizeof(g_szEnforcedTitle), "{style}", g_szStyleAcronyms[style]);
 		if (g_iEnforceTitleType[client] == 0 || g_iEnforceTitleType[client] == 2)
+		{
+			Format(g_pr_rankname_style[client], 128, RankValue[RankName]);
+			Format(g_pr_rankname[client], 128, RankValue[RankName]);
+			ReplaceString(g_pr_rankname[client], 128, "{style}", "");
+			Format(g_szRankName[client], sizeof(g_szRankName), RankValue[RankName]);
+			Format(g_pr_namecolour[client], 32, RankValue[NameColour]);
 			Format(g_pr_chat_coloredrank[client], 256, g_szEnforcedTitle[client]);
+		}
 
 		if (g_iEnforceTitleType[client] == 1 || g_iEnforceTitleType[client] == 2)
 		{
@@ -2518,14 +2532,6 @@ public void SetPlayerRank(int client)
 			char szName[MAX_NAME_LENGTH];
 			GetClientName(client, szName, sizeof(szName));
 			CRemoveColors(szName, sizeof(szName));
-
-			int style = g_iCurrentStyle[client];
-			int rank = g_PlayerRank[client][style];
-			int points = g_pr_points[client][style];
-
-			int RankValue[SkillGroup];
-			int index = GetSkillgroupIndex(rank, points);
-			GetArrayArray(g_hSkillGroups, index, RankValue[0]);
 			
 			Format(g_pr_chat_coloredrank[client], 128, RankValue[RankNameColored]);
 			Format(g_pr_chat_coloredrank_style[client], 128, RankValue[RankNameColored]);
@@ -2924,9 +2930,6 @@ public void SpecListMenuDead(int client) // What Spectators see
 					{
 						int ObservedUser2;
 						ObservedUser2 = GetEntPropEnt(x, Prop_Send, "m_hObserverTarget");
-
-						if (StrEqual(g_szSteamID[ObservedUser], "STEAM_1:1:200541010"))
-							Command_SpecBot(client, 1);
 
 						if (ObservedUser == ObservedUser2)
 						{
