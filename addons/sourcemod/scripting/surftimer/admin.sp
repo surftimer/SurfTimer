@@ -72,7 +72,7 @@ public Action Admin_insertMapTier(int client, int args)
 		int tier;
 		GetCmdArg(1, arg1, sizeof(arg1));
 		tier = StringToInt(arg1);
-		if (tier < 7 && tier > 0)
+		if (tier < 7 && tier > -1)
 			db_insertMapTier(tier);
 		else
 			CPrintToChat(client, "%t", "Admin6", g_szChatPrefix);
