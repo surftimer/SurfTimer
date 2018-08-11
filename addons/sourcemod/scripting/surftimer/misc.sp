@@ -3295,7 +3295,7 @@ public void CenterHudDead(int client)
 				else if (ObservedUser == g_WrcpBot)
 					Format(obsAika, sizeof(obsAika), "<font color='#FFFF00'>%s</font>", g_szWrcpReplayTime[g_iCurrentlyPlayingStage]);
 				
-				PrintHintText(client, "<font face=''>%s\nSpeed: <font color='#66bbff'>%i</font> u/s\nKeys: %s", obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
+				PrintHintText(client, "<pre><font face=''>%s\nSpeed: <font color='#66bbff'>%i</font> u/s\nKeys: %s</pre>", obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
 				return;
 			}
 			else if (g_bTimerRunning[ObservedUser])
@@ -3322,7 +3322,7 @@ public void CenterHudDead(int client)
 				Format(timerText, 32, "%s ", g_szStyleHud[ObservedUser]);
 				// fluffys come back here
 
-			PrintHintText(client, "<font face=''>%s <font color='#00ff00'>%s</font>\nSpeed: <font color='#66bbff'>%i</font> u/s\nKeys: %s", timerText, obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
+			PrintHintText(client, "<pre><font face=''>%s <font color='#00ff00'>%s</font>\nSpeed: <font color='#66bbff'>%i</font> u/s\nKeys: %s</pre>", timerText, obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
 		}
 	}
 	else
@@ -3589,7 +3589,7 @@ public void CenterHudAlive(int client)
 		if (IsValidEntity(client) && 1 <= client <= MaxClients && !g_bOverlay[client])
 		{
 			// PrintHintText(client, "<font face=''>%s%s\n%s%s\n%s%s</font>", module[0], module2, module[2], module4, module[4], module6);
-			PrintHintText(client, "<font face=''>%15s\t %15s\n%15s\t %15s\n%15s\t %15s</font>", module[0], module[1], module[2], module[3], module[4], module[5]);
+			PrintHintText(client, "<pre><font face='' class='fontSize-sm'>%15s\t %15s\n%15s\t %15s\n%15s\t %15s</font></pre>", module[0], module[1], module[2], module[3], module[4], module[5]);
 		}
 	}
 }
@@ -4473,7 +4473,7 @@ bool IsPlayerVip(int client, bool admin = true, bool reply = true)
 			return true;
 	}
 
-	if (!g_bVip[client])
+	if (!g_bVip[client] && !CheckCommandAccess(client, "", ADMFLAG_RESERVATION))
 	{
 		if (reply)
 		{

@@ -284,8 +284,13 @@ void CreateCommandListeners()
 
 public Action sm_test(int client, int args)
 {
-	CPrintToChatAll("stage: %d : wrcp: %d", g_Stage[0][client], g_WrcpStage[client]);
-	CPrintToChatAll("zoneid: %d", g_iClientInZone[client][3]);
+	// CPrintToChatAll("stage: %d : wrcp: %d", g_Stage[0][client], g_WrcpStage[client]);
+	// CPrintToChatAll("zoneid: %d", g_iClientInZone[client][3]);
+	char arg[128];
+	char found[128];
+	GetCmdArg(1, arg, 128);
+	FindMap(arg, found, 128);
+	CPrintToChat(client, "arg: %s | found: %s", arg, found);
 	return Plugin_Handled;
 }
 

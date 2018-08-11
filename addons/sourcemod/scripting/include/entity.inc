@@ -72,6 +72,8 @@ enum PropFieldType
 									 thus FindDataMapOffs() will return the constant size
 									 of the string_t container (which is 32 bits right now).
 								 */
+	PropField_Variant,				/**< Valid for Data fields only Type is not known at the field level,
+									(for this call), but dependent on current field value. */
 };
 
 /**
@@ -139,6 +141,14 @@ native int CreateEdict();
  * @error				Invalid edict index.
  */
 native void RemoveEdict(int edict);
+
+/**
+ * Marks an entity for deletion.
+ *
+ * @param entity		Index of the entity.
+ * @error				Invalid entity index.
+ */
+native void RemoveEntity(int entity);
 
 /**
  * Returns the flags on an edict.  These are not the same as entity flags.
