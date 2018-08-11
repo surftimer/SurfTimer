@@ -3,7 +3,7 @@
 
 ## Backstory
 
-This is a CS:GO timer which is heavily modified from ckSurf, the original developer (Jonitaikaponi) has quit working on it, I decided to use this a opportunity to learn SourcePawn, I didn't want to release this yet as a lot of things are hard coded and very messy, but events occurred and well, here it is.
+This is a CS:GO timer which is heavily modified from ckSurf, the original developer (Jonitaikaponi) has quit working on it, I decided to use this as an opportunity to learn SourcePawn, I didn't want to release this yet as a lot of things are hard coded and very messy, but events occurred and well, here it is.
 
 Keep in mind this is my own version of ckSurf, a lot of things are hard coded so perhaps you should look to <a href="https://github.com/nikooo777/ckSurf">Nikos</a> or <a href="https://github.com/marcowmadeira/ckSurf">Marcos</a> fork of ckSurf instead.
 
@@ -12,7 +12,8 @@ Keep in mind this is my own version of ckSurf, a lot of things are hard coded so
 * Sourcemod 1.8
 * MySQL (SQLite may work but is not supported by me)
 * DHooks (Included)
-* The following dependencies are required for the discord functionality, I will make these things optional in the future, sorry
+
+The following dependencies are required for the discord functionality, I will make these things optional in the future, sorry:
 * Sourcemod-Discord (Included)
 * <a href="https://forums.alliedmods.net/showthread.php?t=229556">SteamWorks</a>
 * <a href="https://forums.alliedmods.net/showthread.php?t=184604">SMJansson</a>
@@ -22,7 +23,7 @@ Keep in mind this is my own version of ckSurf, a lot of things are hard coded so
 * Upload all the files to your csgo server directory
 * Add a MySQL database called `surftimer` to `csgo/addons/sourcemod/configs/databases.cfg`
 #### Upgrading
-If you wish to upgrade from a different fork of cksurf you may run the upgrade sql files located in `optional/upgrading/`, this will convert your database schema to this timers, so make sure you backup first!
+If you wish to upgrade from a different fork of cksurf you may run the upgrade sql files located in `optional/upgrading/`, this will convert your database schema to this timer, so make sure you backup first!
 ###### Optional
 * Import the ck_zones.sql file if you want to use my pre-made zones
 * Import the ck_maptier.sql file if you want to use my pre-made tiers
