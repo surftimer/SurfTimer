@@ -90,7 +90,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		g_bInDuck[client] = false;
 
 		// Set stage to 1 on spawn cause why not
-		if (!g_bRespawnPosition[client])
+		if (!g_bRespawnPosition[client] && !g_specToStage[client])
 		{
 			g_WrcpStage[client] = 1;
 			g_Stage[0][client] = 1;

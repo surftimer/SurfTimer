@@ -1253,9 +1253,9 @@ public void LimitSpeedNew(int client)
 	}
 
 	// Determine how much each vector must be scaled for the magnitude to equal the limit
-  // scale = limit / (vx^2 + vy^2)^0.5)
-  // Derived from Pythagorean theorem, where the hypotenuse represents the magnitude of velocity,
-  // and the two legs represent the x and y velocity components.
+	// scale = limit / (vx^2 + vy^2)^0.5)
+	// Derived from Pythagorean theorem, where the hypotenuse represents the magnitude of velocity,
+	// and the two legs represent the x and y velocity components.
   // As a side effect, velocity component signs are also handled.
 	float scale = FloatDiv(speedCap, SquareRoot( FloatAdd( Pow(fVel[0], 2.0), Pow(fVel[1], 2.0) ) ) );
 
