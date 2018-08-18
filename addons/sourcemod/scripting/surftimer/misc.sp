@@ -1237,23 +1237,9 @@ public void LimitSpeedNew(int client)
 
 	float fVel[3];
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
-	// Determine how much each vector must be scaled for the magnitude to equal the limit
-    // scale = limit / (vx^2 + vy^2)^0.5)
-    // Derived from Pythagorean theorem, where the hypotenuse represents the magnitude of velocity,
-    // and the two legs represent the x and y velocity components.
-    // As a side effect, velocity component signs are also handled.
-	float scale = FloatDiv(speedCap, SquareRoot( FloatAdd( Pow(fVel[0], 2.0), Pow(fVel[1], 2.0) ) ) );
 
-	 // A scale < 1 indicates a magnitude > limit
-	if (scale < 1.0)
+	if (g_bInStartZone[client] || g_bInStageZone[client])
 	{
-		if (g_bInStageZone[client] && g_bNewStage[client])
-		{
-			g_bNewStage[client] = false;
-			g_bLeftZone[client] = false;
-			return;
-		}
-
 		if (GetEntityFlags(client) & FL_ONGROUND)
 		{
 			g_iTicksOnGround[client]++;
@@ -1264,6 +1250,24 @@ public void LimitSpeedNew(int client)
 				return;
 			}
 		}
+	}
+
+	// Determine how much each vector must be scaled for the magnitude to equal the limit
+  // scale = limit / (vx^2 + vy^2)^0.5)
+  // Derived from Pythagorean theorem, where the hypotenuse represents the magnitude of velocity,
+  // and the two legs represent the x and y velocity components.
+  // As a side effect, velocity component signs are also handled.
+	float scale = FloatDiv(speedCap, SquareRoot( FloatAdd( Pow(fVel[0], 2.0), Pow(fVel[1], 2.0) ) ) );
+
+	// A scale < 1 indicates a magnitude > limit
+	if (scale < 1.0)
+	{
+		// if (g_bInStageZone[client] && g_bNewStage[client])
+		// {
+		// 	g_bNewStage[client] = false;
+		// 	g_bLeftZone[client] = false;
+		// 	return;
+		// }
 
 		// Reduce each vector by the appropriate amount
 		float speed = SquareRoot(Pow(fVel[0], 2.0) + Pow(fVel[1], 2.0));
