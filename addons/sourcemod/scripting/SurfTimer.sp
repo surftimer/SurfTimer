@@ -1644,6 +1644,11 @@ public void OnMapStart()
 	// Create nav file
 	CreateNavFile();
 
+	// Workshop fix
+	char mapPieces[6][128];
+	int lastPiece = ExplodeString(g_szMapName, "/", mapPieces, sizeof(mapPieces), sizeof(mapPieces[]));
+	Format(g_szMapName, sizeof(g_szMapName), "%s", mapPieces[lastPiece - 1]);
+	
 	// Debug Logging
 	if (!DirExists("addons/sourcemod/logs/surftimer"))
 		CreateDirectory("addons/sourcemod/logs/surftimer", 511);
@@ -1659,10 +1664,6 @@ public void OnMapStart()
 
 	db_viewMapSettings();
 
-	// Workshop fix
-	char mapPieces[6][128];
-	int lastPiece = ExplodeString(g_szMapName, "/", mapPieces, sizeof(mapPieces), sizeof(mapPieces[]));
-	Format(g_szMapName, sizeof(g_szMapName), "%s", mapPieces[lastPiece - 1]);
 
 	/// Start Loading Server Settings
 	ConVar cvHibernateWhenEmpty = FindConVar("sv_hibernate_when_empty");
