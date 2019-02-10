@@ -4427,44 +4427,12 @@ public void sendDiscordAnnouncement(char szName[32], char szMapName[128], char s
 
 	hook.SetUsername("SurfTimer Records");
 
-	MessageEmbed Embed = new MessageEmbed();
-
-	// Get a random colour for the.. left colour
-	int hex = GetRandomInt(0, 6);
-	switch (hex)
-	{
-		case 0: Embed.SetColor("#ff0000");
-		case 1: Embed.SetColor("#ff7F00");
-		case 2: Embed.SetColor("#ffD700");
-		case 3: Embed.SetColor("#00aa00");
-		case 4: Embed.SetColor("#0000ff");
-		case 5: Embed.SetColor("#6600ff");
-		case 6: Embed.SetColor("#8b00ff");
-		default: Embed.SetColor("#ff0000");
-	}
-
-	Embed.SetTitle("**NEW MAP RECORD**");
-
 	// Format The Message
 	char szMessage[256];
 
-	Format(szMessage, sizeof(szMessage), "%s has beaten the %s map record in the %s server with a time of %s", szName, szMapName, g_sServerName, szTime);
+	Format(szMessage, sizeof(szMessage), "```md\n# New Server Record #\n\n [%s] eat the Server Record on < %s > with time < %s > in the < %s >```", szName, szMapName, szTime, g_sServerName);
 
-	// Get A Random Emoji
-	int emoji = GetRandomInt(0, 3);
-	char szEmoji[128];
-	switch (emoji)
-	{
-		case 0: Format(szEmoji, sizeof(szEmoji), ":ok_hand: :ok_hand: :ok_hand: :ok_hand: :ok_hand:");
-		case 1: Format(szEmoji, sizeof(szEmoji), ":thinking: :thinking: :thinking: :thinking: :thinking:");
-		case 2: Format(szEmoji, sizeof(szEmoji), ":fire: :fire: :fire: :fire: :fire:");
-		case 3: Format(szEmoji, sizeof(szEmoji), ":scream: :scream: :scream: :scream: :scream:");
-		default: Format(szEmoji, sizeof(szEmoji), ":ok_hand: :ok_hand: :ok_hand: :ok_hand: :ok_hand:");
-	}
-
-	Embed.AddField(szEmoji, szMessage, false);
-
-	hook.Embed(Embed);
+	hook.Message(szMessage);
 	hook.Send();
 	delete hook;
 }
