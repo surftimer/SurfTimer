@@ -42,8 +42,8 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "2.2"
-#define PLUGIN_VERSION 220
+#define VERSION "2.3"
+#define PLUGIN_VERSION 230
 
 // Database Definitions
 #define MYSQL 0
@@ -226,10 +226,10 @@ enum SkillGroup
 public Plugin myinfo =
 {
 	name = "SurfTimer",
-	author = "fluffys",
-	description = "A fork of ckSurf",
+	author = "totles",
+	description = "a fork from fluffys cksurf fork",
 	version = VERSION,
-	url = "http://steamcommunity.com/profiles/76561198000303868/"
+	url = "https://steamcommunity.com/id/dat-lewis//"
 };
 
 /*===================================
