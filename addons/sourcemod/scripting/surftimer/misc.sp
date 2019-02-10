@@ -4430,7 +4430,7 @@ public void sendDiscordAnnouncement(char szName[32], char szMapName[128], char s
 	// Format The Message
 	char szMessage[256];
 
-	Format(szMessage, sizeof(szMessage), "```md\n# New Server Record on %s Server #\n\n[%s] beat the Server Record on < %s > with time of < %s > ]:```", g_sServerName, szName, szMapName, szTime);
+	Format(szMessage, sizeof(szMessage), "```md\n# New Server Record on %s #\n\n[%s] beat the server record on < %s > with time of < %s > ]:```", g_sServerName, szName, szMapName, szTime);
 
 	hook.SetContent(szMessage);
 	hook.Send();
