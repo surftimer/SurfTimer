@@ -4425,14 +4425,14 @@ public void sendDiscordAnnouncement(char szName[32], char szMapName[128], char s
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("SurfTimer Records");
+	hook.SetUsername("z4lab Surf Records");
 
 	// Format The Message
 	char szMessage[256];
 
-	Format(szMessage, sizeof(szMessage), "```md\n# New Server Record #\n\n [%s] eat the Server Record on < %s > with time < %s > in the < %s >```", szName, szMapName, szTime, g_sServerName);
+	Format(szMessage, sizeof(szMessage), "```md\n# New Server Record on %s Server #\n\n[%s] beat the Server Record on < %s > with time < %s > in the < %s > ]:```", g_sServerName, szName, szMapName, szTime);
 
-	hook.Message(szMessage);
+	hook.SetContent(szMessage);
 	hook.Send();
 	delete hook;
 }
