@@ -4219,11 +4219,11 @@ public void GetSpeedColour(int client, int speed, int type)
 		else if (type == 3 && g_SpeedMode[client] == 0) // gain/loss
 		{
 			if (speed >= GetConVarInt(g_hMaxVelocity))
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#a300ff");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#b48ead");
 			else if (g_iPreviousSpeed[client] < speed || g_iPreviousSpeed[client] == speed)
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#66bbff");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#88c0d0");
 			else
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#ff7d7d");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#bf616a");
 
 			g_iPreviousSpeed[client] = speed;
 		}
@@ -4250,11 +4250,11 @@ public void GetSpeedColour(int client, int speed, int type)
 		else if (type == 3 && g_SpeedMode[client] == 0) // gain/loss
 		{
 			if (speed >= GetConVarInt(g_hMaxVelocity))
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#a300ff");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#b48ead");
 			else if (g_iPreviousSpeed[client] < speed || g_iPreviousSpeed[client] == speed)
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#66bbff");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#88c0d0");
 			else
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#ff7d7d");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#bf616a");
 			
 			g_iPreviousSpeed[client] = speed;
 		}
