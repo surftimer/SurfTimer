@@ -4503,13 +4503,13 @@ public void SendBugReport(int client)
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("SurfTimer Bugtracker");
+	hook.SetUsername("z4lab Bugtracker");
 
 	MessageEmbed Embed = new MessageEmbed();
 
 	// Format Title
 	char sTitle[256];
-	Format(sTitle, sizeof(sTitle), "Bug Type: %s || Server: %s || Map: %s", g_sBugType[client], g_sServerName, g_szMapName);
+	Format(sTitle, sizeof(sTitle), "Bug Type: %s ║ Server: %s ║ Map: %s", g_sBugType[client], g_sServerName, g_szMapName);
 	Embed.SetTitle(sTitle);
 
 	// Format Player
@@ -4539,13 +4539,13 @@ public void CallAdmin(int client, char[] sText)
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("SurfTimer Calladmin");
+	hook.SetUsername("z4lab Calladmin");
 
 	MessageEmbed Embed = new MessageEmbed();
 
 	// Format title
 	char sTitle[256];
-	Format(sTitle, sizeof(sTitle), "Server: %s || Map: %s", g_sServerName, g_szMapName);
+	Format(sTitle, sizeof(sTitle), "║ Server: %s ║ Map: %s", g_sServerName, g_szMapName);
 	Embed.SetTitle(sTitle);
 
 	// Format player
