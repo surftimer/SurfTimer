@@ -1,6 +1,6 @@
 /*=======================================================
-=                    CS:GO Surftimer                    =
- This is a heavily modified version of ckSurf by fluffys 
+=                 z4lab CS:GO Surftimer                 =
+ modified version of "surftimer" from fluffy for z4lab
  The original version of this timer was by jonitaikaponi 
 = https://forums.alliedmods.net/showthread.php?t=264498 =
 =======================================================*/
@@ -10,7 +10,6 @@
 ====================================*/
 
 #include <sourcemod>
-// #include <regex>
 #include <sdkhooks>
 #include <adminmenu>
 #include <cstrike>
@@ -24,14 +23,9 @@
 #include <dhooks>
 #include <mapchooser>
 #include <sdktools>
-// #include <store>
 #include <discord>
 #include <sourcecomms>
 #include <surftimer>
-
-/*====================================
-=            Declarations            =
-====================================*/
 
 /*===================================
 =            Definitions            =
@@ -1204,7 +1198,6 @@ int g_iSelectedTrigger[MAXPLAYERS + 1];
 // Store
 int g_iMapTier;
 bool g_bRankedMap;
-// Handle g_hStore;
 
 // Late Load Linux fix
 Handle g_cvar_sv_hibernate_when_empty = INVALID_HANDLE;
@@ -1790,11 +1783,6 @@ public void OnMapStart()
 	// Playtime
 	CreateTimer(1.0, PlayTimeTimer, INVALID_HANDLE, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 	
-	// if (FindPluginByFile("store.smx") != INVALID_HANDLE)
-	// 	LogMessage("Store plugin has been found! Timer credits enabled.");
-	// else 
-	// 	LogMessage("Store not found! Timer credits have been disabled");
-	
 	// Server Announcements
 	g_iServerID = GetConVarInt(g_hServerID);
 	if (GetConVarBool(g_hRecordAnnounce))
@@ -1853,9 +1841,6 @@ public void OnMapEnd()
 	delete g_hTriggerMultiple;
 
 	CloseHandle(g_mTriggerMultipleMenu);
-
-	// if (g_hStore != null)
-	// 	CloseHandle(g_hStore);
 
 	if (g_hDestinations != null)
 		CloseHandle(g_hDestinations);
