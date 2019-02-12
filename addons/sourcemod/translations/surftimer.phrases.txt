@@ -1261,12 +1261,12 @@
 	"Misc44"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Bug report sent"
+		"en"		"{1} Bug report sent - thanks"
 	}
 	"Misc45"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Report sent"
+		"en"		"{1} Report sent - thanks"
 	}
 	"SQL1"
 	{

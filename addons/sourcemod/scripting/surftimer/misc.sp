@@ -3332,7 +3332,7 @@ public void CenterHudDead(int client)
 	else
 		g_SpecTarget[client] = -1;
 }
-
+// to do change to nord color scheme https://github.com/arcticicestudio/nord (testing with missed PB)
 public void CenterHudAlive(int client)
 {
 	if (!IsValidClient(client))
@@ -3376,17 +3376,20 @@ public void CenterHudAlive(int client)
 					else if (g_bMissedMapBest[client] && g_fPersonalRecord[client] > 0.0)
 					{
 						// Missed Personal Best time
-						Format(module[i], 128, "<font color='#fd0000'>%s       </font>", pAika);
+						Format(module[i], 128, "<font color='#bf616a'>%s       </font>", pAika);
+						// Format(module[i], 128, "<font color='#fd0000'>%s       </font>", pAika);
 					}
 					else if (g_fPersonalRecord[client] < 0.1)
 					{
 						// No Personal Best on map
-						Format(module[i], 128, "<font color='#0089ff'>%s       </font>", pAika);
+						Format(module[i], 128, "<font color='#5e81ac'>%s       </font>", pAika);
+						// Format(module[i], 128, "<font color='#0089ff'>%s       </font>", pAika);
 					}
 					else
 					{
 						// Hasn't missed Personal Best yet
-						Format(module[i], 128, "<font color='#00ff00'>%s       </font>", pAika);
+						Format(module[i], 128, "<font color='#a3be8c'>%s       </font>", pAika);
+						// Format(module[i], 128, "<font color='#00ff00'>%s       </font>", pAika);
 					}
 				}
 				else if (g_bWrcpTimeractivated[client] && !g_bPracticeMode[client])
@@ -3416,7 +3419,7 @@ public void CenterHudAlive(int client)
 			}
 			else if (g_iCentreHudModule[client][i] == 2)
 			{
-				// WR
+				// server records (change from WR)
 				if (gametime - g_fLastDifferenceTime[client] > 5.0)
 				{
 					if (g_iClientInZone[client][2] == 0 && style == 0)
@@ -3425,12 +3428,12 @@ public void CenterHudAlive(int client)
 						{
 							// fluffys
 							if (g_bPracticeMode[client])
-								Format(g_szLastSRDifference[client], 64, "WR: %s", g_szRecordMapTime);
+								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordMapTime);
 							else
-								Format(g_szLastSRDifference[client], 64, "WR: %s", g_szRecordMapTime);
+								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordMapTime);
 						}
 						else
-							Format(g_szLastSRDifference[client], 64, "WR: N/A");
+							Format(g_szLastSRDifference[client], 64, "SR: N/A");
 					}
 					else if (g_iClientInZone[client][2] == 0 && g_iCurrentStyle[client] != 0) // Styles
 					{
@@ -3438,19 +3441,19 @@ public void CenterHudAlive(int client)
 						{
 							// fluffys
 							if (g_bPracticeMode[client])
-								Format(g_szLastSRDifference[client], 64, "WR: %s", g_szRecordStyleMapTime[style]);
+								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordStyleMapTime[style]);
 							else
-								Format(g_szLastSRDifference[client], 64, "WR: %s", g_szRecordStyleMapTime[style]);
+								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordStyleMapTime[style]);
 						}
 						else
-							Format(g_szLastSRDifference[client], 64, "WR: N/A");
+							Format(g_szLastSRDifference[client], 64, "SR: N/A");
 					}
 					else
 					{
 						if (g_iCurrentStyle[client] == 0)
-							Format(g_szLastSRDifference[client], 64, "WR: %s", g_szBonusFastestTime[g_iClientInZone[client][2]]);
+							Format(g_szLastSRDifference[client], 64, "SR: %s", g_szBonusFastestTime[g_iClientInZone[client][2]]);
 						else if (g_iCurrentStyle[client] != 0) // Styles
-							Format(g_szLastSRDifference[client], 64, "WR: %s", g_szStyleBonusFastestTime[style][g_iClientInZone[client][2]]);
+							Format(g_szLastSRDifference[client], 64, "SR: %s", g_szStyleBonusFastestTime[style][g_iClientInZone[client][2]]);
 					}
 				}
 				Format(module[i], 128, "%s", g_szLastSRDifference[client]);
