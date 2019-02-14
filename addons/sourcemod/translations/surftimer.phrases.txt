@@ -53,7 +53,7 @@
 	"AdvertWRCP"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Type {lightgreen}!wrcp {default}to see your stage times"
+		"en"		"{1} Type {lightgreen}!srcp {default}to see your stage times"
 	}
 	"AvgTime"
 	{

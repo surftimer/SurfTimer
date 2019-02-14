@@ -128,6 +128,8 @@ void CreateCommands()
 	// WRCPs
 	RegConsoleCmd("sm_wrcp", Client_Wrcp, "[surftimer] displays stage times for map");
 	RegConsoleCmd("sm_wrcps", Client_Wrcp, "[surftimer] displays stage times for map");
+	RegConsoleCmd("sm_srcp", Client_Wrcp, "[surftimer] displays stage times for map");
+	RegConsoleCmd("sm_srcps", Client_Wrcp, "[surftimer] displays stage times for map");
 
 	// QOL Commands
 	RegConsoleCmd("sm_gb", Command_GoBack, "[surftimer] Go back a stage");

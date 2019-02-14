@@ -460,7 +460,7 @@ public void PlayRecord(int client, int type, int style)
 			Format(buffer, sizeof(buffer), "%s: %s (%s)", buffer2, g_szReplayName, g_szReplayTime);
 			SetClientName(client, buffer);
 
-			Format(buffer, sizeof(buffer), "SR Replay (%s)", buffer2);
+			Format(buffer, sizeof(buffer), "MAP Replay (%s)", buffer2);
 			CS_SetClientClanTag(client, buffer);
 		}
 	}
@@ -471,7 +471,7 @@ public void PlayRecord(int client, int type, int style)
 		Format(g_szWrcpReplayName[stage], sizeof(g_szWrcpReplayName), "%s", iFileHeader[view_as<int>(FH_Playername)]);
 		Format(buffer, sizeof(buffer), "S%d %s (%s)", stage, g_szWrcpReplayName[stage], g_szWrcpReplayTime[stage]);
 		g_iCurrentlyPlayingStage = stage;
-		CS_SetClientClanTag(client, "SRCP Replay");
+		CS_SetClientClanTag(client, "CP Replay");
 		SetClientName(client, buffer);
 	}
 	else
@@ -481,7 +481,7 @@ public void PlayRecord(int client, int type, int style)
 		if (style == 0)
 		{
 			Format(buffer, sizeof(buffer), "%s (%s)", g_szBonusName, g_szBonusTime);
-			CS_SetClientClanTag(client, "SRB Replay");
+			CS_SetClientClanTag(client, "BONUS Replay");
 			SetClientName(client, buffer);
 		}
 		else
