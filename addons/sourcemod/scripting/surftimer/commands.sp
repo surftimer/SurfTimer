@@ -284,8 +284,6 @@ void CreateCommandListeners()
 
 public Action sm_test(int client, int args)
 {
-	// CPrintToChatAll("stage: %d : wrcp: %d", g_Stage[0][client], g_WrcpStage[client]);
-	// CPrintToChatAll("zoneid: %d", g_iClientInZone[client][3]);
 	char arg[128];
 	char found[128];
 	GetCmdArg(1, arg, 128);
@@ -2969,8 +2967,6 @@ public void SideHudModulesMenu(int client, int module, char[] szTitle)
 	Format(szTitle2, sizeof(szTitle2), "%s\n \n", szTitle);
 	SetMenuTitle(menu, szTitle2);
 
-	// Format(szPanel, sizeof(szPanel), "Timeleft: %s\n \n%s \nby %s\n \n%s\n%s\n \n%s\nWRCP: %s\nby %s\n \nSpecs (6)\nfluffys\nGrandpa Goose\nJakeey802\nant\nsoda\n...", szTimeleft, szWR, g_szRecordPlayer, szPB, szRank, szStage, szWrcpTime, g_szStageRecordPlayer[stage]);
-	
 	// Toggle Module
 	if (g_iSideHudModule[client][module] == 0)
 		AddMenuItem(menu, szTitle, "[OFF] Toggle Module\n \n");
@@ -3439,7 +3435,7 @@ public Action Client_Wrcp(int client, int args)
 public void WrcpStyleSelectMenu(int client)
 {
 	Menu menu = CreateMenu(WrcpStyleSelectMenuHandler);
-	SetMenuTitle(menu, "WRCP: Select a style");
+	SetMenuTitle(menu, "SRCP: Select a style");
 	AddMenuItem(menu, "", "Normal");
 	AddMenuItem(menu, "", "Sideways");
 	AddMenuItem(menu, "", "Half-Sideways");
