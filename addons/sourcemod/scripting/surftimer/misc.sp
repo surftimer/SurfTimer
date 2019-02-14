@@ -3426,7 +3426,7 @@ public void CenterHudAlive(int client)
 							if (g_bPracticeMode[client])
 								Format(g_szLastSRDifference[client], 64, "SR: <font color='#b48ead'>%s</font>", g_szRecordMapTime);
 							else
-								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordMapTime);
+								Format(g_szLastSRDifference[client], 64, "SR: <font color='#b48ead'>%s</font>", g_szRecordMapTime);
 						}
 						else
 							Format(g_szLastSRDifference[client], 64, "SR: N/A");
