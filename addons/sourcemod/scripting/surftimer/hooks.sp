@@ -142,7 +142,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 			else if (client == g_BonusBot)
 				CS_SetClientClanTag(client, "BONUS Replay");
 			else if (client == g_WrcpBot)
-				CS_SetClientClanTag(client, "CP Replay");
+				CS_SetClientClanTag(client, "STAGE Replay");
 
 			if (client == g_RecordBot || client == g_BonusBot || client == g_WrcpBot)
 			{
