@@ -4645,7 +4645,8 @@ public void SetDefaultTitle(int client, const char szTitle[256])
 	// Set the clients default title
 	g_bEnforceTitle[client] = true;
 	Format(g_szEnforcedTitle[client], sizeof(g_szEnforcedTitle), szTitle);
-	CreateTimer(1.0, SetClanTag, client, TIMER_FLAG_NO_MAPCHANGE);
+	// oof?
+	CreateTimer(2.0, SetClanTag, client, TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public int GetStyleIndex(char[] szBuffer)
