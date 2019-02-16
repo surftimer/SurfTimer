@@ -3380,7 +3380,7 @@ public void CenterHudAlive(int client)
 					else if (g_fPersonalRecord[client] < 0.1)
 					{
 						// No Personal Best on map
-						Format(module[i], 128, "<font color='#5e81ac'>%s       </font>", pAika);
+						Format(module[i], 128, "<font color='#88c0d0'>%s       </font>", pAika);
 					}
 					else
 					{
