@@ -4545,7 +4545,7 @@ public void CallAdmin(int client, char[] sText)
 
 	// Format title
 	char sTitle[256];
-	Format(sTitle, sizeof(sTitle), "║ Server: %s ║ Map: %s", g_sServerName, g_szMapName);
+	Format(sTitle, sizeof(sTitle), "Server: %s ║ Map: %s", g_sServerName, g_szMapName);
 	Embed.SetTitle(sTitle);
 
 	// Format player
@@ -4554,7 +4554,7 @@ public void CallAdmin(int client, char[] sText)
 
 	// Format msg
 	char sMessage[512];
-	Format(sMessage, sizeof(sMessage), "%s (%s): %s", sName, g_szSteamID[client], sText);
+	Format(sMessage, sizeof(sMessage), "%s (%s): @here %s", sName, g_szSteamID[client], sText);
 	Embed.AddField("", sMessage, true);
 
 	hook.Embed(Embed);
