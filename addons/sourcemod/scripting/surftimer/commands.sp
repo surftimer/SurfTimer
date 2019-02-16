@@ -2833,9 +2833,9 @@ public void CentreHudModulesMenu(int client, int module, const char[] szTitle)
 
 	// WR
 	if (g_iCentreHudModule[client][module] == 2)
-		AddMenuItem(menu, szTitle, "[ON] World Record");
+		AddMenuItem(menu, szTitle, "[ON] Server Record");
 	else
-		AddMenuItem(menu, szTitle, "[OFF] World Record");
+		AddMenuItem(menu, szTitle, "[OFF] Server Record");
 
 	// PB
 	if (g_iCentreHudModule[client][module] == 3)
@@ -2983,9 +2983,9 @@ public void SideHudModulesMenu(int client, int module, char[] szTitle)
 
 	// WR
 	if (g_iSideHudModule[client][module] == 2)
-		AddMenuItem(menu, szTitle, "[ON] World Record Info");
+		AddMenuItem(menu, szTitle, "[ON] Server Record Info");
 	else
-		AddMenuItem(menu, szTitle, "[OFF] World Record Info");
+		AddMenuItem(menu, szTitle, "[OFF] Server Record Info");
 
 	// PB
 	if (g_iSideHudModule[client][module] == 3)
