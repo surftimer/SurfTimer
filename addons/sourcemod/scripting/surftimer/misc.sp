@@ -1685,8 +1685,8 @@ public void InitPrecache()
 	PrecacheModel(ZONE_MODEL);
 
 	// Preache default arm models
-	PrecacheModel("models/weapons/t_arms.mdl", false); 
-	PrecacheModel("models/weapons/ct_arms.mdl", false); 
+	PrecacheModel("models/weapons/t_arms.mdl", true); 
+	PrecacheModel("models/weapons/ct_arms.mdl", true); 
 }
 
 
