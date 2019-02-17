@@ -176,6 +176,7 @@ public Action CKTimer2(Handle timer)
 				case 60:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
 				case 30:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
 				case 10:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
+				case -3:
 				{
 					if (!g_bRoundEnd)
 					{
@@ -184,7 +185,7 @@ public Action CKTimer2(Handle timer)
 						CPrintToChatAll("%t", "TimeleftCounter", g_szChatPrefix, g_szMapName, 1);
 						char szNextMap[128];
 						GetNextMap(szNextMap, 128);
-						CPrintToChatAll("%t", "Timer2", g_szChatPrefix, szNextMap);
+						// CPrintToChatAll("%t", "Timer2", g_szChatPrefix, szNextMap);
 						CreateTimer(1.0, TerminateRoundTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 					}
 				}
