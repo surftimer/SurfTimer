@@ -3274,19 +3274,19 @@ public void CenterHudDead(int client)
 			else
 				Format(sResult, sizeof(sResult), "%s _", sResult);
 			if (Buttons & IN_DUCK)
-				Format(sResult, sizeof(sResult), "%s - <font color='#b48ead'>+D</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s - <font color='#b48ead'>C</font>", sResult);
 			else
 				Format(sResult, sizeof(sResult), "%s - _", sResult);
 			if (Buttons & IN_JUMP)
-				Format(sResult, sizeof(sResult), "%s <font color='#b48ead'>+J</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s <font color='#b48ead'>J</font>", sResult);
 			else
 				Format(sResult, sizeof(sResult), "%s _", sResult);
 			if (Buttons & IN_LEFT)
-				Format(sResult, sizeof(sResult), "%s <font color='#b48ead'>+L</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s <font color='#b48ead'>L</font>", sResult);
 			else
 				Format(sResult, sizeof(sResult), "%s _", sResult);
 			if (Buttons & IN_RIGHT)
-				Format(sResult, sizeof(sResult), "%s <font color='#b48ead'>+R</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s <font color='#b48ead'>R</font>", sResult);
 			else
 				Format(sResult, sizeof(sResult), "%s _", sResult);
 			
@@ -3299,7 +3299,7 @@ public void CenterHudDead(int client)
 				else if (ObservedUser == g_WrcpBot)
 					Format(obsAika, sizeof(obsAika), "<font color='#ebcb8b'>%s</font>", g_szWrcpReplayTime[g_iCurrentlyPlayingStage]);
 				
-				PrintHintText(client, "<pre><font face=''>%s\nSpeed: <font color='#5e81ac'>%i</font> u/s\nKeys: %s</pre>", obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
+				PrintHintText(client, "<pre><font face=''>%s\nSpeed: <font color='#5e81ac'>%i</font> u/s\n%s</pre>", obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
 				return;
 			}
 			else if (g_bTimerRunning[ObservedUser])
@@ -3325,7 +3325,7 @@ public void CenterHudDead(int client)
 			else if (g_iCurrentStyle[ObservedUser] != 0)
 				Format(timerText, 32, "%s ", g_szStyleHud[ObservedUser]);
 
-			PrintHintText(client, "<pre><font face=''>%s <font color='#a3be8c'>%s</font>\nSpeed: <font color='#5e81ac'>%i</font> u/s\nKeys: %s</pre>", timerText, obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
+			PrintHintText(client, "<pre><font face=''>%s <font color='#a3be8c'>%s</font>\nSpeed: <font color='#5e81ac'>%i</font> u/s\n%s</pre>", timerText, obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
 		}
 	}
 	else
