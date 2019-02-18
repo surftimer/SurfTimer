@@ -83,7 +83,7 @@
 	"MissedMapBest"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} You have missed your best time of [{lightgreen}{2}{default}]"
+		"en"		"{1} You missed your PB of [{lightgreen}{2}{default}]"
 	}
 	"SkillGroup"
 	{
@@ -93,7 +93,7 @@
 	"Rc_PlayerRankStart"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Refreshing profile data."
+		"en"		"{1} Refreshing profile data"
 	}
 	"Rc_PlayerRankFinished"
 	{

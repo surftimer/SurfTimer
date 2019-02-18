@@ -2753,8 +2753,7 @@ public void OnPluginStart()
 
 public void OnAllPluginsLoaded()
 {
-	// Check if store is running
-	// g_hStore = FindPluginByFile("store.smx");
+	// nothing
 }
 
 /*======  End of Events  ======*/

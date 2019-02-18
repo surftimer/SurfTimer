@@ -482,8 +482,6 @@ public Action CenterMsgTimer(Handle timer, any client)
 		{
 			g_fLastOverlay[client] = GetGameTime();
 			g_bOverlay[client] = true;
-			// fluffys
-			// PrintHintText(client, "%t", "PositionRestored");
 		}
 		g_bRestorePositionMsg[client] = false;
 	}
