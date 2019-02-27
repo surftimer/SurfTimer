@@ -36,7 +36,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "2.3"
+#define VERSION "2.3.1"
 #define PLUGIN_VERSION 230
 
 // Database Definitions
@@ -223,7 +223,7 @@ public Plugin myinfo =
 	author = "totles",
 	description = "a fork from fluffys cksurf fork",
 	version = VERSION,
-	url = "https://steamcommunity.com/id/dat-lewis//"
+	url = "https://github.com/totles/z4lab-surftimer"
 };
 
 /*===================================
