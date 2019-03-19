@@ -2085,7 +2085,7 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 	if (g_bBonusSRVRecord[client])
 	{
 		char buffer[1024];
-		GetConVarString(g_hBonusRecordAnnounceDiscord, buffer, 1024);
+		GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
 		if (!StrEqual(buffer, ""))
 			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup);
 	}
@@ -4434,7 +4434,7 @@ public void sendDiscordAnnouncement(char szName[32], char szMapName[128], char s
 public void sendDiscordAnnouncementBonus(char szName[32], char szMapName[128], char szTime[32], int zGroup)
 {
 	char webhook[1024];
-	GetConVarString(g_hBonusRecordAnnounceDiscord, webhook, 1024);
+	GetConVarString(g_hRecordAnnounceDiscord, webhook, 1024);
 	if (StrEqual(webhook, ""))
 		return;
 
