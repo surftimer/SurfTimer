@@ -90,7 +90,8 @@ ConVar g_hServerType = null;									// Set server to surf or bhop mode
 ConVar g_hOneJumpLimit = null;									// Only allows players to jump once inside a start or stage zone
 ConVar g_hServerID = null;										// Sets the servers id for cross-server announcements
 ConVar g_hRecordAnnounce = null;								// Enable/Disable cross-server announcements
-ConVar g_hRecordAnnounceDiscord = null;							// Web hook link to announce records to discord
+ConVar g_hRecordAnnounceDiscord = null;							// Web hook link to announce records to 
+ConVar g_hBonusRecordAnnounceDiscord = null;					// Web hook link to announce bonus records to discord
 ConVar g_hReportBugsDiscord = null;								// Web hook link to report bugs to discord
 ConVar g_hCalladminDiscord = null;								// Web hook link to allow players to call admin to discord
 ConVar g_hSidewaysBlockKeys = null;
@@ -323,6 +324,8 @@ void CreateConVars()
 
 	// Discord
 	g_hRecordAnnounceDiscord = CreateConVar("ck_announce_records_discord", "", "Web hook link to announce records to discord, keep empty to disable");
+
+	g_hBonusRecordAnnounceDiscord = CreateConVar("ck_announce_bonus_records_discord", "", "Web hook link to announce bonus records to discord, keep empty to disable");
 
 	g_hReportBugsDiscord = CreateConVar("ck_report_discord", "", "Web hook link to report bugs to discord, keep empty to disable");
 

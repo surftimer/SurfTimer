@@ -2081,6 +2081,15 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 
 	}
 
+	// Send Announcements
+	if (g_bBonusSRVRecord[client])
+	{
+		char buffer[1024];
+		GetConVarString(g_hBonusRecordAnnounceDiscord, buffer, 1024);
+		if (!StrEqual(buffer, ""))
+			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup);
+	}
+
 	/* Start function call */
 	Call_StartForward(g_BonusFinishForward);
 
@@ -4415,7 +4424,30 @@ public void sendDiscordAnnouncement(char szName[32], char szMapName[128], char s
 	// Format The Message
 	char szMessage[256];
 
-	Format(szMessage, sizeof(szMessage), "```md\n# New Server Record on %s #\n\n[%s] beat the server record on < %s > with time of < %s > ]:```", g_sServerName, szName, szMapName, szTime);
+	Format(szMessage, sizeof(szMessage), "```md\n# New Server Record on %s #\n\n[%s] beat the server record on < %s > with a time of < %s > ]:```", g_sServerName, szName, szMapName, szTime);
+
+	hook.SetContent(szMessage);
+	hook.Send();
+	delete hook;
+}
+
+public void sendDiscordAnnouncementBonus(char szName[32], char szMapName[128], char szTime[32], int zGroup)
+{
+	char webhook[1024];
+	GetConVarString(g_hBonusRecordAnnounceDiscord, webhook, 1024);
+	if (StrEqual(webhook, ""))
+		return;
+
+ 	// Send Discord Announcement
+	DiscordWebHook hook = new DiscordWebHook(webhook);
+	hook.SlackMode = true;
+
+	hook.SetUsername("z4lab Surf Records");
+
+	// Format The Message
+	char szMessage[256];
+
+	Format(szMessage, sizeof(szMessage), "```md\n# New Bonus Server Record on %s #\n\n[%s] beat the bonus %i server record on < %s > with a time of < %s > ]:```", g_sServerName, szName, zGroup, szMapName, szTime);
 
 	hook.SetContent(szMessage);
 	hook.Send();
@@ -4442,6 +4474,7 @@ bool IsPlayerVip(int client, bool admin = true, bool reply = true)
 
 	return true;
 }
+
 
 public float GetStrafeSync(int client, bool sync)
 {
