@@ -85,6 +85,19 @@ public void CL_OnStartTimerPress(int client)
 
 			}
 		}
+
+		if (!IsFakeClient(client))
+		{
+			if (IsPlayerAlive(client)){
+				char szSpeed[128];
+				Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
+				if (g_iClientInZone[client][2] == 0) 
+					CPrintToChat(client, "%s Mapstart Prestrafe: %s u/s", g_szChatPrefix, szSpeed);
+				else
+					CPrintToChat(client, "%s Bonus %s Prestrafe: %s u/s", g_szChatPrefix, g_szZoneGroupName[g_iClientInZone[client][2]][6], szSpeed);
+			}
+		}
+
 	}
 
 	// Play Start Sound
@@ -742,6 +755,16 @@ public void CL_OnStartWrcpTimerPress(int client)
 			g_bNotTeleporting[client] = true;
 			g_WrcpStage[client] = g_Stage[0][client];
 			Stage_StartRecording(client);
+		}
+		if (!IsFakeClient(client))
+		{
+			if (IsPlayerAlive(client)){
+				if (g_Stage[0][client] != 1) {
+				char szSpeed[128];
+				Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
+				CPrintToChat(client, "%s Stage %i Prestrafe: %s u/s", g_szChatPrefix, g_Stage[0][client], szSpeed);
+				}
+			}
 		}
 	}
 }
