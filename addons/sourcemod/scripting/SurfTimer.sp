@@ -775,7 +775,7 @@ int g_iSideHudModule[MAXPLAYERS + 1][5];
 // Custom tele side
 int g_iTeleSide[MAXPLAYERS + 1];
 
-// Custom tele side
+// Prestrafe Message
 int g_iPrespeedText[MAXPLAYERS + 1];
 
 /*----------  Run Variables  ----------*/
