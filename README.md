@@ -1,4 +1,8 @@
-# z4lab-SurfTimer v2.3 for CS:GO
+# z4lab-SurfTimer v2.4 for CS:GO
+
+## features added so far
+* added discord bonus announcement 
+* added prestrafe chat info option
 
 ## fork from fluffys - credits
 * Jonitaikaponi - Original ckSurf creator
