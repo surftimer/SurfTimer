@@ -219,7 +219,7 @@ enum SkillGroup
 public Plugin myinfo =
 {
 	name = "SurfTimer",
-	author = "Maintainer: totles & Ace",
+	author = "[z4lab] - Maintainer: totles & Ace",
 	description = "a fork from fluffys cksurf fork",
 	version = VERSION,
 	url = "https://github.com/totles/z4lab-surftimer"
