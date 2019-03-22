@@ -1991,6 +1991,17 @@ void TeleSide(int client, bool menu = false)
 		MiscellaneousOptions(client);
 }
 
+void PrespeedText(int client, bool menu = false)
+{
+	if (g_iPrespeedText[client] == 0)
+		g_iPrespeedText[client]++;
+	else
+		g_iPrespeedText[client] = 0;
+	
+	if (menu)
+		MiscellaneousOptions(client);
+}
+
 public Action Client_Hide(int client, int args)
 {
 	HideMethod(client);
@@ -3106,6 +3117,12 @@ public void MiscellaneousOptions(int client)
 		AddMenuItem(menu, "", "[OFF] Hide Weapon");
 	else
 		AddMenuItem(menu, "", "[ON] Hide Weapon");
+
+	// Show Prespeed
+	if (g_iPrespeedText[client])
+		AddMenuItem(menu, "", "[ON] Prestrafe Message");
+	else
+		AddMenuItem(menu, "", "[OFF] Prestrafe Message");
 	
 
 	SetMenuExitBackButton(menu, true);
@@ -3126,6 +3143,7 @@ public int MiscellaneousOptionsHandler(Menu menu, MenuAction action, int param1,
 			case 5: CenterSpeedDisplay(param1, true);
 			case 6: HideChat(param1, true);
 			case 7: HideViewModel(param1, true);
+			case 8: PrespeedText(param1, true);
 		}
 	}
 	else if (action == MenuAction_Cancel)

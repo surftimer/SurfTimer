@@ -759,7 +759,7 @@ bool g_bHide[MAXPLAYERS + 1];
 // Show spectator list?
 bool g_bShowSpecs[MAXPLAYERS + 1];
 
-// Show spectator list?
+// Client autobhop?
 bool g_bAutoBhopClient[MAXPLAYERS + 1];
 
 
@@ -774,6 +774,9 @@ int g_iSideHudModule[MAXPLAYERS + 1][5];
 
 // Custom tele side
 int g_iTeleSide[MAXPLAYERS + 1];
+
+// Custom tele side
+int g_iPrespeedText[MAXPLAYERS + 1];
 
 /*----------  Run Variables  ----------*/
 
