@@ -494,7 +494,9 @@ public Action Say_Hook(int client, const char[] command, int argc)
 				char szStyle[128];
 				Format(szStyle, sizeof(szStyle), g_szStyleAcronyms[g_iCurrentStyle[client]]);
 				StringToUpper(szStyle);
-				Format(szChatRank, 154, "[%s] %s", szStyle, szChatRank2);
+				Format(szStyle, sizeof(szStyle), "%s-", szStyle);
+				ReplaceString(szChatRank2, sizeof(szChatRank2), "{style}", szStyle);
+				Format(szChatRank, sizeof(szChatRank), "%s", szChatRank2);
 			}
 			else
 				ReplaceString(szChatRank, sizeof(szChatRank), "{style}", "");
