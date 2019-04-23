@@ -36,8 +36,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "2.3.1"
-#define PLUGIN_VERSION 230
+#define VERSION "2.4"
 
 // Database Definitions
 #define MYSQL 0
@@ -220,7 +219,7 @@ enum SkillGroup
 public Plugin myinfo =
 {
 	name = "SurfTimer",
-	author = "totles",
+	author = "[z4lab] - Maintainer: totles & Ace",
 	description = "a fork from fluffys cksurf fork",
 	version = VERSION,
 	url = "https://github.com/totles/z4lab-surftimer"
@@ -761,7 +760,6 @@ bool g_bShowSpecs[MAXPLAYERS + 1];
 
 // Client autobhop?
 bool g_bAutoBhopClient[MAXPLAYERS + 1];
-
 
 // centre hud new
 bool g_bCentreHud[MAXPLAYERS + 1];

@@ -3124,7 +3124,6 @@ public void MiscellaneousOptions(int client)
 	else
 		AddMenuItem(menu, "", "[OFF] Prestrafe Message");
 	
-
 	SetMenuExitBackButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
 }
