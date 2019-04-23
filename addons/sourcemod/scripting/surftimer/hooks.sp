@@ -94,6 +94,9 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		{
 			g_WrcpStage[client] = 1;
 			g_Stage[0][client] = 1;
+			g_CurrentStage[client] = 1;
+            g_Stage[g_iClientInZone[client][2]][client] = 1;
+            g_bWrcpTimeractivated[client] = false;
 		}
 
 		if (g_iCurrentStyle[client] == 4) // 4 low gravity
@@ -491,9 +494,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 				char szStyle[128];
 				Format(szStyle, sizeof(szStyle), g_szStyleAcronyms[g_iCurrentStyle[client]]);
 				StringToUpper(szStyle);
-				Format(szStyle, sizeof(szStyle), "%s-", szStyle);
-				ReplaceString(szChatRank2, sizeof(szChatRank2), "{style}", szStyle);
-				Format(szChatRank, sizeof(szChatRank), "%s", szChatRank2);
+				Format(szChatRank, 154, "[%s] %s", szStyle, szChatRank2);
 			}
 			else
 				ReplaceString(szChatRank, sizeof(szChatRank), "{style}", "");
