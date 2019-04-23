@@ -1931,7 +1931,6 @@ public void OnClientConnected(int client)
 	g_Stage[0][client] = 1;
 	g_bWrcpTimeractivated[client] = false;
 	g_CurrentStage[client] = 1;
-	g_VEmax = 1;
 	g_wrcpStage2Fix[client] = true;
 }
 
