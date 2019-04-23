@@ -379,16 +379,6 @@ public Action SetClanTag(Handle timer, any client)
 		else
 			ReplaceString(tag, sizeof(tag), "{style}", "");
 
-
-
-		/*
-				Format(szStyle, sizeof(szStyle), "%s-", szStyle);
-				ReplaceString(szChatRank2, sizeof(szChatRank2), "{style}", szStyle);
-				Format(szChatRank, sizeof(szChatRank), "%s", szChatRank2);
-			}
-			else
-				ReplaceString(szChatRank, sizeof(szChatRank), "{style}", "");
-		*/
 		char szTabRank[1024];
 		Format(szTabRank, 1024, "%s", g_pr_chat_coloredrank[client]);
 		CRemoveColors(szTabRank, 1024);
