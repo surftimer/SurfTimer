@@ -176,6 +176,8 @@ public Action CKTimer2(Handle timer)
 				case 60:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
 				case 30:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
 				case 10:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
+				//add ~~~MAP ENDING~~~ 
+				//maybe switch to 3,2,1,0 not 0,-1,-2,-3
 				case -3:
 				{
 					if (!g_bRoundEnd)
@@ -377,11 +379,17 @@ public Action SetClanTag(Handle timer, any client)
 			ReplaceString(tag, sizeof(tag), "{style}", szStyle);
 		}
 		else
-			ReplaceString(tag, sizeof(tag), "{style}", "");
+			ReplaceString(tag, sizeof(tag), "{style}", ""); 
 
-		CS_SetClientClanTag(client, tag);
+		char szTabRank[1024], szTabClanTag[1024];
+		Format(szTabRank, 1024, "%s", g_pr_chat_coloredrank[client]);
+		CRemoveColors(szTabRank, 1024);
+		Format(szTabClanTag, 1024, "%s | %s", g_szCountryCode[client], szTabRank); //temp. disabled due to 
+
+		if ((GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) CS_SetClientClanTag(client, szTabRank);
+		else CS_SetClientClanTag(client, szTabClanTag);
 	}
-	else
+	else //we don't use it. What you think about it @totles :) ?
 	{
 		if (GetConVarBool(g_hPointSystem))
 		{

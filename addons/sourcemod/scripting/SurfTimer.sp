@@ -1059,6 +1059,9 @@ char g_BlockedChatText[256][256];
 // Last time an overlay was displayed
 float g_fLastOverlay[MAXPLAYERS + 1];
 
+// Stage 2 Bug Fixer
+bool g_wrcpStage2Fix[MAXPLAYERS + 1];
+
 /*----------  Player location restoring  ----------*/
 
 // Clients location was restored this run
@@ -1917,6 +1920,16 @@ public void OnAutoConfigsBuffered()
 		ServerCommand("exec %s", szPath);
 	else
 		SetFailState("<Surftimer> %s not found.", szPath2);
+}
+
+public void OnClientConnected(int client)
+{    
+	g_Stage[g_iClientInZone[client][2]][client] = 1;
+	g_WrcpStage[client] = 1;
+	g_Stage[0][client] = 1;
+	g_bWrcpTimeractivated[client] = false;
+	g_CurrentStage[client] = 1;
+	g_wrcpStage2Fix[client] = true;
 }
 
 public void OnClientPutInServer(int client)

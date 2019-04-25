@@ -1,4 +1,5 @@
 .vscode/
+.vs/
 
 addons/sourcemod/scripting/surftimer-api.sp
 addons/sourcemod/scripting/surftimer-api.smx
