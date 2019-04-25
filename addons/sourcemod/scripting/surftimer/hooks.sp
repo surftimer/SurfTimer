@@ -95,8 +95,8 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 			g_WrcpStage[client] = 1;
 			g_Stage[0][client] = 1;
 			g_CurrentStage[client] = 1;
-            g_Stage[g_iClientInZone[client][2]][client] = 1;
-            g_bWrcpTimeractivated[client] = false;
+			g_Stage[g_iClientInZone[client][2]][client] = 1;
+			g_bWrcpTimeractivated[client] = false;
 		}
 
 		if (g_iCurrentStyle[client] == 4) // 4 low gravity
@@ -458,7 +458,8 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		return Plugin_Handled;
 
 		// Chat Trigger?
-		if ((IsChatTrigger() && sText[0] == '/') || (sText[0] == '@' && (GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)))
+		if ((IsChatTrigger() && sText[0] == '/'))
+		//if ((IsChatTrigger() && sText[0] == '/') || (sText[0] == '@' && (GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)))
 		{
 			return Plugin_Continue;
 		}
