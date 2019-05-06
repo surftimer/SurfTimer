@@ -11,11 +11,12 @@
 
 ## installation
 *   stuff
+*   to add
 
+## credits
 <details>
-  <summary>Credits</summary> 
+  <summary>forked from fluffys - contributors</summary> 
   
-## fork from fluffys - credits
 *   Jonitaikaponi - Original ckSurf creator
 *   nikooo777 - ckSurf 1.19 Fork
 *   <a href="http://steamcommunity.com/id/fluffystko/">fluffys</a>
