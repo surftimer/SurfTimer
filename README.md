@@ -1,29 +1,22 @@
 # z4lab-SurfTimer 2.6 for CS:GO
 
-## features added so far
+## installation and requirements
+you will need SourceMod, MetaMod and a working MySQL server
+
+*   download the latest version from the release page [here](https://github.com/totles/z4lab-surftimer/releases/latest)
+*   copy the files to your csgo directory
+*   import the `surftimer.sql` to your database
+*   edit configs (mysql db, etc, to do)
+
+## features added
 *   added discord bonus announcement 
 *   added prestrafe chat info option
+*   new [NORD](https://www.nordtheme.com/) color scheme
 
 ## bugs fixed in this version
 *   fixed "S1 to S2 record glitch"
 *   fixed custom Clantags in Scoreboard which weren't working
 *   prestrafe message option is now saved correctly
-
-## installation
-*   stuff
-*   to add
-
-## credits
-<details>
-  <summary>forked from fluffys - contributors</summary> 
-  
-*   Jonitaikaponi - Original ckSurf creator
-*   nikooo777 - ckSurf 1.19 Fork
-*   <a href="http://steamcommunity.com/id/fluffystko/">fluffys</a>
-*   Jakeey802
-*   Grandpa Goose
-  
-</details>
 
 ## point system
 <details>
@@ -67,5 +60,17 @@ Take surf_aircontrol_nbv for example: (You can use sm_mi to see this menu)
 <img src="http://puu.sh/ykaR8/7520a6b0d6.jpg" width="372" height="469" />
 
 ###### Credit to NDiamond for theory crafting this point system, I just implemented his idea
+  
+</details>
+
+## credits
+<details>
+  <summary>forked from fluffys - contributors</summary> 
+  
+*   Jonitaikaponi - Original ckSurf creator
+*   nikooo777 - ckSurf 1.19 Fork
+*   <a href="http://steamcommunity.com/id/fluffystko/">fluffys</a>
+*   Jakeey802
+*   Grandpa Goose
   
 </details>
