@@ -4431,7 +4431,7 @@ public void sendDiscordAnnouncement(char szName[32], char szMapName[128], char s
 	delete hook;
 }
 
-public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], char szTime[32], int zGroup)
+public void sendDiscordAnnouncementBonus(char szName[32], char szMapName[128], char szTime[32], int zGroup)
 {
 	char webhook[1024];
 	GetConVarString(g_hRecordAnnounceDiscord, webhook, 1024);
