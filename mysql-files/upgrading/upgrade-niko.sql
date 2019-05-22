@@ -57,7 +57,6 @@ CREATE TABLE `ck_playeroptions2` (
  `module3s` int(11) NOT NULL DEFAULT '0',
  `module4s` int(11) NOT NULL DEFAULT '0',
  `module5s` int(11) NOT NULL DEFAULT '0',
- `prestrafe` int(11) NOT NULL DEFAULT '0',
  PRIMARY KEY (`steamid`)
 ) DEFAULT CHARSET=utf8mb4;
 

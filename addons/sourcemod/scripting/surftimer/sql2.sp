@@ -874,7 +874,7 @@ public void SQL_SelectAnnouncementsCallback(Handle owner, Handle hndl, const cha
 	} 
 }
 
-public void db_insertAnnouncement(char szName[128], char szMapName[128], char szTime[32])
+public void db_insertAnnouncement(char szName[32], char szMapName[128], char szTime[32])
 {
 	if (g_iServerID == -1)
 		return;

@@ -36,7 +36,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "2.6"
+#define VERSION "2.4"
 
 // Database Definitions
 #define MYSQL 0
@@ -1915,7 +1915,7 @@ public void OnAutoConfigsBuffered()
 
 	// map config
 	char szPath[256];
-	Format(szPath, sizeof(szPath), "sourcemod/surftimer/%s_.cfg", szPrefix[0]);
+	Format(szPath, sizeof(szPath), "sourcemod/surftimer/map_types/%s_.cfg", szPrefix[0]);
 	char szPath2[256];
 	Format(szPath2, sizeof(szPath2), "cfg/%s", szPath);
 	if (FileExists(szPath2))

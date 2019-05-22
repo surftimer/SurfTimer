@@ -4408,7 +4408,7 @@ public void totalTimeForHumans(int unix, char[] buffer, int size)
 	}
 }
 
-public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char szTime[32])
+public void sendDiscordAnnouncement(char szName[32], char szMapName[128], char szTime[32])
 {
 	char webhook[1024];
 	GetConVarString(g_hRecordAnnounceDiscord, webhook, 1024);
