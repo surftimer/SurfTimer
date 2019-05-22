@@ -22,10 +22,10 @@
     "title" "{default}[{green}Admin{default}]"
     "type" "both"
   }
-  // "2"
-  // {
-  //  "steamid" "STEAM_1:0:20019070"
-  //  "title" "[test]"
-      "type" "both"
-  // }
+  "2"
+  {
+    "steamid" "STEAM_1:0:27661072"
+     "title" "{default}[{gold}VIP{default}]"
+    "type" "both"
+  }
 }
