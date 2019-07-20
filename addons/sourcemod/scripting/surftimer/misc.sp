@@ -4521,7 +4521,10 @@ public void SendBugReport(int client)
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("z4lab Bugtracker");
+	char dcBugTrackerName[64];
+	GetConVarString(g_dcBugTrackerName, dcBugTrackerName, sizeof(dcBugTrackerName));
+
+	hook.SetUsername(dcBugTrackerName);
 
 	MessageEmbed Embed = new MessageEmbed();
 
@@ -4557,7 +4560,10 @@ public void CallAdmin(int client, char[] sText)
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("z4lab Calladmin");
+	char dcCalladminName[64];
+	GetConVarString(g_dcCalladminName, dcCalladminName, sizeof(dcCalladminName));
+
+	hook.SetUsername(dcCalladminName);
 
 	MessageEmbed Embed = new MessageEmbed();
 
