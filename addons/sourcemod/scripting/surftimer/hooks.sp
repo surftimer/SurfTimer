@@ -457,9 +457,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		if (StrContains(sText, "!", false) == 0)
 		return Plugin_Handled;
 
-		// Chat Trigger?
-		if ((IsChatTrigger() && sText[0] == '/'))
-		//if ((IsChatTrigger() && sText[0] == '/') || (sText[0] == '@' && (GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)))
+		if ((IsChatTrigger() && sText[0] == '/') || (sText[0] == '@' && (GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)))
 		{
 			return Plugin_Continue;
 		}
