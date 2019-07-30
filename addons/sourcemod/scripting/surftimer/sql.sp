@@ -341,6 +341,7 @@ public int callback_Confirm(Menu menu, MenuAction action, int client, int key)
 			PrintToServer(szQuery);
 			
 			CPrintToChat(client, "%t", "DeleteRecordsDeletion", g_szChatPrefix);
+			ShowMainDeleteMenu(client);
 		}
 
 	}
