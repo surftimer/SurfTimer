@@ -470,9 +470,9 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		WriteChatLog(client, "say", sText);
 		PrintToServer("%s: %s", szName, sText);
 
-		if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
-			Format(szName, sizeof(szName), "%s%s", g_pr_namecolour[client], szName);
-		else if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
+		//if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
+		//	Format(szName, sizeof(szName), "%s%s", g_pr_namecolour[client], szName);
+		if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
 			setNameColor(szName, g_iCustomColours[client][0], 64);
 
 		if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client] && g_bHasCustomTextColour[client])
@@ -487,6 +487,12 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		{
 			char szChatRank[1024];
 			Format(szChatRank, 1024, "%s", g_pr_chat_coloredrank[client]);
+			char szChatRankColor[1024];
+			Format(szChatRankColor, 1024, "%s", g_pr_chat_coloredrank[client]);
+			CGetRankColor(szChatRankColor, 1024);
+
+			if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
+				Format(szName, sizeof(szName), "{%s}%s", szChatRankColor, szName);
 
 			if (GetConVarBool(g_hCountry) && (GetConVarBool(g_hPointSystem)))
 			{
@@ -510,6 +516,55 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		}
 	}
 	return Plugin_Continue;
+}
+
+public void CGetRankColor(char[] sMsg, int iSize) // edit from CProcessVariables - colorvars
+{
+	if (!Init()) {
+		return;
+	}
+
+	char[] sOut = new char[iSize]; char[] sCode = new char[iSize]; char[] sColor = new char[iSize];
+	int iOutPos = 0; int iCodePos = -1;
+	int iMsgLen = strlen(sMsg);
+	int dev = 0;
+
+	for (int i = 0; i < iMsgLen; i++) {
+		if (sMsg[i] == '{') {
+			iCodePos = 0;
+		}
+
+		if (iCodePos > -1) {
+			sCode[iCodePos] = sMsg[i];
+			sCode[iCodePos + 1] = '\0';
+
+			if (sMsg[i] == '}' || i == iMsgLen - 1) {
+				strcopy(sCode, strlen(sCode) - 1, sCode[1]);
+				StringToLower(sCode);
+
+				if (CGetColor(sCode, sColor, iSize)) {
+					if(dev == 1) break;
+					dev++;
+				} else {
+					Format(sOut, iSize, "%s{%s}", sOut, sCode);
+					iOutPos += strlen(sCode) + 2;
+				}
+
+				iCodePos = -1;
+				strcopy(sColor, iSize, "");
+			} else {
+				iCodePos++;
+			}
+
+			continue;
+		}
+
+		sOut[iOutPos] = sMsg[i];
+		iOutPos++;
+		sOut[iOutPos] = '\0';
+	}
+
+	strcopy(sMsg, iSize, sCode);
 }
 
 public Action Event_OnPlayerTeam(Handle event, const char[] name, bool dontBroadcast)
