@@ -36,7 +36,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "2.5"
+#define VERSION "2.4"
 
 // Database Definitions
 #define MYSQL 0
@@ -1516,6 +1516,8 @@ char EntityList[][] = 													// Disable entities that often break maps
 	"logic_timer",
 	"team_round_timer",
 	"logic_relay",
+	"player_weapon_strip",
+	"player_weaponstrip",
 };
 
 char RadioCMDS[][] = 													// Disable radio commands
@@ -1621,14 +1623,14 @@ public void OnLibraryRemoved(const char[] name)
 		g_hTeleport = null;
 }
 
-public void OnEntityCreated(int entity, const char[] classname)
-{
-	// if (StrContains(classname, "trigger_", true) != -1 || StrContains(classname, "_door")!= -1)
-	// {
-	// 	SDKHook(entity, SDKHook_StartTouch, OnTouchAllTriggers);
-	// 	SDKHook(entity, SDKHook_Touch, OnTouchAllTriggers);
-	// 	SDKHook(entity, SDKHook_EndTouch, OnEndTouchAllTriggers);
-	// }
+public void OnEntityCreated(int entity, const char[] classname) {
+	if( (classname[0] == 't' ||  classname[0] == 'l') ? (StrEqual(classname, "trigger_teleport", false) ) : false)
+	{
+		SDKHook(entity, SDKHook_Use, ingnoreTriggers);
+		SDKHook(entity, SDKHook_StartTouch, ingnoreTriggers);
+		SDKHook(entity, SDKHook_Touch, ingnoreTriggers);
+		SDKHook(entity, SDKHook_EndTouch, ingnoreTriggers);
+	}
 }
 
 public void OnMapStart()

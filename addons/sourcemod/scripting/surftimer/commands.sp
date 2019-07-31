@@ -108,6 +108,8 @@ void CreateCommands()
 
 	// VIP Commands
 	RegAdminCmd("sm_fixbot", Admin_FixBot, g_VipFlag, "[surftimer] Toggles replay bots off and on");
+	RegAdminCmd("sm_fixbots", Admin_FixBot, g_VipFlag, "[surftimer] Toggles replay bots off and on");
+	RegAdminCmd("sm_fb", Admin_FixBot, g_VipFlag, "[surftimer] Toggles replay bots off and on");
 
 	RegConsoleCmd("sm_vip", Command_Vip, "[surftimer] [vip] Displays the VIP menu to client");
 	RegConsoleCmd("sm_mytitle", Command_PlayerTitle, "[surftimer] [vip] Displays a menu to the player showing their custom title and allowing them to change their colours");
@@ -117,6 +119,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_textcolour", Command_SetDbTextColour, "[surftimer] [vip] VIPs can set their own custom text colour into the db");
 	RegConsoleCmd("sm_ve", Command_VoteExtend, "[surftimer] [vip] Vote to extend the map");
 	RegConsoleCmd("sm_colours", Command_ListColours, "[surftimer] Lists available colours for sm_mytitle and sm_namecolour");
+	RegConsoleCmd("sm_colors", Command_ListColours, "[surftimer] Lists available colours for sm_mytitle and sm_namecolour");
 	RegConsoleCmd("sm_toggletitle", Command_ToggleTitle, "[surftimer] [vip] VIPs can toggle their title.");
 	RegConsoleCmd("sm_joinmsg", Command_JoinMsg, "[surftimer] [vip] Allows a vip to set their join msg");
 

@@ -2640,14 +2640,20 @@ stock Action PrintSpecMessageAll(int client)
 	char szChatRank[64];
 	Format(szChatRank, 64, "%s", g_pr_chat_coloredrank[client]);
 
-	if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
-		Format(szName, sizeof(szName), "%s%s", g_pr_namecolour[client], szName);
-	else if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
+	//if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
+	//	Format(szName, sizeof(szName), "%s%s", g_pr_namecolour[client], szName);
+	if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
 		setNameColor(szName, g_iCustomColours[client][0], 64);
 	// fluffys
 
 	if (g_bHasCustomTextColour[client])
 		setTextColor(szTextToAll, g_iCustomColours[client][1], 1024);
+
+	char szChatRankColor[1024];
+	Format(szChatRankColor, 1024, "%s", g_pr_chat_coloredrank[client]);
+	CGetRankColor(szChatRankColor, 1024);
+	if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
+		Format(szName, sizeof(szName), "{%s}%s", szChatRankColor, szName);
 
 	if (GetConVarBool(g_hCountry))
 		CPrintToChatAll("%t", "Misc20", g_szCountryCode[client], szChatRank, szName, szTextToAll);
@@ -2657,6 +2663,10 @@ stock Action PrintSpecMessageAll(int client)
 		{
 			char szPlayerTitle2[256][2];
 			ExplodeString(szChatRank, "{blue}", szPlayerTitle2, 2, 256);
+			char szPlayerTitleColor[1024];
+			Format(szPlayerTitleColor, 1024, "%s", szPlayerTitle2[1]);
+			if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
+				Format(szName, sizeof(szName), "{%s}%s", szPlayerTitleColor, szName);
 			if (IsPlayerAlive(client))
 				CPrintToChatAll("%t", "Misc21", szPlayerTitle2[0], szPlayerTitle2[1], szName, szTextToAll);
 			else
@@ -2668,6 +2678,10 @@ stock Action PrintSpecMessageAll(int client)
 		{
 			char szPlayerTitle2[256][2];
 			ExplodeString(szChatRank, "{orange}", szPlayerTitle2, 2, 256);
+			char szPlayerTitleColor[1024];
+			Format(szPlayerTitleColor, 1024, "%s", szPlayerTitle2[1]);
+			if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
+				Format(szName, sizeof(szName), "{%s}%s", szPlayerTitleColor, szName);
 			if (IsPlayerAlive(client))
 				CPrintToChatAll("%t", "Misc23", szPlayerTitle2[0], szPlayerTitle2[1], szName, szTextToAll);
 			else
@@ -4521,7 +4535,10 @@ public void SendBugReport(int client)
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("z4lab Bugtracker");
+	char dcBugTrackerName[64];
+	GetConVarString(g_dcBugTrackerName, dcBugTrackerName, sizeof(dcBugTrackerName));
+
+	hook.SetUsername(dcBugTrackerName);
 
 	MessageEmbed Embed = new MessageEmbed();
 
@@ -4557,7 +4574,10 @@ public void CallAdmin(int client, char[] sText)
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("z4lab Calladmin");
+	char dcCalladminName[64];
+	GetConVarString(g_dcCalladminName, dcCalladminName, sizeof(dcCalladminName));
+
+	hook.SetUsername(dcCalladminName);
 
 	MessageEmbed Embed = new MessageEmbed();
 

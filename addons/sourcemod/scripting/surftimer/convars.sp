@@ -112,6 +112,9 @@ char g_szRelativeSoundPathWRCP[PLATFORM_MAX_PATH];
 ConVar g_hMustPassCheckpoints = null;
 ConVar g_hSlayOnRoundEnd = null;
 ConVar g_hLimitSpeedType = null;
+ConVar g_dcCalladminName = null;
+ConVar g_dcBugTrackerName = null;
+ConVar g_drDeleteSecurity = null;
 
 void CreateConVars()
 {
@@ -157,6 +160,9 @@ void CreateConVars()
 	g_hBackupReplays = CreateConVar("ck_replay_backup", "1", "(1 / 0) Back up replay files, when they are being replaced", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hReplaceReplayTime = 	CreateConVar("ck_replay_replace_faster", "1", "(1 / 0) Replace record bots if a players time is faster than the bot, even if the time is not a server record.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hTeleToStartWhenSettingsLoaded = CreateConVar("ck_teleportclientstostart", "1", "(1 / 0) Teleport players automatically back to the start zone, when their settings have been loaded.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	g_dcCalladminName = CreateConVar("ck_discord_calladmin_name", "z4lab Calladmin", "Webhook name for !calladmin - Discord side", FCVAR_NOTIFY);
+	g_dcBugTrackerName = CreateConVar("ck_discord_bug_tracker_name", "z4lab Bugtracker", "Webhook name for !bug - Discord side", FCVAR_NOTIFY);
+	g_drDeleteSecurity = CreateConVar("ck_dr_delete_security", "1", "(1 / 0) Disabled/Enable delete security for !dr command", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 
 	g_hPointSystem = CreateConVar("ck_point_system", "1", "on/off - Player point system", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	HookConVarChange(g_hPointSystem, OnSettingChanged);

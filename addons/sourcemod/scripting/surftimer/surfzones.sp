@@ -144,14 +144,24 @@ public void CreateZoneEntity(int zoneIndex)
 	}
 }
 
+public Action ingnoreTriggers(int entity, int client) //add command to !options
+{
+	if (!(client > 0 && client <= MaxClients) || !IsPlayerAlive(client)) return Plugin_Continue;
+
+	if(GetEntityMoveType(client) != MOVETYPE_NOCLIP) return Plugin_Continue;
+
+	return Plugin_Handled;
+} 
+
 // Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 public Action StartTouchTrigger(int caller, int activator)
 {
+	int client = activator;
+
 	// Ignore dead players
-	if (!IsValidClient(activator))
+	if (!IsValidClient(client)) {
 		return Plugin_Handled;
-	
-	// g_bLeftZone[activator] = false;
+    }
 
 	char sTargetName[256];
 	int action[3];
@@ -245,10 +255,13 @@ public Action StartTouchTrigger(int caller, int activator)
 
 public Action EndTouchTrigger(int caller, int activator)
 {
+	int client = activator;
+
 	// Ignore dead players
-	if (!IsValidClient(activator))
+	if (!IsValidClient(client)) {
 		return Plugin_Handled;
-	
+    }
+
 	// For new speed limiter
 	g_bLeftZone[activator] = true;
 
