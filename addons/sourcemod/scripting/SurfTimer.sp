@@ -71,12 +71,12 @@
 #define DEFAULT_TITLES_PATH "configs/surftimer/default_titles.txt"
 
 // Paths for sounds
-#define PRO_FULL_SOUND_PATH "sound/quake/holyshit.mp3"
-#define PRO_RELATIVE_SOUND_PATH "*quake/holyshit.mp3"
-#define CP_FULL_SOUND_PATH "sound/quake/wickedsick.mp3"
-#define CP_RELATIVE_SOUND_PATH "*quake/wickedsick.mp3"
-#define UNSTOPPABLE_SOUND_PATH "sound/quake/unstoppable.mp3"
-#define UNSTOPPABLE_RELATIVE_SOUND_PATH "*quake/unstoppable.mp3"
+#define PRO_FULL_SOUND_PATH "sound/surftimer/quake/holyshit.mp3"
+#define PRO_RELATIVE_SOUND_PATH "*surftimer/quake/holyshit.mp3"
+#define CP_FULL_SOUND_PATH "sound/surftimer/quake/wickedsick.mp3"
+#define CP_RELATIVE_SOUND_PATH "*surftimer/quake/wickedsick.mp3"
+#define UNSTOPPABLE_SOUND_PATH "sound/surftimer/quake/unstoppable.mp3"
+#define UNSTOPPABLE_RELATIVE_SOUND_PATH "*surftimer/quake/unstoppable.mp3"
 #define WR_FULL_SOUND_PATH "sound/surftimer/wr/1/valve_logo_music.mp3"
 #define WR_RELATIVE_SOUND_PATH "*surftimer/wr/1/valve_logo_music.mp3"
 #define WR2_FULL_SOUND_PATH "sound/surftimer/wr/2/valve_logo_music.mp3"
