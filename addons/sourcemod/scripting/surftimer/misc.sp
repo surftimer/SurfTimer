@@ -1,4 +1,4 @@
-void disableServerHibernate()
+/*void disableServerHibernate()
 {
 	Handle hServerHibernate = FindConVar("sv_hibernate_when_empty");
 	g_iServerHibernationValue = GetConVarInt(hServerHibernate);
@@ -21,7 +21,7 @@ void revertServerHibernateSettings()
 	}
 	CloseHandle(hServerHibernate);
 	return;
-}
+}*/
 
 void setBotQuota()
 {
@@ -1270,7 +1270,7 @@ public void LimitSpeedNew(int client)
 		// }
 
 		// Reduce each vector by the appropriate amount
-		float speed = SquareRoot(Pow(fVel[0], 2.0) + Pow(fVel[1], 2.0));
+		//float speed = SquareRoot(Pow(fVel[0], 2.0) + Pow(fVel[1], 2.0));
 		fVel[0] = FloatMul(fVel[0], scale);
 		fVel[1] = FloatMul(fVel[1], scale);
 

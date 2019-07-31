@@ -549,7 +549,7 @@ int g_rankArg[MAXPLAYERS + 1];
 
 /*----------  KSF Style Ranking Distribution  ----------*/
 char g_szRankName[MAXPLAYERS + 1][32];
-int g_rankNameChatColour[MAXPLAYERS + 1];
+//int g_rankNameChatColour[MAXPLAYERS + 1];
 int g_GroupMaps[MAX_PR_PLAYERS + 1][MAX_STYLES];
 int g_Top10Maps[MAX_PR_PLAYERS + 1][MAX_STYLES];
 
@@ -717,7 +717,7 @@ bool g_bServerDataLoaded;
 
 // SteamdID of #1 player in map, used to fetch checkpoint times
 char g_szRecordMapSteamID[MAX_NAME_LENGTH];
-int g_iServerHibernationValue;
+//int g_iServerHibernationValue;
 
 /*----------  User Commands  ----------*/
 
@@ -774,7 +774,7 @@ int g_iSideHudModule[MAXPLAYERS + 1][5];
 int g_iTeleSide[MAXPLAYERS + 1];
 
 // Prestrafe Message
-int g_iPrespeedText[MAXPLAYERS + 1];
+bool g_iPrespeedText[MAXPLAYERS + 1];
 
 /*----------  Run Variables  ----------*/
 
