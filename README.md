@@ -5,7 +5,7 @@ you will need [SourceMod 1.9](https://www.sourcemod.net/downloads.php?branch=sta
 
 *   download the latest version from the release page [here](https://github.com/totles/z4lab-surftimer/releases/latest)
 *   copy the files to your csgo directory
-*   import the `surftimer.sql` to your database
+*   ~~import the `surftimer.sql` to your database~~
 *   edit configs (mysql db, etc, to do)
 
 ## features added
