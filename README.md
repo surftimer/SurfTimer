@@ -3,20 +3,39 @@
 ## installation and requirements
 you will need [SourceMod 1.9](https://www.sourcemod.net/downloads.php?branch=stable), [MetaMod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable), [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556), [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604) and a working MySQL instance, other dependencies like `DHooks` and `Cleaner` are already included
 
+### new install
+
 *   download the latest version from the release page [here](https://github.com/totles/z4lab-surftimer/releases/latest)
 *   copy the files to your csgo directory
-*   ~~import the `surftimer.sql` to your database~~
+*   edit configs (mysql db, etc, to do)
+
+### upgrading from SurfTimer(fluffys)
+
+*   download the latest version from the release page [here](https://github.com/totles/z4lab-surftimer/releases/latest)
+*   copy the files to your csgo directory
+*   edit configs (mysql db, etc, to do)
+*   run `mysql-files/upgrade-fluffy.sql` in your surftimer db
+
+### upgrading from ckSurf(nikooo777)
+
+*   download the latest version from the release page [here](https://github.com/totles/z4lab-surftimer/releases/latest)
+*   copy the files to your csgo directory
+*   remove all old ckSurf data you don't want anymore
+*   run `mysql-files/upgrade-niko.sql` in your ckSurf db
 *   edit configs (mysql db, etc, to do)
 
 ## features added
 *   added discord bonus announcement 
 *   added prestrafe chat info option
 *   new [NORD](https://www.nordtheme.com/) color scheme
+*   made name of discord webhooks customizable
+*   made it possible to remove the security question for the `sm_dr` command
 
 ## bugs fixed in this version
 *   fixed "S1 to S2 record glitch"
 *   fixed custom Clantags in Scoreboard which weren't working
 *   prestrafe message option is now saved correctly
+*   fixed name colors while using default_titles
 
 ## point system
 <details>
