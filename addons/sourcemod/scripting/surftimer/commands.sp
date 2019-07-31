@@ -1996,10 +1996,10 @@ void TeleSide(int client, bool menu = false)
 
 void PrespeedText(int client, bool menu = false)
 {
-	if (g_iPrespeedText[client] == 0)
-		g_iPrespeedText[client]++;
+	if (g_iPrespeedText[client])
+		g_iPrespeedText[client] = false;
 	else
-		g_iPrespeedText[client] = 0;
+		g_iPrespeedText[client] = true;
 	
 	if (menu)
 		MiscellaneousOptions(client);

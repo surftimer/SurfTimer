@@ -168,8 +168,8 @@ public void CL_OnEndTimerPress(int client)
 		PlayButtonSound(client);
 
 	// Get client name
-	char szName[MAX_NAME_LENGTH];
-	GetClientName(client, szName, MAX_NAME_LENGTH);
+	char szName[128];
+	GetClientName(client, szName, 128);
 
 	// Get runtime and format it to a string
 	g_fFinalTime[client] = GetGameTime() - g_fStartTime[client] - g_fPauseTime[client];
@@ -262,8 +262,8 @@ public void CL_OnEndTimerPress(int client)
 					// New fastest time in map
 					g_bMapSRVRecord[client] = true;
 					g_fRecordMapTime = g_fFinalTime[client];
-					Format(g_szRecordPlayer, MAX_NAME_LENGTH, "%s", szName);
-					FormatTimeFloat(1, g_fRecordMapTime, 3, g_szRecordMapTime, 64);
+					Format(g_szRecordPlayer, 128, "%s", szName);
+					FormatTimeFloat(1, g_fRecordMapTime, 3, g_szRecordMapTime, 128);
 
 					// Insert latest record
 					db_InsertLatestRecords(g_szSteamID[client], szName, g_fFinalTime[client]);
@@ -299,8 +299,8 @@ public void CL_OnEndTimerPress(int client)
 
 				g_bMapSRVRecord[client] = true;
 				g_fRecordMapTime = g_fFinalTime[client];
-				Format(g_szRecordPlayer, MAX_NAME_LENGTH, "%s", szName);
-				FormatTimeFloat(1, g_fRecordMapTime, 3, g_szRecordMapTime, 64);
+				Format(g_szRecordPlayer, 128, "%s", szName);
+				FormatTimeFloat(1, g_fRecordMapTime, 3, g_szRecordMapTime, 128);
 
 				// Insert latest record
 				db_InsertLatestRecords(g_szSteamID[client], szName, g_fFinalTime[client]);
@@ -398,7 +398,7 @@ public void CL_OnEndTimerPress(int client)
 					// New fastest time in map
 					g_bStyleMapSRVRecord[style][client] = true;
 					g_fRecordStyleMapTime[style] = g_fFinalTime[client];
-					Format(g_szRecordStylePlayer[style], MAX_NAME_LENGTH, "%s", szName);
+					Format(g_szRecordStylePlayer[style], 128, "%s", szName);
 					FormatTimeFloat(1, g_fRecordStyleMapTime[style], 3, g_szRecordStyleMapTime[style], 64);
 
 					if (GetConVarBool(g_hReplayBot) && !g_bPositionRestored[client] && !g_bNewReplay[client])
@@ -430,8 +430,8 @@ public void CL_OnEndTimerPress(int client)
 				// Has to be the new record, since it is the first completion
 				g_bStyleMapSRVRecord[style][client] = true;
 				g_fRecordStyleMapTime[style] = g_fFinalTime[client];
-				Format(g_szRecordStylePlayer[style], MAX_NAME_LENGTH, "%s", szName);
-				FormatTimeFloat(1, g_fRecordStyleMapTime[style], 3, g_szRecordStyleMapTime[style], 64);
+				Format(g_szRecordStylePlayer[style], 128, "%s", szName);
+				FormatTimeFloat(1, g_fRecordStyleMapTime[style], 3, g_szRecordStyleMapTime[style], 128);
 
 				// Insert latest record
 				// db_InsertLatestRecords(g_szSteamID[client], szName, g_fFinalTime[client]);
@@ -445,7 +445,7 @@ public void CL_OnEndTimerPress(int client)
 				g_fPersonalStyleRecord[style][client] = g_fFinalTime[client];
 				/*g_pr_finishedmaps[client]++;
 				g_MapTimesCount++;*/
-				FormatTimeFloat(1, g_fPersonalStyleRecord[style][client], 3, g_szPersonalStyleRecord[style][client], 64);
+				FormatTimeFloat(1, g_fPersonalStyleRecord[style][client], 3, g_szPersonalStyleRecord[style][client], 128);
 				
 				g_bStyleMapFirstRecord[style][client] = true;
 				g_pr_showmsg[client] = true;
@@ -456,7 +456,7 @@ public void CL_OnEndTimerPress(int client)
 			{
 				// Client's new record
 				g_fPersonalStyleRecord[style][client] = g_fFinalTime[client];
-				FormatTimeFloat(1, g_fPersonalStyleRecord[style][client], 3, g_szPersonalStyleRecord[style][client], 64);
+				FormatTimeFloat(1, g_fPersonalStyleRecord[style][client], 3, g_szPersonalStyleRecord[style][client], 128);
 
 				g_bStyleMapPBRecord[style][client] = true;
 				g_pr_showmsg[client] = true;
@@ -528,8 +528,8 @@ public void CL_OnEndTimerPress(int client)
 				{
 					g_fOldBonusRecordTime[zGroup] = g_fBonusFastest[zGroup];
 					g_fBonusFastest[zGroup] = g_fFinalTime[client];
-					Format(g_szBonusFastest[zGroup], MAX_NAME_LENGTH, "%s", szName);
-					FormatTimeFloat(1, g_fBonusFastest[zGroup], 3, g_szBonusFastestTime[zGroup], 64);
+					Format(g_szBonusFastest[zGroup], 128, "%s", szName);
+					FormatTimeFloat(1, g_fBonusFastest[zGroup], 3, g_szBonusFastestTime[zGroup], 128);
 
 					// Update Checkpoints
 					if (g_bCheckpointsEnabled[client] && !g_bPositionRestored[client])
@@ -568,8 +568,8 @@ public void CL_OnEndTimerPress(int client)
 
 				g_fOldBonusRecordTime[zGroup] = g_fBonusFastest[zGroup];
 				g_fBonusFastest[zGroup] = g_fFinalTime[client];
-				Format(g_szBonusFastest[zGroup], MAX_NAME_LENGTH, "%s", szName);
-				FormatTimeFloat(1, g_fBonusFastest[zGroup], 3, g_szBonusFastestTime[zGroup], 64);
+				Format(g_szBonusFastest[zGroup], 128, "%s", szName);
+				FormatTimeFloat(1, g_fBonusFastest[zGroup], 3, g_szBonusFastestTime[zGroup], 128);
 
 				// Update Checkpoints
 				if (g_bCheckpointsEnabled[client] && !g_bPositionRestored[client])
@@ -588,7 +588,7 @@ public void CL_OnEndTimerPress(int client)
 			if (g_fPersonalRecordBonus[zGroup][client] == 0.0)
 			{
 				g_fPersonalRecordBonus[zGroup][client] = g_fFinalTime[client];
-				FormatTimeFloat(1, g_fPersonalRecordBonus[zGroup][client], 3, g_szPersonalRecordBonus[zGroup][client], 64);
+				FormatTimeFloat(1, g_fPersonalRecordBonus[zGroup][client], 3, g_szPersonalRecordBonus[zGroup][client], 128);
 
 				g_bBonusFirstRecord[client] = true;
 				g_pr_showmsg[client] = true;
@@ -600,7 +600,7 @@ public void CL_OnEndTimerPress(int client)
 			{
 				// client's new record
 				g_fPersonalRecordBonus[zGroup][client] = g_fFinalTime[client];
-				FormatTimeFloat(1, g_fPersonalRecordBonus[zGroup][client], 3, g_szPersonalRecordBonus[zGroup][client], 64);
+				FormatTimeFloat(1, g_fPersonalRecordBonus[zGroup][client], 3, g_szPersonalRecordBonus[zGroup][client], 128);
 
 				g_bBonusPBRecord[client] = true;
 				g_pr_showmsg[client] = true;
@@ -660,8 +660,8 @@ public void CL_OnEndTimerPress(int client)
 					// New fastest time in current bonus
 					g_fStyleOldBonusRecordTime[style][zGroup] = g_fStyleBonusFastest[style][zGroup];
 					g_fStyleBonusFastest[style][zGroup] = g_fFinalTime[client];
-					Format(g_szStyleBonusFastest[style][zGroup], MAX_NAME_LENGTH, "%s", szName); // fluffys come back stopped here
-					FormatTimeFloat(1, g_fStyleBonusFastest[style][zGroup], 3, g_szStyleBonusFastestTime[style][zGroup], 64);
+					Format(g_szStyleBonusFastest[style][zGroup], 128, "%s", szName); // fluffys come back stopped here
+					FormatTimeFloat(1, g_fStyleBonusFastest[style][zGroup], 3, g_szStyleBonusFastestTime[style][zGroup], 128);
 
 					g_bBonusSRVRecord[client] = true;
 					if (GetConVarBool(g_hBonusBot) && !g_bPositionRestored[client] && !g_bNewBonus[client])
@@ -692,8 +692,8 @@ public void CL_OnEndTimerPress(int client)
 				// Has to be the new record, since it is the first completion
 				g_fStyleOldBonusRecordTime[style][zGroup] = g_fStyleBonusFastest[style][zGroup];
 				g_fStyleBonusFastest[style][zGroup] = g_fFinalTime[client];
-				Format(g_szStyleBonusFastest[style][zGroup], MAX_NAME_LENGTH, "%s", szName);
-				FormatTimeFloat(1, g_fStyleBonusFastest[style][zGroup], 3, g_szStyleBonusFastestTime[style][zGroup], 64);
+				Format(g_szStyleBonusFastest[style][zGroup], 128, "%s", szName);
+				FormatTimeFloat(1, g_fStyleBonusFastest[style][zGroup], 3, g_szStyleBonusFastestTime[style][zGroup], 128);
 
 				g_bBonusSRVRecord[client] = true;
 
@@ -704,7 +704,7 @@ public void CL_OnEndTimerPress(int client)
 			if (g_fStylePersonalRecordBonus[style][zGroup][client] == 0.0)
 			{
 				g_fStylePersonalRecordBonus[style][zGroup][client] = g_fFinalTime[client];
-				FormatTimeFloat(1, g_fStylePersonalRecordBonus[style][zGroup][client], 3, g_szStylePersonalRecordBonus[style][zGroup][client], 64);
+				FormatTimeFloat(1, g_fStylePersonalRecordBonus[style][zGroup][client], 3, g_szStylePersonalRecordBonus[style][zGroup][client], 128);
 
 				g_bBonusFirstRecord[client] = true;
 				g_pr_showmsg[client] = true;
@@ -714,7 +714,7 @@ public void CL_OnEndTimerPress(int client)
 			{
 				// client's new record
 				g_fStylePersonalRecordBonus[style][zGroup][client] = g_fFinalTime[client];
-				FormatTimeFloat(1, g_fStylePersonalRecordBonus[style][zGroup][client], 3, g_szStylePersonalRecordBonus[style][zGroup][client], 64);
+				FormatTimeFloat(1, g_fStylePersonalRecordBonus[style][zGroup][client], 3, g_szStylePersonalRecordBonus[style][zGroup][client], 128);
 
 				g_bBonusPBRecord[client] = true;
 				g_pr_showmsg[client] = true;
@@ -788,8 +788,8 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 
 	int stage = g_WrcpStage[client];
 	// Get Client Name
-	char szName[MAX_NAME_LENGTH];
-	GetClientName(client, szName, MAX_NAME_LENGTH);
+	char szName[128];
+	GetClientName(client, szName, 128);
 
 	if (g_bWrcpEndZone[client])
 	{

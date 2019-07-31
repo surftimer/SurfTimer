@@ -423,9 +423,9 @@ public Action SetClanTag(Handle timer, any client)
 
 public Action ForceNextMap(Handle timer)
 {
-    char szNextMap[128];
-    GetNextMap(szNextMap, 128);
-    ServerCommand("changelevel %s", szNextMap);
+	char szNextMap[128];
+	GetNextMap(szNextMap, 128);
+	ServerCommand("changelevel %s", szNextMap);
 	return Plugin_Handled;
 }
 

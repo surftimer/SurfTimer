@@ -3769,7 +3769,7 @@ public void SQL_selectBonusTotalCountCallback(Handle owner, Handle hndl, const c
 	return;
 }
 
-public void db_insertBonus(int client, char szSteamId[32], char szUName[32], float FinalTime, int zoneGrp)
+public void db_insertBonus(int client, char szSteamId[32], char szUName[128], float FinalTime, int zoneGrp)
 {
 	char szQuery[1024];
 	char szName[MAX_NAME_LENGTH * 2 + 1];
@@ -3799,7 +3799,7 @@ public void SQL_insertBonusCallback(Handle owner, Handle hndl, const char[] erro
 	CalculatePlayerRank(client, 0);
 }
 
-public void db_updateBonus(int client, char szSteamId[32], char szUName[32], float FinalTime, int zoneGrp)
+public void db_updateBonus(int client, char szSteamId[32], char szUName[128], float FinalTime, int zoneGrp)
 {
 	char szQuery[1024];
 	char szName[MAX_NAME_LENGTH * 2 + 1];
@@ -4820,7 +4820,7 @@ public int LatestRecordsMenuHandler(Handle menu, MenuAction action, int param1, 
 		CloseHandle(menu);
 }
 
-public void db_InsertLatestRecords(char szSteamID[32], char szName[32], float FinalTime)
+public void db_InsertLatestRecords(char szSteamID[32], char szName[128], float FinalTime)
 {
 	char szQuery[512];
 	Format(szQuery, 512, sql_insertLatestRecords, szSteamID, szName, FinalTime, g_szMapName);
@@ -5482,7 +5482,7 @@ public void db_viewPlayerOptionsCallback(Handle owner, Handle hndl, const char[]
 		g_iSideHudModule[client][2] = SQL_FetchInt(hndl, 21);
 		g_iSideHudModule[client][3] = SQL_FetchInt(hndl, 22);
 		g_iSideHudModule[client][4] = SQL_FetchInt(hndl, 23);
-		g_iPrespeedText[client] = SQL_FetchInt(hndl, 24);
+		g_iPrespeedText[client] = view_as<bool>(SQL_FetchInt(hndl, 24));
 
 		// Functionality for normal spec list
 		if (g_iSideHudModule[client][0] == 5 && (g_iSideHudModule[client][1] == 0 && g_iSideHudModule[client][2] == 0 && g_iSideHudModule[client][3] == 0 && g_iSideHudModule[client][4] == 0))
@@ -5528,7 +5528,7 @@ public void db_viewPlayerOptionsCallback(Handle owner, Handle hndl, const char[]
 		g_iSideHudModule[client][3] = 0;
 		g_iSideHudModule[client][4] = 0;
 		g_bSpecListOnly[client] = true;
-		g_iPrespeedText[client] = 0;
+		g_iPrespeedText[client] = false;
 	}
 
 	if (!g_bSettingsLoaded[client])
@@ -5549,7 +5549,7 @@ public void db_updatePlayerOptions(int client)
 	// "UPDATE ck_playeroptions2 SET timer = %i, hide = %i, sounds = %i, chat = %i, viewmodel = %i, autobhop = %i, checkpoints = %i, centrehud = %i, module1c = %i, module2c = %i, module3c = %i, module4c = %i, module5c = %i, module6c = %i, sidehud = %i, module1s = %i, module2s = %i, module3s = %i, module4s = %i, module5s = %i where steamid = '%s'";
 	if (g_bSettingsLoaded[client] && g_bServerDataLoaded && g_bLoadedModules[client])
 	{
-		Format(szQuery, 1024, sql_updatePlayerOptions, BooltoInt(g_bTimerEnabled[client]), BooltoInt(g_bHide[client]), BooltoInt(g_bEnableQuakeSounds[client]),  BooltoInt(g_bHideChat[client]),  BooltoInt(g_bViewModel[client]),  BooltoInt(g_bAutoBhopClient[client]),  BooltoInt(g_bCheckpointsEnabled[client]),  g_SpeedGradient[client], g_SpeedMode[client], BooltoInt(g_bCenterSpeedDisplay[client]), BooltoInt(g_bCentreHud[client]), g_iTeleSide[client], g_iCentreHudModule[client][0], g_iCentreHudModule[client][1], g_iCentreHudModule[client][2], g_iCentreHudModule[client][3], g_iCentreHudModule[client][4], g_iCentreHudModule[client][5],  BooltoInt(g_bSideHud[client]), g_iSideHudModule[client][0], g_iSideHudModule[client][1], g_iSideHudModule[client][2], g_iSideHudModule[client][3], g_iSideHudModule[client][4], BooltoInt(g_iPrespeedText[client]), g_szSteamID[client]);
+		Format(szQuery, 1024, sql_updatePlayerOptions, BooltoInt(g_bTimerEnabled[client]), BooltoInt(g_bHide[client]), BooltoInt(g_bEnableQuakeSounds[client]), BooltoInt(g_bHideChat[client]), BooltoInt(g_bViewModel[client]), BooltoInt(g_bAutoBhopClient[client]), BooltoInt(g_bCheckpointsEnabled[client]), g_SpeedGradient[client], g_SpeedMode[client], BooltoInt(g_bCenterSpeedDisplay[client]), BooltoInt(g_bCentreHud[client]), g_iTeleSide[client], g_iCentreHudModule[client][0], g_iCentreHudModule[client][1], g_iCentreHudModule[client][2], g_iCentreHudModule[client][3], g_iCentreHudModule[client][4], g_iCentreHudModule[client][5], BooltoInt(g_bSideHud[client]), g_iSideHudModule[client][0], g_iSideHudModule[client][1], g_iSideHudModule[client][2], g_iSideHudModule[client][3], g_iSideHudModule[client][4], BooltoInt(g_iPrespeedText[client]), g_szSteamID[client]);
 		SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, client, DBPrio_Low);
 	}
 }
@@ -6940,7 +6940,7 @@ public void db_selectStyleMapTopSurfers(int client, char mapname[128], int style
 }
 
 // Styles for bonuses
-public void db_insertBonusStyle(int client, char szSteamId[32], char szUName[32], float FinalTime, int zoneGrp, int style)
+public void db_insertBonusStyle(int client, char szSteamId[32], char szUName[128], float FinalTime, int zoneGrp, int style)
 {
 	char szQuery[1024];
 	char szName[MAX_NAME_LENGTH * 2 + 1];
@@ -7023,7 +7023,7 @@ public void db_viewMapRankBonusStyleCallback(Handle owner, Handle hndl, const ch
 	}
 }
 
-public void db_updateBonusStyle(int client, char szSteamId[32], char szUName[32], float FinalTime, int zoneGrp, int style)
+public void db_updateBonusStyle(int client, char szSteamId[32], char szUName[128], float FinalTime, int zoneGrp, int style)
 {
 	char szQuery[1024];
 	char szName[MAX_NAME_LENGTH * 2 + 1];

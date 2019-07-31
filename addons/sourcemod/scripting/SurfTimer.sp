@@ -36,7 +36,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "2.4"
+#define VERSION "2.6"
 
 // Database Definitions
 #define MYSQL 0
@@ -71,12 +71,12 @@
 #define DEFAULT_TITLES_PATH "configs/surftimer/default_titles.txt"
 
 // Paths for sounds
-#define PRO_FULL_SOUND_PATH "sound/quake/holyshit.mp3"
-#define PRO_RELATIVE_SOUND_PATH "*quake/holyshit.mp3"
-#define CP_FULL_SOUND_PATH "sound/quake/wickedsick.mp3"
-#define CP_RELATIVE_SOUND_PATH "*quake/wickedsick.mp3"
-#define UNSTOPPABLE_SOUND_PATH "sound/quake/unstoppable.mp3"
-#define UNSTOPPABLE_RELATIVE_SOUND_PATH "*quake/unstoppable.mp3"
+#define PRO_FULL_SOUND_PATH "sound/surftimer/quake/holyshit.mp3"
+#define PRO_RELATIVE_SOUND_PATH "*surftimer/quake/holyshit.mp3"
+#define CP_FULL_SOUND_PATH "sound/surftimer/quake/wickedsick.mp3"
+#define CP_RELATIVE_SOUND_PATH "*surftimer/quake/wickedsick.mp3"
+#define UNSTOPPABLE_SOUND_PATH "sound/surftimer/quake/unstoppable.mp3"
+#define UNSTOPPABLE_RELATIVE_SOUND_PATH "*surftimer/quake/unstoppable.mp3"
 #define WR_FULL_SOUND_PATH "sound/surftimer/wr/1/valve_logo_music.mp3"
 #define WR_RELATIVE_SOUND_PATH "*surftimer/wr/1/valve_logo_music.mp3"
 #define WR2_FULL_SOUND_PATH "sound/surftimer/wr/2/valve_logo_music.mp3"
@@ -549,7 +549,7 @@ int g_rankArg[MAXPLAYERS + 1];
 
 /*----------  KSF Style Ranking Distribution  ----------*/
 char g_szRankName[MAXPLAYERS + 1][32];
-int g_rankNameChatColour[MAXPLAYERS + 1];
+//int g_rankNameChatColour[MAXPLAYERS + 1];
 int g_GroupMaps[MAX_PR_PLAYERS + 1][MAX_STYLES];
 int g_Top10Maps[MAX_PR_PLAYERS + 1][MAX_STYLES];
 
@@ -717,7 +717,7 @@ bool g_bServerDataLoaded;
 
 // SteamdID of #1 player in map, used to fetch checkpoint times
 char g_szRecordMapSteamID[MAX_NAME_LENGTH];
-int g_iServerHibernationValue;
+//int g_iServerHibernationValue;
 
 /*----------  User Commands  ----------*/
 
@@ -774,7 +774,7 @@ int g_iSideHudModule[MAXPLAYERS + 1][5];
 int g_iTeleSide[MAXPLAYERS + 1];
 
 // Prestrafe Message
-int g_iPrespeedText[MAXPLAYERS + 1];
+bool g_iPrespeedText[MAXPLAYERS + 1];
 
 /*----------  Run Variables  ----------*/
 
@@ -1915,7 +1915,7 @@ public void OnAutoConfigsBuffered()
 
 	// map config
 	char szPath[256];
-	Format(szPath, sizeof(szPath), "sourcemod/surftimer/map_types/%s_.cfg", szPrefix[0]);
+	Format(szPath, sizeof(szPath), "sourcemod/surftimer/%s_.cfg", szPrefix[0]);
 	char szPath2[256];
 	Format(szPath2, sizeof(szPath2), "cfg/%s", szPath);
 	if (FileExists(szPath2))
