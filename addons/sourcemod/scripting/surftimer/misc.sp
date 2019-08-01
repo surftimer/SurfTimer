@@ -1586,7 +1586,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", DISCOTIME_RELATIVE_SOUND_PATH);
+				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathTop);
 				ClientCommand(i, buffer);
 			}
 		}
