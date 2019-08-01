@@ -24,7 +24,7 @@ you will need [SourceMod 1.9](https://www.sourcemod.net/downloads.php?branch=sta
 *   run `mysql-files/upgrade-niko.sql` in your ckSurf db
 *   edit configs (mysql db, etc, to do)
 
-## Changelog & Todo-List
+## Changelog
 
 *   [Changelog](https://github.com/totles/z4lab-surftimer/blob/master/CHANGELOG.md) 
 
