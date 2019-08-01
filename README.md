@@ -24,18 +24,9 @@ you will need [SourceMod 1.9](https://www.sourcemod.net/downloads.php?branch=sta
 *   run `mysql-files/upgrade-niko.sql` in your ckSurf db
 *   edit configs (mysql db, etc, to do)
 
-## features added
-*   added discord bonus announcement 
-*   added prestrafe chat info option
-*   new [NORD](https://www.nordtheme.com/) color scheme
-*   made name of discord webhooks customizable
-*   made it possible to remove the security question for the `sm_dr` command
+## Changelog
 
-## bugs fixed in this version
-*   fixed "S1 to S2 record glitch"
-*   fixed custom Clantags in Scoreboard which weren't working
-*   prestrafe message option is now saved correctly
-*   fixed name colors while using default_titles
+*   [Changelog](https://github.com/totles/z4lab-surftimer/blob/master/CHANGELOG.md) 
 
 ## point system
 <details>
