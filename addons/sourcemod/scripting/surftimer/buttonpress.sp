@@ -88,27 +88,29 @@ public void CL_OnStartTimerPress(int client)
 
 		if (!g_bPracticeMode[client] && !IsFakeClient(client)) {
 			char szSpeed[128];
+			char preMessage[128];
 			Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
+			Format(preMessage, sizeof(preMessage), "%t", "StartPrestrafe", g_szChatPrefix, szSpeed);
 			if (g_iPrespeedText[client])
-				CPrintToChat(client, "%t", "StartPrestrafe", g_szChatPrefix, szSpeed);
+				CPrintToChat(client, preMessage);
 		
-			for (int i = 0; i < MaxClients; i++) {
-				if (!IsClientInGame(i)) 
+			for (int i = 1; i <= MaxClients; i++) {
+				if (!IsClientInGame(i))
 					continue;
 
-				if (GetClientTeam(i) != CS_TEAM_SPECTATOR)
+ 				if (GetClientTeam(i) != CS_TEAM_SPECTATOR)
 					continue;
 
-				int ObserverMode = GetEntProp(i, Prop_Send, "m_iObserverMode");
-				if(ObserverMode != 4 && ObserverMode != 5)
+ 				int ObserverMode = GetEntProp(i, Prop_Send, "m_iObserverMode");
+				if (ObserverMode != 4 && ObserverMode != 5)
 					continue;
 
-				int ObserverTarget = GetEntPropEnt(i, Prop_Send, "m_hObserverTarget");
+ 				int ObserverTarget = GetEntPropEnt(i, Prop_Send, "m_hObserverTarget");
 				if (ObserverTarget != client)
 					continue;
 
 				if (g_iPrespeedText[i])
-					CPrintToChat(i, "%t", "StartPrestrafe", g_szChatPrefix, szSpeed);
+					CPrintToChat(i, preMessage);
 			}
 		}
 
@@ -772,11 +774,13 @@ public void CL_OnStartWrcpTimerPress(int client)
 		}
 		if (g_Stage[0][client] > 1 && !g_bPracticeMode[client] && !IsFakeClient(client)) {
 			char szSpeed[128];
+			char preMessage[128];
 			Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
+			Format(preMessage, sizeof(preMessage), "%t", "StagePrestrafe", g_szChatPrefix, g_Stage[0][client], szSpeed);
 			if (g_iPrespeedText[client])
-				CPrintToChat(client, "%t", "StagePrestrafe", g_szChatPrefix, g_Stage[0][client], szSpeed);
+				CPrintToChat(client, preMessage);
 		
-			for (int i = 0; i < MaxClients; i++) {
+			for (int i = 1; i <= MaxClients; i++) {
 				if (!IsClientInGame(i)) 
 					continue;
 
@@ -792,7 +796,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 					continue;
 
 				if (g_iPrespeedText[i])
-					CPrintToChat(i, "%t", "StagePrestrafe", g_szChatPrefix, g_Stage[0][client], szSpeed);
+					CPrintToChat(i, preMessage);
 			}
 		}
 	}
