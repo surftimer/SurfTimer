@@ -818,7 +818,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		//Stage 1 to stage 2 glitch stopper.
 		if(g_wrcpStage2Fix[client] && stage == 2){
 			g_wrcpStage2Fix[client] = false;
-			CPrintToChat(client, "Potential S1 to S2 glitch stopped. Stage time was not recorded"); // add to trans. file and add prefix!
+			CPrintToChat(client, "%t", "StageNotRecorded", g_szChatPrefix);
 			return;
 		}
 		

@@ -1483,4 +1483,19 @@
 		"#format"	"{1:s},{2:s}"
 		"en"		"{1} {darkred}You must pass all {2} to finish your run"
 	}
+	"PrestrafeMessageToggleOn"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Prestrafe messages are now {green}enabled"
+	}
+	"PrestrafeMessageToggleOff"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Prestrafe messages are now {red}disabled"
+	}
+	"StageNotRecorded"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Potential S1 to S2 glitch stopped. Stage time was not recorded"
+	}
 }
