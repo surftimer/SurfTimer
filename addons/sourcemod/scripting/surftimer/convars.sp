@@ -346,7 +346,7 @@ void CreateConVars()
 	g_hPlayReplayVipOnly = CreateConVar("ck_play_replay_vip_only", "1", "Sets whether the sm_replay command will be VIP only Disable/Enable");
 
 	// Sound Convars
-	g_hSoundPathWR = CreateConVar("ck_sp_wr", "sound/surftimer/wr/2/valve_logo_music.mp3", "Set the sound path for the WR sound");
+	g_hSoundPathWR = CreateConVar("ck_sp_wr", "sound/surftimer/wr.mp3", "Set the sound path for the WR sound");
 	HookConVarChange(g_hSoundPathWR, OnSettingChanged);
 	GetConVarString(g_hSoundPathWR, g_szSoundPathWR, sizeof(g_szSoundPathWR));
 	if (FileExists(g_szSoundPathWR))
@@ -361,7 +361,7 @@ void CreateConVars()
 		Format(g_szRelativeSoundPathWR, sizeof(g_szRelativeSoundPathWR), WR2_RELATIVE_SOUND_PATH);
 	}
 
-	g_hSoundPathTop = CreateConVar("ck_sp_top", "sound/surftimer/top10/valve_logo_music.mp3", "Set the sound path for the Top 10 sound");
+	g_hSoundPathTop = CreateConVar("ck_sp_top", "sound/surftimer/top10.mp3", "Set the sound path for the Top 10 sound");
 	HookConVarChange(g_hSoundPathTop, OnSettingChanged);
 	GetConVarString(g_hSoundPathTop, g_szSoundPathTop, sizeof(g_szSoundPathTop));
 	if (FileExists(g_szSoundPathTop))
@@ -376,7 +376,7 @@ void CreateConVars()
 		Format(g_szRelativeSoundPathTop, sizeof(g_szRelativeSoundPathTop), TOP10_RELATIVE_SOUND_PATH);
 	}
 
-	g_hSoundPathPB = CreateConVar("ck_sp_pb", "sound/surftimer/pr/valve_logo_music.mp3", "Set the sound path for the PB sound");
+	g_hSoundPathPB = CreateConVar("ck_sp_pb", "sound/surftimer/pr.mp3", "Set the sound path for the PB sound");
 	HookConVarChange(g_hSoundPathPB, OnSettingChanged);
 	GetConVarString(g_hSoundPathPB, g_szSoundPathPB, sizeof(g_szSoundPathPB));
 	if (FileExists(g_szSoundPathPB))
