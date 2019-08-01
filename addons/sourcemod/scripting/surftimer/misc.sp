@@ -3989,6 +3989,9 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		/* Finish the call, get the result */
 		Call_Finish();
 
+		if (g_bCheckpointsEnabled[client])
+			CPrintToChat(client, "%t", "Misc30", g_szChatPrefix, g_iClientInZone[client][1] + 1, szTime, szDiff, sz_srDiff);
+
 		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "Misc31", g_szChatPrefix, szName, g_iClientInZone[client][1] + 1, szTime, szDiff, sz_srDiff);
 		CheckpointToSpec(client, szSpecMessage);
 
