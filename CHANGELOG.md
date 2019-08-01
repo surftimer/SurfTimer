@@ -65,12 +65,6 @@
 * **[STYLE]** nord colors [#1](https://github.com/totles/z4lab-surftimer/commit/195e4cdd88d7b940a8c345497a438814189b7c62)
 * **[STYLE]** wr => sr [#1](https://github.com/totles/z4lab-surftimer/commit/4b4d2fdcf9cf6d84503a695a18f30a6037e9e33d)
 
-[2019-02-16]
----
-* **[STYLE]** wr => sr [#1](https://github.com/totles/z4lab-surftimer/commit/621b8003fb5a3c8356271205492f274499b0f2a3)
-* **[STYLE]** nord colors [#1](https://github.com/totles/z4lab-surftimer/commit/195e4cdd88d7b940a8c345497a438814189b7c62)
-* **[STYLE]** wr => sr [#1](https://github.com/totles/z4lab-surftimer/commit/4b4d2fdcf9cf6d84503a695a18f30a6037e9e33d)
-
 [2019-02-14]
 ---
 * **[STYLE]** wr => sr [#1](https://github.com/totles/z4lab-surftimer/commit/ec0abddcf0508a86305fa618bd0f099c7a60fec5) - [#2](https://github.com/totles/z4lab-surftimer/commit/ff816ab14928f390f361d7cffd0b8e4a9901944c)
