@@ -776,6 +776,9 @@ int g_iTeleSide[MAXPLAYERS + 1];
 // Prestrafe Message
 bool g_iPrespeedText[MAXPLAYERS + 1];
 
+// Silent Spectate
+bool g_iSilentSpectate[MAXPLAYERS + 1];
+
 /*----------  Run Variables  ----------*/
 
 // Clients personal record in map

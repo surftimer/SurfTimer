@@ -1508,4 +1508,14 @@
 		"#format"	"{1:s},{2:i},{3:s}"
 		"en"		"{1} Stage {2} Prestrafe: {3} u/s"
 	}
+	"SilentSpecMessageToggleOn"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Silent spectate is now {green}enabled"
+	}
+	"SilentSpecMessageToggleOff"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Silent spectate is now {red}disabled"
+	}
 }
