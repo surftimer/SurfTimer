@@ -207,12 +207,14 @@ void CreateCommands()
 	// Setting Commands
 	RegConsoleCmd("sm_pre", Command_Prestrafe, "[surftimer] [settings] Toggles prestrafe messages for player");
 	RegConsoleCmd("sm_prestrafe", Command_Prestrafe, "[surftimer] [settings] Toggles prestrafe messages for player");
-	RegAdminCmd("sm_silentspec", Command_SilentSpec, ADMFLAG_ROOT, "[surftimer] [settings] Toggles silent spectate for player");
-	RegAdminCmd("sm_sspec", Command_SilentSpec, ADMFLAG_ROOT, "[surftimer] [settings] Toggles silent spectate for player");
+	RegConsoleCmd("sm_silentspec", Command_SilentSpec, "[surftimer] [settings] Toggles silent spectate for player");
+	RegConsoleCmd("sm_sspec", Command_SilentSpec, "[surftimer] [settings] Toggles silent spectate for player");
 
 }
 
 public Action Command_SilentSpec(int client, int args) {
+	if (!IsPlayerVip(client)) return Plugin_Handled;
+	
 	if (g_iSilentSpectate[client]) {
 		g_iSilentSpectate[client] = false;
 		CPrintToChat(client, "%t", "SilentSpecMessageToggleOff", g_szChatPrefix);
