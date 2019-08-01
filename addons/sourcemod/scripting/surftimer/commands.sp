@@ -211,9 +211,7 @@ void CreateCommands()
 
 }
 
-public Action Command_Prestrafe(int client) {
-	if (IsFakeClient(client)) return;
-
+public Action Command_Prestrafe(int client, int args) {
 	if (g_iPrespeedText[client]) {
 		g_iPrespeedText[client] = false;
 		CPrintToChat(client, "%t", "PrestrafeMessageToggleOff", g_szChatPrefix);
@@ -222,6 +220,7 @@ public Action Command_Prestrafe(int client) {
 		g_iPrespeedText[client] = true;
 		CPrintToChat(client, "%t", "PrestrafeMessageToggleOn", g_szChatPrefix);
 	}
+	return Plugin_Handled;
 }
 
 public Action Command_DeleteRecords(int client, int args)

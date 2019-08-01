@@ -770,7 +770,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 			g_WrcpStage[client] = g_Stage[0][client];
 			Stage_StartRecording(client);
 		}
-		if (g_Stage[0][client] > 1 !g_bPracticeMode[client] && !IsFakeClient(client)) {
+		if (g_Stage[0][client] > 1 && !g_bPracticeMode[client] && !IsFakeClient(client)) {
 			char szSpeed[128];
 			Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
 			if (g_iPrespeedText[client])
@@ -792,7 +792,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 					continue;
 
 				if (g_iPrespeedText[i])
-					CPrintToChat(i, "%t", "StagePrestrafe", g_szChatPrefix, g_Stage[0][client], szSpeed szSpeed);
+					CPrintToChat(i, "%t", "StagePrestrafe", g_szChatPrefix, g_Stage[0][client], szSpeed);
 			}
 		}
 	}
