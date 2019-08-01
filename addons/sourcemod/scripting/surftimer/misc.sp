@@ -1586,7 +1586,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", DISCOTIME_RELATIVE_SOUND_PATH);
+				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathTop);
 				ClientCommand(i, buffer);
 			}
 		}
@@ -2949,7 +2949,7 @@ public void SpecListMenuDead(int client) // What Spectators see
 
 			for (x = 1; x <= MaxClients; x++)
 			{
-				if (IsValidClient(x) && !IsFakeClient(client) && !IsPlayerAlive(x) && GetClientTeam(x) >= 1 && GetClientTeam(x) <= 3)
+				if (IsValidClient(x) && !IsFakeClient(client) && !IsPlayerAlive(x) && GetClientTeam(x) >= 1 && GetClientTeam(x) <= 3 && !g_iSilentSpectate[x])
 				{
 
 					SpecMode = GetEntProp(x, Prop_Send, "m_iObserverMode");
@@ -3815,7 +3815,7 @@ public void SideHudAlive(int client)
 				int count = 0;
 				for (int j = 0; j <= MaxClients; j++)
 				{
-					if (IsValidClient(j) && !IsFakeClient(client) && !IsPlayerAlive(j) && !g_bFirstTeamJoin[j] && g_bSpectate[j])
+					if (IsValidClient(j) && !IsFakeClient(client) && !IsPlayerAlive(j) && !g_bFirstTeamJoin[j] && g_bSpectate[j] && !g_iSilentSpectate[j])
 					{
 						SpecMode = GetEntProp(j, Prop_Send, "m_iObserverMode");
 						if (SpecMode == 4 || SpecMode == 5)

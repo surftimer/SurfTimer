@@ -36,7 +36,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "2.6"
+#define VERSION "261"
 
 // Database Definitions
 #define MYSQL 0
@@ -71,24 +71,12 @@
 #define DEFAULT_TITLES_PATH "configs/surftimer/default_titles.txt"
 
 // Paths for sounds
-#define PRO_FULL_SOUND_PATH "sound/surftimer/quake/holyshit.mp3"
-#define PRO_RELATIVE_SOUND_PATH "*surftimer/quake/holyshit.mp3"
-#define CP_FULL_SOUND_PATH "sound/surftimer/quake/wickedsick.mp3"
-#define CP_RELATIVE_SOUND_PATH "*surftimer/quake/wickedsick.mp3"
-#define UNSTOPPABLE_SOUND_PATH "sound/surftimer/quake/unstoppable.mp3"
-#define UNSTOPPABLE_RELATIVE_SOUND_PATH "*surftimer/quake/unstoppable.mp3"
-#define WR_FULL_SOUND_PATH "sound/surftimer/wr/1/valve_logo_music.mp3"
-#define WR_RELATIVE_SOUND_PATH "*surftimer/wr/1/valve_logo_music.mp3"
-#define WR2_FULL_SOUND_PATH "sound/surftimer/wr/2/valve_logo_music.mp3"
-#define WR2_RELATIVE_SOUND_PATH "*surftimer/wr/2/valve_logo_music.mp3"
-#define TOP10_FULL_SOUND_PATH "sound/surftimer/top10/valve_logo_music.mp3"
-#define TOP10_RELATIVE_SOUND_PATH "*surftimer/top10/valve_logo_music.mp3"
-#define PR_FULL_SOUND_PATH "sound/surftimer/pr/valve_logo_music.mp3"
-#define PR_RELATIVE_SOUND_PATH "*surftimer/pr/valve_logo_music.mp3"
-#define WRCP_FULL_SOUND_PATH "sound/surftimer/wow_fast.mp3"
-#define WRCP_RELATIVE_SOUND_PATH "*surftimer/wow_fast.mp3"
-#define DISCOTIME_FULL_SOUND_PATH "sound/surftimer/discotime.mp3"
-#define DISCOTIME_RELATIVE_SOUND_PATH "*/surftimer/discotime.mp3"
+#define WR2_FULL_SOUND_PATH "sound/surftimer/wr.mp3"
+#define WR2_RELATIVE_SOUND_PATH "*surftimer/wr.mp3"
+#define TOP10_FULL_SOUND_PATH "sound/surftimer/top10.mp3"
+#define TOP10_RELATIVE_SOUND_PATH "*surftimer/top10.mp3"
+#define PR_FULL_SOUND_PATH "sound/surftimer/pr.mp3"
+#define PR_RELATIVE_SOUND_PATH "*surftimer/pr.mp3"
 
 #define MAX_STYLES 7
 
@@ -775,6 +763,9 @@ int g_iTeleSide[MAXPLAYERS + 1];
 
 // Prestrafe Message
 bool g_iPrespeedText[MAXPLAYERS + 1];
+
+// Silent Spectate
+bool g_iSilentSpectate[MAXPLAYERS + 1];
 
 /*----------  Run Variables  ----------*/
 

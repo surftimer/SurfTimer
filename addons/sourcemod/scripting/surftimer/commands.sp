@@ -75,7 +75,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_prac", Command_goToPlayerCheckpoint, "[surftimer] Teleports player to his last checkpoint");
 	RegConsoleCmd("sm_practice", Command_goToPlayerCheckpoint, "[surftimer] Teleports player to his last checkpoint");
 	RegConsoleCmd("sm_loadloc", Command_goToPlayerCheckpoint, "[surftimer] Teleports player to his last checkpoint");
-
 	RegConsoleCmd("sm_cp", Command_createPlayerCheckpoint, "[surftimer] Creates a checkpoint, where the player can teleport back to");
 	RegConsoleCmd("sm_checkpoint", Command_createPlayerCheckpoint, "[surftimer] Creates a checkpoint, where the player can teleport back to");
 	RegConsoleCmd("sm_saveloc", Command_createPlayerCheckpoint, "[surftimer] Creates a checkpoint, where the player can teleport back to");
@@ -84,11 +83,12 @@ void CreateCommands()
 	RegConsoleCmd("sm_normal", Command_normalMode, "[surftimer] Switches player back to normal mode.");
 	RegConsoleCmd("sm_n", Command_normalMode, "[surftimer] Switches player back to normal mode.");
 
+	// Admin Commands
 	RegConsoleCmd("sm_ckadmin", Admin_ckPanel, "[surftimer] Displays the surftimer admin menu panel");
 	RegConsoleCmd("sm_refreshprofile", Admin_RefreshProfile, "[surftimer] Recalculates player profile for given steam id");
-
 	RegConsoleCmd("sm_clearassists", Admin_ClearAssists, "[surftimer] Clears assist points (map progress) from all players");
 
+	// Zoning/Mapsetting Commands
 	RegConsoleCmd("sm_zones", Command_Zones, "[surftimer] [zoner] Opens up the zone creation menu.");
 	RegConsoleCmd("sm_hookzone", Command_HookZones, "[surftimer] [zoner] Opens up zone hook creation menu.");
 	RegConsoleCmd("sm_addmaptier", Admin_insertMapTier, "[surftimer] [zoner] Changes maps tier");
@@ -203,6 +203,39 @@ void CreateCommands()
 	// Delete records
 	RegAdminCmd("sm_deleterecords", Command_DeleteRecords, g_ZonerFlag, "[surftimer] [zoner] Delete records");
 	RegAdminCmd("sm_dr", Command_DeleteRecords, g_ZonerFlag, "[surftimer] [zoner] Delete records");
+
+	// Setting Commands
+	RegConsoleCmd("sm_pre", Command_Prestrafe, "[surftimer] [settings] Toggles prestrafe messages for player");
+	RegConsoleCmd("sm_prestrafe", Command_Prestrafe, "[surftimer] [settings] Toggles prestrafe messages for player");
+	RegConsoleCmd("sm_silentspec", Command_SilentSpec, "[surftimer] [settings] Toggles silent spectate for player");
+	RegConsoleCmd("sm_sspec", Command_SilentSpec, "[surftimer] [settings] Toggles silent spectate for player");
+
+}
+
+public Action Command_SilentSpec(int client, int args) {
+	if (!IsPlayerVip(client)) return Plugin_Handled;
+	
+	if (g_iSilentSpectate[client]) {
+		g_iSilentSpectate[client] = false;
+		CPrintToChat(client, "%t", "SilentSpecMessageToggleOff", g_szChatPrefix);
+	} 
+	else {
+		g_iSilentSpectate[client] = true;
+		CPrintToChat(client, "%t", "SilentSpecMessageToggleOn", g_szChatPrefix);
+	}
+	return Plugin_Handled;
+}
+
+public Action Command_Prestrafe(int client, int args) {
+	if (g_iPrespeedText[client]) {
+		g_iPrespeedText[client] = false;
+		CPrintToChat(client, "%t", "PrestrafeMessageToggleOff", g_szChatPrefix);
+	} 
+	else {
+		g_iPrespeedText[client] = true;
+		CPrintToChat(client, "%t", "PrestrafeMessageToggleOn", g_szChatPrefix);
+	}
+	return Plugin_Handled;
 }
 
 public Action Command_DeleteRecords(int client, int args)

@@ -1483,4 +1483,39 @@
 		"#format"	"{1:s},{2:s}"
 		"en"		"{1} {darkred}You must pass all {2} to finish your run"
 	}
+	"PrestrafeMessageToggleOn"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Prestrafe messages are now {green}enabled"
+	}
+	"PrestrafeMessageToggleOff"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Prestrafe messages are now {red}disabled"
+	}
+	"StageNotRecorded"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Potential S1 to S2 glitch stopped. Stage time was not recorded"
+	}
+	"StartPrestrafe"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"{1} Start Prestrafe: {2} u/s"
+	}
+	"StagePrestrafe"
+	{
+		"#format"	"{1:s},{2:i},{3:s}"
+		"en"		"{1} Stage {2} Prestrafe: {3} u/s"
+	}
+	"SilentSpecMessageToggleOn"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Silent spectate is now {green}enabled"
+	}
+	"SilentSpecMessageToggleOff"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Silent spectate is now {red}disabled"
+	}
 }
