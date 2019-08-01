@@ -26,9 +26,7 @@ you will need [SourceMod 1.9](https://www.sourcemod.net/downloads.php?branch=sta
 
 ## Changelog & Todo-List
 
-*   [Changelog](https://github.com/totles/z4lab-surftimer/blob/master/.CHANGELOG.md) 
-
-*   [Todo-List](https://github.com/totles/z4lab-surftimer/blob/master/.TODO.md) 
+*   [Changelog](https://github.com/totles/z4lab-surftimer/blob/master/CHANGELOG.md) 
 
 ## point system
 <details>
