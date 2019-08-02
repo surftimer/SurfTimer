@@ -112,6 +112,15 @@ ConVar g_dcCalladminName = null;
 ConVar g_dcBugTrackerName = null;
 ConVar g_drDeleteSecurity = null;
 
+// Trails
+ConVar gCV_PluginEnabled = null;
+ConVar gCV_AdminsOnly = null;
+ConVar gCV_AllowHide = null;
+ConVar gCV_CheapTrails = null;
+ConVar gCV_BeamLife = null;
+ConVar gCV_BeamWidth = null;
+ConVar gCV_RespawnDisable = null;
+
 void CreateConVars()
 {
 	CreateConVar("timer_version", VERSION, "Timer Version.", FCVAR_DONTRECORD | FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY);
@@ -155,6 +164,16 @@ void CreateConVars()
 	g_dcCalladminName = CreateConVar("ck_discord_calladmin_name", "z4lab Calladmin", "Webhook name for !calladmin - Discord side", FCVAR_NOTIFY);
 	g_dcBugTrackerName = CreateConVar("ck_discord_bug_tracker_name", "z4lab Bugtracker", "Webhook name for !bug - Discord side", FCVAR_NOTIFY);
 	g_drDeleteSecurity = CreateConVar("ck_dr_delete_security", "1", "(1 / 0) Disabled/Enable delete security for !dr command", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+
+	// Trails
+	gCV_PluginEnabled = CreateConVar("sm_trails_enable", "1", "Enable or Disable all features of the plugin.", 0, true, 0.0, true, 1.0);
+	gCV_AdminsOnly = CreateConVar("sm_trails_admins_only", "1", "Enable trails for admins only.", 0, true, 0.0, true, 1.0);
+	gCV_AllowHide = CreateConVar("sm_trails_allow_hide", "1", "Allow hiding other players' trails.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	gCV_CheapTrails = CreateConVar("sm_trails_cheap", "0", "Force cheap trails (lower quality in exchange for more FPS).", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	gCV_BeamLife = CreateConVar("sm_trails_life", "1.5", "Time duration of the trails.", FCVAR_NOTIFY, true, 0.0);
+	gCV_BeamWidth = CreateConVar("sm_trails_width", "1.5", "Width of the trail beams.", FCVAR_NOTIFY, true, 0.0);
+	gCV_RespawnDisable = CreateConVar("sm_trails_respawn_disable", "0", "Disable the player's trail after respawning.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	
 
 	g_hPointSystem = CreateConVar("ck_point_system", "1", "on/off - Player point system", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	HookConVarChange(g_hPointSystem, OnSettingChanged);

@@ -26,6 +26,8 @@
 #include <discord>
 #include <sourcecomms>
 #include <surftimer>
+#include <tf2>
+#include <tf2_stocks>
 
 /*===================================
 =            Definitions            =
@@ -770,8 +772,11 @@ bool g_iSilentSpectate[MAXPLAYERS + 1];
 // CP Messages
 bool g_iCpMessages[MAXPLAYERS + 1];
 
-// WRCP Messeages
+// WRCP Messages
 bool g_iWrcpMessages[MAXPLAYERS + 1];
+
+// trails chroma stuff
+bool g_iHasEnforcedTitle[MAXPLAYERS + 1];
 /*----------  Run Variables  ----------*/
 
 // Clients personal record in map
@@ -1343,6 +1348,63 @@ int g_iTicksOnGround[MAXPLAYERS + 1];
 bool g_bNewStage[MAXPLAYERS + 1];
 bool g_bLeftZone[MAXPLAYERS + 1];
 
+// Trails
+
+#define TRAIL_NONE -1
+
+enum TrailSettings
+{
+	iRedChannel,
+	iGreenChannel,
+	iBlueChannel,
+	iSpecialColor,
+	iAlphaChannel
+}
+
+// Hiding trails globals
+bool gB_HidingTrails[MAXPLAYERS + 1];
+ArrayList aL_Clients = null;
+
+/* Cached CVars */
+
+bool gB_PluginEnabled = true;
+bool gB_AdminsOnly = true;
+bool gB_AllowHide = true;
+bool gB_CheapTrails = false;
+float gF_BeamLife = 1.5;
+float gF_BeamWidth = 1.5;
+bool gB_RespawnDisable = false;
+
+/* Global variables */
+
+int gI_BeamSprite;
+int gI_SelectedTrail[MAXPLAYERS + 1] = {TRAIL_NONE, ...};
+float gF_LastPosition[MAXPLAYERS + 1][3];
+
+// KeyValue globals
+int gI_TrailAmount;
+char gS_TrailTitle[128][128];
+int gI_TrailSettings[128][TrailSettings];
+
+// Spectrum cycle globals
+int gI_CycleColor[MAXPLAYERS + 1][4];
+bool gB_RedToYellow[MAXPLAYERS + 1];
+bool gB_YellowToGreen[MAXPLAYERS + 1];
+bool gB_GreenToCyan[MAXPLAYERS + 1];
+bool gB_CyanToBlue[MAXPLAYERS + 1];
+bool gB_BlueToMagenta[MAXPLAYERS + 1];
+bool gB_MagentaToRed[MAXPLAYERS + 1];
+
+// Cheap trail globals
+int gI_TickCounter[MAXPLAYERS + 1];
+float gF_PlayerOrigin[MAXPLAYERS + 1][3];
+
+// Cookie handles
+Handle gH_TrailChoiceCookie;
+Handle gH_TrailHidingCookie;
+
+EngineVersion gEV_Type = Engine_Unknown;
+
 /*===================================
 =         Predefined Arrays         =
 ===================================*/
@@ -1545,6 +1607,7 @@ char RadioCMDS[][] = 													// Disable radio commands
 #include "surftimer/mapsettings.sp"
 #include "surftimer/cvote.sp"
 #include "surftimer/vip.sp"
+#include "surftimer/trails.sp"
 
 /*====================================
 =               Events               =
@@ -1650,6 +1713,16 @@ public void OnMapStart()
 
 	BuildPath(Path_SM, g_szLogFile, sizeof(g_szLogFile), "logs/surftimer/%s.log", g_szMapName);
 
+
+	if (!LoadColorsConfig())
+		{
+			SetFailState("Failed load \"configs/trails-colors.cfg\". File missing or invalid.");
+		}
+		
+	gI_BeamSprite = PrecacheModel("materials/trails/beam_01.vmt", true);
+		
+	AddFileToDownloadsTable("materials/trails/beam_01.vmt");
+	AddFileToDownloadsTable("materials/trails/beam_01.vtf");
 	// Get map maxvelocity
 	g_hMaxVelocity = FindConVar("sv_maxvelocity");
 
@@ -1796,6 +1869,8 @@ public void OnMapStart()
 
 public void OnMapEnd()
 {
+	aL_Clients.Clear();
+
 	// ServerCommand("sm_updater_force");
 	g_bEnableJoinMsgs = false;
 	g_bServerDataLoaded = false;
@@ -2023,6 +2098,13 @@ public void OnClientAuthorized(int client)
 
 public void OnClientDisconnect(int client)
 {
+	int index = aL_Clients.FindValue(client);
+	
+	if(index != -1) // If the index is valid and the player was found on the list
+	{
+		aL_Clients.Erase(index);
+	}
+
 	if (IsFakeClient(client) && g_hRecordingAdditionalTeleport[client] != null)
 	{
 		CloseHandle(g_hRecordingAdditionalTeleport[client]);
@@ -2692,6 +2774,29 @@ public void OnPluginStart()
 	g_MapCheckpointForward = CreateGlobalForward("surftimer_OnCheckpoint", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String);
 	g_BonusFinishForward = CreateGlobalForward("surftimer_OnBonusFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell, Param_Cell);
 	g_PracticeFinishForward = CreateGlobalForward("surftimer_OnPracticeFinished", ET_Event, Param_Cell, Param_Float, Param_String);
+
+	// Trails
+	gCV_PluginEnabled.AddChangeHook(OnConVarChanged);
+	gCV_AdminsOnly.AddChangeHook(OnConVarChanged);
+	gCV_AllowHide.AddChangeHook(OnConVarChanged);
+	gCV_CheapTrails.AddChangeHook(OnConVarChanged);
+	gCV_BeamLife.AddChangeHook(OnConVarChanged);
+	gCV_BeamWidth.AddChangeHook(OnConVarChanged);
+	gCV_RespawnDisable.AddChangeHook(OnConVarChanged);
+
+	gH_TrailChoiceCookie = RegClientCookie("trail_choice", "Trail Choice Cookie", CookieAccess_Protected);
+	gH_TrailHidingCookie = RegClientCookie("trail_hiding", "Trail Hiding Cookie", CookieAccess_Protected);
+	
+	aL_Clients = new ArrayList();
+	gEV_Type = GetEngineVersion();
+
+	for(int i = 1; i <= MaxClients; i++)
+	{
+		if(AreClientCookiesCached(i))
+		{
+			OnClientCookiesCached(i);
+		}
+	}
 
 	if (g_bLateLoaded)
 	{

@@ -4492,10 +4492,13 @@ public void LoadDefaultTitle(int client)
 					{
 						KvGetString(kv, "title", szBuffer, sizeof(szBuffer));
 						SetDefaultTitle(client, szBuffer);
+						g_iHasEnforcedTitle[client] = true;
 						break;
-					}
-					else
+					} else {
+						g_iHasEnforcedTitle[client] = false;
 						continue;
+					}
+					
 				}
 
 				KvGetString(kv, "flag", szBuffer, sizeof(szBuffer), "none");

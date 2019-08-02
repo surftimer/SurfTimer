@@ -216,7 +216,13 @@ void CreateCommands()
 	RegConsoleCmd("sm_speedgradient", Command_ChangeSpeedGradient, "[surftimer] [settings] white/green/rainbow/momentum - change speed gradient");
 	RegConsoleCmd("sm_speedmode", Command_ChangeSpeedMode, "[surftimer] [settings] xy/xyz/z - change speed mode");
 	RegConsoleCmd("sm_centerspeed", Command_CenterSpeed, "[surftimer] [settings] on/off - toggle center speed display");
-	
+
+	// Trails
+	RegConsoleCmd("sm_trail", Command_Trail, "Opens the 'Trail Selection' menu.");
+	RegConsoleCmd("sm_trails", Command_Trail, "Opens the 'Trail Selection' menu.");
+	RegConsoleCmd("sm_hidetrail", Command_Hide, "Hides other players' trails.");
+	RegConsoleCmd("sm_hidetrails", Command_Hide, "Hides other players' trails.");
+
 }
 
 public Action Command_CenterSpeed(int client, int args) {
