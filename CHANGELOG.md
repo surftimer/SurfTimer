@@ -1,5 +1,12 @@
 # Changelog
 
+[Version 270 - Current work in progress]
+---
+
+* **[UTIL]** Combined config files and removed old settings like bhop and such
+* **[UTIL]** Addes external dependencies for compiling (dhooks, steamworks, discord_api, cleaner)
+* **[NEW]** Addes "Silence Spec" usable with `sm_silentspec` and `sm_sspec`
+
 [2019-08-02]
 ---
 * **[RELEASE/NEW]** added chat command for each option in miscellaneous options [#1](https://github.com/totles/z4lab-surftimer/commit/075694a9af16bc8772992dcc3c6fe833192806e6) - [Todo](https://github.com/totles/z4lab-surftimer/issues/38)

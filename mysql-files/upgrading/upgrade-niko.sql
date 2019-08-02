@@ -58,6 +58,8 @@ CREATE TABLE `ck_playeroptions2` (
  `module4s` int(11) NOT NULL DEFAULT '0',
  `module5s` int(11) NOT NULL DEFAULT '0',
  `prestrafe` int(11) NOT NULL DEFAULT '0',
+ `cpmessages` INT(11) NOT NULL DEFAULT '1' AFTER `prestrafe`,
+ `wrcpmessages` INT(11) NOT NULL DEFAULT '1' AFTER `cpmessages`,
  PRIMARY KEY (`steamid`)
 ) DEFAULT CHARSET=utf8mb4;
 

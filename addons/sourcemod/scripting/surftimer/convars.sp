@@ -83,7 +83,6 @@ ConVar g_hMultiServerMapcycle = null;							// Use multi server mapcycle
 ConVar g_hDBMapcycle = null;									// use maps from ck_maptier as the servers mapcycle
 ConVar g_hPrestigeRank = null;									// Rank to limit the server
 ConVar g_hPrestigeStyles = null;								// Determines if the rank limit applies to normal style or all styles
-ConVar g_hServerType = null;									// Set server to surf or bhop mode
 ConVar g_hOneJumpLimit = null;									// Only allows players to jump once inside a start or stage zone
 ConVar g_hServerID = null;										// Sets the servers id for cross-server announcements
 ConVar g_hRecordAnnounce = null;								// Enable/Disable cross-server announcements
@@ -301,9 +300,6 @@ void CreateConVars()
 	// Prestige Server
 	g_hPrestigeRank = CreateConVar("ck_prestige_rank", "0", "Rank of players who can join the server, 0 to disable");
 	g_hPrestigeStyles = CreateConVar("ck_prestige_all_styles", "1", "If enabled, players must be the rank of ck_prestige_rank in ANY style");
-	// Surf / Bhop
-	g_hServerType = CreateConVar("ck_server_type", "0", "Change the timer to function for Surf or Bhop, 0 = surf, 1 = bhop (Note: Currently does nothing)");
-	HookConVarChange(g_hServerType, OnSettingChanged);
 
 	// One Jump Limit
 	g_hOneJumpLimit = CreateConVar("ck_one_jump_limit", "1", "Enables/Disables the one jump limit globally for all zones");
