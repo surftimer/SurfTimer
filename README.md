@@ -80,6 +80,7 @@ extensions used in this version:
 *   [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604)
 *   [Dhooks](https://forums.alliedmods.net/showthread.php?t=180114)
 *   [Discord API](https://github.com/Deathknife/sourcemod-discord/blob/master/discord_api.sp)
+*   [Trails Chroma](https://github.com/Nickelony/Trails-Chroma)
 <details>
   <summary>forked from fluffys - contributors</summary> 
   
