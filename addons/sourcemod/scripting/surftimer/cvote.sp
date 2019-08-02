@@ -1,23 +1,12 @@
 char votetype[32];
 char mapnameforvote[64];
-// float g_fmptimelimit;
 
 Handle mapTime;
 
 public void GetCurrentMaptime()
 {
 	mapTime = FindConVar("mp_timelimit");
-	// g_fmptimelimit = GetConVarFloat(mapTime);
 }
-
-/*public int GetCurrentMaptime()
-{
-	char buffer[128];
-
-	mapTime.GetString(buffer, 128);
-
-	return StringToInt(buffer);
-}*/
 
 public void extendMap(int seconds)
 {

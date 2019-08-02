@@ -294,13 +294,6 @@ public void ckAdminMenu(int client)
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		/*if (GetConVarBool(g_hAutoTimer))
-			Format(szTmp, sizeof(szTmp), "[%i.] Timer starts at spawn  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] Timer starts at spawn  -  Disabled", menuItemNumber);
-		AddMenuItem(adminmenu, szTmp, szTmp);
-		menuItemNumber++;*/
-
 		if (GetConVarBool(g_hReplayBot))
 			Format(szTmp, sizeof(szTmp), "[%i.] Replay bot  -  Enabled", menuItemNumber);
 		else
