@@ -400,7 +400,6 @@ void CreateCommandListeners()
 	AddCommandListener(Say_Hook, "say");
 	HookUserMessage(GetUserMessageId("SayText2"), SayText2, true);
 	AddCommandListener(Say_Hook, "say_team");
-	// AddCommandListener(Commands_CommandListener);
 
 	AddCommandListener(Command_JoinTeam, "jointeam");
 	AddCommandListener(Command_ext_Menu, "radio1");
@@ -447,53 +446,6 @@ public Action Command_Vip(int client, int args)
 {
 	return Plugin_Handled;
 }
-
-// public Action Command_Vip(int client, int args)
-// {
-// 	if (!IsPlayerVip(client, 1))
-// 	{
-// 		return Plugin_Handled;
-// 	}
-	
-// 	VipMenu(client);
-// 	return Plugin_Handled;
-// }
-
-// public void VipMenu(int client)
-// {
-// 	Menu menu = CreateMenu(VipMenuHandler);
-// 	SetMenuTitle(menu, "VIP Menu");
-// 	AddMenuItem(menu, "ve", "Vote Extend");
-// 	AddMenuItem(menu, "models", "Player Models");
-// 	if (g_iVipLvl[client] > 1)
-// 	{
-// 		AddMenuItem(menu, "title", "VIP Title");
-// 		AddMenuItem(menu, "paintcolour", "Paint Colour");
-// 	}
-// 	else
-// 	{
-// 		AddMenuItem(menu, "title", "VIP Title", ITEMDRAW_DISABLED);
-// 		AddMenuItem(menu, "paintcolour", "Paint Colour", ITEMDRAW_DISABLED);
-// 	}
-// 	SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
-// 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
-// }
-
-// public int VipMenuHandler(Menu menu, MenuAction action, int param1, int param2)
-// {
-// 	if (action == MenuAction_Select)
-// 	{
-// 		switch (param2)
-// 		{
-// 			case 0: VoteExtend(param1);
-// 			case 1: FakeClientCommandEx(param1, "sm_models");
-// 			case 2: CustomTitleMenu(param1);
-// 			case 3: FakeClientCommandEx(param1, "sm_paintcolour");
-// 		}
-// 	}
-// 	else if (action == MenuAction_End)
-// 		CloseHandle(menu);
-// }
 
 public void CustomTitleMenu(int client)
 {
@@ -630,41 +582,6 @@ public Action Command_createPlayerCheckpoint(int client, int args)
 	return Plugin_Handled;
 }
 
-// public Action Command_createPlayerCheckpoint(int client, int args)
-// {
-// 	if (!IsValidClient(client))
-// 		return Plugin_Handled;
-
-// 	if (g_iClientInZone[client][0] == 1 || g_iClientInZone[client][0] == 5)
-// 	{
-// 		CPrintToChat(client, "%t", "PracticeInStartZone", g_szChatPrefix);
-// 		return Plugin_Handled;
-// 	}
-
-// 	float CheckpointTime = GetGameTime();
-
-// 	// Move old checkpoint to the undo values, if the last checkpoint was made more than a second ago
-// 	if (g_bCreatedTeleport[client] && (CheckpointTime - g_fLastPlayerCheckpoint[client]) > 1.0)
-// 	{
-// 		g_fLastPlayerCheckpoint[client] = CheckpointTime;
-// 		Array_Copy(g_fCheckpointLocation[client], g_fCheckpointLocation_undo[client], 3);
-// 		Array_Copy(g_fCheckpointVelocity[client], g_fCheckpointVelocity_undo[client], 3);
-// 		Array_Copy(g_fCheckpointAngle[client], g_fCheckpointAngle_undo[client], 3);
-// 		Format(g_szCheckpointTargetname_undo[client], sizeof(g_szCheckpointTargetname_undo), "%s", g_szCheckpointTargetname[client]);
-// 	}
-
-// 	g_bCreatedTeleport[client] = true;
-// 	GetClientAbsOrigin(client, g_fCheckpointLocation[client]);
-// 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", g_fCheckpointVelocity[client]);
-// 	GetClientEyeAngles(client, g_fCheckpointAngle[client]);
-// 	GetEntPropString(client, Prop_Data, "m_iName", g_szCheckpointTargetname[client], sizeof(g_szCheckpointTargetname));
-
-
-// 	CPrintToChat(client, "%t", "PracticePointCreated", g_szChatPrefix, LIMEGREEN, WHITE);
-
-// 	return Plugin_Handled;
-// }
-
 public Action Command_goToPlayerCheckpoint(int client, int args)
 {
 	if (!IsValidClient(client))
@@ -780,76 +697,6 @@ public int SaveLocListHandler(Menu menu, MenuAction action, int param1, int para
 	else if (action == MenuAction_End)
 		delete menu;
 }
-
-// public Action Command_goToPlayerCheckpoint(int client, int args)
-// {
-// 	if (!IsValidClient(client))
-// 		return Plugin_Handled;
-
-// 	if (g_fCheckpointLocation[client][0] != 0.0 && g_fCheckpointLocation[client][1] != 0.0 && g_fCheckpointLocation[client][2] != 0.0)
-// 	{
-// 		if (g_bPracticeMode[client] == false)
-// 		{
-// 			CPrintToChat(client, "%t", "PracticeStarted", g_szChatPrefix, LIMEGREEN, WHITE, LIMEGREEN, WHITE);
-// 			CPrintToChat(client, "%t", "PracticeStarted2", g_szChatPrefix, LIMEGREEN, WHITE, LIMEGREEN, WHITE);
-// 			g_bPracticeMode[client] = true;
-// 		}
-
-// 		// fluffys gravity
-// 		if (g_iInitalStyle[client] != 4)
-// 			ResetGravity(client);
-// 		else // lowgravity
-// 			SetEntityGravity(client, 0.5);
-
-// 		CL_OnStartTimerPress(client);
-// 		SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, 0.0 } ));
-// 		TeleportEntity(client, g_fCheckpointLocation[client], g_fCheckpointAngle[client], g_fCheckpointVelocity[client]);
-// 		g_bWrcpTimeractivated[client] = false;
-// 		DispatchKeyValue(client, "targetname", g_szCheckpointTargetname[client]);
-// 	}
-// 	else
-// 		CPrintToChat(client, "%t", "PracticeStartError", g_szChatPrefix, LIGHTGREEN);
-
-// 	return Plugin_Handled;
-// }
-
-// public Action Command_undoPlayerCheckpoint(int client, int args)
-// {
-// 	if (!IsValidClient(client))
-// 		return Plugin_Handled;
-
-// 	if (g_fCheckpointLocation_undo[client][0] != 0.0 && g_fCheckpointLocation_undo[client][1] != 0.0 && g_fCheckpointLocation_undo[client][2] != 0.0)
-// 	{
-// 		float tempLocation[3], tempVelocity[3], tempAngle[3];
-// 		char tempTargetname[128];
-
-// 		// Location
-// 		Array_Copy(g_fCheckpointLocation_undo[client], tempLocation, 3);
-// 		Array_Copy(g_fCheckpointLocation[client], g_fCheckpointLocation_undo[client], 3);
-// 		Array_Copy(tempLocation, g_fCheckpointLocation[client], 3);
-
-// 		// Velocity
-// 		Array_Copy(g_fCheckpointVelocity_undo[client], tempVelocity, 3);
-// 		Array_Copy(g_fCheckpointVelocity[client], g_fCheckpointVelocity_undo[client], 3);
-// 		Array_Copy(tempVelocity, g_fCheckpointVelocity[client], 3);
-
-// 		// Angle
-// 		Array_Copy(g_fCheckpointAngle_undo[client], tempAngle, 3);
-// 		Array_Copy(g_fCheckpointAngle[client], g_fCheckpointAngle_undo[client], 3);
-// 		Array_Copy(tempAngle, g_fCheckpointAngle[client], 3);
-
-// 		// Targetname
-// 		Format(tempTargetname, sizeof(tempTargetname), "%s", g_szCheckpointTargetname_undo[client]);
-// 		Format(g_szCheckpointTargetname[client], sizeof(g_szCheckpointTargetname), "%s", g_szCheckpointTargetname_undo);
-// 		Format(g_szCheckpointTargetname[client], sizeof(g_szCheckpointTargetname), "%s", tempTargetname);
-
-// 		CPrintToChat(client, "%t", "PracticeUndo", g_szChatPrefix);
-// 	}
-// 	else
-// 		CPrintToChat(client, "%t", "PracticeUndoError", g_szChatPrefix, LIGHTGREEN);
-
-// 	return Plugin_Handled;
-// }
 
 public Action Command_Teleport(int client, int args)
 {
@@ -990,15 +837,6 @@ public Action Command_ToBonus(int client, int args)
 	// If not enough arguments, or there is more than one bonus
 	if (args < 1 && g_mapZoneGroupCount > 2) // Tell player to select specific bonus
 	{
-		/*CPrintToChat(client, "%t Usage: !b <bonus number>", g_szChatPrefix);
-		if (g_mapZoneGroupCount > 1)
-		{
-			CPrintToChat(client, "%t Available bonuses:", g_szChatPrefix);
-			for (int i = 1; i < g_mapZoneGroupCount; i++)
-			{
-				CPrintToChat(client, "[%c%i.%c] %s", YELLOW, i, WHITE, g_szZoneGroupName[i]);
-			}
-		}*/
 		ListBonuses(client, 1);
 		return Plugin_Handled;
 	}
@@ -1109,7 +947,6 @@ public Action Command_ToStage(int client, int args)
 	if (args < 1)
 	{
 		// Remove chat output to reduce chat spam
-		// CPrintToChat(client, "Teleport to stage 1 | Default usage: !s <stage number>");
 		g_bInStartZone[client] = false;
 		g_bUsingStageTeleport[client] = true;
 		teleportClient(client, 0, 1, true);
@@ -1663,16 +1500,6 @@ public int MapTopMenuSelectStyleHandler(Handle menu, MenuAction action, int para
 		char szMapName[128];
 		GetMenuItem(menu, param2, szMapName, sizeof(szMapName));
 		db_selectMapNameEquals(param1, szMapName, param2);
-		// if (param2 == 0)
-		// {
-		// 	g_ProfileStyleSelect[param1] = 0;
-		// 	db_selectMapTopSurfers(param1, szMapName);
-		// }
-		// else
-		// {
-		// 	g_ProfileStyleSelect[param1] = param2;
-		// 	db_selectStyleMapTopSurfers(param1, szMapName, param2);
-		// }
 	}
 	else if (action == MenuAction_End)
 		delete menu;
@@ -2195,30 +2022,6 @@ public int HelpMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 		CloseHandle(menu);
 }
 
-// old client_ranks
-/*public Action Client_Ranks(int client, int args)
-{
-	if (IsValidClient(client))
-	{
-		char ChatLine[512];
-		Format(ChatLine, 512, "%s", g_szChatPrefix);
-		int i, RankValue[SkillGroup];
-		for (i = 0; i < GetArraySize(g_hSkillGroups); i++)
-		{
-			GetArrayArray(g_hSkillGroups, i, RankValue[0]);
-
-			if (i != 0 && i % 3 == 0)
-			{
-				CPrintToChat(client, ChatLine);
-				Format(ChatLine, 512, " ");
-			}
-			Format(ChatLine, 512, "%s%s%c (%ip)   ", ChatLine, RankValue[RankNameColored], WHITE, RankValue[PointReq]);
-		}
-		CPrintToChat(client, ChatLine);
-	}
-	return Plugin_Handled;
-}*/
-
 public Action Client_Ranks(int client, int args)
 {
 	if (IsValidClient(client))
@@ -2445,12 +2248,6 @@ public void PauseMethod(int client)
 			return;
 		}
 		g_bPause[client] = true;
-		/*float fVel[3];
-		fVel[0] = 0.000000;
-		fVel[1] = 0.000000;
-		fVel[2] = 0.000000;
-		SetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
-		*/
 		SetEntityMoveType(client, MOVETYPE_NONE); // not sure why he sets vel to 0
 		// Timer enabled?
 		if (g_bTimerRunning[client] == true)
@@ -2481,8 +2278,6 @@ public void PauseMethod(int client)
 			SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
 		else
 			SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 5, true);
-
-		// TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, view_as<float>( { 0.0, 0.0, -100.0 } ));
 	}
 }
 
@@ -2557,7 +2352,6 @@ public void GotoMethod(int client, int target)
 				GetClientAbsOrigin(target, position);
 				GetClientEyeAngles(target, angles);
 				teleportEntitySafe(client, position, angles, view_as<float>( { 0.0, 0.0, -100.0 } ), true);
-				// TeleportEntity(client, position, angles, Float:{0.0,0.0,-100.0});
 				char szClientName[MAX_NAME_LENGTH];
 				GetClientName(client, szClientName, MAX_NAME_LENGTH);
 				CPrintToChat(target, "%t", "Goto5", g_szChatPrefix, szClientName);
@@ -3682,7 +3476,6 @@ public int StageSelectMenuHandler(Menu menu, MenuAction action, int param1, int 
 	{
 		char info[32];
 		GetMenuItem(menu, param2, info, sizeof(info));
-		// CPrintToChat(param1, "Stage %i - %s", info, g_szWrcpMapSelect[param1]);
 		db_selectStageTopSurfers(param1, info, g_szWrcpMapSelect[param1]);
 	}
 	else
@@ -3703,7 +3496,6 @@ public int StageStyleSelectMenuHandler(Menu menu, MenuAction action, int param1,
 		int style = g_StyleStageSelect[param1];
 		char info[32];
 		GetMenuItem(menu, param2, info, sizeof(info));
-		// CPrintToChat(param1, "Stage %i - %s", info, g_szWrcpMapSelect[param1]);
 		db_selectStageStyleTopSurfers(param1, info, g_szWrcpMapSelect[param1], style);
 	}
 	else
@@ -4004,11 +3796,6 @@ public Action Command_SelectBonusTime(int client, int args)
 			char szSteamId2[32];
 			char szName[MAX_NAME_LENGTH];
 
-			/*if (StrContains(arg1[0], "surf_", true) != -1) // if arg1 contains a surf map
-			{
-				db_selectMapRank(client, g_szSteamID[client], arg1);
-				return Plugin_Handled;
-			}*/
 			if (StrContains(arg1, "#", false) != -1) // bonus number
 			{
 				ReplaceString(arg1, 128, "#", "", false);
@@ -4498,7 +4285,6 @@ public int HookZoneHandler(Menu menu, MenuAction action, int param1, int param2)
 
 					CPrintToChat(param1, "%t", "TeleportingTo", g_szChatPrefix, szTriggerName, position[0], position[1], position[2]);
 
-					// teleportEntitySafe(param1, position, angles, view_as<float>( { 0.0, 0.0, -100.0 } ), true);
 					Client_Stop(param1, 0);
 					TeleportEntity(param1, position, angles, view_as<float>( { 0.0, 0.0, -100.0 } ));
 				}
@@ -4650,7 +4436,6 @@ public int HookZoneTypeHandler(Menu menu, MenuAction action, int param1, int par
 			{
 				case 0: // Start Zone
 				{
-					//public void db_insertZoneHook(int zoneid, int zonetype, int zonetypeid, float pointax, float pointay, float pointaz, float pointbx, float pointby, float pointbz, int vis, int team, int zonegroup, char[] szHookName)
 					db_insertZoneHook(g_mapZonesCount, 1, g_mapZonesTypeCount[0][1], 0, 0, g_iZonegroupHook[param1], szTriggerName, fMins, fMaxs);
 				}
 				case 1: // Checkpoint Zone
