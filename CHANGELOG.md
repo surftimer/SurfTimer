@@ -6,6 +6,7 @@
 * **[UTIL]** Combined config files and removed old settings like bhop and such
 * **[UTIL]** Added external dependencies for compiling (dhooks, steamworks, discord_api, cleaner)
 * **[NEW]** Added "Silence Spec" usable with `sm_silentspec` and `sm_sspec`
+* **[NEW]** Added [Trails Chroma](https://github.com/Nickelony/Trails-Chroma) into the SurfTimer for VIP's and Admins
 
 [2019-08-02]
 ---
