@@ -209,17 +209,87 @@ void CreateCommands()
 	RegConsoleCmd("sm_prestrafe", Command_Prestrafe, "[surftimer] [settings] Toggles prestrafe messages for player");
 	RegConsoleCmd("sm_silentspec", Command_SilentSpec, "[surftimer] [settings] Toggles silent spectate for player");
 	RegConsoleCmd("sm_sspec", Command_SilentSpec, "[surftimer] [settings] Toggles silent spectate for player");
-	RegConsoleCmd("sm_togglewrcps", Command_ToggleWrcps, "[surftimer] on/off - Enable player checkpoints");
-	RegConsoleCmd("sm_togglecps", Command_ToggleCps, "[surftimer] on/off - Enable player checkpoints");
+	RegConsoleCmd("sm_togglewrcps", Command_ToggleWrcps, "[surftimer] [settings] on/off - Enable player checkpoints");
+	RegConsoleCmd("sm_togglecps", Command_ToggleCps, "[surftimer] [settings] on/off - Enable player checkpoints");
+	RegConsoleCmd("sm_quake", Command_ToggleQuake, "[surftimer] [settings] on/off - Enable sounds");
+	RegConsoleCmd("sm_startside", Command_ChangeStartSide, "[surftimer] [settings] left/right - change start side");
+	RegConsoleCmd("sm_speedgradient", Command_ChangeSpeedGradient, "[surftimer] [settings] white/green/rainbow/momentum - change speed gradient");
+	RegConsoleCmd("sm_speedmode", Command_ChangeSpeedMode, "[surftimer] [settings] xy/xyz/z - change speed mode");
+	RegConsoleCmd("sm_centerspeed", Command_CenterSpeed, "[surftimer] [settings] on/off - toggle center speed display");
+	
+}
 
+public Action Command_CenterSpeed(int client, int args) {
+	if (g_bCenterSpeedDisplay[client]) {
+		g_bCenterSpeedDisplay[client] = false;
+		CPrintToChat(client, "%t", "CenterSpeedOff", g_szChatPrefix);
+	} else {
+		g_bCenterSpeedDisplay[client] = true;
+		SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
+		CreateTimer(0.1, CenterSpeedDisplayTimer, client, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
+		CPrintToChat(client, "%t", "CenterSpeedOn", g_szChatPrefix);
+	}
+	return Plugin_Handled;
+}
+
+public Action Command_ChangeSpeedMode(int client, int args) {
+	if (g_SpeedMode[client] == 0) { 
+		g_SpeedMode[client]++;
+		CPrintToChat(client, "%t", "SpeedModeXYZ", g_szChatPrefix);
+	} else if (g_SpeedMode[client] == 1) {
+		g_SpeedMode[client]++;
+		CPrintToChat(client, "%t", "SpeedModeZ", g_szChatPrefix);
+	} else {
+		g_SpeedMode[client] = 0;
+		CPrintToChat(client, "%t", "SpeedModeXY", g_szChatPrefix);
+	}
+	return Plugin_Handled;
+}
+
+public Action Command_ChangeSpeedGradient(int client, int args) {
+	if (g_SpeedGradient[client] == 0) { 
+		g_SpeedGradient[client]++;
+		CPrintToChat(client, "%t", "SpeedGradientGreen", g_szChatPrefix);
+	} else if (g_SpeedGradient[client] == 1) {
+		g_SpeedGradient[client]++;
+		CPrintToChat(client, "%t", "SpeedGradientRainbow", g_szChatPrefix);
+	} else if (g_SpeedGradient[client] == 2) {
+		g_SpeedGradient[client]++;
+		CPrintToChat(client, "%t", "SpeedGradientMomentum", g_szChatPrefix);
+	} else {
+		g_SpeedGradient[client] = 0;
+		CPrintToChat(client, "%t", "SpeedGradientWhite", g_szChatPrefix);
+	}
+	return Plugin_Handled;
+}
+
+public Action Command_ChangeStartSide(int client, int args) {
+	if (g_iTeleSide[client] == 0) {
+		g_iTeleSide[client] = 1;
+		CPrintToChat(client, "%t", "StartSideRight", g_szChatPrefix);
+	} else {
+		g_iTeleSide[client] = 0;
+		CPrintToChat(client, "%t", "StartSideLeft", g_szChatPrefix);
+	}
+	return Plugin_Handled;
+}
+
+public Action Command_ToggleQuake(int client, int args) {
+	if (g_bEnableQuakeSounds[client]) {
+		g_bEnableQuakeSounds[client] = false;
+		CPrintToChat(client, "%t", "QuakeToggleOff", g_szChatPrefix);
+	} else {
+		g_bEnableQuakeSounds[client] = true;
+		CPrintToChat(client, "%t", "QuakeToggleOn", g_szChatPrefix);
+	}
+	return Plugin_Handled;
 }
 
 public Action Command_ToggleWrcps(int client, int args) {
 	if (g_iWrcpMessages[client]) {
 		g_iWrcpMessages[client] = false;
 		CPrintToChat(client, "%t", "ToggleWrcpsMessageToggleOff", g_szChatPrefix);
-	} 
-	else {
+	} else {
 		g_iWrcpMessages[client] = true;
 		CPrintToChat(client, "%t", "ToggleWrcpsMessageToggleOn", g_szChatPrefix);
 	}
@@ -230,8 +300,7 @@ public Action Command_ToggleCps(int client, int args) {
 	if (g_iCpMessages[client]) {
 		g_iCpMessages[client] = false;
 		CPrintToChat(client, "%t", "ToggleCpsMessageToggleOff", g_szChatPrefix);
-	} 
-	else {
+	} else {
 		g_iCpMessages[client] = true;
 		CPrintToChat(client, "%t", "ToggleCpsMessageToggleOn", g_szChatPrefix);
 	}
@@ -244,8 +313,7 @@ public Action Command_SilentSpec(int client, int args) {
 	if (g_iSilentSpectate[client]) {
 		g_iSilentSpectate[client] = false;
 		CPrintToChat(client, "%t", "SilentSpecMessageToggleOff", g_szChatPrefix);
-	} 
-	else {
+	} else {
 		g_iSilentSpectate[client] = true;
 		CPrintToChat(client, "%t", "SilentSpecMessageToggleOn", g_szChatPrefix);
 	}
@@ -256,8 +324,7 @@ public Action Command_Prestrafe(int client, int args) {
 	if (g_iPrespeedText[client]) {
 		g_iPrespeedText[client] = false;
 		CPrintToChat(client, "%t", "PrestrafeMessageToggleOff", g_szChatPrefix);
-	} 
-	else {
+	} else {
 		g_iPrespeedText[client] = true;
 		CPrintToChat(client, "%t", "PrestrafeMessageToggleOn", g_szChatPrefix);
 	}
@@ -271,8 +338,7 @@ public Action Command_DeleteRecords(int client, int args)
 		char sqlStripped[128];
 		GetCmdArg(1, sqlStripped[client], 128);
 		SQL_EscapeString(g_hDb, sqlStripped, g_EditingMap[client], 256);
-	}
-	else
+	} else
 		Format(g_EditingMap[client], 256, g_szMapName);
 	
 	ShowMainDeleteMenu(client);

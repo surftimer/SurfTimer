@@ -1538,4 +1538,69 @@
 		"#format"	"{1:s}"
 		"en"		"{1} CP messages are now {red}disabled"
 	}
+	"QuakeToggleOn"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Timer sounds are now {green}enabled"
+	}
+	"QuakeToggleOff"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Timer sounds are now {red}disabled"
+	}
+	"StartSideLeft"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Your start side is now {blue}left"
+	}
+	"StartSideRight"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Your start side is now {yellow}right"
+	}
+	"SpeedGradientWhite"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Your speed gradient is now {blue}white"
+	}
+	"SpeedGradientGreen"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Your speed gradient is now {green}green"
+	}
+	"SpeedGradientRainbow"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Your speed gradient is now {pink}r{purple}a{darkblue}i{green}n{yellow}b{orange}o{red}w"
+	}
+	"SpeedGradientMomentum"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Your speed gradient is now {blue}momen{red}tum"
+	}
+	"SpeedModeXY"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Your speed mode is now {yellow}X{orange}Y"
+	}
+	"SpeedModeXYZ"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Your speed mode is now {yellow}X{orange}Y{red}Z"
+	}
+	"SpeedModeZ"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Your speed mode is now {red}Z"
+	}
+	"CenterSpeedOn"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} The center speed display is now {green}enabled"
+	}
+	"CenterSpeedOff"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} The center speed display is now {red}disabled"
+	}
 }
