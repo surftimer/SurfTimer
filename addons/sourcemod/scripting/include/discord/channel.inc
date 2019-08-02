@@ -1,3 +1,12 @@
+enum
+{
+	GUILD_TEXT = 0,
+	DM,
+	GUILD_VOICE,
+	GROUP_DM,
+	GUILD_CATEGORY
+};
+
 methodmap DiscordChannel < StringMap {
 	public DiscordChannel() {
 		Handle hObj = json_object();
@@ -16,10 +25,6 @@ methodmap DiscordChannel < StringMap {
 	
 	public void GetName(char[] buffer, int maxlength) {
 		JsonObjectGetString(this, "name", buffer, maxlength);
-	}
-	
-	public void GetType(char[] buffer, int maxlength) {
-		JsonObjectGetString(this, "type", buffer, maxlength);
 	}
 	
 	property int Position {
@@ -42,8 +47,14 @@ methodmap DiscordChannel < StringMap {
 		JsonObjectGetString(this, "last_message_id", buffer, maxlength);
 	}
 	
-	public void SetLastMessageID(char[] id) {
+	public void SetLastMessageID(const char[] id) {
 		json_object_set_new(this, "last_message_id", json_string(id));
+	}
+	
+	property int Type {
+		public get() {
+			return JsonObjectGetInt(this, "type");
+		}
 	}
 	
 	property int Bitrate {
@@ -60,10 +71,7 @@ methodmap DiscordChannel < StringMap {
 	
 	property bool IsText {
 		public get() {
-			char type[8];
-			this.GetType(type, sizeof(type));
-			if(StrEqual(type, "text", false)) return true;
-			return false;
+			return this.Type == GUILD_TEXT;
 		}
 	}
-}
+};

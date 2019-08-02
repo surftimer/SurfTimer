@@ -1,7 +1,7 @@
-# z4lab-SurfTimer 261 for CS:GO
+# z4lab-SurfTimer 270 for CS:GO
 
 ## installation and requirements
-you will need [SourceMod 1.9](https://www.sourcemod.net/downloads.php?branch=stable), [MetaMod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable), [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556), [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604) and a working MySQL instance, other dependencies like `DHooks` and `Cleaner` are already included
+you will need [SourceMod 1.9](https://www.sourcemod.net/downloads.php?branch=stable), [MetaMod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable) and a working MySQL instance
 
 ### new install
 
@@ -74,6 +74,12 @@ Take surf_aircontrol_nbv for example: (You can use sm_mi to see this menu)
 </details>
 
 ## credits
+
+extensions used in this version:
+*   [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
+*   [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604)
+*   [Dhooks](https://forums.alliedmods.net/showthread.php?t=180114)
+*   [Discord API](https://github.com/Deathknife/sourcemod-discord/blob/master/discord_api.sp)
 <details>
   <summary>forked from fluffys - contributors</summary> 
   

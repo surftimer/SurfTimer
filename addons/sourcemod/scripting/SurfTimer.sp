@@ -36,7 +36,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "263"
+#define VERSION "270"
 
 // Database Definitions
 #define MYSQL 0
@@ -1708,9 +1708,6 @@ public void OnMapStart()
 	CreateTimer(1.0, DelayedStuff, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 	CreateTimer(10.0, LoadReplaysTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 
-	if (g_bLateLoaded)
-		OnAutoConfigsBuffered();
-
 	g_Advert = 0;
 	CreateTimer(180.0, AdvertTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 
@@ -1884,40 +1881,9 @@ public void OnConfigsExecuted()
 		ServerCommand("mp_respawn_on_death_ct 0;mp_respawn_on_death_t 0");
 
 	ServerCommand("mp_endmatch_votenextmap 0;mp_do_warmup_period 0;mp_warmuptime 0;mp_match_can_clinch 0;mp_match_end_changelevel 1;mp_match_restart_delay 10;mp_endmatch_votenextleveltime 10;mp_endmatch_votenextmap 0;mp_halftime 0;bot_zombie 1;mp_do_warmup_period 0;mp_maxrounds 1");
+	ServerCommand("sv_infinite_ammo 2");
+	ServerCommand("sv_autobunnyhopping 1");
 
-	if (GetConVarInt(g_hServerType) == 1)
-	{
-		// Bhop
-		ServerCommand("sv_infinite_ammo 1");
-	}
-	else
-	{
-		// Surf
-		ServerCommand("sv_infinite_ammo 2");
-		ServerCommand("sv_autobunnyhopping 1");
-	}
-}
-
-public void OnAutoConfigsBuffered()
-{
-	// just to be sure that it's not empty
-	char szMap[128];
-	char szPrefix[2][32];
-	GetCurrentMap(szMap, 128);
-	char mapPieces[6][128];
-	int lastPiece = ExplodeString(szMap, "/", mapPieces, sizeof(mapPieces), sizeof(mapPieces[]));
-	Format(szMap, sizeof(szMap), "%s", mapPieces[lastPiece - 1]);
-	ExplodeString(szMap, "_", szPrefix, 2, 32);
-
-	// map config
-	char szPath[256];
-	Format(szPath, sizeof(szPath), "sourcemod/surftimer/%s_.cfg", szPrefix[0]);
-	char szPath2[256];
-	Format(szPath2, sizeof(szPath2), "cfg/%s", szPath);
-	if (FileExists(szPath2))
-		ServerCommand("exec %s", szPath);
-	else
-		SetFailState("<Surftimer> %s not found.", szPath2);
 }
 
 public void OnClientConnected(int client)
@@ -2554,13 +2520,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 		else
 			g_AdminMenuFlag = FlagToBit(flag);
 	}
-	else if (convar == g_hServerType)
-	{
-		if (GetConVarInt(g_hServerType) == 1) // Bhop
-			ServerCommand("sv_infinite_ammo 1");
-		else
-			ServerCommand("sv_infinite_ammo 2"); // Surf
-	}
+
 	else if (convar == g_hServerID)
 		g_iServerID = GetConVarInt(g_hServerID);
 	else if (convar == g_hHostName)

@@ -58,7 +58,7 @@ methodmap DiscordBot < StringMap {
 	 * Checks if the bot is listening to channel for messages
 	 * @param DiscordChannel Channel
 	 */
-	public bool IsListeningToChannelID(char[] id) {
+	public bool IsListeningToChannelID(const char[] id) {
 		Handle hChannels = this.GetListeningChannels();
 		if(hChannels == null) return false;
 		
@@ -105,7 +105,7 @@ methodmap DiscordBot < StringMap {
 	 * Stops the bot from listening to that channel id for messages
 	 * @param DiscordChannel Channel
 	 */
-	public void StopListeningToChannelID(char[] id) {
+	public void StopListeningToChannelID(const char[] id) {
 		Handle channels = this.GetListeningChannels();
 		if(channels == null) return;
 		
@@ -122,7 +122,7 @@ methodmap DiscordBot < StringMap {
 		delete channels;
 	}
 	
-	public DiscordChannel GetListeningChannelByID(char[] id) {
+	public DiscordChannel GetListeningChannelByID(const char[] id) {
 		Handle channels = this.GetListeningChannels();
 		if(channels == null) return null;
 		
@@ -163,39 +163,39 @@ methodmap DiscordBot < StringMap {
 	}
 	
 	
-	public native void AddReactionID(char[] channel, char[] messageid, char[] emoji);
+	public native void AddReactionID(const char[] channel, const char[] messageid, const char[] emoji);
 	
-	public void AddReaction(DiscordChannel channel, char[] messageid, char[] emoji) {
+	public void AddReaction(DiscordChannel channel, const char[] messageid, const char[] emoji) {
 		char channelid[64];
 		channel.GetID(channelid, sizeof(channelid));
 		this.AddReactionID(channelid, messageid, emoji);
 	}
 	
-	public native void DeleteReactionID(char[] channel, char[] messageid, char[] emoji, char[] user);
+	public native void DeleteReactionID(const char[] channel, const char[] messageid, const char[] emoji, const char[] user);
 	
-	public void DeleteReaction(DiscordChannel channel, char[] messageid, char[] emoji, char[] user) {
+	public void DeleteReaction(DiscordChannel channel, const char[] messageid, const char[] emoji, const char[] user) {
 		char chid[64];
 		channel.GetID(chid, sizeof(chid));
 		this.DeleteReactionID(chid, messageid, emoji, user);
 	}
 	
-	public void DeleteReactionSelf(DiscordChannel channel, char[] messageid, char[] emoji) {
+	public void DeleteReactionSelf(DiscordChannel channel, const char[] messageid, const char[] emoji) {
 		this.DeleteReaction(channel, messageid, emoji, "@me");
 	}
-	public void DeleteReactionAll(DiscordChannel channel, char[] messageid, char[] emoji) {
+	public void DeleteReactionAll(DiscordChannel channel, const char[] messageid, const char[] emoji) {
 		this.DeleteReaction(channel, messageid, emoji, "@all");
 	}
 	
-	public void DeleteReactionSelfID(char[] channel, char[] messageid, char[] emoji) {
+	public void DeleteReactionSelfID(const char[] channel, const char[] messageid, const char[] emoji) {
 		this.DeleteReactionID(channel, messageid, emoji, "@me");
 	}
-	public void DeleteReactionAllID(char[] channel, char[] messageid, char[] emoji) {
+	public void DeleteReactionAllID(const char[] channel, const char[] messageid, const char[] emoji) {
 		this.DeleteReactionID(channel, messageid, emoji, "@all");
 	}
 	
-	public native void GetReactionID(char[] channel, char[] messageid, char[] emoji, OnGetReactions fCallback=INVALID_FUNCTION, any data=0);
+	public native void GetReactionID(const char[] channel, const char[] messageid, const char[] emoji, OnGetReactions fCallback=INVALID_FUNCTION, any data=0);
 	
-	public void GetReaction(DiscordChannel channel, char[] messageid, char[] emoji, OnGetReactions fCallback=INVALID_FUNCTION, any data=0) {
+	public void GetReaction(DiscordChannel channel, const char[] messageid, const char[] emoji, OnGetReactions fCallback=INVALID_FUNCTION, any data=0) {
 		char id[64];
 		channel.GetID(id, sizeof(id));
 		this.GetReactionID(id, messageid, emoji, fCallback, data);
@@ -206,6 +206,10 @@ methodmap DiscordBot < StringMap {
 	public native void SendMessage(DiscordChannel channel, char[] message, OnMessageSent fCallback=INVALID_FUNCTION, any data=0);
 	
 	public native void SendMessageToChannelID(char[] channel, char[] message, OnMessageSent fCallback=INVALID_FUNCTION, any data=0);
+	
+	public native void DeleteMessageID(char[] channel, char[] message, OnMessageDeleted fCallback=INVALID_FUNCTION, any data=0);
+	public native void DeleteMessage(DiscordChannel channel, DiscordMessage message, OnMessageDeleted fCallback=INVALID_FUNCTION, any data=0);
+	
 	
 	public native void GetGuilds(DiscordGuildsRetrieve fCallback = INVALID_FUNCTION, DiscordGuildsRetrievedAll fCallbackAll = INVALID_FUNCTION, any data=0);
 	
@@ -224,4 +228,4 @@ methodmap DiscordBot < StringMap {
 	public native void GetGuildMembersAll(char[] guild, OnGetMembers fCallback, int perPage=250, char[] afterUserID="");
 	
 	public native void GetGuildRoles(char[] guild, DiscordGuildGetRoles fCallback, any data);
-}
+};
