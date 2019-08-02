@@ -4,8 +4,8 @@
 ---
 
 * **[UTIL]** Combined config files and removed old settings like bhop and such
-* **[UTIL]** Addes external dependencies for compiling (dhooks, steamworks, discord_api, cleaner)
-* **[NEW]** Addes "Silence Spec" usable with `sm_silentspec` and `sm_sspec`
+* **[UTIL]** Added external dependencies for compiling (dhooks, steamworks, discord_api, cleaner)
+* **[NEW]** Added "Silence Spec" usable with `sm_silentspec` and `sm_sspec`
 
 [2019-08-02]
 ---
