@@ -1,9 +1,9 @@
 # Changelog
 
-[2019-07-20]
+[2019-08-02]
 ---
 * **[RELEASE/NEW]** added chat command for each option in miscellaneous options [#1](https://github.com/totles/z4lab-surftimer/commit/075694a9af16bc8772992dcc3c6fe833192806e6) - [Todo](https://github.com/totles/z4lab-surftimer/issues/38)
-* **[RELEASE/FIX]** added chat command for each option in miscellaneous options [#1](https://github.com/totles/z4lab-surftimer/commit/1cdb099c87b24bf201add111f2cb8123b45555d6) - [Todo](https://github.com/totles/z4lab-surftimer/issues/39) - [Backlog](https://github.com/totles/z4lab-surftimer/commit/1cdb099c87b24bf201add111f2cb8123b45555d6)
+* **[RELEASE/FIX]** fixed and made cp/wrcp messages toggleable  [#1](https://github.com/totles/z4lab-surftimer/commit/1cdb099c87b24bf201add111f2cb8123b45555d6) - [#2](https://github.com/totles/z4lab-surftimer/commit/808871c5617449de86c074737a193e2ea2610c33) - [Todo](https://github.com/totles/z4lab-surftimer/issues/39)
 
 [2019-07-31 - 2019-08-01]
 ---

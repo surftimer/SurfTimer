@@ -1,28 +1,3 @@
-/*void disableServerHibernate()
-{
-	Handle hServerHibernate = FindConVar("sv_hibernate_when_empty");
-	g_iServerHibernationValue = GetConVarInt(hServerHibernate);
-	if (g_iServerHibernationValue > 0)
-	{
-		PrintToServer("[surftimer] Disabling server hibernation.");
-		SetConVarInt(hServerHibernate, 0, false, false);
-	}
-	CloseHandle(hServerHibernate);
-	return;
-}
-
-void revertServerHibernateSettings()
-{
-	Handle hServerHibernate = FindConVar("sv_hibernate_when_empty");
-	if (GetConVarInt(hServerHibernate) != g_iServerHibernationValue)
-	{
-		PrintToServer("[surftimer] Resetting Server Hibernation CVar");
-		SetConVarInt(hServerHibernate, g_iServerHibernationValue, false, false);
-	}
-	CloseHandle(hServerHibernate);
-	return;
-}*/
-
 void setBotQuota()
 {
 	// Get bot_quota value
@@ -46,7 +21,6 @@ void setBotQuota()
 		SetConVarInt(hBotQuota, 0, false, false);
 	else
 	{
-		// count = count + 1;
 		SetConVarInt(hBotQuota, count, false, false);
 	}
 
@@ -113,16 +87,9 @@ public void LoadClientSetting(int client, int setting)
 		switch (setting)
 		{
 			case 0: db_viewPersonalRecords(client, g_szSteamID[client], g_szMapName);
-			// db_viewMapRankPro(client);
-			// db_viewStyleMapRank(client, style);
 			case 1: db_viewPersonalBonusRecords(client, g_szSteamID[client]);
-			// db_viewMapRankBonus(client, zgroup, 0);
-			// db_viewMapRankBonusStyle(client, zgroup, 0, style);
 			case 2: db_viewPersonalStageRecords(client, g_szSteamID[client]);
-			// db_viewStageRanks(client, stage);
-			// db_viewStyleStageRanks(client, stage, style);
 			case 3: db_viewPlayerPoints(client);
-			// db_GetPlayerRank(client);
 			case 4: db_viewPlayerOptions(client, g_szSteamID[client]);
 			case 5: db_CheckVIPAdmin(client, g_szSteamID[client]);
 			case 6: db_viewCustomTitles(client, g_szSteamID[client]);
@@ -213,7 +180,6 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 				Client_Stop(client, 0);
 
 			Array_Copy(g_fStartposLocation[client][zonegroup], g_fTeleLocation[client], 3);
-			// Array_Copy(g_fSpawnLocation[zonegroup][realZone], g_fStartposLocation[client][zonegroup], 3);
 
 			g_specToStage[client] = true;
 			g_bRespawnPosition[client] = false;
@@ -452,36 +418,6 @@ int setClientLocation(int client, float fDestination[3])
 	return zId;
 }
 
-/*
-void performTeleport(int client, float pos[3], float ang[3], float vel[3])
-{
-	Client_Stop(client, 1);
-	// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
-	if (destinationZoneId != g_iClientInZone[client][3])
-	{
-		// If teleporting from inside a zone, ignore the end touch
-		if (g_iClientInZone[client][0] != -1)
-			g_bIgnoreZone[client] = true;
-
-		if (destinationZoneId > -1)
-		{
-			g_iClientInZone[client][0] = g_mapZones[destinationZoneId][zoneType];
-			g_iClientInZone[client][1] = g_mapZones[destinationZoneId][zoneTypeId];
-			g_iClientInZone[client][2] = g_mapZones[destinationZoneId][zoneGroup];
-			g_iClientInZone[client][3] = destinationZoneId;
-		}
-		else
-			if (targetClient > -1)
-			{
-				g_iClientInZone[client][0] = -1;
-				g_iClientInZone[client][1] = -1;
-				g_iClientInZone[client][2] = g_iClientInZone[targetClient][2];
-				g_iClientInZone[client][3] = -1;
-			}
-	}
-	TeleportEntity(client, pos, ang, vel);
-}*/
-
 stock void WriteChatLog(int client, const char[] sayOrSayTeam, const char[] msg)
 {
 	char name[MAX_NAME_LENGTH], steamid[32], teamName[10];
@@ -631,9 +567,6 @@ void TeamChangeActual(int client, int toteam)
 			g_fPauseTime[client] = GetGameTime() - g_fStartPauseTime[client];
 		g_bSpectate[client] = false;
 	}
-
-//	if (!IsPlayerAlive(client) && toteam > 1)
-//		CS_RespawnPlayer(client);
 
 	ChangeClientTeam(client, toteam);
 
@@ -1205,19 +1138,12 @@ public void LimitSpeed(int client)
 		CurVelVec[2] = 1.0;
 
 	float currentspeed = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0));
-	// float xy = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0));
-	// float z = SquareRoot(Pow(CurVelVec[2], 2.0));
 
 	if (currentspeed > speedCap)
 	{
 		NormalizeVector(CurVelVec, CurVelVec);
 		ScaleVector(CurVelVec, speedCap);
-		// CPrintToChat(client, "XY: %f Z: %f XYZ: %f", xy, z, currentspeed);
-		// CPrintToChat(client, "%f", CurVelVec);
-		// CPrintToChat(client, "%f %f %f", CurVelVec[0], CurVelVec[1], CurVelVec[2]);
-		// CPrintToChat(client, "Limited speed");
 		TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
-		//TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
 	}
 }
 
@@ -1253,7 +1179,6 @@ public void LimitSpeedNew(int client)
 	}
 
 	// Determine how much each vector must be scaled for the magnitude to equal the limit
-	// scale = limit / (vx^2 + vy^2)^0.5)
 	// Derived from Pythagorean theorem, where the hypotenuse represents the magnitude of velocity,
 	// and the two legs represent the x and y velocity components.
   // As a side effect, velocity component signs are also handled.
@@ -1262,15 +1187,8 @@ public void LimitSpeedNew(int client)
 	// A scale < 1 indicates a magnitude > limit
 	if (scale < 1.0)
 	{
-		// if (g_bInStageZone[client] && g_bNewStage[client])
-		// {
-		// 	g_bNewStage[client] = false;
-		// 	g_bLeftZone[client] = false;
-		// 	return;
-		// }
 
 		// Reduce each vector by the appropriate amount
-		//float speed = SquareRoot(Pow(fVel[0], 2.0) + Pow(fVel[1], 2.0));
 		fVel[0] = FloatMul(fVel[0], scale);
 		fVel[1] = FloatMul(fVel[1], scale);
 
@@ -1397,18 +1315,6 @@ public void SetClientDefaults(int client)
 
 	Format(g_szPersonalRecord[client], 64, "");
 
-	// Player Checkpoints
-	// for (int x = 0; x < 3; x++)
-	// {
-	// 	g_fCheckpointLocation[client][x] = 0.0;
-	// 	g_fCheckpointVelocity[client][x] = 0.0;
-	// 	g_fCheckpointAngle[client][x] = 0.0;
-
-	// 	g_fCheckpointLocation_undo[client][x] = 0.0;
-	// 	g_fCheckpointVelocity_undo[client][x] = 0.0;
-	// 	g_fCheckpointAngle_undo[client][x] = 0.0;
-	// }
-
 	for (int x = 0; x < MAXZONEGROUPS; x++)
 	{
 		Format(g_szPersonalRecordBonus[x][client], 64, "-");
@@ -1489,22 +1395,6 @@ public void SetClientDefaults(int client)
 	
 	g_bInBhop[client] = false;
 }
-
-// public void clearPlayerCheckPoints(int client)
-// {
-// 	for (int x = 0; x < 3; x++)
-// 	{
-// 		g_fCheckpointLocation[client][x] = 0.0;
-// 		g_fCheckpointVelocity[client][x] = 0.0;
-// 		g_fCheckpointAngle[client][x] = 0.0;
-
-// 		g_fCheckpointLocation_undo[client][x] = 0.0;
-// 		g_fCheckpointVelocity_undo[client][x] = 0.0;
-// 		g_fCheckpointAngle_undo[client][x] = 0.0;
-// 	}
-// 	g_fLastPlayerCheckpoint[client] = GetGameTime();
-// 	g_bCreatedTeleport[client] = false;
-// }
 
 // Get Runtime
 public void GetcurrentRunTime(int client)
@@ -1634,15 +1524,6 @@ public void PlayWRCPRecord(int iRecordtype)
 public void InitPrecache()
 {
 	char szBuffer[256];
-	// db_precacheCustomSounds();
-
-	// Timer finish sounds
-	// AddFileToDownloadsTable(UNSTOPPABLE_SOUND_PATH);
-	// FakePrecacheSound(UNSTOPPABLE_RELATIVE_SOUND_PATH);
-	// AddFileToDownloadsTable(PRO_FULL_SOUND_PATH);
-	// FakePrecacheSound(PRO_RELATIVE_SOUND_PATH);
-	// AddFileToDownloadsTable(CP_FULL_SOUND_PATH);
-	// FakePrecacheSound(CP_RELATIVE_SOUND_PATH);
 	
 	GetConVarString(g_hSoundPathWR, szBuffer, sizeof(szBuffer));
 	AddFileToDownloadsTable(szBuffer);
@@ -1962,7 +1843,6 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		CreateDataTimer(1.0, UpdatePlayerProfile, pack, TIMER_FLAG_NO_MAPCHANGE);
 		WritePackCell(pack, GetClientUserId(client));
 		WritePackCell(pack, style);
-		// CreateTimer(0.0, UpdatePlayerProfile, client, TIMER_FLAG_NO_MAPCHANGE);
 
 		if (g_bMapFirstRecord[client] || g_bMapPBRecord[client] || g_bMapSRVRecord[client])
 			CheckMapRanks(client);
@@ -2640,8 +2520,6 @@ stock Action PrintSpecMessageAll(int client)
 	char szChatRank[64];
 	Format(szChatRank, 64, "%s", g_pr_chat_coloredrank[client]);
 
-	//if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
-	//	Format(szName, sizeof(szName), "%s%s", g_pr_namecolour[client], szName);
 	if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
 		setNameColor(szName, g_iCustomColours[client][0], 64);
 	// fluffys
@@ -3171,34 +3049,6 @@ public void LoadInfoBot()
 		CreateTimer(0.5, RefreshInfoBot, TIMER_FLAG_NO_MAPCHANGE);
 	}
 }
-
-// public void CreateNavFiles()
-// {
-// 	char DestFile[256];
-// 	char SourceFile[256];
-// 	Format(SourceFile, sizeof(SourceFile), "maps/replay_bot.nav");
-// 	if (!FileExists(SourceFile))
-// 	{
-// 		LogError("<surftimer> Failed to create .nav files. Reason: %s doesn't exist!", SourceFile);
-// 		return;
-// 	}
-// 	char map[256];
-// 	int mapListSerial = -1;
-// 	if (ReadMapList(g_MapList, mapListSerial, "mapcyclefile", MAPLIST_FLAG_CLEARARRAY | MAPLIST_FLAG_NO_DEFAULT) == null)
-// 		if (mapListSerial == -1)
-// 			return;
-
-// 	for (int i = 0; i < GetArraySize(g_MapList); i++)
-// 	{
-// 		GetArrayString(g_MapList, i, map, sizeof(map));
-// 		if (map[0])
-// 		{
-// 			Format(DestFile, sizeof(DestFile), "maps/%s.nav", map);
-// 			if (!FileExists(DestFile))
-// 				File_Copy(SourceFile, DestFile);
-// 		}
-// 	}
-// }
 
 public void CreateNavFile()
 {
@@ -3800,7 +3650,6 @@ public void SideHudAlive(int client)
 				}
 				else
 				{
-					// Format(szStage, 64, "Bonus %i", g_iClientInZone[client][2]);
 					Format(szModule[i], 256, "", szStage);
 				}
 
@@ -3860,7 +3709,6 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 	if (!IsValidClient(client) || g_bPositionRestored[client] || IsFakeClient(client) || zone >= CPLIMIT)
 		return;
 
-	// float time = g_fCurrentRunTime[client];
 	float percent = -1.0;
 	int totalPoints = 0;
 	char szPercnt[24];
@@ -3974,7 +3822,6 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		FormatTimeFloat(client, time, 3, szTime, 32);
 
 		// Checkpoint forward
-		//forward Action:surftimer_OnCheckpoint(client, Float:fRunTime, String:sRunTime[54], Float:fPbCp, String:sPbDiff[16], Float:fSrCp, String:sSrDiff[16]);
 		Call_StartForward(g_MapCheckpointForward);
 
 		/* Push parameters one at a time */
@@ -4137,7 +3984,6 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 	GetClientName(client, szName, MAX_NAME_LENGTH);
 	if (g_bBonusSRVRecord[client])
 	{
-		// int i = GetRandomInt(1, 2);
 		PlayRecordSound(2);
 
 		RecordDiff = g_fStyleOldBonusRecordTime[style][zGroup] - g_fFinalTime[client];
@@ -4195,15 +4041,6 @@ public void CheckBonusStyleRanks(int client, int zGroup, int style)
 		}
 	}
 }
-
-// Streamline Logging jakeey802
-/*public Action Commands_CommandListener(int client, const char[] command, any argc)
-{
-	char gz_sCmdString[256];
-	GetCmdArgString(gz_sCmdString, sizeof(gz_sCmdString));
-	LogToFileEx(g_sStreamlineLogs, "%L used: %s %s", client, command, gz_sCmdString);
-	return Plugin_Continue;
-}*/
 
 public void GetSpeedColour(int client, int speed, int type)
 {
@@ -4741,33 +4578,3 @@ public bool IsPlayerTimerAdmin(int client)
 	}
 	return false;
 }
-
-// public void getMapName(char[] szMapName, int size)
-// {
-// 	bool bFound = false;
-// 	bool bPossible;
-// 	char szMapName2[128], szMapName3[128];
-// 	// Check that the map is in the mapcycle
-// 	for (int i = 0; i < GetArraySize(g_MapList); i++)
-// 	{
-// 		// Exact Match
-// 		if (StrEqual(szMapName, szMapName2, false))
-// 		{
-// 			Format(szMapName, size, szMapName2);
-// 			bFound = true;
-// 			break;
-// 		}
-
-// 		// Possible match e.g surf_me or surf_forbidden_tomb
-// 		if (StrContains(szMapName, szMapName2, false) == -1)
-// 		{
-// 			Format(szMapName3, sizeof(szMapName3), szMapName2);
-// 			bPossible = true;
-// 		}
-// 	}
-
-// 	if (!bFound && bPossible)
-// 	{
-// 		Format(szMapName, sizeof(szMapName), szMapName3);
-// 	}
-// }

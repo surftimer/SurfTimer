@@ -17,9 +17,7 @@ void CreateHooks()
 	HookEvent("player_team", Event_OnPlayerTeam, EventHookMode_Post);
 	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
 	HookEvent("player_jump", Event_PlayerJump);
-	// HookEvent("player_disconnect", Event_PlayerDisconnect);
-
-	// AddNormalSoundHook(OnNormalSoundPlayed);
+	// HookEvent("player_disconnect", Event_PlayerDisconnect); -- maybe needed later
 
 	// Gunshots
 	AddTempEntHook("Shotgun Shot", Hook_ShotgunShot);
@@ -149,8 +147,6 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 
 			if (client == g_RecordBot || client == g_BonusBot || client == g_WrcpBot)
 			{
-				// Disabling noclip, makes the bot bug, look into later
-				// SetEntityMoveType(client, MOVETYPE_NOCLIP);
 				SetEntityGravity(client, 0.0);
 			}
 
@@ -161,13 +157,10 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		if (GetConVarBool(g_hPlayerSkinChange) && (GetClientTeam(client) > 1))
 		{
 			char szBuffer[256];
-			// GetConVarString(g_hArmModel, szBuffer, 256);
-			// SetEntPropString(client, Prop_Send, "m_szArmsModel", szBuffer);
 
 			GetConVarString(g_hPlayerModel, szBuffer, 256);
 			SetEntityModel(client, szBuffer);
 			CreateTimer(1.0, SetArmsModel, client, TIMER_FLAG_NO_MAPCHANGE);
-			//SetEntPropString(client, Prop_Send, "m_szArmsModel", "models/weapons/ct_arms.mdl");
 		}
 
 		// 1st Spawn & T/CT
@@ -415,20 +408,6 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		if (StrContains(sText, "!b", false) == 0 || StrContains(sText, "!bonus", false) == 0)
 			return Plugin_Handled;
 
-		// Maptier
-		// if (StrContains(sText, "!map", false) == 0)
-		// {
-		// 	if (CheckCommandAccess(client, "sm_map", ADMFLAG_RESERVATION))
-		// 	{
-		// 		char mapname[1024];
-		// 		mapname = sText;
-		// 		ReplaceString(mapname, 1024, "!map ", "", false);
-		// 		db_selectMapName(mapname);
-		// 	}
-		// 	else
-		// 		return Plugin_Handled;
-		// }
-
 		// Empty Message
 		if (StrEqual(sText, " ") || !sText[0])
 			return Plugin_Handled;
@@ -437,9 +416,6 @@ public Action Say_Hook(int client, const char[] command, int argc)
 			return Plugin_Handled;
 
 		parseColorsFromString(sText, 1024);
-
-		/*if (g_bDbCustomTitleInUse[client])
-			Format(sText, 1024, "%s%s", g_szTextColoured[client], sText);*/
 
 		// Lowercase
 		if ((sText[0] == '/') || (sText[0] == '!'))
@@ -470,8 +446,6 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		WriteChatLog(client, "say", sText);
 		PrintToServer("%s: %s", szName, sText);
 
-		//if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
-		//	Format(szName, sizeof(szName), "%s%s", g_pr_namecolour[client], szName);
 		if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
 			setNameColor(szName, g_iCustomColours[client][0], 64);
 
@@ -668,7 +642,6 @@ public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)
 public Action Event_OnRoundEnd(Handle event, const char[] name, bool dontBroadcast)
 {
 	g_bRoundEnd = true;
-	// UnhookEntityOutput("trigger_teleport", "OnStartTouch", OnTouchTriggerTeleport);
 	return Plugin_Continue;
 }
 
@@ -717,13 +690,6 @@ public Action Event_OnRoundStart(Handle event, const char[] name, bool dontBroad
 	{
 		PushArrayCell(g_hTriggerMultiple, iEnt);
 	}
-
-	// iEnt = -1;
-	// while ((iEnt = FindEntityByClassname(iEnt, "trigger_*")) != -1)
-	// {
-	// 	SDKHook(iEnt, SDKHook_Touch, OnTouchAllTriggers);
-	// 	SDKHook(iEnt, SDKHook_EndTouch, OnEndTouchAllTriggers);
-	// }
 
 	// Teleport Destinations (goose)
 	iEnt = -1;
@@ -991,8 +957,6 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 
 		float val = GetVectorDotProduct( eye, velocity );
 
-		// CPrintToChat(client, "%.2f", val); // for testing
-
 		if (!g_bInStartZone[client] && !g_bInStageZone[client] && val > -0.75)
 		{
 			g_KeyCount[client]++;
@@ -1066,7 +1030,6 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		float newVelocity[3];
 		// Slope Boost Fix by Mev, & Blacky
 		// https://forums.alliedmods.net/showthread.php?t=266888
-		// if (GetConVarBool(g_hSlopeFixEnable) == true)
 		if (GetConVarBool(g_hSlopeFixEnable) == true && !IsFakeClient(client))
 		{
 			g_vLast[client][0] = g_vCurrent[client][0];
@@ -1271,50 +1234,6 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		g_LastButton[client] = buttons;
 
 		BeamBox_OnPlayerRunCmd(client);
-
-		// if (!IsFakeClient(client))
-		// {
-		// 	float vVelocity[3];
-		// 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", vVelocity);
-		// 	float velocity = GetVectorLength(vVelocity);
-
-		// 	if (velocity == 0.0)
-		// 	{
-		// 		if (g_iClientInZone[client][0] == 1 || g_iClientInZone[client][0] == 5) // Start & Start Speed zones
-		// 		{
-		// 			if (g_hRecording[client] != null)
-		// 			{
-		// 				StopRecording(client);
-		// 			}
-
-		// 			if (g_StageRecStartFrame[client] != -1)
-		// 				g_StageRecStartFrame[client] = -1;
-		// 		}
-		// 		else if (g_iClientInZone[client][0] == 3) // Stage zones
-		// 		{
-		// 			// Check if the stage replay is being recorded
-		// 			if (g_StageRecStartFrame[client] != -1)
-		// 				g_StageRecStartFrame[client] = -1;
-		// 		}
-		// 	}
-		// 	else
-		// 	{
-		// 		if (g_iClientInZone[client][0] == 1 || g_iClientInZone[client][0] == 5) // Start & Start Speed zones
-		// 		{
-		// 			if (g_hRecording[client] == null)
-		// 				StartRecording(client);
-					
-		// 			// Check if the map has stages
-		// 			if (g_bhasStages && g_StageRecStartFrame[client] == -1)
-		// 				Stage_StartRecording(client);
-		// 		}
-		// 		else if (g_iClientInZone[client][0] == 3) // Stage zones
-		// 		{
-		// 			if (g_StageRecStartFrame[client] == -1)
-		// 				Stage_StartRecording(client);
-		// 		}
-		// 	}
-		// }
 	}
 
 	// Strafe Sync taken from shavit's bhop timer
@@ -1481,7 +1400,6 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 						g_bJumpedInZone[client] = true;
 						g_bResetOneJump[client] = true;
 						g_fJumpedInZoneTime[client] = GetGameTime();
-						// CPrintToChat(client, "First Time: %f", g_fJumpedInZoneTime[client]);
 						CreateTimer(1.0, ResetOneJump, client, TIMER_FLAG_NO_MAPCHANGE);
 					}
 					else
@@ -1489,8 +1407,6 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 						g_bResetOneJump[client] = false;
 						float time = GetGameTime();
 						float time2 = time - g_fJumpedInZoneTime[client];
-						// CPrintToChat(client, "Second Time: %f", time);
-						// CPrintToChat(client, "Second Time - First Time = %f", time2);
 						g_bJumpedInZone[client] = false;
 						if (time2 <= 0.9)
 						{
@@ -1586,58 +1502,4 @@ public Action Hook_FootstepCheck(int clients[64], int &numClients, char sample[P
 public Action Hook_ShotgunShot(const char[] te_name, const int[] players, int numClients, float delay) 
 {
 	return Plugin_Handled;
-	// int shooter = TE_ReadNum("m_iPlayer") + 1;
-
-	// int[] newClients = new int[MaxClients];
-	// int newTotal = 0;
-
-	// for (int i = 1; i <= MaxClients; i++)
-	// {
-	// 	if (IsValidClient(i) && !IsPlayerAlive(i))
-	// 	{
-	// 		int SpecMode = GetEntProp(i, Prop_Send, "m_iObserverMode");
-	// 		if (SpecMode == 4 || SpecMode == 5)
-	// 		{
-	// 			int Target = GetEntPropEnt(i, Prop_Send, "m_hObserverTarget");
-	// 			if (Target == shooter)
-	// 				newClients[newTotal] = i;
-	// 				newTotal++;
-	// 			}
-	// 	}
-	// }
-
-	// if (newTotal == 0)
-	// 	return Plugin_Stop;
-	
-	// float vTemp[3];
-  // TE_Start("Shotgun Shot");
-  // TE_ReadVector("m_vecOrigin", vTemp);
-  // TE_WriteVector("m_vecOrigin", vTemp);
-  // TE_WriteFloat("m_vecAngles[0]", TE_ReadFloat("m_vecAngles[0]"));
-  // TE_WriteFloat("m_vecAngles[1]", TE_ReadFloat("m_vecAngles[1]"));
-  // TE_WriteNum("m_weapon", TE_ReadNum("m_weapon"));
-  // TE_WriteNum("m_iMode", TE_ReadNum("m_iMode"));
-  // TE_WriteNum("m_iSeed", TE_ReadNum("m_iSeed"));
-  // TE_WriteNum("m_iPlayer", TE_ReadNum("m_iPlayer"));
-  // TE_WriteFloat("m_fInaccuracy", TE_ReadFloat("m_fInaccuracy"));
-  // TE_WriteFloat("m_fSpread", TE_ReadFloat("m_fSpread"));
-  // TE_Send(newClients, newTotal, delay);
-
-	// return Plugin_Stop;
 }
-
-// https://forums.alliedmods.net/showthread.php?t=300549
-// public Action TeamMenuHook(UserMsg msg_id, Protobuf msg, const int[] players, int playersNum, bool reliable, bool init)
-// {
-// 	char buffermsg[64];
-// 	PbReadString(msg, "name", buffermsg, sizeof(buffermsg));
-
-// 	if (StrEqual(buffermsg, "team", true))
-// 	{
-// 		int client = players[0];
-// 		int team = GetRandomInt(2, 3);
-// 		ChangeClientTeam(client, team);
-// 	}
-
-// 	return Plugin_Continue;
-// }
