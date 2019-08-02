@@ -158,15 +158,6 @@ public void SaveRecording(int client, int zgroup, int style)
 	// Finish the path
 	Format(sPath3, sizeof(sPath3), "%s.rec", sPath3);
 	BuildPath(Path_SM, sPath2, sizeof(sPath2), sPath3);
-	
-	// Old method of making paths
-	// if (zgroup == 0)
-	// 	BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s%s.rec", CK_REPLAY_PATH, g_szMapName);
-	// else
-	// {
-	// 	if (zgroup > 0)
-	// 		BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, g_szMapName, zgroup);
-	// }
 
 	if (FileExists(sPath2) && GetConVarBool(g_hBackupReplays))
 	{
@@ -857,7 +848,6 @@ public void StopPlayerMimic(int client)
 	g_CurrentAdditionalTeleportIndex[client] = 0;
 	g_BotMimicRecordTickCount[client] = 0;
 	g_bValidTeleportCall[client] = false;
-	// SDKUnhook(client, SDKHook_WeaponCanSwitchTo, Hook_WeaponCanSwitchTo);
 	delete g_hBotMimicsRecord[client];
 }
 
@@ -897,12 +887,6 @@ public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int
 			float fBuffer[3];
 			GetClientAbsOrigin(client, fBuffer);
 			Array_Copy(fBuffer, iAT[atOrigin], 3);
-
-			/*GetClientEyeAngles(client, fBuffer);
-			Array_Copy(fBuffer, iAT[atAngles], 3);
-
-			Entity_GetAbsVelocity(client, fBuffer);
-			Array_Copy(fBuffer, iAT[atVelocity], 3);*/
 
 			iAT[atFlags] = ADDITIONAL_FIELD_TELEPORTED_ORIGIN;
 			PushArrayArray(g_hRecordingAdditionalTeleport[client], iAT[0], view_as<int>(AdditionalTeleport));

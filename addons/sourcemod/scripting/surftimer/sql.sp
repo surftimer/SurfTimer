@@ -519,16 +519,6 @@ public void db_viewMapRankProCallback(Handle owner, Handle hndl, const char[] er
 	{
 		g_MapRank[client] = SQL_GetRowCount(hndl);
 	}
-
-	// if (!g_bSettingsLoaded[client])
-	// {
-	// 	g_fTick[client][1] = GetGameTime();
-	// 	float tick = g_fTick[client][1] - g_fTick[client][0];
-	// 	LogToFileEx(g_szLogFile, "[Surftimer] %s: Finished db_viewPersonalRecords in %fs", g_szSteamID[client], tick);
-	// 	g_fTick[client][0] = GetGameTime();
-
-	// 	db_viewPersonalBonusRecords(client, g_szSteamID[client]);
-	// }
 }
 
 // Players points have changed in game, make changes in database and recalculate points
@@ -606,11 +596,6 @@ public void CalculatePlayerRank(int client, int style)
 	g_Points[client][style][4] = 0; // Bonus WR Points
 	g_Points[client][style][5] = 0; // Top 10 Points
 	g_Points[client][style][6] = 0; // WRCP Points
-	// g_GroupPoints[client][0] // G1 Points
-	// g_GroupPoints[client][1] // G2 Points
-	// g_GroupPoints[client][2] // G3 Points
-	// g_GroupPoints[client][3] // G4 Points
-	// g_GroupPoints[client][4] // G5 Points
 	g_GroupMaps[client][style] = 0; // Group Maps
 	g_Top10Maps[client][style] = 0; // Top 10 Maps
 	g_WRs[client][style][0] = 0; // WRs
@@ -735,7 +720,6 @@ public void sql_CountFinishedBonusCallback(Handle owner, Handle hndl, const char
 		{
 			finishedbonuses++;
 			// Total amount of players who have finished the bonus
-			// totalplayers = SQL_FetchInt(hndl, 2);
 			rank = SQL_FetchInt(hndl, 1);
 			SQL_FetchString(hndl, 0, szMap, 128);
 			for (int i = 0; i < GetArraySize(g_MapList); i++) // Check that the map is in the mapcycle
@@ -743,8 +727,6 @@ public void sql_CountFinishedBonusCallback(Handle owner, Handle hndl, const char
 				GetArrayString(g_MapList, i, szMapName2, sizeof(szMapName2));
 				if (StrEqual(szMapName2, szMap, false))
 				{
-					/*float percentage = 1.0 + ((1.0 / float(totalplayers)) - (float(rank) / float(totalplayers)));
-					g_pr_points[client] += RoundToCeil(200.0 * percentage);*/
 					switch (rank)
 					{
 						case 1:
@@ -887,7 +869,6 @@ public void sql_CountFinishedStagesCallback(Handle owner, Handle hndl, const cha
 	int style = ReadPackCell(pack);
 
 	char szMap[128], szSteamId[32], szMapName2[128];
-	// int totalplayers, rank;
 
 	getSteamIDFromClient(client, szSteamId, 32);
 	int finishedstages = 0;
@@ -900,7 +881,6 @@ public void sql_CountFinishedStagesCallback(Handle owner, Handle hndl, const cha
 		{
 			finishedstages++;
 			// Total amount of players who have finished the bonus
-			// totalplayers = SQL_FetchInt(hndl, 2);
 			SQL_FetchString(hndl, 0, szMap, 128);
 			rank = SQL_FetchInt(hndl, 2);
 			for (int i = 0; i < GetArraySize(g_MapList); i++) // Check that the map is in the mapcycle
@@ -975,8 +955,6 @@ public void sql_CountFinishedMapsCallback(Handle owner, Handle hndl, const char[
 					float wrpoints;
 					int iwrpoints;
 					float points;
-					// bool wr;
-					// bool top10;
 					float g1points;
 					float g2points;
 					float g3points;
@@ -1288,7 +1266,6 @@ public void db_updatePoints(int client, int style)
 		{
 			GetClientName(client, szName, MAX_NAME_LENGTH);
 			GetClientAuthId(client, AuthId_Steam2, szSteamId, MAX_NAME_LENGTH, true);
-			// GetClientAuthString(client, szSteamId, MAX_NAME_LENGTH);
 			Format(szQuery, 512, sql_updatePlayerRankPoints2, szName, g_pr_points[client][style], g_Points[client][style][3], g_Points[client][style][4], g_Points[client][style][6], g_Points[client][style][5], g_Points[client][style][2], g_Points[client][style][0], g_Points[client][style][1], g_pr_finishedmaps[client][style], g_pr_finishedbonuses[client][style], g_pr_finishedstages[client][style], g_WRs[client][style][0], g_WRs[client][style][1], g_WRs[client][style][2], g_Top10Maps[client][style], g_GroupMaps[client][style], g_szCountry[client], szSteamId, style);
 			SQL_TQuery(g_hDb, sql_updatePlayerRankPointsCallback, szQuery, pack, DBPrio_Low);
 		}
@@ -1578,7 +1555,6 @@ public void sql_selectRankedPlayersRankCallback(Handle owner, Handle hndl, const
 			else
 				CS_SetClientContributionScore(client, -g_PlayerRank[client][style]);
 		}
-		// CS_SetClientContributionScore(client, (g_pr_AllPlayers - SQL_GetRowCount(hndl)));
 	}
 	else if (style == 0 && GetConVarInt(g_hPrestigeRank) > 0)
 		KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
@@ -2656,9 +2632,6 @@ public void SQL_ViewAllRecordsCallback3(Handle owner, Handle hndl, const char[] 
 	}
 
 	// fluffys
-	/*Handle menu;
-	menu = CreateMenu(FinishedMapsMenuHandler);
-	SetMenuPagination(menu, 5);*/
 
 	// if there is a player record
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
@@ -2890,9 +2863,6 @@ public void SQL_ViewTop10RecordsCallback3(Handle owner, Handle hndl, const char[
 	}
 
 	// fluffys
-	/*Handle menu;
-	menu = CreateMenu(FinishedMapsMenuHandler);
-	SetMenuPagination(menu, 5);*/
 
 	int i = 1;
 
@@ -2923,13 +2893,7 @@ public void SQL_ViewTop10RecordsCallback3(Handle owner, Handle hndl, const char[
 		Format(szTime, 32, "   %s", szTime);
 
 		Format(szValue, 128, "%i/%i %s |    » %s", rank, count, szTime, szMapName);
-		/*AddMenuItem(menu, szSteamId, szValue, ITEMDRAW_DEFAULT);*/
 		i++;
-
-		/*Format(title, 256, "Finished maps for %s \n    Rank    Time               Mapnname", szName);
-		SetMenuTitle(menu, title);
-		SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
-		DisplayMenu(menu, client, MENU_TIME_FOREVER);*/
 
 		if (IsValidClient(client))
 		{
