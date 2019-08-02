@@ -767,6 +767,11 @@ bool g_iPrespeedText[MAXPLAYERS + 1];
 // Silent Spectate
 bool g_iSilentSpectate[MAXPLAYERS + 1];
 
+// CP Messages
+bool g_iCpMessages[MAXPLAYERS + 1];
+
+// WRCP Messeages
+bool g_iWrcpMessages[MAXPLAYERS + 1];
 /*----------  Run Variables  ----------*/
 
 // Clients personal record in map

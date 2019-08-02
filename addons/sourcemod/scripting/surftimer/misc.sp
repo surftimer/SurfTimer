@@ -3989,7 +3989,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		/* Finish the call, get the result */
 		Call_Finish();
 
-		if (g_bCheckpointsEnabled[client])
+		if (g_bCheckpointsEnabled[client] && g_iCpMessages[client])
 			CPrintToChat(client, "%t", "Misc30", g_szChatPrefix, g_iClientInZone[client][1] + 1, szTime, szDiff, sz_srDiff);
 
 		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "Misc31", g_szChatPrefix, szName, g_iClientInZone[client][1] + 1, szTime, szDiff, sz_srDiff);
@@ -4026,7 +4026,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 
 			if (percent > -1.0)
 			{
-				if (g_bCheckpointsEnabled[client])
+				if (g_bCheckpointsEnabled[client] && g_iCpMessages[client])
 					CPrintToChat(client, "%t", "Misc32", g_szChatPrefix, g_iClientInZone[client][1] + 1, szTime, sz_srDiff);
 
 				Format(szSpecMessage, sizeof(szSpecMessage), "%t", "Misc33", g_szChatPrefix, szName, g_iClientInZone[client][1] + 1, szTime, sz_srDiff);
@@ -4046,7 +4046,7 @@ public void CheckpointToSpec(int client, char[] buffer)
 			if (SpecMode == 4 || SpecMode == 5)
 			{
 				int Target = GetEntPropEnt(x, Prop_Send, "m_hObserverTarget");
-				if (Target == client)
+				if (Target == client && g_iCpMessages[x])
 					CPrintToChat(x, "%s", buffer);
 			}
 		}

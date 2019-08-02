@@ -1518,4 +1518,24 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Silent spectate is now {red}disabled"
 	}
+	"ToggleWrcpsMessageToggleOn"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} SRCP messages are now {green}enabled"
+	}
+	"ToggleWrcpsMessageToggleOff"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} SRCP messages are now {red}disabled"
+	}
+	"ToggleCpsMessageToggleOn"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} CP messages are now {green}enabled"
+	}
+	"ToggleCpsMessageToggleOff"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} CP messages are now {red}disabled"
+	}
 }
