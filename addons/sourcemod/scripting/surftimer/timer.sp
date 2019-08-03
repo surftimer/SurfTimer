@@ -385,7 +385,12 @@ public Action SetClanTag(Handle timer, any client)
 		CRemoveColors(szTabRank, 1024);
 		Format(szTabClanTag, 1024, "%s | %s", g_szCountryCode[client], szTabRank);
 		
-		if ((GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) CS_SetClientClanTag(client, szTabRank);
+		if ((GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) {
+			if (GetConVarBool(g_iAdminCountryTags))
+				CS_SetClientClanTag(client, szTabRank);
+			else 
+				CS_SetClientClanTag(client, szTabClanTag);
+		} 
 		else CS_SetClientClanTag(client, szTabClanTag);
 	}
 	else //we don't use it. What you think about it @totles :) ?
