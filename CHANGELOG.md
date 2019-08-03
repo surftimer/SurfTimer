@@ -7,6 +7,7 @@
 * **[UTIL]** Added external dependencies for compiling (dhooks, steamworks, discord_api, cleaner)
 * **[NEW]** Added "Silence Spec" usable with `sm_silentspec` and `sm_sspec`
 * **[NEW]** Added [Trails Chroma](https://github.com/Nickelony/Trails-Chroma) into the SurfTimer for VIP's and Admins
+* **[NEW]** Added trails for replay bots
 
 [2019-08-02]
 ---
