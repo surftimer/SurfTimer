@@ -1585,22 +1585,22 @@ char RadioCMDS[][] = 													// Disable radio commands
 =              Includes              =
 ====================================*/
 
-#include "surftimer/convars.sp" // DON'T CHANGE ORDER OF THESE INCLUDES!!!!!!!!!!!!!!!!!!!!
-#include "surftimer/misc.sp" // DON'T CHANGE ORDER OF THESE INCLUDES!!!!!!!!!!!!!!!!!!!!
-#include "surftimer/sql.sp" // DON'T CHANGE ORDER OF THESE INCLUDES!!!!!!!!!!!!!!!!!!!!
-#include "surftimer/admin.sp" // DON'T CHANGE ORDER OF THESE INCLUDES!!!!!!!!!!!!!!!!!!!!
-#include "surftimer/commands.sp" // DON'T CHANGE ORDER OF THESE INCLUDES!!!!!!!!!!!!!!!!!!!!
-#include "surftimer/hooks.sp" // DON'T CHANGE ORDER OF THESE INCLUDES!!!!!!!!!!!!!!!!!!!!
-#include "surftimer/buttonpress.sp" // DON'T CHANGE ORDER OF THESE INCLUDES!!!!!!!!!!!!!!!!!!!!
-#include "surftimer/sql2.sp" // DON'T CHANGE ORDER OF THESE INCLUDES!!!!!!!!!!!!!!!!!!!!
-#include "surftimer/sqltime.sp" // DON'T CHANGE ORDER OF THESE INCLUDES!!!!!!!!!!!!!!!!!!!!
-#include "surftimer/timer.sp" // DON'T CHANGE ORDER OF THESE INCLUDES!!!!!!!!!!!!!!!!!!!!
-#include "surftimer/replay.sp" // DON'T CHANGE ORDER OF THESE INCLUDES!!!!!!!!!!!!!!!!!!!!
-#include "surftimer/surfzones.sp" // DON'T CHANGE ORDER OF THESE INCLUDES!!!!!!!!!!!!!!!!!!!!
-#include "surftimer/mapsettings.sp" // DON'T CHANGE ORDER OF THESE INCLUDES!!!!!!!!!!!!!!!!!!!!
-#include "surftimer/cvote.sp" // DON'T CHANGE ORDER OF THESE INCLUDES!!!!!!!!!!!!!!!!!!!!
-#include "surftimer/vip.sp" // DON'T CHANGE ORDER OF THESE INCLUDES!!!!!!!!!!!!!!!!!!!!
-#include "surftimer/trails.sp" // DON'T CHANGE ORDER OF THESE INCLUDES!!!!!!!!!!!!!!!!!!!!
+#include "surftimer/convars.sp"
+#include "surftimer/misc.sp"
+#include "surftimer/sql.sp"
+#include "surftimer/admin.sp"
+#include "surftimer/commands.sp"
+#include "surftimer/hooks.sp"
+#include "surftimer/buttonpress.sp"
+#include "surftimer/sql2.sp"
+#include "surftimer/sqltime.sp"
+#include "surftimer/timer.sp"
+#include "surftimer/replay.sp"
+#include "surftimer/surfzones.sp"
+#include "surftimer/mapsettings.sp"
+#include "surftimer/cvote.sp"
+#include "surftimer/vip.sp"
+#include "surftimer/trails.sp"
 
 /*====================================
 =               Events               =
