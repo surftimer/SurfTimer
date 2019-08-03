@@ -314,7 +314,7 @@ void CreatePlayerTrail(int client, float origin[3])
 		return;
 	}
 	
-	if(gB_AdminsOnly && !CheckCommandAccess(client, "sm_trails_override", ADMFLAG_RESERVATION))
+	if(!g_iHasEnforcedTitle)
 	{
 		return;
 	}
