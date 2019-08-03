@@ -136,7 +136,7 @@ public Action Command_Trail(int client, int args)
 		return Plugin_Handled;
 	}
 	
-	if(!g_iHasEnforcedTitle[client])
+	if(!g_iHasEnforcedTitle[client] && !IsPlayerVip(client))
 	{
 		PrintCenterText(client, "You do not have permission to use this command.");
 		return Plugin_Handled;
@@ -314,7 +314,7 @@ void CreatePlayerTrail(int client, float origin[3])
 		return;
 	}
 	
-	if(!g_iHasEnforcedTitle)
+	if(!g_iHasEnforcedTitle[client] && !IsPlayerVip(client))
 	{
 		return;
 	}
