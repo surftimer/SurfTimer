@@ -1,6 +1,6 @@
 /*
 	Surftimer Hooks
-	TODO: Cleanup
+	TODO: Cleanup, si si
 */
 
 void CreateHooks()
@@ -17,7 +17,6 @@ void CreateHooks()
 	HookEvent("player_team", Event_OnPlayerTeam, EventHookMode_Post);
 	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
 	HookEvent("player_jump", Event_PlayerJump);
-	// HookEvent("player_disconnect", Event_PlayerDisconnect); -- maybe needed later
 
 	// Gunshots
 	AddTempEntHook("Shotgun Shot", Hook_ShotgunShot);
@@ -137,7 +136,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		else
 			SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 5, 4, true);
 
-		// Botmimic2
+		// Botmimic3
 		if (g_hBotMimicsRecord[client] != null && IsFakeClient(client))
 		{
 			g_BotMimicTick[client] = 0;

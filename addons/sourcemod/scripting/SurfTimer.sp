@@ -387,9 +387,6 @@ bool g_bInStageZone[MAXPLAYERS + 1];
 /*----------  MaxSpeed Variables  ----------*/
 bool g_bInMaxSpeed[MAXPLAYERS + 1];
 
-/*----------  Bhop Limiter  ----------*/
-int g_userJumps[MAXPLAYERS][UserJumps];
-
 /*----------  VIP Variables  ----------*/
 ConVar g_hAutoVipFlag = null;
 int g_VipFlag;
@@ -721,8 +718,6 @@ float g_fLastCommandBack[MAXPLAYERS + 1];
 bool g_bNoClip[MAXPLAYERS + 1];
 
 /*----------  User Options  ----------*/
-
-// org variables track the original setting status, on disconnect, check if changed, if so, update new settings to database
 
 // bool to ensure the modules have loaded before resetting 
 bool g_bLoadedModules[MAXPLAYERS + 1];
@@ -1281,7 +1276,6 @@ float g_fClientCPs[MAXPLAYERS + 1][36];
 float g_fTargetTime[MAXPLAYERS + 1];
 char g_szTargetCPR[MAXPLAYERS + 1][MAX_NAME_LENGTH];
 char g_szCPRMapName[MAXPLAYERS + 1][128];
-// float g_fTargetCPs[MAXPLAYERS + 1][35];
 
 // surf_christmas2
 bool g_bUsingStageTeleport[MAXPLAYERS + 1];
@@ -1591,23 +1585,22 @@ char RadioCMDS[][] = 													// Disable radio commands
 =              Includes              =
 ====================================*/
 
-
-#include "surftimer/convars.sp"
-#include "surftimer/misc.sp"
-#include "surftimer/sql.sp"
 #include "surftimer/admin.sp"
-#include "surftimer/commands.sp"
-#include "surftimer/hooks.sp"
 #include "surftimer/buttonpress.sp"
+#include "surftimer/commands.sp"
+#include "surftimer/convars.sp"
+#include "surftimer/cvote.sp"
+#include "surftimer/hooks.sp"
+#include "surftimer/mapsettings.sp"
+#include "surftimer/misc.sp"
+#include "surftimer/replay.sp"
+#include "surftimer/surfzones.sp"
+#include "surftimer/sql.sp"
 #include "surftimer/sql2.sp"
 #include "surftimer/sqltime.sp"
 #include "surftimer/timer.sp"
-#include "surftimer/replay.sp"
-#include "surftimer/surfzones.sp"
-#include "surftimer/mapsettings.sp"
-#include "surftimer/cvote.sp"
-#include "surftimer/vip.sp"
 #include "surftimer/trails.sp"
+#include "surftimer/vip.sp"
 
 /*====================================
 =               Events               =
@@ -2001,11 +1994,6 @@ public void OnClientPutInServer(int client)
 	g_bToggleMapFinish[client] = true;
 	g_bRepeat[client] = false;
 	g_bNotTeleporting[client] = false;
-
-	g_userJumps[client][LastJumpTimes][3] = 0;
-	g_userJumps[client][LastJumpTimes][2] = 0;
-	g_userJumps[client][LastJumpTimes][1] = 0;
-	g_userJumps[client][LastJumpTimes][0] = 0;
 
 	if (IsFakeClient(client))
 	{
@@ -2741,9 +2729,9 @@ public void OnPluginStart()
 	// button sound hook
 	// AddNormalSoundHook(NormalSHook_callback);
 
-	// Botmimic 2
+	// Botmimic 3
 	// https://forums.alliedmods.net/showthread.php?t=180114
-	// Optionally setup a hook on CBaseEntity::Teleport to keep track of sudden place changes
+
 	CheatFlag("bot_zombie", false, true);
 	CheatFlag("bot_mimic", false, true);
 	g_hLoadedRecordsAdditionalTeleport = CreateTrie();
