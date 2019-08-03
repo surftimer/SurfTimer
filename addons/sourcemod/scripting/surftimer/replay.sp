@@ -1,5 +1,5 @@
 
-// Botmimic2 - modified by 1NutWunDeR
+// Botmimic3 - modified by 1NutWunDeR
 // http://forums.alliedmods.net/showthread.php?t=164148
 
 void setReplayTime(int zGrp, int stage, int style)
@@ -297,7 +297,7 @@ public void LoadReplays()
 		{
 			BuildPath(Path_SM, newPath, sizeof(newPath), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, g_szMapName, g_mapZones[zId][zoneGroup]);
 			if (RenameFile(newPath, sPath))
-				PrintToServer("surftimer | Succesfully renamed bonus record file to: %s", newPath);
+				PrintToServer("SurfTimer | Succesfully renamed bonus record file to: %s", newPath);
 		}
 		CloseHandle(hFilex);
 	}

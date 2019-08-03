@@ -8,12 +8,6 @@ public Action VIP_GiveVip(int client, int args)
 		return Plugin_Handled;
 	}
 
-	// if (IsValidClient(client))
-	// {
-	//  CReplyToCommand(client, "%cSurftimer %c| You do not have access to this command", LIMEGREEN, WHITE);
-	//  return Plugin_Handled;
-	// }
-
 	char szSteamId[128], szBuffer[128];
 	int iVip;
 	GetCmdArg(1, szSteamId, sizeof(szSteamId));
@@ -117,7 +111,7 @@ public void db_selectVipStatusCallback(Handle owner, Handle hndl, const char[] e
 {
 	if (hndl == null)
 	{
-		LogError("[surftimer] SQL Error (db_selectVipStatusCallback): %s", error);
+		LogError("[SurfTimer] SQL Error (db_selectVipStatusCallback): %s", error);
 		return;
 	}
 
@@ -161,7 +155,7 @@ public void db_removeVipCallback(Handle owner, Handle hndl, const char[] error, 
 {
 	if (hndl == null)
 	{
-		LogError("[surftimer] SQL Error (db_removeVipCallback): %s", error);
+		LogError("[SurfTimer] SQL Error (db_removeVipCallback): %s", error);
 		return;
 	}
 
@@ -204,7 +198,7 @@ public void db_insertVipCallback(Handle owner, Handle hndl, const char[] error, 
 {
 	if (hndl == null)
 	{
-		LogError("[surftimer] SQL Error (db_insertVipCallback): %s", error);
+		LogError("[SurfTimer] SQL Error (db_insertVipCallback): %s", error);
 		return;
 	}
 
@@ -233,18 +227,6 @@ public void db_insertVipCallback(Handle owner, Handle hndl, const char[] error, 
 	{
 		g_bCheckCustomTitle[client] = true;
 		db_CheckVIPAdmin(client, szSteamId);
-
-		// Give Credits to client
-		// if (g_hStore != INVALID_HANDLE && GetPluginStatus(g_hStore) == Plugin_Running)
-		// {
-		// 	int newCredits;
-		// 	if (iVip == 1)
-		// 	newCredits = 2999;
-		// 	else if (iVip == 2)
-		// 	newCredits = 5999;
-
-		// 	Store_SetClientCredits(client, Store_GetClientCredits(client) + newCredits);
-		// }
 	}
 }
 

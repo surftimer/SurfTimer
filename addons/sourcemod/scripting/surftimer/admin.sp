@@ -5,7 +5,7 @@ public void Admin_renameZone(int client, const char[] name)
 		g_ClientRenamingZone[client] = false;
 		return;
 	}
-	// avoid unnecessary calls by checking the first cell first. If it's 0 -> \0 then negating it will make the if check pass -> return
+
 	if (!name[0] || StrEqual(name, " ") || StrEqual(name, ""))
 	{
 		CPrintToChat(client, "%t", "Admin1", g_szChatPrefix);
@@ -212,9 +212,9 @@ public void ckAdminMenu(int client)
 
 		Handle adminmenu = CreateMenu(AdminPanelHandler);
 		if (IsPlayerZoner(client))
-			Format(szTmp, sizeof(szTmp), "Surftimer %s Admin Menu (full access)", VERSION);
+			Format(szTmp, sizeof(szTmp), "SurfTimer %s Admin Menu (full access)", VERSION);
 		else
-			Format(szTmp, sizeof(szTmp), "Surftimer %s Admin Menu (limited access)", VERSION);
+			Format(szTmp, sizeof(szTmp), "SurfTimer %s Admin Menu (limited access)", VERSION);
 		SetMenuTitle(adminmenu, szTmp);
 
 		if (!g_pr_RankingRecalc_InProgress)
@@ -611,7 +611,6 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 
 	if (action == MenuAction_End)
 	{
-		// Test
 		if (IsValidClient(param1))
 		{
 			if (menu != null)

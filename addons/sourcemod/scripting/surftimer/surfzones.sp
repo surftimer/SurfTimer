@@ -26,7 +26,7 @@ public void CreateZoneEntity(int zoneIndex)
 			{
 				char szTriggerName[128];
 				GetEntPropString(iEnt, Prop_Send, "m_iName", szTriggerName, 128, 0);
-				// GetEntityClassname(iEnt, szClassName, sizeof(szClassName));
+
 				if (StrEqual(szHookName, szTriggerName))
 				{
 					Format(sZoneName, sizeof(sZoneName), "sm_ckZoneHooked %i", zoneIndex);

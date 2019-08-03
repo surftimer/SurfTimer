@@ -137,7 +137,7 @@ public Action DelayedStuff(Handle timer)
 	if (FileExists("cfg/sourcemod/surftimer/main.cfg"))
 		ServerCommand("exec sourcemod/surftimer/main.cfg");
 	else
-		SetFailState("<surftimer> cfg/sourcemod/surftimer/main.cfg not found.");
+		SetFailState("<SurfTimer> cfg/sourcemod/surftimer/main.cfg not found.");
 
 	return Plugin_Handled;
 }

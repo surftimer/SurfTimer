@@ -10,7 +10,7 @@ public void SQL_ViewPlayerInfoCallback(Handle owner, Handle hndl, const char[] e
 {
 	if (hndl == null)
 	{
-		LogError("[surftimer] SQL Error (SQL_ViewPlayerInfoCallback): %s", error);
+		LogError("[SurfTimer] SQL Error (SQL_ViewPlayerInfoCallback): %s", error);
 		return;
 	}
 
@@ -63,7 +63,6 @@ public int ProfileInfoMenuHandler(Menu menu, MenuAction action, int param1, int 
 {
 	if (action == MenuAction_Select)
 	{
-	// http://steamcommunity.com/profiles/76561198000303868/
 		char info[64];
 		GetMenuItem(menu, param2, info, sizeof(info));
 		CPrintToChat(param1, "%t", "SQLTime1", g_szChatPrefix, info);
@@ -88,7 +87,7 @@ public void SQL_SavePlayTimeCallback(Handle owner, Handle hndl, const char[] err
 {
 	if (hndl == null)
 	{
-		LogError("[surftimer] SQL Error (SQL_SavePlayTimeCallback): %s", error);
+		LogError("[SurfTimer] SQL Error (SQL_SavePlayTimeCallback): %s", error);
 		return;
 	}
 }

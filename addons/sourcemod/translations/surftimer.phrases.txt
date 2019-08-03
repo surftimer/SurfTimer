@@ -478,7 +478,7 @@
 	"Commands20"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Noclip disabled, use {lightgreen}!surftimer {default}to re-enable your timer"
+		"en"		"{1} Noclip disabled, use {lightgreen}!SurfTimer {default}to re-enable your timer"
 	}
 	"Commands31"
 	{

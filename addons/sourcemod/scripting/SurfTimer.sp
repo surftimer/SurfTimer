@@ -1,6 +1,6 @@
 /*=======================================================
 =                 z4lab CS:GO Surftimer                 =
- modified version of "surftimer" from fluffy for z4lab
+ modified version of "SurfTimer" from fluffy for z4lab
  The original version of this timer was by jonitaikaponi 
 = https://forums.alliedmods.net/showthread.php?t=264498 =
 =======================================================*/
