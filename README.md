@@ -12,7 +12,7 @@ you will need [SourceMod 1.9](https://www.sourcemod.net/downloads.php?branch=sta
 ### upgrading from SurfTimer(fluffys)
 
 *   download the latest version from the release page [here](https://github.com/totles/z4lab-surftimer/releases/latest)
-*   copy the files to your csgo directory
+*   copy the files to your csgo directory <br> - an update script can be found [here](https://github.com/totles/z4lab-surftimer/blob/master/scripts/upgrade_scripts/upgrade-fluffy.sh)
 *   edit configs (mysql db, etc, to do)
 *   run `mysql-files/upgrade-fluffy.sql` in your surftimer db
 
