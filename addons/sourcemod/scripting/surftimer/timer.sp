@@ -369,19 +369,6 @@ public Action SetClanTag(Handle timer, any client)
 
 	if (GetConVarBool(g_hCountry))
 	{
-		char tag[154];
-		Format(tag, 154, "%s | %s", g_szCountryCode[client], g_pr_rankname_style[client]);
-		if (g_iCurrentStyle[client] > 0)
-		{
-			char szStyle[128];
-			Format(szStyle, sizeof(szStyle), g_szStyleAcronyms[g_iCurrentStyle[client]]);
-			StringToUpper(szStyle);
-			Format(szStyle, sizeof(szStyle), "%s-", szStyle);
-			ReplaceString(tag, sizeof(tag), "{style}", szStyle);
-		}
-		else
-			ReplaceString(tag, sizeof(tag), "{style}", ""); 
-
 		char szTabRank[1024], szTabClanTag[1024];
 		Format(szTabRank, 1024, "%s", g_pr_chat_coloredrank[client]);
 		CRemoveColors(szTabRank, 1024);
@@ -395,26 +382,22 @@ public Action SetClanTag(Handle timer, any client)
 		} 
 		else CS_SetClientClanTag(client, szTabClanTag);
 	}
-	else //we don't use it. What you think about it @totles :) ?
+	else
 	{
 		if (GetConVarBool(g_hPointSystem))
 		{
-			char tag[154];
-			Format(tag, 154, "%s", g_pr_rankname_style[client]);
+			char szTabRank[1024], szTabClanTag[1024];
+			Format(szTabRank, 1024, "%s", g_pr_chat_coloredrank[client]);
+			CRemoveColors(szTabRank, 1024);
+			Format(szTabClanTag, 1024, "%s", szTabRank);
 			
-			// Replace {style} with style
-			if (g_iCurrentStyle[client] > 0)
-			{
-				char szStyle[128];
-				Format(szStyle, sizeof(szStyle), g_szStyleAcronyms[g_iCurrentStyle[client]]);
-				StringToUpper(szStyle);
-				Format(szStyle, sizeof(szStyle), "%s-", szStyle);
-				ReplaceString(tag, sizeof(tag), "{style}", szStyle);
-			}
-			else
-				ReplaceString(tag, sizeof(tag), "{style}", "");
-
-			CS_SetClientClanTag(client, tag);
+			if ((GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) {
+				if (GetConVarBool(g_iAdminCountryTags))
+					CS_SetClientClanTag(client, szTabRank);
+				else 
+					CS_SetClientClanTag(client, szTabClanTag);
+			} 
+			else CS_SetClientClanTag(client, szTabClanTag);
 		}
 	}
 
