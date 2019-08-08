@@ -1964,8 +1964,11 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 	// Send Announcements
 	if (g_bBonusSRVRecord[client])
 	{
-		char buffer[1024];
+		char buffer[1024], buffer1[1024];
 		GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
+		GetConVarString(g_hRecordAnnounceDiscordBonus, buffer1, 1024);
+		if (!StrEqual(buffer, ""))
+			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup);
 		if (!StrEqual(buffer, ""))
 			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup);
 	}
@@ -4264,8 +4267,9 @@ public void totalTimeForHumans(int unix, char[] buffer, int size)
 
 public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char szTime[32])
 {
-	char webhook[1024];
+	char webhook[1024], webhookName[1024];
 	GetConVarString(g_hRecordAnnounceDiscord, webhook, 1024);
+	GetConVarString(g_dcMapRecordName, webhookName, 1024);
 	if (StrEqual(webhook, ""))
 		return;
 		
@@ -4273,7 +4277,7 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("z4lab Surf Records");
+	hook.SetUsername(webhookName);
 
 	// Format The Message
 	char szMessage[256];
@@ -4287,16 +4291,22 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 
 public void sendDiscordAnnouncementBonus(char szName[32], char szMapName[128], char szTime[32], int zGroup)
 {
-	char webhook[1024];
-	GetConVarString(g_hRecordAnnounceDiscord, webhook, 1024);
+	char webhook[1024], webhookN[1024], webhookName[1024];
+	GetConVarString(g_hRecordAnnounceDiscord, webhookN, 1024);
+	GetConVarString(g_hRecordAnnounceDiscordBonus, webhook, 1024);
+	GetConVarString(g_dcBonusRecordName, webhookName, 1024);
 	if (StrEqual(webhook, ""))
-		return;
+		if (StrEqual(webhookN, ""))
+			return;
+		else
+			webhook = webhookN;
+			
 
  	// Send Discord Announcement
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("z4lab Surf Records");
+	hook.SetUsername(webhookName);
 
 	// Format The Message
 	char szMessage[256];
