@@ -176,8 +176,10 @@ public Action CKTimer2(Handle timer)
 				case 60:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
 				case 30:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
 				case 10:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
-
-				case -1:
+				case 3:CPrintToChatAll("%s ~~~ MAP ENDING ~~~", g_szChatPrefix);
+				case 2:CPrintToChatAll("%s ~~~ MAP ENDING ~~~", g_szChatPrefix);
+				case 1:CPrintToChatAll("%s ~~~ MAP ENDING ~~~", g_szChatPrefix);	
+				case 0:
 				{
 					if (!g_bRoundEnd)
 					{
