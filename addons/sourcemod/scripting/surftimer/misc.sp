@@ -1967,9 +1967,7 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 		char buffer[1024], buffer1[1024];
 		GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
 		GetConVarString(g_hRecordAnnounceDiscordBonus, buffer1, 1024);
-		if (!StrEqual(buffer, ""))
-			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup);
-		if (!StrEqual(buffer, ""))
+		if (!StrEqual(buffer, "") && !StrEqual(buffer1, ""))
 			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup);
 	}
 
