@@ -9305,7 +9305,6 @@ public void db_insertAnnouncement(char szName[128], char szMapName[128], int szM
 
 	char szQuery[512];
 	Format(szQuery, 512, "INSERT INTO `ck_announcements` (`server`, `name`, `mapname`, `mode`, `time`, `group`) VALUES ('%s', '%s', '%s', '%i', '%s', '%i');", g_sServerName, szName, szMapName, szMode, szTime, szGroup);
-	CPrintToChatAll(szQuery);
 	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, 1, DBPrio_Low);
 }
 
