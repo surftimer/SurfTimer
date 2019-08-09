@@ -179,7 +179,7 @@ public Action CKTimer2(Handle timer)
 				case 3:CPrintToChatAll("%s ~~~ MAP ENDING ~~~", g_szChatPrefix);
 				case 2:CPrintToChatAll("%s ~~~ MAP ENDING ~~~", g_szChatPrefix);
 				case 1:CPrintToChatAll("%s ~~~ MAP ENDING ~~~", g_szChatPrefix);	
-				case 0:
+				case -1:
 				{
 					if (!g_bRoundEnd)
 					{
