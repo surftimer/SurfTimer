@@ -11,6 +11,7 @@
 * **[REQUEST/NEW]** Added ConVars for both discord records announcement webhooks
 * **[REQUEST/FIX]** Fixed admin tags without country tags
 * **[REQUEST/NEW]** Added command to toggle triggers while noclipping
+* **[FIX?]** Maybe mapchange fix
 
 [2019-08-02]
 ---
