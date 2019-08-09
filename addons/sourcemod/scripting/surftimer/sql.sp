@@ -9298,20 +9298,21 @@ public void SQL_SelectAnnouncementsCallback(Handle owner, Handle hndl, const cha
 	} 
 }
 
-public void db_insertAnnouncement(char szName[128], char szMapName[128], char szTime[32])
+public void db_insertAnnouncement(char szName[128], char szMapName[128], int szMode, char szTime[32], int szGroup)
 {
 	if (g_iServerID == -1)
 		return;
 
 	char szQuery[512];
-	Format(szQuery, 512, "INSERT INTO ck_announcements (server, name, mapname, time) VALUES ('%s', '%s', '%s', '%s');", g_sServerName, szName, szMapName, szTime);
+	Format(szQuery, 512, "INSERT INTO `ck_announcements` (`server`, `name`, `mapname`, `mode`, `time`, `group`) VALUES ('%s', '%s', '%s', '%i', '%s', '%i');", g_sServerName, szName, szMapName, szMode, szTime, szGroup);
+	CPrintToChatAll(szQuery);
 	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, 1, DBPrio_Low);
 }
 
 public void db_checkAnnouncements()
 {
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT id, server, name, mapname, time FROM ck_announcements WHERE server != '%s' AND id > %d;", g_sServerName, g_iLastID);
+	Format(szQuery, 512, "SELECT id, server, name, mapname, mode, time, group FROM ck_announcements WHERE server != '%s' AND id > %d;", g_sServerName, g_iLastID);
 	SQL_TQuery(g_hDb, SQL_CheckAnnouncementsCallback, szQuery, 1, DBPrio_Low);
 }
 
@@ -9328,18 +9329,23 @@ public void SQL_CheckAnnouncementsCallback(Handle owner, Handle hndl, const char
 		while (SQL_FetchRow(hndl))
 		{
 			int id = SQL_FetchInt(hndl, 0);
-			char szServerName[256], szName[32], szMapName[128], szTime[32];
+			int mode = SQL_FetchInt(hndl, 4);
+			int group = SQL_FetchInt(hndl, 6);
+			char szServerName[256], szName[128], szMapName[128], szTime[32];
 			SQL_FetchString(hndl, 1, szServerName, sizeof(szServerName));
 			SQL_FetchString(hndl, 2, szName, sizeof(szName));
 			SQL_FetchString(hndl, 3, szMapName, sizeof(szMapName));
-			SQL_FetchString(hndl, 4, szTime, sizeof(szTime));
+			SQL_FetchString(hndl, 5, szTime, sizeof(szTime));
 
 			if (id > g_iLastID)
 			{
 				// Send Server Announcement
 				g_iLastID = id;
 				CPrintToChatAll("%t", "SQLTwo4.1");
-				CPrintToChatAll("%t", "SQLTwo4.2", g_szChatPrefix, szName, szMapName, szServerName, szTime);
+				if (mode == 0)
+					CPrintToChatAll("%t", "SQLTwo4.2", g_szChatPrefix, szName, szMapName, szServerName, szTime);
+				else if (mode == 1)
+					CPrintToChatAll("%t", "SQLTwo4.2Bonus", g_szChatPrefix, szName, szMapName, group, szServerName, szTime);
 				CPrintToChatAll("%t", "SQLTwo4.3");
 			}
 		}
