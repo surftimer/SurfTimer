@@ -179,18 +179,16 @@ public Action CKTimer2(Handle timer)
 				case 3:CPrintToChatAll("%s ~~~ MAP ENDING ~~~", g_szChatPrefix);
 				case 2:CPrintToChatAll("%s ~~~ MAP ENDING ~~~", g_szChatPrefix);
 				case 1:CPrintToChatAll("%s ~~~ MAP ENDING ~~~", g_szChatPrefix);
-				case 0:CreateTimer(10.0, ForceNextMap, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);	
+				case 0:CreateTimer(14.0, ForceNextMap, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);	
 				case -1:
 				{
 					if (!g_bRoundEnd)
 					{
 						g_bRoundEnd = true;
 						ServerCommand("mp_ignore_round_win_conditions 0");
-						CPrintToChatAll("%t", "TimeleftCounter", g_szChatPrefix, g_szMapName, 1);
 						char szNextMap[128];
 						GetNextMap(szNextMap, 128);
 						CreateTimer(1.0, TerminateRoundTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
-						CreateTimer(10.0, ForceNextMap, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 					}
 				}
 			}
