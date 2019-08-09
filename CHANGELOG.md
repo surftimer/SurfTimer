@@ -1,6 +1,6 @@
 # Changelog
 
-[Version 270 - Current work in progress]
+[Version 270 - Pre-release / Feature freez]
 ---
 
 * **[UTIL]** Combined config files and removed old settings like bhop and such
@@ -8,6 +8,9 @@
 * **[NEW]** Added "Silence Spec" usable with `sm_silentspec` and `sm_sspec`
 * **[NEW]** Added [Trails Chroma](https://github.com/Nickelony/Trails-Chroma) into the SurfTimer for VIP's and Admins
 * **[NEW]** Added trails for replay bots
+* **[REQUEST/NEW]** Added ConVars for both discord records announcement webhooks
+* **[REQUEST/FIX]** Fixed admin tags without country tags
+* **[REQUEST/NEW]** Added command to toggle triggers while noclipping
 
 [2019-08-02]
 ---
