@@ -439,10 +439,6 @@ int g_StageRank[MAXPLAYERS + 1][CPLIMIT];
 float g_fStageRecord[CPLIMIT];
 char g_szRecordStageTime[CPLIMIT];
 
-// will be used, need to fix query
-// char g_szRecordStagePlayer[CPLIMIT];
-// char g_szRecordStageSteamID[CPLIMIT];
-
 int g_TotalStageRecords[CPLIMIT];
 int g_TotalStages;
 float g_fWrcpMenuLastQuery[MAXPLAYERS + 1] = 1.0;
@@ -516,8 +512,6 @@ int g_SpeedMode[MAXPLAYERS + 1];
 bool g_bCenterSpeedDisplay[MAXPLAYERS + 1];
 int g_iCenterSpeedEnt[MAXPLAYERS + 1];
 int g_iSettingToLoad[MAXPLAYERS + 1];
-// Handle g_hServerTier;
-// gain/loss speed colour in centre hud
 int g_iPreviousSpeed[MAXPLAYERS + 1];
 
 /*----------  Sounds  ----------*/
@@ -900,7 +894,6 @@ bool g_bValidTeleportCall[MAXPLAYERS + 1];
 // Don't allow starting a new run if saving a record run
 bool g_bNewReplay[MAXPLAYERS + 1];
 bool g_bNewBonus[MAXPLAYERS + 1];
-
 bool g_createAdditionalTeleport[MAXPLAYERS + 1];
 int g_BotMimicRecordTickCount[MAXPLAYERS + 1] = { 0, ... };
 int g_BotActiveWeapon[MAXPLAYERS + 1] = { -1, ... };
@@ -1224,7 +1217,6 @@ float g_fStageInitialPosition[MAXPLAYERS + 1][3];
 // Replay start angle
 float g_fStageInitialAngles[MAXPLAYERS + 1][3];
 
-
 bool g_bSavingWrcpReplay[MAXPLAYERS + 1];
 int g_StageReplayCurrentStage;
 int g_StageReplaysLoop;
@@ -1346,7 +1338,6 @@ bool g_bNewStage[MAXPLAYERS + 1];
 bool g_bLeftZone[MAXPLAYERS + 1];
 
 // Trails
-
 #define TRAIL_NONE -1
 
 enum TrailSettings
@@ -2729,9 +2720,6 @@ public void OnPluginStart()
 	// default titles whitelist array
 	g_DefaultTitlesWhitelist = CreateArray();
 
-	// button sound hook
-	// AddNormalSoundHook(NormalSHook_callback);
-
 	// Botmimic 3
 	// https://forums.alliedmods.net/showthread.php?t=180114
 
@@ -2815,8 +2803,6 @@ public void OnPluginStart()
 	g_bHasLatestID = false;
 	g_iLastID = 0;
 
-	// https://forums.alliedmods.net/showthread.php?t=300549
-	// HookUserMessage(GetUserMessageId("VGUIMenu"), TeamMenuHook, true);
 }
 
 public void OnAllPluginsLoaded()
