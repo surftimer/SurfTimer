@@ -202,6 +202,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_speedgradient", Command_ChangeSpeedGradient, "[SurfTimer] [settings] white/green/rainbow/momentum - change speed gradient");
 	RegConsoleCmd("sm_speedmode", Command_ChangeSpeedMode, "[SurfTimer] [settings] xy/xyz/z - change speed mode");
 	RegConsoleCmd("sm_centerspeed", Command_CenterSpeed, "[SurfTimer] [settings] on/off - toggle center speed display");
+	RegConsoleCmd("sm_nctriggers", Command_ToggleNcTriggers, "[SurfTimer] [settings] on/off - toggle triggers while noclipping");
 
 	// Trails
 	RegConsoleCmd("sm_trail", Command_Trail, "Opens the 'Trail Selection' menu.");
@@ -209,6 +210,17 @@ void CreateCommands()
 	RegConsoleCmd("sm_hidetrail", Command_Hide, "Hides other players' trails.");
 	RegConsoleCmd("sm_hidetrails", Command_Hide, "Hides other players' trails.");
 
+}
+
+public Action Command_ToggleNcTriggers(int client, int args) {
+	if (g_iDisableTriggers[client]) {
+		g_iDisableTriggers[client] = false;
+		CPrintToChat(client, "%t", "TriggersDisabled", g_szChatPrefix);
+	} else {
+		g_iDisableTriggers[client] = true;
+		CPrintToChat(client, "%t", "TriggersEnabled", g_szChatPrefix);
+	}
+	return Plugin_Handled;
 }
 
 public Action Command_CenterSpeed(int client, int args) {

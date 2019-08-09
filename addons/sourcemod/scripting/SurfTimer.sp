@@ -772,6 +772,9 @@ bool g_iWrcpMessages[MAXPLAYERS + 1];
 
 // trails chroma stuff
 bool g_iHasEnforcedTitle[MAXPLAYERS + 1];
+
+// disable noclip triggers toggle
+bool g_iDisableTriggers[MAXPLAYERS + 1];
 /*----------  Run Variables  ----------*/
 
 // Clients personal record in map

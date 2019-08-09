@@ -1603,4 +1603,14 @@
 		"#format"	"{1:s}"
 		"en"		"{1} The center speed display is now {red}disabled"
 	}
+	"TriggersEnabled"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Triggers are now {green}enabled {default}while noclipping"
+	}
+	"TriggersDisabled"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Triggers are now {red}disabled {default}while noclipping"
+	}
 }
