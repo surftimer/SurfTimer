@@ -327,6 +327,7 @@ void CreateConVars()
 	// Prestige Server
 	g_hPrestigeRank = CreateConVar("ck_prestige_rank", "0", "Rank of players who can join the server, 0 to disable");
 	g_hPrestigeStyles = CreateConVar("ck_prestige_all_styles", "1", "If enabled, players must be the rank of ck_prestige_rank in ANY style");
+	g_hPrestigeVip = CreateConVar("ck_prestige_rank_vip", "1", "if enabled, VIPs will ingore the prestige rank");
 
 	// One Jump Limit
 	g_hOneJumpLimit = CreateConVar("ck_one_jump_limit", "1", "Enables/Disables the one jump limit globally for all zones");
