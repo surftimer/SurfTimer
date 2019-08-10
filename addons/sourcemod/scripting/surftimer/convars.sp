@@ -83,6 +83,7 @@ ConVar g_hMultiServerMapcycle = null;							// Use multi server mapcycle
 ConVar g_hDBMapcycle = null;									// use maps from ck_maptier as the servers mapcycle
 ConVar g_hPrestigeRank = null;									// Rank to limit the server
 ConVar g_hPrestigeStyles = null;								// Determines if the rank limit applies to normal style or all styles
+ConVar g_hPrestigeVip = null;
 ConVar g_hOneJumpLimit = null;									// Only allows players to jump once inside a start or stage zone
 ConVar g_hServerID = null;										// Sets the servers id for cross-server announcements
 ConVar g_hRecordAnnounce = null;								// Enable/Disable cross-server announcements
@@ -124,6 +125,7 @@ ConVar gCV_CheapTrails = null;
 ConVar gCV_BeamLife = null;
 ConVar gCV_BeamWidth = null;
 ConVar gCV_RespawnDisable = null;
+ConVar gCV_Trails = null;
 
 void CreateConVars()
 {
@@ -181,7 +183,7 @@ void CreateConVars()
 	gCV_BeamLife = CreateConVar("sm_trails_life", "2.5", "Time duration of the trails.", FCVAR_NOTIFY, true, 0.0);
 	gCV_BeamWidth = CreateConVar("sm_trails_width", "1.5", "Width of the trail beams.", FCVAR_NOTIFY, true, 0.0);
 	gCV_RespawnDisable = CreateConVar("sm_trails_respawn_disable", "0", "Disable the player's trail after respawning.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
-	
+	gCV_Trails = CreateConVar("ck_trails_enable", "1", "Enable or Disable trails completely ", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 
 	g_hPointSystem = CreateConVar("ck_point_system", "1", "on/off - Player point system", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	HookConVarChange(g_hPointSystem, OnSettingChanged);

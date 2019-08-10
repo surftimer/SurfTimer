@@ -50,6 +50,7 @@ public void OnClientCookiesCached(int client)
 
 bool LoadColorsConfig()
 {
+	if (!gCV_Trails) return true;
 	char[] sPath = new char[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, sPath, PLATFORM_MAX_PATH, "configs/surftimer/trails-colors.cfg");
 	KeyValues kv = new KeyValues("trails-colors");
@@ -83,6 +84,7 @@ bool LoadColorsConfig()
 
 public Action Command_Hide(int client, int args)
 {
+	if (!gCV_Trails) return Plugin_Handled;
 	if(!gB_PluginEnabled || !gB_AllowHide || !IsValidClient(client))
 	{
 		return Plugin_Handled;
@@ -131,6 +133,7 @@ public Action Command_Hide(int client, int args)
 
 public Action Command_Trail(int client, int args)
 {
+	if (!gCV_Trails) return Plugin_Handled;
 	if(!gB_PluginEnabled || !IsValidClient(client))
 	{
 		return Plugin_Handled;
@@ -147,6 +150,7 @@ public Action Command_Trail(int client, int args)
 
 Action OpenTrailMenu(int client, int page)
 {
+	if (!gCV_Trails) return Plugin_Handled;
 	Menu menu = new Menu(Menu_Handler);
 	menu.SetTitle("Choose a trail:\n ");
 	

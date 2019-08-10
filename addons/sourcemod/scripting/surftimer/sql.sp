@@ -9267,7 +9267,7 @@ public void SQL_UpdatePlayerColoursCallback(Handle owner, Handle hndl, const cha
 public void db_selectAnnouncements()
 {
 	char szQuery[1024];
-	Format(szQuery, 1024, "SELECT id FROM ck_announcements WHERE server != '%s' AND id > %d", g_sServerName, g_iLastID);
+	Format(szQuery, 1024, "SELECT `id` FROM `ck_announcements` WHERE `server` != '%s' AND `id` > %d", g_sServerName, g_iLastID);
 	SQL_TQuery(g_hDb, SQL_SelectAnnouncementsCallback, szQuery, 1, DBPrio_Low);
 }
 
@@ -9315,7 +9315,7 @@ public void db_insertAnnouncement(char szName[128], char szMapName[128], int szM
 public void db_checkAnnouncements()
 {
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT id, server, name, mapname, mode, time, group FROM ck_announcements WHERE server != '%s' AND id > %d;", g_sServerName, g_iLastID);
+	Format(szQuery, 512, "SELECT `id`, `server`, `name`, `mapname`, `mode`, `time`, `group` FROM `ck_announcements` WHERE `server` != '%s' AND `id` > %d;", g_sServerName, g_iLastID);
 	SQL_TQuery(g_hDb, SQL_CheckAnnouncementsCallback, szQuery, 1, DBPrio_Low);
 }
 
