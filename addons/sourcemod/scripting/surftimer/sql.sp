@@ -1387,10 +1387,15 @@ public void db_viewPlayerPoints(int client)
 		g_pr_points[client][i] = 0;
 	}
 
+	if (GetConVarBool(g_hEnforceDefaultTitles))
+		LoadDefaultTitle(client);
+
 	g_bPrestigeCheck[client] = false;
 	
-	if (GetConVarBool(g_hPrestigeVip) && (IsPlayerVip(client) || g_iHasEnforcedTitle[client]))
-		g_bPrestigeCheck[client] = true;
+	if (!g_bPrestigeCheck[client]) {
+		if (GetConVarBool(g_hPrestigeVip) && (IsPlayerVip(client, false, false) || g_iHasEnforcedTitle[client]))
+			g_bPrestigeCheck[client] = true;
+	}
 	
 	g_iPlayTimeAlive[client] = 0;
 	g_iPlayTimeSpec[client] = 0;
@@ -1531,7 +1536,7 @@ public void sql_selectRankedPlayersRankCallback(Handle owner, Handle hndl, const
 			{
 				if (style == 0)
 				{
-					if (g_PlayerRank[client][0] > GetConVarInt(g_hPrestigeRank) && !(GetConVarBool(g_hPrestigeVip) && (IsPlayerVip(client) || g_iHasEnforcedTitle[client])))
+					if (g_PlayerRank[client][0] > GetConVarInt(g_hPrestigeRank) && !g_bPrestigeCheck[client])
 						KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
 				}
 
@@ -1540,7 +1545,7 @@ public void sql_selectRankedPlayersRankCallback(Handle owner, Handle hndl, const
 			}
 			else
 			{
-				if (g_PlayerRank[client][0] < GetConVarInt(g_hPrestigeRank) || (GetConVarBool(g_hPrestigeVip) && (IsPlayerVip(client) || g_iHasEnforcedTitle[client])))
+				if (g_PlayerRank[client][0] < GetConVarInt(g_hPrestigeRank) || g_bPrestigeCheck[client])
 					g_bPrestigeCheck[client] = true;
 				else
 					KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
@@ -1560,7 +1565,7 @@ public void sql_selectRankedPlayersRankCallback(Handle owner, Handle hndl, const
 				CS_SetClientContributionScore(client, -g_PlayerRank[client][style]);
 		}
 	}
-	else if (style == 0 && GetConVarInt(g_hPrestigeRank) > 0)
+	else if (style == 0 && GetConVarInt(g_hPrestigeRank) > 0 && !g_bPrestigeCheck[client])
 		KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
 
 	if (!g_bSettingsLoaded[client] && style == (MAX_STYLES - 1))
@@ -9107,9 +9112,9 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 		g_fTick[client][0] = GetGameTime();
 		LoadClientSetting(client, g_iSettingToLoad[client]);
 
-		// Check Enforced Tags
+		/* Check Enforced Tags
 		if (GetConVarBool(g_hEnforceDefaultTitles))
-			LoadDefaultTitle(client);
+			LoadDefaultTitle(client);*/
 	}
 }
 
