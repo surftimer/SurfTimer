@@ -30,6 +30,8 @@ typedef OnGetReactions = function void (DiscordBot bot, ArrayList Users, char[] 
 
 typedef OnMessageSent = function void(DiscordBot bot, char[] channel, DiscordMessage message, any data);
 
+typedef OnMessageDeleted = function void(DiscordBot bot, any data);
+
 //hMemberList is JSON array containing guild members
 typedef OnGetMembers = function void(DiscordBot bot, char[] guild, Handle hMemberList);
 
@@ -65,7 +67,7 @@ methodmap Role < Handle {
 	public bool Mentionable() {
 		return JsonObjectGetBool(this, "mentionable");
 	}
-}
+};
 
 methodmap RoleList < Handle {
 	property int Size {
@@ -82,7 +84,7 @@ methodmap RoleList < Handle {
 		return this.GetRole(i);
 	}
 	
-}
+};
 
 /*
 {
@@ -114,7 +116,7 @@ methodmap DiscordUser < Handle {
 	public native void GetEmail(char[] buffer, int maxlength);
 	
 	public native bool IsBot();
-}
+};
 
 /*
 
@@ -130,7 +132,7 @@ methodmap DiscordMessage < Handle {
 	public native void GetContent(char[] buffer, int maxlength);
 	
 	public native void GetChannelID(char[] buffer, int maxlength);
-}
+};
 
 #include <discord/channel>
 #include <discord/message_embed>

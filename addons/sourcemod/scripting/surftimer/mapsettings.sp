@@ -269,7 +269,7 @@ public void sql_viewMapSettingsCallback(Handle owner, Handle hndl, const char[] 
 {
 	if (hndl == null)
 	{
-		LogError("[surftimer] SQL Error (sql_viewMapSettingsCallback): %s", error);
+		LogError("[SurfTimer] SQL Error (sql_viewMapSettingsCallback): %s", error);
 	}
 
 	if (SQL_HasResultSet(hndl) && SQL_GetRowCount(hndl) > 0)
@@ -288,7 +288,7 @@ public void sql_insertMapSettingsCallback(Handle owner, Handle hndl, const char[
 {
 	if (hndl == null)
 	{
-		LogError("[surftimer] SQL Error (sql_insertMapSettingsCallback): %s", error);
+		LogError("[SurfTimer] SQL Error (sql_insertMapSettingsCallback): %s", error);
 	}
 
 	db_viewMapSettings();

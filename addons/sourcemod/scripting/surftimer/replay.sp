@@ -1,5 +1,5 @@
 
-// Botmimic2 - modified by 1NutWunDeR
+// Botmimic3 - modified by 1NutWunDeR
 // http://forums.alliedmods.net/showthread.php?t=164148
 
 void setReplayTime(int zGrp, int stage, int style)
@@ -297,7 +297,7 @@ public void LoadReplays()
 		{
 			BuildPath(Path_SM, newPath, sizeof(newPath), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, g_szMapName, g_mapZones[zId][zoneGroup]);
 			if (RenameFile(newPath, sPath))
-				PrintToServer("surftimer | Succesfully renamed bonus record file to: %s", newPath);
+				PrintToServer("SurfTimer | Succesfully renamed bonus record file to: %s", newPath);
 		}
 		CloseHandle(hFilex);
 	}
@@ -703,6 +703,10 @@ public void LoadRecordReplay()
 		PlayRecord(g_RecordBot, 0, 0);
 		// We can start multiple bots but first we need to get if bot has finished playing???
 		SetEntityRenderColor(g_RecordBot, g_ReplayBotColor[0], g_ReplayBotColor[1], g_ReplayBotColor[2], 50);
+		float fOrigin[3];
+		GetClientAbsOrigin(g_RecordBot, fOrigin);
+		gI_SelectedTrail[g_RecordBot] = 5;
+		CreatePlayerTrail(g_RecordBot, fOrigin);
 		if (GetConVarBool(g_hPlayerSkinChange))
 		{
 			char szBuffer[256];
@@ -762,6 +766,10 @@ public void LoadBonusReplay()
 
 		PlayRecord(g_BonusBot, 1, 0);
 		SetEntityRenderColor(g_BonusBot, g_BonusBotColor[0], g_BonusBotColor[1], g_BonusBotColor[2], 50);
+		float fOrigin[3];
+		GetClientAbsOrigin(g_BonusBot, fOrigin);
+		gI_SelectedTrail[g_BonusBot] = 4;
+		CreatePlayerTrail(g_BonusBot, fOrigin);
 		if (GetConVarBool(g_hPlayerSkinChange))
 		{
 			char szBuffer[256];
@@ -821,7 +829,11 @@ public void LoadWrcpReplay()
 		SetEntityGravity(g_WrcpBot, 0.0);
 
 		PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0);
-		SetEntityRenderColor(g_WrcpBot, 255, 0, 255, 50);
+		SetEntityRenderColor(g_WrcpBot, 180, 142, 173, 50);
+		float fOrigin[3];
+		GetClientAbsOrigin(g_WrcpBot, fOrigin);
+		gI_SelectedTrail[g_WrcpBot] = 7;
+		CreatePlayerTrail(g_WrcpBot, fOrigin);
 		if (GetConVarBool(g_hPlayerSkinChange))
 		{
 			char szBuffer[256];

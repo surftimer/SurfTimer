@@ -26,4 +26,4 @@ methodmap DiscordGuildUser < Handle {
 	public bool IsMute() {
 		return JsonObjectGetBool(this, "mute");
 	}
-}
+};

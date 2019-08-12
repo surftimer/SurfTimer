@@ -1,6 +1,6 @@
 /*=======================================================
 =                 z4lab CS:GO Surftimer                 =
- modified version of "surftimer" from fluffy for z4lab
+ modified version of "SurfTimer" from fluffy for z4lab
  The original version of this timer was by jonitaikaponi 
 = https://forums.alliedmods.net/showthread.php?t=264498 =
 =======================================================*/
@@ -26,6 +26,8 @@
 #include <discord>
 #include <sourcecomms>
 #include <surftimer>
+#include <tf2>
+#include <tf2_stocks>
 
 /*===================================
 =            Definitions            =
@@ -36,7 +38,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "263"
+#define VERSION "270"
 
 // Database Definitions
 #define MYSQL 0
@@ -385,9 +387,6 @@ bool g_bInStageZone[MAXPLAYERS + 1];
 /*----------  MaxSpeed Variables  ----------*/
 bool g_bInMaxSpeed[MAXPLAYERS + 1];
 
-/*----------  Bhop Limiter  ----------*/
-int g_userJumps[MAXPLAYERS][UserJumps];
-
 /*----------  VIP Variables  ----------*/
 ConVar g_hAutoVipFlag = null;
 int g_VipFlag;
@@ -439,10 +438,6 @@ float g_fCurrentWrcpRunTime[MAXPLAYERS + 1];
 int g_StageRank[MAXPLAYERS + 1][CPLIMIT];
 float g_fStageRecord[CPLIMIT];
 char g_szRecordStageTime[CPLIMIT];
-
-// will be used, need to fix query
-// char g_szRecordStagePlayer[CPLIMIT];
-// char g_szRecordStageSteamID[CPLIMIT];
 
 int g_TotalStageRecords[CPLIMIT];
 int g_TotalStages;
@@ -517,8 +512,6 @@ int g_SpeedMode[MAXPLAYERS + 1];
 bool g_bCenterSpeedDisplay[MAXPLAYERS + 1];
 int g_iCenterSpeedEnt[MAXPLAYERS + 1];
 int g_iSettingToLoad[MAXPLAYERS + 1];
-// Handle g_hServerTier;
-// gain/loss speed colour in centre hud
 int g_iPreviousSpeed[MAXPLAYERS + 1];
 
 /*----------  Sounds  ----------*/
@@ -720,8 +713,6 @@ bool g_bNoClip[MAXPLAYERS + 1];
 
 /*----------  User Options  ----------*/
 
-// org variables track the original setting status, on disconnect, check if changed, if so, update new settings to database
-
 // bool to ensure the modules have loaded before resetting 
 bool g_bLoadedModules[MAXPLAYERS + 1];
 
@@ -770,8 +761,14 @@ bool g_iSilentSpectate[MAXPLAYERS + 1];
 // CP Messages
 bool g_iCpMessages[MAXPLAYERS + 1];
 
-// WRCP Messeages
+// WRCP Messages
 bool g_iWrcpMessages[MAXPLAYERS + 1];
+
+// trails chroma stuff
+bool g_iHasEnforcedTitle[MAXPLAYERS + 1];
+
+// disable noclip triggers toggle
+bool g_iDisableTriggers[MAXPLAYERS + 1];
 /*----------  Run Variables  ----------*/
 
 // Clients personal record in map
@@ -897,7 +894,6 @@ bool g_bValidTeleportCall[MAXPLAYERS + 1];
 // Don't allow starting a new run if saving a record run
 bool g_bNewReplay[MAXPLAYERS + 1];
 bool g_bNewBonus[MAXPLAYERS + 1];
-
 bool g_createAdditionalTeleport[MAXPLAYERS + 1];
 int g_BotMimicRecordTickCount[MAXPLAYERS + 1] = { 0, ... };
 int g_BotActiveWeapon[MAXPLAYERS + 1] = { -1, ... };
@@ -1221,7 +1217,6 @@ float g_fStageInitialPosition[MAXPLAYERS + 1][3];
 // Replay start angle
 float g_fStageInitialAngles[MAXPLAYERS + 1][3];
 
-
 bool g_bSavingWrcpReplay[MAXPLAYERS + 1];
 int g_StageReplayCurrentStage;
 int g_StageReplaysLoop;
@@ -1276,7 +1271,6 @@ float g_fClientCPs[MAXPLAYERS + 1][36];
 float g_fTargetTime[MAXPLAYERS + 1];
 char g_szTargetCPR[MAXPLAYERS + 1][MAX_NAME_LENGTH];
 char g_szCPRMapName[MAXPLAYERS + 1][128];
-// float g_fTargetCPs[MAXPLAYERS + 1][35];
 
 // surf_christmas2
 bool g_bUsingStageTeleport[MAXPLAYERS + 1];
@@ -1342,6 +1336,62 @@ int g_iLastJump[MAXPLAYERS + 1];
 int g_iTicksOnGround[MAXPLAYERS + 1];
 bool g_bNewStage[MAXPLAYERS + 1];
 bool g_bLeftZone[MAXPLAYERS + 1];
+
+// Trails
+#define TRAIL_NONE -1
+
+enum TrailSettings
+{
+	iRedChannel,
+	iGreenChannel,
+	iBlueChannel,
+	iSpecialColor,
+	iAlphaChannel
+}
+
+// Hiding trails globals
+bool gB_HidingTrails[MAXPLAYERS + 1];
+ArrayList aL_Clients = null;
+
+/* Cached CVars */
+
+bool gB_PluginEnabled = true;
+bool gB_AdminsOnly = true;
+bool gB_AllowHide = true;
+bool gB_CheapTrails = false;
+float gF_BeamLife = 1.5;
+float gF_BeamWidth = 1.5;
+bool gB_RespawnDisable = false;
+
+/* Global variables */
+
+int gI_BeamSprite;
+int gI_SelectedTrail[MAXPLAYERS + 1] = {TRAIL_NONE, ...};
+float gF_LastPosition[MAXPLAYERS + 1][3];
+
+// KeyValue globals
+int gI_TrailAmount;
+char gS_TrailTitle[128][128];
+int gI_TrailSettings[128][TrailSettings];
+
+// Spectrum cycle globals
+int gI_CycleColor[MAXPLAYERS + 1][4];
+bool gB_RedToYellow[MAXPLAYERS + 1];
+bool gB_YellowToGreen[MAXPLAYERS + 1];
+bool gB_GreenToCyan[MAXPLAYERS + 1];
+bool gB_CyanToBlue[MAXPLAYERS + 1];
+bool gB_BlueToMagenta[MAXPLAYERS + 1];
+bool gB_MagentaToRed[MAXPLAYERS + 1];
+
+// Cheap trail globals
+int gI_TickCounter[MAXPLAYERS + 1];
+float gF_PlayerOrigin[MAXPLAYERS + 1][3];
+
+// Cookie handles
+Handle gH_TrailChoiceCookie;
+Handle gH_TrailHidingCookie;
+
+EngineVersion gEV_Type = Engine_Unknown;
 
 /*===================================
 =         Predefined Arrays         =
@@ -1529,7 +1579,6 @@ char RadioCMDS[][] = 													// Disable radio commands
 =              Includes              =
 ====================================*/
 
-
 #include "surftimer/convars.sp"
 #include "surftimer/misc.sp"
 #include "surftimer/sql.sp"
@@ -1537,7 +1586,7 @@ char RadioCMDS[][] = 													// Disable radio commands
 #include "surftimer/commands.sp"
 #include "surftimer/hooks.sp"
 #include "surftimer/buttonpress.sp"
-#include "surftimer/sql2.sp"
+//#include "surftimer/sql2.sp"
 #include "surftimer/sqltime.sp"
 #include "surftimer/timer.sp"
 #include "surftimer/replay.sp"
@@ -1545,6 +1594,7 @@ char RadioCMDS[][] = 													// Disable radio commands
 #include "surftimer/mapsettings.sp"
 #include "surftimer/cvote.sp"
 #include "surftimer/vip.sp"
+#include "surftimer/trails.sp"
 
 /*====================================
 =               Events               =
@@ -1650,6 +1700,16 @@ public void OnMapStart()
 
 	BuildPath(Path_SM, g_szLogFile, sizeof(g_szLogFile), "logs/surftimer/%s.log", g_szMapName);
 
+
+	if (!LoadColorsConfig())
+		{
+			SetFailState("Failed load \"configs/trails-colors.cfg\". File missing or invalid.");
+		}
+		
+	gI_BeamSprite = PrecacheModel("materials/trails/beam_01.vmt", true);
+		
+	AddFileToDownloadsTable("materials/trails/beam_01.vmt");
+	AddFileToDownloadsTable("materials/trails/beam_01.vtf");
 	// Get map maxvelocity
 	g_hMaxVelocity = FindConVar("sv_maxvelocity");
 
@@ -1707,9 +1767,6 @@ public void OnMapStart()
 	// main.cfg & replays
 	CreateTimer(1.0, DelayedStuff, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 	CreateTimer(10.0, LoadReplaysTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
-
-	if (g_bLateLoaded)
-		OnAutoConfigsBuffered();
 
 	g_Advert = 0;
 	CreateTimer(180.0, AdvertTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
@@ -1799,6 +1856,8 @@ public void OnMapStart()
 
 public void OnMapEnd()
 {
+	aL_Clients.Clear();
+
 	// ServerCommand("sm_updater_force");
 	g_bEnableJoinMsgs = false;
 	g_bServerDataLoaded = false;
@@ -1884,40 +1943,9 @@ public void OnConfigsExecuted()
 		ServerCommand("mp_respawn_on_death_ct 0;mp_respawn_on_death_t 0");
 
 	ServerCommand("mp_endmatch_votenextmap 0;mp_do_warmup_period 0;mp_warmuptime 0;mp_match_can_clinch 0;mp_match_end_changelevel 1;mp_match_restart_delay 10;mp_endmatch_votenextleveltime 10;mp_endmatch_votenextmap 0;mp_halftime 0;bot_zombie 1;mp_do_warmup_period 0;mp_maxrounds 1");
+	ServerCommand("sv_infinite_ammo 2");
+	ServerCommand("sv_autobunnyhopping 1");
 
-	if (GetConVarInt(g_hServerType) == 1)
-	{
-		// Bhop
-		ServerCommand("sv_infinite_ammo 1");
-	}
-	else
-	{
-		// Surf
-		ServerCommand("sv_infinite_ammo 2");
-		ServerCommand("sv_autobunnyhopping 1");
-	}
-}
-
-public void OnAutoConfigsBuffered()
-{
-	// just to be sure that it's not empty
-	char szMap[128];
-	char szPrefix[2][32];
-	GetCurrentMap(szMap, 128);
-	char mapPieces[6][128];
-	int lastPiece = ExplodeString(szMap, "/", mapPieces, sizeof(mapPieces), sizeof(mapPieces[]));
-	Format(szMap, sizeof(szMap), "%s", mapPieces[lastPiece - 1]);
-	ExplodeString(szMap, "_", szPrefix, 2, 32);
-
-	// map config
-	char szPath[256];
-	Format(szPath, sizeof(szPath), "sourcemod/surftimer/%s_.cfg", szPrefix[0]);
-	char szPath2[256];
-	Format(szPath2, sizeof(szPath2), "cfg/%s", szPath);
-	if (FileExists(szPath2))
-		ServerCommand("exec %s", szPath);
-	else
-		SetFailState("<Surftimer> %s not found.", szPath2);
 }
 
 public void OnClientConnected(int client)
@@ -1960,11 +1988,6 @@ public void OnClientPutInServer(int client)
 	g_bToggleMapFinish[client] = true;
 	g_bRepeat[client] = false;
 	g_bNotTeleporting[client] = false;
-
-	g_userJumps[client][LastJumpTimes][3] = 0;
-	g_userJumps[client][LastJumpTimes][2] = 0;
-	g_userJumps[client][LastJumpTimes][1] = 0;
-	g_userJumps[client][LastJumpTimes][0] = 0;
 
 	if (IsFakeClient(client))
 	{
@@ -2057,6 +2080,13 @@ public void OnClientAuthorized(int client)
 
 public void OnClientDisconnect(int client)
 {
+	int index = aL_Clients.FindValue(client);
+	
+	if(index != -1) // If the index is valid and the player was found on the list
+	{
+		aL_Clients.Erase(index);
+	}
+
 	if (IsFakeClient(client) && g_hRecordingAdditionalTeleport[client] != null)
 	{
 		CloseHandle(g_hRecordingAdditionalTeleport[client]);
@@ -2554,13 +2584,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 		else
 			g_AdminMenuFlag = FlagToBit(flag);
 	}
-	else if (convar == g_hServerType)
-	{
-		if (GetConVarInt(g_hServerType) == 1) // Bhop
-			ServerCommand("sv_infinite_ammo 1");
-		else
-			ServerCommand("sv_infinite_ammo 2"); // Surf
-	}
+
 	else if (convar == g_hServerID)
 		g_iServerID = GetConVarInt(g_hServerID);
 	else if (convar == g_hHostName)
@@ -2696,12 +2720,9 @@ public void OnPluginStart()
 	// default titles whitelist array
 	g_DefaultTitlesWhitelist = CreateArray();
 
-	// button sound hook
-	// AddNormalSoundHook(NormalSHook_callback);
-
-	// Botmimic 2
+	// Botmimic 3
 	// https://forums.alliedmods.net/showthread.php?t=180114
-	// Optionally setup a hook on CBaseEntity::Teleport to keep track of sudden place changes
+
 	CheatFlag("bot_zombie", false, true);
 	CheatFlag("bot_mimic", false, true);
 	g_hLoadedRecordsAdditionalTeleport = CreateTrie();
@@ -2733,6 +2754,29 @@ public void OnPluginStart()
 	g_BonusFinishForward = CreateGlobalForward("surftimer_OnBonusFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell, Param_Cell);
 	g_PracticeFinishForward = CreateGlobalForward("surftimer_OnPracticeFinished", ET_Event, Param_Cell, Param_Float, Param_String);
 
+	// Trails
+	gCV_PluginEnabled.AddChangeHook(OnConVarChanged);
+	gCV_AdminsOnly.AddChangeHook(OnConVarChanged);
+	gCV_AllowHide.AddChangeHook(OnConVarChanged);
+	gCV_CheapTrails.AddChangeHook(OnConVarChanged);
+	gCV_BeamLife.AddChangeHook(OnConVarChanged);
+	gCV_BeamWidth.AddChangeHook(OnConVarChanged);
+	gCV_RespawnDisable.AddChangeHook(OnConVarChanged);
+
+	gH_TrailChoiceCookie = RegClientCookie("trail_choice", "Trail Choice Cookie", CookieAccess_Protected);
+	gH_TrailHidingCookie = RegClientCookie("trail_hiding", "Trail Hiding Cookie", CookieAccess_Protected);
+	
+	aL_Clients = new ArrayList();
+	gEV_Type = GetEngineVersion();
+
+	for(int i = 1; i <= MaxClients; i++)
+	{
+		if(AreClientCookiesCached(i))
+		{
+			OnClientCookiesCached(i);
+		}
+	}
+
 	if (g_bLateLoaded)
 	{
 		CreateTimer(3.0, LoadPlayerSettings, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
@@ -2759,8 +2803,6 @@ public void OnPluginStart()
 	g_bHasLatestID = false;
 	g_iLastID = 0;
 
-	// https://forums.alliedmods.net/showthread.php?t=300549
-	// HookUserMessage(GetUserMessageId("VGUIMenu"), TeamMenuHook, true);
 }
 
 public void OnAllPluginsLoaded()

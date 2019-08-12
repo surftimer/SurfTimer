@@ -3,7 +3,9 @@ CREATE TABLE IF NOT EXISTS `ck_announcements` (
  `server` varchar(256) NOT NULL DEFAULT 'Beginner',
  `name` varchar(32) NOT NULL,
  `mapname` varchar(128) NOT NULL,
+ `mode` int(11) NOT NULL DEFAULT '0',
  `time` varchar(32) NOT NULL,
+ `group` int(12) NOT NULL DEFAULT '0',
  PRIMARY KEY (`id`)
 ) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
@@ -58,6 +60,8 @@ CREATE TABLE `ck_playeroptions2` (
  `module4s` int(11) NOT NULL DEFAULT '0',
  `module5s` int(11) NOT NULL DEFAULT '0',
  `prestrafe` int(11) NOT NULL DEFAULT '0',
+ `cpmessages` INT(11) NOT NULL DEFAULT '1',
+ `wrcpmessages` INT(11) NOT NULL DEFAULT '1',
  PRIMARY KEY (`steamid`)
 ) DEFAULT CHARSET=utf8mb4;
 

@@ -478,7 +478,7 @@
 	"Commands20"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Noclip disabled, use {lightgreen}!surftimer {default}to re-enable your timer"
+		"en"		"{1} Noclip disabled, use {lightgreen}!SurfTimer {default}to re-enable your timer"
 	}
 	"Commands31"
 	{
@@ -838,6 +838,11 @@
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
 		"en"		"{1} {yellow}{2} {default}beat the {blue}{3} {default}map record in the {lime}{4} {default}server with a time of {lime}{5}"
+	}
+	"SQLTwo4.2Bonus"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:i},{5:s},{6:s}"
+		"en"		"{1} {yellow}{2} {default}beat the {blue}{3} {default}bonus {yellow}{4} {default}record in the {lime}{4} {default}server with a time of {lime}{5}"
 	}
 	"SQLTwo4.3"
 	{
@@ -1602,5 +1607,15 @@
 	{
 		"#format"	"{1:s}"
 		"en"		"{1} The center speed display is now {red}disabled"
+	}
+	"TriggersEnabled"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Triggers are now {green}enabled {default}while noclipping"
+	}
+	"TriggersDisabled"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Triggers are now {red}disabled {default}while noclipping"
 	}
 }

@@ -1825,7 +1825,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		if (g_bMapSRVRecord[client])
 		{
 			if (GetConVarBool(g_hRecordAnnounce))
-				db_insertAnnouncement(szName, g_szMapName, g_szFinalTime[client]);
+				db_insertAnnouncement(szName, g_szMapName, 0, g_szFinalTime[client], 0);
 			char buffer[1024];
 			GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
 			if (!StrEqual(buffer, ""))
@@ -1873,12 +1873,12 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 		return;
 
 	float RecordDiff;
-	char szRecordDiff[54], szName[MAX_NAME_LENGTH];
+	char szRecordDiff[54], szName[128];
 
 	if (rank == 0)
 		rank = g_MapRankBonus[zGroup][client];
 
-	GetClientName(client, szName, MAX_NAME_LENGTH);
+	GetClientName(client, szName, 128);
 	if ((GetConVarInt(g_hAnnounceRecord) == 0 ||
 		(GetConVarInt(g_hAnnounceRecord) == 1 && g_bBonusSRVRecord[client] || g_bBonusPBRecord[client] || g_bBonusFirstRecord[client]) ||
 		(GetConVarInt(g_hAnnounceRecord) == 2 && g_bBonusSRVRecord[client])) &&
@@ -1964,9 +1964,12 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 	// Send Announcements
 	if (g_bBonusSRVRecord[client])
 	{
-		char buffer[1024];
+		if (GetConVarBool(g_hRecordAnnounce))
+			db_insertAnnouncement(szName, g_szMapName, 1, g_szFinalTime[client], zGroup);
+		char buffer[1024], buffer1[1024];
 		GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
-		if (!StrEqual(buffer, ""))
+		GetConVarString(g_hRecordAnnounceDiscordBonus, buffer1, 1024);
+		if (!StrEqual(buffer, "") && !StrEqual(buffer1, ""))
 			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup);
 	}
 
@@ -4264,8 +4267,9 @@ public void totalTimeForHumans(int unix, char[] buffer, int size)
 
 public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char szTime[32])
 {
-	char webhook[1024];
+	char webhook[1024], webhookName[1024];
 	GetConVarString(g_hRecordAnnounceDiscord, webhook, 1024);
+	GetConVarString(g_dcMapRecordName, webhookName, 1024);
 	if (StrEqual(webhook, ""))
 		return;
 		
@@ -4273,7 +4277,7 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("z4lab Surf Records");
+	hook.SetUsername(webhookName);
 
 	// Format The Message
 	char szMessage[256];
@@ -4285,18 +4289,24 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 	delete hook;
 }
 
-public void sendDiscordAnnouncementBonus(char szName[32], char szMapName[128], char szTime[32], int zGroup)
+public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], char szTime[32], int zGroup)
 {
-	char webhook[1024];
-	GetConVarString(g_hRecordAnnounceDiscord, webhook, 1024);
+	char webhook[1024], webhookN[1024], webhookName[1024];
+	GetConVarString(g_hRecordAnnounceDiscord, webhookN, 1024);
+	GetConVarString(g_hRecordAnnounceDiscordBonus, webhook, 1024);
+	GetConVarString(g_dcBonusRecordName, webhookName, 1024);
 	if (StrEqual(webhook, ""))
-		return;
+		if (StrEqual(webhookN, ""))
+			return;
+		else
+			webhook = webhookN;
+			
 
  	// Send Discord Announcement
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 
-	hook.SetUsername("z4lab Surf Records");
+	hook.SetUsername(webhookName);
 
 	// Format The Message
 	char szMessage[256];
@@ -4492,10 +4502,13 @@ public void LoadDefaultTitle(int client)
 					{
 						KvGetString(kv, "title", szBuffer, sizeof(szBuffer));
 						SetDefaultTitle(client, szBuffer);
+						g_iHasEnforcedTitle[client] = true;
 						break;
-					}
-					else
+					} else {
+						g_iHasEnforcedTitle[client] = false;
 						continue;
+					}
+					
 				}
 
 				KvGetString(kv, "flag", szBuffer, sizeof(szBuffer), "none");

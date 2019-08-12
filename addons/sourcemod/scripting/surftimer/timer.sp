@@ -137,7 +137,7 @@ public Action DelayedStuff(Handle timer)
 	if (FileExists("cfg/sourcemod/surftimer/main.cfg"))
 		ServerCommand("exec sourcemod/surftimer/main.cfg");
 	else
-		SetFailState("<surftimer> cfg/sourcemod/surftimer/main.cfg not found.");
+		SetFailState("<SurfTimer> cfg/sourcemod/surftimer/main.cfg not found.");
 
 	return Plugin_Handled;
 }
@@ -176,20 +176,19 @@ public Action CKTimer2(Handle timer)
 				case 60:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
 				case 30:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
 				case 10:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
-				//add ~~~MAP ENDING~~~ 
-				//maybe switch to 3,2,1,0 not 0,-1,-2,-3
-				case -3:
+				case 3:CPrintToChatAll("%s ~~~ MAP ENDING ~~~", g_szChatPrefix);
+				case 2:CPrintToChatAll("%s ~~~ MAP ENDING ~~~", g_szChatPrefix);
+				case 1:CPrintToChatAll("%s ~~~ MAP ENDING ~~~", g_szChatPrefix);
+				case 0:CreateTimer(14.0, ForceNextMap, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);	
+				case -1:
 				{
 					if (!g_bRoundEnd)
 					{
 						g_bRoundEnd = true;
 						ServerCommand("mp_ignore_round_win_conditions 0");
-						CPrintToChatAll("%t", "TimeleftCounter", g_szChatPrefix, g_szMapName, 1);
 						char szNextMap[128];
 						GetNextMap(szNextMap, 128);
-						// CPrintToChatAll("%t", "Timer2", g_szChatPrefix, szNextMap);
 						CreateTimer(1.0, TerminateRoundTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
-						CreateTimer(10.0, ForceNextMap, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 					}
 				}
 			}
@@ -369,47 +368,35 @@ public Action SetClanTag(Handle timer, any client)
 
 	if (GetConVarBool(g_hCountry))
 	{
-		char tag[154];
-		Format(tag, 154, "%s | %s", g_szCountryCode[client], g_pr_rankname_style[client]);
-		if (g_iCurrentStyle[client] > 0)
-		{
-			char szStyle[128];
-			Format(szStyle, sizeof(szStyle), g_szStyleAcronyms[g_iCurrentStyle[client]]);
-			StringToUpper(szStyle);
-			Format(szStyle, sizeof(szStyle), "%s-", szStyle);
-			ReplaceString(tag, sizeof(tag), "{style}", szStyle);
-		}
-		else
-			ReplaceString(tag, sizeof(tag), "{style}", ""); 
-
 		char szTabRank[1024], szTabClanTag[1024];
 		Format(szTabRank, 1024, "%s", g_pr_chat_coloredrank[client]);
 		CRemoveColors(szTabRank, 1024);
 		Format(szTabClanTag, 1024, "%s | %s", g_szCountryCode[client], szTabRank);
 		
-		if ((GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) CS_SetClientClanTag(client, szTabRank);
+		if ((GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) {
+			if (GetConVarBool(g_iAdminCountryTags))
+				CS_SetClientClanTag(client, szTabRank);
+			else 
+				CS_SetClientClanTag(client, szTabClanTag);
+		} 
 		else CS_SetClientClanTag(client, szTabClanTag);
 	}
-	else //we don't use it. What you think about it @totles :) ?
+	else
 	{
 		if (GetConVarBool(g_hPointSystem))
 		{
-			char tag[154];
-			Format(tag, 154, "%s", g_pr_rankname_style[client]);
+			char szTabRank[1024], szTabClanTag[1024];
+			Format(szTabRank, 1024, "%s", g_pr_chat_coloredrank[client]);
+			CRemoveColors(szTabRank, 1024);
+			Format(szTabClanTag, 1024, "%s", szTabRank);
 			
-			// Replace {style} with style
-			if (g_iCurrentStyle[client] > 0)
-			{
-				char szStyle[128];
-				Format(szStyle, sizeof(szStyle), g_szStyleAcronyms[g_iCurrentStyle[client]]);
-				StringToUpper(szStyle);
-				Format(szStyle, sizeof(szStyle), "%s-", szStyle);
-				ReplaceString(tag, sizeof(tag), "{style}", szStyle);
-			}
-			else
-				ReplaceString(tag, sizeof(tag), "{style}", "");
-
-			CS_SetClientClanTag(client, tag);
+			if ((GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) {
+				if (GetConVarBool(g_iAdminCountryTags))
+					CS_SetClientClanTag(client, szTabRank);
+				else 
+					CS_SetClientClanTag(client, szTabClanTag);
+			} 
+			else CS_SetClientClanTag(client, szTabClanTag);
 		}
 	}
 

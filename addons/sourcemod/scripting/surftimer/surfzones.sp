@@ -26,7 +26,7 @@ public void CreateZoneEntity(int zoneIndex)
 			{
 				char szTriggerName[128];
 				GetEntPropString(iEnt, Prop_Send, "m_iName", szTriggerName, 128, 0);
-				// GetEntityClassname(iEnt, szClassName, sizeof(szClassName));
+
 				if (StrEqual(szHookName, szTriggerName))
 				{
 					Format(sZoneName, sizeof(sZoneName), "sm_ckZoneHooked %i", zoneIndex);
@@ -148,7 +148,9 @@ public Action ingnoreTriggers(int entity, int client) //add command to !options
 {
 	if (!(client > 0 && client <= MaxClients) || !IsPlayerAlive(client)) return Plugin_Continue;
 
-	if(GetEntityMoveType(client) != MOVETYPE_NOCLIP) return Plugin_Continue;
+	if (GetEntityMoveType(client) != MOVETYPE_NOCLIP) return Plugin_Continue;
+
+	if (g_iDisableTriggers[client]) return Plugin_Continue;
 
 	return Plugin_Handled;
 } 

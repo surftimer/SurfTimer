@@ -1,6 +1,6 @@
 /*
 	Surftimer Hooks
-	TODO: Cleanup
+	TODO: Cleanup, si si
 */
 
 void CreateHooks()
@@ -17,7 +17,6 @@ void CreateHooks()
 	HookEvent("player_team", Event_OnPlayerTeam, EventHookMode_Post);
 	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
 	HookEvent("player_jump", Event_PlayerJump);
-	// HookEvent("player_disconnect", Event_PlayerDisconnect); -- maybe needed later
 
 	// Gunshots
 	AddTempEntHook("Shotgun Shot", Hook_ShotgunShot);
@@ -87,6 +86,16 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		g_bInJump[client] = false;
 		g_bInDuck[client] = false;
 
+
+		if(!gB_HidingTrails[client] && aL_Clients.FindValue(client) == -1) // If the client isn't hiding trails, but somehow isn't on the list
+		{
+			aL_Clients.Push(client);
+		}
+		
+		if(gB_RespawnDisable) // Reset trail on respawn
+		{
+			gI_SelectedTrail[client] = TRAIL_NONE;
+		}	
 		// Set stage to 1 on spawn cause why not
 		if (!g_bRespawnPosition[client] && !g_specToStage[client])
 		{
@@ -127,7 +136,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		else
 			SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 5, 4, true);
 
-		// Botmimic2
+		// Botmimic3
 		if (g_hBotMimicsRecord[client] != null && IsFakeClient(client))
 		{
 			g_BotMimicTick[client] = 0;
@@ -828,7 +837,16 @@ public Action OnLogAction(Handle source, Identity ident, int client, int target,
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
-	// fluffys
+
+	if(gB_CheapTrails)
+	{
+		ForceCheapTrails(client);
+	}
+	else
+	{
+		ForceExpensiveTrails(client);
+	}
+
 	if (buttons & IN_DUCK && g_bInDuck[client] == true)
 	{
 		CPrintToChat(client, "%t", "Hooks11", g_szChatPrefix);

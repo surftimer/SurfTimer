@@ -83,11 +83,12 @@ ConVar g_hMultiServerMapcycle = null;							// Use multi server mapcycle
 ConVar g_hDBMapcycle = null;									// use maps from ck_maptier as the servers mapcycle
 ConVar g_hPrestigeRank = null;									// Rank to limit the server
 ConVar g_hPrestigeStyles = null;								// Determines if the rank limit applies to normal style or all styles
-ConVar g_hServerType = null;									// Set server to surf or bhop mode
+ConVar g_hPrestigeVip = null;
 ConVar g_hOneJumpLimit = null;									// Only allows players to jump once inside a start or stage zone
 ConVar g_hServerID = null;										// Sets the servers id for cross-server announcements
 ConVar g_hRecordAnnounce = null;								// Enable/Disable cross-server announcements
 ConVar g_hRecordAnnounceDiscord = null;							// Web hook link to announce records to discord
+ConVar g_hRecordAnnounceDiscordBonus = null;							// Web hook link to announce bonus records to discord
 ConVar g_hReportBugsDiscord = null;								// Web hook link to report bugs to discord
 ConVar g_hCalladminDiscord = null;								// Web hook link to allow players to call admin to discord
 ConVar g_hSidewaysBlockKeys = null;
@@ -109,16 +110,29 @@ char g_szRelativeSoundPathWRCP[PLATFORM_MAX_PATH];
 ConVar g_hMustPassCheckpoints = null;
 ConVar g_hSlayOnRoundEnd = null;
 ConVar g_hLimitSpeedType = null;
+ConVar g_dcMapRecordName = null;
+ConVar g_dcBonusRecordName = null;
 ConVar g_dcCalladminName = null;
 ConVar g_dcBugTrackerName = null;
 ConVar g_drDeleteSecurity = null;
+ConVar g_iAdminCountryTags = null;
+
+// Trails
+ConVar gCV_PluginEnabled = null;
+ConVar gCV_AdminsOnly = null;
+ConVar gCV_AllowHide = null;
+ConVar gCV_CheapTrails = null;
+ConVar gCV_BeamLife = null;
+ConVar gCV_BeamWidth = null;
+ConVar gCV_RespawnDisable = null;
+ConVar gCV_Trails = null;
 
 void CreateConVars()
 {
 	CreateConVar("timer_version", VERSION, "Timer Version.", FCVAR_DONTRECORD | FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY);
 
 	g_hChatPrefix = CreateConVar("ck_chat_prefix", "{lime}SurfTimer {default}|", "Determines the prefix used for chat messages", FCVAR_NOTIFY);
-	g_hConnectMsg = CreateConVar("ck_connect_msg", "1", "on/off - Enables a player connect message with country", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	g_hConnectMsg = CreateConVar("ck_connect_msg", "1", "on/off - Enables a player connect message with country tag", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hAllowRoundEndCvar = CreateConVar("ck_round_end", "0", "on/off - Allows to end the current round", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hDisconnectMsg = CreateConVar("ck_disconnect_msg", "1", "on/off - Enables a player disconnect message in chat", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hMapEnd = CreateConVar("ck_map_end", "1", "on/off - Allows map changes after the timelimit has run out (mp_timelimit must be greater than 0)", FCVAR_NOTIFY, true, 0.0, true, 1.0);
@@ -126,7 +140,7 @@ void CreateConVars()
 	g_hNoClipS = CreateConVar("ck_noclip", "1", "on/off - Allows players to use noclip", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hGoToServer = CreateConVar("ck_goto", "1", "on/off - Allows players to use the !goto command", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hCommandToEnd = CreateConVar("ck_end", "1", "on/off - Allows players to use the !end command", FCVAR_NOTIFY, true, 0.0, true, 1.0);
-	g_hCvarGodMode = CreateConVar("ck_godmode", "1", "on/off - unlimited hp", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	g_hCvarGodMode = CreateConVar("ck_godmode", "1", "on/off - Godmode", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hPauseServerside = CreateConVar("ck_pause", "1", "on/off - Allows players to use the !pause command", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hcvarRestore = CreateConVar("ck_restore", "1", "on/off - Restoring of time and last position after reconnect", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hAttackSpamProtection = CreateConVar("ck_attack_spam_protection", "1", "on/off - max 40 shots; +5 new/extra shots per minute; 1 he/flash counts like 9 shots", FCVAR_NOTIFY, true, 0.0, true, 1.0);
@@ -155,11 +169,25 @@ void CreateConVars()
 	g_hTeleToStartWhenSettingsLoaded = CreateConVar("ck_teleportclientstostart", "1", "(1 / 0) Teleport players automatically back to the start zone, when their settings have been loaded.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_dcCalladminName = CreateConVar("ck_discord_calladmin_name", "z4lab Calladmin", "Webhook name for !calladmin - Discord side", FCVAR_NOTIFY);
 	g_dcBugTrackerName = CreateConVar("ck_discord_bug_tracker_name", "z4lab Bugtracker", "Webhook name for !bug - Discord side", FCVAR_NOTIFY);
+	g_dcBonusRecordName = CreateConVar("ck_discord_bonus_record_name", "z4lab Surf Records", "Webhook name for bonus record announcements - Discord side", FCVAR_NOTIFY);
+	g_dcMapRecordName = CreateConVar("ck_discord_map_record_name", "z4lab Surf Records", "Webhook name for map record announcements - Discord side", FCVAR_NOTIFY);
 	g_drDeleteSecurity = CreateConVar("ck_dr_delete_security", "1", "(1 / 0) Disabled/Enable delete security for !dr command", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	g_iAdminCountryTags = CreateConVar("ck_admin_country_tags", "0", "(1 / 0) Disabled/Enable country tags for admins", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	
+
+	// Trails
+	gCV_PluginEnabled = CreateConVar("sm_trails_enable", "1", "Enable or Disable all features of the plugin.", 0, true, 0.0, true, 1.0);
+	gCV_AdminsOnly = CreateConVar("sm_trails_admins_only", "1", "Enable trails for admins only.", 0, true, 0.0, true, 1.0);
+	gCV_AllowHide = CreateConVar("sm_trails_allow_hide", "1", "Allow hiding other players' trails.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	gCV_CheapTrails = CreateConVar("sm_trails_cheap", "0", "Force cheap trails (FPS boost).", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	gCV_BeamLife = CreateConVar("sm_trails_life", "2.5", "Time duration of the trails.", FCVAR_NOTIFY, true, 0.0);
+	gCV_BeamWidth = CreateConVar("sm_trails_width", "1.5", "Width of the trail beams.", FCVAR_NOTIFY, true, 0.0);
+	gCV_RespawnDisable = CreateConVar("sm_trails_respawn_disable", "0", "Disable the player's trail after respawning.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	gCV_Trails = CreateConVar("ck_trails_enable", "1", "Enable or Disable trails completely ", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 
 	g_hPointSystem = CreateConVar("ck_point_system", "1", "on/off - Player point system", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	HookConVarChange(g_hPointSystem, OnSettingChanged);
-	g_hPlayerSkinChange = CreateConVar("ck_custom_models", "1", "on/off - Allows Surftimer to change the models of players and bots", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	g_hPlayerSkinChange = CreateConVar("ck_custom_models", "1", "on/off - Allows SurfTimer to change the models of players and bots", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	HookConVarChange(g_hPlayerSkinChange, OnSettingChanged);
 	g_hReplayBotPlayerModel = CreateConVar("ck_replay_bot_skin", "models/player/tm_professional_var1.mdl", "Replay pro bot skin", FCVAR_NOTIFY);
 	HookConVarChange(g_hReplayBotPlayerModel, OnSettingChanged);
@@ -301,9 +329,7 @@ void CreateConVars()
 	// Prestige Server
 	g_hPrestigeRank = CreateConVar("ck_prestige_rank", "0", "Rank of players who can join the server, 0 to disable");
 	g_hPrestigeStyles = CreateConVar("ck_prestige_all_styles", "1", "If enabled, players must be the rank of ck_prestige_rank in ANY style");
-	// Surf / Bhop
-	g_hServerType = CreateConVar("ck_server_type", "0", "Change the timer to function for Surf or Bhop, 0 = surf, 1 = bhop (Note: Currently does nothing)");
-	HookConVarChange(g_hServerType, OnSettingChanged);
+	g_hPrestigeVip = CreateConVar("ck_prestige_rank_vip", "1", "if enabled, VIPs will ingore the prestige rank");
 
 	// One Jump Limit
 	g_hOneJumpLimit = CreateConVar("ck_one_jump_limit", "1", "Enables/Disables the one jump limit globally for all zones");
@@ -316,6 +342,8 @@ void CreateConVars()
 
 	// Discord
 	g_hRecordAnnounceDiscord = CreateConVar("ck_announce_records_discord", "", "Web hook link to announce records to discord, keep empty to disable");
+
+	g_hRecordAnnounceDiscordBonus = CreateConVar("ck_announce_bonus_records_discord", "", "Web hook link to announce bonus records to discord, keep empty to use ck_announce_records_discord");	
 
 	g_hReportBugsDiscord = CreateConVar("ck_report_discord", "", "Web hook link to report bugs to discord, keep empty to disable");
 
