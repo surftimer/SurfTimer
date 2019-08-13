@@ -1,13 +1,22 @@
 # z4lab-SurfTimer 270 for CS:GO
 
-## installation and requirements
-you will need [SourceMod 1.9](https://www.sourcemod.net/downloads.php?branch=stable), [MetaMod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable) and a working MySQL instance
+## Installation and requirements
+[SourceMod 1.9](https://www.sourcemod.net/downloads.php?branch=stable), [MetaMod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable) and a working MySQL instance is required for this plugin 
 
-### new install
+<sup>(This version also supports SourceMod 1.10 and MetaMod 1.11)</sup>
+
+## Changelog
+
+*   [Changelog](https://github.com/totles/z4lab-surftimer/blob/master/CHANGELOG.md) for a list of all our changes / fixes
+
+
+## Fresh Install
 
 *   download the latest version from the release page [here](https://github.com/totles/z4lab-surftimer/releases/latest)
 *   copy the files to your csgo directory
 *   edit configs (mysql db, etc, to do)
+
+## Upgrade
 
 ### upgrading from SurfTimer(fluffys)
 
@@ -24,11 +33,8 @@ you will need [SourceMod 1.9](https://www.sourcemod.net/downloads.php?branch=sta
 *   run `mysql-files/upgrade-niko.sql` in your ckSurf db
 *   edit configs (mysql db, etc, to do)
 
-## Changelog
 
-*   [Changelog](https://github.com/totles/z4lab-surftimer/blob/master/CHANGELOG.md) 
-
-## point system
+## Point system
 <details>
   <summary>explanation</summary> 
   
@@ -73,7 +79,7 @@ Take surf_aircontrol_nbv for example: (You can use sm_mi to see this menu)
   
 </details>
 
-## credits
+## Credits
 
 extensions used in this version:
 *   [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
