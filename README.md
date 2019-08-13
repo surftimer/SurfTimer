@@ -5,8 +5,6 @@
 
 <sup>(This version also supports SourceMod 1.10 and MetaMod 1.11)</sup>
 
-~ 4GB of RAM
-
 ## Changelog
 
 *   [Changelog](https://github.com/totles/z4lab-surftimer/blob/master/CHANGELOG.md) for a list of all our changes / fixes

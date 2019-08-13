@@ -2,8 +2,9 @@
 
 [Version 280 - current work in progress]
 ---
+* **[UTIL]** Updated GeoIP.dat
 * **[UTIL]** More code cleanup (WIP)
-
+* **[FIX]** Useless error log spam (cleaner.cfg)
 
 [2019-08-13 - Version 271]
 ---
