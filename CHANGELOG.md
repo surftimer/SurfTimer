@@ -1,5 +1,10 @@
 # Changelog
 
+[Version 280 - current work in progress]
+---
+* **[UTIL]** More code cleanup (WIP)
+
+
 [2019-08-13 - Version 271]
 ---
 * **[REQUEST/FIX]** Fixed `sv_maxvelocity` bug
