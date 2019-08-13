@@ -492,7 +492,6 @@ void DrawSpectrumTrail(int client, int stepsize)
 	if(gB_MagentaToRed[client])
 	{
 		gB_BlueToMagenta[client] = false;
-		
 		gI_CycleColor[client][0] = 255; gI_CycleColor[client][1] = 0; gI_CycleColor[client][2] -= stepsize;
 		
 		if(gI_CycleColor[client][0] >= 255 && gI_CycleColor[client][1] <= 0 && gI_CycleColor[client][2] <= 0)
