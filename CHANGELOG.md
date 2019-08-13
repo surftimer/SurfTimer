@@ -1,8 +1,12 @@
 # Changelog
 
+[2019-08-13 - Version 271]
+---
+* **[REQUEST/FIX]** Fixed `sv_maxvelocity` bug
+* **[REQUEST/FIX]** Fixed prestige avoid for vips
+
 [2019-08-12 - Version 270]
 ---
-
 * **[UTIL]** Combined config files and removed old settings like bhop and such
 * **[UTIL]** Added external dependencies for compiling (dhooks, steamworks, discord_api, cleaner)
 * **[NEW]** Added "Silence Spec" usable with `sm_silentspec` and `sm_sspec`
