@@ -1391,10 +1391,13 @@ public void db_viewPlayerPoints(int client)
 		LoadDefaultTitle(client);
 
 	g_bPrestigeCheck[client] = false;
+	g_bPrestigeAvoid[client] = false;
 	
 	if (!g_bPrestigeCheck[client]) {
-		if (GetConVarBool(g_hPrestigeVip) && (IsPlayerVip(client, false, false) || g_iHasEnforcedTitle[client]))
+		if (GetConVarBool(g_hPrestigeVip) && (IsPlayerVip(client, false, false) || g_iHasEnforcedTitle[client])) {
 			g_bPrestigeCheck[client] = true;
+			g_bPrestigeAvoid[client] = true;
+		}
 	}
 	
 	g_iPlayTimeAlive[client] = 0;
@@ -1532,7 +1535,7 @@ public void sql_selectRankedPlayersRankCallback(Handle owner, Handle hndl, const
 		g_PlayerRank[client][style] = SQL_GetRowCount(hndl);
 		if (GetConVarInt(g_hPrestigeRank) > 0)
 		{
-			if (GetConVarBool(g_hPrestigeStyles))
+			if (GetConVarBool(g_hPrestigeStyles) && !g_bPrestigeAvoid[client])
 			{
 				if (style == 0)
 				{
@@ -1540,14 +1543,14 @@ public void sql_selectRankedPlayersRankCallback(Handle owner, Handle hndl, const
 						KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
 				}
 
-				if (style == MAX_STYLES && g_bPrestigeCheck[client] == false)
+				if (style == MAX_STYLES && !g_bPrestigeCheck[client])
 					KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
 			}
 			else
 			{
 				if (g_PlayerRank[client][0] < GetConVarInt(g_hPrestigeRank) || g_bPrestigeCheck[client])
 					g_bPrestigeCheck[client] = true;
-				else
+				else if (!g_bPrestigeAvoid[client])
 					KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
 			}
 		}

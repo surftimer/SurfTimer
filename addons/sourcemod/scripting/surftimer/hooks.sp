@@ -675,6 +675,8 @@ public Action Event_OnRoundStart(Handle event, const char[] name, bool dontBroad
 			AcceptEntityInput(iEnt, "Kill");
 		}
 	}
+	
+	db_viewMapSettings();
 
 	// PushFix by Mev, George, & Blacky
 	// https://forums.alliedmods.net/showthread.php?t=267131

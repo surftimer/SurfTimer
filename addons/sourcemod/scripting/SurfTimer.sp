@@ -38,7 +38,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "270"
+#define VERSION "271"
 
 // Database Definitions
 #define MYSQL 0
@@ -1325,6 +1325,7 @@ bool g_bIsValidRun[MAXPLAYERS + 1];
 
 // Prestige
 bool g_bPrestigeCheck[MAXPLAYERS + 1];
+bool g_bPrestigeAvoid[MAXPLAYERS + 1];
 
 // Menus mapname
 char g_szMapNameFromDatabase[MAXPLAYERS + 1][128];
