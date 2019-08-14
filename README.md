@@ -1,11 +1,9 @@
-# z4lab-SurfTimer 271 for CS:GO
+# z4lab-SurfTimer 280 for CS:GO
 
 ## Installation and requirements
 [SourceMod 1.9](https://www.sourcemod.net/downloads.php?branch=stable), [MetaMod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable) and a working MySQL instance is required for this plugin 
 
 <sup>(This version also supports SourceMod 1.10 and MetaMod 1.11)</sup>
-
-~ 4GB of RAM
 
 ## Changelog
 
