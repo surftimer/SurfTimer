@@ -4318,7 +4318,7 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 	delete hook;
 }
 
-bool IsPlayerVip(int client, bool admin = true, bool reply = false)
+bool IsPlayerVip(int client, bool admin = true, bool reply = true)
 {
 	if (admin)
 	{
@@ -4326,7 +4326,7 @@ bool IsPlayerVip(int client, bool admin = true, bool reply = false)
 			return true;
 	}
 
-	if (!g_bVip[client] && !g_iHasEnforcedTitle[client])
+	if (!g_bVip[client] && !CheckCommandAccess(client, "", ADMFLAG_RESERVATION))
 	{
 		if (reply)
 		{

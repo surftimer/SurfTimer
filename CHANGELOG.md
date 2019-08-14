@@ -1,12 +1,5 @@
 # Changelog
 
-[Version 280 - current work in progress]
----
-* **[UTIL]** Updated GeoIP.dat
-* **[UTIL]** More code cleanup (WIP)
-* **[FIX]** Useless error log spam (cleaner.cfg)
-* **[FIX]** VIP chat spam bug
-
 [2019-08-13 - Version 271]
 ---
 * **[REQUEST/FIX]** Fixed `sv_maxvelocity` bug
