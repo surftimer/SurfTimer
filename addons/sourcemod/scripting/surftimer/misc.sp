@@ -4318,7 +4318,7 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 	delete hook;
 }
 
-bool IsPlayerVip(int client, bool admin = true, bool reply = true)
+bool IsPlayerVip(int client, bool admin = true, bool reply = false)
 {
 	if (admin)
 	{
@@ -4326,12 +4326,12 @@ bool IsPlayerVip(int client, bool admin = true, bool reply = true)
 			return true;
 	}
 
-	if (!g_bVip[client] && !CheckCommandAccess(client, "", ADMFLAG_RESERVATION))
+	if (!g_bVip[client] && !g_iHasEnforcedTitle[client])
 	{
 		if (reply)
 		{
 			CPrintToChat(client, "%t", "Misc43", g_szChatPrefix);
-			PrintToConsole(client, "surftimer | This is a VIP feature");
+			PrintToConsole(client, "SurfTimer | This is a VIP feature");
 		}
 		return false;
 	}
