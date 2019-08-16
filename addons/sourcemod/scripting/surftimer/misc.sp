@@ -4331,7 +4331,7 @@ bool IsPlayerVip(int client, bool admin = true, bool reply = false)
 		if (reply)
 		{
 			CPrintToChat(client, "%t", "Misc43", g_szChatPrefix);
-			PrintToConsole(client, "SurfTimer | This is a VIP feature");
+			PrintToConsole(client, "surftimer | This is a VIP feature");
 		}
 		return false;
 	}

@@ -273,7 +273,7 @@
 	"Pause1"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Pause function is server-sided disabled"
+		"en"		"{1} Pause function is disabled on this server"
 	}
 	"Pause2"
 	{
@@ -493,7 +493,7 @@
 	"Commands33"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} You cannot pause with your timer stopped"
+		"en"		"{1} You can't pause while your timer is stopped"
 	}
 	"Commands34"
 	{
@@ -518,7 +518,7 @@
 	"Commands40"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Usage: sm_mytitle \"my cool title\""
+		"en"		"{1} Usage: sm_mytitle \"my custom title\""
 	}
 	"Commands41"
 	{
