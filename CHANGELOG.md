@@ -1,5 +1,9 @@
 # Changelog
 
+[2019-08-16 - Version 273]
+---
+* **[REQUEST/FIX]** Finally fixed maxvelocity bug ._.
+
 [2019-08-14 - Version 272]
 ---
 * **[REQUEST/FIX]** Fixed VIP chat spam bug
