@@ -1,5 +1,10 @@
 # Changelog
 
+[2019-08-14 - Version 272]
+---
+* **[REQUEST/FIX]** Fixed VIP chat spam bug
+* **[UTIL]** Changed VIP system
+
 [2019-08-13 - Version 271]
 ---
 * **[REQUEST/FIX]** Fixed `sv_maxvelocity` bug
