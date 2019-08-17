@@ -1703,16 +1703,6 @@ public void OnMapStart()
 
 	BuildPath(Path_SM, g_szLogFile, sizeof(g_szLogFile), "logs/surftimer/%s.log", g_szMapName);
 
-
-	if (!LoadColorsConfig())
-		{
-			SetFailState("Failed load \"configs/trails-colors.cfg\". File missing or invalid.");
-		}
-		
-	gI_BeamSprite = PrecacheModel("materials/trails/beam_01.vmt", true);
-		
-	AddFileToDownloadsTable("materials/trails/beam_01.vmt");
-	AddFileToDownloadsTable("materials/trails/beam_01.vtf");
 	// Get map maxvelocity
 	g_hMaxVelocity = FindConVar("sv_maxvelocity");
 
@@ -1855,6 +1845,16 @@ public void OnMapStart()
 
 	// Save Locs
 	ResetSaveLocs();
+	
+	if (!LoadColorsConfig())
+		{
+			SetFailState("Failed load \"configs/trails-colors.cfg\". File missing or invalid.");
+		}
+		
+	gI_BeamSprite = PrecacheModel("materials/trails/beam_01.vmt", true);
+		
+	AddFileToDownloadsTable("materials/trails/beam_01.vmt");
+	AddFileToDownloadsTable("materials/trails/beam_01.vtf");
 }
 
 public void OnMapEnd()
