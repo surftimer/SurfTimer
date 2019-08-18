@@ -38,7 +38,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "273"
+#define VERSION "274"
 
 // Database Definitions
 #define MYSQL 0
@@ -769,6 +769,10 @@ bool g_iHasEnforcedTitle[MAXPLAYERS + 1];
 
 // disable noclip triggers toggle
 bool g_iDisableTriggers[MAXPLAYERS + 1];
+
+// auto reset
+bool g_iAutoReset[MAXPLAYERS + 1];
+
 /*----------  Run Variables  ----------*/
 
 // Clients personal record in map

@@ -1,5 +1,9 @@
 # Changelog
 
+[2019-08-18 - Version 274]
+---
+* **[NEW]** added `sm_autoreset` command
+
 [2019-08-16 - Version 273]
 ---
 * **[REQUEST/FIX]** Finally fixed maxvelocity bug ._.
