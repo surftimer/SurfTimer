@@ -28,7 +28,6 @@
 #include <surftimer>
 #include <tf2>
 #include <tf2_stocks>
-#include <base64>
 
 /*===================================
 =            Definitions            =
@@ -39,7 +38,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "280"
+#define VERSION "273"
 
 // Database Definitions
 #define MYSQL 0
@@ -514,7 +513,6 @@ bool g_bCenterSpeedDisplay[MAXPLAYERS + 1];
 int g_iCenterSpeedEnt[MAXPLAYERS + 1];
 int g_iSettingToLoad[MAXPLAYERS + 1];
 int g_iPreviousSpeed[MAXPLAYERS + 1];
-bool db_Matcher[MAXPLAYERS+1];
 
 /*----------  Sounds  ----------*/
 bool g_bTop10Time[MAXPLAYERS + 1] = false;
@@ -1700,19 +1698,8 @@ public void OnMapStart()
 	// Debug Logging
 	if (!DirExists("addons/sourcemod/logs/surftimer"))
 		CreateDirectory("addons/sourcemod/logs/surftimer", 511);
-
 	BuildPath(Path_SM, g_szLogFile, sizeof(g_szLogFile), "logs/surftimer/%s.log", g_szMapName);
 
-
-	if (!LoadColorsConfig())
-		{
-			SetFailState("Failed load \"configs/trails-colors.cfg\". File missing or invalid.");
-		}
-		
-	gI_BeamSprite = PrecacheModel("materials/trails/beam_01.vmt", true);
-		
-	AddFileToDownloadsTable("materials/trails/beam_01.vmt");
-	AddFileToDownloadsTable("materials/trails/beam_01.vtf");
 	// Get map maxvelocity
 	g_hMaxVelocity = FindConVar("sv_maxvelocity");
 
@@ -1855,6 +1842,14 @@ public void OnMapStart()
 
 	// Save Locs
 	ResetSaveLocs();
+
+	if (!LoadColorsConfig())
+		SetFailState("Failed load \"configs/trails-colors.cfg\". File missing or invalid.");
+	
+	gI_BeamSprite = PrecacheModel("materials/trails/beam_01.vmt", true);
+		
+	AddFileToDownloadsTable("materials/trails/beam_01.vmt");
+	AddFileToDownloadsTable("materials/trails/beam_01.vtf");
 }
 
 public void OnMapEnd()
