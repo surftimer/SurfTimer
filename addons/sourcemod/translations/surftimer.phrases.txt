@@ -1618,4 +1618,24 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Triggers are now {red}disabled {default}while noclipping"
 	}
+	"AutoResetDisabled"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Your timer {green}won't reset {default}if you've missed your PB"
+	}
+	"AutoResetEnabled"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Your timer will {red}reset {default}if you've missed your PB"
+	}
+	"AutoResetMessage1"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} You got teleported to the start because auto-reset is enabled"
+	}
+	"AutoResetMessage2"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Use {blue}sm_autoreset {default}to disable it"
+	}
 }
