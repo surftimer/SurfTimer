@@ -1,5 +1,5 @@
 /*
-	Surftimer Hooks
+	SurfTimer Hooks
 	TODO: Cleanup, si si
 */
 

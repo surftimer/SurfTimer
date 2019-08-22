@@ -1,5 +1,5 @@
 /* 
-	Surftimer Commands
+	SurfTimer Commands
 	TODO: Cleanup and sort commands
 */
 void CreateCommands()

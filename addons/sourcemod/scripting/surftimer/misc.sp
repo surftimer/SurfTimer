@@ -3071,7 +3071,7 @@ public void CreateNavFile()
 	Format(szSource, sizeof(szSource), "maps/replay_bot.nav");
 	if (!FileExists(szSource))
 	{
-		LogError("[Surftimer] Failed to create .nav files. %s doesn't exist!", szSource);
+		LogError("[SurfTimer] Failed to create .nav files. %s doesn't exist!", szSource);
 		return;
 	}
 
@@ -4481,7 +4481,7 @@ public void ReadDefaultTitlesWhitelist()
 		CloseHandle(whitelist);
 	}
 	else
-		LogError("[Surftimer] %s not found", DEFAULT_TITLES_WHITELIST_PATH);
+		LogError("[SurfTimer] %s not found", DEFAULT_TITLES_WHITELIST_PATH);
 }
 
 public void LoadDefaultTitle(int client)
@@ -4551,7 +4551,7 @@ public void LoadDefaultTitle(int client)
 		delete kv;
 	}
 	else
-		LogError("[Surftimer] %s not found", DEFAULT_TITLES_PATH);
+		LogError("[SurfTimer] %s not found", DEFAULT_TITLES_PATH);
 }
 
 public void SetDefaultTitle(int client, const char szTitle[256])
