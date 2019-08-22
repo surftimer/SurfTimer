@@ -266,21 +266,19 @@ public int callback_DeleteRecord(Menu menu, MenuAction action, int client, int k
 		char recordsBreak[3][32];
 		ExplodeString(menuItem, ";;;", recordsBreak, sizeof(recordsBreak), sizeof(recordsBreak[]));
 		
-		if(GetConVarBool(g_drDeleteSecurity)) {
-			Menu confirm = new Menu(callback_Confirm);
+		Menu confirm = new Menu(callback_Confirm);
 
-			confirm.SetTitle("%s Records Editing Menu - Confirm Deletion\n► Deleting %s [%s] %s record\n ", g_szMenuPrefix, recordsBreak[0], recordsBreak[1], recordsBreak[2]);
-			
-			confirm.AddItem("0", "No");
-			confirm.AddItem(recordsBreak[1], "Yes\n \n► This cannot be undone");
-			
+		confirm.SetTitle("%s Records Editing Menu - Confirm Deletion\n► Deleting %s [%s] %s record\n ", g_szMenuPrefix, recordsBreak[0], recordsBreak[1], recordsBreak[2]);
+
+		confirm.AddItem("0", "No");
+		confirm.AddItem(recordsBreak[1], "Yes\n \n► This cannot be undone");
+
+		if (GetConVarBool(g_drDeleteSecurity))
 			confirm.Display(client, MENU_TIME_FOREVER);
-			
-			return 0;
-		} else {
-			Menu confirm = new Menu(callback_Confirm);
+		else
 			callback_Confirm(confirm, MenuAction_Select, client, 1);
-		}
+
+		return 0;
 	}
 	else if (action == MenuAction_Cancel)
 	{
