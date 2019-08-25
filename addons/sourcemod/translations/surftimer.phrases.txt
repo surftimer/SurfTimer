@@ -842,7 +842,7 @@
 	"SQLTwo4.2Bonus"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:i},{5:s},{6:s}"
-		"en"		"{1} {yellow}{2} {default}beat the {blue}{3} {default}bonus {yellow}{4} {default}record in the {lime}{4} {default}server with a time of {lime}{5}"
+		"en"		"{1} {yellow}{2} {default}beat the {blue}{3} {default}bonus {yellow}{4} {default}record in the {lime}{5} {default}server with a time of {lime}{6}"
 	}
 	"SQLTwo4.3"
 	{
