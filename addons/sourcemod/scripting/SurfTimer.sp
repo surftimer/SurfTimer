@@ -1588,10 +1588,10 @@ char RadioCMDS[][] = 													// Disable radio commands
 #include "surftimer/misc.sp"
 #include "surftimer/sql.sp"
 #include "surftimer/admin.sp"
+#include "surftimer/newmaps.sp"
 #include "surftimer/commands.sp"
 #include "surftimer/hooks.sp"
 #include "surftimer/buttonpress.sp"
-//#include "surftimer/sql2.sp"
 #include "surftimer/sqltime.sp"
 #include "surftimer/timer.sp"
 #include "surftimer/replay.sp"
@@ -2702,6 +2702,8 @@ public void OnPluginStart()
 	CreateCommandListeners();
 
 	db_setupDatabase();
+
+	CreateCommandsNewMap();
 
 	// exec surftimer.cfg
 	AutoExecConfig(true, "surftimer");
