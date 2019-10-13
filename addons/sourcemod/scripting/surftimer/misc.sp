@@ -2754,9 +2754,12 @@ public void CheckRun(int client)
 			g_bMissedMapBest[client] = true;
 			if (g_fPersonalRecord[client] > 0.0) {
 				CPrintToChat(client, "%t", "MissedMapBest", g_szChatPrefix, g_szPersonalRecord[client]);
-				if (g_iAutoReset[client]) {
+				if (g_iAutoReset[client] && g_iCurrentStyle[client] == 0) {
 					Command_Restart(client, 1);
 					CPrintToChat(client, "%t", "AutoResetMessage1", g_szChatPrefix);
+					CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
+				} else if (g_iAutoReset[client] && g_iCurrentStyle[client] != 0) {
+					CPrintToChat(client, "%t", "AutoResetMessageStyle", g_szChatPrefix, g_szStyleMenuPrint[g_iCurrentStyle[client]]);
 					CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
 				}
 			}
@@ -2770,9 +2773,12 @@ public void CheckRun(int client)
 				{
 					g_bMissedBonusBest[client] = true;
 					CPrintToChat(client, "%t", "Misc29", g_szChatPrefix, g_szPersonalRecordBonus[g_iClientInZone[client][2]][client]);
-					if (g_iAutoReset[client]) {
+					if (g_iAutoReset[client] && g_iCurrentStyle[client] == 0) {
 						Command_Teleport(client, 0);
 						CPrintToChat(client, "%t", "AutoResetMessage1", g_szChatPrefix);
+						CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
+					} else if (g_iAutoReset[client] && g_iCurrentStyle[client] != 0) {
+						CPrintToChat(client, "%t", "AutoResetMessageStyle", g_szChatPrefix, g_szStyleMenuPrint[g_iCurrentStyle[client]]);
 						CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
 					}
 					EmitSoundToClient(client, "buttons/button18.wav", client);
