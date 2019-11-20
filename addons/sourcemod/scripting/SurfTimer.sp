@@ -39,6 +39,7 @@
 
 // Plugin Info
 #define VERSION "274"
+#define VERSION "280"
 
 // Database Definitions
 #define MYSQL 0
@@ -1589,6 +1590,7 @@ char RadioCMDS[][] = 													// Disable radio commands
 #include "surftimer/sql.sp"
 #include "surftimer/admin.sp"
 #include "surftimer/newmaps.sp"
+//#include "surftimer/prestrafe.sp"
 #include "surftimer/commands.sp"
 #include "surftimer/hooks.sp"
 #include "surftimer/buttonpress.sp"
@@ -2703,6 +2705,7 @@ public void OnPluginStart()
 
 	db_setupDatabase();
 
+	//CreateDBPrestrafe();
 	CreateCommandsNewMap();
 
 	// exec surftimer.cfg
@@ -2766,6 +2769,14 @@ public void OnPluginStart()
 	gCV_BeamLife.AddChangeHook(OnConVarChanged);
 	gCV_BeamWidth.AddChangeHook(OnConVarChanged);
 	gCV_RespawnDisable.AddChangeHook(OnConVarChanged);
+
+	//Update Fix
+
+	g_TextMsg = GetUserMessageId("TextMsg");
+	g_HintText = GetUserMessageId("HintText");
+	HookUserMessage(g_TextMsg, TextMsgHintTextHook, true);
+	HookUserMessage(g_HintText, TextMsgHintTextHook, true);
+
 
 	gH_TrailChoiceCookie = RegClientCookie("trail_choice", "Trail Choice Cookie", CookieAccess_Protected);
 	gH_TrailHidingCookie = RegClientCookie("trail_hiding", "Trail Hiding Cookie", CookieAccess_Protected);

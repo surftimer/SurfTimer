@@ -1,5 +1,13 @@
 # Changelog
 
+[2019-11-20 - Version 280pre]
+---
+* **[FIX]** "fixed" colors in the center panel
+* **[NEW]** added/fixed "one jump limit" for new speed style
+* **[REQUEST/NEW]** added `sm_newmaps` and `sm_addnewmap` command
+* **[FIX]** disabled auto-reset while surfing in style
+* **[UTIL]** removed some typos
+
 [2019-08-18 - Version 274]
 ---
 * **[NEW]** added `sm_autoreset` command
