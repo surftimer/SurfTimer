@@ -1,5 +1,5 @@
 /*=======================================================
-=                 z4lab CS:GO Surftimer                 =
+=                 z4lab CS:GO SurfTimer                 =
  modified version of "SurfTimer" from fluffy for z4lab
  The original version of this timer was by jonitaikaponi 
 = https://forums.alliedmods.net/showthread.php?t=264498 =
@@ -771,6 +771,10 @@ bool g_iHasEnforcedTitle[MAXPLAYERS + 1];
 
 // disable noclip triggers toggle
 bool g_iDisableTriggers[MAXPLAYERS + 1];
+
+// auto reset
+bool g_iAutoReset[MAXPLAYERS + 1];
+
 /*----------  Run Variables  ----------*/
 
 // Clients personal record in map
@@ -1590,7 +1594,6 @@ char RadioCMDS[][] = 													// Disable radio commands
 #include "surftimer/commands.sp"
 #include "surftimer/hooks.sp"
 #include "surftimer/buttonpress.sp"
-//#include "surftimer/sql2.sp"
 #include "surftimer/sqltime.sp"
 #include "surftimer/timer.sp"
 #include "surftimer/replay.sp"
@@ -1701,7 +1704,6 @@ public void OnMapStart()
 	// Debug Logging
 	if (!DirExists("addons/sourcemod/logs/surftimer"))
 		CreateDirectory("addons/sourcemod/logs/surftimer", 511);
-
 	BuildPath(Path_SM, g_szLogFile, sizeof(g_szLogFile), "logs/surftimer/%s.log", g_szMapName);
 
 	// Get map maxvelocity
@@ -1846,12 +1848,10 @@ public void OnMapStart()
 
 	// Save Locs
 	ResetSaveLocs();
-	
+
 	if (!LoadColorsConfig())
-		{
-			SetFailState("Failed load \"configs/trails-colors.cfg\". File missing or invalid.");
-		}
-		
+		SetFailState("Failed load \"configs/trails-colors.cfg\". File missing or invalid.");
+	
 	gI_BeamSprite = PrecacheModel("materials/trails/beam_01.vmt", true);
 		
 	AddFileToDownloadsTable("materials/trails/beam_01.vmt");
@@ -2767,6 +2767,14 @@ public void OnPluginStart()
 	gCV_BeamLife.AddChangeHook(OnConVarChanged);
 	gCV_BeamWidth.AddChangeHook(OnConVarChanged);
 	gCV_RespawnDisable.AddChangeHook(OnConVarChanged);
+
+	//Update Fix
+
+	g_TextMsg = GetUserMessageId("TextMsg");
+	g_HintText = GetUserMessageId("HintText");
+	HookUserMessage(g_TextMsg, TextMsgHintTextHook, true);
+	HookUserMessage(g_HintText, TextMsgHintTextHook, true);
+
 
 	gH_TrailChoiceCookie = RegClientCookie("trail_choice", "Trail Choice Cookie", CookieAccess_Protected);
 	gH_TrailHidingCookie = RegClientCookie("trail_hiding", "Trail Hiding Cookie", CookieAccess_Protected);
