@@ -1,6 +1,6 @@
 # Changelog
 
-[2019-11-20 - Version 280pre]
+[Version 280 - current work in progress]
 ---
 * **[UTIL]** Updated GeoIP.dat
 * **[UTIL]** More code cleanup (WIP)
@@ -25,6 +25,7 @@
 ---
 * **[REQUEST/FIX]** Fixed VIP chat spam bug
 * **[UTIL]** Changed VIP system
+
 
 [2019-08-13 - Version 271]
 ---

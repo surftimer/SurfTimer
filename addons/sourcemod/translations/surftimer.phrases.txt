@@ -842,7 +842,7 @@
 	"SQLTwo4.2Bonus"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:i},{5:s},{6:s}"
-		"en"		"{1} {yellow}{2} {default}beat the {blue}{3} {default}bonus {yellow}{4} {default}record in the {lime}{5} {default}server with a time of {lime}{6}"
+		"en"		"{1} {yellow}{2} {default}beat the {blue}{3} {default}bonus {yellow}{4} {default}record in the {lime}{4} {default}server with a time of {lime}{5}"
 	}
 	"SQLTwo4.3"
 	{
@@ -1617,30 +1617,5 @@
 	{
 		"#format"	"{1:s}"
 		"en"		"{1} Triggers are now {red}disabled {default}while noclipping"
-	}
-	"AutoResetDisabled"
-	{
-		"#format"	"{1:s}"
-		"en"		"{1} Your timer {green}won't reset {default}if you've missed your PB"
-	}
-	"AutoResetEnabled"
-	{
-		"#format"	"{1:s}"
-		"en"		"{1} Your timer will {red}reset {default}if you've missed your PB"
-	}
-	"AutoResetMessage1"
-	{
-		"#format"	"{1:s}"
-		"en"		"{1} You got teleported to the start because auto-reset is enabled"
-	}
-	"AutoResetMessage2"
-	{
-		"#format"	"{1:s}"
-		"en"		"{1} Use {blue}sm_autoreset {default}to disable it"
-	}
-	"AutoResetMessageStyle"
-	{
-		"#format"	"{1:s}, {2:s}"
-		"en"		"{1} Auto-reset is enabled, but you weren't teleported because you're surfing in {gold}{2}"
 	}
 }
