@@ -2752,17 +2752,8 @@ public void CheckRun(int client)
 		if (g_fCurrentRunTime[client] > g_fPersonalRecord[client] && !g_bMissedMapBest[client] && !g_bPause[client] && g_iClientInZone[client][2] == 0)
 		{
 			g_bMissedMapBest[client] = true;
-			if (g_fPersonalRecord[client] > 0.0) {
+			if (g_fPersonalRecord[client] > 0.0)
 				CPrintToChat(client, "%t", "MissedMapBest", g_szChatPrefix, g_szPersonalRecord[client]);
-				if (g_iAutoReset[client] && g_iCurrentStyle[client] == 0) {
-					Command_Restart(client, 1);
-					CPrintToChat(client, "%t", "AutoResetMessage1", g_szChatPrefix);
-					CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
-				} else if (g_iAutoReset[client] && g_iCurrentStyle[client] != 0) {
-					CPrintToChat(client, "%t", "AutoResetMessageStyle", g_szChatPrefix, g_szStyleMenuPrint[g_iCurrentStyle[client]]);
-					CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
-				}
-			}
 			EmitSoundToClient(client, "buttons/button18.wav", client);
 		}
 		else
@@ -2773,14 +2764,6 @@ public void CheckRun(int client)
 				{
 					g_bMissedBonusBest[client] = true;
 					CPrintToChat(client, "%t", "Misc29", g_szChatPrefix, g_szPersonalRecordBonus[g_iClientInZone[client][2]][client]);
-					if (g_iAutoReset[client] && g_iCurrentStyle[client] == 0) {
-						Command_Teleport(client, 0);
-						CPrintToChat(client, "%t", "AutoResetMessage1", g_szChatPrefix);
-						CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
-					} else if (g_iAutoReset[client] && g_iCurrentStyle[client] != 0) {
-						CPrintToChat(client, "%t", "AutoResetMessageStyle", g_szChatPrefix, g_szStyleMenuPrint[g_iCurrentStyle[client]]);
-						CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
-					}
 					EmitSoundToClient(client, "buttons/button18.wav", client);
 				}
 			}
@@ -3077,7 +3060,7 @@ public void CreateNavFile()
 	Format(szSource, sizeof(szSource), "maps/replay_bot.nav");
 	if (!FileExists(szSource))
 	{
-		LogError("[SurfTimer] Failed to create .nav files. %s doesn't exist!", szSource);
+		LogError("[Surftimer] Failed to create .nav files. %s doesn't exist!", szSource);
 		return;
 	}
 
@@ -4348,7 +4331,7 @@ bool IsPlayerVip(int client, bool admin = true, bool reply = false)
 		if (reply)
 		{
 			CPrintToChat(client, "%t", "Misc43", g_szChatPrefix);
-			PrintToConsole(client, "SurfTimer | This is a VIP feature");
+			PrintToConsole(client, "surftimer | This is a VIP feature");
 		}
 		return false;
 	}
@@ -4487,7 +4470,7 @@ public void ReadDefaultTitlesWhitelist()
 		CloseHandle(whitelist);
 	}
 	else
-		LogError("[SurfTimer] %s not found", DEFAULT_TITLES_WHITELIST_PATH);
+		LogError("[Surftimer] %s not found", DEFAULT_TITLES_WHITELIST_PATH);
 }
 
 public void LoadDefaultTitle(int client)
@@ -4557,7 +4540,7 @@ public void LoadDefaultTitle(int client)
 		delete kv;
 	}
 	else
-		LogError("[SurfTimer] %s not found", DEFAULT_TITLES_PATH);
+		LogError("[Surftimer] %s not found", DEFAULT_TITLES_PATH);
 }
 
 public void SetDefaultTitle(int client, const char szTitle[256])

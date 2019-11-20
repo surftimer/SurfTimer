@@ -158,7 +158,7 @@ void CreateConVars()
 	g_hAnnounceRecord = CreateConVar("ck_chat_record_type", "0", "0: Announce all times to chat, 1: Only announce PB's to chat, 2: Only announce SR's to chat", FCVAR_NOTIFY, true, 0.0, true, 2.0);
 	g_hForceCT = CreateConVar("ck_force_players_ct", "0", "Forces all players to join the CT team.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hChatSpamFilter = CreateConVar("ck_chat_spamprotection_time", "1.0", "The frequency in seconds that players are allowed to send chat messages. 0.0 = No chat cap.", FCVAR_NOTIFY, true, 0.0);
-	g_henableChatProcessing = CreateConVar("ck_chat_enable", "1", "(1 / 0) Enable or disable SurfTimers chat processing.", FCVAR_NOTIFY);
+	g_henableChatProcessing = CreateConVar("ck_chat_enable", "1", "(1 / 0) Enable or disable Surftimers chat processing.", FCVAR_NOTIFY);
 	g_hMultiServerMapcycle = CreateConVar("ck_multi_server_mapcycle", "0", "0 = Use mapcycle.txt to load servers maps, 1 = use configs/surftimer/multi_server_mapcycle.txt to load maps", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hDBMapcycle = CreateConVar("ck_db_mapcycle", "1", "0 = use non-db map cycles, 1 use maps from ck_maptier", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hTriggerPushFixEnable = CreateConVar("ck_triggerpushfix_enable", "1", "Enables trigger push fix.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
@@ -291,7 +291,7 @@ void CreateConVars()
 	validFlag = FindFlagByChar(szFlag[0], bufferFlag);
 	if (!validFlag)
 	{
-		PrintToServer("SurfTimer | Invalid flag for ck_adminmenu_flag.");
+		PrintToServer("Surftimer | Invalid flag for ck_adminmenu_flag.");
 		g_AdminMenuFlag = ADMFLAG_ROOT;
 	}
 	else
@@ -303,7 +303,7 @@ void CreateConVars()
 	validFlag = FindFlagByChar(szFlag[0], bufferFlag);
 	if (!validFlag)
 	{
-		LogError("SurfTimer | Invalid flag for ck_zoner_flag, using ADMFLAG_ROOT");
+		LogError("Surftimer | Invalid flag for ck_zoner_flag, using ADMFLAG_ROOT");
 		g_ZonerFlag = ADMFLAG_ROOT;
 	}
 	else
@@ -319,7 +319,7 @@ void CreateConVars()
 	validFlag = FindFlagByChar(szFlag[0], bufferFlag);
 	if (!validFlag)
 	{
-		LogError("SurfTimer | Invalid flag for ck_vip_flag");
+		LogError("Surftimer | Invalid flag for ck_vip_flag");
 		g_VipFlag = ADMFLAG_RESERVATION;
 	}
 	else

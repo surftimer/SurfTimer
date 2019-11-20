@@ -313,7 +313,7 @@ public void SQL_UnlimitAllStagesCallback(Handle owner, Handle hndl, const char[]
 {
 	if (hndl == null)
 	{
-		LogError("[SurfTimer] SQL Error (SQL_UnlimitAllStagesCallback): %s", error);
+		LogError("[Surftimer] SQL Error (SQL_UnlimitAllStagesCallback): %s", error);
 		return;
 	}
 
