@@ -1,12 +1,30 @@
 # Changelog
 
-[Version 280 - current work in progress]
+[2019-11-20 - Version 280pre]
 ---
 * **[UTIL]** Updated GeoIP.dat
 * **[UTIL]** More code cleanup (WIP)
 * **[FIX]** Useless error log spam (cleaner.cfg)
 * **[FIX]** Fixed `maxvel` bug
 * **[FIX]** VIP chat spam bug
+* **[FIX]** "fixed" colors in the center panel
+* **[NEW]** added/fixed "one jump limit" for new speed style
+* **[REQUEST/NEW]** added `sm_newmaps` and `sm_addnewmap` command
+* **[FIX]** disabled auto-reset while surfing in style
+* **[UTIL]** removed some typos
+
+[2019-08-18 - Version 274]
+---
+* **[NEW]** added `sm_autoreset` command
+
+[2019-08-16 - Version 273]
+---
+* **[REQUEST/FIX]** Finally fixed maxvelocity bug ._.
+
+[2019-08-14 - Version 272]
+---
+* **[REQUEST/FIX]** Fixed VIP chat spam bug
+* **[UTIL]** Changed VIP system
 
 [2019-08-13 - Version 271]
 ---
