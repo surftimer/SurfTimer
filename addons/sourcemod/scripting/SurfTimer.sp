@@ -39,7 +39,6 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "274"
 #define VERSION "280"
 
 // Database Definitions
@@ -1592,7 +1591,6 @@ char RadioCMDS[][] = 													// Disable radio commands
 #include "surftimer/sql.sp"
 #include "surftimer/admin.sp"
 #include "surftimer/newmaps.sp"
-//#include "surftimer/prestrafe.sp"
 #include "surftimer/commands.sp"
 #include "surftimer/hooks.sp"
 #include "surftimer/buttonpress.sp"
@@ -2706,8 +2704,6 @@ public void OnPluginStart()
 	CreateCommandListeners();
 
 	db_setupDatabase();
-
-	//CreateDBPrestrafe();
 	CreateCommandsNewMap();
 
 	// exec surftimer.cfg
@@ -2773,7 +2769,7 @@ public void OnPluginStart()
 	gCV_RespawnDisable.AddChangeHook(OnConVarChanged);
 
 	//Update Fix
-
+	UserMsg g_TextMsg, g_HintText;
 	g_TextMsg = GetUserMessageId("TextMsg");
 	g_HintText = GetUserMessageId("HintText");
 	HookUserMessage(g_TextMsg, TextMsgHintTextHook, true);
