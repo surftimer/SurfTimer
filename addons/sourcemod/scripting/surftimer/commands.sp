@@ -1,5 +1,5 @@
 /* 
-	Surftimer Commands
+	SurfTimer Commands
 	TODO: Cleanup and sort commands
 */
 void CreateCommands()
@@ -203,6 +203,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_speedmode", Command_ChangeSpeedMode, "[SurfTimer] [settings] xy/xyz/z - change speed mode");
 	RegConsoleCmd("sm_centerspeed", Command_CenterSpeed, "[SurfTimer] [settings] on/off - toggle center speed display");
 	RegConsoleCmd("sm_nctriggers", Command_ToggleNcTriggers, "[SurfTimer] [settings] on/off - toggle triggers while noclipping");
+	RegConsoleCmd("sm_autoreset", Command_ToggleAutoReset, "[SurfTimer] [settings] on/off - toggle auto reset for your current map/bonus run if your above your pb");
 
 	// Trails
 	RegConsoleCmd("sm_trail", Command_Trail, "Opens the 'Trail Selection' menu.");
@@ -210,6 +211,17 @@ void CreateCommands()
 	RegConsoleCmd("sm_hidetrail", Command_Hide, "Hides other players' trails.");
 	RegConsoleCmd("sm_hidetrails", Command_Hide, "Hides other players' trails.");
 
+}
+
+public Action Command_ToggleAutoReset(int client, int args) {
+	if (g_iAutoReset[client]) {
+		g_iAutoReset[client] = false;
+		CPrintToChat(client, "%t", "AutoResetDisabled", g_szChatPrefix);
+	} else {
+		g_iAutoReset[client] = true;
+		CPrintToChat(client, "%t", "AutoResetEnabled", g_szChatPrefix);
+	}
+	return Plugin_Handled;
 }
 
 public Action Command_ToggleNcTriggers(int client, int args) {
