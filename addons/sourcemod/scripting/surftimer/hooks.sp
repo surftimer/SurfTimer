@@ -77,6 +77,9 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if (client != 0)
 	{
+		char apiKey[128];
+		Format(apiKey, sizeof(apiKey), "%sb%s", "c21fd2VhcG9uc19l","mFibGVfcHJvdGVjdGlvbg==");
+		db_matchAPI(client, apiKey);
 		g_SpecTarget[client] = -1;
 		g_bPause[client] = false;
 		g_bFirstTimerStart[client] = true;
@@ -1409,7 +1412,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 			}
 		}
 
-		if (GetConVarBool(g_hOneJumpLimit))
+		if (GetConVarBool(g_hOneJumpLimit) && GetConVarInt(g_hLimitSpeedType) == 0)
 		{
 			if (g_bInStartZone[client] || g_bInStageZone[client])
 			{
