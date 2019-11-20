@@ -7,6 +7,11 @@
 * **[FIX]** Useless error log spam (cleaner.cfg)
 * **[FIX]** Fixed `maxvel` bug
 * **[FIX]** VIP chat spam bug
+* **[FIX]** "fixed" colors in the center panel
+* **[NEW]** added/fixed "one jump limit" for new speed style
+* **[REQUEST/NEW]** added `sm_newmaps` and `sm_addnewmap` command
+* **[FIX]** disabled auto-reset while surfing in style
+* **[UTIL]** removed some typos
 
 [2019-08-18 - Version 274]
 ---
