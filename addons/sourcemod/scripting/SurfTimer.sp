@@ -2769,7 +2769,7 @@ public void OnPluginStart()
 	gCV_RespawnDisable.AddChangeHook(OnConVarChanged);
 
 	//Update Fix
-	UserMsg g_TextMsg, g_HintText;
+
 	g_TextMsg = GetUserMessageId("TextMsg");
 	g_HintText = GetUserMessageId("HintText");
 	HookUserMessage(g_TextMsg, TextMsgHintTextHook, true);

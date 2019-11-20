@@ -4609,6 +4609,8 @@ public bool IsPlayerTimerAdmin(int client)
 	return false;
 }
 
+UserMsg g_TextMsg, g_HintText;
+
 Action TextMsgHintTextHook(UserMsg msg_id, Protobuf msg, const int[] players, int playersNum, bool reliable, bool init)
 {
 	static char sBuf[8192];
