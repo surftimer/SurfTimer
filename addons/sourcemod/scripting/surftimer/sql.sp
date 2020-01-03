@@ -40,8 +40,8 @@ public void db_setupDatabase()
 
 	// If updating from a previous version
 	SQL_LockDatabase(g_hDb);
-	SQL_FastQuery(g_hDb, "SET NAMES 'utf8'");
-	SQL_FastQuery(g_hDb, "SET name 'utf8'");
+	SQL_FastQuery(g_hDb, "SET NAMES 'utf8m4'");
+	SQL_FastQuery(g_hDb, "SET name 'utf8m4'");
 
 
 	// Check if tables need to be Created or database needs to be upgraded

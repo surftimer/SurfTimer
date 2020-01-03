@@ -395,7 +395,7 @@ int[] GetClientTrailColors(int client, int[] color)
 	PrintHintText(client, "%i\n%i\n%i", color[0], color[1], color[2]);
 	#endif
 	
-	return color;
+	return;
 }
 
 void SendTempEntity(int client)
