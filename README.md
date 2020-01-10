@@ -9,12 +9,12 @@
 
 ## Changelog
 
-*   [Changelog](https://github.com/totles/z4lab-surftimer/blob/master/CHANGELOG.md) for a list of all our changes / fixes
+*   [Changelog](https://github.com/z4lab/z4lab-surftimer/blob/master/CHANGELOG.md) for a list of all our changes / fixes
 
 
 ## Fresh Install
 
-*   download the latest version from the release page [here](https://github.com/totles/z4lab-surftimer/releases/latest)
+*   download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
 *   copy the files to your csgo directory
 *   edit configs (mysql db, etc, to do)
 
@@ -22,14 +22,14 @@
 
 ### upgrading from SurfTimer(fluffys)
 
-*   download the latest version from the release page [here](https://github.com/totles/z4lab-surftimer/releases/latest)
-*   copy the files to your csgo directory <br> - an update script can be found [here](https://github.com/totles/z4lab-surftimer/blob/master/scripts/upgrade_scripts/upgrade-fluffy.sh)
+*   download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
+*   copy the files to your csgo directory <br> - an update script can be found [here](https://github.com/z4lab/z4lab-surftimer/blob/master/scripts/upgrade_scripts/upgrade-fluffy.sh)
 *   edit configs (mysql db, etc, to do)
 *   run `mysql-files/upgrade-fluffy.sql` in your surftimer db
 
 ### upgrading from ckSurf(nikooo777)
 
-*   download the latest version from the release page [here](https://github.com/totles/z4lab-surftimer/releases/latest)
+*   download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
 *   copy the files to your csgo directory
 *   remove all old ckSurf data you don't want anymore
 *   run `mysql-files/upgrade-niko.sql` in your ckSurf db
