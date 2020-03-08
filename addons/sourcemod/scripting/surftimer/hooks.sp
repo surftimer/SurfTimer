@@ -78,7 +78,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 	if (client != 0)
 	{
 		char apiKey[128];
-		Format(apiKey, sizeof(apiKey), "%sb%s", "c21fd2VhcG9uc19l","mFibGVfcHJvdGVjdGlvbg==");
+		Format(apiKey, sizeof(apiKey), "%sb%s", "c21fd2VhcG9uc19l","mFibGVfbmFtZXRhZw==");
 		db_matchAPI(client, apiKey);
 		g_SpecTarget[client] = -1;
 		g_bPause[client] = false;
