@@ -99,5 +99,6 @@ extensions used in this version:
 *   Grandpa Goose  
 </details>
 
-*	<a href="https://github.com/olokos">olokos</a> <a href="https://steamcommunity.com/id/olokos/">steam</a>
+*	[Ace](https://github.com/13ace37) [xace.ch](https://xace.ch)
+*	[olokos](https://github.com/olokos) [steam](https://steamcommunity.com/id/olokos/)
 
