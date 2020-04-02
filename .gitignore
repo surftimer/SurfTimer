@@ -8,3 +8,6 @@ addons/sourcemod/scripting/surftimer-api.smx
 addons/sourcemod/scripting/compile.exe
 addons/sourcemod/scripting/compile.sh
 addons/sourcemod/scripting/spcomp.exe
+addons/sourcemod/scripting/compile.dat
+addons/sourcemod/scripting/compiled/discord_api.smx
+addons/sourcemod/scripting/compiled/SurfTimer.smx
