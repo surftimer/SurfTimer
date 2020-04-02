@@ -97,5 +97,6 @@ extensions used in this version:
 *   <a href="http://steamcommunity.com/id/fluffystko/">fluffys</a>
 *   Jakeey802
 *   Grandpa Goose
+*	<a href="https://github.com/olokos>olokos</a> <a href="https://steamcommunity.com/id/olokos/">steam</a>
   
 </details>
