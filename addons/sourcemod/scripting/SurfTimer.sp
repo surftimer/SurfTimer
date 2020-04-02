@@ -1,4 +1,4 @@
-/*=======================================================
+F/*=======================================================
 =                 z4lab CS:GO SurfTimer                 =
  modified version of "SurfTimer" from fluffy for z4lab
  The original version of this timer was by jonitaikaponi 
@@ -39,7 +39,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "280"
+#define VERSION "281"
 
 // Database Definitions
 #define MYSQL 0
@@ -210,10 +210,10 @@ enum SkillGroup
 public Plugin myinfo =
 {
 	name = "SurfTimer",
-	author = "[z4lab] - Maintainer: Ace & totles",
-	description = "a fork from fluffys cksurf fork",
+	author = "Ace & olokos",
+	description = "a fork from z4labs fluffys cksurf fork",
 	version = VERSION,
-	url = "https://github.com/totles/z4lab-surftimer"
+	url = "https://github.com/13ace37/SurfTimer"
 };
 
 /*===================================
