@@ -5,3 +5,6 @@
 addons/sourcemod/scripting/surftimer-api.sp
 addons/sourcemod/scripting/surftimer-api.smx
 .DS_Store
+addons/sourcemod/scripting/compile.exe
+addons/sourcemod/scripting/compile.sh
+addons/sourcemod/scripting/spcomp.exe
