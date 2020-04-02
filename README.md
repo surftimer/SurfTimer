@@ -96,7 +96,8 @@ extensions used in this version:
 *   nikooo777 - ckSurf 1.19 Fork
 *   <a href="http://steamcommunity.com/id/fluffystko/">fluffys</a>
 *   Jakeey802
-*   Grandpa Goose
-*	<a href="https://github.com/olokos>olokos</a> <a href="https://steamcommunity.com/id/olokos/">steam</a>
-  
+*   Grandpa Goose  
 </details>
+
+*	<a href="https://github.com/olokos">olokos</a> <a href="https://steamcommunity.com/id/olokos/">steam</a>
+
