@@ -1,4 +1,4 @@
-F/*=======================================================
+/*=======================================================
 =                 z4lab CS:GO SurfTimer                 =
  modified version of "SurfTimer" from fluffy for z4lab
  The original version of this timer was by jonitaikaponi 
@@ -1850,7 +1850,7 @@ public void OnMapStart()
 	ResetSaveLocs();
 
 	if (!LoadColorsConfig())
-		SetFailState("Failed load \"configs/trails-colors.cfg\". File missing or invalid.");
+		SetFailState("Failed load \"configs/surftimer/trails-colors.cfg\". File missing or invalid.");
 	
 	gI_BeamSprite = PrecacheModel("materials/trails/beam_01.vmt", true);
 		
