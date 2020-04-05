@@ -211,9 +211,9 @@ public Plugin myinfo =
 {
 	name = "SurfTimer",
 	author = "Ace & olokos",
-	description = "a fork from z4labs fluffys cksurf fork",
+	description = "a fork from fluffys cksurf fork",
 	version = VERSION,
-	url = "https://github.com/13ace37/SurfTimer"
+	url = "https://github.com/z4lab/z4lab-surftimer"
 };
 
 /*===================================

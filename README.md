@@ -1,20 +1,37 @@
-# SurfTimer 280 for CS:GO
+# z4lab-SurfTimer 281 for CS:GO
 
 ## Installation and requirements
-[SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable), [MetaMod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable) and a working MariaDB instance is required for this plugin 
+[SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable), [MetaMod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable) and a working MariaDB or MySQL8 instance is required for this plugin 
 
 <sup>(This version also supports SourceMod 1.11 and MetaMod 1.11)</sup>
 
 ~ 4GB of RAM
 
+## Issue Rules
+
+**If any of the rules listed below are not followed, you must expect the issue to be closed immediately.**
+
+- Follow requirements
+	- The timer is up to date!
+	- SourceMod and MetaMod are up to date!
+	- Includes are up to date!
+	- Using the stock timer without any own changes!
+- You're following the template
+	- That means you won't delete any pre-entered questions!
+- You're giving clear information
+- You won't edit issues - you always write a new comment below!
+- **I won't provide support for servers who use banned/blacklisted plugins!**
+- **Our discord server is not meant for timer support!**
+- **Any community/server specific bug/suggestion will be ignored/closed!**
+
 ## Changelog
 
-*   [Changelog](https://github.com/13ace37/SurfTimer/blob/master/CHANGELOG.md) for a list of all our changes / fixes
+*   [Changelog](https://github.com/z4lab/z4lab-surftimer/blob/master/CHANGELOG.md) for a list of all our changes / fixes
 
 
 ## Fresh Install
 
-*   download the latest version from the release page [here](https://github.com/13ace37/SurfTimer/releases/latest)
+*   download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
 *   copy the files to your csgo directory
 *   edit configs (mysql db, etc, to do)
 
@@ -22,14 +39,14 @@
 
 ### upgrading from SurfTimer(fluffys)
 
-*   download the latest version from the release page [here](https://github.com/13ace37/SurfTimer/releases/latest)
-*   copy the files to your csgo directory <br> - an update script can be found [here](https://github.com/13ace37/SurfTimer/blob/master/scripts/upgrade_scripts/upgrade-fluffy.sh)
+*   download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
+*   copy the files to your csgo directory <br> - an update script can be found [here](https://github.com/z4lab/z4lab-surftimer/blob/master/scripts/upgrade_scripts/upgrade-fluffy.sh)
 *   edit configs (mysql db, etc, to do)
 *   run `mysql-files/upgrade-fluffy.sql` in your surftimer db
 
 ### upgrading from ckSurf(nikooo777)
 
-*   download the latest version from the release page [here](https://github.com/13ace37/SurfTimer/releases/latest)
+*   download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
 *   copy the files to your csgo directory
 *   remove all old ckSurf data you don't want anymore
 *   run `mysql-files/upgrade-niko.sql` in your ckSurf db
@@ -96,9 +113,10 @@ extensions used in this version:
 *   nikooo777 - ckSurf 1.19 Fork
 *   <a href="http://steamcommunity.com/id/fluffystko/">fluffys</a>
 *   Jakeey802
-*   Grandpa Goose  
+*   Grandpa Goose
+  
 </details>
 
 *	[Ace](https://github.com/13ace37) [xace.ch](https://xace.ch)
-*	[olokos](https://github.com/olokos) [steam](https://steamcommunity.com/id/olokos/)
+*	[olokos](https://github.com/olokos) [Steam](https://steamcommunity.com/id/olokos/)
 
