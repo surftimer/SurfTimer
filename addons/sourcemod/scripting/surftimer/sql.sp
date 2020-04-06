@@ -1070,6 +1070,22 @@ public void sql_CountFinishedMapsCallback(Handle owner, Handle hndl, const char[
 						else
 							wrpoints += 328;
 					}
+					else if (tier == 7)
+					{
+						wrpoints = ((float(totalplayers) * 21) / 4);
+						if (wrpoints < 1750.0)
+							wrpoints = 1750.0;
+						else
+							wrpoints += 420;
+					}
+					else if (tier == 8)
+					{
+						wrpoints = ((float(totalplayers) * 30) / 4);
+						if (wrpoints < 2000.0)
+							wrpoints = 2000.0;
+						else
+							wrpoints += 560;
+					}
 					else // no tier set
 						wrpoints = 25.0;
 
@@ -1209,6 +1225,16 @@ public void sql_CountFinishedMapsCallback(Handle owner, Handle hndl, const char[
 					{
 						g_pr_points[client][style] += 600;
 						g_Points[client][style][0] += 600;
+					}
+					else if (tier == 7)
+					{
+						g_pr_points[client][style] += 800;
+						g_Points[client][style][0] += 800;
+					}
+					else if (tier == 8)
+					{
+						g_pr_points[client][style] += 1000;
+						g_Points[client][style][0] += 1000;
 					}
 					else // no tier
 					{
@@ -2676,8 +2702,12 @@ public void SQL_ViewAllRecordsCallback3(Handle owner, Handle hndl, const char[] 
 		IntToString(rank, szT, sizeof(szT));
 		IntToString(count, szS, sizeof(szS));
 		Format(szTotal, sizeof(szTotal), "%s%s", szT, szS);
-		if (strlen(szTotal) == 6)
+		if (strlen(szTotal) == 8)
 			Format(szValue, 128, "%i/%i    %s | » %s - %i", rank, count, szTime, szMapName, tier);
+		else if (strlen(szTotal) == 7)
+			Format(szValue, 128, "%i/%i      %s | » %s - %i", rank, count, szTime, szMapName, tier);
+		else if (strlen(szTotal) == 6)
+			Format(szValue, 128, "%i/%i      %s | » %s - %i", rank, count, szTime, szMapName, tier);
 		else if (strlen(szTotal) == 5)
 			Format(szValue, 128, "%i/%i      %s | » %s - %i", rank, count, szTime, szMapName, tier);
 		else if (strlen(szTotal) == 4)
@@ -3417,7 +3447,7 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 		// Format tier string
 		tier = SQL_FetchInt(hndl, 0);
 		g_bRankedMap = view_as<bool>(SQL_FetchInt(hndl, 1));
-		if (0 < tier < 7)
+		if (0 < tier < 9)
 		{
 			g_bTierFound = true;
 			g_iMapTier = tier;
@@ -3430,6 +3460,8 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 				case 4:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, DARKBLUE, tier, WHITE);
 				case 5:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, RED, tier, WHITE);
 				case 6:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, DARKRED, tier, WHITE);
+				case 7:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, ORCHID, tier, WHITE);
+				case 8:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, PURPLE, tier, WHITE);
 				default:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, GRAY, tier, WHITE);
 			}
 			if (g_bhasStages)
@@ -7987,6 +8019,10 @@ public void db_selectMapImprovementCallback(Handle owner, Handle hndl, const cha
 			mapcompletion = 400;
 		else if (tier == 6)
 			mapcompletion = 600;
+		else if (tier == 7)
+			mapcompletion = 800;
+		else if (tier == 8)
+			mapcompletion = 1000;
 		else // no tier
 			mapcompletion = 13;
 
@@ -8110,6 +8146,22 @@ public void db_selectMapImprovementCallback(Handle owner, Handle hndl, const cha
 				wrpoints = 1500.0;
 			else
 				wrpoints += 328;
+		}
+		else if (tier == 7)
+		{
+			wrpoints = ((float(totalplayers) * 21) / 4);
+			if (wrpoints < 1750.0)
+				wrpoints = 1750.0;
+			else
+				wrpoints += 420;
+		}
+		else if (tier == 8)
+		{
+			wrpoints = ((float(totalplayers) * 30) / 4);
+			if (wrpoints < 2000.0)
+				wrpoints = 2000.0;
+			else
+				wrpoints += 560;
 		}
 		else // no tier set
 			wrpoints = 25.0;
@@ -9412,8 +9464,8 @@ public void SQL_SelectMapCycleCallback(Handle owner, Handle hndl, const char[] e
 			SQL_FetchString(hndl, 0, szMapname, sizeof(szMapname));
 			tier = SQL_FetchInt(hndl, 1);
 			// No out of bounds arrays please
-			if (tier > 6)
-				tier = 6;
+			if (tier > 8)
+				tier = 8;
 			else if (tier < 1)
 				tier = 1;
 

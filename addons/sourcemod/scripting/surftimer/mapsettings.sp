@@ -107,7 +107,7 @@ public void ChangeMapTier(int client)
 	Format(szTitle, sizeof(szTitle), "%s - Tier: %d", g_szMapName, g_iMapTier);
 	SetMenuTitle(menu, szTitle);
 
-	for (int i = 1; i < 7; i++)
+	for (int i = 1; i < 9; i++)
 	{
 		char szMenuItem[32];
 		Format(szMenuItem, sizeof(szMenuItem), "Tier: %d", i);

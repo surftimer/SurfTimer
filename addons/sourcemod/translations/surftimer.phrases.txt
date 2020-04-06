@@ -886,7 +886,7 @@
 	"Admin6"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Invalid tier number. Please choose a tier number between 1-6"
+		"en"		"{1} Invalid tier number. Please choose a tier number between 1-8"
 	}
 	"Admin7"
 	{
