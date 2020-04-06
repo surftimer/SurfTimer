@@ -15,5 +15,8 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
+**Plugin List**
+List of all your current sourcemod plugins
+
 **Additional context**
 Add any other context about the problem here.
