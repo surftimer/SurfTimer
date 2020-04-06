@@ -2084,7 +2084,7 @@ public void sql_selectTopSurfersCallback(Handle owner, Handle hndl, const char[]
 	int client = ReadPackCell(data);
 	char szMap[128];
 	ReadPackString(data, szMap, 128);
-	int style = ReadPackCell(data);
+	int style = 0; // ReadPackCell(data);
 	CloseHandle(data);
 
 	char szFirstMap[128];
