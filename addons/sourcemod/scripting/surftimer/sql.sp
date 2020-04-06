@@ -2134,6 +2134,7 @@ public void sql_selectTopSurfersCallback(Handle owner, Handle hndl, const char[]
 		case 4: Format(title, 256, "Top 50 Low-Gravity Times on %s \n    Rank    Time               Player", szFirstMap);
 		case 5: Format(title, 256, "Top 50 Slow Motion Times on %s \n    Rank    Time               Player", szFirstMap);
 		case 6: Format(title, 256, "Top 50 Fast Forward Times on %s \n    Rank    Time               Player", szFirstMap);
+		case 7: Format(title, 256, "Top 50 Freestyle Times on %s \n    Rank    Time               Player", szFirstMap);
 		default: Format(title, 256, "Top 50 Times on %s \n    Rank    Time               Player", szFirstMap);
 	}
 

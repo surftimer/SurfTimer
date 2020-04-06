@@ -1108,6 +1108,11 @@
 		"#format"	"{1:s},{2:s},{3:s},{4:s}"
 		"en"		"{1} {yellow}{2} {default}holds the {red}fast forward {default}record with time: {lightgreen}{3} {default}on {blue}{4}"
 	}
+	"MiscFreestyle"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s}"
+		"en"		"{1} {yellow}{2} {default}holds the {red}freestyle {default}record with time: {lightgreen}{3} {default}on {blue}{4}"
+	}
 	"Misc13"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
@@ -1137,6 +1142,11 @@
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
 		"en"		"{1} {yellow}{2} {default}holds the {red}fast forward {orange}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}"
+	}
+	"MiscFreestyleBonus"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
+		"en"		"{1} {yellow}{2} {default}holds the {red}freestyle{gold}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}"
 	}
 	"Misc19"
 	{

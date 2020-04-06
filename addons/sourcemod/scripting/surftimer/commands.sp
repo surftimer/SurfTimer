@@ -1179,7 +1179,8 @@ public void PrintWorldRecordStyleSelect(int client, int type)
 	AddMenuItem(menu, szType, "Backwards");
 	AddMenuItem(menu, szType, "Low-Gravity");
 	AddMenuItem(menu, szType, "Slow Motion");
-	AddMenuItem(menu, szType, "Fast Forwards");
+	AddMenuItem(menu, szType, "Fast Forward");
+	AddMenuItem(menu, szType, "Freestyle");
 
 	SetMenuExitButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
@@ -1505,6 +1506,7 @@ public void MapTopMenuSelectStyle(int client, char szMapName[128])
 	AddMenuItem(menu, szMapName, "Low-Gravity");
 	AddMenuItem(menu, szMapName, "Slow Motion");
 	AddMenuItem(menu, szMapName, "Fast Forward");
+	AddMenuItem(menu, szMapName, "Freestyle");
 	SetMenuExitButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
 }
@@ -2133,6 +2135,7 @@ public void ProfileMenuStyleSelect(int client, int style, char szName[MAX_NAME_L
 		AddMenuItem(menu, szName, "Low-Gravity");
 		AddMenuItem(menu, szName, "Slow Motion");
 		AddMenuItem(menu, szName, "Fast Forwards");
+		AddMenuItem(menu, szName, "Freestyle");
 		SetMenuExitButton(menu, true);
 		DisplayMenu(menu, client, MENU_TIME_FOREVER);
 	}
@@ -3400,6 +3403,7 @@ public void WrcpStyleSelectMenu(int client)
 	AddMenuItem(menu, "", "Low-Gravity");
 	AddMenuItem(menu, "", "Slow Motion");
 	AddMenuItem(menu, "", "Fast Forwards");
+	AddMenuItem(menu, "", "Freestyle");
 	SetMenuExitButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
 }
@@ -3578,6 +3582,7 @@ public int StyleTypeSelectMenuHandler(Menu styleSelect, MenuAction action, int p
 				AddMenuItem(styleSelect2, "4", "Low-Gravity");
 				AddMenuItem(styleSelect2, "5", "Slow Motion");
 				AddMenuItem(styleSelect2, "6", "Fast Forward");
+				AddMenuItem(styleSelect2, "7", "Freestyle");
 				SetMenuOptionFlags(styleSelect2, MENUFLAG_BUTTON_EXIT);
 				DisplayMenu(styleSelect2, param1, MENU_TIME_FOREVER);
 			}
@@ -3652,6 +3657,17 @@ public int StyleSelectMenuHandler(Menu menu, MenuAction action, int param1, int 
 			SetEntPropFloat(param1, Prop_Data, "m_flLaggedMovementValue", 1.5);
 			g_bRankedStyle[param1] = false;
 			g_bFunStyle[param1] = true;
+		}
+		else if (StrContains(info, "7", false) != -1)
+		{
+			g_iCurrentStyle[param1] = 7;
+			g_iInitalStyle[param1] = 7;
+			Format(g_szInitalStyle[param1], 128, "Freestyle");
+			Format(g_szStyleHud[param1], 32, "[FS]");
+			g_bRankedStyle[param1] = false;
+			g_bFunStyle[param1] = true;
+			g_bAutoBhop = true;
+			g_bAutoBhopClient[param1] = true;
 		}
 		else
 		{

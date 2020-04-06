@@ -81,7 +81,7 @@
 #define PR_FULL_SOUND_PATH "sound/surftimer/pr.mp3"
 #define PR_RELATIVE_SOUND_PATH "*surftimer/pr.mp3"
 
-#define MAX_STYLES 7
+#define MAX_STYLES 8
 
 #define VOTE_NO "###no###"
 #define VOTE_YES "###yes###"
@@ -459,7 +459,7 @@ ConVar g_hGravityFix;
 
 /*----------  Style Variables  ----------*/
 
-// 0 = normal, 1 = SW, 2 = HSW, 3 = BW, 4 = Low-Gravity, 5 = Slow Motion, 6 = Fast Forward
+// 0 = normal, 1 = SW, 2 = HSW, 3 = BW, 4 = Low-Gravity, 5 = Slow Motion, 6 = Fast Forward, 7 = Freestyle
 int g_iCurrentStyle[MAXPLAYERS + 1];
 int g_iInitalStyle[MAXPLAYERS + 1];
 char g_szInitalStyle[MAXPLAYERS + 1][256];
@@ -1322,7 +1322,7 @@ int g_SelectedStyle[MAXPLAYERS + 1];
 int g_SelectedType[MAXPLAYERS + 1];
 
 char g_EditTypes[][] =  { "Main", "Stage", "Bonus" };
-char g_EditStyles[][] =  { "Normal", "Sideways", "Half-Sideways", "Backwards", "Low-Gravity", "Slow Motion", "Fast Forward"};
+char g_EditStyles[][] =  { "Normal", "Sideways", "Half-Sideways", "Backwards", "Low-Gravity", "Slow Motion", "Fast Forward", "Freestyle"};
 
 // Checkpoint/Stage enforcer
 int g_iTotalCheckpoints;
@@ -1539,7 +1539,8 @@ char g_szStyleRecordPrint[][] =
 	"* Backwards *",
 	"* Low-Gravity *",
 	"* Slow Motion *",
-	"* Fast Forward *"
+	"* Fast Forward *",
+	"* Freestyle *"
 };
 
 char g_szStyleMenuPrint[][] =
@@ -1550,7 +1551,8 @@ char g_szStyleMenuPrint[][] =
 	"Backwards",
 	"Low-Gravity",
 	"Slow Motion",
-	"Fast Forward"
+	"Fast Forward",
+	"Freestyle"
 };
 
 char g_szStyleAcronyms[][] =
@@ -1561,7 +1563,8 @@ char g_szStyleAcronyms[][] =
 	"bw",
 	"lg",
 	"sm",
-	"ff"
+	"ff",
+	"fs"
 };
 
 char EntityList[][] = 													// Disable entities that often break maps

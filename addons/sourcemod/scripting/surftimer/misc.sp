@@ -1659,6 +1659,13 @@ public void PrintMapRecords(int client, int type)
 			CPrintToChat(client, "%t", "Misc12", g_szChatPrefix, g_szRecordStylePlayer[type], g_szRecordStyleMapTime[type], g_szMapName);
 		}
 	}
+	else if (type == 7) // Freestyle
+	{
+		if (g_fRecordStyleMapTime[type] != 9999999.0)
+		{
+			CPrintToChat(client, "%t", "MiscFreestyle", g_szChatPrefix, g_szRecordStylePlayer[type], g_szRecordStyleMapTime[type], g_szMapName);
+		}
+	}
 	else if (type == 991) // bonus sideways
 	{
 		type = 1;
@@ -1722,6 +1729,17 @@ public void PrintMapRecords(int client, int type)
 			if (g_fStyleBonusFastest[type][i] != 9999999.0) // BONUS
 			{
 				CPrintToChat(client, "%t", "Misc18", g_szChatPrefix, g_szStyleBonusFastest[type][i], g_szZoneGroupName[i], g_szStyleBonusFastestTime[type][i], g_szMapName);
+			}
+		}
+	}
+	else if (type == 997) // bonus freestyle
+	{
+		type = 7;
+		for (int i = 1; i <= g_mapZoneGroupCount; i++)
+		{
+			if (g_fStyleBonusFastest[type][i] != 9999999.0) // BONUS
+			{
+				CPrintToChat(client, "%t", "MiscFreestyleBonus", g_szChatPrefix, g_szStyleBonusFastest[type][i], g_szZoneGroupName[i], g_szStyleBonusFastestTime[type][i], g_szMapName);
 			}
 		}
 	}
