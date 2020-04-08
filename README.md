@@ -1,7 +1,8 @@
 # z4lab-SurfTimer 281 for CS:GO
 
 ## Installation and requirements
-[SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable), [MetaMod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable) and a working MariaDB or MySQL8 instance is required for this plugin 
+[SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable), [MetaMod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable) and a working MariaDB, or MySQL instance is required for this plugin.
+Both MySQL5.7 and MySQL8+ are supported, but we recommend using MariaDB or MySQL8+ to get the best experience.
 
 <sup>(This version also supports SourceMod 1.11 and MetaMod 1.11)</sup>
 
