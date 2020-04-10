@@ -76,7 +76,7 @@ public Action UpdatePlayerProfile(Handle timer, Handle pack)
 	return Plugin_Handled;
 }
 
-public Action StartTimer(Handle timer, any client)
+public Action StartTimer(Handle timer, int client)
 {
 	if (IsValidClient(client) && !IsFakeClient(client))
 		CL_OnStartTimerPress(client);

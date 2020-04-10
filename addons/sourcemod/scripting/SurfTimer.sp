@@ -121,7 +121,7 @@
 #define FRAME_INFO_SIZE 15
 #define AT_SIZE 10
 #define ORIGIN_SNAPSHOT_INTERVAL 500
-#define FILE_HEADER_LENGTH 74
+#define https://github.com/ESK0/z4lab-surftimer/blob/master/addons/sourcemod/scripting/surftimer/replay.sp#L543 74
 
 // Show Triggers
 #define EF_NODRAW 32
@@ -133,74 +133,74 @@
 =            Enumerations            =
 ====================================*/
 
-enum UserJumps
+enum struct UserJumps
 {
-	LastJumpTimes[4],
+	int LastJumpTimes[4];
 }
 
-enum FrameInfo
+enum struct FrameInfo
 {
-	playerButtons = 0,
-	playerImpulse,
-	Float:actualVelocity[3],
-	Float:predictedVelocity[3],
-	Float:predictedAngles[2],
-	CSWeaponID:newWeapon,
-	playerSubtype,
-	playerSeed,
-	additionalFields,
-	pause,
+	int playerButtons;
+	int playerImpulse;
+	float actualVelocity[3];
+	float predictedVelocity[3];
+	float predictedAngles[2];
+	CSWeaponID newWeapon;
+	int playerSubtype;
+	int playerSeed;
+	int additionalFields;
+	int pause;
 }
 
-enum AdditionalTeleport
+enum struct AdditionalTeleport
 {
-	Float:atOrigin[3],
-	Float:atAngles[3],
-	Float:atVelocity[3],
-	atFlags
+	float atOrigin[3];
+	float atAngles[3];
+	float atVelocity[3];
+	int atFlags;
 }
 
-enum FileHeader
+enum struct FileHeader
 {
-	FH_binaryFormatVersion = 0,
-	String:FH_Time[32],
-	String:FH_Playername[32],
-	FH_Checkpoints,
-	FH_tickCount,
-	Float:FH_initialPosition[3],
-	Float:FH_initialAngles[3],
-	Handle:FH_frames
+	int FH_binaryFormatVersion;
+	char FH_Time[32];
+	char FH_Playername[32];
+	int FH_Checkpoints;
+	int FH_tickCount;
+	float FH_initialPosition[3];
+	float FH_initialAngles[3];
+	Handle FH_frames;
 }
 
-enum MapZone
+enum struct MapZone
 {
-	zoneId,
-	zoneType,
-	zoneTypeId,
-	Float:PointA[3],
-	Float:PointB[3],
-	Float:CenterPoint[3],
-	String:zoneName[128],
-	String:hookName[128],
-	String:targetName[128],
-	oneJumpLimit,
-	Float:preSpeed,
-	zoneGroup,
-	Vis,
-	Team
+	int zoneId;
+	int zoneType;
+	int zoneTypeId;
+	float PointA[3];
+	float PointB[3];
+	float CenterPoint[3];
+	char zoneName[128];
+	char hookName[128];
+	char targetName[128];
+	int oneJumpLimit;
+	float preSpeed;
+	int zoneGroup;
+	int Vis;
+	int Team;
 }
 
-enum SkillGroup
+enum struct SkillGroup
 {
-	PointsBot,
-	PointsTop,
-	PointReq,
-	RankBot,
-	RankTop,
-	RankReq,
-	String:RankName[128],
-	String:RankNameColored[128],
-	String:NameColour[32]
+	int PointsBot;
+	int PointsTop;
+	int PointReq;
+	int RankBot;
+	int RankTop;
+	int RankReq;
+	char RankName[128];
+	char RankNameColored[128];
+	char NameColour[32];
 }
 
 /*===================================
@@ -363,7 +363,7 @@ int g_mapZonesTypeCount[MAXZONEGROUPS][ZONEAMOUNT];
 char g_szZoneGroupName[MAXZONEGROUPS][128];
 
 // Map Zone array
-int g_mapZones[MAXZONES][MapZone];
+MapZone g_mapZones[MAXZONES];
 
 // The total amount of zones in the map
 int g_mapZonesCount;
@@ -1347,13 +1347,13 @@ bool g_bLeftZone[MAXPLAYERS + 1];
 // Trails
 #define TRAIL_NONE -1
 
-enum TrailSettings
+enum struct TrailSettings
 {
-	iRedChannel,
-	iGreenChannel,
-	iBlueChannel,
-	iSpecialColor,
-	iAlphaChannel
+	int iRedChannel;
+	int iGreenChannel;
+	int iBlueChannel;
+	int iSpecialColor;
+	int iAlphaChannel;
 }
 
 // Hiding trails globals
@@ -1379,7 +1379,7 @@ float gF_LastPosition[MAXPLAYERS + 1][3];
 // KeyValue globals
 int gI_TrailAmount;
 char gS_TrailTitle[128][128];
-int gI_TrailSettings[128][TrailSettings];
+TrailSettings gI_TrailSettings[128];
 
 // Spectrum cycle globals
 int gI_CycleColor[MAXPLAYERS + 1][4];
@@ -1998,7 +1998,7 @@ public void OnClientPutInServer(int client)
 
 	if (IsFakeClient(client))
 	{
-		g_hRecordingAdditionalTeleport[client] = CreateArray(view_as<int>(AdditionalTeleport));
+		g_hRecordingAdditionalTeleport[client] = CreateArray(sizeof(AdditionalTeleport));
 		CS_SetMVPCount(client, 1);
 		return;
 	}
