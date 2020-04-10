@@ -902,61 +902,26 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		}
 	}
 	else if (g_iCurrentStyle[client] == 2) // Half-sideways
-	{
-		if (!g_bInStartZone[client] && !g_bInStageZone[client])
-		{
-			if (buttons & IN_BACK && !(buttons & IN_MOVELEFT || buttons & IN_MOVERIGHT))
-			{
-				g_KeyCount[client]++;
-				if (g_KeyCount[client] == 60)
-				{
-					g_iCurrentStyle[client] = 0;
-					g_KeyCount[client] = 0;
-					CPrintToChat(client, "%t", "Hooks14", g_szChatPrefix);
-				}
-			}
-			else if (buttons & IN_BACK && (buttons & IN_MOVELEFT || buttons & IN_MOVERIGHT))
-				g_KeyCount[client] = 0;
-
-			if (buttons & IN_FORWARD && !(buttons & IN_MOVELEFT || buttons & IN_MOVERIGHT))
-				{
-					g_KeyCount[client]++;
-					if (g_KeyCount[client] == 60)
-					{
-						g_iCurrentStyle[client] = 0;
-						g_KeyCount[client] = 0;
-						CPrintToChat(client, "%t", "Hooks14", g_szChatPrefix);
-					}
-				}
-			else if (buttons & IN_FORWARD && (buttons & IN_MOVELEFT || buttons & IN_MOVERIGHT))
-				g_KeyCount[client] = 0;
-
-			if (buttons & IN_MOVELEFT && !(buttons & IN_FORWARD || buttons & IN_BACK))
-				{
-					g_KeyCount[client]++;
-					if (g_KeyCount[client] == 60)
-					{
-						g_iCurrentStyle[client] = 0;
-						g_KeyCount[client] = 0;
-						CPrintToChat(client, "%t", "Hooks14", g_szChatPrefix);
-					}
-				}
-			else if (buttons & IN_MOVELEFT && (buttons & IN_FORWARD || buttons & IN_BACK))
-				g_KeyCount[client] = 0;
-
-			if (buttons & IN_MOVERIGHT && !(buttons & IN_FORWARD || buttons & IN_BACK))
-				{
-					g_KeyCount[client]++;
-					if (g_KeyCount[client] == 60)
-					{
-						g_iCurrentStyle[client] = 0;
-						g_KeyCount[client] = 0;
-						CPrintToChat(client, "%t", "Hooks14", g_szChatPrefix);
-					}
-				}
-				else if (buttons & IN_MOVELEFT && (buttons & IN_FORWARD || buttons & IN_BACK))
-					g_KeyCount[client] = 0;
-		}
+    {
+        bool bForward = ((buttons & IN_FORWARD) > 0 && vel[0] >= 100.0);
+        bool bMoveLeft = ((buttons & IN_MOVELEFT) > 0 && vel[1] <= -100.0);
+        bool bBack = ((buttons & IN_BACK) > 0 && vel[0] <= -100.0);
+        bool bMoveRight = ((buttons & IN_MOVERIGHT) > 0 && vel[1] >= 100.0);
+        if (!g_bInStartZone[client] && !g_bInStageZone[client])
+        {
+            if((bForward || bBack) && !(bMoveLeft || bMoveRight))
+            {
+                vel[0] = 0.0;
+                buttons &= ~IN_FORWARD;
+                buttons &= ~IN_BACK;
+            }
+            if((bMoveLeft || bMoveRight) && !(bForward || bBack))
+            {
+                vel[1] = 0.0;
+                buttons &= ~IN_MOVELEFT;
+                buttons &= ~IN_MOVERIGHT;
+            }
+        }
 	}
 	else if (g_iCurrentStyle[client] == 3)    // Backwards
 	{
