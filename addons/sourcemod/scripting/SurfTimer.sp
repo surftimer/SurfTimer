@@ -64,6 +64,7 @@
 #define LIGHTBLUE 0x0D
 #define PINK 0x0E
 #define LIGHTRED 0x0F
+#define ORCHID 0x1A // not sure if this is orchid color in csgo.
 
 // Paths for folders and files
 #define CK_REPLAY_PATH "data/replays/"
