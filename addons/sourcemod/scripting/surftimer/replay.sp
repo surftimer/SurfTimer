@@ -555,7 +555,7 @@ public void WriteRecordToDisk(const char[] sPath, FileHeader iFileHeader)
 		if (hAdditionalTeleport != null && iFrame.additionalFields & (ADDITIONAL_FIELD_TELEPORTED_ORIGIN | ADDITIONAL_FIELD_TELEPORTED_ANGLES | ADDITIONAL_FIELD_TELEPORTED_VELOCITY))
 		{
 			AdditionalTeleport iAT;
-			GetArrayArray(hAdditionalTeleport, iATIndex, iAT, AT_SIZE);
+			GetArrayArray(hAdditionalTeleport, iATIndex, iAT, sizeof(AdditionalTeleport));
 			if (iFrame.additionalFields & ADDITIONAL_FIELD_TELEPORTED_ORIGIN)
 				WriteFile(hFile, view_as<int>(iAT.atOrigin), 3, 4);
 			if (iFrame.additionalFields & ADDITIONAL_FIELD_TELEPORTED_ANGLES)
@@ -653,7 +653,7 @@ public void LoadRecordFromFile(const char[] path, FileHeader headerInfo, bool he
 			if (iFrame.additionalFields & ADDITIONAL_FIELD_TELEPORTED_VELOCITY)
 				ReadFile(hFile, view_as<int>(iAT.atVelocity), 3, 4);
 			iAT.atFlags = iFrame.additionalFields & (ADDITIONAL_FIELD_TELEPORTED_ORIGIN | ADDITIONAL_FIELD_TELEPORTED_ANGLES | ADDITIONAL_FIELD_TELEPORTED_VELOCITY);
-			PushArrayArray(hAdditionalTeleport, iAT, AT_SIZE);
+			PushArrayArray(hAdditionalTeleport, iAT, sizeof(AdditionalTeleport));
 		}
 	}
 

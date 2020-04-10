@@ -98,8 +98,10 @@
 // TeleToStart(6), Validator(7), Chekcer(8), Stop(0), AntiJump(9), 
 // AntiDuck(10), MaxSpeed(11)
 #define ZONEAMOUNT 12
+
 // Maximum amount of zonegroups in a map
 #define MAXZONEGROUPS 12
+
 // Maximum amount of zones in a map
 #define MAXZONES 128	
 
@@ -118,10 +120,7 @@
 #define ADDITIONAL_FIELD_TELEPORTED_ORIGIN (1<<0)
 #define ADDITIONAL_FIELD_TELEPORTED_ANGLES (1<<1)
 #define ADDITIONAL_FIELD_TELEPORTED_VELOCITY (1<<2)
-#define FRAME_INFO_SIZE 15
-#define AT_SIZE 10
 #define ORIGIN_SNAPSHOT_INTERVAL 500
-#define https://github.com/ESK0/z4lab-surftimer/blob/master/addons/sourcemod/scripting/surftimer/replay.sp#L543 74
 
 // Show Triggers
 #define EF_NODRAW 32
