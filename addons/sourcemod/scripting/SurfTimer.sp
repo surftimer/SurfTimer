@@ -122,7 +122,6 @@
 #define FRAME_INFO_SIZE 15
 #define AT_SIZE 10
 #define ORIGIN_SNAPSHOT_INTERVAL 500
-#define https://github.com/ESK0/z4lab-surftimer/blob/master/addons/sourcemod/scripting/surftimer/replay.sp#L543 74
 
 // Show Triggers
 #define EF_NODRAW 32
