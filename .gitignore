@@ -1,13 +1,10 @@
 .vscode/
 .vs/
 .idea/
-
+*.smx
 addons/sourcemod/scripting/surftimer-api.sp
-addons/sourcemod/scripting/surftimer-api.smx
 .DS_Store
 addons/sourcemod/scripting/compile.exe
 addons/sourcemod/scripting/compile.sh
 addons/sourcemod/scripting/spcomp.exe
 addons/sourcemod/scripting/compile.dat
-addons/sourcemod/scripting/compiled/discord_api.smx
-addons/sourcemod/scripting/compiled/SurfTimer.smx
