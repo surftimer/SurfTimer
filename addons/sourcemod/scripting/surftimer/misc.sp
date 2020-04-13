@@ -1182,15 +1182,15 @@ public void LimitSpeedNew(int client)
 	// Derived from Pythagorean theorem, where the hypotenuse represents the magnitude of velocity,
 	// and the two legs represent the x and y velocity components.
   // As a side effect, velocity component signs are also handled.
-	float scale = FloatDiv(speedCap, SquareRoot( FloatAdd( Pow(fVel[0], 2.0), Pow(fVel[1], 2.0) ) ) );
+	float scale = speedCap / SquareRoot( Pow(fVel[0], 2.0) + Pow(fVel[1], 2.0) );
 
 	// A scale < 1 indicates a magnitude > limit
 	if (scale < 1.0)
 	{
 
 		// Reduce each vector by the appropriate amount
-		fVel[0] = FloatMul(fVel[0], scale);
-		fVel[1] = FloatMul(fVel[1], scale);
+		fVel[0] = fVel[0] * scale;
+		fVel[1] = fVel[1] * scale;
 
 		// Impart new velocity onto player
 		if (g_bInBhop[client] || g_bLeftZone[client])
@@ -1439,7 +1439,7 @@ public void PlayRecordSound(int iRecordtype)
 	char buffer[PLATFORM_MAX_PATH];
 	if (iRecordtype == 1)
 	{
-		for (int i = 1; i <= GetMaxClients(); i++)
+		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
@@ -1450,7 +1450,7 @@ public void PlayRecordSound(int iRecordtype)
 	}
 	else if (iRecordtype == 2)
 	{
-		for (int i = 1; i <= GetMaxClients(); i++)
+		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
@@ -1461,7 +1461,7 @@ public void PlayRecordSound(int iRecordtype)
 	}
 	else if (iRecordtype == 3) // top10
 	{
-		for (int i = 1; i <= GetMaxClients(); i++)
+		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
@@ -1472,7 +1472,7 @@ public void PlayRecordSound(int iRecordtype)
 	}
 	else if (iRecordtype == 4) // Discotime
 	{
-		for (int i = 1; i <= GetMaxClients(); i++)
+		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
@@ -1510,7 +1510,7 @@ public void PlayWRCPRecord(int iRecordtype)
 	char buffer[255];
 	if (iRecordtype == 1)
 	{
-		for (int i = 1; i <= GetMaxClients(); i++)
+		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
@@ -1777,7 +1777,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 			(GetConVarInt(g_hAnnounceRecord) == 2 && g_bMapSRVRecord[client])) &&
 			(rankThisRun <= GetConVarInt(g_hAnnounceRank) || GetConVarInt(g_hAnnounceRank) == 0))
 		{
-			for (int i = 1; i <= GetMaxClients(); i++)
+			for (int i = 1; i <= MaxClients; i++)
 			{
 				if (IsValidClient(i) && !IsFakeClient(i))
 				{
@@ -3963,7 +3963,7 @@ stock void StyleFinishedMsgs(int client, int style)
 
 		if (GetConVarInt(g_hAnnounceRecord) == 0 || GetConVarInt(g_hAnnounceRecord) == 1)
 		{
-			for (int i = 1; i <= GetMaxClients(); i++)
+			for (int i = 1; i <= MaxClients; i++)
 			{
 				if (IsValidClient(i) && !IsFakeClient(i))
 				{
@@ -3989,7 +3989,7 @@ stock void StyleFinishedMsgs(int client, int style)
 		}
 		else if (GetConVarInt(g_hAnnounceRecord) == 2)
 		{
-			for (int i = 1; i <= GetMaxClients(); i++)
+			for (int i = 1; i <= MaxClients; i++)
 			{
 				if (g_bStyleMapSRVRecord[style][client])
 				{

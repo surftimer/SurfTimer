@@ -4538,9 +4538,9 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 			Array_Copy(g_mapZones[g_mapZonesCount][PointA], posA, 3);
 			Array_Copy(g_mapZones[g_mapZonesCount][PointB], posB, 3);
 			AddVectors(posA, posB, result);
-			g_mapZones[g_mapZonesCount][CenterPoint][0] = FloatDiv(result[0], 2.0);
-			g_mapZones[g_mapZonesCount][CenterPoint][1] = FloatDiv(result[1], 2.0);
-			g_mapZones[g_mapZonesCount][CenterPoint][2] = FloatDiv(result[2], 2.0);
+			g_mapZones[g_mapZonesCount][CenterPoint][0] = result[0] / 2.0;
+			g_mapZones[g_mapZonesCount][CenterPoint][1] = result[1] / 2.0;
+			g_mapZones[g_mapZonesCount][CenterPoint][2] = result[2] / 2.0;
 
 			for (int i = 0; i < 3; i++)
 			{

@@ -2356,9 +2356,9 @@ public void GotoMethod(int client, int target)
 				GetClientEyeAngles(target, angles);
 
 				AddVectors(position, angles, g_fTeleLocation[client]);
-				g_fTeleLocation[client][0] = FloatDiv(g_fTeleLocation[client][0], 2.0);
-				g_fTeleLocation[client][1] = FloatDiv(g_fTeleLocation[client][1], 2.0);
-				g_fTeleLocation[client][2] = FloatDiv(g_fTeleLocation[client][2], 2.0);
+				g_fTeleLocation[client][0] = g_fTeleLocation[client][0] / 2.0;
+				g_fTeleLocation[client][1] = g_fTeleLocation[client][1] / 2.0;
+				g_fTeleLocation[client][2] = g_fTeleLocation[client][2] / 2.0;
 
 				g_bRespawnPosition[client] = false;
 				g_specToStage[client] = true;

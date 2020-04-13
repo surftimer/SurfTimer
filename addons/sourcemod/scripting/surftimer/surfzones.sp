@@ -1945,9 +1945,9 @@ public int MenuHandler_Editor(Handle tMenu, MenuAction action, int client, int i
 					float ZonePos[3];
 					surftimer_StopTimer(client);
 					AddVectors(g_Positions[client][0], g_Positions[client][1], ZonePos);
-					ZonePos[0] = FloatDiv(ZonePos[0], 2.0);
-					ZonePos[1] = FloatDiv(ZonePos[1], 2.0);
-					ZonePos[2] = FloatDiv(ZonePos[2], 2.0);
+					ZonePos[0] = ZonePos[0] / 2.0;
+					ZonePos[1] = ZonePos[1] / 2.0;
+					ZonePos[2] = ZonePos[2] / 2.0;
 
 					TeleportEntity(client, ZonePos, NULL_VECTOR, NULL_VECTOR);
 					EditorMenu(client);
@@ -2059,27 +2059,27 @@ public int MenuHandler_Scale(Handle tMenu, MenuAction action, int client, int it
 				}
 				case 1:
 				{
-					g_Positions[client][g_ClientSelectedPoint[client]][0] = FloatAdd(g_Positions[client][g_ClientSelectedPoint[client]][0], g_AvaliableScales[g_ClientSelectedScale[client]]);
+					g_Positions[client][g_ClientSelectedPoint[client]][0] = g_Positions[client][g_ClientSelectedPoint[client]][0] + g_AvaliableScales[g_ClientSelectedScale[client]];
 				}
 				case 2:
 				{
-					g_Positions[client][g_ClientSelectedPoint[client]][0] = FloatSub(g_Positions[client][g_ClientSelectedPoint[client]][0], g_AvaliableScales[g_ClientSelectedScale[client]]);
+					g_Positions[client][g_ClientSelectedPoint[client]][0] = g_Positions[client][g_ClientSelectedPoint[client]][0] - g_AvaliableScales[g_ClientSelectedScale[client]];
 				}
 				case 3:
 				{
-					g_Positions[client][g_ClientSelectedPoint[client]][1] = FloatAdd(g_Positions[client][g_ClientSelectedPoint[client]][1], g_AvaliableScales[g_ClientSelectedScale[client]]);
+					g_Positions[client][g_ClientSelectedPoint[client]][1] = g_Positions[client][g_ClientSelectedPoint[client]][1] + g_AvaliableScales[g_ClientSelectedScale[client]];
 				}
 				case 4:
 				{
-					g_Positions[client][g_ClientSelectedPoint[client]][1] = FloatSub(g_Positions[client][g_ClientSelectedPoint[client]][1], g_AvaliableScales[g_ClientSelectedScale[client]]);
+					g_Positions[client][g_ClientSelectedPoint[client]][1] = g_Positions[client][g_ClientSelectedPoint[client]][1] - g_AvaliableScales[g_ClientSelectedScale[client]];
 				}
 				case 5:
 				{
-					g_Positions[client][g_ClientSelectedPoint[client]][2] = FloatAdd(g_Positions[client][g_ClientSelectedPoint[client]][2], g_AvaliableScales[g_ClientSelectedScale[client]]);
+					g_Positions[client][g_ClientSelectedPoint[client]][2] = g_Positions[client][g_ClientSelectedPoint[client]][2] + g_AvaliableScales[g_ClientSelectedScale[client]];
 				}
 				case 6:
 				{
-					g_Positions[client][g_ClientSelectedPoint[client]][2] = FloatSub(g_Positions[client][g_ClientSelectedPoint[client]][2], g_AvaliableScales[g_ClientSelectedScale[client]]);
+					g_Positions[client][g_ClientSelectedPoint[client]][2] = g_Positions[client][g_ClientSelectedPoint[client]][2] - g_AvaliableScales[g_ClientSelectedScale[client]];
 				}
 				case 7:
 				{
