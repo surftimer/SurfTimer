@@ -48,6 +48,8 @@ public void MapSettingsMenu(int client)
 		AddMenuItem(menu, "", "Unlimit prespeed for all stage zones");
 	else
 		AddMenuItem(menu, "", "Unlimit prespeed for all stage zones", ITEMDRAW_DISABLED);
+		
+	AddMenuItem(menu, "", "Remove onejumplimit for all zones");
 
 	SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
@@ -93,6 +95,10 @@ public int MapSettingsMenuHandler(Handle menu, MenuAction action, int param1, in
 			case 5:
 			{
 				db_unlimitAllStages(g_szMapName);
+			}
+			case 6:
+			{
+				db_removeOnejumplimit(g_szMapName);
 			}
 		}
 	}
@@ -308,12 +314,29 @@ public void db_unlimitAllStages(char[] szMapName)
 	SQL_TQuery(g_hDb, SQL_UnlimitAllStagesCallback, szQuery, DBPrio_Low);
 }
 
+public void db_removeOnejumplimit(char[] szMapName)
+{
+	char szQuery[256];
+	Format(szQuery, 256, "UPDATE ck_zones SET onejumplimit = 0 WHERE mapname = '%s';", g_szMapName);
+	SQL_TQuery(g_hDb, SQL_removeOnejumplimitCallback, szQuery, DBPrio_Low);
+}
 
 public void SQL_UnlimitAllStagesCallback(Handle owner, Handle hndl, const char[] error, any data)
 {
 	if (hndl == null)
 	{
 		LogError("[SurfTimer] SQL Error (SQL_UnlimitAllStagesCallback): %s", error);
+		return;
+	}
+
+	db_selectMapZones();
+}
+
+public void SQL_removeOnejumplimitCallback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (SQL_removeOnejumplimitCallback): %s", error);
 		return;
 	}
 
