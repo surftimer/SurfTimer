@@ -22,13 +22,13 @@ http://forums.alliedmods.net/showthread.php?t=100537
 #define _Base64_included
 
 // The encoding table
-new const String:sBase64Table[] =
+char sBase64Table[] =
   // 0000000000111111111122222222223333333333444444444455555555556666
   // 0123456789012345678901234567890123456789012345678901234567890123
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 // The decoding table
-new const DecodeTable[] = {
+int DecodeTable[] = {
 //  0   1   2   3   4   5   6   7   8   9
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,   //   0 -   9
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,   //  10 -  19
@@ -59,11 +59,11 @@ new const DecodeTable[] = {
 };
 
 // For some reason the standard demands a string in 24-bit (3 character) intervals.  This fill character is used to identify unused bytes at the end of the string.
-new const cFillChar = '=';
+int cFillChar = '=';
 
 // The conversion characters between the standard and URL-compliance Base64 protocols
-new const String:mime_chars[] = "+/=";
-new const String:url_chars[] = "-_.";
+char mime_chars[] = "+/=";
+char url_chars[] = "-_.";
 
 
 /***
@@ -148,8 +148,10 @@ stock DecodeBase64(String:sResult[], len, const String:sString[]) {
 
 		new c, c1;
 
-		c = DecodeTable[sString[nPos++]];
-		c1 = DecodeTable[sString[nPos]];
+		int iPosS = sString[nPos++];
+
+		c = DecodeTable[iPosS];
+		c1 = DecodeTable[iPosS];
 
 		c = (c << 2) | ( (c1 >> 4) & 0x3 );
 
@@ -157,12 +159,12 @@ stock DecodeBase64(String:sResult[], len, const String:sString[]) {
 
 		if ( ++nPos < nLength ) {
 
-			c = sString[nPos];
+			c = iPosS;
 
 			if ( c == cFillChar )
 				break;
 
-			c = DecodeTable[sString[nPos]];
+			c = DecodeTable[iPosS];
 			c1 = ( (c1 << 4) & 0xf0 ) | ( ( c >> 2) & 0xf );
 
 			resPos += FormatEx(sResult[resPos], len - resPos, "%c", c1);
@@ -170,12 +172,12 @@ stock DecodeBase64(String:sResult[], len, const String:sString[]) {
 
 		if ( ++nPos < nLength ) {
 
-			c1 = sString[nPos];
+			c1 = iPosS;
 
 			if ( c1 == cFillChar )
 				break;
 
-			c1 = DecodeTable[sString[nPos]];
+			c1 = DecodeTable[iPosS];
 			c = ( (c << 6) & 0xc0 ) | c1;
 
 			resPos += FormatEx(sResult[resPos], len - resPos, "%c", c);

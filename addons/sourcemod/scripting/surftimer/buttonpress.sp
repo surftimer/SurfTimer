@@ -455,7 +455,7 @@ public void CL_OnEndTimerPress(int client)
 			{
 				int count = g_StyleMapTimesCount[style];
 
-				for (int i = 1; i <= GetMaxClients(); i++)
+				for (int i = 1; i <= MaxClients; i++)
 				{
 					if (IsValidClient(i) && !IsFakeClient(i))
 					{
