@@ -1323,7 +1323,7 @@ int g_SelectedStyle[MAXPLAYERS + 1];
 int g_SelectedType[MAXPLAYERS + 1];
 
 char g_EditTypes[][] =  { "Main", "Stage", "Bonus" };
-char g_EditStyles[][] =  { "Normal", "Sideways", "Half-Sideways", "Backwards", "Low-Gravity", "Slow Motion", "Fast Forward", "Freestyle"};
+char g_EditStyles[][] =  { "Normal", "Sideways", "Half-Sideways", "Backwards", "Low-Gravity", "Slow Motion", "Fast Forward", "Freestyle" };
 
 // Checkpoint/Stage enforcer
 int g_iTotalCheckpoints;

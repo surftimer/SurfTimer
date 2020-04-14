@@ -1,0 +1,34 @@
+name: Compile with SourceMod
+
+on:
+  push:
+    branches: ["master", "githubActions"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sm_version: ["1.10"]
+
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set environment variables
+        run: |
+          SOURCEMOD_PATH=$GITHUB_WORKSPACE/addons/sourcemod
+          echo ::set-env name=SOURCEMOD_PATH::$SOURCEMOD_PATH
+          echo ::set-env name=SCRIPTS_PATH::$SOURCEMOD_PATH/scripting
+
+      - name: Setup SourcePawn Compiler ${{ matrix.SM_VERSION }}
+        uses: rumblefrog/setup-sp@master
+        with:
+          version: ${{ matrix.SM_VERSION }}
+
+      - name: Compile plugin
+        run: |
+          echo -e "\nCompiling SurfTimer.sp..."
+          spcomp -w234 -O2 -v2 -i $SCRIPTS_PATH/include SurfTimer.sp
+        working-directory: ${{ env.SCRIPTS_PATH }}/
