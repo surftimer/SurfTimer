@@ -1909,7 +1909,7 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 
 			RecordDiff = g_fOldBonusRecordTime[zGroup] - g_fFinalTime[client];
 			FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
-			Format(szRecordDiff, 54, "-%s", szRecordDiff);
+			Format(szRecordDiff, 54, "%s", szRecordDiff);
 		}
 		if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 		{
@@ -1947,7 +1947,7 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 
 			RecordDiff = g_fOldBonusRecordTime[zGroup] - g_fFinalTime[client];
 			FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
-			Format(szRecordDiff, 54, "-%s", szRecordDiff);
+			Format(szRecordDiff, 54, "%s", szRecordDiff);
 		}
 		if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 		{
@@ -2259,9 +2259,9 @@ public void FormatTimeFloat(int client, float time, int type, char[] string, int
 		ReplaceString(string, length, "-", "");
 
 		if (time > 0.0)
-			Format(string, length, "+%s", string);
+			Format(string, length, "%s", string);
 		else
-			Format(string, length, "-%s", string);
+			Format(string, length, "%s", string);
 	}
 }
 
@@ -3169,48 +3169,48 @@ public void CenterHudDead(int client)
 		{
 			Buttons = g_LastButton[ObservedUser];
 			if (Buttons & IN_MOVELEFT)
-				Format(sResult, sizeof(sResult), "<font color='#b48ead'>A</font>");
+				Format(sResult, sizeof(sResult), "<font color='#B8A'>A</font>");
 			else
 				Format(sResult, sizeof(sResult), "_");
 			if (Buttons & IN_FORWARD)
-				Format(sResult, sizeof(sResult), "%s <font color='#b48ead'>W</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s <font color='#B8A'>W</font>", sResult);
 			else
 				Format(sResult, sizeof(sResult), "%s _", sResult);
 			if (Buttons & IN_BACK)
-				Format(sResult, sizeof(sResult), "%s <font color='#b48ead'>S</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s <font color='#B8A'>S</font>", sResult);
 			else
 				Format(sResult, sizeof(sResult), "%s _", sResult);
 			if (Buttons & IN_MOVERIGHT)
-				Format(sResult, sizeof(sResult), "%s <font color='#b48ead'>D</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s <font color='#B8A'>D</font>", sResult);
 			else
 				Format(sResult, sizeof(sResult), "%s _", sResult);
 			if (Buttons & IN_DUCK)
-				Format(sResult, sizeof(sResult), "%s - <font color='#b48ead'>C</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s - <font color='#B8A'>C</font>", sResult);
 			else
 				Format(sResult, sizeof(sResult), "%s - _", sResult);
 			if (Buttons & IN_JUMP)
-				Format(sResult, sizeof(sResult), "%s <font color='#b48ead'>J</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s <font color='#B8A'>J</font>", sResult);
 			else
 				Format(sResult, sizeof(sResult), "%s _", sResult);
 			if (Buttons & IN_LEFT)
-				Format(sResult, sizeof(sResult), "%s <font color='#b48ead'>L</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s <font color='#B8A'>L</font>", sResult);
 			else
 				Format(sResult, sizeof(sResult), "%s _", sResult);
 			if (Buttons & IN_RIGHT)
-				Format(sResult, sizeof(sResult), "%s <font color='#b48ead'>R</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s <font color='#B8A'>R</font>", sResult);
 			else
 				Format(sResult, sizeof(sResult), "%s _", sResult);
 			
 			if (IsFakeClient(ObservedUser))
 			{
 				if (ObservedUser == g_RecordBot)
-					Format(obsAika, sizeof(obsAika), "<font color='#ebcb8b'>%s</font>", g_szReplayTime);
+					Format(obsAika, sizeof(obsAika), "<font color='#EC8'>%s</font>", g_szReplayTime);
 				else if (ObservedUser == g_BonusBot)
-					Format(obsAika, sizeof(obsAika), "<font color='#ebcb8b'>%s</font>", g_szBonusTime);
+					Format(obsAika, sizeof(obsAika), "<font color='#EC8'>%s</font>", g_szBonusTime);
 				else if (ObservedUser == g_WrcpBot)
-					Format(obsAika, sizeof(obsAika), "<font color='#ebcb8b'>%s</font>", g_szWrcpReplayTime[g_iCurrentlyPlayingStage]);
+					Format(obsAika, sizeof(obsAika), "<font color='#EC8'>%s</font>", g_szWrcpReplayTime[g_iCurrentlyPlayingStage]);
 				
-				PrintHintText(client, "<pre><font face=''>%s\nSpeed: <font color='#5e81ac'>%i</font> u/s\n%s</pre>", obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
+				PrintHintText(client, "<pre><font face=''>%s\nSpeed: <font color='#68A'>%i</font>\n%s</pre>", obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
 				return;
 			}
 			else if (g_bTimerRunning[ObservedUser])
@@ -3224,9 +3224,9 @@ public void CenterHudDead(int client)
 				FormatTimeFloat(client, obsTimer, 3, obsAika, sizeof(obsAika));
 			}
 			else if (!g_bTimerEnabled[ObservedUser])
-				obsAika = "<font color='#bf616a'>Disabled</font>";
+				obsAika = "<font color='#B66'>Disabled</font>";
 			else {
-				obsAika = "<font color='#bf616a'>00:00:00</font>";
+				obsAika = "<font color='#B66'>00:00:00</font>";
 			}
 			char timerText[32] = "";
 			if (g_iClientInZone[ObservedUser][2] > 0)
@@ -3236,7 +3236,7 @@ public void CenterHudDead(int client)
 			else if (g_iCurrentStyle[ObservedUser] != 0)
 				Format(timerText, 32, "%s ", g_szStyleHud[ObservedUser]);
 
-			PrintHintText(client, "<pre><font face=''>%s<font color='#a3be8c'>%s</font>\nSpeed: <font color='#5e81ac'>%i</font> u/s\n%s</pre>", timerText, obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
+			PrintHintText(client, "<pre><font face=''>%s<font color='#AB8'>%s</font>\nSpeed: <font color='#68A'>%i</font>\n%s</pre>", timerText, obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
 		}
 	}
 	else
@@ -3271,44 +3271,44 @@ public void CenterHudAlive(int client)
 					if (g_bPause[client])
 					{
 						// Paused
-						Format(module[i], 128, "<font color='#ebcb8b'>%s       </font>", pAika);
+						Format(module[i], 128, "<font color='#EC8'>%s       </font>", pAika);
 					}
 					else if (g_bPracticeMode[client])
 					{
 						// Prac mode
-						Format(module[i], 128, "<font color='#eceff4'>[P]: %s       </font>", pAika);
+						Format(module[i], 128, "<font color='#EEE'>[P]: %s       </font>", pAika);
 					}
 					else if (g_bInBonus[client])
 					{
 						// In Bonus
-						Format(module[i], 128, "<font color='#d08770'>%s       </font>", pAika);
+						Format(module[i], 128, "<font color='#C87'>%s       </font>", pAika);
 					}
 					else if (g_bMissedMapBest[client] && g_fPersonalRecord[client] > 0.0)
 					{
 						// Missed Personal Best time
-						Format(module[i], 128, "<font color='#bf616a'>%s       </font>", pAika);
+						Format(module[i], 128, "<font color='#B66'>%s       </font>", pAika);
 					}
 					else if (g_fPersonalRecord[client] < 0.1)
 					{
 						// No Personal Best on map
-						Format(module[i], 128, "<font color='#88c0d0'>%s       </font>", pAika);
+						Format(module[i], 128, "<font color='#8BC'>%s       </font>", pAika);
 					}
 					else
 					{
 						// Hasn't missed Personal Best yet
-						Format(module[i], 128, "<font color='#a3be8c'>%s       </font>", pAika);
+						Format(module[i], 128, "<font color='#AB8'>%s       </font>", pAika);
 					}
 				}
 				else if (g_bWrcpTimeractivated[client] && !g_bPracticeMode[client])
 				{
 					FormatTimeFloat(client, g_fCurrentWrcpRunTime[client], 3, pAika, 128);
-					Format(module[i], 128, "<font color='#b48ead'>%s       </font>", pAika);
+					Format(module[i], 128, "<font color='#B8A'>%s       </font>", pAika);
 				}
 				else if (!g_bTimerEnabled[client])
-					Format(module[i], 128, "<font color='#ebcb8b'>Disabled       </font>");
+					Format(module[i], 128, "<font color='#EC8'>Disabled       </font>");
 				else
 				{
-					Format(module[i], 128, "<font color='#bf616a'>00:00:00       </font>");
+					Format(module[i], 128, "<font color='#B66'>00:00:00       </font>");
 				}
 
 				if (g_iCurrentStyle[client] != 0)
@@ -3335,9 +3335,9 @@ public void CenterHudAlive(int client)
 						{
 							// fluffys
 							if (g_bPracticeMode[client])
-								Format(g_szLastSRDifference[client], 64, "SR: <font color='#b48ead'>%s</font>", g_szRecordMapTime);
+								Format(g_szLastSRDifference[client], 64, "SR: <font color='#B8A'>%s</font>", g_szRecordMapTime);
 							else
-								Format(g_szLastSRDifference[client], 64, "SR: <font color='#b48ead'>%s</font>", g_szRecordMapTime);
+								Format(g_szLastSRDifference[client], 64, "SR: <font color='#B8A'>%s</font>", g_szRecordMapTime);
 						}
 						else
 							Format(g_szLastSRDifference[client], 64, "SR: N/A");
@@ -3481,12 +3481,12 @@ public void CenterHudAlive(int client)
 				if (RoundToNearest(g_fLastSpeed[client]) < 10 && RoundToNearest(g_fLastSpeed[client]) > -1)
 				{
 					if (i == 0 || i == 2 || i == 4)
-						Format(module[i], 128, "Speed: <font color='%s'>%i</font> u/s       ", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
+						Format(module[i], 128, "Speed: <font color='%s'>%i</font>       ", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
 					else
-						Format(module[i], 128, "Speed: <font color='%s'>%i</font> u/s", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
+						Format(module[i], 128, "Speed: <font color='%s'>%i</font>", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
 				}
 				else
-					Format(module[i], 128, "Speed: <font color='%s'>%i</font> u/s", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
+					Format(module[i], 128, "Speed: <font color='%s'>%i</font>", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
 			}
 			else if (g_iCentreHudModule[client][i] == 7)
 			{
@@ -3785,24 +3785,24 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 
 		if (f_srDiff > 0)
 		{
-			Format(sz_srDiff_colorless, 128, "-%s", sz_srDiff);
-			Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
+			Format(sz_srDiff_colorless, 128, "%s", sz_srDiff);
+			Format(sz_srDiff, 128, "%cSR: %c%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
 			if (zonegroup > 0)
-				Format(g_szLastSRDifference[client], 64, "SR: <font color='#a3be8c'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "SR: <font color='#AB8'>%s</font>", sz_srDiff_colorless);
 			else
-				Format(g_szLastSRDifference[client], 64, "SR: <font color='#a3be8c'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "SR: <font color='#AB8'>%s</font>", sz_srDiff_colorless);
 
 		}
 		else
 		{
-			Format(sz_srDiff_colorless, 128, "+%s", sz_srDiff);
-			Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
+			Format(sz_srDiff_colorless, 128, "%s", sz_srDiff);
+			Format(sz_srDiff, 128, "%cSR: %c%s%c", WHITE, RED, sz_srDiff, WHITE);
 			if (zonegroup > 0)
-				Format(g_szLastSRDifference[client], 64, "SR: <font color='#bf616a'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "SR: <font color='#B66'>%s</font>", sz_srDiff_colorless);
 			else if (g_iCurrentStyle[client] > 0)
-				Format(g_szLastSRDifference[client], 64, "\tSR: <font color='#bf616a'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "\tSR: <font color='#B66'>%s</font>", sz_srDiff_colorless);
 			else
-				Format(g_szLastSRDifference[client], 64, "SR: <font color='#bf616a'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "SR: <font color='#B66'>%s</font>", sz_srDiff_colorless);
 		}
 		g_fLastDifferenceTime[client] = GetGameTime();
 	}
@@ -3833,22 +3833,22 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		// MOVE TO PB variable
 		if (diff > 0)
 		{
-			Format(szDiff_colorless, 32, "-%s", szDiff);
-			Format(szDiff, sizeof(szDiff), "%c-%s", LIGHTGREEN, szDiff);
+			Format(szDiff_colorless, 32, "%s", szDiff);
+			Format(szDiff, sizeof(szDiff), "%c%s", LIGHTGREEN, szDiff);
 			if (zonegroup > 0)
-				Format(g_szLastPBDifference[client], 64, "PB: <font color='#a3be8c'>%s</font>", szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "PB: <font color='#AB8'>%s</font>", szDiff_colorless);
 			else
-				Format(g_szLastPBDifference[client], 64, "PB: <font color='#a3be8c'>%s</font>", szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "PB: <font color='#AB8'>%s</font>", szDiff_colorless);
 
 		}
 		else
 		{
-			Format(szDiff_colorless, 32, "+%s", szDiff);
-			Format(szDiff, sizeof(szDiff), "%c+%s", RED, szDiff);
+			Format(szDiff_colorless, 32, "%s", szDiff);
+			Format(szDiff, sizeof(szDiff), "%c%s", RED, szDiff);
 			if (zonegroup > 0)
-				Format(g_szLastPBDifference[client], 64, "PB: <font color='#bf616a'>%s</font>", szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "PB: <font color='#B66'>%s</font>", szDiff_colorless);
 			else
-				Format(g_szLastPBDifference[client], 64, "PB: <font color='#bf616a'>%s</font>", szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "PB: <font color='#B66'>%s</font>", szDiff_colorless);
 
 		}
 		g_fLastDifferenceTime[client] = GetGameTime();
@@ -4026,7 +4026,7 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 
 		RecordDiff = g_fStyleOldBonusRecordTime[style][zGroup] - g_fFinalTime[client];
 		FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
-		Format(szRecordDiff, 54, "-%s", szRecordDiff);
+		Format(szRecordDiff, 54, "%s", szRecordDiff);
 	}
 	if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 	{
@@ -4102,16 +4102,16 @@ public void GetSpeedColour(int client, int speed, int type)
 		else if (type == 3 && g_SpeedMode[client] == 0) // gain/loss
 		{
 			if (speed >= GetConVarInt(g_hMaxVelocity))
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#b48ead");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#B8A");
 			else if (g_iPreviousSpeed[client] < speed || g_iPreviousSpeed[client] == speed)
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#88c0d0");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#8BC");
 			else
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#bf616a");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#B66");
 
 			g_iPreviousSpeed[client] = speed;
 		}
 		else
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#eceff4");
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#EEE");
 	}
 	else
 	{
@@ -4133,16 +4133,16 @@ public void GetSpeedColour(int client, int speed, int type)
 		else if (type == 3 && g_SpeedMode[client] == 0) // gain/loss
 		{
 			if (speed >= GetConVarInt(g_hMaxVelocity))
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#b48ead");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#B8A");
 			else if (g_iPreviousSpeed[client] < speed || g_iPreviousSpeed[client] == speed)
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#88c0d0");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#8BC");
 			else
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#bf616a");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#B66");
 			
 			g_iPreviousSpeed[client] = speed;
 		}
 		else
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#eceff4");
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#EEE");
 	}
 }
 
