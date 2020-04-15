@@ -80,14 +80,18 @@ The points system has seen a massive overhaul from the original ckSurf; it is no
 * Tier 4: 200
 * Tier 5: 400
 * Tier 6: 600
+* Tier 7: 800
+* Tier 8: 1000
 
 Map ranking points are dependent upon the individuals ranking on the map. This is done firstly by calculation of the WR points for the map. WR points per tier are calculated as follows:
-* Tier 1: WR = (1.75 * Number of Completes) / 6
-* Tier 2: WR = (2.8 * Number of Completes) / 5
-* Tier 3: WR = MAX(350, (3.5 * Number of Completes) / 4)
-* Tier 4: WR = MAX(400, (5.74 * Number of Completes) / 4)
-* Tier 5: WR = MAX(500, (7 * Number of Completes) / 4)
-* Tier 6: WR = MAX(600, (14 * Number of Completes) / 4)
+* Tier 1: WR = MAX(250, (58.5 + (1.75 * Number of Completes) / 6))
+* Tier 2: WR = MAX(500, (82.15 + (2.8 * Number of Completes) / 5))
+* Tier 3: WR = MAX(750, (117 + (3.5 * Number of Completes) / 4))
+* Tier 4: WR = MAX(1000, (164.25 + (5.74 * Number of Completes) / 4))
+* Tier 5: WR = MAX(1250, (234 + (7 * Number of Completes) / 4))
+* Tier 6: WR = MAX(1500, (328 + (14 * Number of Completes) / 4))
+* Tier 7: WR = MAX(1750, (420 + (21 * Number of Completes) / 4))
+* Tier 8: WR = MAX(2000, (560 + (30 * Number of Completes) / 4))
 
 Once the WR points are calculated the top 10 are points are calculated by multiplying the WR points by a factor. These factors are:
 * Rank 2 = WR * 0.8
