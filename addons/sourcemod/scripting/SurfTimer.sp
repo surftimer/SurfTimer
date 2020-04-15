@@ -134,11 +134,6 @@
 =            Enumerations            =
 ====================================*/
 
-enum UserJumps
-{
-	LastJumpTimes[4],
-}
-
 enum FrameInfo
 {
 	playerButtons = 0,
