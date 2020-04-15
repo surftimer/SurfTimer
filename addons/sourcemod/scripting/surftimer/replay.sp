@@ -293,9 +293,9 @@ public void LoadReplays()
 		LoadRecordFromFile(sPath, iFileHeader, true);
 		Array_Copy(iFileHeader[view_as<int>(FH_initialPosition)], initPos, 3);
 		int zId = IsInsideZone(initPos, 50.0);
-		if (zId != -1 && g_mapZones[zId][zoneGroup] != 0)
+		if (zId != -1 && g_mapZones[zId].ZoneGroup != 0)
 		{
-			BuildPath(Path_SM, newPath, sizeof(newPath), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, g_szMapName, g_mapZones[zId][zoneGroup]);
+			BuildPath(Path_SM, newPath, sizeof(newPath), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, g_szMapName, g_mapZones[zId].ZoneGroup);
 			if (RenameFile(newPath, sPath))
 				PrintToServer("SurfTimer | Succesfully renamed bonus record file to: %s", newPath);
 		}

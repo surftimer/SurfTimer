@@ -3919,8 +3919,8 @@ public void sql_setZoneNamesCallback(Handle owner, Handle hndl, const char[] err
 
 	for (int i = 0; i < g_mapZonesCount; i++)
 	{
-		if (g_mapZones[i][zoneGroup] == zonegrp)
-		Format(g_mapZones[i][zoneName], 64, szName);
+		if (g_mapZones[i].ZoneGroup == zonegrp)
+		Format(g_mapZones[i].ZoneName, 64, szName);
 	}
 
 	if (IsValidClient(client))
@@ -4093,13 +4093,13 @@ public void SQL_saveZonesCallBack(Handle owner, Handle hndl, const char[] error,
 	char hookname[128], targetname[128];
 	for (int i = 0; i < g_mapZonesCount; i++)
 	{
-		Format(szzone, 128, "%s", g_szZoneGroupName[g_mapZones[i][zoneGroup]]);
-		Format(hookname, 128, "%s", g_mapZones[i][hookName]);
-		Format(targetname, 128, "%s", g_mapZones[i][targetName]);
+		Format(szzone, 128, "%s", g_szZoneGroupName[g_mapZones[i].ZoneGroup]);
+		Format(hookname, 128, "%s", g_mapZones[i].HookName);
+		Format(targetname, 128, "%s", g_mapZones[i].TargetName);
 
-		if (g_mapZones[i][PointA][0] != -1.0 && g_mapZones[i][PointA][1] != -1.0 && g_mapZones[i][PointA][2] != -1.0)
+		if (g_mapZones[i].PointA[0] != -1.0 && g_mapZones[i].PointA[1] != -1.0 && g_mapZones[i].PointA[2] != -1.0)
 		{
-			db_insertZoneCheap(g_mapZones[i][zoneId], g_mapZones[i][zoneType], g_mapZones[i][zoneTypeId], g_mapZones[i][PointA][0], g_mapZones[i][PointA][1], g_mapZones[i][PointA][2], g_mapZones[i][PointB][0], g_mapZones[i][PointB][1], g_mapZones[i][PointB][2], g_mapZones[i][Vis], g_mapZones[i][Team], g_mapZones[i][zoneGroup], szzone, i, hookname, targetname, g_mapZones[i][oneJumpLimit], g_mapZones[i][preSpeed]);
+			db_insertZoneCheap(g_mapZones[i].ZoneId, g_mapZones[i].ZoneType, g_mapZones[i].ZoneTypeId, g_mapZones[i].PointA[0], g_mapZones[i].PointA[1], g_mapZones[i].PointA[2], g_mapZones[i].PointB[0], g_mapZones[i].PointB[1], g_mapZones[i].PointB[2], g_mapZones[i].Vis, g_mapZones[i].Team, g_mapZones[i].ZoneGroup, szzone, i, hookname, targetname, g_mapZones[i].OneJumpLimit, g_mapZones[i].PreSpeed);
 		}
 	}
 }
@@ -4392,20 +4392,20 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 
 		for (int i = 0; i < MAXZONES; i++)
 		{
-			g_mapZones[i][zoneId] = -1;
-			g_mapZones[i][PointA] = -1.0;
-			g_mapZones[i][PointB] = -1.0;
-			g_mapZones[i][zoneId] = -1;
-			g_mapZones[i][zoneType] = -1;
-			g_mapZones[i][zoneTypeId] = -1;
-			g_mapZones[i][zoneName] = 0;
-			g_mapZones[i][hookName] = 0;
-			g_mapZones[i][Vis] = 0;
-			g_mapZones[i][Team] = 0;
-			g_mapZones[i][zoneGroup] = 0;
-			g_mapZones[i][targetName] = 0;
-			g_mapZones[i][oneJumpLimit] = 1;
-			g_mapZones[i][preSpeed] = 350.0;
+			g_mapZones[i].ZoneId = -1;
+			g_mapZones[i].PointA = view_as<float>({ -1.0, -1.0, -1.0 });;
+			g_mapZones[i].PointB = view_as<float>({ -1.0, -1.0, -1.0 });;
+			g_mapZones[i].ZoneId = -1;
+			g_mapZones[i].ZoneType = -1;
+			g_mapZones[i].ZoneTypeId = -1;
+			Format(g_mapZones[i].ZoneName, sizeof(MapZone::ZoneName), "");
+			Format(g_mapZones[i].HookName, sizeof(MapZone::HookName), "");
+			g_mapZones[i].Vis = 0;
+			g_mapZones[i].Team = 0;
+			g_mapZones[i].ZoneGroup = 0;
+			Format(g_mapZones[i].TargetName, sizeof(MapZone::TargetName), "");
+			g_mapZones[i].OneJumpLimit = 1;
+			g_mapZones[i].PreSpeed = 350.0;
 		}
 
 		for (int x = 0; x < MAXZONEGROUPS; x++)
@@ -4420,21 +4420,21 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 		while (SQL_FetchRow(hndl))
 		{
-			g_mapZones[g_mapZonesCount][zoneId] = SQL_FetchInt(hndl, 0);
-			g_mapZones[g_mapZonesCount][zoneType] = SQL_FetchInt(hndl, 1);
-			g_mapZones[g_mapZonesCount][zoneTypeId] = SQL_FetchInt(hndl, 2);
-			g_mapZones[g_mapZonesCount][PointA][0] = SQL_FetchFloat(hndl, 3);
-			g_mapZones[g_mapZonesCount][PointA][1] = SQL_FetchFloat(hndl, 4);
-			g_mapZones[g_mapZonesCount][PointA][2] = SQL_FetchFloat(hndl, 5);
-			g_mapZones[g_mapZonesCount][PointB][0] = SQL_FetchFloat(hndl, 6);
-			g_mapZones[g_mapZonesCount][PointB][1] = SQL_FetchFloat(hndl, 7);
-			g_mapZones[g_mapZonesCount][PointB][2] = SQL_FetchFloat(hndl, 8);
-			g_mapZones[g_mapZonesCount][Vis] = SQL_FetchInt(hndl, 9);
-			g_mapZones[g_mapZonesCount][Team] = SQL_FetchInt(hndl, 10);
-			g_mapZones[g_mapZonesCount][zoneGroup] = SQL_FetchInt(hndl, 11);
+			g_mapZones[g_mapZonesCount].ZoneId = SQL_FetchInt(hndl, 0);
+			g_mapZones[g_mapZonesCount].ZoneType = SQL_FetchInt(hndl, 1);
+			g_mapZones[g_mapZonesCount].ZoneTypeId = SQL_FetchInt(hndl, 2);
+			g_mapZones[g_mapZonesCount].PointA[0] = SQL_FetchFloat(hndl, 3);
+			g_mapZones[g_mapZonesCount].PointA[1] = SQL_FetchFloat(hndl, 4);
+			g_mapZones[g_mapZonesCount].PointA[2] = SQL_FetchFloat(hndl, 5);
+			g_mapZones[g_mapZonesCount].PointB[0] = SQL_FetchFloat(hndl, 6);
+			g_mapZones[g_mapZonesCount].PointB[1] = SQL_FetchFloat(hndl, 7);
+			g_mapZones[g_mapZonesCount].PointB[2] = SQL_FetchFloat(hndl, 8);
+			g_mapZones[g_mapZonesCount].Vis = SQL_FetchInt(hndl, 9);
+			g_mapZones[g_mapZonesCount].Team = SQL_FetchInt(hndl, 10);
+			g_mapZones[g_mapZonesCount].ZoneGroup = SQL_FetchInt(hndl, 11);
 
 			// Total amount of checkpoints
-			if (g_mapZones[g_mapZonesCount][zoneType] == 4)
+			if (g_mapZones[g_mapZonesCount].ZoneType == 4)
 				g_iTotalCheckpoints++;
 
 			/**
@@ -4445,86 +4445,86 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 			* IDs must be in order 0, 1, 2....
 			* Duplicate zoneids not possible due to primary key
 			*/
-			zoneIdChecker[g_mapZones[g_mapZonesCount][zoneId]]++;
-			if (zoneGroupChecker[g_mapZones[g_mapZonesCount][zoneGroup]] != 1)
+			zoneIdChecker[g_mapZones[g_mapZonesCount].ZoneId]++;
+			if (zoneGroupChecker[g_mapZones[g_mapZonesCount].ZoneGroup] != 1)
 			{
 				// 1 = No Bonus, 2 = Bonus, >2 = Multiple bonuses
 				g_mapZoneGroupCount++;
-				zoneGroupChecker[g_mapZones[g_mapZonesCount][zoneGroup]] = 1;
+				zoneGroupChecker[g_mapZones[g_mapZonesCount].ZoneGroup] = 1;
 			}
 
 			// You can have the same zonetype and zonetypeid values in different zonegroups
-			zoneTypeIdChecker[g_mapZones[g_mapZonesCount][zoneGroup]][g_mapZones[g_mapZonesCount][zoneType]][g_mapZones[g_mapZonesCount][zoneTypeId]]++;
-			zoneTypeIdCheckerCount[g_mapZones[g_mapZonesCount][zoneGroup]][g_mapZones[g_mapZonesCount][zoneType]]++;
+			zoneTypeIdChecker[g_mapZones[g_mapZonesCount].ZoneGroup][g_mapZones[g_mapZonesCount].ZoneType][g_mapZones[g_mapZonesCount].ZoneTypeId]++;
+			zoneTypeIdCheckerCount[g_mapZones[g_mapZonesCount].ZoneGroup][g_mapZones[g_mapZonesCount].ZoneType]++;
 
-			SQL_FetchString(hndl, 12, g_mapZones[g_mapZonesCount][zoneName], 128);
-			SQL_FetchString(hndl, 13, g_mapZones[g_mapZonesCount][hookName], 128);
-			SQL_FetchString(hndl, 14, g_mapZones[g_mapZonesCount][targetName], 128);
-			g_mapZones[g_mapZonesCount][oneJumpLimit] = SQL_FetchInt(hndl, 15);
-			g_mapZones[g_mapZonesCount][preSpeed] = SQL_FetchFloat(hndl, 16);
+			SQL_FetchString(hndl, 12, g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName));
+			SQL_FetchString(hndl, 13, g_mapZones[g_mapZonesCount].HookName, sizeof(MapZone::HookName));
+			SQL_FetchString(hndl, 14, g_mapZones[g_mapZonesCount].TargetName, sizeof(MapZone::TargetName));
+			g_mapZones[g_mapZonesCount].OneJumpLimit = SQL_FetchInt(hndl, 15);
+			g_mapZones[g_mapZonesCount].PreSpeed = SQL_FetchFloat(hndl, 16);
 
-			if (!g_mapZones[g_mapZonesCount][zoneName][0])
+			if (!g_mapZones[g_mapZonesCount].ZoneName[0])
 			{
-				switch (g_mapZones[g_mapZonesCount][zoneType])
+				switch (g_mapZones[g_mapZonesCount].ZoneType)
 				{
 					case 0: {
-						Format(g_mapZones[g_mapZonesCount][zoneName], 128, "Stop-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
+						Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "Stop-%i", g_mapZones[g_mapZonesCount].ZoneTypeId);
 					}
 					case 1: {
-						if (g_mapZones[g_mapZonesCount][zoneGroup] > 0)
+						if (g_mapZones[g_mapZonesCount].ZoneGroup > 0)
 						{
 							g_bhasBonus = true;
-							Format(g_mapZones[g_mapZonesCount][zoneName], 128, "BonusStart-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
-							Format(g_szZoneGroupName[g_mapZones[g_mapZonesCount][zoneGroup]], 128, "Bonus %i", g_mapZones[g_mapZonesCount][zoneGroup]);
+							Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "BonusStart-%i", g_mapZones[g_mapZonesCount].ZoneTypeId);
+							Format(g_szZoneGroupName[g_mapZones[g_mapZonesCount].ZoneGroup], sizeof(MapZone::ZoneGroup), "Bonus %i", g_mapZones[g_mapZonesCount].ZoneGroup);
 						}
 						else
-						Format(g_mapZones[g_mapZonesCount][zoneName], 128, "Start-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
+						Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "Start-%i", g_mapZones[g_mapZonesCount].ZoneTypeId);
 					}
 					case 2: {
-						if (g_mapZones[g_mapZonesCount][zoneGroup] > 0)
-						Format(g_mapZones[g_mapZonesCount][zoneName], 128, "BonusEnd-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
+						if (g_mapZones[g_mapZonesCount].ZoneGroup > 0)
+						Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "BonusEnd-%i", g_mapZones[g_mapZonesCount].ZoneTypeId);
 						else
-						Format(g_mapZones[g_mapZonesCount][zoneName], 128, "End-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
+						Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "End-%i", g_mapZones[g_mapZonesCount].ZoneTypeId);
 					}
 					case 3: {
 						g_bhasStages = true;
-						Format(g_mapZones[g_mapZonesCount][zoneName], 128, "Stage-%i", (g_mapZones[g_mapZonesCount][zoneTypeId] + 2));
+						Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "Stage-%i", (g_mapZones[g_mapZonesCount].ZoneTypeId + 2));
 					}
 					case 4: {
-						Format(g_mapZones[g_mapZonesCount][zoneName], 128, "Checkpoint-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
+						Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "Checkpoint-%i", g_mapZones[g_mapZonesCount].ZoneTypeId);
 					}
 					case 5: {
-						Format(g_mapZones[g_mapZonesCount][zoneName], 128, "Speed-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
+						Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "Speed-%i", g_mapZones[g_mapZonesCount].ZoneTypeId);
 					}
 					case 6: {
-						Format(g_mapZones[g_mapZonesCount][zoneName], 128, "TeleToStart-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
+						Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "TeleToStart-%i", g_mapZones[g_mapZonesCount].ZoneTypeId);
 					}
 					case 7: {
-						Format(g_mapZones[g_mapZonesCount][zoneName], 128, "Validator-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
+						Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "Validator-%i", g_mapZones[g_mapZonesCount].ZoneTypeId);
 					}
 					case 8: {
-						Format(g_mapZones[g_mapZonesCount][zoneName], 128, "Checker-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
+						Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "Checker-%i", g_mapZones[g_mapZonesCount].ZoneTypeId);
 					}
 					case 9: { // fluffys
-						Format(g_mapZones[g_mapZonesCount][zoneName], 128, "AntiJump-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
+						Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "AntiJump-%i", g_mapZones[g_mapZonesCount].ZoneTypeId);
 					}
 					case 10: {
-						Format(g_mapZones[g_mapZonesCount][zoneName], 128, "AntiDuck-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
+						Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "AntiDuck-%i", g_mapZones[g_mapZonesCount].ZoneTypeId);
 					}
 					case 11: {
-						Format(g_mapZones[g_mapZonesCount][zoneName], 128, "MaxSpeed-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
+						Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "MaxSpeed-%i", g_mapZones[g_mapZonesCount].ZoneTypeId);
 					}
 				}
 			}
 			else
 			{
-				switch (g_mapZones[g_mapZonesCount][zoneType])
+				switch (g_mapZones[g_mapZonesCount].ZoneType)
 				{
 					case 1:
 					{
-						if (g_mapZones[g_mapZonesCount][zoneGroup] > 0)
+						if (g_mapZones[g_mapZonesCount].ZoneGroup > 0)
 							g_bhasBonus = true;
-						Format(g_szZoneGroupName[g_mapZones[g_mapZonesCount][zoneGroup]], 128, "%s", g_mapZones[g_mapZonesCount][zoneName]);
+						Format(g_szZoneGroupName[g_mapZones[g_mapZonesCount].ZoneGroup], 128, "%s", g_mapZones[g_mapZonesCount].ZoneName);
 					}
 					case 3: g_bhasStages = true;
 				}
@@ -4535,21 +4535,21 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 			**/
 			// Center
 			float posA[3], posB[3], result[3];
-			Array_Copy(g_mapZones[g_mapZonesCount][PointA], posA, 3);
-			Array_Copy(g_mapZones[g_mapZonesCount][PointB], posB, 3);
+			Array_Copy(g_mapZones[g_mapZonesCount].PointA, posA, 3);
+			Array_Copy(g_mapZones[g_mapZonesCount].PointB, posB, 3);
 			AddVectors(posA, posB, result);
-			g_mapZones[g_mapZonesCount][CenterPoint][0] = result[0] / 2.0;
-			g_mapZones[g_mapZonesCount][CenterPoint][1] = result[1] / 2.0;
-			g_mapZones[g_mapZonesCount][CenterPoint][2] = result[2] / 2.0;
+			g_mapZones[g_mapZonesCount].CenterPoint[0] = result[0] / 2.0;
+			g_mapZones[g_mapZonesCount].CenterPoint[1] = result[1] / 2.0;
+			g_mapZones[g_mapZonesCount].CenterPoint[2] = result[2] / 2.0;
 
 			for (int i = 0; i < 3; i++)
 			{
-				g_fZoneCorners[g_mapZonesCount][0][i] = g_mapZones[g_mapZonesCount][PointA][i];
-				g_fZoneCorners[g_mapZonesCount][7][i] = g_mapZones[g_mapZonesCount][PointB][i];
+				g_fZoneCorners[g_mapZonesCount][0][i] = g_mapZones[g_mapZonesCount].PointA[i];
+				g_fZoneCorners[g_mapZonesCount][7][i] = g_mapZones[g_mapZonesCount].PointB[i];
 			}
 
 			// Zone counts:
-			g_mapZonesTypeCount[g_mapZones[g_mapZonesCount][zoneGroup]][g_mapZones[g_mapZonesCount][zoneType]]++;
+			g_mapZonesTypeCount[g_mapZones[g_mapZonesCount].ZoneGroup][g_mapZones[g_mapZonesCount].ZoneType]++;
 			g_mapZonesCount++;
 		}
 		// Count zone corners

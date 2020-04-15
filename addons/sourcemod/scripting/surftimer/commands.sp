@@ -903,7 +903,7 @@ public void ListStages(int client, int zonegroup)
 	{
 		for (int i = 0; i <= g_mapZonesCount; i++)
 		{
-			if (g_mapZones[i][zoneType] == 3 && g_mapZones[i][zoneGroup] == zonegroup)
+			if (g_mapZones[i].ZoneType == 3 && g_mapZones[i].ZoneGroup == zonegroup)
 			{
 				StageIds[amount] = i;
 				amount++;

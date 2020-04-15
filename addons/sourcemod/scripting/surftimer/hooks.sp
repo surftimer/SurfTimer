@@ -330,7 +330,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					float prespeed = StringToFloat(sText);
 					if (prespeed < 0.0)
 						prespeed = 0.0;
-					g_mapZones[g_ClientSelectedZone[client]][preSpeed] = prespeed;
+					g_mapZones[g_ClientSelectedZone[client]].PreSpeed = prespeed;
 					PrespeedMenu(client);
 				}
 				case 1:
@@ -373,9 +373,9 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					if (StrEqual(sText, "reset"))
 						Format(sText, sizeof(sText), "player");
 
-					Format(g_mapZones[g_ClientSelectedZone[client]][targetName], sizeof(g_mapZones), "%s", sText);
+					Format(g_mapZones[g_ClientSelectedZone[client]].TargetName, sizeof(MapZone::TargetName), "%s", sText);
 
-					CPrintToChat(client, "%t", "Hooks5", g_szChatPrefix, g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId], sText);
+					CPrintToChat(client, "%t", "Hooks5", g_szChatPrefix, g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]].ZoneTypeId, sText);
 
 					EditorMenu(client);
 				}
@@ -1381,7 +1381,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 		{
 			if (g_bInStartZone[client] || g_bInStageZone[client])
 			{
-				if (g_mapZones[zoneid][oneJumpLimit] == 1)
+				if (g_mapZones[zoneid].OneJumpLimit == 1)
 				{
 					if (!g_bJumpedInZone[client])
 					{
