@@ -1,7 +1,24 @@
-# z4lab-SurfTimer 281 for CS:GO
+# Surftimer-olokos for CS:GO
+
+_I have renamed the repository to Surftimer-olokos just to make it obvious, that we're entering a new chapter in csgo surf community, a milestone._
+
+As you probably all know there's quite some bugs in all open-source versions of cksurf or surftimer.
+On this project our main goal is to get bug-free, properly optimized surftimer that would work as we all expect it to, across all configurations.
+Because of this, we will be putting new features and additions on the side, as they can potentially introduce new, unknown issues and there's plenty of those already.
+
+**Does it mean this version is buggy?**
+
+Yes, but not any more than other projects currently and for past years.
+
+**Is there any surftimer open-source, which is less buggy then the code in here?**
+
+No, this is currently the only surftimer project which is currently in active development. 
+The goal is to allow everybody to have the ability to host a perfect surf server and make surftimer great again! :)
+Instead of paying outrageous prices to others to get a plugin or encounter myriad of issues.
 
 ## Installation and requirements
 [SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable), [MetaMod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable) and a working MariaDB, or MySQL instance is required for this plugin.
+
 Both MySQL5.7 and MySQL8+ are supported, but we recommend using MariaDB or MySQL8+ to get the best experience.
 
 <sup>(This version also supports SourceMod 1.11 and MetaMod 1.11)</sup>
@@ -25,16 +42,14 @@ Both MySQL5.7 and MySQL8+ are supported, but we recommend using MariaDB or MySQL
 - **Our discord server is not meant for timer support!**
 - **Any community/server specific bug/suggestion will be ignored/closed!**
 
-## Changelog
-
-*   [Changelog](https://github.com/z4lab/z4lab-surftimer/blob/master/CHANGELOG.md) for a list of all our changes / fixes
-
-
 ## Fresh Install
 
-*   download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
-*   copy the files to your csgo directory
-*   edit configs (mysql db, etc, to do)
+*   Clone or download the repository [Link](https://github.com/olokos/Surftimer-olokos-public/archive/master.zip)
+*   Download latest sourcemod 1.10+ for your OS [Link](https://www.sourcemod.net/downloads.php?branch=stable)
+*   Windows: Put spcomp.exe and compile.exe in scripting folder and double click compile.exe
+*   If there are no errors, (warnings are fine, for now) move .smx files from compiled to /plugins
+*   copy the rest of the files from this repository to your csgo directory
+*   edit configs (Databases.cfg, admins, etc.)
 
 ## Upgrade
 
@@ -119,5 +134,6 @@ extensions used in this version:
 </details>
 
 *	[Ace](https://github.com/13ace37) [xace.ch](https://xace.ch)
-*	[olokos](https://github.com/olokos) [Steam](https://steamcommunity.com/id/olokos/)
+*	[olokos](https://github.com/olokos) [Steam](https://steamcommunity.com/id/olokos/) [My server](https://kiepownica.pl/)
+*	and many, many more people who contributed to the project!
 
