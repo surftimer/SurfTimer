@@ -4393,8 +4393,8 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 		for (int i = 0; i < MAXZONES; i++)
 		{
 			g_mapZones[i].ZoneId = -1;
-			g_mapZones[i].PointA = view_as<float>({ -1.0, -1.0, -1.0 });;
-			g_mapZones[i].PointB = view_as<float>({ -1.0, -1.0, -1.0 });;
+			g_mapZones[i].PointA = view_as<float>({ -1.0, -1.0, -1.0 });
+			g_mapZones[i].PointB = view_as<float>({ -1.0, -1.0, -1.0 });
 			g_mapZones[i].ZoneId = -1;
 			g_mapZones[i].ZoneType = -1;
 			g_mapZones[i].ZoneTypeId = -1;
