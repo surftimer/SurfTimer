@@ -3,7 +3,6 @@ name: Bug Report
 about: Create a report to help us improve
 title: "[BUG]"
 labels: bug
-assignees: 13ace37
 ---
 
 **Describe the bug**
@@ -16,7 +15,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Plugin List**
-List of all your current sourcemod plugins
+List of all your current sourcemod plugins, if applicable to the issue.
 
 **Additional context**
 Add any other context about the problem here.
