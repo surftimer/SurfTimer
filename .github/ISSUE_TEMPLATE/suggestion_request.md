@@ -3,7 +3,6 @@ name: Suggestion Request
 about: Request a Suggestion to help us moving forwards
 title: "[Suggestion]"
 labels: enhancement
-assignees: 13ace37
 ---
 
 **Is your feature request related to a problem? Please describe.**
