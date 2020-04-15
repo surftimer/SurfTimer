@@ -1777,11 +1777,11 @@ public void sql_selectPlayerProfileCallback(Handle owner, Handle hndl, const cha
 		FormatPercentage(fTotalPerc, szTotalPerc, sizeof(szTotalPerc));
 
 		// Get players skillgroup
-		int RankValue[SkillGroup];
+		SkillGroup RankValue;
 		int index = GetSkillgroupIndex(rank, points);
-		GetArrayArray(g_hSkillGroups, index, RankValue[0]);
+		GetArrayArray(g_hSkillGroups, index, RankValue, sizeof(SkillGroup));
 		char szSkillGroup[128];
-		Format(szSkillGroup, sizeof(szSkillGroup), RankValue[RankName]);
+		Format(szSkillGroup, sizeof(szSkillGroup), RankValue.RankName);
 		ReplaceString(szSkillGroup, sizeof(szSkillGroup), "{style}", "");
 
 		char szRank[32];

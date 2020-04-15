@@ -2304,10 +2304,10 @@ public void SetSkillGroups()
 		Handle hKeyValues = CreateKeyValues("SkillGroups");
 		if (FileToKeyValues(hKeyValues, sPath) && KvGotoFirstSubKey(hKeyValues))
 		{
-			int RankValue[SkillGroup];
+			SkillGroup RankValue;
 
 			if (g_hSkillGroups == null)
-				g_hSkillGroups = CreateArray(sizeof(RankValue));
+				g_hSkillGroups = CreateArray(sizeof(SkillGroup));
 			else
 				ClearArray(g_hSkillGroups);
 
@@ -2372,21 +2372,21 @@ public void SetSkillGroups()
 					continue;
 				}
 
-				RankValue[PointReq] = points;
-				RankValue[PointsBot] = pointsBot;
-				RankValue[PointsTop] = pointsTop;
-				RankValue[RankBot] = rankBot;
-				RankValue[RankTop] = rankTop;
-				RankValue[RankReq] = rank;
+				RankValue.PointReq = points;
+				RankValue.PointsBot = pointsBot;
+				RankValue.PointsTop = pointsTop;
+				RankValue.RankBot = rankBot;
+				RankValue.RankTop = rankTop;
+				RankValue.RankReq = rank;
 
 				// Remove colors from rank name
 				CRemoveColors(sRankName, 128);
 
-				Format(RankValue[RankName], 128, "%s", sRankName);
-				Format(RankValue[RankNameColored], 128, "%s", sRankNameColored);
-				Format(RankValue[NameColour], 32, "%s", sNameColour);
+				Format(RankValue.RankName, sizeof(SkillGroup::RankName), "%s", sRankName);
+				Format(RankValue.RankNameColored, sizeof(SkillGroup::RankNameColored), "%s", sRankNameColored);
+				Format(RankValue.NameColour, sizeof(SkillGroup::NameColour), "%s", sNameColour);
 
-				PushArrayArray(g_hSkillGroups, RankValue[0]);
+				PushArrayArray(g_hSkillGroups, RankValue, sizeof(RankValue));
 			} while (KvGotoNextKey(hKeyValues));
 		}
 		if (hKeyValues != null)
@@ -2412,9 +2412,9 @@ public void SetPlayerRank(int client)
 	int rank = g_PlayerRank[client][style];
 	int points = g_pr_points[client][style];
 
-	int RankValue[SkillGroup];
+	SkillGroup RankValue;
 	int index = GetSkillgroupIndex(rank, points);
-	GetArrayArray(g_hSkillGroups, index, RankValue[0]);
+	GetArrayArray(g_hSkillGroups, index, RankValue, sizeof(SkillGroup));
 
 	if (g_bEnforceTitle[client])
 	{
@@ -2422,11 +2422,11 @@ public void SetPlayerRank(int client)
 		ReplaceString(g_szEnforcedTitle[client], sizeof(g_szEnforcedTitle), "{style}", g_szStyleAcronyms[style]);
 		if (g_iEnforceTitleType[client] == 0 || g_iEnforceTitleType[client] == 2)
 		{
-			Format(g_pr_rankname_style[client], 128, RankValue[RankName]);
-			Format(g_pr_rankname[client], 128, RankValue[RankName]);
+			Format(g_pr_rankname_style[client], sizeof(SkillGroup::RankName), RankValue.RankName);
+			Format(g_pr_rankname[client], sizeof(SkillGroup::RankName), RankValue.RankName);
 			ReplaceString(g_pr_rankname[client], 128, "{style}", "");
-			Format(g_szRankName[client], sizeof(g_szRankName), RankValue[RankName]);
-			Format(g_pr_namecolour[client], 32, RankValue[NameColour]);
+			Format(g_szRankName[client], sizeof(SkillGroup::RankName), RankValue.RankName);
+			Format(g_pr_namecolour[client], sizeof(SkillGroup::NameColour), RankValue.NameColour);
 			Format(g_pr_chat_coloredrank[client], 256, g_szEnforcedTitle[client]);
 		}
 
@@ -2447,14 +2447,14 @@ public void SetPlayerRank(int client)
 			GetClientName(client, szName, sizeof(szName));
 			CRemoveColors(szName, sizeof(szName));
 
-			Format(g_pr_chat_coloredrank[client], 128, RankValue[RankNameColored]);
-			Format(g_pr_chat_coloredrank_style[client], 128, RankValue[RankNameColored]);
+			Format(g_pr_chat_coloredrank[client], sizeof(SkillGroup::RankNameColored), RankValue.RankNameColored);
+			Format(g_pr_chat_coloredrank_style[client], sizeof(SkillGroup::RankNameColored), RankValue.RankNameColored);
 			ReplaceString(g_pr_chat_coloredrank[client], 128, "{style}", "");
-			Format(g_pr_rankname_style[client], 128, RankValue[RankName]);
-			Format(g_pr_rankname[client], 128, RankValue[RankName]);
+			Format(g_pr_rankname_style[client], sizeof(SkillGroup::RankName), RankValue.RankName);
+			Format(g_pr_rankname[client], sizeof(SkillGroup::RankName), RankValue.RankName);
 			ReplaceString(g_pr_rankname[client], 128, "{style}", "");
-			Format(g_szRankName[client], sizeof(g_szRankName), RankValue[RankName]);
-			Format(g_pr_namecolour[client], 32, RankValue[NameColour]);
+			Format(g_szRankName[client], sizeof(SkillGroup::RankName), RankValue.RankName);
+			Format(g_pr_namecolour[client], sizeof(SkillGroup::NameColour), RankValue.NameColour);
 		}
 	}
 	else
@@ -2471,52 +2471,52 @@ public int GetSkillgroupIndex(int rank, int points)
 	int size = GetArraySize(g_hSkillGroups);
 	for (int i = 0; i < size; i++)
 	{
-		int RankValue[SkillGroup];
-		GetArrayArray(g_hSkillGroups, i, RankValue[0]);
-		if (RankValue[RankReq] > -1)
+		SkillGroup RankValue;
+		GetArrayArray(g_hSkillGroups, i, RankValue, sizeof(SkillGroup));
+		if (RankValue.RankReq > -1)
 		{
-			if (rank == RankValue[RankReq])
+			if (rank == RankValue.RankReq)
 				return i;
 		}
-		else if (RankValue[RankBot] > -1 && RankValue[RankTop] > -1)
+		else if (RankValue.RankBot > -1 && RankValue.RankTop > -1)
 		{
-			if (rank >= RankValue[RankBot] && rank <= RankValue[RankTop])
+			if (rank >= RankValue.RankBot && rank <= RankValue.RankTop)
 				return i;
 		}
-		else if (RankValue[PointsBot] > -1 && RankValue[PointsTop] > -1)
+		else if (RankValue.PointsBot > -1 && RankValue.PointsTop > -1)
 		{
-			if (points >= RankValue[PointsBot] && points <= RankValue[PointsTop])
+			if (points >= RankValue.PointsBot && points <= RankValue.PointsTop)
 				return i;
 		}
-		else if (RankValue[PointReq] > -1)
+		else if (RankValue.PointReq > -1)
 		{
 			if (i == (size - 1)) // Last Rank
 			{
-				if (points >= RankValue[PointReq])
+				if (points >= RankValue.PointReq)
 					return i;
 			}
 			else if (i == 0) // First Rank
 			{
-				if (points <= RankValue[PointReq])
+				if (points <= RankValue.PointReq)
 					return i;
 			}
 			else // Mid ranks
 			{
-				int RankValueNext[SkillGroup];
-				GetArrayArray(g_hSkillGroups, (i+1), RankValueNext[0]);
-				if (RankValueNext[PointReq] > -1)
+				SkillGroup RankValueNext;
+				GetArrayArray(g_hSkillGroups, (i+1), RankValueNext, sizeof(SkillGroup));
+				if (RankValueNext.PointReq > -1)
 				{
-					if (points >= RankValue[PointReq] && points < RankValueNext[PointReq])
+					if (points >= RankValue.PointReq && points < RankValueNext.PointReq)
 						return i;
 				}
-				else if (RankValueNext[RankReq] > -1)
+				else if (RankValueNext.RankReq > -1)
 				{
-					if (points >= RankValue[PointReq] && rank >= RankValueNext[RankReq])
+					if (points >= RankValue.PointReq && rank >= RankValueNext.RankReq)
 						return i;
 				}
-				else if (RankValueNext[RankTop] > -1)
+				else if (RankValueNext.RankTop > -1)
 				{
-					if (points >= RankValue[PointReq])
+					if (points >= RankValue.PointReq)
 						return i;
 				}
 			}

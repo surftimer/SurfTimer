@@ -2052,19 +2052,19 @@ public void displayRanksMenu(int client)
 	Menu menu = CreateMenu(ShowRanksMenuHandler);
 	SetMenuTitle(menu, "Chat Ranks");
 	char ChatLine[512];
-	int RankValue[SkillGroup];
+	SkillGroup RankValue;
 	for (int i = 0; i < GetArraySize(g_hSkillGroups); i++)
 	{
-		GetArrayArray(g_hSkillGroups, i, RankValue[0]);
-		ReplaceString(RankValue[RankName], sizeof(RankValue), "{style}", "");
-		if (RankValue[PointsBot] > -1 && RankValue[PointsTop] > -1)
-			Format(ChatLine, 512, "%i-%i Points: %s", RankValue[PointsBot], RankValue[PointsTop], RankValue[RankName]);
-		else if (RankValue[PointReq] > -1)
-			Format(ChatLine, 512, "%i Points: %s", RankValue[PointReq], RankValue[RankName]);
-		else if (RankValue[RankBot] > 0 && RankValue[RankTop] > 0)
-			Format(ChatLine, 512, "Rank %i-%i: %s", RankValue[RankBot], RankValue[RankTop], RankValue[RankName]);
+		GetArrayArray(g_hSkillGroups, i, RankValue, sizeof(SkillGroup));
+		ReplaceString(RankValue.RankName, sizeof(SkillGroup::RankName), "{style}", "");
+		if (RankValue.PointsBot > -1 && RankValue.PointsTop > -1)
+			Format(ChatLine, 512, "%i-%i Points: %s", RankValue.PointsBot, RankValue.PointsTop, RankValue.RankName);
+		else if (RankValue.PointReq > -1)
+			Format(ChatLine, 512, "%i Points: %s", RankValue.PointReq, RankValue.RankName);
+		else if (RankValue.RankBot > 0 && RankValue.RankTop > 0)
+			Format(ChatLine, 512, "Rank %i-%i: %s", RankValue.RankBot, RankValue.RankTop, RankValue.RankName);
 		else
-			Format(ChatLine, 512, "Rank %i: %s", RankValue[RankReq], RankValue[RankName]);
+			Format(ChatLine, 512, "Rank %i: %s", RankValue.RankReq, RankValue.RankName);
 		
 		AddMenuItem(menu, "", ChatLine, ITEMDRAW_DISABLED);
 	}

@@ -119,10 +119,7 @@
 #define ADDITIONAL_FIELD_TELEPORTED_ORIGIN (1<<0)
 #define ADDITIONAL_FIELD_TELEPORTED_ANGLES (1<<1)
 #define ADDITIONAL_FIELD_TELEPORTED_VELOCITY (1<<2)
-#define FRAME_INFO_SIZE 15
-#define AT_SIZE 10
 #define ORIGIN_SNAPSHOT_INTERVAL 500
-#define FILE_HEADER_LENGTH 74
 
 // Show Triggers
 #define EF_NODRAW 32
@@ -134,26 +131,26 @@
 =            Enumerations            =
 ====================================*/
 
-enum FrameInfo
+enum struct FrameInfo
 {
-	playerButtons = 0,
-	playerImpulse,
-	Float:actualVelocity[3],
-	Float:predictedVelocity[3],
-	Float:predictedAngles[2],
-	CSWeaponID:newWeapon,
-	playerSubtype,
-	playerSeed,
-	additionalFields,
-	pause,
+	int PlayerButtons;
+	int PlayerImpulse;
+	float ActualVelocity[3];
+	float PredictedVelocity[3];
+	float PredictedAngles[2];
+	CSWeaponID NewWeapon;
+	int PlayerSubtype;
+	int PlayerSeed;
+	int AdditionalFields;
+	int Pause;
 }
 
-enum AdditionalTeleport
+enum struct AdditionalTeleport
 {
-	Float:atOrigin[3],
-	Float:atAngles[3],
-	Float:atVelocity[3],
-	atFlags
+	float AtOrigin[3];
+	float AtAngles[3];
+	float AtVelocity[3];
+	int AtFlags;
 }
 
 enum struct FileHeader
@@ -186,17 +183,17 @@ enum struct MapZone
 	int Team;
 }
 
-enum SkillGroup
+enum struct SkillGroup
 {
-	PointsBot,
-	PointsTop,
-	PointReq,
-	RankBot,
-	RankTop,
-	RankReq,
-	String:RankName[128],
-	String:RankNameColored[128],
-	String:NameColour[32]
+	int PointsBot;
+	int PointsTop;
+	int PointReq;
+	int RankBot;
+	int RankTop;
+	int RankReq;
+	char RankName[128];
+	char RankNameColored[128];
+	char NameColour[32];
 }
 
 /*===================================
@@ -1343,13 +1340,13 @@ bool g_bLeftZone[MAXPLAYERS + 1];
 // Trails
 #define TRAIL_NONE -1
 
-enum TrailSettings
+enum struct TrailSettings
 {
-	iRedChannel,
-	iGreenChannel,
-	iBlueChannel,
-	iSpecialColor,
-	iAlphaChannel
+	int iRedChannel;
+	int iGreenChannel;
+	int iBlueChannel;
+	int iSpecialColor;
+	int iAlphaChannel;
 }
 
 // Hiding trails globals
@@ -1375,7 +1372,7 @@ float gF_LastPosition[MAXPLAYERS + 1][3];
 // KeyValue globals
 int gI_TrailAmount;
 char gS_TrailTitle[128][128];
-int gI_TrailSettings[128][TrailSettings];
+TrailSettings gI_TrailSettings[128];
 
 // Spectrum cycle globals
 int gI_CycleColor[MAXPLAYERS + 1][4];
@@ -1994,7 +1991,7 @@ public void OnClientPutInServer(int client)
 
 	if (IsFakeClient(client))
 	{
-		g_hRecordingAdditionalTeleport[client] = CreateArray(view_as<int>(AdditionalTeleport));
+		g_hRecordingAdditionalTeleport[client] = CreateArray(sizeof(AdditionalTeleport));
 		CS_SetMVPCount(client, 1);
 		return;
 	}
