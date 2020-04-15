@@ -156,16 +156,16 @@ enum AdditionalTeleport
 	atFlags
 }
 
-enum FileHeader
+enum struct FileHeader
 {
-	FH_binaryFormatVersion = 0,
-	String:FH_Time[32],
-	String:FH_Playername[32],
-	FH_Checkpoints,
-	FH_tickCount,
-	Float:FH_initialPosition[3],
-	Float:FH_initialAngles[3],
-	Handle:FH_frames
+	int BinaryFormatVersion;
+	char Time[32];
+	char Playername[32];
+	int Checkpoints;
+	int TickCount;
+	float InitialPosition[3];
+	float InitialAngles[3];
+	Handle Frames;
 }
 
 enum struct MapZone

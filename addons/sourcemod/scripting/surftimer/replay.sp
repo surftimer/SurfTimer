@@ -22,9 +22,9 @@ void setReplayTime(int zGrp, int stage, int style)
 			BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s_style_%d.rec", CK_REPLAY_PATH, g_szMapName, style);
 	}
 
-	int iFileHeader[FILE_HEADER_LENGTH];
-	LoadRecordFromFile(sPath, iFileHeader, true);
-	Format(sTime, sizeof(sTime), "%s", iFileHeader[view_as<int>(FH_Time)]);
+	FileHeader header;
+	LoadRecordFromFile(sPath, header, true);
+	Format(sTime, sizeof(sTime), "%s", header.Time);
 
 	ExplodeString(sTime, ":", sBuffer, 4, 54);
 	float time = (StringToFloat(sBuffer[0]) * 60);
@@ -169,15 +169,15 @@ public void SaveRecording(int client, int zgroup, int style)
 	char szName[MAX_NAME_LENGTH];
 	GetClientName(client, szName, MAX_NAME_LENGTH);
 
-	int iHeader[FILE_HEADER_LENGTH];
-	iHeader[view_as<int>(FH_binaryFormatVersion)] = BINARY_FORMAT_VERSION;
-	strcopy(iHeader[view_as<int>(FH_Time)], 32, g_szFinalTime[client]);
-	iHeader[view_as<int>(FH_tickCount)] = GetArraySize(g_hRecording[client]);
-	strcopy(iHeader[view_as<int>(FH_Playername)], 32, szName);
-	iHeader[view_as<int>(FH_Checkpoints)] = 0; // So that KZTimers replays work
-	Array_Copy(g_fInitialPosition[client], iHeader[view_as<int>(FH_initialPosition)], 3);
-	Array_Copy(g_fInitialAngles[client], iHeader[view_as<int>(FH_initialAngles)], 3);
-	iHeader[view_as<int>(FH_frames)] = g_hRecording[client];
+	FileHeader header;
+	header.BinaryFormatVersion = BINARY_FORMAT_VERSION;
+	strcopy(header.Time, sizeof(FileHeader::Time), g_szFinalTime[client]);
+	header.TickCount = GetArraySize(g_hRecording[client]);
+	strcopy(header.Playername, sizeof(FileHeader::Playername), szName);
+	header.Checkpoints = 0; // So that KZTimers replays work
+	Array_Copy(g_fInitialPosition[client], header.InitialPosition, 3);
+	Array_Copy(g_fInitialAngles[client], header.InitialAngles, 3);
+	header.Frames = g_hRecording[client];
 
 	if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > 0)
 		SetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath2, g_hRecordingAdditionalTeleport[client]);
@@ -186,7 +186,7 @@ public void SaveRecording(int client, int zgroup, int style)
 
 	g_hRecordingAdditionalTeleport[client] = null;
 
-	WriteRecordToDisk(sPath2, iHeader);
+	WriteRecordToDisk(sPath2, header);
 
 	g_bNewReplay[client] = false;
 	g_bNewBonus[client] = false;
@@ -287,11 +287,11 @@ public void LoadReplays()
 
 	if (hFilex != null)
 	{
-		int iFileHeader[FILE_HEADER_LENGTH];
+		FileHeader header;
 		float initPos[3];
 		char newPath[256];
-		LoadRecordFromFile(sPath, iFileHeader, true);
-		Array_Copy(iFileHeader[view_as<int>(FH_initialPosition)], initPos, 3);
+		LoadRecordFromFile(sPath, header, true);
+		Array_Copy(header.InitialPosition, initPos, 3);
 		int zId = IsInsideZone(initPos, 50.0);
 		if (zId != -1 && g_mapZones[zId].ZoneGroup != 0)
 		{
@@ -427,14 +427,14 @@ public void PlayRecord(int client, int type, int style)
 			Format(sPath, sizeof(sPath), "%s%s_stage_%d_style_%d.rec", CK_REPLAY_PATH, g_szMapName, (type * -1), style);
 	}
 
-	int iFileHeader[FILE_HEADER_LENGTH];
+	FileHeader header;
 	BuildPath(Path_SM, sPath, sizeof(sPath), "%s", sPath);
-	LoadRecordFromFile(sPath, iFileHeader, false);
+	LoadRecordFromFile(sPath, header, false);
 
 	if (type == 0)
 	{
-		Format(g_szReplayTime, sizeof(g_szReplayTime), "%s", iFileHeader[view_as<int>(FH_Time)]);
-		Format(g_szReplayName, sizeof(g_szReplayName), "%s", iFileHeader[view_as<int>(FH_Playername)]);
+		Format(g_szReplayTime, sizeof(g_szReplayTime), "%s", header.Time);
+		Format(g_szReplayName, sizeof(g_szReplayName), "%s", header.Playername);
 		if (style == 0)
 		{
 			Format(buffer, sizeof(buffer), "%s (%s)", g_szReplayName, g_szReplayTime);
@@ -458,8 +458,8 @@ public void PlayRecord(int client, int type, int style)
 	else if (type < 0)
 	{
 		int stage = type * -1;
-		Format(g_szWrcpReplayTime[stage], sizeof(g_szWrcpReplayTime), "%s", iFileHeader[view_as<int>(FH_Time)]);
-		Format(g_szWrcpReplayName[stage], sizeof(g_szWrcpReplayName), "%s", iFileHeader[view_as<int>(FH_Playername)]);
+		Format(g_szWrcpReplayTime[stage], sizeof(g_szWrcpReplayTime), "%s", header.Time);
+		Format(g_szWrcpReplayName[stage], sizeof(g_szWrcpReplayName), "%s", header.Playername);
 		Format(buffer, sizeof(buffer), "S%d %s (%s)", stage, g_szWrcpReplayName[stage], g_szWrcpReplayTime[stage]);
 		g_iCurrentlyPlayingStage = stage;
 		CS_SetClientClanTag(client, "STAGE Replay");
@@ -467,8 +467,8 @@ public void PlayRecord(int client, int type, int style)
 	}
 	else
 	{
-		Format(g_szBonusTime, sizeof(g_szBonusTime), "%s", iFileHeader[view_as<int>(FH_Time)]);
-		Format(g_szBonusName, sizeof(g_szBonusName), "%s", iFileHeader[view_as<int>(FH_Playername)]);
+		Format(g_szBonusTime, sizeof(g_szBonusTime), "%s", header.Time);
+		Format(g_szBonusName, sizeof(g_szBonusName), "%s", header.Playername);
 		if (style == 0)
 		{
 			Format(buffer, sizeof(buffer), "%s (%s)", g_szBonusName, g_szBonusTime);
@@ -490,13 +490,13 @@ public void PlayRecord(int client, int type, int style)
 		}
 	}
 
-	g_hBotMimicsRecord[client] = iFileHeader[view_as<int>(FH_frames)];
+	g_hBotMimicsRecord[client] = header.Frames;
 	g_BotMimicTick[client] = 0;
-	g_BotMimicRecordTickCount[client] = iFileHeader[view_as<int>(FH_tickCount)];
+	g_BotMimicRecordTickCount[client] = header.TickCount;
 	g_CurrentAdditionalTeleportIndex[client] = 0;
 
-	Array_Copy(iFileHeader[view_as<int>(FH_initialPosition)], g_fInitialPosition[client], 3);
-	Array_Copy(iFileHeader[view_as<int>(FH_initialAngles)], g_fInitialAngles[client], 3);
+	Array_Copy(header.InitialPosition, g_fInitialPosition[client], 3);
+	Array_Copy(header.InitialAngles, g_fInitialAngles[client], 3);
 
 	// Disarm bot
 	Client_RemoveAllWeapons(client);
@@ -510,7 +510,7 @@ public void PlayRecord(int client, int type, int style)
 	}
 }
 
-public void WriteRecordToDisk(const char[] sPath, iFileHeader[FILE_HEADER_LENGTH])
+public void WriteRecordToDisk(const char[] sPath, FileHeader header)
 {
 	Handle hFile = OpenFile(sPath, "wb");
 	if (hFile == null)
@@ -520,26 +520,26 @@ public void WriteRecordToDisk(const char[] sPath, iFileHeader[FILE_HEADER_LENGTH
 	}
 
 	WriteFileCell(hFile, BM_MAGIC, 4);
-	WriteFileCell(hFile, iFileHeader[view_as<int>(FH_binaryFormatVersion)], 1);
-	WriteFileCell(hFile, strlen(iFileHeader[view_as<int>(FH_Time)]), 1);
-	WriteFileString(hFile, iFileHeader[view_as<int>(FH_Time)], false);
-	WriteFileCell(hFile, strlen(iFileHeader[view_as<int>(FH_Playername)]), 1);
-	WriteFileString(hFile, iFileHeader[view_as<int>(FH_Playername)], false);
-	WriteFileCell(hFile, iFileHeader[view_as<int>(FH_Checkpoints)], 4);
-	WriteFile(hFile, view_as<int>(iFileHeader[view_as<int>(FH_initialPosition)]), 3, 4);
-	WriteFile(hFile, view_as<int>(iFileHeader[view_as<int>(FH_initialAngles)]), 2, 4);
+	WriteFileCell(hFile, header.BinaryFormatVersion, 1);
+	WriteFileCell(hFile, strlen(header.Time), 1);
+	WriteFileString(hFile, header.Time, false);
+	WriteFileCell(hFile, strlen(header.Playername), 1);
+	WriteFileString(hFile, header.Playername, false);
+	WriteFileCell(hFile, header.Checkpoints, 4);
+	WriteFile(hFile, view_as<int>(header.InitialPosition), 3, 4);
+	WriteFile(hFile, view_as<int>(header.InitialAngles), 2, 4);
 
 	Handle hAdditionalTeleport;
 	int iATIndex;
 	GetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath, hAdditionalTeleport);
 
-	int iTickCount = iFileHeader[view_as<int>(FH_tickCount)];
+	int iTickCount = header.TickCount;
 	WriteFileCell(hFile, iTickCount, 4);
 
 	int iFrame[FRAME_INFO_SIZE];
 	for (int i = 0; i < iTickCount; i++)
 	{
-		GetArrayArray(iFileHeader[view_as<int>(FH_frames)], i, iFrame, view_as<int>(FrameInfo));
+		GetArrayArray(header.Frames, i, iFrame, view_as<int>(FrameInfo));
 		WriteFile(hFile, iFrame, view_as<int>(FrameInfo), 4);
 
 		// Handle the optional Teleport call
@@ -561,7 +561,7 @@ public void WriteRecordToDisk(const char[] sPath, iFileHeader[FILE_HEADER_LENGTH
 	LoadReplays();
 }
 
-public void LoadRecordFromFile(const char[] path, int headerInfo[FILE_HEADER_LENGTH], bool headerOnly)
+public void LoadRecordFromFile(const char[] path, FileHeader header, bool headerOnly)
 {
 	Handle hFile = OpenFile(path, "rb");
 	if (hFile == null)
@@ -575,7 +575,7 @@ public void LoadRecordFromFile(const char[] path, int headerInfo[FILE_HEADER_LEN
 	}
 	int iBinaryFormatVersion;
 	ReadFileCell(hFile, iBinaryFormatVersion, 1);
-	headerInfo[view_as<int>(FH_binaryFormatVersion)] = iBinaryFormatVersion;
+	header.BinaryFormatVersion = iBinaryFormatVersion;
 
 	if (iBinaryFormatVersion > BINARY_FORMAT_VERSION)
 	{
@@ -598,17 +598,17 @@ public void LoadRecordFromFile(const char[] path, int headerInfo[FILE_HEADER_LEN
 	int iCp;
 	ReadFileCell(hFile, iCp, 4);
 
-	ReadFile(hFile, view_as<int>(headerInfo[view_as<int>(FH_initialPosition)]), 3, 4);
-	ReadFile(hFile, view_as<int>(headerInfo[view_as<int>(FH_initialAngles)]), 2, 4);
+	ReadFile(hFile, view_as<int>(header.InitialPosition), 3, 4);
+	ReadFile(hFile, view_as<int>(header.InitialAngles), 2, 4);
 
 	int iTickCount;
 	ReadFileCell(hFile, iTickCount, 4);
 
-	strcopy(headerInfo[view_as<int>(FH_Time)], 32, szTime);
-	strcopy(headerInfo[view_as<int>(FH_Playername)], 32, szName);
-	headerInfo[view_as<int>(FH_Checkpoints)] = iCp;
-	headerInfo[view_as<int>(FH_tickCount)] = iTickCount;
-	headerInfo[view_as<int>(FH_frames)] = null;
+	strcopy(header.Time, sizeof(FileHeader::Time), szTime);
+	strcopy(header.Playername, sizeof(FileHeader::Playername), szName);
+	header.Checkpoints = iCp;
+	header.TickCount = iTickCount;
+	header.Frames = null;
 
 	if (headerOnly)
 	{
@@ -639,7 +639,7 @@ public void LoadRecordFromFile(const char[] path, int headerInfo[FILE_HEADER_LEN
 		}
 	}
 
-	headerInfo[view_as<int>(FH_frames)] = hRecordFrames;
+	header.Frames = hRecordFrames;
 
 	// Free any old handles if we already loaded this one once before.
 	Handle hOldAT;
@@ -1236,14 +1236,14 @@ public void Stage_SaveRecording(int client, int stage, char[] time)
 	int startframe = g_StageRecStartFrame[client];
 	int framesRecorded = GetArraySize(g_hRecording[client]) - startframe;
 
-	int iHeader[FILE_HEADER_LENGTH];
-	iHeader[view_as<int>(FH_binaryFormatVersion)] = BINARY_FORMAT_VERSION;
-	strcopy(iHeader[view_as<int>(FH_Time)], 32, time);
-	iHeader[view_as<int>(FH_tickCount)] = framesRecorded;
-	strcopy(iHeader[view_as<int>(FH_Playername)], 32, szName);
-	iHeader[view_as<int>(FH_Checkpoints)] = 0; // So that KZTimers replays work
-	Array_Copy(g_fStageInitialPosition[client], iHeader[view_as<int>(FH_initialPosition)], 3);
-	Array_Copy(g_fStageInitialAngles[client], iHeader[view_as<int>(FH_initialAngles)], 3);
+	FileHeader header;
+	header.BinaryFormatVersion = BINARY_FORMAT_VERSION;
+	strcopy(header.Time, sizeof(FileHeader::Time), time);
+	header.TickCount = framesRecorded;
+	strcopy(header.Playername, sizeof(FileHeader::Playername), szName);
+	header.Checkpoints = 0; // So that KZTimers replays work
+	Array_Copy(g_fStageInitialPosition[client], header.InitialPosition, 3);
+	Array_Copy(g_fStageInitialAngles[client], header.InitialAngles, 3);
 
 	Handle frames = CreateArray(view_as<int>(FrameInfo));
 
@@ -1254,7 +1254,7 @@ public void Stage_SaveRecording(int client, int stage, char[] time)
 		PushArrayArray(frames, iFrame, view_as<int>(FrameInfo));
 	}
 
-	iHeader[view_as<int>(FH_frames)] = frames;
+	header.Frames = frames;
 
 	if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > 0)
 	{
@@ -1270,7 +1270,7 @@ public void Stage_SaveRecording(int client, int stage, char[] time)
 		SetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath2, additionalteleports);
 	}
 
-	WriteRecordToDisk(sPath2, iHeader);
+	WriteRecordToDisk(sPath2, header);
 	if (g_bSavingWrcpReplay[client])
 		g_bSavingWrcpReplay[client] = false;
 }
