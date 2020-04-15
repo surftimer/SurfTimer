@@ -726,6 +726,10 @@ public void CL_OnStartWrcpTimerPress(int client)
 	if (!g_bSpectate[client] && !g_bNoClip[client] && ((GetGameTime() - g_fLastTimeNoClipUsed[client]) > 2.0))
 	{
 		int zGroup = g_iClientInZone[client][2];
+		if(zGroup != 0)
+		{
+			return;
+		}
 		if (zGroup == 0)
 		{
 			g_fStartWrcpTime[client] = GetGameTime();
