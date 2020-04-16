@@ -696,9 +696,7 @@ public void LoadRecordReplay()
 
 		// "Having a bot in noclip and zero gravity ensures it's smooth" - Crashfort
 		// https://github.com/crashfort/SourceToolAssist/blob/be9218583ee0a8086c817a5bd29101b2a260e5a7/Source/surf_segmentplay.sp#L113
-		// Disabling noclip, makes the bot bug, look into later
-		// SetEntityMoveType(g_RecordBot, MOVETYPE_NOCLIP);
-		SetEntityGravity(g_RecordBot, 0.0);
+		SetEntityMoveType(g_RecordBot, MOVETYPE_NOCLIP);
 
 		PlayRecord(g_RecordBot, 0, 0);
 		// We can start multiple bots but first we need to get if bot has finished playing???
@@ -760,9 +758,7 @@ public void LoadBonusReplay()
 
 		// "Having a bot in noclip and zero gravity ensures it's smooth" - Crashfort
 		// https://github.com/crashfort/SourceToolAssist/blob/be9218583ee0a8086c817a5bd29101b2a260e5a7/Source/surf_segmentplay.sp#L113
-		// Disabling noclip, makes the bot bug, look into later
-		// SetEntityMoveType(g_BonusBot, MOVETYPE_NOCLIP);
-		SetEntityGravity(g_BonusBot, 0.0);
+		SetEntityMoveType(g_BonusBot, MOVETYPE_NOCLIP);
 
 		PlayRecord(g_BonusBot, 1, 0);
 		SetEntityRenderColor(g_BonusBot, g_BonusBotColor[0], g_BonusBotColor[1], g_BonusBotColor[2], 50);
@@ -824,9 +820,8 @@ public void LoadWrcpReplay()
 
 		// "Having a bot in noclip and zero gravity ensures it's smooth" - Crashfort
 		// https://github.com/crashfort/SourceToolAssist/blob/be9218583ee0a8086c817a5bd29101b2a260e5a7/Source/surf_segmentplay.sp#L113
-		// Disabling noclip, makes the bot bug, look into later
-		// SetEntityMoveType(g_WrcpBot, MOVETYPE_NOCLIP);
-		SetEntityGravity(g_WrcpBot, 0.0);
+		SetEntityMoveType(g_WrcpBot, MOVETYPE_NOCLIP);
+
 
 		PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0);
 		SetEntityRenderColor(g_WrcpBot, 180, 142, 173, 50);
