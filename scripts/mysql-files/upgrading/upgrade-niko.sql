@@ -90,10 +90,10 @@ ADD COLUMN `timealive` int(64) NOT NULL DEFAULT 0 AFTER `joined`,
 ADD COLUMN `timespec` int(64) NOT NULL DEFAULT 0 AFTER `timealive`,
 ADD COLUMN `connections` int(64) NOT NULL DEFAULT 1 AFTER `timespec`,
 ADD COLUMN `readchangelog` int(11) NOT NULL DEFAULT 0 AFTER `connections`,
-ADD COLUMN `style` int(11) NOT NULL DEFAULT 0 AFTER `readchangelog`,
+ADD COLUMN `style` int(11) NOT NULL DEFAULT 0 AFTER `readchangelog`;
 UPDATE ck_playerrank SET lastseen2 = UNIX_TIMESTAMP(STR_TO_DATE(lastseen, '%Y-%m-%d'));
 ALTER TABLE `ck_playerrank` DROP `lastseen`;
-ALTER TABLE `ck_playerrank` CHANGE `lastseen2` `lastseen` INT(64) NULL DEFAULT NULL;
+ALTER TABLE `ck_playerrank` CHANGE `lastseen2` `lastseen` INT(64) NULL DEFAULT NULL,
 ADD PRIMARY KEY (steamid, style);
 
 ALTER TABLE `ck_playertimes`
