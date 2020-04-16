@@ -696,8 +696,12 @@ public void LoadRecordReplay()
 
 		// "Having a bot in noclip and zero gravity ensures it's smooth" - Crashfort
 		// https://github.com/crashfort/SourceToolAssist/blob/be9218583ee0a8086c817a5bd29101b2a260e5a7/Source/surf_segmentplay.sp#L113
+		// Disabling noclip, makes the bot bug.
+		// Since the bot is getting teleported with angle and speed not angle and position
+		// the bot sometimes will fly around like a headless fly (because of getting blocked) or choppy on a ramp
 		SetEntityMoveType(g_RecordBot, MOVETYPE_NOCLIP);
-
+		SetEntityGravity(g_RecordBot, 0.0);
+		
 		PlayRecord(g_RecordBot, 0, 0);
 		// We can start multiple bots but first we need to get if bot has finished playing???
 		SetEntityRenderColor(g_RecordBot, g_ReplayBotColor[0], g_ReplayBotColor[1], g_ReplayBotColor[2], 50);
@@ -758,7 +762,11 @@ public void LoadBonusReplay()
 
 		// "Having a bot in noclip and zero gravity ensures it's smooth" - Crashfort
 		// https://github.com/crashfort/SourceToolAssist/blob/be9218583ee0a8086c817a5bd29101b2a260e5a7/Source/surf_segmentplay.sp#L113
-		SetEntityMoveType(g_BonusBot, MOVETYPE_NOCLIP);
+		// Disabling noclip, makes the bot bug.
+		// Since the bot is getting teleported with angle and speed not angle and position
+		// the bot sometimes will fly around like a headless fly (because of getting blocked) or choppy on a ramp
+		SetEntityMoveType(g_RecordBot, MOVETYPE_NOCLIP);
+		SetEntityGravity(g_RecordBot, 0.0);
 
 		PlayRecord(g_BonusBot, 1, 0);
 		SetEntityRenderColor(g_BonusBot, g_BonusBotColor[0], g_BonusBotColor[1], g_BonusBotColor[2], 50);
@@ -820,7 +828,11 @@ public void LoadWrcpReplay()
 
 		// "Having a bot in noclip and zero gravity ensures it's smooth" - Crashfort
 		// https://github.com/crashfort/SourceToolAssist/blob/be9218583ee0a8086c817a5bd29101b2a260e5a7/Source/surf_segmentplay.sp#L113
-		SetEntityMoveType(g_WrcpBot, MOVETYPE_NOCLIP);
+		// Disabling noclip, makes the bot bug.
+		// Since the bot is getting teleported with angle and speed not angle and position
+		// the bot sometimes will fly around like a headless fly (because of getting blocked) or choppy on a ramp
+		SetEntityMoveType(g_RecordBot, MOVETYPE_NOCLIP);
+		SetEntityGravity(g_RecordBot, 0.0);
 
 
 		PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0);
