@@ -24,8 +24,8 @@
   }
   "2"
   {
-    "steamid" "STEAM_1:0:27661072"
-     "title" "{default}[{gold}VIP{default}]"
+    "steamid" "STEAM_1:0:0000000"
+    "title" "{default}[{gold}VIP{default}]"
     "type" "both"
   }
 }

