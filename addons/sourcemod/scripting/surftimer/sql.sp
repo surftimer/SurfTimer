@@ -9347,7 +9347,9 @@ public void SQL_UpdatePlayerColoursCallback(Handle owner, Handle hndl, const cha
 public void db_selectAnnouncements()
 {
 	char szQuery[1024];
-	Format(szQuery, 1024, "SELECT `id` FROM `ck_announcements` WHERE `server` != '%s' AND `id` > %d", g_sServerName, g_iLastID);
+	char szEscServerName[128];
+	SQL_EscapeString(g_hDb, g_sServerName, szEscServerName, sizeof(szEscServerName));
+	Format(szQuery, 1024, "SELECT `id` FROM `ck_announcements` WHERE `server` != '%s' AND `id` > %d", szEscServerName, g_iLastID);
 	SQL_TQuery(g_hDb, SQL_SelectAnnouncementsCallback, szQuery, 1, DBPrio_Low);
 }
 
@@ -9388,14 +9390,18 @@ public void db_insertAnnouncement(char szName[128], char szMapName[128], int szM
 		return;
 
 	char szQuery[512];
-	Format(szQuery, 512, "INSERT INTO `ck_announcements` (`server`, `name`, `mapname`, `mode`, `time`, `group`) VALUES ('%s', '%s', '%s', '%i', '%s', '%i');", g_sServerName, szName, szMapName, szMode, szTime, szGroup);
+	char szEscServerName[128];
+	SQL_EscapeString(g_hDb, g_sServerName, szEscServerName, sizeof(szEscServerName));
+	Format(szQuery, 512, "INSERT INTO `ck_announcements` (`server`, `name`, `mapname`, `mode`, `time`, `group`) VALUES ('%s', '%s', '%s', '%i', '%s', '%i');", szEscServerName, szName, szMapName, szMode, szTime, szGroup);
 	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, 1, DBPrio_Low);
 }
 
 public void db_checkAnnouncements()
 {
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT `id`, `server`, `name`, `mapname`, `mode`, `time`, `group` FROM `ck_announcements` WHERE `server` != '%s' AND `id` > %d;", g_sServerName, g_iLastID);
+	char szEscServerName[128];
+	SQL_EscapeString(g_hDb, g_sServerName, szEscServerName, sizeof(szEscServerName));
+	Format(szQuery, 512, "SELECT `id`, `server`, `name`, `mapname`, `mode`, `time`, `group` FROM `ck_announcements` WHERE `server` != '%s' AND `id` > %d;", szEscServerName, g_iLastID);
 	SQL_TQuery(g_hDb, SQL_CheckAnnouncementsCallback, szQuery, 1, DBPrio_Low);
 }
 
