@@ -4633,6 +4633,9 @@ char g_sSpace[2048];
 
 Action TextMsgHintTextHook(UserMsg msg_id, Protobuf msg, const int[] players, int playersNum, bool reliable, bool init)
 {
+	// Workaround to avoid warnings on sm1.11 (warning 203: symbol is never used: "init"/"reliable")
+	if (reliable && init) {}
+
 	static char sBuf[sizeof g_sSpace];
 
 	if(msg_id == g_HintText)
