@@ -285,6 +285,11 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Pause enabled"
 	}
+	"Pause Disabled"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} This server currently has !pause disabled."
+	}
 	"QuakeSounds1"
 	{
 		"#format"	"{1:s}"

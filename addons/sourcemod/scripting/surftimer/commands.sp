@@ -2242,17 +2242,24 @@ public int ProfilePlayerSelectMenuHandler(Handle menu, MenuAction action, int pa
 
 public Action Client_Pause(int client, int args)
 {
-	if (GetClientTeam(client) == 1)return Plugin_Handled;
-	if (g_bInStartZone[client])
+	bool bAllowPause = GetConVarBool(g_AllowPause);
+
+	if (bAllowPause)
 	{
-		CPrintToChat(client, "%t", "Commands33", g_szChatPrefix);
-		return Plugin_Handled;
+		if (GetClientTeam(client) == 1)return Plugin_Handled;
+		if (g_bInStartZone[client])
+		{
+			CPrintToChat(client, "%t", "Commands33", g_szChatPrefix);
+			return Plugin_Handled;
+		}
+		PauseMethod(client);
+		if (g_bPause[client] == false)
+			CPrintToChat(client, "%t", "Pause2", g_szChatPrefix);
+		else
+			CPrintToChat(client, "%t", "Pause3", g_szChatPrefix);
 	}
-	PauseMethod(client);
-	if (g_bPause[client] == false)
-		CPrintToChat(client, "%t", "Pause2", g_szChatPrefix);
 	else
-		CPrintToChat(client, "%t", "Pause3", g_szChatPrefix);
+		CPrintToChat(client, "%t", "Pause Disabled", g_szChatPrefix);
 	return Plugin_Handled;
 }
 
