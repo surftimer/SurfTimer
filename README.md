@@ -37,6 +37,7 @@ Yes, but not any more than other projects currently and for past years.
 
 **Recommended:**
 * [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (Suppresses console warnings)
+* [Trails Chroma](https://github.com/Nickelony/Trails-Chroma) (Pretty trails, also recommended to have the materials on fastdl)
 
 ## Issue Rules
 
