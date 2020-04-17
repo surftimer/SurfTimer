@@ -20,7 +20,7 @@ Yes, but not any more than other projects currently and for past years.
 * [SourceMod-Discord API](https://github.com/Deathknife/sourcemod-discord)
 * A MySQL Database (MySQL 5.7, MySQL 8+, MariaDB supported)
 
-<sup>(This version also supports SourceMod 1.11 and Metamod 1.11)</sup>
+<sup>(We plan to support SourceMod 1.11 and Metamod 1.11, but that will not happen until code is stable. Good progress is done with each hour, but until then, SM1.10 and MM1.10 is the only supported version. We cannot allow ourselves to encounter bugs within sourcemod itself.)</sup>
 
 **Extensions:**
 * [DHooks](https://forums.alliedmods.net/showthread.php?t=180114) - **Recommended:** [Detours Build](https://forums.alliedmods.net/showpost.php?p=2588686&postcount=589) for SourceMod 1.10 Stable
