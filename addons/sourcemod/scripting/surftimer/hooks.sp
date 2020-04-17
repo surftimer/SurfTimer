@@ -523,7 +523,7 @@ public void CGetRankColor(char[] sMsg, int iSize) // edit from CProcessVariables
 
 			if (sMsg[i] == '}' || i == iMsgLen - 1) {
 				strcopy(sCode, strlen(sCode) - 1, sCode[1]);
-				StringToLower(sCode);
+				String_ToLower(sCode, sCode, iSize);
 
 				if (CGetColor(sCode, sColor, iSize)) {
 					if(dev == 1) break;
