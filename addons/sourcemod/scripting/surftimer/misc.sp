@@ -172,7 +172,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	// Check clients tele side
 	int teleside = g_iTeleSide[client];
 
-	if (g_bStartposUsed[client][zonegroup])
+	if (g_bStartposUsed[client][zonegroup] && zone == 1)
 	{
 		if (GetClientTeam(client) == 1 || GetClientTeam(client) == 0) // Spectating
 		{
