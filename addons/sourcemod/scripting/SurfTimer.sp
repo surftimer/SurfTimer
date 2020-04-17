@@ -26,9 +26,6 @@
 #include <discord>
 #include <sourcecomms>
 #include <surftimer>
-#include <tf2>
-#include <tf2_stocks>
-#include <base64>
 
 /*===================================
 =            Definitions            =
@@ -1397,8 +1394,6 @@ float gF_PlayerOrigin[MAXPLAYERS + 1][3];
 // Cookie handles
 Handle gH_TrailChoiceCookie;
 Handle gH_TrailHidingCookie;
-
-EngineVersion gEV_Type = Engine_Unknown;
 
 /*===================================
 =         Predefined Arrays         =
@@ -2791,7 +2786,6 @@ public void OnPluginStart()
 	gH_TrailHidingCookie = RegClientCookie("trail_hiding", "Trail Hiding Cookie", CookieAccess_Protected);
 
 	aL_Clients = new ArrayList();
-	gEV_Type = GetEngineVersion();
 
 	for(int i = 1; i <= MaxClients; i++)
 	{
