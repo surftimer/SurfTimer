@@ -101,14 +101,7 @@ public Action Command_Hide(int client, int args)
 			aL_Clients.Erase(index);
 		}
 		
-		if(gEV_Type == Engine_CSGO) // CS:GO supports HTML
-		{
-			PrintCenterText(client, "Other players' trails are now <font color='#FF00FF' face=''>Hidden</font>.");
-		}
-		else
-		{
-			PrintCenterText(client, "Other players' trails are now Hidden.");
-		}
+		PrintCenterText(client, "Other players' trails are now <font color='#FF00FF' face=''>Hidden</font>.");
 		
 		SetClientCookie(client, gH_TrailHidingCookie, "0");
 	}
@@ -116,14 +109,7 @@ public Action Command_Hide(int client, int args)
 	{
 		aL_Clients.Push(client);
 		
-		if(gEV_Type == Engine_CSGO)
-		{
-			PrintCenterText(client, "Other players' trails are now <font color='#FFFF00' face=''>Visible</font>.");
-		}
-		else
-		{
-			PrintCenterText(client, "Other players' trails are now Visible.");
-		}
+		PrintCenterText(client, "Other players' trails are now <font color='#FFFF00' face=''>Visible</font>.");
 		
 		SetClientCookie(client, gH_TrailHidingCookie, "1");
 	}
@@ -204,14 +190,7 @@ void MenuSelection(int client, char[] info)
 	
 	if(choice == TRAIL_NONE)
 	{
-		if(gEV_Type == Engine_CSGO) // CS:GO supports HTML
-		{
-			PrintCenterText(client, "Your trail is now <font color='#FF0000' face=''>DISABLED</font>.");
-		}
-		else
-		{
-			PrintCenterText(client, "Your trail is now DISABLED.");
-		}
+		PrintCenterText(client, "Your trail is now <font color='#FF0000' face=''>DISABLED</font>.");
 		
 		StopSpectrumCycle(client);
 	}
@@ -227,25 +206,11 @@ void MenuSelection(int client, char[] info)
 		
 		if(gI_SelectedTrail[client] == TRAIL_NONE)
 		{
-			if(gEV_Type == Engine_CSGO)
-			{
-				PrintCenterText(client, "Your trail is now <font color='#00FF00' face=''>ENABLED</font>.\nYour beam color is: <font color='%s' face=''>%s</font>.", sHexColor, gS_TrailTitle[choice]);
-			}
-			else
-			{
-				PrintCenterText(client, "Your trail is now ENABLED.\nYour beam color is: %s.", gS_TrailTitle[choice]);
-			}
+			PrintCenterText(client, "Your trail is now <font color='#00FF00' face=''>ENABLED</font>.\nYour beam color is: <font color='%s' face=''>%s</font>.", sHexColor, gS_TrailTitle[choice]);
 		}
 		else
 		{
-			if(gEV_Type == Engine_CSGO)
-			{
-				PrintCenterText(client, "Your beam color is now: <font color='%s' face=''>%s</font>.", sHexColor, gS_TrailTitle[choice]);
-			}
-			else
-			{
-				PrintCenterText(client, "Your beam color is now: %s.", gS_TrailTitle[choice]);
-			}
+			PrintCenterText(client, "Your beam color is now: <font color='%s' face=''>%s</font>.", sHexColor, gS_TrailTitle[choice]);
 		}
 		
 		if(gI_TrailSettings[choice].iSpecialColor == 1 || gI_TrailSettings[choice].iSpecialColor == 2)
@@ -323,14 +288,6 @@ void CreatePlayerTrail(int client, float origin[3])
 		return;
 	}
 	
-	if(gEV_Type == Engine_TF2)
-	{
-		if(TF2_IsPlayerInCondition(client, TFCond_Cloaked)) // If the Spy is invisible
-		{
-			return;
-		}
-	}
-	
 	float fFirstPos[3];
 	fFirstPos[0] = origin[0];
 	fFirstPos[1] = origin[1];
@@ -392,7 +349,7 @@ int[] GetClientTrailColors(int client, int[] color)
 	}
 	
 	#if defined DEBUG
-	PrintHintText(client, "%i\n%i\n%i", color[0], color[1], color[2]);
+	PrintCSGOHUDText(client, "%i\n%i\n%i", color[0], color[1], color[2]);
 	#endif
 	
 	return;

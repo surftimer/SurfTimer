@@ -70,7 +70,6 @@ DROP PRIMARY KEY,
 DROP COLUMN `winratio`,
 DROP COLUMN `pointsratio`,
 DROP COLUMN `multiplier`,
-DROP COLUMN `lastseen`,
 ADD COLUMN `steamid64` varchar(64) NULL DEFAULT NULL AFTER `steamid`,
 ADD COLUMN `wrpoints` int(12) NOT NULL DEFAULT 0 AFTER `points`,
 ADD COLUMN `wrbpoints` int(12) NOT NULL DEFAULT 0 AFTER `wrpoints`,
@@ -85,13 +84,16 @@ ADD COLUMN `wrbs` int(12) NOT NULL DEFAULT 0 AFTER `wrs`,
 ADD COLUMN `wrcps` int(12) NOT NULL DEFAULT 0 AFTER `wrbs`,
 ADD COLUMN `top10s` int(12) NOT NULL DEFAULT 0 AFTER `wrcps`,
 ADD COLUMN `groups` int(12) NOT NULL DEFAULT 0 AFTER `top10s`,
-ADD COLUMN `lastseen` int(64) NULL DEFAULT NULL AFTER `groups`,
+ADD COLUMN `lastseen2` int(64) NULL DEFAULT NULL AFTER `groups`,
 ADD COLUMN `joined` int(64) NOT NULL AFTER `lastseen`,
 ADD COLUMN `timealive` int(64) NOT NULL DEFAULT 0 AFTER `joined`,
 ADD COLUMN `timespec` int(64) NOT NULL DEFAULT 0 AFTER `timealive`,
 ADD COLUMN `connections` int(64) NOT NULL DEFAULT 1 AFTER `timespec`,
 ADD COLUMN `readchangelog` int(11) NOT NULL DEFAULT 0 AFTER `connections`,
-ADD COLUMN `style` int(11) NOT NULL DEFAULT 0 AFTER `readchangelog`,
+ADD COLUMN `style` int(11) NOT NULL DEFAULT 0 AFTER `readchangelog`;
+UPDATE ck_playerrank SET lastseen2 = UNIX_TIMESTAMP(STR_TO_DATE(lastseen, '%Y-%m-%d'));
+ALTER TABLE `ck_playerrank` DROP `lastseen`;
+ALTER TABLE `ck_playerrank` CHANGE `lastseen2` `lastseen` INT(64) NULL DEFAULT NULL,
 ADD PRIMARY KEY (steamid, style);
 
 ALTER TABLE `ck_playertimes`

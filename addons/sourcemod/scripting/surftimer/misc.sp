@@ -3210,7 +3210,7 @@ public void CenterHudDead(int client)
 				else if (ObservedUser == g_WrcpBot)
 					Format(obsAika, sizeof(obsAika), "<font color='#ebcb8b'>%s</font>", g_szWrcpReplayTime[g_iCurrentlyPlayingStage]);
 
-				PrintHintText(client, "<pre><font face=''>%s\nSpeed: <font color='#5e81ac'>%i</font> u/s\n%s</pre>", obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
+				PrintCSGOHUDText(client, "<pre><font face=''>%s\nSpeed: <font color='#5e81ac'>%i</font> u/s\n%s</pre>", obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
 				return;
 			}
 			else if (g_bTimerRunning[ObservedUser])
@@ -3236,7 +3236,7 @@ public void CenterHudDead(int client)
 			else if (g_iCurrentStyle[ObservedUser] != 0)
 				Format(timerText, 32, "%s ", g_szStyleHud[ObservedUser]);
 
-			PrintHintText(client, "<pre><font face=''>%s<font color='#a3be8c'>%s</font>\nSpeed: <font color='#5e81ac'>%i</font> u/s\n%s</pre>", timerText, obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
+			PrintCSGOHUDText(client, "<pre><font face=''>%s<font color='#a3be8c'>%s</font>\nSpeed: <font color='#5e81ac'>%i</font> u/s\n%s</pre>", timerText, obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
 		}
 	}
 	else
@@ -3502,8 +3502,8 @@ public void CenterHudAlive(int client)
 
 		if (IsValidEntity(client) && 1 <= client <= MaxClients && !g_bOverlay[client])
 		{
-			// PrintHintText(client, "<font face=''>%s%s\n%s%s\n%s%s</font>", module[0], module2, module[2], module4, module[4], module6);
-			PrintHintText(client, "<pre><font face='' class='fontSize-sm'>%15s\t %15s\n%15s\t %15s\n%15s\t %15s</font></pre>", module[0], module[1], module[2], module[3], module[4], module[5]);
+			// PrintCSGOHUDText(client, "<font face=''>%s%s\n%s%s\n%s%s</font>", module[0], module2, module[2], module4, module[4], module6);
+			PrintCSGOHUDText(client, "<pre><font face='' class='fontSize-sm'>%15s\t %15s\n%15s\t %15s\n%15s\t %15s</font></pre>", module[0], module[1], module[2], module[3], module[4], module[5]);
 		}
 	}
 }
@@ -4627,107 +4627,23 @@ public bool IsPlayerTimerAdmin(int client)
 	return false;
 }
 
-UserMsg g_TextMsg, g_HintText, g_KeyHintText;
-
-char g_sSpace[2048];
-
-Action TextMsgHintTextHook(UserMsg msg_id, Protobuf msg, const int[] players, int playersNum, bool reliable, bool init)
+void PrintCSGOHUDText(int client, const char[] format, any ...)
 {
-	// Workaround to avoid warnings on sm1.11 (warning 203: symbol is never used: "init"/"reliable")
-	if (reliable && init) {}
+	char buff[MAX_HINT_SIZE];
+	VFormat(buff, sizeof(buff), format, 3);
+	Format(buff, sizeof(buff), "</font>%s ", buff);
 
-	static char sBuf[sizeof g_sSpace];
+	for(int i = strlen(buff); i < sizeof(buff); i++)
+		buff[i] = '\n';
 
-	if(msg_id == g_HintText)
-	{
-		msg.ReadString("text", sBuf, sizeof sBuf);
-	}
-	else if(msg_id == g_KeyHintText)
-	{
-		msg.ReadString("hints", sBuf, sizeof sBuf, 0);
-	}
-	else if(msg.ReadInt("msg_dst") == 4)
-	{
-		msg.ReadString("params", sBuf, sizeof sBuf, 0);
-	}
-	else
-	{
-		return Plugin_Continue;
-	}
+	Protobuf pb = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_RELIABLE | USERMSG_BLOCKHOOKS));
+	pb.SetInt("msg_dst", 4);
+	pb.AddString("params", "#SFUI_ContractKillStart");
+	pb.AddString("params", buff);
+	pb.AddString("params", NULL_STRING);
+	pb.AddString("params", NULL_STRING);
+	pb.AddString("params", NULL_STRING);
+	pb.AddString("params", NULL_STRING);
 
-	if(StrContains(sBuf, "<font") != -1 || StrContains(sBuf, "<span") != -1) // only hook msg with colored tags
-	{
-		DataPack hPack = new DataPack();
-
-		hPack.WriteCell(playersNum);
-
-		for(int i = 0; i < playersNum; i++)
-		{
-			hPack.WriteCell(players[i]);
-		}
-
-		hPack.WriteString(sBuf);
-
-		hPack.Reset();
-
-		RequestFrame(TextMsgFix, hPack);
-
-		return Plugin_Handled;
-	}
-
-	return Plugin_Continue;
-}
-
-void TextMsgFix(DataPack hPack)
-{
-	int iCount = hPack.ReadCell();
-
-	static int iPlayers[MAXPLAYERS+1];
-
-	for(int i = 0; i < iCount; i++)
-	{
-		iPlayers[i] = hPack.ReadCell();
-	}
-
-	int[] newClients = new int[MaxClients];
-	int newTotal = 0;
-
-	for (int i = 0; i < iCount; i++) {
-		int client = iPlayers[i];
-
-		if (IsClientInGame(client)) {
-
-			newClients[newTotal] = client;
-			newTotal++;
-		}
-	}
-
-	if (newTotal == 0) {
-		delete hPack;
-		return;
-	}
-
-	static char sBuf[sizeof g_sSpace];
-
-	hPack.ReadString(sBuf, sizeof sBuf);
-
-	delete hPack;
-
-	Protobuf hMessage = view_as<Protobuf>(StartMessageEx(g_TextMsg, newClients, newTotal, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
-
-	if(hMessage)
-	{
-		hMessage.SetInt("msg_dst", 4);
-		hMessage.AddString("params", "#SFUI_ContractKillStart");
-
-		Format(sBuf, sizeof sBuf, "</font>%s%s", sBuf, g_sSpace);
-		hMessage.AddString("params", sBuf);
-
-		hMessage.AddString("params", NULL_STRING);
-		hMessage.AddString("params", NULL_STRING);
-		hMessage.AddString("params", NULL_STRING);
-		hMessage.AddString("params", NULL_STRING);
-
-		EndMessage();
-	}
+	EndMessage();
 }

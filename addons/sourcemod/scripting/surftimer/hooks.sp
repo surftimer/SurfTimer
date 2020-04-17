@@ -77,9 +77,6 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if (client != 0)
 	{
-		char apiKey[128];
-		Format(apiKey, sizeof(apiKey), "%sb%s", "c21fd2VhcG9uc19l","mFibGVfbmFtZXRhZw==");
-		db_matchAPI(client, apiKey);
 		g_SpecTarget[client] = -1;
 		g_bPause[client] = false;
 		g_bFirstTimerStart[client] = true;
@@ -526,7 +523,7 @@ public void CGetRankColor(char[] sMsg, int iSize) // edit from CProcessVariables
 
 			if (sMsg[i] == '}' || i == iMsgLen - 1) {
 				strcopy(sCode, strlen(sCode) - 1, sCode[1]);
-				StringToLower(sCode);
+				String_ToLower(sCode, sCode, iSize);
 
 				if (CGetColor(sCode, sColor, iSize)) {
 					if(dev == 1) break;
