@@ -515,7 +515,6 @@ bool g_bCenterSpeedDisplay[MAXPLAYERS + 1];
 int g_iCenterSpeedEnt[MAXPLAYERS + 1];
 int g_iSettingToLoad[MAXPLAYERS + 1];
 int g_iPreviousSpeed[MAXPLAYERS + 1];
-bool db_Matcher[MAXPLAYERS+1];
 
 /*----------  Sounds  ----------*/
 bool g_bTop10Time[MAXPLAYERS + 1] = false;
