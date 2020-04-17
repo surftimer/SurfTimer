@@ -349,7 +349,7 @@ int[] GetClientTrailColors(int client, int[] color)
 	}
 	
 	#if defined DEBUG
-	PrintHintText(client, "%i\n%i\n%i", color[0], color[1], color[2]);
+	PrintCSGOHUDText(client, "%i\n%i\n%i", color[0], color[1], color[2]);
 	#endif
 	
 	return;

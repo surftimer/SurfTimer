@@ -126,6 +126,9 @@
 // New Save Locs
 #define MAX_LOCS 1024
 
+//CSGO HUD Hint Fix
+#define MAX_HINT_SIZE 225
+
 /*====================================
 =            Enumerations            =
 ====================================*/
@@ -2764,22 +2767,6 @@ public void OnPluginStart()
 	gCV_BeamLife.AddChangeHook(OnConVarChanged);
 	gCV_BeamWidth.AddChangeHook(OnConVarChanged);
 	gCV_RespawnDisable.AddChangeHook(OnConVarChanged);
-
-	//Update Fix
-
-	for(int i = 0; i < sizeof g_sSpace - 1; i++)
-	{
-		g_sSpace[i] = ' ';
-	}
-
-	g_TextMsg = GetUserMessageId("TextMsg");
-	g_HintText = GetUserMessageId("HintText");
-	g_KeyHintText = GetUserMessageId("KeyHintText");
-
-	HookUserMessage(g_TextMsg, TextMsgHintTextHook, true);
-	HookUserMessage(g_HintText, TextMsgHintTextHook, true);
-	HookUserMessage(g_KeyHintText, TextMsgHintTextHook, true);
-
 
 	gH_TrailChoiceCookie = RegClientCookie("trail_choice", "Trail Choice Cookie", CookieAccess_Protected);
 	gH_TrailHidingCookie = RegClientCookie("trail_hiding", "Trail Hiding Cookie", CookieAccess_Protected);
