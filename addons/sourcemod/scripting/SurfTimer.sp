@@ -11,6 +11,7 @@
 
 #include <sourcemod>
 #include <sdkhooks>
+#include <sdktools>
 #include <adminmenu>
 #include <cstrike>
 #include <smlib>
@@ -22,9 +23,7 @@
 #undef REQUIRE_PLUGIN
 #include <dhooks>
 #include <mapchooser>
-#include <sdktools>
 #include <discord>
-#include <sourcecomms>
 #include <surftimer>
 #include <tf2>
 #include <tf2_stocks>
