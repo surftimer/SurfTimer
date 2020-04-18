@@ -118,16 +118,6 @@ ConVar g_drDeleteSecurity = null;
 ConVar g_iAdminCountryTags = null;
 ConVar g_replayBotDelay = null;
 
-// Trails
-ConVar gCV_PluginEnabled = null;
-ConVar gCV_AdminsOnly = null;
-ConVar gCV_AllowHide = null;
-ConVar gCV_CheapTrails = null;
-ConVar gCV_BeamLife = null;
-ConVar gCV_BeamWidth = null;
-ConVar gCV_RespawnDisable = null;
-ConVar gCV_Trails = null;
-
 void CreateConVars()
 {
 	CreateConVar("timer_version", VERSION, "Timer Version.", FCVAR_DONTRECORD | FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY);
@@ -175,17 +165,6 @@ void CreateConVars()
 	g_drDeleteSecurity = CreateConVar("ck_dr_delete_security", "1", "(1 / 0) Disabled/Enable delete security for !dr command", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_iAdminCountryTags = CreateConVar("ck_admin_country_tags", "0", "(1 / 0) Disabled/Enable country tags for admins", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_replayBotDelay = CreateConVar("ck_replay_bot_delay", "10", "Delay in seconds after initial mapstart after the bots join the server", FCVAR_NOTIFY, true, 10.0);
-	
-
-	// Trails
-	gCV_PluginEnabled = CreateConVar("sm_trails_enable", "1", "Enable or Disable all features of the plugin.", 0, true, 0.0, true, 1.0);
-	gCV_AdminsOnly = CreateConVar("sm_trails_admins_only", "1", "Enable trails for admins only.", 0, true, 0.0, true, 1.0);
-	gCV_AllowHide = CreateConVar("sm_trails_allow_hide", "1", "Allow hiding other players' trails.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
-	gCV_CheapTrails = CreateConVar("sm_trails_cheap", "0", "Force cheap trails (FPS boost).", FCVAR_NOTIFY, true, 0.0, true, 1.0);
-	gCV_BeamLife = CreateConVar("sm_trails_life", "2.5", "Time duration of the trails.", FCVAR_NOTIFY, true, 0.0);
-	gCV_BeamWidth = CreateConVar("sm_trails_width", "1.5", "Width of the trail beams.", FCVAR_NOTIFY, true, 0.0);
-	gCV_RespawnDisable = CreateConVar("sm_trails_respawn_disable", "0", "Disable the player's trail after respawning.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
-	gCV_Trails = CreateConVar("ck_trails_enable", "1", "Enable or Disable trails completely ", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 
 	g_hPointSystem = CreateConVar("ck_point_system", "1", "on/off - Player point system", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	HookConVarChange(g_hPointSystem, OnSettingChanged);

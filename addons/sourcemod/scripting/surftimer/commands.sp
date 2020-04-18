@@ -205,12 +205,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_nctriggers", Command_ToggleNcTriggers, "[surftimer] [settings] on/off - toggle triggers while noclipping");
 	RegConsoleCmd("sm_autoreset", Command_ToggleAutoReset, "[surftimer] [settings] on/off - toggle auto reset for your current map/bonus run if your above your pb");
 
-	// Trails
-	RegConsoleCmd("sm_trail", Command_Trail, "Opens the 'Trail Selection' menu.");
-	RegConsoleCmd("sm_trails", Command_Trail, "Opens the 'Trail Selection' menu.");
-	RegConsoleCmd("sm_hidetrail", Command_Hide, "Hides other players' trails.");
-	RegConsoleCmd("sm_hidetrails", Command_Hide, "Hides other players' trails.");
-
 }
 
 public Action Command_ToggleAutoReset(int client, int args) {
