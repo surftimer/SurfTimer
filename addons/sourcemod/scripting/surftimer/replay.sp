@@ -540,16 +540,16 @@ public void WriteRecordToDisk(const char[] sPath, FileHeader header)
 	for (int i = 0; i < iTickCount; i++)
 	{
 		GetArrayArray(header.Frames, i, iFrame, sizeof(FrameInfo));
-		WriteFile(hFile, iFrame.PlayerButtons, sizeof(FrameInfo), 4);
-		WriteFile(hFile, iFrame.PlayerImpulse, sizeof(FrameInfo), 4);
-		WriteFile(hFile, view_as<int>(iFrame.ActualVelocity), sizeof(FrameInfo), 4);
-		WriteFile(hFile, view_as<int>(iFrame.PredictedVelocity), sizeof(FrameInfo), 4);
-		WriteFile(hFile, view_as<int>(iFrame.PredictedAngles), sizeof(FrameInfo), 4);
-		WriteFile(hFile, view_as<int>(iFrame.NewWeapon), sizeof(FrameInfo), 4);
-		WriteFile(hFile, iFrame.PlayerSubtype, sizeof(FrameInfo), 4);
-		WriteFile(hFile, iFrame.PlayerSeed, sizeof(FrameInfo), 4);
-		WriteFile(hFile, iFrame.AdditionalFields, sizeof(FrameInfo), 4);
-		WriteFile(hFile, iFrame.Pause, sizeof(FrameInfo), 4);
+		WriteFile(hFile, iFrame.PlayerButtons, sizeof(FrameInfo::PlayerButtons), 4);
+		WriteFile(hFile, iFrame.PlayerImpulse, sizeof(FrameInfo::PlayerImpulse), 4);
+		WriteFile(hFile, view_as<int>(iFrame.ActualVelocity), sizeof(FrameInfo::ActualVelocity), 4);
+		WriteFile(hFile, view_as<int>(iFrame.PredictedVelocity), sizeof(FrameInfo::PredictedVelocity), 4);
+		WriteFile(hFile, view_as<int>(iFrame.PredictedAngles), sizeof(FrameInfo::PredictedAngles), 4);
+		WriteFile(hFile, view_as<int>(iFrame.NewWeapon), sizeof(FrameInfo::NewWeapon), 4);
+		WriteFile(hFile, iFrame.PlayerSubtype, sizeof(FrameInfo::PlayerSubtype), 4);
+		WriteFile(hFile, iFrame.PlayerSeed, sizeof(FrameInfo::PlayerSeed), 4);
+		WriteFile(hFile, iFrame.AdditionalFields, sizeof(FrameInfo::AdditionalFields), 4);
+		WriteFile(hFile, iFrame.Pause, sizeof(FrameInfo::Pause), 4);
 
 		// Handle the optional Teleport call
 		if (hAdditionalTeleport != null && iFrame.AdditionalFields & (ADDITIONAL_FIELD_TELEPORTED_ORIGIN | ADDITIONAL_FIELD_TELEPORTED_ANGLES | ADDITIONAL_FIELD_TELEPORTED_VELOCITY))
@@ -631,16 +631,16 @@ public void LoadRecordFromFile(const char[] path, FileHeader header, bool header
 	FrameInfo iFrame;
 	for (int i = 0; i < iTickCount; i++)
 	{
-		ReadFile(hFile, iFrame.PlayerButtons, sizeof(FrameInfo), 4);
-		ReadFile(hFile, iFrame.PlayerImpulse, sizeof(FrameInfo), 4);
-		ReadFile(hFile, view_as<int>(iFrame.ActualVelocity), sizeof(FrameInfo), 4);
-		ReadFile(hFile, view_as<int>(iFrame.PredictedVelocity), sizeof(FrameInfo), 4);
-		ReadFile(hFile, view_as<int>(iFrame.PredictedAngles), sizeof(FrameInfo), 4);
-		ReadFile(hFile, view_as<int>(iFrame.NewWeapon), sizeof(FrameInfo), 4);
-		ReadFile(hFile, iFrame.PlayerSubtype, sizeof(FrameInfo), 4);
-		ReadFile(hFile, iFrame.PlayerSeed, sizeof(FrameInfo), 4);
-		ReadFile(hFile, iFrame.AdditionalFields, sizeof(FrameInfo), 4);
-		ReadFile(hFile, iFrame.Pause, sizeof(FrameInfo), 4);
+		ReadFile(hFile, iFrame.PlayerButtons, sizeof(FrameInfo::PlayerButtons), 4);
+		ReadFile(hFile, iFrame.PlayerImpulse, sizeof(FrameInfo::PlayerImpulse), 4);
+		ReadFile(hFile, view_as<int>(iFrame.ActualVelocity), sizeof(FrameInfo::ActualVelocity), 4);
+		ReadFile(hFile, view_as<int>(iFrame.PredictedVelocity), sizeof(FrameInfo::PredictedVelocity), 4);
+		ReadFile(hFile, view_as<int>(iFrame.PredictedAngles), sizeof(FrameInfo::PredictedAngles), 4);
+		ReadFile(hFile, view_as<int>(iFrame.NewWeapon), sizeof(FrameInfo::NewWeapon), 4);
+		ReadFile(hFile, iFrame.PlayerSubtype, sizeof(FrameInfo::PlayerSubtype), 4);
+		ReadFile(hFile, iFrame.PlayerSeed, sizeof(FrameInfo::PlayerSeed), 4);
+		ReadFile(hFile, iFrame.AdditionalFields, sizeof(FrameInfo::AdditionalFields), 4);
+		ReadFile(hFile, iFrame.Pause, sizeof(FrameInfo::Pause), 4);
 		PushArrayArray(hRecordFrames, iFrame, sizeof(FrameInfo));
 
 		if (iFrame.AdditionalFields & (ADDITIONAL_FIELD_TELEPORTED_ORIGIN | ADDITIONAL_FIELD_TELEPORTED_ANGLES | ADDITIONAL_FIELD_TELEPORTED_VELOCITY))
