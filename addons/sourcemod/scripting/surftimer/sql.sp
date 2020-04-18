@@ -40,7 +40,7 @@ public void db_setupDatabase()
 
 	// If updating from a previous version
 	SQL_LockDatabase(g_hDb);
-	SQL_SetCharset(g_hDb, "utf8mb4");
+	SQL_FastQuery(g_hDb, "SET NAMES 'utf8mb4'");
 
 
 	// Check if tables need to be Created or database needs to be upgraded
@@ -500,7 +500,7 @@ public void db_viewMapRankPro(int client)
 	if (!IsValidClient(client))
 	return;
 
-	// "SELECT name,mapname FROM ck_playertimes WHERE runtimepro <= (SELECT runtimepro FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > -1.0) AND mapname = '%s' AND runtimepro > -1.0 ORDER BY runtimepro;";
+	// "SELECT COUNT(*) FROM ck_playertimes WHERE runtimepro <= (SELECT runtimepro FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > -1.0) AND mapname = '%s' AND runtimepro > -1.0";
 	Format(szQuery, 512, sql_selectPlayerRankProTime, g_szSteamID[client], g_szMapName, g_szMapName);
 	SQL_TQuery(g_hDb, db_viewMapRankProCallback, szQuery, client, DBPrio_Low);
 }
@@ -514,7 +514,7 @@ public void db_viewMapRankProCallback(Handle owner, Handle hndl, const char[] er
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-		g_MapRank[client] = SQL_GetRowCount(hndl);
+		g_MapRank[client] = SQL_FetchInt(hndl, 0);
 	}
 }
 
@@ -6278,7 +6278,7 @@ public void db_viewStageRanks(int client, int stage)
 
 	// "SELECT name,mapname FROM ck_playertimes WHERE runtimepro <= (SELECT runtimepro FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > -1.0) AND mapname = '%s' AND runtimepro > -1.0 ORDER BY runtimepro;";
 	// SELECT name FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '%s' AND mapname= '%s' AND runtime > 0.0 AND zonegroup = %i) AND mapname = '%s' AND zonegroup = %i;
-	Format(szQuery, 512, "SELECT name, mapname, stage, runtimepro FROM ck_wrcps WHERE runtimepro <= (SELECT runtimepro FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > -1.0 AND stage = %i AND style = 0) AND mapname = '%s' AND stage = %i AND style = 0 AND runtimepro > -1.0 ORDER BY runtimepro;", g_szSteamID[client], g_szMapName, stage, g_szMapName, stage);
+	Format(szQuery, 512, "SELECT COUNT(*) FROM ck_wrcps WHERE runtimepro <= (SELECT runtimepro FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > -1.0 AND stage = %i AND style = 0) AND mapname = '%s' AND stage = %i AND style = 0 AND runtimepro > -1.0;", g_szSteamID[client], g_szMapName, stage, g_szMapName, stage);
 	SQL_TQuery(g_hDb, sql_viewStageRanksCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -6296,7 +6296,7 @@ public void sql_viewStageRanksCallback(Handle owner, Handle hndl, const char[] e
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-		g_StageRank[client][stage] = SQL_GetRowCount(hndl);
+		g_StageRank[client][stage] = SQL_FetchInt(hndl, 0);
 	}
 }
 
@@ -6918,7 +6918,7 @@ public void db_viewStyleMapRank(int client, int style)
 	WritePackCell(data, client);
 	WritePackCell(data, style);
 
-	Format(szQuery, 512, "SELECT name,mapname FROM ck_playertimes WHERE runtimepro <= (SELECT runtimepro FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND style = %i AND runtimepro > -1.0) AND mapname = '%s' AND style = %i AND runtimepro > -1.0 ORDER BY runtimepro;", g_szSteamID[client], g_szMapName, style, g_szMapName, style);
+	Format(szQuery, 512, "SELECT COUNT(*) FROM ck_playertimes WHERE runtimepro <= (SELECT runtimepro FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND style = %i AND runtimepro > -1.0) AND mapname = '%s' AND style = %i AND runtimepro > -1.0;", g_szSteamID[client], g_szMapName, style, g_szMapName, style);
 	SQL_TQuery(g_hDb, db_viewStyleMapRankCallback, szQuery, data, DBPrio_Low);
 }
 
@@ -6936,7 +6936,7 @@ public void db_viewStyleMapRankCallback(Handle owner, Handle hndl, const char[] 
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-		g_StyleMapRank[style][client] = SQL_GetRowCount(hndl);
+		g_StyleMapRank[style][client] = SQL_FetchInt(hndl, 0);
 	}
 
 	return;
@@ -7187,8 +7187,7 @@ public void db_viewStyleStageRanks(int client, int stage, int style)
 	WritePackCell(pack, stage);
 	WritePackCell(pack, style);
 
-	// "SELECT name,mapname FROM ck_playertimes WHERE runtimepro <= (SELECT runtimepro FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > -1.0) AND mapname = '%s' AND runtimepro > -1.0 ORDER BY runtimepro;";
-	Format(szQuery, 512, "SELECT name, mapname FROM ck_wrcps WHERE runtimepro <= (SELECT runtimepro FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = %i AND runtimepro > -1.0) AND mapname = '%s' AND stage = %i AND style = %i AND runtimepro > -1.0 ORDER BY runtimepro;", g_szSteamID[client], g_szMapName, stage, style, g_szMapName, stage, style);
+	Format(szQuery, 512, "SELECT COUNT(*) FROM ck_wrcps WHERE runtimepro <= (SELECT runtimepro FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = %i AND runtimepro > -1.0) AND mapname = '%s' AND stage = %i AND style = %i AND runtimepro > -1.0;", g_szSteamID[client], g_szMapName, stage, style, g_szMapName, stage, style);
 	SQL_TQuery(g_hDb, sql_viewStyleStageRanksCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -7207,7 +7206,7 @@ public void sql_viewStyleStageRanksCallback(Handle owner, Handle hndl, const cha
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-		g_StyleStageRank[style][client][stage] = SQL_GetRowCount(hndl);
+		g_StyleStageRank[style][client][stage] = SQL_FetchInt(hndl, 0);
 	}
 }
 
