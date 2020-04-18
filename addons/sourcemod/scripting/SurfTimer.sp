@@ -213,7 +213,7 @@ public Plugin myinfo =
 	author = "Ace & olokos",
 	description = "a fork from fluffys cksurf fork",
 	version = VERSION,
-	url = "https://github.com/z4lab/z4lab-surftimer"
+	url = "https://github.com/olokos/Surftimer-olokos"
 };
 
 /*===================================
