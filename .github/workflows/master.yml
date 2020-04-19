@@ -2,7 +2,7 @@ name: Compile with SourceMod
 
 on:
   push:
-    branches: ["master", "githubActions"]
+    branches: ["master", "githubActions", "dev"]
 
 jobs:
   build:
@@ -21,14 +21,32 @@ jobs:
           SOURCEMOD_PATH=$GITHUB_WORKSPACE/addons/sourcemod
           echo ::set-env name=SOURCEMOD_PATH::$SOURCEMOD_PATH
           echo ::set-env name=SCRIPTS_PATH::$SOURCEMOD_PATH/scripting
+          echo ::set-env name=INCLUDE_PATH::$SOURCEMOD_PATH/scripting/include
 
       - name: Setup SourcePawn Compiler ${{ matrix.SM_VERSION }}
         uses: rumblefrog/setup-sp@master
         with:
           version: ${{ matrix.SM_VERSION }}
 
+      - name: Create dependency directories
+        run: mkdir $INCLUDE_PATH/smlib
+
+      - name: Fetch plugin dependencies
+        run: |
+          wget https://raw.githubusercontent.com/bcserv/smlib/transitional_syntax/scripting/include/smlib.inc -P $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/PremyslTalich/ColorVariables/master/addons/sourcemod/scripting/includes/colorvariables.inc -P $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/KyleSanderson/SteamWorks/master/Pawn/includes/SteamWorks.inc -P $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/JoinedSenses/SourceMod-IncludeLibrary/master/include/smjansson.inc -P $INCLUDE_PATH
+          wget https://bitbucket.org/Drifter321/dhooks2/raw/009f11c6c518227c51d708af69f4c759147f704b/sourcemod/scripting/include/dhooks.inc -P $INCLUDE_PATH
+          
+          git clone -b transitional_syntax https://github.com/bcserv/smlib.git
+          mv smlib/scripting/include/* $INCLUDE_PATH
+
+          git clone https://github.com/Deathknife/sourcemod-discord.git
+          mv sourcemod-discord/include/* $INCLUDE_PATH
+
       - name: Compile plugin
         run: |
           echo -e "\nCompiling SurfTimer.sp..."
-          spcomp -w234 -O2 -v2 -i $SCRIPTS_PATH/include SurfTimer.sp
+          spcomp -w234 -O2 -v2 -i $INCLUDE_PATH SurfTimer.sp
         working-directory: ${{ env.SCRIPTS_PATH }}/

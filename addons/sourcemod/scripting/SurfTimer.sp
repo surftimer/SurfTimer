@@ -1,9 +1,9 @@
-/*=======================================================
-=                 z4lab CS:GO SurfTimer                 =
- modified version of "SurfTimer" from fluffy for z4lab
- The original version of this timer was by jonitaikaponi
-= https://forums.alliedmods.net/showthread.php?t=264498 =
-=======================================================*/
+/*=========================================================
+=                    CS:GO SurfTimer                      =
+=       modified version of "SurfTimer" from fluffy       =
+= The original version of this timer was by jonitaikaponi =
+=  https://forums.alliedmods.net/showthread.php?t=264498  =
+=========================================================*/
 
 /*====================================
 =              Includes              =
@@ -35,7 +35,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "282"
+#define VERSION "283"
 
 // Database Definitions
 #define MYSQL 0
@@ -213,7 +213,7 @@ public Plugin myinfo =
 	author = "Ace & olokos",
 	description = "a fork from fluffys cksurf fork",
 	version = VERSION,
-	url = "https://github.com/z4lab/z4lab-surftimer"
+	url = "https://github.com/olokos/Surftimer-olokos"
 };
 
 /*===================================
