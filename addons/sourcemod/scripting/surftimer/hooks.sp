@@ -1336,27 +1336,28 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 			if (!g_bInStartZone[client] && !g_bInStageZone[client])
 				return Plugin_Continue;
 
+			// This logic for detecting bhops is pretty terrible and should be reworked -sneaK
 			g_iTicksOnGround[client] = 0;
-			int time = GetTime();
-			int cTime = time - g_iLastJump[client];
+			float time = GetGameTime();
+			float cTime = time - g_iLastJump[client];
 			if (!g_bInBhop[client])
 			{
 				if (g_bFirstJump[client])
 				{
-					if (cTime > 1)
+					if (cTime > 0.8)
 					{
-						g_bFirstJump[client] = false;
-						g_iLastJump[client] = GetTime();
+						g_bFirstJump[client] = true;
+						g_iLastJump[client] = GetGameTime();
 					}
 					else
 					{
-						g_iLastJump[client] = GetTime();
+						g_iLastJump[client] = GetGameTime();
 						g_bInBhop[client] = true;
 					}
 				}
 				else
 				{
-					g_iLastJump[client] = GetTime();
+					g_iLastJump[client] = GetGameTime();
 					g_bFirstJump[client] = true;
 				}
 			}
@@ -1365,11 +1366,11 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 				if (cTime > 1)
 				{
 					g_bInBhop[client] = false;
-					g_iLastJump[client] = GetTime();
+					g_iLastJump[client] = GetGameTime();
 				}
 				else
 				{
-					g_iLastJump[client] = GetTime();
+					g_iLastJump[client] = GetGameTime();
 				}
 			}
 		}
