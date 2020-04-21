@@ -667,14 +667,6 @@ public void OnPlayerThink(int entity)
 public Action Event_OnRoundStart(Handle event, const char[] name, bool dontBroadcast)
 {
 	int iEnt;
-	for (int i = 0; i < sizeof(EntityList); i++)
-	{
-		while ((iEnt = FindEntityByClassname(iEnt, EntityList[i])) != -1)
-		{
-			AcceptEntityInput(iEnt, "Disable");
-			AcceptEntityInput(iEnt, "Kill");
-		}
-	}
 	
 	db_viewMapSettings();
 

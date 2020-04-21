@@ -37,6 +37,7 @@ Yes, but not any more than other projects currently and for past years.
 
 **Recommended:**
 * [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (Suppresses console warnings)
+* [Stripper:Source](https://forums.alliedmods.net/showthread.php?t=39439) (Allows you to add/modify/removes entities from maps, recommended filter file included)
 
 ## Issue Rules
 

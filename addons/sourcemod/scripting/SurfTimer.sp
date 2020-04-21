@@ -1564,15 +1564,6 @@ char g_szStyleAcronyms[][] =
 	"fs"
 };
 
-char EntityList[][] = 													// Disable entities that often break maps
-{
-	"logic_timer",
-	"team_round_timer",
-	"logic_relay",
-	"player_weapon_strip",
-	"player_weaponstrip",
-};
-
 char RadioCMDS[][] =  // Disable radio commands
 {
 	"coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", "fallback", "sticktog",
@@ -1769,14 +1760,6 @@ public void OnMapStart()
 	CreateTimer(180.0, AdvertTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 
 	int iEnt;
-	for (int i = 0; i < sizeof(EntityList); i++)
-	{
-		while ((iEnt = FindEntityByClassname(iEnt, EntityList[i])) != -1)
-		{
-			AcceptEntityInput(iEnt, "Disable");
-			AcceptEntityInput(iEnt, "Kill");
-		}
-	}
 
 	// PushFix by Mev, George, & Blacky
 	// https://forums.alliedmods.net/showthread.php?t=267131
