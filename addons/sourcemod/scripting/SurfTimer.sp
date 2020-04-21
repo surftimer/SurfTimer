@@ -1338,7 +1338,7 @@ char g_szMapNameFromDatabase[MAXPLAYERS + 1][128];
 // New speed limit variables
 bool g_bInBhop[MAXPLAYERS + 1];
 bool g_bFirstJump[MAXPLAYERS + 1];
-int g_iLastJump[MAXPLAYERS + 1];
+float g_iLastJump[MAXPLAYERS + 1];
 int g_iTicksOnGround[MAXPLAYERS + 1];
 bool g_bNewStage[MAXPLAYERS + 1];
 bool g_bLeftZone[MAXPLAYERS + 1];
@@ -1564,11 +1564,12 @@ char g_szStyleAcronyms[][] =
 	"fs"
 };
 
-char RadioCMDS[][] = 													// Disable radio commands
+char RadioCMDS[][] =  // Disable radio commands
 {
 	"coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", "fallback", "sticktog",
 	"getinpos", "stormfront", "report", "roger", "enemyspot", "needbackup", "sectorclear", "inposition",
-	"reportingin", "getout", "negative", "enemydown", "cheer", "thanks", "nice", "compliment"
+	"reportingin", "getout", "negative", "enemydown", "cheer", "thanks", "nice", "compliment", "go_a",
+	"go_b", "sorry", "needrop"
 };
 
 /*======  End of Declarations  ======*/
