@@ -145,7 +145,7 @@ Extensions used in this version:
 *   Jonitaikaponi - Original ckSurf creator
 *   sneaK
 *   nikooo777 - ckSurf 1.19 Fork
-*   <a href="http://steamcommunity.com/id/fluffystko/">fluffys</a>
+*   fluffys
 *   Jakeey802
 *   Grandpa Goose
   
