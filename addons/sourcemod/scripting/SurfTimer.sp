@@ -35,7 +35,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "283"
+#define VERSION "284"
 
 // Database Definitions
 #define MYSQL 0
@@ -115,10 +115,7 @@
 #define ADDITIONAL_FIELD_TELEPORTED_ORIGIN (1<<0)
 #define ADDITIONAL_FIELD_TELEPORTED_ANGLES (1<<1)
 #define ADDITIONAL_FIELD_TELEPORTED_VELOCITY (1<<2)
-#define FRAME_INFO_SIZE 15
-#define AT_SIZE 10
 #define ORIGIN_SNAPSHOT_INTERVAL 500
-#define FILE_HEADER_LENGTH 74
 
 // Show Triggers
 #define EF_NODRAW 32
@@ -133,74 +130,69 @@
 =            Enumerations            =
 ====================================*/
 
-enum UserJumps
+enum struct FrameInfo
 {
-	LastJumpTimes[4],
+	int PlayerButtons;
+	int PlayerImpulse;
+	float ActualVelocity[3];
+	float PredictedVelocity[3];
+	float PredictedAngles[2];
+	CSWeaponID NewWeapon;
+	int PlayerSubtype;
+	int PlayerSeed;
+	int AdditionalFields;
+	int Pause;
 }
 
-enum FrameInfo
+enum struct AdditionalTeleport
 {
-	playerButtons = 0,
-	playerImpulse,
-	Float:actualVelocity[3],
-	Float:predictedVelocity[3],
-	Float:predictedAngles[2],
-	CSWeaponID:newWeapon,
-	playerSubtype,
-	playerSeed,
-	additionalFields,
-	pause,
+	float AtOrigin[3];
+	float AtAngles[3];
+	float AtVelocity[3];
+	int AtFlags;
 }
 
-enum AdditionalTeleport
+enum struct FileHeader
 {
-	Float:atOrigin[3],
-	Float:atAngles[3],
-	Float:atVelocity[3],
-	atFlags
+	int BinaryFormatVersion;
+	char Time[32];
+	char Playername[32];
+	int Checkpoints;
+	int TickCount;
+	float InitialPosition[3];
+	float InitialAngles[3];
+	Handle Frames;
 }
 
-enum FileHeader
+enum struct MapZone
 {
-	FH_binaryFormatVersion = 0,
-	String:FH_Time[32],
-	String:FH_Playername[32],
-	FH_Checkpoints,
-	FH_tickCount,
-	Float:FH_initialPosition[3],
-	Float:FH_initialAngles[3],
-	Handle:FH_frames
+	int ZoneId;
+	int ZoneType;
+	int ZoneTypeId;
+	float PointA[3];
+	float PointB[3];
+	float CenterPoint[3];
+	char ZoneName[128];
+	char HookName[128];
+	char TargetName[128];
+	int OneJumpLimit;
+	float PreSpeed;
+	int ZoneGroup;
+	int Vis;
+	int Team;
 }
 
-enum MapZone
+enum struct SkillGroup
 {
-	zoneId,
-	zoneType,
-	zoneTypeId,
-	Float:PointA[3],
-	Float:PointB[3],
-	Float:CenterPoint[3],
-	String:zoneName[128],
-	String:hookName[128],
-	String:targetName[128],
-	oneJumpLimit,
-	Float:preSpeed,
-	zoneGroup,
-	Vis,
-	Team
-}
-
-enum SkillGroup
-{
-	PointsBot,
-	PointsTop,
-	PointReq,
-	RankBot,
-	RankTop,
-	RankReq,
-	String:RankName[128],
-	String:RankNameColored[128],
-	String:NameColour[32]
+	int PointsBot;
+	int PointsTop;
+	int PointReq;
+	int RankBot;
+	int RankTop;
+	int RankReq;
+	char RankName[128];
+	char RankNameColored[128];
+	char NameColour[32];
 }
 
 /*===================================
@@ -363,7 +355,7 @@ int g_mapZonesTypeCount[MAXZONEGROUPS][ZONEAMOUNT];
 char g_szZoneGroupName[MAXZONEGROUPS][128];
 
 // Map Zone array
-int g_mapZones[MAXZONES][MapZone];
+MapZone g_mapZones[MAXZONES];
 
 // The total amount of zones in the map
 int g_mapZonesCount;
@@ -1338,7 +1330,7 @@ char g_szMapNameFromDatabase[MAXPLAYERS + 1][128];
 // New speed limit variables
 bool g_bInBhop[MAXPLAYERS + 1];
 bool g_bFirstJump[MAXPLAYERS + 1];
-int g_iLastJump[MAXPLAYERS + 1];
+float g_iLastJump[MAXPLAYERS + 1];
 int g_iTicksOnGround[MAXPLAYERS + 1];
 bool g_bNewStage[MAXPLAYERS + 1];
 bool g_bLeftZone[MAXPLAYERS + 1];
@@ -1510,20 +1502,12 @@ char g_szStyleAcronyms[][] =
 	"fs"
 };
 
-char EntityList[][] = 													// Disable entities that often break maps
-{
-	"logic_timer",
-	"team_round_timer",
-	"logic_relay",
-	"player_weapon_strip",
-	"player_weaponstrip",
-};
-
-char RadioCMDS[][] = 													// Disable radio commands
+char RadioCMDS[][] =  // Disable radio commands
 {
 	"coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", "fallback", "sticktog",
 	"getinpos", "stormfront", "report", "roger", "enemyspot", "needbackup", "sectorclear", "inposition",
-	"reportingin", "getout", "negative", "enemydown", "cheer", "thanks", "nice", "compliment"
+	"reportingin", "getout", "negative", "enemydown", "cheer", "thanks", "nice", "compliment", "go_a",
+	"go_b", "sorry", "needrop"
 };
 
 /*======  End of Declarations  ======*/
@@ -1713,14 +1697,6 @@ public void OnMapStart()
 	CreateTimer(180.0, AdvertTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 
 	int iEnt;
-	for (int i = 0; i < sizeof(EntityList); i++)
-	{
-		while ((iEnt = FindEntityByClassname(iEnt, EntityList[i])) != -1)
-		{
-			AcceptEntityInput(iEnt, "Disable");
-			AcceptEntityInput(iEnt, "Kill");
-		}
-	}
 
 	// PushFix by Mev, George, & Blacky
 	// https://forums.alliedmods.net/showthread.php?t=267131
@@ -1932,7 +1908,7 @@ public void OnClientPutInServer(int client)
 
 	if (IsFakeClient(client))
 	{
-		g_hRecordingAdditionalTeleport[client] = CreateArray(view_as<int>(AdditionalTeleport));
+		g_hRecordingAdditionalTeleport[client] = CreateArray(sizeof(AdditionalTeleport));
 		CS_SetMVPCount(client, 1);
 		return;
 	}

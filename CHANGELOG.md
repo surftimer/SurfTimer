@@ -1,4 +1,67 @@
 # Changelog
+[2020-04-22 - Version 284]
+---
+- Actions: Actually download includes for building with GitHub actions
+- Actions: Thanks to @Bara actions will now download the entire repo containing the includes, instead of just some of them
+- Updated plugin URL to the current repository
+- Removed z4lab tags from SurfTimer.sp, since it now is a community-oriented project
+- Add new radio commands to block list @sneak-it
+- Fixed prespeed exploit Thanks to @sneak-it
+- Removed hardcoded entity kill list, we suggest using stripper instead
+- Actually started making use of GitHub releases page :smile:
+
+[2020-04-18 - Version 283]
+---
+- Fix !starpos command braking staged maps Thanks to @ashakiri-dev
+- Massive optimizations to queries, which helps with DB performance a lot! Thanks to @ashakiri-dev #6de0d5b
+
+[2020-04-17 - Version 282]
+---
+- Fixed trails-colors.cfg error message
+- Added variable replay bot delay (ck_replay_bot_delay to set delay with which bots will join the sever)
+- Updated bug report template
+- Remove duplicated query
+- Added style Freestyle
+- Implemented tier 7 & 8 system
+- Fixed casing for !help command
+- Updated readme
+- Added Orchid color declaration (Is it really 0x1A though?)
+- Possibly fixed HSW
+- Workaround for invalid data pack type ( http://github.com/z4lab/z4lab-surftimer/issues/98 )
+- Remove unndeded space that caused an error
+- Corrected some typos
+- Added github actions to repository, big thanks @Bara
+- Remove sourcemod includes from the repository
+- Update gitignore
+- Replaced deprecated functions
+- Fix base64.inc compile issue with SM1.11
+- Added onejumplimit remover to mapsettings
+- Fixed the speed of prespeed displaying multiple times
+- Fixed a memory leak thanks to @covertxd
+- Fix sql errors when server name has symbols @sneak-it
+- Repository cleanup - removed external dependencies and includes
+- Remove unnecesary locking of queries in favor of SQL_SetCharset 
+- Dont lose last seen data when migrating to the new SQL structure using upgrade.sql
+- Fix delimitations in upgrade script
+- Fix upgrade script for CentOS
+- Updated upgrade script to point to this repo.
+- Fix SQL Hostname Error Thanks to @sneak-it
+- Removed sourcecomms includes
+- Removed TF2 and Base64 includes
+- _FIX BIG MEMORY LEAK s/o GAMMACASE, KiD-Fearless_ THANKS TO @sneak-it #996ef60
+- Remove broken SQL query set name
+- We dont support SM1.11 really, make it obvious in Readme aswell.
+
+[2020-04-05 - Version 281]
+---
+- Fixed sourcemod compiler warnings
+- Change the repo to z4lab
+- Added missing texture files
+- Fixed typo in queries.sp
+- Updated gitignore
+- Updated cleaner.cfg
+- Now SurfTimer supports MySQL8+ - ranks and groups were used in queries, but are reserved MySQL keywords. Bacticks had to be used.
+- Updated Readme
 
 [2019-11-20 - Version 280pre]
 ---
