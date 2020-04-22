@@ -1064,7 +1064,8 @@ public void PlayButtonSound(int client)
 {
 	if (!GetConVarBool(g_hSoundEnabled))
 		return;
-
+	if (!g_bEnableQuakeSounds[client])
+		return;
 	// Players button sound
 	if (!IsFakeClient(client))
 	{
