@@ -455,7 +455,7 @@ public void CL_OnEndTimerPress(int client)
 			{
 				int count = g_StyleMapTimesCount[style];
 
-				for (int i = 1; i <= GetMaxClients(); i++)
+				for (int i = 1; i <= MaxClients; i++)
 				{
 					if (IsValidClient(i) && !IsFakeClient(i))
 					{
@@ -726,6 +726,10 @@ public void CL_OnStartWrcpTimerPress(int client)
 	if (!g_bSpectate[client] && !g_bNoClip[client] && ((GetGameTime() - g_fLastTimeNoClipUsed[client]) > 2.0))
 	{
 		int zGroup = g_iClientInZone[client][2];
+		if(zGroup != 0)
+		{
+			return;
+		}
 		if (zGroup == 0)
 		{
 			g_fStartWrcpTime[client] = GetGameTime();

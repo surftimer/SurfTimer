@@ -1,62 +1,90 @@
-# z4lab-SurfTimer 281 for CS:GO
+# Surftimer-olokos for CS:GO
 
-## Installation and requirements
-[SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable), [MetaMod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable) and a working MariaDB, or MySQL instance is required for this plugin.
-Both MySQL5.7 and MySQL8+ are supported, but we recommend using MariaDB or MySQL8+ to get the best experience.
+_I have renamed the repository to Surftimer-olokos just to make it obvious, that we're entering a new chapter in CS:GO surf community, a milestone._
 
-<sup>(This version also supports SourceMod 1.11 and MetaMod 1.11)</sup>
+## Project Goals
 
-~ 4GB of RAM
+As you probably all know there are quite some bugs in all open-source versions of cksurf or surftimer.
+Our main goal with this project to have a bug-free, properly optimized surf timer that would work as we all expect it to, across all configurations.
+Because of this, we will be putting new features and additions on the side, as they can potentially introduce new, unknown issues and there's plenty of those already.
+
+**Does it mean this version is buggy?**
+
+Yes, but not any more than other projects currently and for past years.
+
+**Pull requests and any contributions are welcome and encouraged!**
+
+## Installation and Requirements
+* [SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable)
+* [Metamod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable)
+* [SourceMod-Discord API](https://github.com/Deathknife/sourcemod-discord)
+* A MySQL Database (MySQL 5.7, MySQL 8+, MariaDB supported)
+
+<sup>(We only support the latest stable version of Sourcemod.)</sup>
+
+**Extensions:**
+* [DHooks](https://forums.alliedmods.net/showthread.php?t=180114) - **Recommended:** [Detours Build](https://forums.alliedmods.net/showpost.php?p=2588686&postcount=589) for SourceMod 1.10 Stable
+* [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604)
+* [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
+
+**Compilation Requirements (Includes):**
+* [SMJansson](https://github.com/JoinedSenses/SourceMod-IncludeLibrary/blob/master/include/smjansson.inc)
+* [SMLib (Transitional Syntax Branch)](https://github.com/bcserv/smlib/tree/transitional_syntax)
+* [SourceMod Includes](https://www.sourcemod.net/downloads.php?branch=stable)
+* [Sourcemod-Discord API](https://github.com/Deathknife/sourcemod-discord)
+* [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
+* [colorvariables](https://github.com/PremyslTalich/ColorVariables/blob/master/addons/sourcemod/scripting/includes/colorvariables.inc)
+
+**Recommended:**
+* [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (Suppresses console warnings)
+* [Stripper:Source](https://forums.alliedmods.net/showthread.php?t=39439) (Allows you to add/modify/removes entities from maps, recommended filter file included)
 
 ## Issue Rules
 
 **If any of the rules listed below are not followed, you must expect the issue to be closed immediately.**
 
-- Follow requirements
-	- The timer is up to date!
-	- SourceMod and MetaMod are up to date!
-	- Includes are up to date!
-	- Using the stock timer without any own changes!
+- Requirements:
+	- Ensure your timer version is up to date with the latest release
+	- SourceMod and Metamod are up to date (support will only be given for latest stable versions)
+	- Ensure includes for compilation are up to date
+	- Using the stock timer without any additional changes
 - You're following the template
 	- That means you won't delete any pre-entered questions!
 - You're giving clear information
 - You won't edit issues - you always write a new comment below!
-- **I won't provide support for servers who use banned/blacklisted plugins!**
-- **Our discord server is not meant for timer support!**
 - **Any community/server specific bug/suggestion will be ignored/closed!**
-
-## Changelog
-
-*   [Changelog](https://github.com/z4lab/z4lab-surftimer/blob/master/CHANGELOG.md) for a list of all our changes / fixes
-
 
 ## Fresh Install
 
-*   download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
-*   copy the files to your csgo directory
-*   edit configs (mysql db, etc, to do)
+*   Clone or download the repository ([Link](https://github.com/olokos/Surftimer-olokos-public/archive/master.zip))
+*   Obtain all of the [compilation requirements](https://github.com/olokos/Surftimer-olokos#installation-and-requirements)
+*   Download latest stable SourceMod version (1.10+) for your OS ([Link](https://www.sourcemod.net/downloads.php?branch=stable))
+*   Windows: Put spcomp.exe and compile.exe in scripting folder and double click compile.exe
+*   If there are no errors, (warnings are fine, for now) move .smx files from compiled to /plugins
+*   Copy the rest of the files from this repository to your csgo directory
+*   Edit configs (databases.cfg, admins, etc.)
 
-## Upgrade
+## Upgrading
 
-### upgrading from SurfTimer(fluffys)
+### Upgrading from SurfTimer (fluffys)
 
-*   download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
-*   copy the files to your csgo directory <br> - an update script can be found [here](https://github.com/z4lab/z4lab-surftimer/blob/master/scripts/upgrade_scripts/upgrade-fluffy.sh)
-*   edit configs (mysql db, etc, to do)
-*   run `mysql-files/upgrade-fluffy.sql` in your surftimer db
+*   Download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
+*   Copy the files to your csgo directory <br> - an update script can be found [here](https://github.com/z4lab/z4lab-surftimer/blob/master/scripts/upgrade_scripts/upgrade-fluffy.sh)
+*   Edit configs (mysql db, etc, to do)
+*   Run `mysql-files/upgrade-fluffy.sql` in your surftimer db
 
-### upgrading from ckSurf(nikooo777)
+### Upgrading from ckSurf (nikooo777)
 
-*   download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
-*   copy the files to your csgo directory
-*   remove all old ckSurf data you don't want anymore
-*   run `mysql-files/upgrade-niko.sql` in your ckSurf db
-*   edit configs (mysql db, etc, to do)
+*   Download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
+*   Copy the files to your csgo directory
+*   Remove all old ckSurf data you don't want anymore
+*   Run `mysql-files/upgrade-niko.sql` in your ckSurf db
+*   Edit configs (mysql db, etc, to do)
 
 
-## Point system
+## Point System
 <details>
-  <summary>explanation</summary> 
+  <summary>Explanation</summary> 
   
 The points system has seen a massive overhaul from the original ckSurf; it is now a percentile tiered system. Points are now distributed in two ways: (1) map completion, and (2) map ranking. Map completion points will be given to all players who complete a specific and are dependent on the tier.
 * Tier 1: 25
@@ -65,14 +93,18 @@ The points system has seen a massive overhaul from the original ckSurf; it is no
 * Tier 4: 200
 * Tier 5: 400
 * Tier 6: 600
+* Tier 7: 800
+* Tier 8: 1000
 
 Map ranking points are dependent upon the individuals ranking on the map. This is done firstly by calculation of the WR points for the map. WR points per tier are calculated as follows:
-* Tier 1: WR = (1.75 * Number of Completes) / 6
-* Tier 2: WR = (2.8 * Number of Completes) / 5
-* Tier 3: WR = MAX(350, (3.5 * Number of Completes) / 4)
-* Tier 4: WR = MAX(400, (5.74 * Number of Completes) / 4)
-* Tier 5: WR = MAX(500, (7 * Number of Completes) / 4)
-* Tier 6: WR = MAX(600, (14 * Number of Completes) / 4)
+* Tier 1: WR = MAX(250, (58.5 + (1.75 * Number of Completes) / 6))
+* Tier 2: WR = MAX(500, (82.15 + (2.8 * Number of Completes) / 5))
+* Tier 3: WR = MAX(750, (117 + (3.5 * Number of Completes) / 4))
+* Tier 4: WR = MAX(1000, (164.25 + (5.74 * Number of Completes) / 4))
+* Tier 5: WR = MAX(1250, (234 + (7 * Number of Completes) / 4))
+* Tier 6: WR = MAX(1500, (328 + (14 * Number of Completes) / 4))
+* Tier 7: WR = MAX(1750, (420 + (21 * Number of Completes) / 4))
+* Tier 8: WR = MAX(2000, (560 + (30 * Number of Completes) / 4))
 
 Once the WR points are calculated the top 10 are points are calculated by multiplying the WR points by a factor. These factors are:
 * Rank 2 = WR * 0.8
@@ -101,23 +133,25 @@ Take surf_aircontrol_nbv for example: (You can use sm_mi to see this menu)
 
 ## Credits
 
-extensions used in this version:
-*   [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
-*   [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604)
-*   [Dhooks](https://forums.alliedmods.net/showthread.php?t=180114)
-*   [Discord API](https://github.com/Deathknife/sourcemod-discord/blob/master/discord_api.sp)
-*   [Trails Chroma](https://github.com/Nickelony/Trails-Chroma)
+Extensions used in this version:
+*   [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556) (KyleS)
+*   [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604) (Thrawn2)
+*   [DHooks](https://forums.alliedmods.net/showthread.php?t=180114) (Dr!fter)
+*   [Discord API](https://github.com/Deathknife/sourcemod-discord) (Deathknife)
+*   [Trails Chroma](https://github.com/Nickelony/Trails-Chroma) (Nickelony)
 <details>
   <summary>forked from fluffys - contributors</summary> 
   
 *   Jonitaikaponi - Original ckSurf creator
+*   sneaK
 *   nikooo777 - ckSurf 1.19 Fork
-*   <a href="http://steamcommunity.com/id/fluffystko/">fluffys</a>
+*   fluffys
 *   Jakeey802
 *   Grandpa Goose
   
 </details>
 
 *	[Ace](https://github.com/13ace37) [xace.ch](https://xace.ch)
-*	[olokos](https://github.com/olokos) [Steam](https://steamcommunity.com/id/olokos/)
+*	[olokos](https://github.com/olokos) [Steam](https://steamcommunity.com/id/olokos/) [My server](https://kiepownica.pl/)
+*	and many, many more people who contributed to the project!
 

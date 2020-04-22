@@ -17,4 +17,4 @@ mv "${SERVERDIR}/cfg/sourcemod/surftimer/main.cfg" "${SERVERDIR}/cfg/sourcemod/s
 mv "${SERVERDIR}/cfg/sourcemod/surftimer/map_types/surf_.cfg" "${SERVERDIR}/cfg/sourcemod/surftimer/surf.cfg.backup"
 rm -rf "${SERVERDIR}/cfg/sourcemod/surftimer/map_types/"
 rm "${SERVERDIR}/cfg/sourcemod/surftimer/*_.cfg"
-wget https://raw.githubusercontent.com/totles/z4lab-surftimer/master/cfg/sourcemod/surftimer/main.cfg -P "${SERVERDIR}/cfg/sourcemod/surftimer/main.cfg"
+wget https://raw.githubusercontent.com/olokos/Surftimer-olokos/master/cfg/sourcemod/surftimer/main.cfg -P "${SERVERDIR}/cfg/sourcemod/surftimer/"
