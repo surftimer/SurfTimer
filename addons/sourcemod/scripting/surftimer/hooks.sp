@@ -327,7 +327,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					float prespeed = StringToFloat(sText);
 					if (prespeed < 0.0)
 						prespeed = 0.0;
-					g_mapZones[g_ClientSelectedZone[client]][preSpeed] = prespeed;
+					g_mapZones[g_ClientSelectedZone[client]].PreSpeed = prespeed;
 					PrespeedMenu(client);
 				}
 				case 1:
@@ -370,9 +370,9 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					if (StrEqual(sText, "reset"))
 						Format(sText, sizeof(sText), "player");
 
-					Format(g_mapZones[g_ClientSelectedZone[client]][targetName], sizeof(g_mapZones), "%s", sText);
+					Format(g_mapZones[g_ClientSelectedZone[client]].TargetName, sizeof(MapZone::TargetName), "%s", sText);
 
-					CPrintToChat(client, "%t", "Hooks5", g_szChatPrefix, g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId], sText);
+					CPrintToChat(client, "%t", "Hooks5", g_szChatPrefix, g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]].ZoneTypeId, sText);
 
 					EditorMenu(client);
 				}
@@ -1272,21 +1272,21 @@ public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 	if (bOriginNull && bAnglesNull && bVelocityNull)
 		return MRES_Ignored;
 
-	int iAT[AT_SIZE];
-	Array_Copy(origin, iAT[atOrigin], 3);
-	Array_Copy(angles, iAT[atAngles], 3);
-	Array_Copy(velocity, iAT[atVelocity], 3);
+	AdditionalTeleport iAT;
+	Array_Copy(origin, iAT.AtOrigin, 3);
+	Array_Copy(angles, iAT.AtAngles, 3);
+	Array_Copy(velocity, iAT.AtVelocity, 3);
 
 	// Remember,
 	if (!bOriginNull)
-		iAT[atFlags] |= ADDITIONAL_FIELD_TELEPORTED_ORIGIN;
+		iAT.AtFlags |= ADDITIONAL_FIELD_TELEPORTED_ORIGIN;
 	if (!bAnglesNull)
-		iAT[atFlags] |= ADDITIONAL_FIELD_TELEPORTED_ANGLES;
+		iAT.AtFlags |= ADDITIONAL_FIELD_TELEPORTED_ANGLES;
 	if (!bVelocityNull)
-		iAT[atFlags] |= ADDITIONAL_FIELD_TELEPORTED_VELOCITY;
+		iAT.AtFlags |= ADDITIONAL_FIELD_TELEPORTED_VELOCITY;
 
 	if (g_hRecordingAdditionalTeleport[client] != null)
-		PushArrayArray(g_hRecordingAdditionalTeleport[client], iAT, AT_SIZE);
+		PushArrayArray(g_hRecordingAdditionalTeleport[client], iAT, sizeof(AdditionalTeleport));
 
 	return MRES_Ignored;
 }
@@ -1371,7 +1371,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 		{
 			if (g_bInStartZone[client] || g_bInStageZone[client])
 			{
-				if (g_mapZones[zoneid][oneJumpLimit] == 1)
+				if (g_mapZones[zoneid].OneJumpLimit == 1)
 				{
 					if (!g_bJumpedInZone[client])
 					{

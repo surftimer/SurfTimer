@@ -67,11 +67,11 @@ bool LoadColorsConfig()
 	{
 		kv.GetString("name", gS_TrailTitle[i], 128, "<MISSING TRAIL NAME>");
 		
-		gI_TrailSettings[i][iRedChannel] = kv.GetNum("red", 255);
-		gI_TrailSettings[i][iGreenChannel] = kv.GetNum("green", 255);
-		gI_TrailSettings[i][iBlueChannel] = kv.GetNum("blue", 255);
-		gI_TrailSettings[i][iSpecialColor] = kv.GetNum("special", 0);
-		gI_TrailSettings[i][iAlphaChannel] = kv.GetNum("alpha", 128);
+		gI_TrailSettings[i].iRedChannel = kv.GetNum("red", 255);
+		gI_TrailSettings[i].iGreenChannel = kv.GetNum("green", 255);
+		gI_TrailSettings[i].iBlueChannel = kv.GetNum("blue", 255);
+		gI_TrailSettings[i].iSpecialColor = kv.GetNum("special", 0);
+		gI_TrailSettings[i].iAlphaChannel = kv.GetNum("alpha", 128);
 		
 		i++;
 	}
@@ -197,9 +197,9 @@ void MenuSelection(int client, char[] info)
 	else
 	{
 		int color[3];
-		color[0] = gI_TrailSettings[choice][iRedChannel];
-		color[1] = gI_TrailSettings[choice][iGreenChannel];
-		color[2] = gI_TrailSettings[choice][iBlueChannel];
+		color[0] = gI_TrailSettings[choice].iRedChannel;
+		color[1] = gI_TrailSettings[choice].iGreenChannel;
+		color[2] = gI_TrailSettings[choice].iBlueChannel;
 		
 		char[] sHexColor = new char[16];
 		FormatEx(sHexColor, 16, "#%02x%02x%02x", color[0], color[1], color[2]);
@@ -213,7 +213,7 @@ void MenuSelection(int client, char[] info)
 			PrintCenterText(client, "Your beam color is now: <font color='%s' face=''>%s</font>.", sHexColor, gS_TrailTitle[choice]);
 		}
 		
-		if(gI_TrailSettings[choice][iSpecialColor] == 1 || gI_TrailSettings[choice][iSpecialColor] == 2)
+		if(gI_TrailSettings[choice].iSpecialColor == 1 || gI_TrailSettings[choice].iSpecialColor == 2)
 		{
 			gI_CycleColor[client][0] = 0;
 			gI_CycleColor[client][1] = 0;
@@ -308,10 +308,10 @@ void CreatePlayerTrail(int client, float origin[3])
 int[] GetClientTrailColors(int client, int[] color)
 {
 	int choice = gI_SelectedTrail[client];
-	color[3] = gI_TrailSettings[choice][iAlphaChannel];
+	color[3] = gI_TrailSettings[choice].iAlphaChannel;
 	int stepsize = 0;
 	
-	if(gI_TrailSettings[choice][iSpecialColor] == 1) // Spectrum trail
+	if(gI_TrailSettings[choice].iSpecialColor == 1) // Spectrum trail
 	{
 		stepsize = 1;
 		DrawSpectrumTrail(client, stepsize);
@@ -320,7 +320,7 @@ int[] GetClientTrailColors(int client, int[] color)
 		color[1] = gI_CycleColor[client][1];
 		color[2] = gI_CycleColor[client][2];
 	}
-	else if(gI_TrailSettings[choice][iSpecialColor] == 2) // Wave trail
+	else if(gI_TrailSettings[choice].iSpecialColor == 2) // Wave trail
 	{
 		stepsize = 15;
 		DrawSpectrumTrail(client, stepsize);
@@ -329,7 +329,7 @@ int[] GetClientTrailColors(int client, int[] color)
 		color[1] = gI_CycleColor[client][1];
 		color[2] = gI_CycleColor[client][2];
 	}
-	else if(gI_TrailSettings[choice][iSpecialColor] == 3) // Velocity trail
+	else if(gI_TrailSettings[choice].iSpecialColor == 3) // Velocity trail
 	{
 		float fAbsVelocity[3];
 		GetEntPropVector(client, Prop_Data, "m_vecAbsVelocity", fAbsVelocity);
@@ -343,9 +343,9 @@ int[] GetClientTrailColors(int client, int[] color)
 	}
 	else
 	{
-		color[0] = gI_TrailSettings[choice][iRedChannel];
-		color[1] = gI_TrailSettings[choice][iGreenChannel];
-		color[2] = gI_TrailSettings[choice][iBlueChannel];
+		color[0] = gI_TrailSettings[choice].iRedChannel;
+		color[1] = gI_TrailSettings[choice].iGreenChannel;
+		color[2] = gI_TrailSettings[choice].iBlueChannel;
 	}
 	
 	#if defined DEBUG
