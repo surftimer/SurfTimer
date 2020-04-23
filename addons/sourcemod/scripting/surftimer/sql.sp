@@ -1625,7 +1625,6 @@ public void db_viewPlayerProfile(int client, int style, char szSteamId[32], bool
 	}
 	else
 	{
-        LogError("[SurfTimer] Unknown Player Profile");
 		// "SELECT steamid, steamid64, name, country, points, wrpoints, wrbpoints, top10points, groupspoints, mappoints, bonuspoints, finishedmapspro, finishedbonuses, finishedstages, wrs, wrbs, wrcps, top10s, groups, lastseen FROM ck_playerrank WHERE name LIKE '%c%s%c' AND style = '%i';"; sql_selectUnknownProfile
 		Format(szQuery, sizeof(szQuery), "SELECT steamid FROM ck_playerrank WHERE style = %i AND name LIKE '%c%s%c' LIMIT 1;", style, PERCENT, szName, PERCENT);
 		SQL_TQuery(g_hDb, sql_selectUnknownPlayerCallback, szQuery, pack, DBPrio_Low);
@@ -1690,11 +1689,11 @@ public void sql_selectPlayerRankCallback (Handle owner, Handle hndl, const char[
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
         WritePackCell(pack, SQL_FetchInt(hndl,0));
-        
+ 
         // "SELECT steamid, steamid64, name, country, points, wrpoints, wrbpoints, wrcppoints, top10points, groupspoints, mappoints, bonuspoints, finishedmapspro, finishedbonuses, finishedstages, wrs, wrbs, wrcps, top10s, groups, lastseen FROM ck_playerrank WHERE steamid = '%s' AND style = '%i';";
-		char szQuery[512];
-		Format(szQuery, sizeof(szQuery), sql_selectPlayerProfile, szSteamId, style);
-		SQL_TQuery(g_hDb, sql_selectPlayerProfileCallback, szQuery, pack, DBPrio_Low);
+        char szQuery[512];
+        Format(szQuery, sizeof(szQuery), sql_selectPlayerProfile, szSteamId, style);
+        SQL_TQuery(g_hDb, sql_selectPlayerProfileCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
 	{
@@ -2644,21 +2643,21 @@ public void SQL_ViewAllRecordsCallback2(Handle owner, Handle hndl, const char[] 
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-		char szQuery[512];
-		char szName[MAX_NAME_LENGTH];
-		char szSteamId[32];
-		char szMapName[128];
+        char szQuery[512];
+        char szName[MAX_NAME_LENGTH];
+        char szSteamId[32];
+        char szMapName[128];
 
         int rank = SQL_FetchInt(hndl,0);
 
-		WritePackCell(data, rank);
-		ResetPack(data);
-		ReadPackString(data, szName, MAX_NAME_LENGTH);
-		ReadPackString(data, szSteamId, 32);
-		ReadPackString(data, szMapName, 128);
+        WritePackCell(data, rank);
+        ResetPack(data);
+        ReadPackString(data, szName, MAX_NAME_LENGTH);
+        ReadPackString(data, szSteamId, 32);
+        ReadPackString(data, szMapName, 128);
 
-		Format(szQuery, 512, sql_selectPlayerProCount, szMapName);
-		SQL_TQuery(g_hDb, SQL_ViewAllRecordsCallback3, szQuery, data, DBPrio_Low);
+        Format(szQuery, 512, sql_selectPlayerProCount, szMapName);
+        SQL_TQuery(g_hDb, SQL_ViewAllRecordsCallback3, szQuery, data, DBPrio_Low);
 	}
 }
 
@@ -2880,21 +2879,21 @@ public void SQL_ViewTop10RecordsCallback2(Handle owner, Handle hndl, const char[
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-		char szQuery[512];
-		char szName[MAX_NAME_LENGTH];
-		char szSteamId[32];
-		char szMapName[128];
+        char szQuery[512];
+        char szName[MAX_NAME_LENGTH];
+        char szSteamId[32];
+        char szMapName[128];
 
         int rank = SQL_FetchInt(hndl,0);
 
-		WritePackCell(data, rank);
-		ResetPack(data);
-		ReadPackString(data, szName, MAX_NAME_LENGTH);
-		ReadPackString(data, szSteamId, 32);
-		ReadPackString(data, szMapName, 128);
+        WritePackCell(data, rank);
+        ResetPack(data);
+        ReadPackString(data, szName, MAX_NAME_LENGTH);
+        ReadPackString(data, szSteamId, 32);
+        ReadPackString(data, szMapName, 128);
 
-		Format(szQuery, 512, sql_selectPlayerProCount, szMapName);
-		SQL_TQuery(g_hDb, SQL_ViewTop10RecordsCallback3, szQuery, data, DBPrio_Low);
+        Format(szQuery, 512, sql_selectPlayerProCount, szMapName);
+        SQL_TQuery(g_hDb, SQL_ViewTop10RecordsCallback3, szQuery, data, DBPrio_Low);
 	}
 }
 
@@ -4846,16 +4845,18 @@ public void db_CalcAvgRunTime()
 
 public void SQL_db_CalcAvgRunTimeCallback(Handle owner, Handle hndl, const char[] error, any data)
 {
-	if (hndl == null)
-	{
-		LogError("[SurfTimer] SQL Error (SQL_db_CalcAvgRunTimeCallback): %s", error);
+    if (hndl == null)
+    {
+        LogError("[SurfTimer] SQL Error (SQL_db_CalcAvgRunTimeCallback): %s", error);
 
-		if (!g_bServerDataLoaded && g_bhasBonus)
-			db_CalcAvgRunTimeBonus();
-		else if (!g_bServerDataLoaded)
-			db_CalculatePlayerCount(0);
+        if (!g_bServerDataLoaded && g_bhasBonus){
+            db_CalcAvgRunTimeBonus();
+        }
+        else if (!g_bServerDataLoaded){
+            db_CalculatePlayerCount(0);
+        }
 
-		return;
+        return;
 	}
 
     if (SQL_HasResultSet(hndl)){
@@ -4864,7 +4865,7 @@ public void SQL_db_CalcAvgRunTimeCallback(Handle owner, Handle hndl, const char[
         }
     }
 
-	if (g_bhasBonus)
+    if (g_bhasBonus)
 		db_CalcAvgRunTimeBonus();
 	else
 		db_CalculatePlayerCount(0);
@@ -7498,28 +7499,28 @@ public void db_SelectTotalMapCompletesCallback(Handle owner, Handle hndl, const 
 
 public void db_SelectPlayersMapRankCallback(Handle owner, Handle hndl, const char[] error, any pack)
 {
-	if (hndl == null)
-	{
-		LogError("[SurfTimer] SQL Error (db_SelectPlayersMapRankCallback): %s ", error);
-	}
+    if (hndl == null)
+    {
+        LogError("[SurfTimer] SQL Error (db_SelectPlayersMapRankCallback): %s ", error);
+    }
 
-	ResetPack(pack);
-	int client = ReadPackCell(pack);
-	char szSteamId[32];
-	char playername[MAX_NAME_LENGTH];
-	char mapname[128];
-	ReadPackString(pack, szSteamId, 32);
-	ReadPackString(pack, playername, sizeof(playername));
-	ReadPackString(pack, mapname, sizeof(mapname));
-	CloseHandle(pack);
+    ResetPack(pack);
+    int client = ReadPackCell(pack);
+    char szSteamId[32];
+    char playername[MAX_NAME_LENGTH];
+    char mapname[128];
+    ReadPackString(pack, szSteamId, 32);
+    ReadPackString(pack, playername, sizeof(playername));
+    ReadPackString(pack, mapname, sizeof(mapname));
+    CloseHandle(pack);
 
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-	{
-		int rank;
-        
+    if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+    {
+        int rank;
+
         rank = SQL_FetchInt(hndl,0);
 
-		if (StrEqual(mapname, g_szMapName))
+        if (StrEqual(mapname, g_szMapName))
 		{
 			char szGroup[128];
 			if (rank >= 11 && rank <= g_G1Top)
@@ -7936,14 +7937,13 @@ public void db_getPlayerRankUnknownCallback(Handle owner, Handle hndl, const cha
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-
 		int playerrank = SQL_FetchInt(hndl,0);
-
 
 		CPrintToChatAll("%t", "SQL39", g_szChatPrefix, szName, playerrank, g_pr_RankedPlayers, points);
 	}
-	else
+	else{
 		CPrintToChat(client, "%t", "SQL40", g_szChatPrefix, szName);
+    }
 }
 
 public void db_selectMapImprovement(int client, char szMapName[128])
