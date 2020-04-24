@@ -460,10 +460,11 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		else
 		{
 			char szChatRank[1024];
-			Format(szChatRank, 1024, "%s", g_pr_chat_coloredrank[client]);
+			Format(szChatRank, sizeof(szChatRank), "%s", g_pr_chat_coloredrank[client]);
+
 			char szChatRankColor[1024];
-			Format(szChatRankColor, 1024, "%s", g_pr_chat_coloredrank[client]);
-			CGetRankColor(szChatRankColor, 1024);
+			Format(szChatRankColor, sizeof(szChatRankColor), "%s", g_pr_chat_coloredrank[client]);
+			CGetRankColor(szChatRankColor, sizeof(szChatRankColor));
 
 			if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
 				Format(szName, sizeof(szName), "{%s}%s", szChatRankColor, szName);
@@ -494,12 +495,11 @@ public Action Say_Hook(int client, const char[] command, int argc)
 
 public void CGetRankColor(char[] sMsg, int iSize) // edit from CProcessVariables - colorvars
 {
-	if (!Init()) {
-		return;
-	}
-
-	char[] sOut = new char[iSize]; char[] sCode = new char[iSize]; char[] sColor = new char[iSize];
-	int iOutPos = 0; int iCodePos = -1;
+	char[] sOut = new char[iSize];
+	char[] sCode = new char[iSize];
+	char[] sColor = new char[iSize];
+	int iOutPos = 0;
+	int iCodePos = -1;
 	int iMsgLen = strlen(sMsg);
 	int dev = 0;
 
@@ -517,7 +517,9 @@ public void CGetRankColor(char[] sMsg, int iSize) // edit from CProcessVariables
 				String_ToLower(sCode, sCode, iSize);
 
 				if (CGetColor(sCode, sColor, iSize)) {
-					if(dev == 1) break;
+					if(dev == 1) {
+						break;
+					}
 					dev++;
 				} else {
 					Format(sOut, iSize, "%s{%s}", sOut, sCode);
