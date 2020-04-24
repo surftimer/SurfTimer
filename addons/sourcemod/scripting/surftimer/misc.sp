@@ -3504,7 +3504,7 @@ public void CenterHudAlive(int client)
 		if (IsValidEntity(client) && 1 <= client <= MaxClients && !g_bOverlay[client])
 		{
 			// PrintCSGOHUDText(client, "<font face=''>%s%s\n%s%s\n%s%s</font>", module[0], module2, module[2], module4, module[4], module6);
-			PrintCSGOHUDText(client, "<pre><font class='fontSize-sm'>%15s\t %15s\n%15s\t %15s\n%15s\t %15s</font></pre>", module[0], module[1], module[2], module[3], module[4], module[5]);
+			PrintCSGOHUDText(client, "<pre>%15s\t %15s\n%15s\t %15s\n%15s\t %15s</pre>", module[0], module[1], module[2], module[3], module[4], module[5]);
 		}
 	}
 }
