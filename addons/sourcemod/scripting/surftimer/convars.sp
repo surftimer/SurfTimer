@@ -117,6 +117,7 @@ ConVar g_dcBugTrackerName = null;
 ConVar g_drDeleteSecurity = null;
 ConVar g_iAdminCountryTags = null;
 ConVar g_replayBotDelay = null;
+ConVar g_AllowPause = null;
 
 void CreateConVars()
 {
@@ -437,4 +438,8 @@ void CreateConVars()
 
 	// Footsteps
 	g_hFootsteps = FindConVar("sv_footsteps");
+
+	//Allow pausing
+	g_AllowPause = CreateConVar("ck_allow_pause", "1", "on/off - Allows players to pause their timer", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	HookConVarChange(g_AllowPause, OnSettingChanged);
 }
