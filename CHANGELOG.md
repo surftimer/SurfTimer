@@ -1,4 +1,16 @@
 # Changelog
+[2020-04-24 - Version 285]
+---
+- Created and updated the changelog to version 285. @olokos
+- Updated readme
+- Use short coded colors for center hud
+- **Replace old enum arrays with enum structs - Huge thanks to @Bara**
+- Quake sounds fix Thanks to @samatazz Stops ALL sounds being played if the user has it turned off in their configs
+- Removed trails chroma from surftimer's code. You now have to install trails chroma separately. Thanks to @13ace37 and @Bara
+- Updated colorvariables.inc in release binary and Readme.md with a fork by @olokos which merges all pull requests on the original repository and adds cksurf colors to it.
+- Fixed speed disappearing between stages and on startzone, by removing blank font class from the center hud code.
+- Compiled with latest PTaH and DHooks includes, if such are used by the code.
+
 [2020-04-22 - Version 284]
 ---
 - Actions: Actually download includes for building with GitHub actions
