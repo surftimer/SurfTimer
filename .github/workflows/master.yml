@@ -1,8 +1,6 @@
 name: Compile with SourceMod
 
-on:
-  push:
-    branches: ["master", "githubActions", "dev"]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -18,6 +16,8 @@ jobs:
 
       - name: Set environment variables
         run: |
+          TOOLS_PATH=$GITHUB_WORKSPACE/tools
+          echo ::set-env name=TOOLS_PATH::$TOOLS_PATH
           SOURCEMOD_PATH=$GITHUB_WORKSPACE/addons/sourcemod
           echo ::set-env name=SOURCEMOD_PATH::$SOURCEMOD_PATH
           echo ::set-env name=SCRIPTS_PATH::$SOURCEMOD_PATH/scripting
@@ -34,16 +34,21 @@ jobs:
       - name: Fetch plugin dependencies
         run: |
           wget https://raw.githubusercontent.com/bcserv/smlib/transitional_syntax/scripting/include/smlib.inc -P $INCLUDE_PATH
-          wget https://raw.githubusercontent.com/PremyslTalich/ColorVariables/master/addons/sourcemod/scripting/includes/colorvariables.inc -P $INCLUDE_PATH
           wget https://raw.githubusercontent.com/KyleSanderson/SteamWorks/master/Pawn/includes/SteamWorks.inc -P $INCLUDE_PATH
           wget https://raw.githubusercontent.com/JoinedSenses/SourceMod-IncludeLibrary/master/include/smjansson.inc -P $INCLUDE_PATH
           wget https://bitbucket.org/Drifter321/dhooks2/raw/009f11c6c518227c51d708af69f4c759147f704b/sourcemod/scripting/include/dhooks.inc -P $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/addons/sourcemod/scripting/include/colorlib.inc -P $INCLUDE_PATH
           
           git clone -b transitional_syntax https://github.com/bcserv/smlib.git
           mv smlib/scripting/include/* $INCLUDE_PATH
 
           git clone https://github.com/Deathknife/sourcemod-discord.git
           mv sourcemod-discord/include/* $INCLUDE_PATH
+      
+      - name: Generate colorlib_map.inc
+        run: |
+          wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/tools/color_gen.py -P $TOOLS_PATH
+          python3 $TOOLS_PATH/color_gen.py --include-ref-colors --config "$TOOLS_PATH/colors.yaml" "$INCLUDE_PATH/colorlib_map.inc"
 
       - name: Compile plugin
         run: |
