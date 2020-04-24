@@ -33,7 +33,7 @@ Yes, but not any more than other projects currently and for past years.
 * [SourceMod Includes](https://www.sourcemod.net/downloads.php?branch=stable)
 * [Sourcemod-Discord API](https://github.com/Deathknife/sourcemod-discord)
 * [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
-* [colorvariables](https://github.com/PremyslTalich/ColorVariables/blob/master/addons/sourcemod/scripting/includes/colorvariables.inc)
+* [colorvariables](https://github.com/olokos/Chat-Processor/blob/master/scripting/include/colorvariables.inc)
 
 **Recommended:**
 * [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (Suppresses console warnings)

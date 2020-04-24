@@ -86,16 +86,6 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		g_bInJump[client] = false;
 		g_bInDuck[client] = false;
 
-
-		if(!gB_HidingTrails[client] && aL_Clients.FindValue(client) == -1) // If the client isn't hiding trails, but somehow isn't on the list
-		{
-			aL_Clients.Push(client);
-		}
-		
-		if(gB_RespawnDisable) // Reset trail on respawn
-		{
-			gI_SelectedTrail[client] = TRAIL_NONE;
-		}	
 		// Set stage to 1 on spawn cause why not
 		if (!g_bRespawnPosition[client] && !g_specToStage[client])
 		{
@@ -327,7 +317,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					float prespeed = StringToFloat(sText);
 					if (prespeed < 0.0)
 						prespeed = 0.0;
-					g_mapZones[g_ClientSelectedZone[client]][preSpeed] = prespeed;
+					g_mapZones[g_ClientSelectedZone[client]].PreSpeed = prespeed;
 					PrespeedMenu(client);
 				}
 				case 1:
@@ -370,9 +360,9 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					if (StrEqual(sText, "reset"))
 						Format(sText, sizeof(sText), "player");
 
-					Format(g_mapZones[g_ClientSelectedZone[client]][targetName], sizeof(g_mapZones), "%s", sText);
+					Format(g_mapZones[g_ClientSelectedZone[client]].TargetName, sizeof(MapZone::TargetName), "%s", sText);
 
-					CPrintToChat(client, "%t", "Hooks5", g_szChatPrefix, g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]][zoneTypeId], sText);
+					CPrintToChat(client, "%t", "Hooks5", g_szChatPrefix, g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]].ZoneTypeId, sText);
 
 					EditorMenu(client);
 				}
@@ -832,15 +822,6 @@ public Action OnLogAction(Handle source, Identity ident, int client, int target,
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
 
-	if(gB_CheapTrails)
-	{
-		ForceCheapTrails(client);
-	}
-	else
-	{
-		ForceExpensiveTrails(client);
-	}
-
 	if (buttons & IN_DUCK && g_bInDuck[client] == true)
 	{
 		CPrintToChat(client, "%t", "Hooks11", g_szChatPrefix);
@@ -1272,21 +1253,21 @@ public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 	if (bOriginNull && bAnglesNull && bVelocityNull)
 		return MRES_Ignored;
 
-	int iAT[AT_SIZE];
-	Array_Copy(origin, iAT[atOrigin], 3);
-	Array_Copy(angles, iAT[atAngles], 3);
-	Array_Copy(velocity, iAT[atVelocity], 3);
+	AdditionalTeleport iAT;
+	Array_Copy(origin, iAT.AtOrigin, 3);
+	Array_Copy(angles, iAT.AtAngles, 3);
+	Array_Copy(velocity, iAT.AtVelocity, 3);
 
 	// Remember,
 	if (!bOriginNull)
-		iAT[atFlags] |= ADDITIONAL_FIELD_TELEPORTED_ORIGIN;
+		iAT.AtFlags |= ADDITIONAL_FIELD_TELEPORTED_ORIGIN;
 	if (!bAnglesNull)
-		iAT[atFlags] |= ADDITIONAL_FIELD_TELEPORTED_ANGLES;
+		iAT.AtFlags |= ADDITIONAL_FIELD_TELEPORTED_ANGLES;
 	if (!bVelocityNull)
-		iAT[atFlags] |= ADDITIONAL_FIELD_TELEPORTED_VELOCITY;
+		iAT.AtFlags |= ADDITIONAL_FIELD_TELEPORTED_VELOCITY;
 
 	if (g_hRecordingAdditionalTeleport[client] != null)
-		PushArrayArray(g_hRecordingAdditionalTeleport[client], iAT, AT_SIZE);
+		PushArrayArray(g_hRecordingAdditionalTeleport[client], iAT, sizeof(AdditionalTeleport));
 
 	return MRES_Ignored;
 }
@@ -1371,7 +1352,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 		{
 			if (g_bInStartZone[client] || g_bInStageZone[client])
 			{
-				if (g_mapZones[zoneid][oneJumpLimit] == 1)
+				if (g_mapZones[zoneid].OneJumpLimit == 1)
 				{
 					if (!g_bJumpedInZone[client])
 					{
