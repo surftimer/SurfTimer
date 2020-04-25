@@ -133,8 +133,7 @@ public void CL_OnStartTimerPress(int client)
 			if (g_bShowSpeedDifferenceHud[client])
 				g_fLastDifferenceSpeed[client] = GetGameTime();
 
-			if (g_bShowSpeedDifferenceChat[client])
-				CPrintToChat(client, "%s {default}Speed: {yellow}%d u/s {default}[WR: %s {default}| PB: %s{default}]", g_szChatPrefix, g_iStartVelsNew[client][zgrp][1], szDiff ,szDiff2);
+			CPrintToChat(client, "%s {default}Speed: {yellow}%d u/s {default}[WR: %s {default}| PB: %s{default}]", g_szChatPrefix, g_iStartVelsNew[client][zgrp][1], szDiff ,szDiff2);
 		}
 	}
 
@@ -200,8 +199,7 @@ public void CL_OnEndTimerPress(int client)
 				
 	// Print Speed if velocity setting
 
-	if (g_bShowSpeedDifferenceChat[client])
-		CPrintToChat(client, "%s {default}Speed: {yellow}%d {default}[WR: %s {default}| PB: %s{default}]", g_szChatPrefix, g_iEndVelsNew[client][zGroup][1], szDiff ,szDiff2);
+	CPrintToChat(client, "%s {default}Speed: {yellow}%d {default}[WR: %s {default}| PB: %s{default}]", g_szChatPrefix, g_iEndVelsNew[client][zGroup][1], szDiff ,szDiff2);
 
 	// Print bot finishing message to spectators
 	if (IsFakeClient(client) && g_bTimerRunning[client])
@@ -273,21 +271,6 @@ public void CL_OnEndTimerPress(int client)
 		return;
 	}
 
-	// Set "Map Finished" overlay panel
-	/*g_bOverlay[client] = true;
-	g_fLastOverlay[client] = GetGameTime();*/
-	// PrintHintText(client, "%t", "TimerStopped", g_szFinalTime[client]);
-
-	// how much credits to give
-	// first complete
-	// int fcTierCredits = (100 * g_iMapTier);
-	// int tierCredits = (5 * g_iMapTier);
-	// int wrCredits = 0;
-	// int fcCredits = 0;
-	// int pbCredits = 0;
-	// int slowCredits = 0;
-
-	// Get zonegroup and style
 	int style = g_iCurrentStyle[client];
 
 	/*====================================
@@ -600,7 +583,6 @@ public void CL_OnEndTimerPress(int client)
 				}
 			}
 
-			// char szDiff[54];
 			float diff;
 
 			// Record bools init
@@ -629,8 +611,8 @@ public void CL_OnEndTimerPress(int client)
 				{
 					g_fOldBonusRecordTime[zGroup] = g_fBonusFastest[zGroup];
 					g_fBonusFastest[zGroup] = g_fFinalTime[client];
-					Format(g_szBonusFastest[zGroup], MAX_NAME_LENGTH, "%s", szName);
-					FormatTimeFloat(1, g_fBonusFastest[zGroup], 3, g_szBonusFastestTime[zGroup], 64);
+					Format(g_szBonusFastest[zGroup], 128, "%s", szName);
+					FormatTimeFloat(1, g_fBonusFastest[zGroup], 3, g_szBonusFastestTime[zGroup], 128);
 
 					// Update Checkpoints
 					if (g_bCheckpointsEnabled[client] && !g_bPositionRestored[client])
@@ -669,8 +651,8 @@ public void CL_OnEndTimerPress(int client)
 
 				g_fOldBonusRecordTime[zGroup] = g_fBonusFastest[zGroup];
 				g_fBonusFastest[zGroup] = g_fFinalTime[client];
-				Format(g_szBonusFastest[zGroup], MAX_NAME_LENGTH, "%s", szName);
-				FormatTimeFloat(1, g_fBonusFastest[zGroup], 3, g_szBonusFastestTime[zGroup], 64);
+				Format(g_szBonusFastest[zGroup], 128, "%s", szName);
+				FormatTimeFloat(1, g_fBonusFastest[zGroup], 3, g_szBonusFastestTime[zGroup], 128);
 
 				// Update Checkpoints
 				if (g_bCheckpointsEnabled[client] && !g_bPositionRestored[client])
@@ -689,7 +671,7 @@ public void CL_OnEndTimerPress(int client)
 			if (g_fPersonalRecordBonus[zGroup][client] == 0.0)
 			{
 				g_fPersonalRecordBonus[zGroup][client] = g_fFinalTime[client];
-				FormatTimeFloat(1, g_fPersonalRecordBonus[zGroup][client], 3, g_szPersonalRecordBonus[zGroup][client], 64);
+				FormatTimeFloat(1, g_fPersonalRecordBonus[zGroup][client], 3, g_szPersonalRecordBonus[zGroup][client], 128);
 
 				g_bBonusFirstRecord[client] = true;
 				g_pr_showmsg[client] = true;
@@ -701,7 +683,7 @@ public void CL_OnEndTimerPress(int client)
 			{
 				// client's new record
 				g_fPersonalRecordBonus[zGroup][client] = g_fFinalTime[client];
-				FormatTimeFloat(1, g_fPersonalRecordBonus[zGroup][client], 3, g_szPersonalRecordBonus[zGroup][client], 64);
+				FormatTimeFloat(1, g_fPersonalRecordBonus[zGroup][client], 3, g_szPersonalRecordBonus[zGroup][client], 128);
 
 				g_bBonusPBRecord[client] = true;
 				g_pr_showmsg[client] = true;
@@ -732,7 +714,6 @@ public void CL_OnEndTimerPress(int client)
 			}
 
 			// styles for bonus
-			// char szDiff[54];
 			float diff;
 
 			// Record bools init
@@ -761,8 +742,8 @@ public void CL_OnEndTimerPress(int client)
 					// New fastest time in current bonus
 					g_fStyleOldBonusRecordTime[style][zGroup] = g_fStyleBonusFastest[style][zGroup];
 					g_fStyleBonusFastest[style][zGroup] = g_fFinalTime[client];
-					Format(g_szStyleBonusFastest[style][zGroup], MAX_NAME_LENGTH, "%s", szName); // fluffys come back stopped here
-					FormatTimeFloat(1, g_fStyleBonusFastest[style][zGroup], 3, g_szStyleBonusFastestTime[style][zGroup], 64);
+					Format(g_szStyleBonusFastest[style][zGroup], 128, "%s", szName); // fluffys come back stopped here
+					FormatTimeFloat(1, g_fStyleBonusFastest[style][zGroup], 3, g_szStyleBonusFastestTime[style][zGroup], 128);
 
 					g_bBonusSRVRecord[client] = true;
 					if (GetConVarBool(g_hBonusBot) && !g_bPositionRestored[client] && !g_bNewBonus[client])
@@ -793,8 +774,8 @@ public void CL_OnEndTimerPress(int client)
 				// Has to be the new record, since it is the first completion
 				g_fStyleOldBonusRecordTime[style][zGroup] = g_fStyleBonusFastest[style][zGroup];
 				g_fStyleBonusFastest[style][zGroup] = g_fFinalTime[client];
-				Format(g_szStyleBonusFastest[style][zGroup], MAX_NAME_LENGTH, "%s", szName);
-				FormatTimeFloat(1, g_fStyleBonusFastest[style][zGroup], 3, g_szStyleBonusFastestTime[style][zGroup], 64);
+				Format(g_szStyleBonusFastest[style][zGroup], 128, "%s", szName);
+				FormatTimeFloat(1, g_fStyleBonusFastest[style][zGroup], 3, g_szStyleBonusFastestTime[style][zGroup], 128);
 
 				g_bBonusSRVRecord[client] = true;
 
@@ -805,7 +786,7 @@ public void CL_OnEndTimerPress(int client)
 			if (g_fStylePersonalRecordBonus[style][zGroup][client] == 0.0)
 			{
 				g_fStylePersonalRecordBonus[style][zGroup][client] = g_fFinalTime[client];
-				FormatTimeFloat(1, g_fStylePersonalRecordBonus[style][zGroup][client], 3, g_szStylePersonalRecordBonus[style][zGroup][client], 64);
+				FormatTimeFloat(1, g_fStylePersonalRecordBonus[style][zGroup][client], 3, g_szStylePersonalRecordBonus[style][zGroup][client], 128);
 
 				g_bBonusFirstRecord[client] = true;
 				g_pr_showmsg[client] = true;
@@ -815,7 +796,7 @@ public void CL_OnEndTimerPress(int client)
 			{
 				// client's new record
 				g_fStylePersonalRecordBonus[style][zGroup][client] = g_fFinalTime[client];
-				FormatTimeFloat(1, g_fStylePersonalRecordBonus[style][zGroup][client], 3, g_szStylePersonalRecordBonus[style][zGroup][client], 64);
+				FormatTimeFloat(1, g_fStylePersonalRecordBonus[style][zGroup][client], 3, g_szStylePersonalRecordBonus[style][zGroup][client], 128);
 
 				g_bBonusPBRecord[client] = true;
 				g_pr_showmsg[client] = true;
@@ -832,15 +813,6 @@ public void CL_OnEndTimerPress(int client)
 
 	Client_Stop(client, 1);
 	db_deleteTmp(client);
-
-	// Give Credits
-	// if (g_hStore != INVALID_HANDLE && GetPluginStatus(g_hStore) == Plugin_Running)
-	// {
-		// 	int totalCredits = (wrCredits + fcCredits + pbCredits + slowCredits);
-		// 	int credits = Store_GetClientCredits(client);
-		// 	Store_SetClientCredits(client, credits + totalCredits);
-		// 	CPrintToChat(client, "%t", "BPress7", g_szChatPrefix, totalCredits);
-	// }
 }
 
 // Start Timer
@@ -908,8 +880,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 				if (g_bShowSpeedDifferenceHud[client])
 					g_fLastDifferenceSpeed[client] = GetGameTime();
 				
-				if (g_bShowSpeedDifferenceChat[client])
-					CPrintToChat(client, "%s {default}Stage %d: {yellow}%d u/s {default}[WR: %s {default}| PB: %s{default}]", g_szChatPrefix, stage, g_iWrcpVelsStartNew[client][stage][1], szDiff ,szDiff2);
+				CPrintToChat(client, "%s {default}Stage %d: {yellow}%d u/s {default}[WR: %s {default}| PB: %s{default}]", g_szChatPrefix, stage, g_iWrcpVelsStartNew[client][stage][1], szDiff ,szDiff2);
 			}
 		}
 	}
@@ -930,8 +901,8 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 
 	int stage = g_WrcpStage[client];
 	// Get Client Name
-	char szName[128];
-	GetClientName(client, szName, 128);
+	char szName[MAX_NAME_LENGTH];
+	GetClientName(client, szName, MAX_NAME_LENGTH);
 
 	if (g_bWrcpEndZone[client])
 	{
@@ -948,21 +919,15 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 	{
 		// int stage = g_CurrentStage[client];
 
+		// g_fFinalWrcpTime[client] = GetGameTime() - g_fStartWrcpTime[client];
 		g_fFinalWrcpTime[client] = g_fCurrentWrcpRunTime[client];
 
+		// g_fFinalWrcpTime[client] = g_fStartWrcpTime[client] - time2;
 		if (g_fFinalWrcpTime[client] <= 0.0)
 		{
 			CPrintToChat(client, "%t", "ErrorStageTime", g_szChatPrefix, stage);
 			return;
 		}
-		//Stage 1 to stage 2 glitch stopper.
-		if(g_wrcpStage2Fix[client] && stage == 2){
-			g_wrcpStage2Fix[client] = false;
-			CPrintToChat(client, "%t", "StageNotRecorded", g_szChatPrefix);
-			return;
-		}
-		
-		g_wrcpStage2Fix[client] = false;
 
 		char sz_srDiff[128];
 		float time = g_fFinalWrcpTime[client];
@@ -970,12 +935,17 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
 		if (f_srDiff > 0)
 		{
-			Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
+			// Format(sz_srDiff_colorless, 128, "-%s", sz_srDiff);
+			Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
 		}
 		else
 		{
-			Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
+			// Format(sz_srDiff_colorless, 128, "+%s", sz_srDiff);
+			Format(sz_srDiff, 128, "%cWR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
 		}
+		// g_fLastDifferenceTime[client] = GetGameTime();
+		/*else
+		Format(sz_srDiff, 128, "");*/
 
 		FormatTimeFloat(client, g_fFinalWrcpTime[client], 3, g_szFinalWrcpTime[client], 32);
 		// Make a new stage replay bot?
@@ -1017,15 +987,26 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
 		if (f_srDiff > 0)
 		{
-			Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
+			// Format(sz_srDiff_colorless, 128, "-%s", sz_srDiff);
+			Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
 		}
 		else
 		{
-			Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
+			// Format(sz_srDiff_colorless, 128, "+%s", sz_srDiff);
+			Format(sz_srDiff, 128, "%cWR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
 		}
+		// g_fLastDifferenceTime[client] = GetGameTime();
+		/*else
+		Format(sz_srDiff, 128, "");*/
 
 		FormatTimeFloat(client, g_fFinalWrcpTime[client], 3, g_szFinalWrcpTime[client], 32);
 		db_selectWrcpRecord(client, style, stage);
 		g_bWrcpTimeractivated[client] = false;
 	}
+	else if (!g_bWrcpTimeractivated[client])
+	{
+		g_StageRecStartFrame[client] = -1;
+	}
+
+	Client_StopWrcp(client, 1);
 }

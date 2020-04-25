@@ -305,7 +305,6 @@ float g_fCheckpointServerRecord[MAXZONEGROUPS][CPLIMIT];
 // Velocity 0 = XY, 1 = XYZ, 2 = Z
 int g_iCheckpointVelsStartServerRecord[MAXZONEGROUPS][CPLIMIT][3];
 int g_iCheckpointVelsEndServerRecord[MAXZONEGROUPS][CPLIMIT][3];
-int g_iCheckpointVelsAvgServerRecord[MAXZONEGROUPS][CPLIMIT][3];
 
 // Start Velocitys
 int g_iStartVelsServerRecord[MAXZONEGROUPS][3];
@@ -859,6 +858,9 @@ float g_fRecordMapTime;
 // Record map time in 00:00:00 format
 char g_szRecordMapTime[64];
 
+// Old Map Record
+float g_fOldRecordMapTime;
+
 // Client's peronal record in 00:00:00 format
 char g_szPersonalRecord[MAXPLAYERS + 1][64];
 
@@ -1303,7 +1305,6 @@ int g_fClientVelsStart[MAXPLAYERS + 1][CPLIMIT][3];
 int g_fClientVelsEnd[MAXPLAYERS + 1][CPLIMIT][3];
 int g_fTargetVelsStart[MAXPLAYERS + 1][CPLIMIT][3];
 int g_fTargetVelsEnd[MAXPLAYERS + 1][CPLIMIT][3];
-// float g_fTargetCPs[MAXPLAYERS + 1][35];
 
 // surf_christmas2
 bool g_bUsingStageTeleport[MAXPLAYERS + 1];
@@ -1370,6 +1371,14 @@ float g_iLastJump[MAXPLAYERS + 1];
 int g_iTicksOnGround[MAXPLAYERS + 1];
 bool g_bNewStage[MAXPLAYERS + 1];
 bool g_bLeftZone[MAXPLAYERS + 1];
+
+// Speed Comparsion (hud)
+float g_fLastDifferenceSpeed[MAXPLAYERS + 1];
+char g_szLastSpeedDifference[MAXPLAYERS + 1][64];
+bool g_bShowSpeedDifferenceHud[MAXPLAYERS + 1];
+
+// Trying to fix maps with multiple end zones :(
+bool g_bSavingMapTime[MAXPLAYERS + 1];
 
 /*===================================
 =         Predefined Arrays         =

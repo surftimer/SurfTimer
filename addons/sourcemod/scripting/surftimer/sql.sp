@@ -153,23 +153,23 @@ public void db_upgradeDatabase(int ver)
   }
   else if (ver == 2)
   {
-	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN wrcppoints INT(11) NOT NULL DEFAULT 0 AFTER `wrbpoints`;");
+	SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN wrcppoints INT(11) NOT NULL DEFAULT 0 AFTER `wrbpoints`;");
   }
   else if (ver == 3)
   {
-	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER centrehud;");
-	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_spawnlocations DROP PRIMARY KEY, ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER stage, ADD PRIMARY KEY (mapname, zonegroup, stage, teleside);");
+	SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER centrehud;");
+	SQL_FastQuery(g_hDb, "ALTER TABLE ck_spawnlocations DROP PRIMARY KEY, ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER stage, ADD PRIMARY KEY (mapname, zonegroup, stage, teleside);");
   }
-  else if (ver == 3)
+  else if (ver == 4)
   {
-	  SQL_FastQuery(g_hDb, "CREATE TABLE `ck_checkpointsnew` ( `steamid` VARCHAR(32) collate utf8mb4_unicode_ci NOT NULL, `mapname` VARCHAR(32) COLLATE utf8mb4_unicode_ci NOT NULL, `cp` INT(11) NOT NULL, `time` FLOAT NOT NULL, `velstartxy` INT(11) NOT NULL, `velstartxyz` INT(11) NOT NULL, `velstartz` INT(11) NOT NULL, `velendxy` INT(11) NOT NULL, `velendxyz` INT(11) NOT NULL, `velendz` INT(11) NOT NULL, `velavgxy` INT(11) NOT NULL, `velavgxyz` INT(11) NOT NULL, `velavgz` INT(11) NOT NULL, `zonegroup` INT(12) NOT NULL, PRIMARY KEY (`steamid`,`mapname`,`cp`,`zonegroup`));");
-	  SQL_FastQuery(g_hDb, "REPLACE INTO ck_checkpointsnew (steamid, mapname, cp, time, zonegroup) SELECT * FROM ( SELECT steamid, mapname, 1 AS cp, cp1 AS time, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 2 AS cp, cp2, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 3 AS cp, cp3, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 4 AS cp, cp4, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 5 AS cp, cp5, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 6 AS cp, cp6, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 7 AS cp, cp7, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 8 AS cp, cp8, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 9 AS cp, cp9, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 10 AS cp, cp10, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 11 AS cp, cp11, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 12 AS cp, cp12, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 13 AS cp, cp13, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 14 AS cp, cp14, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 15 AS cp, cp15, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 16 AS cp, cp16, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 17 AS cp, cp17, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 18 AS cp, cp18, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 19 AS cp, cp19, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 20 AS cp, cp20, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 21 AS cp, cp21, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 22 AS cp, cp22, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 23 AS cp, cp23, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 24 AS cp, cp24, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 25 AS cp, cp25, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 26 AS cp, cp26, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 27 AS cp, cp27, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 28 AS cp, cp28, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 29 AS cp, cp29, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 30 AS cp, cp30, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 31 AS cp, cp31, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 32 AS cp, cp32, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 33 AS cp, cp33, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 34 AS cp, cp34, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 35 AS cp, cp35, zonegroup FROM ck_checkpoints ) v; ");
-	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_checkpoints RENAME TO ck_checkpointsold;");
-	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_checkpointsnew RENAME TO ck_checkpoints;");
-	  SQL_FastQuery(g_hDb, "ALTER TABLE `ck_playertimes` ADD `velStartXY` INT NOT NULL AFTER `runtimepro`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`;");
-	  SQL_FastQuery(g_hDb, "ALTER TABLE `ck_bonus` ADD `velStartXY` INT NOT NULL AFTER `runtime`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`;");
-	  SQL_FastQuery(g_hDb, "ALTER TABLE `ck_wrcps` ADD `velStartXY` INT NOT NULL AFTER `runtimepro`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`;");
-	  SQL_FastQuery(g_hDb, "ALTER TABLE `ck_playeroptions2` ADD `velcmphud` INT NOT NULL DEFAULT 1 AFTER `teleside`, ADD `velcmpchat` INT NOT NULL DEFAULT 1 AFTER `velcmphud`;");
+	SQL_FastQuery(g_hDb, "CREATE TABLE `ck_checkpointsnew` (`steamid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,`mapname` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,`cp` int(11) NOT NULL,`time` float NOT NULL,`velStartXY` int(11) NOT NULL,`velStartXYZ` int(11) NOT NULL,`velStartZ` int(11) NOT NULL,`velEndXY` int(11) NOT NULL,`velEndXYZ` int(11) NOT NULL,`velEndZ` int(11) NOT NULL,`velAvgXY` int(11) NOT NULL,`velAvgXYZ` int(11) NOT NULL,`velAvgZ` int(11) NOT NULL,`zonegroup` int(12) NOT NULL,PRIMARY KEY (`steamid`,`mapname`,`cp`,`zonegroup`));");
+	SQL_FastQuery(g_hDb, "REPLACE INTO ck_checkpointsnew (steamid, mapname, cp, time, zonegroup) SELECT * FROM ( SELECT steamid, mapname, 1 AS cp, cp1 AS time, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 2 AS cp, cp2, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 3 AS cp, cp3, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 4 AS cp, cp4, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 5 AS cp, cp5, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 6 AS cp, cp6, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 7 AS cp, cp7, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 8 AS cp, cp8, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 9 AS cp, cp9, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 10 AS cp, cp10, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 11 AS cp, cp11, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 12 AS cp, cp12, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 13 AS cp, cp13, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 14 AS cp, cp14, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 15 AS cp, cp15, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 16 AS cp, cp16, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 17 AS cp, cp17, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 18 AS cp, cp18, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 19 AS cp, cp19, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 20 AS cp, cp20, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 21 AS cp, cp21, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 22 AS cp, cp22, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 23 AS cp, cp23, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 24 AS cp, cp24, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 25 AS cp, cp25, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 26 AS cp, cp26, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 27 AS cp, cp27, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 28 AS cp, cp28, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 29 AS cp, cp29, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 30 AS cp, cp30, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 31 AS cp, cp31, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 32 AS cp, cp32, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 33 AS cp, cp33, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 34 AS cp, cp34, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 35 AS cp, cp35, zonegroup FROM ck_checkpoints ) v; ");
+	SQL_FastQuery(g_hDb, "ALTER TABLE ck_checkpoints RENAME TO ck_checkpointsold;");
+	SQL_FastQuery(g_hDb, "ALTER TABLE ck_checkpointsnew RENAME TO ck_checkpoints;");
+	SQL_FastQuery(g_hDb, "ALTER TABLE `ck_playertimes` ADD `velStartXY` INT NOT NULL AFTER `runtimepro`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`;");
+	SQL_FastQuery(g_hDb, "ALTER TABLE `ck_bonus` ADD `velStartXY` INT NOT NULL AFTER `runtime`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`;");
+	SQL_FastQuery(g_hDb, "ALTER TABLE `ck_wrcps` ADD `velStartXY` INT NOT NULL AFTER `runtimepro`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`;");
+	SQL_FastQuery(g_hDb, "ALTER TABLE `ck_playeroptions2` ADD `velcmphud` INT NOT NULL DEFAULT 1 AFTER `teleside`, ADD `velcmpchat` INT NOT NULL DEFAULT 1 AFTER `velcmphud`;");
   }
   
   SQL_UnlockDatabase(g_hDb);
@@ -3221,8 +3221,9 @@ public void db_viewRecordCheckpointInMap()
 		for (int i = 0; i < CPLIMIT; i++)
 		g_fCheckpointServerRecord[k][i] = 0.0;
 	}
-
 	// "SELECT c.zonegroup, c.cp1, c.cp2, c.cp3, c.cp4, c.cp5, c.cp6, c.cp7, c.cp8, c.cp9, c.cp10, c.cp11, c.cp12, c.cp13, c.cp14, c.cp15, c.cp16, c.cp17, c.cp18, c.cp19, c.cp20, c.cp21, c.cp22, c.cp23, c.cp24, c.cp25, c.cp26, c.cp27, c.cp28, c.cp29, c.cp30, c.cp31, c.cp32, c.cp33, c.cp34, c.cp35 FROM ck_checkpoints c WHERE steamid = '%s' AND mapname='%s' UNION SELECT a.zonegroup, b.cp1, b.cp2, b.cp3, b.cp4, b.cp5, b.cp6, b.cp7, b.cp8, b.cp9, b.cp10, b.cp11, b.cp12, b.cp13, b.cp14, b.cp15, b.cp16, b.cp17, b.cp18, b.cp19, b.cp20, b.cp21, b.cp22, b.cp23, b.cp24, b.cp25, b.cp26, b.cp27, b.cp28, b.cp29, b.cp30, b.cp31, b.cp32, b.cp33, b.cp34, b.cp35 FROM ck_bonus a LEFT JOIN ck_checkpoints b ON a.steamid = b.steamid AND a.zonegroup = b.zonegroup WHERE a.mapname = '%s' GROUP BY a.zonegroup";
+	
+	// SELECT steamid, mapname, cp, time, zonegroup FROM ck_checkpoints WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = 0;
 	char szQuery[1028];
 	Format(szQuery, 1028, sql_selectRecordCheckpoints, g_szRecordMapSteamID, g_szMapName, g_szMapName);
 	SQL_TQuery(g_hDb, sql_selectRecordCheckpointsCallback, szQuery, 1, DBPrio_Low);
@@ -3268,6 +3269,8 @@ public void db_viewCheckpoints(int client, char szSteamID[32], char szMapName[12
 {
 	char szQuery[1024];
 	// "SELECT zonegroup, cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20, cp21, cp22, cp23, cp24, cp25, cp26, cp27, cp28, cp29, cp30, cp31, cp32, cp33, cp34, cp35 FROM ck_checkpoints WHERE mapname='%s' AND steamid = '%s';";
+
+	//SELECT zonegroup, cp, time, zonegroup, velXY, velXYZ, velZ FROM ck_checkpoints WHERE mapname='%s' AND steamid = '%s' AND zonegroup = 0;
 	Format(szQuery, 1024, sql_selectCheckpoints, szMapName, szSteamID);
 	SQL_TQuery(g_hDb, SQL_selectCheckpointsCallback, szQuery, client, DBPrio_Low);
 }
@@ -3277,14 +3280,14 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 	// fluffys come back
 	if (hndl == null)
 	{
-		LogError("[Surftimer] SQL Error (SQL_selectCheckpointsCallback): %s", error);
+		LogError("[SurfTimer] SQL Error (SQL_selectCheckpointsCallback): %s", error);
 		return;
 	}
 
 	int zoneGrp, cp, index;
 
 	if (!IsValidClient(client))
-		return;
+	return;
 
 	if (SQL_HasResultSet(hndl))
 	{
@@ -3313,12 +3316,12 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[Surftimer] %s: Finished db_viewCheckpoints in %fs", g_szSteamID[client], tick);
+		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewCheckpoints in %fs", g_szSteamID[client], tick);
 
 		float time = g_fTick[client][1] - g_fClientsLoading[client][0];
 		char szName[32];
 		GetClientName(client, szName, sizeof(szName));
-		LogToFileEx(g_szLogFile, "[Surftimer] Finished loading %s - %s settings in %fs", g_szSteamID[client], szName, time);
+		LogToFileEx(g_szLogFile, "[SurfTimer] Finished loading %s - %s settings in %fs", g_szSteamID[client], szName, time);
 		
 		// Print a VIP's custom join msg to all
 		if (g_bEnableJoinMsgs && !StrEqual(g_szCustomJoinMsg[client], "none") && IsPlayerVip(client, true, false))
@@ -3356,6 +3359,8 @@ public void db_viewCheckpointsinZoneGroup(int client, char szSteamID[32], char s
 {
 	char szQuery[1024];
 	// "SELECT cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20, cp21, cp22, cp23, cp24, cp25, cp26, cp27, cp28, cp29, cp30, cp31, cp32, cp33, cp34, cp35 FROM ck_checkpoints WHERE mapname='%s' AND steamid = '%s' AND zonegroup = %i;";
+
+	// SELECT zonegroup, cp, time, velStartXY, velStartXYZ, velStartZ, velEndXY, velEndXYZ, velEndZ, velAvgXY, velAvgXYZ, velAvgZ FROM ck_checkpoints WHERE mapname='%s' AND steamid = '%s' AND zonegroup = %d;
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackCell(pack, zonegroup);
@@ -3453,11 +3458,31 @@ public void db_UpdateCheckpoints(int client, char szSteamID[32], int zGroup)
 	}
 }
 
+public void SQLTxn_UpdateCheckpointsSuccess(Handle db, any data, int numQueries, Handle[] results, any[] queryData)
+{
+	ResetPack(data);
+	int client = ReadPackCell(data);
+	int zonegrp = ReadPackCell(data);
+	CloseHandle(data);
+
+	db_viewCheckpointsinZoneGroup(client, g_szSteamID[client], g_szMapName, zonegrp);
+	return;
+}
+
+public void SQLTxn_UpdateCheckpointsFailed(Handle db, any client, int numQueries, const char[] error, int failIndex, any[] queryData)
+{
+	if (IsValidClient(client))
+		CPrintToChat(client, "%t", "SQL10", g_szChatPrefix, error);
+	PrintToServer("[Surftimer] Zone Removal Failed. Error: %s", error);
+	LogError("[SurfTimer] Error updating checkpoints: %s", error);
+	return;
+}
+
 public void SQL_updateCheckpointsCallback(Handle owner, Handle hndl, const char[] error, any data)
 {
 	if (hndl == null)
 	{
-		LogError("[SurfTimer] SQL Error (SQL_updateCheckpointsCallback): %s", error);
+		LogError("[Surftimer] SQL Error (SQL_updateCheckpointsCallback): %s", error);
 		return;
 	}
 	ResetPack(data);
@@ -3957,7 +3982,6 @@ public void db_updateBonus(int client, char szSteamId[32], char szUName[MAX_NAME
 	Format(szQuery, 1024, sql_updateBonus, FinalTime, szName, g_iStartVelsNew[client][zoneGrp][0], g_iStartVelsNew[client][zoneGrp][1], g_iStartVelsNew[client][zoneGrp][2], g_iEndVelsNew[client][zoneGrp][0], g_iEndVelsNew[client][zoneGrp][1], g_iEndVelsNew[client][zoneGrp][2], szSteamId, g_szMapName, zoneGrp);
 	SQL_TQuery(g_hDb, SQL_updateBonusCallback, szQuery, datapack, DBPrio_Low);
 }
-
 
 
 public void SQL_updateBonusCallback(Handle owner, Handle hndl, const char[] error, any data)
@@ -9716,7 +9740,7 @@ public void db_selectCPR(int client, int rank, const char szMapName[128], const 
 	WritePackString(pack, szSteamId);
 
 	char szQuery[512];
-	Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `steamid` = '%s' AND `mapname` LIKE '%c%s%c' AND style = 0", g_szSteamID[client], PERCENT, szMapName, PERCENT);
+	Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro`, velStartXY, velStartXYZ, velStartZ, velEndXY, velEndXYZ, velEndZ FROM `ck_playertimes` WHERE `steamid` = '%s' AND `mapname` LIKE '%c%s%c' AND style = 0", g_szSteamID[client], PERCENT, szMapName, PERCENT);
 	SQL_TQuery(g_hDb, SQL_SelectCPRTimeCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -9763,21 +9787,14 @@ public void SQL_SelectCPRCallback(Handle owner, Handle hndl, const char[] error,
 		return;
 	}
 
-	if (SQL_HasResultSet(hndl))
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
 		ResetPack(pack);
 		int client = ReadPackCell(pack);
 
-		while(SQL_FetchRow(hndl))
+		for (int i = 1; i < 36; i++)
 		{
-			int cp = SQL_FetchInt(hndl, 2);
-			g_fClientCPs[client][cp] = SQL_FetchFloat(hndl, 3);
-			g_fClientVelsStart[client][cp][0] = SQL_FetchInt(hndl, 4);
-			g_fClientVelsStart[client][cp][1] = SQL_FetchInt(hndl, 5);
-			g_fClientVelsStart[client][cp][2] = SQL_FetchInt(hndl, 6);
-			g_fClientVelsEnd[client][cp][0] = SQL_FetchInt(hndl, 7);
-			g_fClientVelsEnd[client][cp][1] = SQL_FetchInt(hndl, 8);
-			g_fClientVelsEnd[client][cp][2] = SQL_FetchInt(hndl, 9);
+			g_fClientCPs[client][i] = SQL_FetchFloat(hndl, i - 1);
 		}
 		db_selectCPRTarget(pack);
 	}
@@ -9836,7 +9853,7 @@ public void db_selectCPRTargetCPs(const char[] szSteamId, any pack)
 	int client = ReadPackCell(pack);
 
 	char szQuery[512];
-	Format(szQuery, sizeof(szQuery), "SELECT cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20, cp21, cp22, cp23, cp24, cp25, cp26, cp27, cp28, cp29, cp30, cp31, cp32, cp33, cp34, cp35 FROM ck_checkpoints WHERE steamid = '%s' AND mapname LIKE '%c%s%c' AND zonegroup = 0;", szSteamId, PERCENT, g_szCPRMapName[client], PERCENT);
+	Format(szQuery, sizeof(szQuery), "SELECT steamid, mapname, cp, time, velStartXY, velStartXYZ, velStartZ, velEndXY, velEndXYZ, velEndZ FROM ck_checkpoints WHERE steamid = '%s' AND mapname LIKE '%c%s%c' AND zonegroup = 0;", szSteamId, PERCENT, g_szCPRMapName[client], PERCENT);
 	SQL_TQuery(g_hDb, SQL_SelectCPRTargetCPsCallback, szQuery, pack, DBPrio_Low);
 }
 

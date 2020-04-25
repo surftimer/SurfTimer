@@ -2505,6 +2505,19 @@ public Action Client_Stop(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action Client_StopWrcp(int client, int args)
+{
+	if (g_bWrcpTimeractivated[client])
+	{
+		g_bWrcpTimeractivated[client] = false;
+		g_fStartWrcpTime[client] = -1.0;
+		g_fCurrentWrcpRunTime[client] = -1.0;
+	}
+
+	if (g_StageRecStartFrame[client] != -1)
+		g_StageRecStartFrame[client] = -1;
+}
+
 public void Action_NoClip(int client)
 {
 	if (IsValidClient(client) && !IsFakeClient(client) && IsPlayerAlive(client) && GetConVarBool(g_hNoClipS))

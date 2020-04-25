@@ -171,8 +171,14 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 
 	// Check clients tele side
 	int teleside = g_iTeleSide[client];
+	
+	int zoneID = getZoneID(zonegroup, zone);
+	if (!StrEqual("player", g_mapZones[zoneID].TargetName))
+		DispatchKeyValue(client, "targetname", g_mapZones[zoneID].TargetName);
 
-	if (g_bStartposUsed[client][zonegroup] && zone == 1)
+	g_StageRecStartFrame[client] = -1;
+
+	if (zone == 1 && g_bStartposUsed[client][zonegroup])
 	{
 		if (GetClientTeam(client) == 1 || GetClientTeam(client) == 0) // Spectating
 		{
@@ -180,6 +186,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 				Client_Stop(client, 0);
 
 			Array_Copy(g_fStartposLocation[client][zonegroup], g_fTeleLocation[client], 3);
+			// Array_Copy(g_fSpawnLocation[zonegroup][realZone], g_fStartposLocation[client][zonegroup], 3);
 
 			g_specToStage[client] = true;
 			g_bRespawnPosition[client] = false;
@@ -1258,7 +1265,6 @@ public void SetClientDefaults(int client)
 	g_bSettingsLoaded[client] = false;
 
 	g_fLastDifferenceTime[client] = 0.0;
-	g_fLastDifferenceSpeed[client] = 0.0;
 
 	g_flastClientUsp[client] = GameTime;
 
@@ -1314,21 +1320,8 @@ public void SetClientDefaults(int client)
 	g_fMaxPercCompleted[client] = 0.0;
 	Format(g_szLastSRDifference[client], 64, "");
 	Format(g_szLastPBDifference[client], 64, "");
-	Format(g_szLastSpeedDifference[client], 64, "");
 
 	Format(g_szPersonalRecord[client], 64, "");
-
-	// Player Checkpoints
-	// for (int x = 0; x < 3; x++)
-	// {
-	// 	g_fCheckpointLocation[client][x] = 0.0;
-	// 	g_fCheckpointVelocity[client][x] = 0.0;
-	// 	g_fCheckpointAngle[client][x] = 0.0;
-
-	// 	g_fCheckpointLocation_undo[client][x] = 0.0;
-	// 	g_fCheckpointVelocity_undo[client][x] = 0.0;
-	// 	g_fCheckpointAngle_undo[client][x] = 0.0;
-	// }
 
 	for (int x = 0; x < MAXZONEGROUPS; x++)
 	{
@@ -1399,7 +1392,7 @@ public void SetClientDefaults(int client)
 	// Goose Start Pos
 	for (int i = 0; i < MAXZONEGROUPS; i++)
 		g_bStartposUsed[client][i] = false;
-	
+
 	// Save loc
 	g_iLastSaveLocIdClient[client] = 0;
 	g_fLastCheckpointMade[client] = 0.0;
@@ -1417,10 +1410,8 @@ public void SetClientDefaults(int client)
 	// Set default stage maybe
 	for (int i = 0; i < MAXZONEGROUPS; i++)
 		g_Stage[i][client] = 1;
-	
-	g_bInBhop[client] = false;
 
-	g_bSavingMapTime[client] = false;
+	g_bInBhop[client] = false;
 }
 
 // Get Runtime
@@ -1447,6 +1438,25 @@ public float GetSpeed(int client)
 		speed = fVelocity[2];
 	else // XY default
 		speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0));
+
+	return speed;
+}
+
+int GetAllSpeedTypes(int client)
+{
+	int speed[3];
+	for (int i = 0; i < 3; i++)
+		speed[i] = 0;
+
+	if (!IsValidClient(client))
+		return speed;
+		
+	float fVelocity[3];
+	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+
+	speed[0] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0))); // XY
+	speed[1] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0))); // XYZ
+	speed[2] = RoundToNearest(fVelocity[2]);
 
 	return speed;
 }
@@ -1776,7 +1786,8 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 {
 	if (IsValidClient(client))
 	{
-		char szName[128];
+		float RecordDiff;
+		char szRecordDiff[32], szName[MAX_NAME_LENGTH];
 		GetClientName(client, szName, 128);
 		int count = g_MapTimesCount;
 
@@ -1831,6 +1842,11 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 					{
 						// int r = GetRandomInt(1, 2);
 						PlayRecordSound(2);
+						RecordDiff = g_fOldRecordMapTime - g_fFinalTime[client];
+						FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 32);
+						Format(szRecordDiff, 32, "-%s", szRecordDiff);
+
+						// CPrintToChat(i, "%t", "MapFinished3", g_szChatPrefix, szName, g_szFinalTime[client], szRecordDiff, g_MapRank[client], count, g_szRecordMapTime);
 						CPrintToChat(i, "%t", "NewMapRecord", g_szChatPrefix, szName);
 						PrintToConsole(i, "surftimer | %s scored a new MAP RECORD", szName);
 					}
@@ -3777,7 +3793,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, int spee
 	// int speedType = g_SpeedMode[client];
 	int speedType = 1;
 
-	if (g_mapZones[zone][preSpeed] > 250.0 || !g_bhasStages)
+	if (g_mapZones[zone].PreSpeed > 250.0 || !g_bhasStages)
 		speedType = 0;
 	else
 		speedType = 1;
@@ -3932,7 +3948,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, int spee
 		}
 		else
 		{
-			if (g_mapZones[zone][preSpeed] > 250.0 || !g_bhasStages)
+			if (g_mapZones[zone].PreSpeed > 250.0 || !g_bhasStages)
 				speedType = 0;
 			else
 				speedType = 1;
@@ -4064,8 +4080,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, int spee
 			else
 				startSpeed = g_iCheckpointVelsStartNew[zonegroup][client][zone - 1][speedType];
 
-			if (g_bShowSpeedDifferenceChat[client])
-				CPrintToChat(client, "%t", "ShowVelocityCP", g_szChatPrefix, startSpeed, szStartWR, szStartPB, (g_bhasStages ? "End" : "Touch"), speed[speedType], szEndWR, szEnd);
+			CPrintToChat(client, "%t", "ShowVelocityCP", g_szChatPrefix, startSpeed, szStartWR, szStartPB, (g_bhasStages ? "End" : "Touch"), speed[speedType], szEndWR, szEnd);
 		}
 
 		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "Misc31", g_szChatPrefix, szName, g_iClientInZone[client][1] + 1, szTime, szDiff, sz_srDiff);
@@ -4090,7 +4105,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, int spee
 			}
 			else
 			{
-				if (g_mapZones[zone][preSpeed] > 250.0)
+				if (g_mapZones[zone].PreSpeed > 250.0)
 					speedType = 0;
 				else
 					speedType = 1;
@@ -4139,8 +4154,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, int spee
 			else
 				startSpeed = g_iCheckpointVelsStartNew[zonegroup][client][zone - 1][speedType];
 
-			if (g_bShowSpeedDifferenceChat[client])
-				CPrintToChat(client, "%t", "ShowVelocityCP", g_szChatPrefix, startSpeed, szStartWR, "N/A", (g_bhasStages ? "End" : "Touch"), speed[speedType], szEndWR, "N/A");
+			CPrintToChat(client, "%t", "ShowVelocityCP", g_szChatPrefix, startSpeed, szStartWR, "N/A", (g_bhasStages ? "End" : "Touch"), speed[speedType], szEndWR, "N/A");
 			// Set percent of completion to assist
 			if (CS_GetMVPCount(client) < 1)
 				CS_SetClientAssists(client, RoundToFloor(g_fMaxPercCompleted[client]));

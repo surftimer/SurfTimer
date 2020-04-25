@@ -419,7 +419,7 @@ public void StartTouch(int client, int action[3])
 						g_bIsValidRun[client] = true;
 
 					if (g_iCurrentStyle[client] == 0)
-						Checkpoint(client, action[1], g_iClientInZone[client][2], time);
+						Checkpoint(client, action[1], g_iClientInZone[client][2], time, GetAllSpeedTypes(client));
 
 					lastCheckpoint[g_iClientInZone[client][2]][client] = action[1];
 				}
@@ -448,7 +448,7 @@ public void StartTouch(int client, int action[3])
 				if (g_iCurrentStyle[client] == 0)
 				{
 					float time = g_fCurrentRunTime[client];
-					Checkpoint(client, action[1], g_iClientInZone[client][2], time);
+					Checkpoint(client, action[1], g_iClientInZone[client][2], time, GetAllSpeedTypes(client));
 					lastCheckpoint[g_iClientInZone[client][2]][client] = action[1];
 				}
 			}
@@ -490,8 +490,8 @@ public void EndTouch(int client, int action[3])
 		// Set Client targetName
 		if (StrEqual(g_szMapName, "surf_forgotten"))
 		{
-			if (!StrEqual("player", g_mapZones[g_iClientInZone[client][3]][targetName]))
-				DispatchKeyValue(client, "targetname", g_mapZones[g_iClientInZone[client][3]][targetName]);
+			if (!StrEqual("player", g_mapZones[g_iClientInZone[client][3]].TargetName))
+				DispatchKeyValue(client, "targetname", g_mapZones[g_iClientInZone[client][3]].TargetName);
 		}
 
 		// float CurVelVec[3];
@@ -557,7 +557,7 @@ public void EndTouch(int client, int action[3])
 			// int idiff, speedMode = g_SpeedMode[client];
 			int idiff, speedMode;
 
-			if (g_mapZones[zone][preSpeed] > 250.0)
+			if (g_mapZones[zone].PreSpeed > 250.0)
 				speedMode = 0;
 			else
 				speedMode = 1;
@@ -615,7 +615,7 @@ public void EndTouch(int client, int action[3])
 			// int idiff, speedMode = g_SpeedMode[client];
 			int idiff, speedMode = 0;
 
-			if (g_mapZones[zone][preSpeed] > 250.0)
+			if (g_mapZones[zone].PreSpeed > 250.0)
 				speedMode = 0;
 			else
 				speedMode = 1;
