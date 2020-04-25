@@ -120,3 +120,6 @@ char sql_setZoneNames[] = "UPDATE ck_zones SET zonename = '%s' WHERE mapname = '
 
 char sql_MainEditQuery[] = "SELECT steamid, name, %s FROM %s where mapname='%s' and style='%i' %sORDER BY %s ASC LIMIT 50";
 char sql_MainDeleteQeury[] = "DELETE From %s where mapname='%s' and style='%i' and steamid='%s' %s";
+
+char sql_selectMapWrcp[] = "SELECT name, MIN(runtimepro), stage, style, velStartXY, velStartXYZ, velStartZ, velEndXY, velEndXYZ, velEndZ FROM ck_wrcps WHERE mapname = '%s' GROUP BY stage, style;";
+char sql_selectStageTimes[] = "SELECT runtimepro, stage, style, velStartXY, velStartXYZ, velStartZ, velEndXY, velEndXYZ, velEndZ FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > '0.0';";
