@@ -1367,7 +1367,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 						float time = GetGameTime();
 						float time2 = time - g_fJumpedInZoneTime[client];
 						g_bJumpedInZone[client] = false;
-						if (time2 <= 0.9)
+						if (time2 <= 0.9 && !(g_iCurrentStyle[client] == 7))
 						{
 							CPrintToChat(client, "%t", "Hooks15", g_szChatPrefix);
 							Handle pack;

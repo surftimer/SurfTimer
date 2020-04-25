@@ -3211,7 +3211,7 @@ public void CenterHudDead(int client)
 				else if (ObservedUser == g_WrcpBot)
 					Format(obsAika, sizeof(obsAika), "<font color='#ec8'>%s</font>", g_szWrcpReplayTime[g_iCurrentlyPlayingStage]);
 
-				PrintCSGOHUDText(client, "<pre><font face=''>%s\nSpeed: <font color='#5e5'>%i</font> u/s\n%s</pre>", obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
+				PrintCSGOHUDText(client, "<pre>%s\nSpeed: <font color='#5e5'>%i u/s\n%s</pre>", obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
 				return;
 			}
 			else if (g_bTimerRunning[ObservedUser])
@@ -3237,7 +3237,7 @@ public void CenterHudDead(int client)
 			else if (g_iCurrentStyle[ObservedUser] != 0)
 				Format(timerText, 32, "%s ", g_szStyleHud[ObservedUser]);
 
-			PrintCSGOHUDText(client, "<pre><font face=''>%s<font color='#5e5'>%s</font>\nSpeed: <font color='#5e5'>%i</font> u/s\n%s</pre>", timerText, obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
+			PrintCSGOHUDText(client, "<pre>%s<font color='#5e5'>%s</font>\nSpeed: <font color='#5e5'>%i u/s\n%s</pre>", timerText, obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
 		}
 	}
 	else
@@ -3504,7 +3504,7 @@ public void CenterHudAlive(int client)
 		if (IsValidEntity(client) && 1 <= client <= MaxClients && !g_bOverlay[client])
 		{
 			// PrintCSGOHUDText(client, "<font face=''>%s%s\n%s%s\n%s%s</font>", module[0], module2, module[2], module4, module[4], module6);
-			PrintCSGOHUDText(client, "<pre><font face='' class='fontSize-sm'>%15s\t %15s\n%15s\t %15s\n%15s\t %15s</font></pre>", module[0], module[1], module[2], module[3], module[4], module[5]);
+			PrintCSGOHUDText(client, "<pre>%15s\t %15s\n%15s\t %15s\n%15s\t %15s</pre>", module[0], module[1], module[2], module[3], module[4], module[5]);
 		}
 	}
 }
