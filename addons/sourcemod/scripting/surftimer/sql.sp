@@ -9736,9 +9736,15 @@ public void SQL_SelectCPRTimeCallback(Handle owner, Handle hndl, const char[] er
 	{
 		SQL_FetchString(hndl, 2, g_szCPRMapName[client], 128);
 		g_fClientCPs[client][0] = SQL_FetchFloat(hndl, 3);
+		g_fClientVelsStart[client][0][0] = SQL_FetchInt(hndl, 4);
+		g_fClientVelsStart[client][0][1] = SQL_FetchInt(hndl, 5);
+		g_fClientVelsStart[client][0][2] = SQL_FetchInt(hndl, 6);
+		g_fClientVelsEnd[client][0][0] = SQL_FetchInt(hndl, 7);
+		g_fClientVelsEnd[client][0][1] = SQL_FetchInt(hndl, 8);
+		g_fClientVelsEnd[client][0][2] = SQL_FetchInt(hndl, 9);
 
 		char szQuery[512];
-		Format(szQuery, sizeof(szQuery), "SELECT cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20, cp21, cp22, cp23, cp24, cp25, cp26, cp27, cp28, cp29, cp30, cp31, cp32, cp33, cp34, cp35 FROM ck_checkpoints WHERE steamid = '%s' AND mapname LIKE '%c%s%c' AND zonegroup = 0;", g_szSteamID[client], PERCENT, g_szCPRMapName[client], PERCENT);
+		Format(szQuery, sizeof(szQuery), "SELECT steamid, mapname, cp, time, velStartXY, velStartXYZ, velStartZ, velEndXY, velEndXYZ, velEndZ FROM ck_checkpoints WHERE steamid = '%s' AND mapname LIKE '%c%s%c' AND zonegroup = 0;", g_szSteamID[client], PERCENT, g_szCPRMapName[client], PERCENT);
 		SQL_TQuery(g_hDb, SQL_SelectCPRCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
@@ -9757,14 +9763,21 @@ public void SQL_SelectCPRCallback(Handle owner, Handle hndl, const char[] error,
 		return;
 	}
 
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	if (SQL_HasResultSet(hndl))
 	{
 		ResetPack(pack);
 		int client = ReadPackCell(pack);
 
-		for (int i = 1; i < 36; i++)
+		while(SQL_FetchRow(hndl))
 		{
-			g_fClientCPs[client][i] = SQL_FetchFloat(hndl, i - 1);
+			int cp = SQL_FetchInt(hndl, 2);
+			g_fClientCPs[client][cp] = SQL_FetchFloat(hndl, 3);
+			g_fClientVelsStart[client][cp][0] = SQL_FetchInt(hndl, 4);
+			g_fClientVelsStart[client][cp][1] = SQL_FetchInt(hndl, 5);
+			g_fClientVelsStart[client][cp][2] = SQL_FetchInt(hndl, 6);
+			g_fClientVelsEnd[client][cp][0] = SQL_FetchInt(hndl, 7);
+			g_fClientVelsEnd[client][cp][1] = SQL_FetchInt(hndl, 8);
+			g_fClientVelsEnd[client][cp][2] = SQL_FetchInt(hndl, 9);
 		}
 		db_selectCPRTarget(pack);
 	}
@@ -9807,6 +9820,12 @@ public void SQL_SelectCPRTargetCallback(Handle owner, Handle hndl, const char[] 
 		SQL_FetchString(hndl, 0, szSteamId, sizeof(szSteamId));
 		SQL_FetchString(hndl, 1, g_szTargetCPR[client], sizeof(g_szTargetCPR));
 		g_fTargetTime[client] = SQL_FetchFloat(hndl, 3);
+		g_fTargetVelsStart[client][0][0] = SQL_FetchInt(hndl, 4);
+		g_fTargetVelsStart[client][0][1] = SQL_FetchInt(hndl, 5);
+		g_fTargetVelsStart[client][0][2] = SQL_FetchInt(hndl, 6);
+		g_fTargetVelsEnd[client][0][0] = SQL_FetchInt(hndl, 7);
+		g_fTargetVelsEnd[client][0][1] = SQL_FetchInt(hndl, 8);
+		g_fTargetVelsEnd[client][0][2] = SQL_FetchInt(hndl, 9); 
 		db_selectCPRTargetCPs(szSteamId, pack);
 	}
 }
@@ -9830,7 +9849,7 @@ public void SQL_SelectCPRTargetCPsCallback(Handle owner, Handle hndl, const char
 		return;
 	}
 
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	if (SQL_HasResultSet(hndl))
 	{
 		ResetPack(pack);
 		int client = ReadPackCell(pack);
@@ -9843,18 +9862,50 @@ public void SQL_SelectCPRTargetCPsCallback(Handle owner, Handle hndl, const char
 		SetMenuTitle(menu, szTitle);
 
 		float targetCPs, comparedCPs;
-		char szCPR[32], szCompared[32], szItem[256];
+		char szCPR[32], szCompared[32], szItem[256], szCompare[16];
+		int i = 0;
+		// int mode = g_SpeedMode[client];
+		int mode = 1;
+		int compareVel;
 
-		for (int i = 1; i < 36; i++)
+		while (SQL_FetchRow(hndl))
 		{
-			targetCPs = SQL_FetchFloat(hndl, i - 1);
-			comparedCPs = (g_fClientCPs[client][i] - targetCPs);
+			int cp = SQL_FetchInt(hndl, 2);
+			// g_fClientCPs[client][cp] = SQL_FetchFloat(hndl, 3);
+			g_fTargetVelsStart[client][cp][0] = SQL_FetchInt(hndl, 4);
+			g_fTargetVelsStart[client][cp][1] = SQL_FetchInt(hndl, 5);
+			g_fTargetVelsStart[client][cp][2] = SQL_FetchInt(hndl, 6);
+			g_fTargetVelsEnd[client][cp][0] = SQL_FetchInt(hndl, 7);
+			g_fTargetVelsEnd[client][cp][1] = SQL_FetchInt(hndl, 8);
+			g_fTargetVelsEnd[client][cp][2] = SQL_FetchInt(hndl, 9);
+			targetCPs = SQL_FetchFloat(hndl, 3);
+			comparedCPs = (g_fClientCPs[client][cp] - targetCPs);
+			if (i == 0)
+			{
+				
+				compareVel = g_fClientVelsStart[client][0][mode] - g_fTargetVelsStart[client][cp][mode];
+				if (g_fClientVelsStart[client][0][mode] > g_fTargetVelsStart[client][cp][mode])
+					Format(szCompare, sizeof(szCompare), "+%d", compareVel);
+				else
+					Format(szCompare, sizeof(szCompare), "%d", compareVel);
 
-			if (targetCPs == 0.0 || g_fClientCPs[client][i] == 0.0)
+				Format(szItem, sizeof(szItem), "Map Start: 00:00:00 (00:00:00) | Start: %d u/s (%s u/s)", g_fClientVelsStart[client][0][mode], szCompare);
+				AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+				i++;
+			}
+
+			if (targetCPs == 0.0 || g_fClientCPs[client][cp] == 0.0)
 				continue;
+
+			compareVel = g_fClientVelsEnd[client][cp][mode] - g_fTargetVelsEnd[client][cp][mode];
+			if (g_fClientVelsEnd[client][cp][mode] > g_fTargetVelsEnd[client][cp][mode])
+				Format(szCompare, sizeof(szCompare), "+%d", compareVel);
+			else
+				Format(szCompare, sizeof(szCompare), "%d", compareVel);
+
 			FormatTimeFloat(client, targetCPs, 3, szCPR, sizeof(szCPR));
 			FormatTimeFloat(client, comparedCPs, 6, szCompared, sizeof(szCompared));
-			Format(szItem, sizeof(szItem), "CP %i: %s (%s)", i, szCPR, szCompared);
+			Format(szItem, sizeof(szItem), "CP %i: %s (%s) | Touch: %d u/s (%s u/s)", cp, szCPR, szCompared, g_fClientVelsEnd[client][cp][mode], szCompare);
 			AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
 		}
 
@@ -9862,7 +9913,13 @@ public void SQL_SelectCPRTargetCPsCallback(Handle owner, Handle hndl, const char
 		float compared = g_fClientCPs[client][0] - g_fTargetTime[client];
 		FormatTimeFloat(client, g_fClientCPs[client][0], 3, szTime, sizeof(szTime));
 		FormatTimeFloat(client, compared, 6, szCompared2, sizeof(szCompared2));
-		Format(szItem, sizeof(szItem), "Total Time: %s (%s)", szTime, szCompared2);
+		compareVel = g_fClientVelsEnd[client][0][mode] - g_fTargetVelsEnd[client][0][mode];
+		if (g_fClientVelsEnd[client][0][mode] > g_fTargetVelsEnd[client][0][mode])
+			Format(szCompare, sizeof(szCompare), "+%d", compareVel);
+		else
+			Format(szCompare, sizeof(szCompare), "%d", compareVel);
+
+		Format(szItem, sizeof(szItem), "Total Time: %s (%s) | End: %d u/s (%s u/s)", szTime, szCompared2, g_fClientVelsEnd[client][0][mode], szCompare);
 		AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
 		SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
 		DisplayMenu(menu, client, MENU_TIME_FOREVER);
