@@ -1258,6 +1258,7 @@ public void SetClientDefaults(int client)
 	g_bSettingsLoaded[client] = false;
 
 	g_fLastDifferenceTime[client] = 0.0;
+	g_fLastDifferenceSpeed[client] = 0.0;
 
 	g_flastClientUsp[client] = GameTime;
 
@@ -1313,8 +1314,21 @@ public void SetClientDefaults(int client)
 	g_fMaxPercCompleted[client] = 0.0;
 	Format(g_szLastSRDifference[client], 64, "");
 	Format(g_szLastPBDifference[client], 64, "");
+	Format(g_szLastSpeedDifference[client], 64, "");
 
 	Format(g_szPersonalRecord[client], 64, "");
+
+	// Player Checkpoints
+	// for (int x = 0; x < 3; x++)
+	// {
+	// 	g_fCheckpointLocation[client][x] = 0.0;
+	// 	g_fCheckpointVelocity[client][x] = 0.0;
+	// 	g_fCheckpointAngle[client][x] = 0.0;
+
+	// 	g_fCheckpointLocation_undo[client][x] = 0.0;
+	// 	g_fCheckpointVelocity_undo[client][x] = 0.0;
+	// 	g_fCheckpointAngle_undo[client][x] = 0.0;
+	// }
 
 	for (int x = 0; x < MAXZONEGROUPS; x++)
 	{
@@ -1326,6 +1340,16 @@ public void SetClientDefaults(int client)
 		{
 			g_fCheckpointTimesNew[x][client][i] = 0.0;
 			g_fCheckpointTimesRecord[x][client][i] = 0.0;
+
+			for (int k = 0; i < 3; i++)
+			{
+				g_iCheckpointVelsStartNew[x][client][i][k] = 0;
+				g_iCheckpointVelsEndNew[x][client][i][k] = 0;
+				g_iCheckpointVelsAvgNew[x][client][i][k] = 0;
+				g_iCheckpointVelsStartRecord[x][client][i][k] = 0;
+				g_iCheckpointVelsEndRecord[x][client][i][k] = 0;
+				g_iCheckpointVelsAvgRecord[x][client][i][k] = 0;
+			}
 		}
 	}
 
@@ -1375,7 +1399,7 @@ public void SetClientDefaults(int client)
 	// Goose Start Pos
 	for (int i = 0; i < MAXZONEGROUPS; i++)
 		g_bStartposUsed[client][i] = false;
-
+	
 	// Save loc
 	g_iLastSaveLocIdClient[client] = 0;
 	g_fLastCheckpointMade[client] = 0.0;
@@ -1393,8 +1417,10 @@ public void SetClientDefaults(int client)
 	// Set default stage maybe
 	for (int i = 0; i < MAXZONEGROUPS; i++)
 		g_Stage[i][client] = 1;
-
+	
 	g_bInBhop[client] = false;
+
+	g_bSavingMapTime[client] = false;
 }
 
 // Get Runtime
@@ -3743,11 +3769,20 @@ public void SideHudAlive(int client)
 	}
 }
 
-public void Checkpoint(int client, int zone, int zonegroup, float time)
+public void Checkpoint(int client, int zone, int zonegroup, float time, int speed[3])
 {
 	if (!IsValidClient(client) || g_bPositionRestored[client] || IsFakeClient(client) || zone >= CPLIMIT)
 		return;
 
+	// int speedType = g_SpeedMode[client];
+	int speedType = 1;
+
+	if (g_mapZones[zone][preSpeed] > 250.0 || !g_bhasStages)
+		speedType = 0;
+	else
+		speedType = 1;
+
+	// float time = g_fCurrentRunTime[client];
 	float percent = -1.0;
 	int totalPoints = 0;
 	char szPercnt[24];
@@ -3773,42 +3808,49 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 	}
 
 	g_fCheckpointTimesNew[zonegroup][client][zone] = time;
+	
+	for (int i = 0; i < 3; i++)
+	{
+		g_iCheckpointVelsEndNew[zonegroup][client][zone][i] = speed[i];
+	}
 
 	// Server record difference
 	char sz_srDiff[128];
 	char sz_srDiff_colorless[128];
 
+	char sz_srDiffVel[128];
+	char sz_srDiffVel_colorless[128];
+
 	if (g_bCheckpointRecordFound[zonegroup] && g_fCheckpointServerRecord[zonegroup][zone] > 0.1 && g_bTimerRunning[client])
 	{
 		float f_srDiff = (g_fCheckpointServerRecord[zonegroup][zone] - time);
-
 		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
 
 		if (f_srDiff > 0)
 		{
 			Format(sz_srDiff_colorless, 128, "-%s", sz_srDiff);
-			Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
+			Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
 			if (zonegroup > 0)
-				Format(g_szLastSRDifference[client], 64, "SR: <font color='#5e5'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "WR: <font color='#0f0'>%s</font>", sz_srDiff_colorless);
 			else
-				Format(g_szLastSRDifference[client], 64, "SR: <font color='#5e5'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "WR: <font color='#0f0'>%s</font>", sz_srDiff_colorless);
 
 		}
 		else
 		{
 			Format(sz_srDiff_colorless, 128, "+%s", sz_srDiff);
-			Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
+			Format(sz_srDiff, 128, "%cWR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
 			if (zonegroup > 0)
-				Format(g_szLastSRDifference[client], 64, "SR: <font color='#f32'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "WR: <font color='#f00'>%s</font>", sz_srDiff_colorless);
 			else if (g_iCurrentStyle[client] > 0)
-				Format(g_szLastSRDifference[client], 64, "\tSR: <font color='#f32'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "\tWR: <font color='#f00'>%s</font>", sz_srDiff_colorless);
 			else
-				Format(g_szLastSRDifference[client], 64, "SR: <font color='#f32'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "WR: <font color='#f00'>%s</font>", sz_srDiff_colorless);
 		}
 		g_fLastDifferenceTime[client] = GetGameTime();
 	}
 	else
-		Format(sz_srDiff, 128, "%cSR: %cN/A%c", WHITE, LIGHTGREEN, WHITE);
+		Format(sz_srDiff, 128, "%cWR: %cN/A%c", WHITE, LIGHTGREEN, WHITE);
 
 
 	// Get client name for spectators
@@ -3837,23 +3879,156 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 			Format(szDiff_colorless, 32, "-%s", szDiff);
 			Format(szDiff, sizeof(szDiff), "%c-%s", LIGHTGREEN, szDiff);
 			if (zonegroup > 0)
-				Format(g_szLastPBDifference[client], 64, "PB: <font color='#5e5'>%s</font>", szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "PB: <font color='#00ff00'>%s</font>", szDiff_colorless);
 			else
-				Format(g_szLastPBDifference[client], 64, "PB: <font color='#5e5'>%s</font>", szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "PB: <font color='#00ff00'>%s</font>", szDiff_colorless);
 
+			/*
+			if (zonegroup > 0)
+				Format(g_szLastPBDifference[client], 64, "%s <font color='#99ff99' size='16'>%s</font>", g_szPersonalRecordBonus[zonegroup][client], szDiff_colorless);
+			else
+				Format(g_szLastPBDifference[client], 64, "%s <font color='#99ff99' size='16'>%s</font>", g_szPersonalRecord[client], szDiff_colorless);
+				*/
 		}
 		else
 		{
 			Format(szDiff_colorless, 32, "+%s", szDiff);
 			Format(szDiff, sizeof(szDiff), "%c+%s", RED, szDiff);
 			if (zonegroup > 0)
-				Format(g_szLastPBDifference[client], 64, "PB: <font color='#f32'>%s</font>", szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "PB: <font color='#FF0000'>%s</font>", szDiff_colorless);
 			else
-				Format(g_szLastPBDifference[client], 64, "PB: <font color='#f32'>%s</font>", szDiff_colorless);
-
+				Format(g_szLastPBDifference[client], 64, "PB: <font color='#FF0000'>%s</font>", szDiff_colorless);
+			/*
+			if (zonegroup > 0)
+				Format(g_szLastPBDifference[client], 64, "%s <font color='#FF9999' size='16'>%s</font>", g_szPersonalRecordBonus[zonegroup][client], szDiff_colorless);
+			else
+				Format(g_szLastPBDifference[client], 64, "%s <font color='#FF9999' size='16'>%s</font>", g_szPersonalRecord[client], szDiff_colorless);
+			*/
 		}
 		g_fLastDifferenceTime[client] = GetGameTime();
 
+		// Velocity Difference
+		char szDiffVel[128];
+		char szDiffVel_colorless[128];
+		char szStartWR[256], szStartPB[256];
+		char szEnd[256];
+		char szEndWR[256];
+		int diffVel, savedSpeed, currentSpeed;
+
+		// FormatTimeFloat(client, diffVel, 3, szDiffVel, 32);
+
+		// // MOVE TO PB variable
+		//ShowVelocityPB
+		//"en"		"{1} Start: 0 u/s [PB +0 u/s] | {2}: {3} [PB {4} u/s]"
+
+		// WR Start Speed
+		int startSpeedDiffWR, startSpeedDiffPB;
+		int compare, compare2;
+		if (zone == 0)
+		{
+			speedType = 1;
+			compare = g_iStartVelsServerRecord[0][1];
+			compare2 = g_iStartVelsNew[client][0][1];
+		}
+		else
+		{
+			if (g_mapZones[zone][preSpeed] > 250.0 || !g_bhasStages)
+				speedType = 0;
+			else
+				speedType = 1;
+				
+			compare = g_iCheckpointVelsStartServerRecord[zonegroup][zone - 1][speedType];
+			compare2 = g_iCheckpointVelsStartNew[zonegroup][client][zone - 1][speedType];
+		}
+		
+		if (compare == 0)
+			startSpeedDiffWR = compare2;
+		else if (compare > compare2)
+			startSpeedDiffWR = (compare - compare2);
+		else
+			startSpeedDiffWR = (compare2 - compare);
+		
+		if (compare2 > compare)
+			Format(szStartWR, sizeof(szStartWR), "+%d", startSpeedDiffWR);
+		else
+			Format(szStartWR, sizeof(szStartWR), "-%d", startSpeedDiffWR);
+			
+	
+		// WR End Speed
+		int f_srDiffVel;
+		if (g_iCheckpointVelsEndServerRecord[zonegroup][zone][speedType] == 0)
+			f_srDiffVel = speed[speedType];
+		else if (g_iCheckpointVelsEndServerRecord[zonegroup][zone][speedType] > speed[speedType])
+			f_srDiffVel = (g_iCheckpointVelsEndServerRecord[zonegroup][zone][speedType] - speed[speedType]);
+		else
+			f_srDiffVel = (speed[speedType] - g_iCheckpointVelsEndServerRecord[zonegroup][zone][speedType]);
+
+		int srDiffVel = f_srDiffVel;
+		if (speed[speedType] > g_iCheckpointVelsEndServerRecord[zonegroup][zone][speedType] || g_iCheckpointVelsEndServerRecord[zonegroup][zone][speedType] == 0)
+		{
+			Format(sz_srDiffVel_colorless, 128, "+%d", srDiffVel);
+			Format(sz_srDiffVel, 128, "%s", sz_srDiffVel_colorless);
+			Format(szEndWR, sizeof(szEndWR), sz_srDiffVel);
+		}
+		else
+		{
+			Format(sz_srDiffVel_colorless, 128, "-%d", srDiffVel);
+			Format(sz_srDiffVel, 128, "%s", sz_srDiffVel_colorless);
+			Format(szEndWR, sizeof(szEndWR), sz_srDiffVel);
+		}
+		
+		// PB Start Speed
+		if (zone == 0)
+		{
+			compare = g_iStartVelsRecord[client][0][speedType];
+			compare2 = g_iStartVelsNew[client][0][speedType];
+		}
+		else
+		{
+			compare = g_iCheckpointVelsStartRecord[zonegroup][client][zone - 1][speedType];
+			compare2 = g_iCheckpointVelsStartNew[zonegroup][client][zone - 1][speedType];
+		}
+		
+		if (compare == 0)
+			startSpeedDiffPB = compare2;
+		else if (compare > compare2)
+			startSpeedDiffPB = (compare - compare2);
+		else
+			startSpeedDiffPB = (compare2 - compare);
+		
+		if (compare2 > compare)
+			Format(szStartPB, sizeof(szStartPB), "+%d", startSpeedDiffPB);
+		else
+			Format(szStartPB, sizeof(szStartPB), "-%d", startSpeedDiffPB);
+
+		// PB End Speed
+		
+		savedSpeed = g_iCheckpointVelsEndRecord[zonegroup][client][zone][speedType];
+		currentSpeed = speed[speedType];
+
+		if (savedSpeed == 0)
+			diffVel = currentSpeed;
+		else if (savedSpeed > currentSpeed)
+			diffVel = (savedSpeed - currentSpeed);
+		else
+			diffVel = (currentSpeed - savedSpeed);
+
+		int iDiffVel = diffVel;
+		if (currentSpeed > savedSpeed || savedSpeed == 0)
+		{
+			Format(szDiffVel_colorless, 128, "+%d", iDiffVel);
+			Format(szDiffVel, 128, "%s", szDiffVel_colorless);
+			Format(szEnd, sizeof(szEnd), szDiffVel);
+			// Format(szDiff, 128, "%s%s", szDiff, szDiffVel);
+		}
+		else
+		{
+			Format(szDiffVel_colorless, 128, "%d", iDiffVel);
+			Format(szDiffVel, 128, "-%s", szDiffVel_colorless);
+			Format(szEnd, sizeof(szEnd), szDiffVel);
+			// Format(szDiff, 128, "%s%s", szDiff, szDiffVel);
+		}
+		
 		if (g_fCheckpointTimesRecord[zonegroup][client][zone] <= 0.0)
 			Format(szDiff, 128, "");
 
@@ -3861,6 +4036,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		FormatTimeFloat(client, time, 3, szTime, 32);
 
 		// Checkpoint forward
+		//forward Action:surftimer_OnCheckpoint(client, Float:fRunTime, String:sRunTime[54], Float:fPbCp, String:sPbDiff[16], Float:fSrCp, String:sSrDiff[16]);
 		Call_StartForward(g_MapCheckpointForward);
 
 		/* Push parameters one at a time */
@@ -3875,8 +4051,22 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		/* Finish the call, get the result */
 		Call_Finish();
 
-		if (g_bCheckpointsEnabled[client] && g_iCpMessages[client])
+		if (g_bCheckpointsEnabled[client])
+		{
 			CPrintToChat(client, "%t", "Misc30", g_szChatPrefix, g_iClientInZone[client][1] + 1, szTime, szDiff, sz_srDiff);
+			// if velocity setting enabled
+			//ShowVelocityPB
+			// "#format"	"{1:s},{2:i},{3:s},{4:s},{5:i},{6:i},{7:s},{8:s}"
+			// "en"		"{1} Start: {yellow}{2} u/s {default}[WR {3} {default}| PB {4}{default}] | {5}: {yellow}{6} {default}[WR {7} {default}| PB {8}{default}]"
+			int startSpeed;
+			if (zone == 0)
+				startSpeed = g_iStartVelsNew[client][0][speedType];
+			else
+				startSpeed = g_iCheckpointVelsStartNew[zonegroup][client][zone - 1][speedType];
+
+			if (g_bShowSpeedDifferenceChat[client])
+				CPrintToChat(client, "%t", "ShowVelocityCP", g_szChatPrefix, startSpeed, szStartWR, szStartPB, (g_bhasStages ? "End" : "Touch"), speed[speedType], szEndWR, szEnd);
+		}
 
 		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "Misc31", g_szChatPrefix, szName, g_iClientInZone[client][1] + 1, szTime, szDiff, sz_srDiff);
 		CheckpointToSpec(client, szSpecMessage);
@@ -3887,6 +4077,70 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 	else // if first run
 		if (g_bTimerRunning[client] && !g_bPracticeMode[client])
 		{
+			char szStartWR[256];
+			char szEndWR[256];
+			// WR Start Speed
+			int startSpeedDiffWR;
+			int compare, compare2;
+			if (zone == 0)
+			{
+				speedType = 1;
+				compare = g_iStartVelsServerRecord[0][speedType];
+				compare2 = g_iStartVelsNew[client][0][speedType];
+			}
+			else
+			{
+				if (g_mapZones[zone][preSpeed] > 250.0)
+					speedType = 0;
+				else
+					speedType = 1;
+
+				compare = g_iCheckpointVelsStartServerRecord[zonegroup][zone - 1][speedType];
+				compare2 = g_iCheckpointVelsStartNew[zonegroup][client][zone - 1][speedType];
+			}
+			
+			if (compare == 0)
+				startSpeedDiffWR = compare2;
+			else if (compare > compare2)
+				startSpeedDiffWR = (compare - compare2);
+			else
+				startSpeedDiffWR = (compare2 - compare);
+			
+			if (compare2 > compare)
+				Format(szStartWR, sizeof(szStartWR), "+%d", startSpeedDiffWR);
+			else
+				Format(szStartWR, sizeof(szStartWR), "-%d", startSpeedDiffWR);
+				
+		
+			// WR End Speed
+			int f_srDiffVel;
+			if (g_iCheckpointVelsEndServerRecord[zonegroup][zone][speedType] == 0)
+				f_srDiffVel = speed[speedType];
+			else
+				f_srDiffVel = (g_iCheckpointVelsEndServerRecord[zonegroup][zone][speedType] - speed[speedType]);
+
+			int srDiffVel = f_srDiffVel;
+			if (speed[speedType] > g_iCheckpointVelsEndServerRecord[zonegroup][zone][speedType] || g_iCheckpointVelsEndServerRecord[zonegroup][zone][speedType] == 0)
+			{
+				Format(sz_srDiffVel_colorless, 128, "+%d", srDiffVel);
+				Format(sz_srDiffVel, 128, "%s", sz_srDiffVel_colorless);
+				Format(szEndWR, sizeof(szEndWR), sz_srDiffVel);
+			}
+			else
+			{
+				Format(sz_srDiffVel_colorless, 128, "-%d", srDiffVel);
+				Format(sz_srDiffVel, 128, "%s", sz_srDiffVel_colorless);
+				Format(szEndWR, sizeof(szEndWR), sz_srDiffVel);
+			}
+
+			int startSpeed;
+			if (zone == 0)
+				startSpeed = g_iStartVelsNew[client][0][speedType];
+			else
+				startSpeed = g_iCheckpointVelsStartNew[zonegroup][client][zone - 1][speedType];
+
+			if (g_bShowSpeedDifferenceChat[client])
+				CPrintToChat(client, "%t", "ShowVelocityCP", g_szChatPrefix, startSpeed, szStartWR, "N/A", (g_bhasStages ? "End" : "Touch"), speed[speedType], szEndWR, "N/A");
 			// Set percent of completion to assist
 			if (CS_GetMVPCount(client) < 1)
 				CS_SetClientAssists(client, RoundToFloor(g_fMaxPercCompleted[client]));
@@ -3912,7 +4166,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 
 			if (percent > -1.0)
 			{
-				if (g_bCheckpointsEnabled[client] && g_iCpMessages[client])
+				if (g_bCheckpointsEnabled[client])
 					CPrintToChat(client, "%t", "Misc32", g_szChatPrefix, g_iClientInZone[client][1] + 1, szTime, sz_srDiff);
 
 				Format(szSpecMessage, sizeof(szSpecMessage), "%t", "Misc33", g_szChatPrefix, szName, g_iClientInZone[client][1] + 1, szTime, sz_srDiff);

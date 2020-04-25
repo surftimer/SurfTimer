@@ -490,8 +490,8 @@ public void EndTouch(int client, int action[3])
 		// Set Client targetName
 		if (StrEqual(g_szMapName, "surf_forgotten"))
 		{
-			if (!StrEqual("player", g_mapZones[g_iClientInZone[client][3]].TargetName))
-				DispatchKeyValue(client, "targetname", g_mapZones[g_iClientInZone[client][3]].TargetName);
+			if (!StrEqual("player", g_mapZones[g_iClientInZone[client][3]][targetName]))
+				DispatchKeyValue(client, "targetname", g_mapZones[g_iClientInZone[client][3]][targetName]);
 		}
 
 		// float CurVelVec[3];
@@ -545,6 +545,38 @@ public void EndTouch(int client, int action[3])
 		// fluffys
 		else if (action[0] == 3) // fluffys stage
 		{
+			float fVelocity[3];
+			GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+			int zoneGrp = action[2];
+			int zone = action[1];
+			// int mode = g_SpeedMode[client];
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][0] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0))); // XY
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][1] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0))); // XYZ
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][2] = RoundToNearest(fVelocity[2]); // Z
+			
+			// int idiff, speedMode = g_SpeedMode[client];
+			int idiff, speedMode;
+
+			if (g_mapZones[zone][preSpeed] > 250.0)
+				speedMode = 0;
+			else
+				speedMode = 1;
+				
+			if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
+				idiff = g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode];
+			else if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] > g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode])
+				idiff = (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] - g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode]);
+			else
+				idiff = (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] - g_iCheckpointVelsStartServerRecord[0][zone][speedMode]);
+			
+			if (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] > g_iCheckpointVelsStartServerRecord[0][zone][speedMode] || g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
+				Format(g_szLastSpeedDifference[client], 128, "(WR +%d)", idiff);
+			else
+				Format(g_szLastSpeedDifference[client], 128, "(WR -%d)", idiff);
+
+
+			g_fLastDifferenceSpeed[client] = GetGameTime();
+			
 			// targetname filters
 			if (StrEqual(g_szMapName, "surf_treespam") && g_Stage[g_iClientInZone[client][2]][client] == 4)
 			{
@@ -567,6 +599,40 @@ public void EndTouch(int client, int action[3])
 			if (!g_bPracticeMode[client] && g_bTimerEnabled[client])
 				CL_OnStartWrcpTimerPress(client);
 
+		}
+		else if (action[0] == 4) // stage & cp
+		{
+			// If velocity
+			float fVelocity[3];
+			GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+			int zoneGrp = action[2];
+			int zone = g_iClientInZone[client][1];
+			// int mode = g_SpeedMode[client];
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][0] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0))); // XY
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][1] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0))); // XYZ
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][2] = RoundToNearest(fVelocity[2]); // Z
+
+			// int idiff, speedMode = g_SpeedMode[client];
+			int idiff, speedMode = 0;
+
+			if (g_mapZones[zone][preSpeed] > 250.0)
+				speedMode = 0;
+			else
+				speedMode = 1;
+				
+			if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
+				idiff = g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode];
+			else if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] > g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode])
+				idiff = (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] - g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode]);
+			else
+				idiff = (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] - g_iCheckpointVelsStartServerRecord[0][zone][speedMode]);
+			
+			if (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] > g_iCheckpointVelsStartServerRecord[0][zone][speedMode] || g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
+				Format(g_szLastSpeedDifference[client], 128, "(WR +%d)", idiff);
+			else
+				Format(g_szLastSpeedDifference[client], 128, "(WR -%d)", idiff);
+			
+			g_fLastDifferenceSpeed[client] = GetGameTime();
 		}
 		else if (action[0] == 9) // fluffys nojump
 		{
