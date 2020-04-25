@@ -116,6 +116,7 @@ ConVar g_dcCalladminName = null;
 ConVar g_dcBugTrackerName = null;
 ConVar g_drDeleteSecurity = null;
 ConVar g_iAdminCountryTags = null;
+ConVar g_iVIPCommands = null;
 ConVar g_replayBotDelay = null;
 ConVar g_AllowPause = null;
 
@@ -163,9 +164,11 @@ void CreateConVars()
 	g_dcBugTrackerName = CreateConVar("ck_discord_bug_tracker_name", "Bugtracker", "Webhook name for !bug - Discord side", FCVAR_NOTIFY);
 	g_dcBonusRecordName = CreateConVar("ck_discord_bonus_record_name", "Surf Records", "Webhook name for bonus record announcements - Discord side", FCVAR_NOTIFY);
 	g_dcMapRecordName = CreateConVar("ck_discord_map_record_name", "Surf Records", "Webhook name for map record announcements - Discord side", FCVAR_NOTIFY);
-	g_drDeleteSecurity = CreateConVar("ck_dr_delete_security", "1", "(1 / 0) Disabled/Enable delete security for !dr command", FCVAR_NOTIFY, true, 0.0, true, 1.0);
-	g_iAdminCountryTags = CreateConVar("ck_admin_country_tags", "0", "(1 / 0) Disabled/Enable country tags for admins", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	g_drDeleteSecurity = CreateConVar("ck_dr_delete_security", "1", "(1 / 0) Enable/Disable delete security for !dr command", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	g_iAdminCountryTags = CreateConVar("ck_admin_country_tags", "0", "(1 / 0) Enable/Disable country tags for admins", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_replayBotDelay = CreateConVar("ck_replay_bot_delay", "10", "Delay in seconds after initial mapstart after the bots join the server", FCVAR_NOTIFY, true, 10.0);
+	g_iVIPCommands = CreateConVar("ck_vip_commands", "1", "(1 / 0) Enable/Disable all SurfTimer VIP commands.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	g_iVIPCommands = FindConVar("ck_vip_commands");
 
 	g_hPointSystem = CreateConVar("ck_point_system", "1", "on/off - Player point system", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	HookConVarChange(g_hPointSystem, OnSettingChanged);
