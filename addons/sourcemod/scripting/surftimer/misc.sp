@@ -131,6 +131,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	if (!IsValidZonegroup(zonegroup))
 	{
 		CPrintToChat(client, "%t", "Misc1", g_szChatPrefix);
+		db_selectMapZones();
 		return;
 	}
 
