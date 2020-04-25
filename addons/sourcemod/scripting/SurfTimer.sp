@@ -748,9 +748,6 @@ int g_iTeleSide[MAXPLAYERS + 1];
 // Prestrafe Message
 bool g_iPrespeedText[MAXPLAYERS + 1];
 
-// Silent Spectate
-bool g_iSilentSpectate[MAXPLAYERS + 1];
-
 // CP Messages
 bool g_iCpMessages[MAXPLAYERS + 1];
 
