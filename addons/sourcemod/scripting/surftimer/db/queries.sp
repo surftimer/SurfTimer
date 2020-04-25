@@ -123,3 +123,4 @@ char sql_MainDeleteQeury[] = "DELETE From %s where mapname='%s' and style='%i' a
 
 char sql_selectMapWrcp[] = "SELECT name, MIN(runtimepro), stage, style, velStartXY, velStartXYZ, velStartZ, velEndXY, velEndXYZ, velEndZ FROM ck_wrcps WHERE mapname = '%s' GROUP BY stage, style;";
 char sql_selectStageTimes[] = "SELECT runtimepro, stage, style, velStartXY, velStartXYZ, velStartZ, velEndXY, velEndXYZ, velEndZ FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > '0.0';";
+char sql_selectPersonalRecords[] = "SELECT runtimepro, style, velStartXY, velStartXYZ, velStartZ FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > 0.0;";

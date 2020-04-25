@@ -3030,12 +3030,12 @@ public void db_viewPersonalRecords(int client, char szSteamId[32], char szMapNam
 	char szName[32];
 	GetClientName(client, szName, sizeof(szName));
 	g_fClientsLoading[client][0] = GetGameTime();
-	LogToFileEx(g_szLogFile, "[SurfTimer] Loading %s - %s settings", szSteamId, szName);
+	LogToFileEx(g_szLogFile, "[Surftimer] Loading %s - %s settings", szSteamId, szName);
 
 	g_fTick[client][0] = GetGameTime();
 
 	char szQuery[1024];
-	Format(szQuery, 1024, "SELECT runtimepro, style FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > 0.0;", szSteamId, szMapName);
+	Format(szQuery, 1024, sql_selectPersonalRecords, szSteamId, szMapName);
 	SQL_TQuery(g_hDb, SQL_selectPersonalRecordsCallback, szQuery, client, DBPrio_Low);
 }
 
