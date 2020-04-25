@@ -85,7 +85,7 @@
 
 // Checkpoint Definitions
 // Maximum amount of checkpoints in a map
-#define CPLIMIT 37
+#define CPLIMIT 100
 
 // Zone Definitions
 #define ZONE_MODEL "models/props/de_train/barrel.mdl"
@@ -288,12 +288,43 @@ bool g_bhasBonus;
 
 // Clients best run's times
 float g_fCheckpointTimesRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
+// Velocity 0 = XY, 1 = XYZ, 2 = Z
+int g_iCheckpointVelsStartRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT][3];
+int g_iCheckpointVelsEndRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT][3];
+int g_iCheckpointVelsAvgRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT][3];
 
 // Clients current run's times
 float g_fCheckpointTimesNew[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
+// Velocity 0 = XY, 1 = XYZ, 2 = Z
+int g_iCheckpointVelsStartNew[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT][3];
+int g_iCheckpointVelsEndNew[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT][3];
+int g_iCheckpointVelsAvgNew[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT][3];
 
 // Server record checkpoint times
 float g_fCheckpointServerRecord[MAXZONEGROUPS][CPLIMIT];
+// Velocity 0 = XY, 1 = XYZ, 2 = Z
+int g_iCheckpointVelsStartServerRecord[MAXZONEGROUPS][CPLIMIT][3];
+int g_iCheckpointVelsEndServerRecord[MAXZONEGROUPS][CPLIMIT][3];
+int g_iCheckpointVelsAvgServerRecord[MAXZONEGROUPS][CPLIMIT][3];
+
+// Start Velocitys
+int g_iStartVelsServerRecord[MAXZONEGROUPS][3];
+int g_iStartVelsRecord[MAXPLAYERS + 1][MAXZONEGROUPS][3];
+int g_iStartVelsNew[MAXPLAYERS + 1][MAXZONEGROUPS][3];
+
+// End Velocitys
+int g_iEndVelsServerRecord[MAXZONEGROUPS][3];
+int g_iEndVelsRecord[MAXPLAYERS + 1][MAXZONEGROUPS][3];
+int g_iEndVelsNew[MAXPLAYERS + 1][MAXZONEGROUPS][3];
+
+// WRCP Velocitys
+int g_iWrcpVelsStartNew[MAXPLAYERS + 1][CPLIMIT][3];
+int g_iWrcpVelsStartRecord[MAXPLAYERS + 1][CPLIMIT][3];
+int g_iWrcpVelsStartServerRecord[CPLIMIT][3];
+
+int g_iWrcpVelsEndNew[MAXPLAYERS + 1][CPLIMIT][3];
+int g_iWrcpVelsEndRecord[MAXPLAYERS + 1][CPLIMIT][3];
+int g_iWrcpVelsEndServerRecord[CPLIMIT][3];
 
 // Last difference to the server record checkpoint
 char g_szLastSRDifference[MAXPLAYERS + 1][64];
@@ -1268,6 +1299,11 @@ float g_fClientCPs[MAXPLAYERS + 1][36];
 float g_fTargetTime[MAXPLAYERS + 1];
 char g_szTargetCPR[MAXPLAYERS + 1][MAX_NAME_LENGTH];
 char g_szCPRMapName[MAXPLAYERS + 1][128];
+int g_fClientVelsStart[MAXPLAYERS + 1][CPLIMIT][3];
+int g_fClientVelsEnd[MAXPLAYERS + 1][CPLIMIT][3];
+int g_fTargetVelsStart[MAXPLAYERS + 1][CPLIMIT][3];
+int g_fTargetVelsEnd[MAXPLAYERS + 1][CPLIMIT][3];
+// float g_fTargetCPs[MAXPLAYERS + 1][35];
 
 // surf_christmas2
 bool g_bUsingStageTeleport[MAXPLAYERS + 1];
