@@ -193,8 +193,6 @@ void CreateCommands()
 	// Setting Commands
 	RegConsoleCmd("sm_pre", Command_Prestrafe, "[surftimer] [settings] Toggles prestrafe messages for player");
 	RegConsoleCmd("sm_prestrafe", Command_Prestrafe, "[surftimer] [settings] Toggles prestrafe messages for player");
-	RegConsoleCmd("sm_silentspec", Command_SilentSpec, "[surftimer] [settings] Toggles silent spectate for player");
-	RegConsoleCmd("sm_sspec", Command_SilentSpec, "[surftimer] [settings] Toggles silent spectate for player");
 	RegConsoleCmd("sm_togglewrcps", Command_ToggleWrcps, "[surftimer] [settings] on/off - Enable player checkpoints");
 	RegConsoleCmd("sm_togglecps", Command_ToggleCps, "[surftimer] [settings] on/off - Enable player checkpoints");
 	RegConsoleCmd("sm_quake", Command_ToggleQuake, "[surftimer] [settings] on/off - Enable sounds");
@@ -313,19 +311,6 @@ public Action Command_ToggleCps(int client, int args) {
 	} else {
 		g_iCpMessages[client] = true;
 		CPrintToChat(client, "%t", "ToggleCpsMessageToggleOn", g_szChatPrefix);
-	}
-	return Plugin_Handled;
-}
-
-public Action Command_SilentSpec(int client, int args) {
-	if (!IsPlayerVip(client)) return Plugin_Handled;
-	
-	if (g_iSilentSpectate[client]) {
-		g_iSilentSpectate[client] = false;
-		CPrintToChat(client, "%t", "SilentSpecMessageToggleOff", g_szChatPrefix);
-	} else {
-		g_iSilentSpectate[client] = true;
-		CPrintToChat(client, "%t", "SilentSpecMessageToggleOn", g_szChatPrefix);
 	}
 	return Plugin_Handled;
 }
