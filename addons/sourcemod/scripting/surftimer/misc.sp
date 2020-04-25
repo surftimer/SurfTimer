@@ -3072,7 +3072,7 @@ public void SpecListMenuAlive(int client) // What player sees
 	count = 0;
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if (IsValidClient(i) && !IsFakeClient(client) && !IsPlayerAlive(i) && !g_bFirstTeamJoin[i] && g_bSpectate[i])
+		if (IsValidClient(i) && !IsFakeClient(client) && !IsPlayerAlive(i) && !g_bFirstTeamJoin[i] && g_bSpectate[i] && !g_iSilentSpectate[i])
 		{
 			SpecMode = GetEntProp(i, Prop_Send, "m_iObserverMode");
 			if (SpecMode == 4 || SpecMode == 5)
