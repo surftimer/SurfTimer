@@ -378,14 +378,14 @@ public void db_deleteSpawnLocations(int zGrp, int teleside)
 public void db_updateSpawnLocations(float position[3], float angle[3], float vel[3], int zGrp, int teleside)
 {
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), sql_updateSpawnLocations, position[0], position[1], position[2], angle[0], angle[1], angle[2], vel[0], vel[1], vel[2], g_szMapName, zGrp, teleside);
+	Format(szQuery, sizeof(szQuery), sql_updateSpawnLocations, position[0], position[1], position[2], angle[0], angle[1], angle[2], vel[0], vel[1], vel[2], g_szMapName, zGrp, teleside);
 	g_dDb.Query(db_editSpawnLocationsCallback, szQuery, zGrp, DBPrio_Low);
 }
 
 public void db_insertSpawnLocations(float position[3], float angle[3], float vel[3], int zGrp, int teleside)
 {
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), sql_insertSpawnLocations, g_szMapName, position[0], position[1], position[2], angle[0], angle[1], angle[2], vel[0], vel[1], vel[2], zGrp, teleside);
+	Format(szQuery, sizeof(szQuery), sql_insertSpawnLocations, g_szMapName, position[0], position[1], position[2], angle[0], angle[1], angle[2], vel[0], vel[1], vel[2], zGrp, teleside);
 	g_dDb.Query(db_editSpawnLocationsCallback, szQuery, zGrp, DBPrio_Low);
 }
 
@@ -458,7 +458,7 @@ public void db_viewMapProRankCount()
 {
 	g_MapTimesCount = 0;
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), sql_selectPlayerProCount, g_szMapName);
+	Format(szQuery, sizeof(szQuery), sql_selectPlayerProCount, g_szMapName);
 	g_dDb.Query(sql_selectPlayerProCountCallback, szQuery, DBPrio_Low);
 }
 
@@ -510,7 +510,7 @@ public void db_viewMapRankPro(int client)
 	return;
 
 	// "SELECT COUNT(*) FROM ck_playertimes WHERE runtimepro <= (SELECT runtimepro FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > -1.0) AND mapname = '%s' AND runtimepro > -1.0";
-	Format(szQuery, sizeof(sQuery), sql_selectPlayerRankProTime, g_szSteamID[client], g_szMapName, g_szMapName);
+	Format(szQuery, sizeof(szQuery), sql_selectPlayerRankProTime, g_szSteamID[client], g_szMapName, g_szMapName);
 	g_dDb.Query(db_viewMapRankProCallback, szQuery, client, DBPrio_Low);
 }
 
@@ -536,7 +536,7 @@ public void db_updateStat(int client, int style)
 
 	char szQuery[512];
 	// "UPDATE ck_playerrank SET finishedmaps ='%i', finishedmapspro='%i', multiplier ='%i'  where steamid='%s'";
-	Format(szQuery, sizeof(sQuery), sql_updatePlayerRank, g_pr_finishedmaps[client], g_pr_finishedmaps[client], g_szSteamID[client], style);
+	Format(szQuery, sizeof(szQuery), sql_updatePlayerRank, g_pr_finishedmaps[client], g_pr_finishedmaps[client], g_szSteamID[client], style);
 
 	g_dDb.Query(SQL_UpdateStatCallback, szQuery, pack, DBPrio_Low);
 
@@ -654,7 +654,7 @@ public void sql_CalcuatePlayerRankCallback(Handle owner, Handle hndl, const char
 
 		// Next up, calculate bonus points:
 		char szQuery[512];
-		Format(szQuery, sizeof(sQuery), "SELECT mapname, (SELECT count(1)+1 FROM ck_bonus b WHERE a.mapname=b.mapname AND a.runtime > b.runtime AND a.zonegroup = b.zonegroup AND b.style = %i) AS `rank`, (SELECT count(1) FROM ck_bonus b WHERE a.mapname = b.mapname AND a.zonegroup = b.zonegroup AND b.style = %i) as total FROM ck_bonus a WHERE steamid = '%s' AND style = %i;", style, style, szSteamId, style);
+		Format(szQuery, sizeof(szQuery), "SELECT mapname, (SELECT count(1)+1 FROM ck_bonus b WHERE a.mapname=b.mapname AND a.runtime > b.runtime AND a.zonegroup = b.zonegroup AND b.style = %i) AS `rank`, (SELECT count(1) FROM ck_bonus b WHERE a.mapname = b.mapname AND a.zonegroup = b.zonegroup AND b.style = %i) as total FROM ck_bonus a WHERE steamid = '%s' AND style = %i;", style, style, szSteamId, style);
 		g_dDb.Query(sql_CountFinishedBonusCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
@@ -675,7 +675,7 @@ public void sql_CalcuatePlayerRankCallback(Handle owner, Handle hndl, const char
 
 			// "INSERT INTO ck_playerrank (steamid, name, country) VALUES('%s', '%s', '%s');";
 			// No need to continue calculating, as the doesn't have any records.
-			Format(szQuery, sizeof(sQuery), sql_insertPlayerRank, szSteamId, szSteamId64, szName, g_szCountry[client], GetTime(), style);
+			Format(szQuery, sizeof(szQuery), sql_insertPlayerRank, szSteamId, szSteamId64, szName, g_szCountry[client], GetTime(), style);
 			g_dDb.Query(SQL_InsertPlayerCallBack, szQuery, client, DBPrio_Low);
 
 			g_pr_finishedmaps[client][style] = 0;
@@ -852,7 +852,7 @@ public void sql_CountFinishedBonusCallback(Handle owner, Handle hndl, const char
 	g_WRs[client][style][1] = wrbs;
 	// Next up: Points from stages
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), "SELECT mapname, stage, (select count(1)+1 from ck_wrcps b where a.mapname=b.mapname and a.runtimepro > b.runtimepro and a.style = b.style and a.stage = b.stage) AS `rank` FROM ck_wrcps a where steamid = '%s' AND style = %i;", szSteamId, style);
+	Format(szQuery, sizeof(szQuery), "SELECT mapname, stage, (select count(1)+1 from ck_wrcps b where a.mapname=b.mapname and a.runtimepro > b.runtimepro and a.style = b.style and a.stage = b.stage) AS `rank` FROM ck_wrcps a where steamid = '%s' AND style = %i;", szSteamId, style);
 	g_dDb.Query(sql_CountFinishedStagesCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -915,7 +915,7 @@ public void sql_CountFinishedStagesCallback(Handle owner, Handle hndl, const cha
 
 	// Next up: Points from maps
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), "SELECT mapname, (select count(1)+1 from ck_playertimes b where a.mapname=b.mapname and a.runtimepro > b.runtimepro AND b.style = %i) AS `rank`, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname AND b.style = %i) as total, (SELECT tier FROM `ck_maptier` b WHERE a.mapname = b.mapname) as tier FROM ck_playertimes a where steamid = '%s' AND style = %i;", style, style, szSteamId, style);
+	Format(szQuery, sizeof(szQuery), "SELECT mapname, (select count(1)+1 from ck_playertimes b where a.mapname=b.mapname and a.runtimepro > b.runtimepro AND b.style = %i) AS `rank`, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname AND b.style = %i) as total, (SELECT tier FROM `ck_maptier` b WHERE a.mapname = b.mapname) as tier FROM ck_playertimes a where steamid = '%s' AND style = %i;", style, style, szSteamId, style);
 	g_dDb.Query(sql_CountFinishedMapsCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -1289,7 +1289,7 @@ public void db_updatePoints(int client, int style)
 	if (client > MAXPLAYERS && g_pr_RankingRecalc_InProgress || client > MAXPLAYERS && g_bProfileRecalc[client])
 	{
 		g_dDb.Escape(g_pr_szName[client], szName, MAX_NAME_LENGTH * 2 + 1);
-		Format(szQuery, sizeof(sQuery), sql_updatePlayerRankPoints, szName, g_pr_points[client][style], g_Points[client][style][3], g_Points[client][style][4], g_Points[client][style][6], g_Points[client][style][5], g_Points[client][style][2], g_Points[client][style][0], g_Points[client][style][1], g_pr_finishedmaps[client][style], g_pr_finishedbonuses[client][style], g_pr_finishedstages[client][style], g_WRs[client][style][0], g_WRs[client][style][1], g_WRs[client][style][2], g_Top10Maps[client][style], g_GroupMaps[client][style], g_pr_szSteamID[client], style);
+		Format(szQuery, sizeof(szQuery), sql_updatePlayerRankPoints, szName, g_pr_points[client][style], g_Points[client][style][3], g_Points[client][style][4], g_Points[client][style][6], g_Points[client][style][5], g_Points[client][style][2], g_Points[client][style][0], g_Points[client][style][1], g_pr_finishedmaps[client][style], g_pr_finishedbonuses[client][style], g_pr_finishedstages[client][style], g_WRs[client][style][0], g_WRs[client][style][1], g_WRs[client][style][2], g_Top10Maps[client][style], g_GroupMaps[client][style], g_pr_szSteamID[client], style);
 		g_dDb.Query(sql_updatePlayerRankPointsCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
@@ -1298,7 +1298,7 @@ public void db_updatePoints(int client, int style)
 		{
 			GetClientName(client, szName, MAX_NAME_LENGTH);
 			GetClientAuthId(client, AuthId_Steam2, szSteamId, MAX_NAME_LENGTH, true);
-			Format(szQuery, sizeof(sQuery), sql_updatePlayerRankPoints2, szName, g_pr_points[client][style], g_Points[client][style][3], g_Points[client][style][4], g_Points[client][style][6], g_Points[client][style][5], g_Points[client][style][2], g_Points[client][style][0], g_Points[client][style][1], g_pr_finishedmaps[client][style], g_pr_finishedbonuses[client][style], g_pr_finishedstages[client][style], g_WRs[client][style][0], g_WRs[client][style][1], g_WRs[client][style][2], g_Top10Maps[client][style], g_GroupMaps[client][style], g_szCountry[client], szSteamId, style);
+			Format(szQuery, sizeof(szQuery), sql_updatePlayerRankPoints2, szName, g_pr_points[client][style], g_Points[client][style][3], g_Points[client][style][4], g_Points[client][style][6], g_Points[client][style][5], g_Points[client][style][2], g_Points[client][style][0], g_Points[client][style][1], g_pr_finishedmaps[client][style], g_pr_finishedbonuses[client][style], g_pr_finishedstages[client][style], g_WRs[client][style][0], g_WRs[client][style][1], g_WRs[client][style][2], g_Top10Maps[client][style], g_GroupMaps[client][style], g_szCountry[client], szSteamId, style);
 			g_dDb.Query(sql_updatePlayerRankPointsCallback, szQuery, pack, DBPrio_Low);
 		}
 	}
@@ -1511,7 +1511,7 @@ public void db_viewPlayerPointsCallback(Handle owner, Handle hndl, const char[] 
 			char szSteamId64[64];
 			GetClientAuthId(client, AuthId_SteamID64, szSteamId64, MAX_NAME_LENGTH, true);
 
-			Format(szQuery, sizeof(sQuery), sql_insertPlayerRank, g_szSteamID[client], szSteamId64, szName, g_szCountry[client], GetTime());
+			Format(szQuery, sizeof(szQuery), sql_insertPlayerRank, g_szSteamID[client], szSteamId64, szName, g_szCountry[client], GetTime());
 			g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
 
 			// Play time
@@ -1540,7 +1540,7 @@ public void db_GetPlayerRank(int client, int style)
 
 	char szQuery[512];
 	// "SELECT COUNT(*) FROM ck_playerrank WHERE points >= (SELECT points FROM ck_playerrank WHERE steamid = '%s') ORDER BY points";
-	Format(szQuery, sizeof(sQuery), sql_selectRankedPlayersRank, style, g_szSteamID[client], style);
+	Format(szQuery, sizeof(szQuery), sql_selectRankedPlayersRank, style, g_szSteamID[client], style);
 	g_dDb.Query(sql_selectRankedPlayersRankCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -1629,7 +1629,7 @@ public void db_viewPlayerProfile(int client, int style, char szSteamId[32], bool
 	if (bPlayerFound)
 	{
 		// "SELECT COUNT(*) FROM ck_playerrank WHERE style = %i AND points >= (SELECT points FROM ck_playerrank WHERE steamid = '%s' AND style = %i);";
-		Format(szQuery, sizeof(sQuery), sql_selectRankedPlayersRank, style, szSteamId, style);
+		Format(szQuery, sizeof(szQuery), sql_selectRankedPlayersRank, style, szSteamId, style);
 		g_dDb.Query(sql_selectPlayerRankCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
@@ -1669,7 +1669,7 @@ public void sql_selectUnknownPlayerCallback (Handle owner, Handle hndl, const ch
 
 		// "SELECT COUNT(*) FROM ck_playerrank WHERE style = %i AND points >= (SELECT points FROM ck_playerrank WHERE steamid = '%s' AND style = %i) ORDER BY points";
 		char szQuery[512];
-		Format(szQuery, sizeof(sQuery), sql_selectRankedPlayersRank, style, szSteamId, style);
+		Format(szQuery, sizeof(szQuery), sql_selectRankedPlayersRank, style, szSteamId, style);
 		g_dDb.Query(sql_selectPlayerRankCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
@@ -1979,7 +1979,7 @@ public void db_GetMapRecord_Pro()
 
 	char szQuery[512];
 	// SELECT MIN(runtimepro), name, steamid, style FROM ck_playertimes WHERE mapname = '%s' AND runtimepro > -1.0 GROUP BY style
-	Format(szQuery, sizeof(sQuery), sql_selectMapRecord, g_szMapName);
+	Format(szQuery, sizeof(szQuery), sql_selectMapRecord, g_szMapName);
 	g_dDb.Query(sql_selectMapRecordCallback, szQuery, DBPrio_Low);
 }
 
@@ -2185,7 +2185,7 @@ public void db_selectBonusesInMap(int client, char mapname[128])
 {
 	// SELECT mapname, zonegroup, zonename FROM `ck_zones` WHERE mapname LIKE '%c%s%c' AND zonegroup > 0 GROUP BY zonegroup;
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), sql_selectBonusesInMap, PERCENT, mapname, PERCENT);
+	Format(szQuery, sizeof(szQuery), sql_selectBonusesInMap, PERCENT, mapname, PERCENT);
 	g_dDb.Query(db_selectBonusesInMapCallback, szQuery, client, DBPrio_Low);
 }
 
@@ -2363,7 +2363,7 @@ public void db_currentRunRank(int client)
 	return;
 
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), "SELECT count(runtimepro)+1 FROM `ck_playertimes` WHERE `mapname` = '%s' AND `runtimepro` < %f;", g_szMapName, g_fFinalTime[client]);
+	Format(szQuery, sizeof(szQuery), "SELECT count(runtimepro)+1 FROM `ck_playertimes` WHERE `mapname` = '%s' AND `runtimepro` < %f;", g_szMapName, g_fFinalTime[client]);
 	g_dDb.Query(SQL_CurrentRunRankCallback, szQuery, client, DBPrio_Low);
 }
 
@@ -2435,7 +2435,7 @@ public void sql_selectRecordCallback(Handle owner, Handle hndl, const char[] err
 		WritePackCell(pack, data);
 
 		// "INSERT INTO ck_playertimes (steamid, mapname, name, runtimepro, style) VALUES('%s', '%s', '%s', '%f', %i);";
-		Format(szQuery, sizeof(sQuery), sql_insertPlayerTime, g_szSteamID[data], g_szMapName, szName, g_fFinalTime[data], 0);
+		Format(szQuery, sizeof(szQuery), sql_insertPlayerTime, g_szSteamID[data], g_szMapName, szName, g_fFinalTime[data], 0);
 		g_dDb.Query(SQL_UpdateRecordProCallback, szQuery, pack, DBPrio_Low);
 
 		g_bInsertNewTime = true;
@@ -2485,7 +2485,7 @@ public void SQL_UpdateRecordProCallback(Handle owner, Handle hndl, const char[] 
 
 		// Find out how many times are are faster than the players time
 		char szQuery[512];
-		Format(szQuery, sizeof(sQuery), "SELECT count(runtimepro) FROM `ck_playertimes` WHERE `mapname` = '%s' AND `runtimepro` < %f-(1E-3) AND style = 0;", g_szMapName, time);
+		Format(szQuery, sizeof(szQuery), "SELECT count(runtimepro) FROM `ck_playertimes` WHERE `mapname` = '%s' AND `runtimepro` < %f-(1E-3) AND style = 0;", g_szMapName, time);
 		g_dDb.Query(SQL_UpdateRecordProCallback2, szQuery, client, DBPrio_Low);
 
 	}
@@ -2665,7 +2665,7 @@ public void SQL_ViewAllRecordsCallback2(Handle owner, Handle hndl, const char[] 
 		ReadPackString(data, szSteamId, 32);
 		ReadPackString(data, szMapName, 128);
 
-		Format(szQuery, sizeof(sQuery), sql_selectPlayerProCount, szMapName);
+		Format(szQuery, sizeof(szQuery), sql_selectPlayerProCount, szMapName);
 		g_dDb.Query(SQL_ViewAllRecordsCallback3, szQuery, data, DBPrio_Low);
 	}
 }
@@ -2901,7 +2901,7 @@ public void SQL_ViewTop10RecordsCallback2(Handle owner, Handle hndl, const char[
 		ReadPackString(data, szSteamId, 32);
 		ReadPackString(data, szMapName, 128);
 
-		Format(szQuery, sizeof(sQuery), sql_selectPlayerProCount, szMapName);
+		Format(szQuery, sizeof(szQuery), sql_selectPlayerProCount, szMapName);
 		g_dDb.Query(SQL_ViewTop10RecordsCallback3, szQuery, data, DBPrio_Low);
 	}
 }
@@ -3104,7 +3104,7 @@ public void db_selectLastRun(int client)
 	char szQuery[512];
 	if (!IsValidClient(client))
 	return;
-	Format(szQuery, sizeof(sQuery), sql_selectPlayerTmp, g_szSteamID[client], g_szMapName);
+	Format(szQuery, sizeof(szQuery), sql_selectPlayerTmp, g_szSteamID[client], g_szMapName);
 	g_dDb.Query(SQL_LastRunCallback, szQuery, client, DBPrio_Low);
 }
 
@@ -3506,7 +3506,7 @@ public void db_currentBonusRunRank(int client, int zGroup)
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackCell(pack, zGroup);
-	Format(szQuery, sizeof(sQuery), "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '%s' AND zonegroup = '%i' AND runtime < %f", g_szMapName, zGroup, g_fFinalTime[client]);
+	Format(szQuery, sizeof(szQuery), "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '%s' AND zonegroup = '%i' AND runtime < %f", g_szMapName, zGroup, g_fFinalTime[client]);
 	g_dDb.Query(db_viewBonusRunRank, szQuery, pack, DBPrio_Low);
 }
 
@@ -3908,7 +3908,7 @@ public void db_setZoneNames(int client, char szName[128])
 	WritePackCell(pack, g_CurrentSelectedZoneGroup[client]);
 	WritePackString(pack, szEscapedName);
 	// UPDATE ck_zones SET zonename = '%s' WHERE mapname = '%s' AND zonegroup = '%i';
-	Format(szQuery, sizeof(sQuery), sql_setZoneNames, szEscapedName, g_szMapName, g_CurrentSelectedZoneGroup[client]);
+	Format(szQuery, sizeof(szQuery), sql_setZoneNames, szEscapedName, g_szMapName, g_CurrentSelectedZoneGroup[client]);
 	g_dDb.Query(sql_setZoneNamesCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -3949,7 +3949,7 @@ public void db_checkAndFixZoneIds()
 	if (!g_szMapName[0])
 	GetCurrentMap(g_szMapName, 128);
 
-	Format(szQuery, sizeof(sQuery), sql_selectZoneIds, g_szMapName);
+	Format(szQuery, sizeof(szQuery), sql_selectZoneIds, g_szMapName);
 	g_dDb.Query(db_checkAndFixZoneIdsCallback, szQuery, 1, DBPrio_Low);
 }
 
@@ -4611,7 +4611,7 @@ public void db_insertLastPosition(int client, char szMapName[128], int stage, in
 		WritePackCell(pack, stage);
 		WritePackCell(pack, zgroup);
 		char szQuery[512];
-		Format(szQuery, sizeof(sQuery), "SELECT * FROM ck_playertemp WHERE steamid = '%s'", g_szSteamID[client]);
+		Format(szQuery, sizeof(szQuery), "SELECT * FROM ck_playertemp WHERE steamid = '%s'", g_szSteamID[client]);
 		g_dDb.Query(db_insertLastPositionCallback, szQuery, pack, DBPrio_Low);
 	}
 }
@@ -4726,7 +4726,7 @@ public int LatestRecordsMenuHandler(Handle menu, MenuAction action, int param1, 
 public void db_InsertLatestRecords(char szSteamID[32], char szName[128], float FinalTime)
 {
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), sql_insertLatestRecords, szSteamID, szName, FinalTime, g_szMapName);
+	Format(szQuery, sizeof(szQuery), sql_insertLatestRecords, szSteamID, szName, FinalTime, g_szMapName);
 	g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
 }
 
@@ -5233,7 +5233,7 @@ public void db_UpdateLastSeen(int client)
 	if ((StrContains(g_szSteamID[client], "STEAM_") != -1) && !IsFakeClient(client))
 	{
 		char szQuery[512];
-		Format(szQuery, sizeof(sQuery), sql_UpdateLastSeen, g_szSteamID[client]);
+		Format(szQuery, sizeof(szQuery), sql_UpdateLastSeen, g_szSteamID[client]);
 		g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
 	}
 }
@@ -5593,7 +5593,7 @@ public int FinishedMapsMenuHandler(Handle menu, MenuAction action, int client, i
 public void db_selectTotalBonusCount()
 {
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), "SELECT COUNT(DISTINCT a.mapname,zonegroup) FROM ck_zones a RIGHT JOIN ck_maptier b ON a.mapname = b.mapname WHERE a.zonegroup > 0;");
+	Format(szQuery, sizeof(szQuery), "SELECT COUNT(DISTINCT a.mapname,zonegroup) FROM ck_zones a RIGHT JOIN ck_maptier b ON a.mapname = b.mapname WHERE a.zonegroup > 0;");
 	g_dDb.Query(sql_selectTotalBonusCountCallback, szQuery, DBPrio_Low);
 }
 
@@ -5620,7 +5620,7 @@ public void sql_selectTotalBonusCountCallback(Handle owner, Handle hndl, const c
 public void db_selectTotalStageCount()
 {
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), "SELECT SUM(c.stages) FROM (SELECT a.mapname, MAX(zonetypeid)+2 as stages FROM `ck_zones` a RIGHT JOIN ck_maptier b ON a.mapname = b.mapname WHERE zonetype = 3 GROUP BY a.mapname)c;");
+	Format(szQuery, sizeof(szQuery), "SELECT SUM(c.stages) FROM (SELECT a.mapname, MAX(zonetypeid)+2 as stages FROM `ck_zones` a RIGHT JOIN ck_maptier b ON a.mapname = b.mapname WHERE zonetype = 3 GROUP BY a.mapname)c;");
 	g_dDb.Query(sql_selectTotalStageCountCallback, szQuery, DBPrio_Low);
 }
 
@@ -5779,9 +5779,9 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 		WritePackCell(pack, data);
 
 		if (style == 0)
-			Format(szQuery, sizeof(sQuery), "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage) VALUES ('%s', '%s', '%s', '%f', %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage);
+			Format(szQuery, sizeof(szQuery), "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage) VALUES ('%s', '%s', '%s', '%f', %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage);
 		else if (style != 0)
-			Format(szQuery, sizeof(sQuery), "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage, style) VALUES ('%s', '%s', '%s', '%f', %i, %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage, style);
+			Format(szQuery, sizeof(szQuery), "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage, style) VALUES ('%s', '%s', '%s', '%f', %i, %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage, style);
 
 		g_dDb.Query(SQL_UpdateWrcpRecordCallback, szQuery, pack, DBPrio_Low);
 
@@ -5838,9 +5838,9 @@ public void SQL_UpdateWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 	// Find out how many times are are faster than the players time
 	char szQuery[512];
 	if (style == 0)
-		Format(szQuery, sizeof(sQuery), "SELECT count(runtimepro) FROM ck_wrcps WHERE `mapname` = '%s' AND stage = %i AND style = 0 AND runtimepro < %f-(1E-3) AND runtimepro > -1.0;", g_szMapName, stage, stagetime);
+		Format(szQuery, sizeof(szQuery), "SELECT count(runtimepro) FROM ck_wrcps WHERE `mapname` = '%s' AND stage = %i AND style = 0 AND runtimepro < %f-(1E-3) AND runtimepro > -1.0;", g_szMapName, stage, stagetime);
 	else if (style != 0)
-		Format(szQuery, sizeof(sQuery), "SELECT count(runtimepro) FROM ck_wrcps WHERE mapname = '%s' AND runtimepro < %f-(1E-3) AND stage = %i AND style = %i AND runtimepro > -1.0;", g_szMapName, stagetime, stage, style);
+		Format(szQuery, sizeof(szQuery), "SELECT count(runtimepro) FROM ck_wrcps WHERE mapname = '%s' AND runtimepro < %f-(1E-3) AND stage = %i AND style = %i AND runtimepro > -1.0;", g_szMapName, stagetime, stage, style);
 
 	g_dDb.Query(SQL_UpdateWrcpRecordCallback2, szQuery, data, DBPrio_Low);
 }
@@ -6140,7 +6140,7 @@ public void db_viewStageRanks(int client, int stage)
 
 	// "SELECT name,mapname FROM ck_playertimes WHERE runtimepro <= (SELECT runtimepro FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > -1.0) AND mapname = '%s' AND runtimepro > -1.0 ORDER BY runtimepro;";
 	// SELECT name FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '%s' AND mapname= '%s' AND runtime > 0.0 AND zonegroup = %i) AND mapname = '%s' AND zonegroup = %i;
-	Format(szQuery, sizeof(sQuery), "SELECT COUNT(*) FROM ck_wrcps WHERE runtimepro <= (SELECT runtimepro FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > -1.0 AND stage = %i AND style = 0) AND mapname = '%s' AND stage = %i AND style = 0 AND runtimepro > -1.0;", g_szSteamID[client], g_szMapName, stage, g_szMapName, stage);
+	Format(szQuery, sizeof(szQuery), "SELECT COUNT(*) FROM ck_wrcps WHERE runtimepro <= (SELECT runtimepro FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > -1.0 AND stage = %i AND style = 0) AND mapname = '%s' AND stage = %i AND style = 0 AND runtimepro > -1.0;", g_szSteamID[client], g_szMapName, stage, g_szMapName, stage);
 	g_dDb.Query(sql_viewStageRanksCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -6174,7 +6174,7 @@ public void db_GetTotalStages()
 
 	char szQuery[512];
 
-	Format(szQuery, sizeof(sQuery), "SELECT COUNT(`zonetype`) AS stages FROM `ck_zones` WHERE `zonetype` = '3' AND `mapname` = '%s'", g_szMapName);
+	Format(szQuery, sizeof(szQuery), "SELECT COUNT(`zonetype`) AS stages FROM `ck_zones` WHERE `zonetype` = '3' AND `mapname` = '%s'", g_szMapName);
 	g_dDb.Query(db_GetTotalStagesCallback, szQuery, DBPrio_Low);
 }
 
@@ -6205,7 +6205,7 @@ public void db_GetTotalStagesCallback(Handle owner, Handle hndl, const char[] er
 public void db_viewWrcpMap(int client, char mapname[128])
 {
 	char szQuery[1024];
-	Format(szQuery, sizeof(sQuery), "SELECT `mapname`, COUNT(`zonetype`) AS stages FROM `ck_zones` WHERE `zonetype` = '3' AND `mapname` = (SELECT DISTINCT `mapname` FROM `ck_zones` WHERE `zonetype` = '3' AND `mapname` LIKE '%c%s%c' LIMIT 0, 1)", PERCENT, g_szWrcpMapSelect[client], PERCENT);
+	Format(szQuery, sizeof(szQuery), "SELECT `mapname`, COUNT(`zonetype`) AS stages FROM `ck_zones` WHERE `zonetype` = '3' AND `mapname` = (SELECT DISTINCT `mapname` FROM `ck_zones` WHERE `zonetype` = '3' AND `mapname` LIKE '%c%s%c' LIMIT 0, 1)", PERCENT, g_szWrcpMapSelect[client], PERCENT);
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackString(pack, mapname);
@@ -6262,7 +6262,7 @@ public void sql_viewWrcpMapCallback(Handle owner, Handle hndl, const char[] erro
 public void db_viewWrcpMapRecord(int client)
 {
 	char szQuery[1024];
-	Format(szQuery, sizeof(sQuery), "SELECT name, MIN(runtimepro) FROM ck_wrcps WHERE mapname = '%s' AND runtimepro > -1.0 AND stage = %s AND style = 0;", g_szMapName, g_szWrcpMapSelect[client]);
+	Format(szQuery, sizeof(szQuery), "SELECT name, MIN(runtimepro) FROM ck_wrcps WHERE mapname = '%s' AND runtimepro > -1.0 AND stage = %s AND style = 0;", g_szMapName, g_szWrcpMapSelect[client]);
 
 	g_dDb.Query(sql_viewWrcpMapRecordCallback, szQuery, client, DBPrio_Low);
 }
@@ -7114,7 +7114,7 @@ public void sql_viewWrcpStyleMapRecordCallback(Handle owner, Handle hndl, const 
 public void db_viewStyleWrcpMap(int client, char mapname[128], int style)
 {
 	char szQuery[1024];
-	Format(szQuery, sizeof(sQuery), "SELECT `mapname`, COUNT(`zonetype`) AS stages FROM `ck_zones` WHERE `zonetype` = '3' AND `mapname` = (SELECT DISTINCT `mapname` FROM `ck_zones` WHERE `zonetype` = '3' AND `mapname` LIKE '%c%s%c' LIMIT 0, 1)", PERCENT, g_szWrcpMapSelect[client], PERCENT);
+	Format(szQuery, sizeof(szQuery), "SELECT `mapname`, COUNT(`zonetype`) AS stages FROM `ck_zones` WHERE `zonetype` = '3' AND `mapname` = (SELECT DISTINCT `mapname` FROM `ck_zones` WHERE `zonetype` = '3' AND `mapname` LIKE '%c%s%c' LIMIT 0, 1)", PERCENT, g_szWrcpMapSelect[client], PERCENT);
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackCell(pack, style);
@@ -7777,7 +7777,7 @@ public void db_selectPlayerRankUnknownCallback(Handle owner, Handle hndl, const 
 
 		char szQuery[1024];
 		// "SELECT name FROM ck_playerrank WHERE points >= (SELECT points FROM ck_playerrank WHERE steamid = '%s') ORDER BY points";
-		Format(szQuery, sizeof(sQuery), sql_selectRankedPlayersRank, 0, szSteamId, 0);
+		Format(szQuery, sizeof(szQuery), sql_selectRankedPlayersRank, 0, szSteamId, 0);
 		g_dDb.Query(db_getPlayerRankUnknownCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
@@ -8699,7 +8699,7 @@ public void db_checkCustomPlayerTitle(int client, char[] szSteamID, char[] arg)
 	WritePackString(pack, arg);
 
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), "SELECT `steamid` FROM `ck_vipadmins` WHERE `steamid` = '%s';", szSteamID);
+	Format(szQuery, sizeof(szQuery), "SELECT `steamid` FROM `ck_vipadmins` WHERE `steamid` = '%s';", szSteamID);
 	g_dDb.Query(SQL_checkCustomPlayerTitleCallback, szQuery, pack, DBPrio_Low);
 
 }
@@ -8737,7 +8737,7 @@ public void db_checkCustomPlayerNameColour(int client, char[] szSteamID, char[] 
 	WritePackString(pack, arg);
 
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), "SELECT `steamid` FROM `ck_vipadmins` WHERE `steamid` = '%s';", szSteamID);
+	Format(szQuery, sizeof(szQuery), "SELECT `steamid` FROM `ck_vipadmins` WHERE `steamid` = '%s';", szSteamID);
 	g_dDb.Query(SQL_checkCustomPlayerNameColourCallback, szQuery, pack, DBPrio_Low);
 
 }
@@ -8775,7 +8775,7 @@ public void db_checkCustomPlayerTextColour(int client, char[] szSteamID, char[] 
 	WritePackString(pack, arg);
 
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), "SELECT `steamid` FROM `ck_vipadmins` WHERE `steamid` = '%s';", szSteamID);
+	Format(szQuery, sizeof(szQuery), "SELECT `steamid` FROM `ck_vipadmins` WHERE `steamid` = '%s';", szSteamID);
 	g_dDb.Query(SQL_checkCustomPlayerTextColourCallback, szQuery, pack, DBPrio_Low);
 
 }
@@ -8813,7 +8813,7 @@ public void db_insertCustomPlayerTitle(int client, char[] szSteamID, char[] arg)
 	WritePackString(pack, szSteamID);
 
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), "INSERT INTO `ck_vipadmins` (steamid, title, inuse) VALUES ('%s', '%s', 1);", szSteamID, arg);
+	Format(szQuery, sizeof(szQuery), "INSERT INTO `ck_vipadmins` (steamid, title, inuse) VALUES ('%s', '%s', 1);", szSteamID, arg);
 	g_dDb.Query(SQL_insertCustomPlayerTitleCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -8837,7 +8837,7 @@ public void db_updateCustomPlayerTitle(int client, char[] szSteamID, char[] arg)
 	WritePackString(pack, szSteamID);
 
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), "UPDATE `ck_vipadmins` SET `title` = '%s' WHERE `steamid` = '%s';", arg, szSteamID);
+	Format(szQuery, sizeof(szQuery), "UPDATE `ck_vipadmins` SET `title` = '%s' WHERE `steamid` = '%s';", arg, szSteamID);
 	g_dDb.Query(SQL_updateCustomPlayerTitleCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -8860,7 +8860,7 @@ public void db_updateCustomPlayerNameColour(int client, char[] szSteamID, char[]
 	WritePackString(pack, szSteamID);
 
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), "UPDATE `ck_vipadmins` SET `namecolour` = '%s' WHERE `steamid` = '%s';", arg, szSteamID);
+	Format(szQuery, sizeof(szQuery), "UPDATE `ck_vipadmins` SET `namecolour` = '%s' WHERE `steamid` = '%s';", arg, szSteamID);
 	g_dDb.Query(SQL_updateCustomPlayerNameColourCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -8883,7 +8883,7 @@ public void db_updateCustomPlayerTextColour(int client, char[] szSteamID, char[]
 	WritePackString(pack, szSteamID);
 
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), "UPDATE `ck_vipadmins` SET `textcolour` = '%s' WHERE `steamid` = '%s';", arg, szSteamID);
+	Format(szQuery, sizeof(szQuery), "UPDATE `ck_vipadmins` SET `textcolour` = '%s' WHERE `steamid` = '%s';", arg, szSteamID);
 	g_dDb.Query(SQL_updateCustomPlayerTextColourCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -8908,11 +8908,11 @@ public void db_toggleCustomPlayerTitle(int client, char[] szSteamID)
 	char szQuery[512];
 	if (g_bDbCustomTitleInUse[client])
 	{
-		Format(szQuery, sizeof(sQuery), "UPDATE `ck_vipadmins` SET `inuse` = '0' WHERE `steamid` = '%s';", szSteamID);
+		Format(szQuery, sizeof(szQuery), "UPDATE `ck_vipadmins` SET `inuse` = '0' WHERE `steamid` = '%s';", szSteamID);
 	}
 	else
 	{
-		Format(szQuery, sizeof(sQuery), "UPDATE `ck_vipadmins` SET `inuse` = '1' WHERE `steamid` = '%s';", szSteamID);
+		Format(szQuery, sizeof(szQuery), "UPDATE `ck_vipadmins` SET `inuse` = '1' WHERE `steamid` = '%s';", szSteamID);
 	}
 
 	g_dDb.Query(SQL_insertCustomPlayerTitleCallback, szQuery, pack, DBPrio_Low);
@@ -9022,7 +9022,7 @@ public void db_viewPlayerColours(int client, char szSteamId[32], int type)
 	WritePackCell(data, type); // 10 = name colour, 1 = text colour
 
 	char szQuery[512];
-	Format(szQuery, sizeof(sQuery), "SELECT steamid, namecolour, textcolour FROM ck_vipadmins WHERE `steamid` = '%s';", szSteamId);
+	Format(szQuery, sizeof(szQuery), "SELECT steamid, namecolour, textcolour FROM ck_vipadmins WHERE `steamid` = '%s';", szSteamId);
 
 	g_dDb.Query(SQL_ViewPlayerColoursCallback, szQuery, data, DBPrio_Low);
 }
@@ -9144,8 +9144,8 @@ public void db_updateColours(int client, char szSteamId[32], int newColour, int 
 	char szQuery[512];
 	switch (type)
 	{
-		case 0: Format(szQuery, sizeof(sQuery), "UPDATE ck_vipadmins SET namecolour = %i WHERE steamid = '%s';", newColour, szSteamId);
-		case 1: Format(szQuery, sizeof(sQuery), "UPDATE ck_vipadmins SET textcolour = %i WHERE steamid = '%s';", newColour, szSteamId);
+		case 0: Format(szQuery, sizeof(szQuery), "UPDATE ck_vipadmins SET namecolour = %i WHERE steamid = '%s';", newColour, szSteamId);
+		case 1: Format(szQuery, sizeof(szQuery), "UPDATE ck_vipadmins SET textcolour = %i WHERE steamid = '%s';", newColour, szSteamId);
 	}
 
 	g_dDb.Query(SQL_UpdatePlayerColoursCallback, szQuery, client, DBPrio_Low);
@@ -9214,7 +9214,7 @@ public void db_insertAnnouncement(char szName[128], char szMapName[128], int szM
 	char szQuery[512];
 	char szEscServerName[128];
 	g_dDb.Escape(g_sServerName, szEscServerName, sizeof(szEscServerName));
-	Format(szQuery, sizeof(sQuery), "INSERT INTO `ck_announcements` (`server`, `name`, `mapname`, `mode`, `time`, `group`) VALUES ('%s', '%s', '%s', '%i', '%s', '%i');", szEscServerName, szName, szMapName, szMode, szTime, szGroup);
+	Format(szQuery, sizeof(szQuery), "INSERT INTO `ck_announcements` (`server`, `name`, `mapname`, `mode`, `time`, `group`) VALUES ('%s', '%s', '%s', '%i', '%s', '%i');", szEscServerName, szName, szMapName, szMode, szTime, szGroup);
 	g_dDb.Query(SQL_CheckCallback, szQuery, 1, DBPrio_Low);
 }
 
@@ -9223,7 +9223,7 @@ public void db_checkAnnouncements()
 	char szQuery[512];
 	char szEscServerName[128];
 	g_dDb.Escape(g_sServerName, szEscServerName, sizeof(szEscServerName));
-	Format(szQuery, sizeof(sQuery), "SELECT `id`, `server`, `name`, `mapname`, `mode`, `time`, `group` FROM `ck_announcements` WHERE `server` != '%s' AND `id` > %d;", szEscServerName, g_iLastID);
+	Format(szQuery, sizeof(szQuery), "SELECT `id`, `server`, `name`, `mapname`, `mode`, `time`, `group` FROM `ck_announcements` WHERE `server` != '%s' AND `id` > %d;", szEscServerName, g_iLastID);
 	g_dDb.Query(SQL_CheckAnnouncementsCallback, szQuery, 1, DBPrio_Low);
 }
 
