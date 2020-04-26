@@ -3862,7 +3862,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, int spee
 		float f_srDiff = (g_fCheckpointServerRecord[zonegroup][zone] - time);
 		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
 
-		if (fSrDiff > 0)
+		if (f_srDiff > 0)
 		{
 			Format(sz_srDiff_colorless, 128, "-%s", sz_srDiff);
 			Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
