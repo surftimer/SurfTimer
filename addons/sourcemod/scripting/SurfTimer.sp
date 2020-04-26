@@ -17,7 +17,7 @@
 #include <smlib>
 #include <geoip>
 #include <basecomm>
-#include <colorvariables>
+#include <colorlib>
 #undef REQUIRE_EXTENSIONS
 #include <clientprefs>
 #undef REQUIRE_PLUGIN

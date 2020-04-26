@@ -4648,3 +4648,63 @@ void PrintCSGOHUDText(int client, const char[] format, any ...)
 
 	EndMessage();
 }
+
+// Copied this stock from colorvariables with some modifications (new syntax, replaced stuff with g_hColor )
+bool CGetColor(const char[] sName, char[] sColor, int iColorSize)
+{
+	if (sName[0] == '\0')
+		return false;
+
+	if (sName[0] == '@') {
+		int iSpace;
+		char sData[64];
+		char m_sName[64];
+		strcopy(m_sName, sizeof(m_sName), sName[1]);
+
+		if ((iSpace = FindCharInString(m_sName, ' ')) != -1 && (iSpace + 1 < strlen(m_sName))) {
+			strcopy(m_sName, iSpace + 1, m_sName);
+			strcopy(sData, sizeof(sData), m_sName[iSpace + 1]);
+		}
+
+		if (sColor[0] != '\0') {
+			return true;
+		}
+
+	} else if (sName[0] == '#') {
+		if (strlen(sName) == 7) {
+			Format(sColor, iColorSize, "\x07%s", sName[1]);
+			return true;
+		}
+		if (strlen(sName) == 9) {
+			Format(sColor, iColorSize, "\x08%s", sName[1]);
+			return true;
+		}
+	} else if (StrContains(sName, "player ", false) == 0 && strlen(sName) > 7) {
+		int iClient = StringToInt(sName[7]);
+
+		if (iClient < 1 || iClient > MaxClients || !IsClientInGame(iClient)) {
+			strcopy(sColor, iColorSize, "\x01");
+			LogError("Invalid client index %d", iClient);
+			return false;
+		}
+
+		strcopy(sColor, iColorSize, "\x01");
+		switch (GetClientTeam(iClient)) {
+			case 1: {
+				Format(sColor, iColorSize, "team 0");
+			}
+			case 2: {
+				Format(sColor, iColorSize, "team 1");
+			}
+			case 3: {
+				Format(sColor, iColorSize, "team 2");
+			}
+		}
+		return true;
+	} else {
+		Format(sColor, iColorSize, sName);
+		return true;
+	}
+
+	return false;
+}
