@@ -1586,7 +1586,7 @@ public void sql_selectRankedPlayersRankCallback(Handle owner, Handle hndl, const
 		// Sort players by rank in scoreboard
 		if (style == 0)
 		{
-			if (g_pr_AllPlayers[style] < g_PlayerRank[client][style])
+			if (g_pr_AllPlayers[style] < g_PlayerRank[client][style] || g_PlayerRank[client][style] == 0)
 				CS_SetClientContributionScore(client, -99999);
 			else
 				CS_SetClientContributionScore(client, -g_PlayerRank[client][style]);
