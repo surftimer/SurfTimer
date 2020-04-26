@@ -68,25 +68,25 @@ public void sqlSetSQLMode(Database db, DBResultSet results, const char[] error, 
 
 public void db_createTables()
 {
-	Transaction tTransation = new Transaction();
+	Transaction tTransaction = new Transaction();
 
-	tTransation.AddQuery(sql_createPlayertmp);
-	tTransation.AddQuery(sql_createPlayertimes);
-	tTransation.AddQuery(sql_createPlayertimesIndex);
-	tTransation.AddQuery(sql_createPlayerRank);
-	tTransation.AddQuery(sql_createPlayerOptions);
-	tTransation.AddQuery(sql_createLatestRecords);
-	tTransation.AddQuery(sql_createBonus);
-	tTransation.AddQuery(sql_createBonusIndex);
-	tTransation.AddQuery(sql_createCheckpoints);
-	tTransation.AddQuery(sql_createZones);
-	tTransation.AddQuery(sql_createMapTier);
-	tTransation.AddQuery(sql_createSpawnLocations);
-	tTransation.AddQuery(sql_createAnnouncements);
-	tTransation.AddQuery(sql_createVipAdmins);
-	tTransation.AddQuery(sql_createWrcps);
+	tTransaction.AddQuery(sql_createPlayertmp);
+	tTransaction.AddQuery(sql_createPlayertimes);
+	tTransaction.AddQuery(sql_createPlayertimesIndex);
+	tTransaction.AddQuery(sql_createPlayerRank);
+	tTransaction.AddQuery(sql_createPlayerOptions);
+	tTransaction.AddQuery(sql_createLatestRecords);
+	tTransaction.AddQuery(sql_createBonus);
+	tTransaction.AddQuery(sql_createBonusIndex);
+	tTransaction.AddQuery(sql_createCheckpoints);
+	tTransaction.AddQuery(sql_createZones);
+	tTransaction.AddQuery(sql_createMapTier);
+	tTransaction.AddQuery(sql_createSpawnLocations);
+	tTransaction.AddQuery(sql_createAnnouncements);
+	tTransaction.AddQuery(sql_createVipAdmins);
+	tTransaction.AddQuery(sql_createWrcps);
 
-	g_dDb.Execute(tTransation, SQLTxn_CreateDatabaseSuccess, SQLTxn_CreateDatabaseFailed);
+	g_dDb.Execute(tTransaction, SQLTxn_CreateDatabaseSuccess, SQLTxn_CreateDatabaseFailed);
 }
 
 public void SQLTxn_CreateDatabaseSuccess(Handle db, any data, int numQueries, Handle[] results, any[] queryData)
@@ -125,7 +125,7 @@ public void SQLTxn_CheckDatabaseUpgradesFailed(Handle db, any data, int numQueri
 
 public void db_upgradeDatabase(int ver)
 {
-	Transaction tTransation = new Transaction();
+	Transaction tTransaction = new Transaction();
 
 	if (ver == 0)
 	{
@@ -134,54 +134,54 @@ public void db_upgradeDatabase(int ver)
 		for (int i = 1; i < 11; i++)
 		{
 			Format(query, sizeof(query), "ALTER TABLE ck_maptier DROP COLUMN btier%i", i);
-			tTransation.AddQuery(query);
+			tTransaction.AddQuery(query);
 		}
 
-		tTransation.AddQuery("ALTER TABLE ck_maptier ADD COLUMN maxvelocity FLOAT NOT NULL DEFAULT '3500.0';");
-		tTransation.AddQuery("ALTER TABLE ck_maptier ADD COLUMN announcerecord INT(11) NOT NULL DEFAULT '0';");
-		tTransation.AddQuery("ALTER TABLE ck_maptier ADD COLUMN gravityfix INT(11) NOT NULL DEFAULT '1';");
-		tTransation.AddQuery("ALTER TABLE ck_zones ADD COLUMN `prespeed` int(64) NOT NULL DEFAULT '350';");
-		tTransation.AddQuery("ALTER TABLE ck_maptier ADD INDEX tier (mapname, tier);");
-		tTransation.AddQuery("ALTER TABLE ck_maptier ADD INDEX mapsettings (mapname, maxvelocity, announcerecord, gravityfix);");
-		tTransation.AddQuery("UPDATE ck_maptier a, ck_mapsettings b SET a.maxvelocity = b.maxvelocity WHERE a.mapname = b.mapname;");
-		tTransation.AddQuery("UPDATE ck_maptier a, ck_mapsettings b SET a.announcerecord = b.announcerecord WHERE a.mapname = b.mapname;");
-		tTransation.AddQuery("UPDATE ck_maptier a, ck_mapsettings b SET a.gravityfix = b.gravityfix WHERE a.mapname = b.mapname;");
-		tTransation.AddQuery("UPDATE ck_zones a, ck_mapsettings b SET a.prespeed = b.startprespeed WHERE a.mapname = b.mapname AND zonetype = 1;");
-		tTransation.AddQuery("DROP TABLE IF EXISTS ck_mapsettings;");
+		tTransaction.AddQuery("ALTER TABLE ck_maptier ADD COLUMN maxvelocity FLOAT NOT NULL DEFAULT '3500.0';");
+		tTransaction.AddQuery("ALTER TABLE ck_maptier ADD COLUMN announcerecord INT(11) NOT NULL DEFAULT '0';");
+		tTransaction.AddQuery("ALTER TABLE ck_maptier ADD COLUMN gravityfix INT(11) NOT NULL DEFAULT '1';");
+		tTransaction.AddQuery("ALTER TABLE ck_zones ADD COLUMN `prespeed` int(64) NOT NULL DEFAULT '350';");
+		tTransaction.AddQuery("ALTER TABLE ck_maptier ADD INDEX tier (mapname, tier);");
+		tTransaction.AddQuery("ALTER TABLE ck_maptier ADD INDEX mapsettings (mapname, maxvelocity, announcerecord, gravityfix);");
+		tTransaction.AddQuery("UPDATE ck_maptier a, ck_mapsettings b SET a.maxvelocity = b.maxvelocity WHERE a.mapname = b.mapname;");
+		tTransaction.AddQuery("UPDATE ck_maptier a, ck_mapsettings b SET a.announcerecord = b.announcerecord WHERE a.mapname = b.mapname;");
+		tTransaction.AddQuery("UPDATE ck_maptier a, ck_mapsettings b SET a.gravityfix = b.gravityfix WHERE a.mapname = b.mapname;");
+		tTransaction.AddQuery("UPDATE ck_zones a, ck_mapsettings b SET a.prespeed = b.startprespeed WHERE a.mapname = b.mapname AND zonetype = 1;");
+		tTransaction.AddQuery("DROP TABLE IF EXISTS ck_mapsettings;");
 	}
 	else if (ver == 1)
 	{
 		// SurfTimer v2.1 -> v2.2
-		tTransation.AddQuery("ALTER TABLE ck_maptier ADD COLUMN ranked INT(11) NOT NULL DEFAULT '1';");
-		tTransation.AddQuery("ALTER TABLE ck_playerrank DROP PRIMARY KEY, ADD COLUMN style INT(11) NOT NULL DEFAULT '0', ADD PRIMARY KEY (steamid, style);");
+		tTransaction.AddQuery("ALTER TABLE ck_maptier ADD COLUMN ranked INT(11) NOT NULL DEFAULT '1';");
+		tTransaction.AddQuery("ALTER TABLE ck_playerrank DROP PRIMARY KEY, ADD COLUMN style INT(11) NOT NULL DEFAULT '0', ADD PRIMARY KEY (steamid, style);");
 	}
 	else if (ver == 2)
 	{
-		tTransation.AddQuery("ALTER TABLE ck_playerrank ADD COLUMN wrcppoints INT(11) NOT NULL DEFAULT 0 AFTER `wrbpoints`;");
+		tTransaction.AddQuery("ALTER TABLE ck_playerrank ADD COLUMN wrcppoints INT(11) NOT NULL DEFAULT 0 AFTER `wrbpoints`;");
 	}
 	else if (ver == 3)
 	{
-		tTransation.AddQuery("ALTER TABLE ck_playeroptions2 ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER centrehud;");
-		tTransation.AddQuery("ALTER TABLE ck_spawnlocations DROP PRIMARY KEY, ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER stage, ADD PRIMARY KEY (mapname, zonegroup, stage, teleside);");
+		tTransaction.AddQuery("ALTER TABLE ck_playeroptions2 ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER centrehud;");
+		tTransaction.AddQuery("ALTER TABLE ck_spawnlocations DROP PRIMARY KEY, ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER stage, ADD PRIMARY KEY (mapname, zonegroup, stage, teleside);");
 	}
 	else if (ver == 4)
 	{
-		tTransation.AddQuery("CREATE TABLE `ck_checkpointsnew`( `steamid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL, `mapname` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL, `cp` int(11) NOT NULL, `time` float NOT NULL, `velStartXY` int(11) NOT NULL, `velStartXYZ` int(11) NOT NULL, `velStartZ` int(11) NOT NULL, `velEndXY` int(11) NOT NULL, `velEndXYZ` int(11) NOT NULL, `velEndZ` int(11) NOT NULL, `velAvgXY` int(11) NOT NULL, `velAvgXYZ` int(11) NOT NULL, `velAvgZ` int(11) NOT NULL, `zonegroup` int(12) NOT NULL, PRIMARY KEY (`steamid`,`mapname`,`cp`,`zonegroup`));");
-		tTransation.AddQuery("REPLACE INTO ck_checkpointsnew (steamid, mapname, cp, time, zonegroup) SELECT * FROM ( SELECT steamid, mapname, 1 AS cp, cp1 AS time, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 2 AS cp, cp2, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 3 AS cp, cp3, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 4 AS cp, cp4, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 5 AS cp, cp5, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 6 AS cp, cp6, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 7 AS cp, cp7, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 8 AS cp, cp8, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 9 AS cp, cp9, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 10 AS cp, cp10, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 11 AS cp, cp11, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 12 AS cp, cp12, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 13 AS cp, cp13, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 14 AS cp, cp14, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 15 AS cp, cp15, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 16 AS cp, cp16, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 17 AS cp, cp17, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 18 AS cp, cp18, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 19 AS cp, cp19, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 20 AS cp, cp20, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 21 AS cp, cp21, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 22 AS cp, cp22, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 23 AS cp, cp23, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 24 AS cp, cp24, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 25 AS cp, cp25, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 26 AS cp, cp26, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 27 AS cp, cp27, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 28 AS cp, cp28, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 29 AS cp, cp29, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 30 AS cp, cp30, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 31 AS cp, cp31, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 32 AS cp, cp32, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 33 AS cp, cp33, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 34 AS cp, cp34, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 35 AS cp, cp35, zonegroup FROM ck_checkpoints );");
-		tTransation.AddQuery("ALTER TABLE ck_checkpoints RENAME TO ck_checkpointsold;");
-		tTransation.AddQuery("ALTER TABLE ck_checkpointsnew RENAME TO ck_checkpoints;");
-		tTransation.AddQuery("ALTER TABLE `ck_playertimes` ADD `velStartXY` INT NOT NULL AFTER `runtimepro`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`; ");
-		tTransation.AddQuery("ALTER TABLE `ck_bonus` ADD `velStartXY` INT NOT NULL AFTER `runtime`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`; ");
-		tTransation.AddQuery("ALTER TABLE `ck_wrcps` ADD `velStartXY` INT NOT NULL AFTER `runtimepro`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`; ");
-		tTransation.AddQuery("ALTER TABLE `ck_playeroptions2` ADD `velcmphud` INT NOT NULL DEFAULT 1 AFTER `teleside`, ADD `velcmpchat` INT NOT NULL DEFAULT 1 AFTER `velcmphud`; '+ ");
+		tTransaction.AddQuery("CREATE TABLE `ck_checkpointsnew`( `steamid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL, `mapname` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL, `cp` int(11) NOT NULL, `time` float NOT NULL, `velStartXY` int(11) NOT NULL, `velStartXYZ` int(11) NOT NULL, `velStartZ` int(11) NOT NULL, `velEndXY` int(11) NOT NULL, `velEndXYZ` int(11) NOT NULL, `velEndZ` int(11) NOT NULL, `velAvgXY` int(11) NOT NULL, `velAvgXYZ` int(11) NOT NULL, `velAvgZ` int(11) NOT NULL, `zonegroup` int(12) NOT NULL, PRIMARY KEY (`steamid`,`mapname`,`cp`,`zonegroup`));");
+		tTransaction.AddQuery("REPLACE INTO ck_checkpointsnew (steamid, mapname, cp, time, zonegroup) SELECT * FROM ( SELECT steamid, mapname, 1 AS cp, cp1 AS time, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 2 AS cp, cp2, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 3 AS cp, cp3, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 4 AS cp, cp4, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 5 AS cp, cp5, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 6 AS cp, cp6, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 7 AS cp, cp7, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 8 AS cp, cp8, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 9 AS cp, cp9, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 10 AS cp, cp10, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 11 AS cp, cp11, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 12 AS cp, cp12, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 13 AS cp, cp13, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 14 AS cp, cp14, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 15 AS cp, cp15, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 16 AS cp, cp16, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 17 AS cp, cp17, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 18 AS cp, cp18, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 19 AS cp, cp19, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 20 AS cp, cp20, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 21 AS cp, cp21, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 22 AS cp, cp22, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 23 AS cp, cp23, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 24 AS cp, cp24, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 25 AS cp, cp25, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 26 AS cp, cp26, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 27 AS cp, cp27, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 28 AS cp, cp28, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 29 AS cp, cp29, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 30 AS cp, cp30, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 31 AS cp, cp31, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 32 AS cp, cp32, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 33 AS cp, cp33, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 34 AS cp, cp34, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 35 AS cp, cp35, zonegroup FROM ck_checkpoints );");
+		tTransaction.AddQuery("ALTER TABLE ck_checkpoints RENAME TO ck_checkpointsold;");
+		tTransaction.AddQuery("ALTER TABLE ck_checkpointsnew RENAME TO ck_checkpoints;");
+		tTransaction.AddQuery("ALTER TABLE `ck_playertimes` ADD `velStartXY` INT NOT NULL AFTER `runtimepro`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`; ");
+		tTransaction.AddQuery("ALTER TABLE `ck_bonus` ADD `velStartXY` INT NOT NULL AFTER `runtime`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`; ");
+		tTransaction.AddQuery("ALTER TABLE `ck_wrcps` ADD `velStartXY` INT NOT NULL AFTER `runtimepro`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`; ");
+		tTransaction.AddQuery("ALTER TABLE `ck_playeroptions2` ADD `velcmphud` INT NOT NULL DEFAULT 1 AFTER `teleside`, ADD `velcmpchat` INT NOT NULL DEFAULT 1 AFTER `velcmphud`; '+ ");
 	}
 	else
 	{
-		delete tTransation;
+		delete tTransaction;
 		return;
 	}
 
-	g_dDb.Execute(tTransation, SQLTxn_UpgradeDatabaseSuccess, SQLTxn_UpgradeDatabaseFailed);
+	g_dDb.Execute(tTransaction, SQLTxn_UpgradeDatabaseSuccess, SQLTxn_UpgradeDatabaseFailed);
 }
 
 public void SQLTxn_UpgradeDatabaseSuccess(Database db, int userid, int numQueries, DBResultSet[] results, any[] queryData)
@@ -3436,7 +3436,7 @@ public void db_UpdateCheckpoints(int client, char szSteamID[32], int zGroup)
 	if (g_bCheckpointsFound[zGroup][client])
 	{
 		char szQuery[1024];
-		Transaction tTransation = new Transaction();
+		Transaction tTransaction = new Transaction();
 		int cp;
 		for (int i = 0; i < CPLIMIT; i++)
 		{
@@ -3445,16 +3445,16 @@ public void db_UpdateCheckpoints(int client, char szSteamID[32], int zGroup)
 
 			cp = i + 1;
 			Format(szQuery, sizeof(szQuery), sql_updateCheckpoint, g_fCheckpointTimesNew[zGroup][client][i], g_iCheckpointVelsStartNew[zGroup][client][i][0], g_iCheckpointVelsStartNew[zGroup][client][i][1], g_iCheckpointVelsStartNew[zGroup][client][i][2], g_iCheckpointVelsEndNew[zGroup][client][i][0], g_iCheckpointVelsEndNew[zGroup][client][i][1], g_iCheckpointVelsEndNew[zGroup][client][i][2], 0, 0, 0, szSteamID, g_szMapName, cp, zGroup);
-			tTransation.AddQuery(szQuery);
+			tTransaction.AddQuery(szQuery);
 		}
-		g_dDb.Execute(tTransation, SQLTxn_UpdateCheckpointsSuccess, SQLTxn_UpdateCheckpointsFailed, pack);
+		g_dDb.Execute(tTransaction, SQLTxn_UpdateCheckpointsSuccess, SQLTxn_UpdateCheckpointsFailed, pack);
 	}
 	else
 	{
 		// char sql_insertCheckpoint[] = "INSERT INTO ck_checkpoints VALUES ('%s', '%s', '%d', '%f', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', %d');";
 		char szQuery[1024];
 		int cp;
-		Transaction tTransation = new Transaction();
+		Transaction tTransaction = new Transaction();
 
 		for (int i = 0; i < CPLIMIT; i++)
 		{
@@ -3462,9 +3462,9 @@ public void db_UpdateCheckpoints(int client, char szSteamID[32], int zGroup)
 				continue;
 			cp = i + 1;
 			Format(szQuery, sizeof(szQuery), sql_insertCheckpoint, szSteamID, g_szMapName, cp, g_fCheckpointTimesNew[zGroup][client][i], g_iCheckpointVelsStartNew[zGroup][client][i][0], g_iCheckpointVelsStartNew[zGroup][client][i][1], g_iCheckpointVelsStartNew[zGroup][client][i][2], g_iCheckpointVelsEndNew[zGroup][client][i][0], g_iCheckpointVelsEndNew[zGroup][client][i][1], g_iCheckpointVelsEndNew[zGroup][client][i][2], 0, 0, 0, zGroup);
-			tTransation.AddQuery(szQuery);
+			tTransaction.AddQuery(szQuery);
 		}
-		g_dDb.Execute(tTransation, SQLTxn_UpdateCheckpointsSuccess, SQLTxn_UpdateCheckpointsFailed, pack);
+		g_dDb.Execute(tTransaction, SQLTxn_UpdateCheckpointsSuccess, SQLTxn_UpdateCheckpointsFailed, pack);
 	}
 }
 
@@ -4317,15 +4317,15 @@ public int db_deleteZonesInGroup(int client)
 		PrintToServer("surftimer | Invalid zonegroup index selected, aborting. (%i)", g_CurrentSelectedZoneGroup[client]);
 	}
 
-	Transaction tTransation = new Transaction();
+	Transaction tTransaction = new Transaction();
 
 	Format(szQuery, sizeof(szQuery), sql_deleteZonesInGroup, g_szMapName, g_CurrentSelectedZoneGroup[client]);
-	tTransation.AddQuery(szQuery);
+	tTransaction.AddQuery(szQuery);
 
 	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_bonus WHERE zonegroup = %i AND mapname = '%s';", g_CurrentSelectedZoneGroup[client], g_szMapName);
-	tTransation.AddQuery(szQuery);
+	tTransaction.AddQuery(szQuery);
 
-	g_dDb.Execute(tTransation, SQLTxn_ZoneGroupRemovalSuccess, SQLTxn_ZoneGroupRemovalFailed, GetClientUserId(client));
+	g_dDb.Execute(tTransaction, SQLTxn_ZoneGroupRemovalSuccess, SQLTxn_ZoneGroupRemovalFailed, GetClientUserId(client));
 }
 
 public void SQLTxn_ZoneGroupRemovalSuccess(Database db, int userid, int numQueries, DBResultSet[] results, any[] queryData)
@@ -4733,15 +4733,15 @@ public void SQL_deleteMapZonesCallback(Handle owner, Handle hndl, const char[] e
 public void db_deleteZone(int client, int zoneid)
 {
 	char szQuery[258];
-	Transaction tTransation = new Transaction();
+	Transaction tTransaction = new Transaction();
 
 	Format(szQuery, sizeof(szQuery), sql_deleteZone, g_szMapName, zoneid);
-	tTransation.AddQuery(szQuery);
+	tTransaction.AddQuery(szQuery);
 
 	Format(szQuery, sizeof(szQuery), "UPDATE ck_zones SET zoneid = zoneid-1 WHERE mapname = '%s' AND zoneid > %i", g_szMapName, zoneid);
-	tTransation.AddQuery(szQuery);
+	tTransaction.AddQuery(szQuery);
 
-	g_dDb.Execute(tTransation, SQLTxn_ZoneRemovalSuccess, SQLTxn_ZoneRemovalFailed, GetClientUserId(client));
+	g_dDb.Execute(tTransaction, SQLTxn_ZoneRemovalSuccess, SQLTxn_ZoneRemovalFailed, GetClientUserId(client));
 }
 
 public void SQLTxn_ZoneRemovalSuccess(Database db, int userid, int numQueries, DBResultSet[] results, any[] queryData)
