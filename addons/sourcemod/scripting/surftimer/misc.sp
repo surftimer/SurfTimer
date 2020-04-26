@@ -2914,7 +2914,7 @@ public void SpecListMenuDead(int client) // What Spectators see
 			if (g_bhasStages) // There are stages
 				Format(szStage, 32, "Stage: %i / %i", g_Stage[g_iClientInZone[ObservedUser][2]][ObservedUser], (g_mapZonesTypeCount[g_iClientInZone[ObservedUser][2]][3] + 1));
 			else
-				Format(szStage, 32, "Linear map");
+				Format(szStage, 32, "Linear");
 
 			if (g_Stage[g_iClientInZone[client][2]][ObservedUser] == 999) // if player is in stage 999
 				Format(szStage, 32, "Bonus");
@@ -3465,7 +3465,7 @@ public void CenterHudAlive(int client)
 				{
 					if (!g_bhasStages) // map is linear
 					{
-						Format(module[i], 128, "Linear Map");
+						Format(module[i], 128, "Linear");
 					}
 					else // map has stages
 					{
@@ -3655,7 +3655,7 @@ public void SideHudAlive(int client)
 				{
 					if (!g_bhasStages) // map is linear
 					{
-						// Format(szStage, 64, "Linear Map");
+						// Format(szStage, 64, "Linear");
 						char szCP[64];
 						char szCurrentCP[64];
 						if (g_iCurrentCheckpoint[client] == g_mapZonesTypeCount[g_iClientInZone[client][2]][4])
