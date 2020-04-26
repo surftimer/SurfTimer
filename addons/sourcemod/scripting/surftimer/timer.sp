@@ -237,7 +237,7 @@ public Action CKTimer2(Handle timer)
 				Client_SetScore(i, 0);
 			}
 
-			if (g_pr_AllPlayers[0] < g_PlayerRank[i][0] || g_PlayerRank[i][0] == 0)
+			if (g_pr_AllPlayers[0] < g_PlayerRank[i][0])
 				CS_SetClientContributionScore(i, -99999);
 			else
 				CS_SetClientContributionScore(i, -g_PlayerRank[i][0]);
