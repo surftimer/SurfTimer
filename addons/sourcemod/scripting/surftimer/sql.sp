@@ -4133,14 +4133,8 @@ public int db_deleteZonesInGroup(int client)
 	Format(szQuery, sizeof(szQuery), sql_deleteZonesInGroup, g_szMapName, g_CurrentSelectedZoneGroup[client]);
 	tTransation.AddQuery(szQuery);
 
-	// Format(szQuery, sizeof(szQuery), "UPDATE ck_zones SET zonegroup = zonegroup-1 WHERE zonegroup > %i AND mapname = '%s';", g_CurrentSelectedZoneGroup[client], g_szMapName);
-	// tTransation.AddQuery(szQuery);
-
 	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_bonus WHERE zonegroup = %i AND mapname = '%s';", g_CurrentSelectedZoneGroup[client], g_szMapName);
 	tTransation.AddQuery(szQuery);
-
-	// Format(szQuery, sizeof(szQuery), "UPDATE ck_bonus SET zonegroup = zonegroup-1 WHERE zonegroup > %i AND mapname = '%s';", g_CurrentSelectedZoneGroup[client], g_szMapName);
-	// tTransation.AddQuery(szQuery);
 
 	g_dDb.Execute(tTransation, SQLTxn_ZoneGroupRemovalSuccess, SQLTxn_ZoneGroupRemovalFailed, GetClientUserId(client));
 }
@@ -4236,127 +4230,6 @@ public void SQL_selectzoneTypeIdsCallback(Handle owner, Handle hndl, const char[
 		TypeMenu.Display(data, MENU_TIME_FOREVER);
 	}
 }
-/*
-public checkZoneTypeIds()
-{
-InitZoneVariables();
-
-char szQuery[258];
-Format(szQuery, sizeof(szQuery), "SELECT `zonegroup` ,`zonetype`, `zonetypeid`  FROM `ck_zones` WHERE `mapname` = '%s';", g_szMapName);
-g_dDb.Query(checkZoneTypeIdsCallback, szQuery, 1, DBPrio_High);
-}
-
-public checkZoneTypeIdsCallback(Handle owner, Handle hndl, const char[] error, any:data)
-{
-if (hndl == null)
-{
-LogError("[SurfTimer] SQL Error (checkZoneTypeIds): %s", error);
-return;
-}
-if (SQL_HasResultSet(hndl))
-{
-int idChecker[MAXZONEGROUPS][ZONEAMOUNT][MAXZONES], idCount[MAXZONEGROUPS][ZONEAMOUNT];
-char szQuery[258];
-//  Fill array with id's
-// idChecker = map zones in
-while (SQL_FetchRow(hndl))
-{
-idChecker[SQL_FetchInt(hndl, 0)][SQL_FetchInt(hndl, 1)][SQL_FetchInt(hndl, 2)] = 1;
-idCount[SQL_FetchInt(hndl, 0)][SQL_FetchInt(hndl, 1)]++;
-}
-for (int i = 0; i < MAXZONEGROUPS; i++)
-{
-for (int j = 0; j < ZONEAMOUNT; j++)
-{
-for (int k = 0; k < idCount[i][j]; k++)
-{
-if (idChecker[i][j][k] == 1)
-continue;
-else
-{
-PrintToServer("[SurfTimer] Error on zonetype: %i, zonetypeid: %i", i, idChecker[i][k]);
-Format(szQuery, sizeof(szQuery), "UPDATE `ck_zones` SET zonetypeid = zonetypeid-1 WHERE mapname = '%s' AND zonetype = %i AND zonetypeid > %i AND zonegroup = %i;", g_szMapName, j, k, i);
-SQL_LockDatabase(g_hDb);
-SQL_FastQuery(g_hDb, szQuery);
-SQL_UnlockDatabase(g_hDb);
-}
-}
-}
-}
-
-Format(szQuery, sizeof(szQuery), "SELECT `zoneid` FROM `ck_zones` WHERE mapname = '%s' ORDER BY zoneid ASC;", g_szMapName);
-g_dDb.Query(checkZoneIdsCallback, szQuery, 1, DBPrio_High);
-}
-}
-
-public checkZoneIdsCallback(Handle owner, Handle hndl, const char[] error, any:data)
-{
-if (hndl == null)
-{
-LogError("[SurfTimer] SQL Error (checkZoneIdsCallback): %s", error);
-return;
-}
-
-if (SQL_HasResultSet(hndl))
-{
-int i = 0;
-char szQuery[258];
-while (SQL_FetchRow(hndl))
-{
-if (SQL_FetchInt(hndl, 0) == i)
-{
-i++;
-continue;
-}
-else
-{
-PrintToServer("[SurfTimer] Found an error in ZoneID's. Fixing...");
-Format(szQuery, sizeof(szQuery), "UPDATE `ck_zones` SET zoneid = %i WHERE mapname = '%s' AND zoneid = %i", i, g_szMapName, SQL_FetchInt(hndl, 0));
-SQL_LockDatabase(g_hDb);
-SQL_FastQuery(g_hDb, szQuery);
-SQL_UnlockDatabase(g_hDb);
-i++;
-}
-}
-
-char szQuery2[258];
-Format(szQuery2, 258, "SELECT `zonegroup` FROM `ck_zones` WHERE `mapname` = '%s' ORDER BY `zonegroup` ASC;", g_szMapName);
-g_dDb.Query(checkZoneGroupIds, szQuery2, 1, DBPrio_Low);
-}
-}
-
-public checkZoneGroupIds(Handle owner, Handle hndl, const char[] error, any:data)
-{
-if (hndl == null)
-{
-LogError("[SurfTimer] SQL Error (checkZoneGroupIds): %s", error);
-return;
-}
-
-if (SQL_HasResultSet(hndl))
-{
-int i = 0;
-char szQuery[258];
-while (SQL_FetchRow(hndl))
-{
-if (SQL_FetchInt(hndl, 0) == i)
-continue;
-else if (SQL_FetchInt(hndl, 0) == (i+1))
-i++;
-else
-{
-i++;
-PrintToServer("[SurfTimer] Found an error in zoneGroupID's. Fixing...");
-Format(szQuery, sizeof(szQuery), "UPDATE `ck_zones` SET `zonegroup` = %i WHERE `mapname` = '%s' AND `zonegroup` = %i", i, g_szMapName, SQL_FetchInt(hndl, 0));
-SQL_LockDatabase(g_hDb);
-SQL_FastQuery(g_hDb, szQuery);
-SQL_UnlockDatabase(g_hDb);
-}
-}
-db_selectMapZones();
-}
-}
-*/
 
 public void db_selectMapZones()
 {
@@ -5208,18 +5081,6 @@ public Action PrintUnfinishedLine(Handle timer, any pack)
 
 }
 
-/*
-void PrintUnfinishedLine(Handle pack)
-{
-ResetPack(pack);
-int client = ReadPackCell(pack);
-char teksti[1024];
-ReadPackString(pack, teksti, 1024);
-CloseHandle(pack);
-PrintToConsole(client, teksti);
-}
-*/
-
 public void sql_selectPlayerNameCallback(Handle owner, Handle hndl, const char[] error, any data)
 {
 	if (hndl == null)
@@ -5338,8 +5199,6 @@ public void db_Cleanup()
 
 	// fluffys pointless players
 	g_dDb.Query(SQL_CheckCallback, "DELETE FROM ck_playerrank WHERE `points` <= 0");
-	/*g_dDb.Query(SQL_CheckCallback, "DELETE FROM ck_wrcps WHERE `runtimepro` <= -1.0");
-	g_dDb.Query(SQL_CheckCallback, "DELETE FROM ck_wrcps WHERE `stage` = 0");*/
 
 }
 
@@ -6386,11 +6245,6 @@ public void sql_viewWrcpMapCallback(Handle owner, Handle hndl, const char[] erro
 			SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
 			DisplayMenu(menu, client, MENU_TIME_FOREVER);
 			return;
-
-			/*// Find out how many times are are faster than the players time
-			char szQuery[512];
-			Format(szQuery, sizeof(sQuery), "", g_szMapName, g_CurrentStage[data], stagetime);
-			g_dDb.Query(SQL_UpdateRecordProCallback2, szQuery, client, DBPrio_Low);*/
 		}
 	}
 }
@@ -6978,8 +6832,6 @@ public void SQL_insertBonusStyleCallback(Handle owner, Handle hndl, const char[]
 	CloseHandle(data);
 
 	db_viewMapRankBonusStyle(client, zgroup, 1, style);
-	/*Change to update profile timer, if giving multiplier count or extra points for bonuses
-	CalculatePlayerRank(client);*/
 }
 
 public void db_viewMapRankBonusStyle(int client, int zgroup, int type, int style)
@@ -9063,9 +8915,7 @@ public void SQL_toggleCustomPlayerTitleCallback(Handle owner, Handle hndl, const
 	char szSteamID[32];
 	ReadPackString(pack, szSteamID, 32);
 	CloseHandle(pack);
-
-	/*PrintToServer("Successfully updated custom title.");
-	db_viewCustomTitles(client, szSteamID);*/
+	
 	SetPlayerRank(client);
 }
 
@@ -9104,11 +8954,7 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 	{
 		g_bdbHasCustomTitle[client] = true;
 		SQL_FetchString(hndl, 0, g_szCustomTitleColoured[client], sizeof(g_szCustomTitleColoured));
-
-		// fluffys temp fix for scoreboard
-		// int RankValue[SkillGroup];
-		// int index = GetSkillgroupIndex(g_pr_rank[client], g_pr_points[client]);
-		// GetArrayArray(g_hSkillGroups, index, RankValue[0]);
+		
 		Format(g_pr_chat_coloredrank[client], 1024, "%s", g_szCustomTitleColoured[client]);
 
 		char szTitle[1024];
@@ -9123,10 +8969,6 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 		else
 			Format(g_szCustomJoinMsg[client], sizeof(g_szCustomJoinMsg), "none");
 
-		// SQL_FetchString(hndl, 7, g_szCustomSounds[client][0], sizeof(g_szCustomSounds));
-		// SQL_FetchString(hndl, 8, g_szCustomSounds[client][1], sizeof(g_szCustomSounds));
-		// SQL_FetchString(hndl, 9, g_szCustomSounds[client][2], sizeof(g_szCustomSounds));
-
 		if (SQL_FetchInt(hndl, 3) == 0)
 		{
 			g_bDbCustomTitleInUse[client] = false;
@@ -9135,7 +8977,6 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 		{
 			g_bDbCustomTitleInUse[client] = true;
 			g_iCustomColours[client][0] = SQL_FetchInt(hndl, 1);
-			// setNameColor(szName, g_szdbCustomNameColour[client], 64);
 
 			g_iCustomColours[client][1] = SQL_FetchInt(hndl, 2);
 			g_bHasCustomTextColour[client] = true;
@@ -9161,10 +9002,6 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 
 		g_fTick[client][0] = GetGameTime();
 		LoadClientSetting(client, g_iSettingToLoad[client]);
-
-		/* Check Enforced Tags
-		if (GetConVarBool(g_hEnforceDefaultTitles))
-			LoadDefaultTitle(client);*/
 	}
 }
 
@@ -9477,51 +9314,6 @@ public void SQL_SetJoinMsgCallback(Handle owner, Handle hndl, const char[] error
 	else
 		CPrintToChat(client, "%t", "SQLTwo6", g_szChatPrefix, g_szCustomJoinMsg[client]);
 }
-
-// public void db_precacheCustomSounds()
-// {
-// 	char szQuery[512];
-// 	Format(szQuery, sizeof(szQuery), "SELECT pbsound, topsound, wrsound FROM ck_vipadmins");
-// 	g_dDb.Query(SQL_PrecacheCustomSoundsCallback szQuery, 1, DBPrio_Low);
-// }
-
-// public void SQL_SetJoinMsgCallback(Handle owner, Handle hndl, const char[] error, any data)
-// {
-// 	if (hndl == null)
-// 	{
-// 		LogError("[surftimer] SQL Error (SQL_PrecacheCustomSoundsCallback): %s", error);
-// 		return;
-// 	}
-
-// 	if (SQL_HasResultSet(hndl))
-// 	{
-// 		char pbsound[256], topsound[256], wrsound[256];
-// 		while (SQL_FetchRow(hndl))
-// 		{
-// 			SQL_FetchString(hndl, 0, pbsound, sizeof(pbsound));
-// 			SQL_FetchString(hndl, 1, topsound, sizeof(topsound));
-// 			SQL_FetchString(hndl, 2, wrsound, sizeof(wrsound));
-
-// 			if (!StrEqual(pbsound, "none"))
-// 			{
-// 				AddFileToDownloadsTable(pbsound);
-// 				FakePrecacheSound(pbsound);
-// 			}
-
-// 			if (!StrEqual(topsound, "none"))
-// 			{
-// 				AddFileToDownloadsTable(topsound);
-// 				FakePrecacheSound(topsound);
-// 			}
-
-// 			if (!StrEqual(wrsound, "none"))
-// 			{
-// 				AddFileToDownloadsTable(wrsound);
-// 				FakePrecacheSound(wrsound);
-// 			}
-// 		}
-// 	}
-// }
 
 public void db_selectCPR(int client, int rank, const char szMapName[128], const char szSteamId[32])
 {
