@@ -3336,9 +3336,9 @@ public void CenterHudAlive(int client)
 						{
 							// fluffys
 							if (g_bPracticeMode[client])
-								Format(g_szLastSRDifference[client], 64, "SR: <font color='#b8b'>%s</font>", g_szRecordMapTime);
+								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordMapTime);
 							else
-								Format(g_szLastSRDifference[client], 64, "SR: <font color='#b8b'>%s</font>", g_szRecordMapTime);
+								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordMapTime);
 						}
 						else
 							Format(g_szLastSRDifference[client], 64, "SR: N/A");
@@ -3503,8 +3503,8 @@ public void CenterHudAlive(int client)
 
 		if (IsValidEntity(client) && 1 <= client <= MaxClients && !g_bOverlay[client])
 		{
-			// PrintCSGOHUDText(client, "<font face=''>%s%s\n%s%s\n%s%s</font>", module[0], module2, module[2], module4, module[4], module6);
-			PrintCSGOHUDText(client, "<pre>%15s\t %15s\n%15s\t %15s\n%15s\t %15s</pre>", module[0], module[1], module[2], module[3], module[4], module[5]);
+			// PrintCSGOHUDText(client, "<pre class='fontSize-sm'>%s%s\n%s%s\n%s%s</pre>", module[0], module2, module[2], module4, module[4], module6);
+			PrintCSGOHUDText(client, "<pre class='fontSize-sm'>%15s\t %15s\n%15s\t %15s\n%15s\t %15s</pre>", module[0], module[1], module[2], module[3], module[4], module[5]);
 		}
 	}
 }
@@ -3789,9 +3789,9 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 			Format(sz_srDiff_colorless, 128, "-%s", sz_srDiff);
 			Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
 			if (zonegroup > 0)
-				Format(g_szLastSRDifference[client], 64, "SR: <font color='#5e5'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "SR: %s", sz_srDiff_colorless);
 			else
-				Format(g_szLastSRDifference[client], 64, "SR: <font color='#5e5'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "SR: %s", sz_srDiff_colorless);
 
 		}
 		else
@@ -3799,11 +3799,11 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 			Format(sz_srDiff_colorless, 128, "+%s", sz_srDiff);
 			Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
 			if (zonegroup > 0)
-				Format(g_szLastSRDifference[client], 64, "SR: <font color='#f32'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "SR: %s", sz_srDiff_colorless);
 			else if (g_iCurrentStyle[client] > 0)
-				Format(g_szLastSRDifference[client], 64, "\tSR: <font color='#f32'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "\tSR: %s", sz_srDiff_colorless);
 			else
-				Format(g_szLastSRDifference[client], 64, "SR: <font color='#f32'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "SR: %s", sz_srDiff_colorless);
 		}
 		g_fLastDifferenceTime[client] = GetGameTime();
 	}
