@@ -106,6 +106,11 @@ void CreateCommands()
 	RegConsoleCmd("sm_triggers", Command_ToggleTriggers, "[surftimer] [zoner] Toggle display of map triggers");
 	RegConsoleCmd("sm_noclipspeed", Command_NoclipSpeed, "[surftimer] [zoner] Changes the value of sv_noclipspeed");
 
+	// VIP Commands
+	RegAdminCmd("sm_fixbot", Admin_FixBot, g_ZonerFlag, "[surftimer] Toggles replay bots off and on");
+	RegAdminCmd("sm_fixbots", Admin_FixBot, g_ZonerFlag, "[surftimer] Toggles replay bots off and on");
+	RegAdminCmd("sm_fb", Admin_FixBot, g_ZonerFlag, "[surftimer] Toggles replay bots off and on");
+
 	// WRCPs
 	RegConsoleCmd("sm_wrcp", Client_Wrcp, "[surftimer] displays stage times for map");
 	RegConsoleCmd("sm_wrcps", Client_Wrcp, "[surftimer] displays stage times for map");
@@ -187,11 +192,6 @@ void CreateCommands()
 
 void CreateVIPCommands()
 {
-	// VIP Commands
-	RegAdminCmd("sm_fixbot", Admin_FixBot, g_VipFlag, "[surftimer] Toggles replay bots off and on");
-	RegAdminCmd("sm_fixbots", Admin_FixBot, g_VipFlag, "[surftimer] Toggles replay bots off and on");
-	RegAdminCmd("sm_fb", Admin_FixBot, g_VipFlag, "[surftimer] Toggles replay bots off and on");
-
 	if (GetConVarBool(g_iVIPCommands))
 	{
 		RegConsoleCmd("sm_vip", Command_Vip, "[surftimer] [vip] Displays the VIP menu to client");
