@@ -9,6 +9,12 @@ public void db_setupDatabase()
 	/*===================================
 	=    INIT CONNECTION TO DATABASE    =
 	===================================*/
+	if (!SQL_CheckConfig("surftimer"))
+	{
+		SetFailState("[SurfTimer] Can not find the \"surftimer\" entry in your \"addons/sourcemod/configs/databases.cfg\" config.");
+		return;
+	}
+
 	Database.Connect(OnConnect, "surftimer");
 }
 
@@ -33,6 +39,15 @@ public void OnConnect(Database db, const char[] error, any data)
 	else
 	{
 		SetFailState("[SurfTimer] Invalid database type");
+		return;
+	}
+}
+
+public void sqlSetSQLMode(Database db, DBResultSet results, const char[] error, any data)
+{
+	if (db == null || strlen(error))
+	{
+		LogError("[surftimer] SQL Error (sqlSetSQLMode): %s", error);
 		return;
 	}
 
@@ -9515,13 +9530,4 @@ public void db_updateMapRankedStatus()
 	}
 
 	g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
-}
-
-public void sqlSetSQLMode(Database db, DBResultSet results, const char[] error, any data)
-{
-	if (db == null || strlen(error))
-	{
-		LogError("[surftimer] SQL Error (sqlSetSQLMode): %s", error);
-		return;
-	}
 }
