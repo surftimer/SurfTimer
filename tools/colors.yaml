@@ -12,6 +12,13 @@ colors:
   team 1:       0x09
   team 2:       0x11
   teamcolor:    0x03
+  gray:         grey
+  gray2:        grey2
+  bluegray:     bluegrey
+  steelblue:    grey2
+  pink:         orchid
+  lightblue:    bluegrey
+  olive:        lightgreen
 ref_colors:
   red:          0x07
   lightred:     0x0F
@@ -29,3 +36,4 @@ ref_colors:
   lime:         0x06
   grey:         0x08
   grey2:        0x0D
+
