@@ -29,7 +29,6 @@ public void OnConnect(Database db, const char[] error, any data)
 	{
 		// https://github.com/nikooo777/ckSurf/pull/58
 		g_dDb.Query(sqlSetSQLMode, "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
-		g_DbType = MYSQL;
 	}
 	else
 	{
@@ -38,7 +37,11 @@ public void OnConnect(Database db, const char[] error, any data)
 	}
 
 	// If updating from a previous version
-	g_dDb.SetCharset("utf8mb4");
+	if (!g_dDb.SetCharset("utf8mb4"))
+	{
+		SetFailState("[SurfTimer] Can not set charset to \"utf8mb4\". Upgrade your mysql server to a version with support for \"utf8mb4\".");
+		return;
+	}
 
 
 	// Check if tables need to be Created or database needs to be upgraded
@@ -4934,10 +4937,7 @@ public void sql_CountRankedPlayers2Callback(Handle owner, Handle hndl, const cha
 
 public void db_ClearLatestRecords()
 {
-	if (g_DbType == MYSQL)
-		g_dDb.Query(SQL_CheckCallback, "DELETE FROM ck_latestrecords WHERE date < NOW() - INTERVAL 1 WEEK", DBPrio_Low);
-	else
-		g_dDb.Query(SQL_CheckCallback, "DELETE FROM ck_latestrecords WHERE date <= date('now','-7 day')", DBPrio_Low);
+	g_dDb.Query(SQL_CheckCallback, "DELETE FROM ck_latestrecords WHERE date < NOW() - INTERVAL 1 WEEK", DBPrio_Low);
 
 	if (!g_bServerDataLoaded)
 		db_GetDynamicTimelimit();
@@ -5219,11 +5219,7 @@ public void db_UpdateLastSeen(int client)
 	if ((StrContains(g_szSteamID[client], "STEAM_") != -1) && !IsFakeClient(client))
 	{
 		char szQuery[512];
-		if (g_DbType == MYSQL)
-			Format(szQuery, sizeof(sQuery), sql_UpdateLastSeenMySQL, g_szSteamID[client]);
-		else if (g_DbType == SQLITE)
-			Format(szQuery, sizeof(sQuery), sql_UpdateLastSeenSQLite, g_szSteamID[client]);
-
+		Format(szQuery, sizeof(sQuery), sql_UpdateLastSeen, g_szSteamID[client]);
 		g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
 	}
 }

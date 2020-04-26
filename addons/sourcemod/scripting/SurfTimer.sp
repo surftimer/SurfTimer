@@ -668,9 +668,6 @@ Handle g_PracticeFinishForward;
 // SQL driver
 Database g_dDb = null;
 
-// Database type
-int g_DbType;
-
 // Used to check if SQL changes are being made
 bool g_bInTransactionChain = false;
 
