@@ -1873,6 +1873,8 @@ public void OnMapEnd()
 
 public void OnConfigsExecuted()
 {
+	CreateVIPCommands();
+
 	// Get Chat Prefix
 	GetConVarString(g_hChatPrefix, g_szChatPrefix, sizeof(g_szChatPrefix));
 	GetConVarString(g_hChatPrefix, g_szMenuPrefix, sizeof(g_szMenuPrefix));
