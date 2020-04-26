@@ -666,7 +666,7 @@ Handle g_PracticeFinishForward;
 /*----------  SQL Variables  ----------*/
 
 // SQL driver
-Handle g_hDb = null;
+Database g_dDb = null;
 
 // Database type
 int g_DbType;
