@@ -93,34 +93,33 @@ public void SQLTxn_CreateDatabaseSuccess(Handle db, any data, int numQueries, Ha
 {
 	PrintToServer("[SurfTimer] Database tables succesfully created!");
 	
-	// Check for db upgrades
-	if (!SQL_FastQuery(g_hDb, "SELECT prespeed FROM ck_zones LIMIT 1"))
-	{
-		db_upgradeDatabase(0);
-		return;
-	}
-	// SELECT ck_maptier.ranked, ck_playerrank.style FROM ck_maptier, ck_playerrank LIMIT 1;
-	else if(!SQL_FastQuery(g_hDb, "SELECT ranked FROM ck_maptier LIMIT 1") || !SQL_FastQuery(g_hDb, "SELECT style FROM ck_playerrank LIMIT 1;"))
-	{
-		db_upgradeDatabase(1);
-		return;
-	}
-	else if (!SQL_FastQuery(g_hDb, "SELECT wrcppoints FROM ck_playerrank LIMIT 1"))
-	{
-		db_upgradeDatabase(2);
-	}
-	else if (!SQL_FastQuery(g_hDb, "SELECT teleside FROM ck_playeroptions LIMIT 1"))
-	{
-		db_upgradeDatabase(3);
-	}
-
-	for (int i = 0; i < sizeof(g_failedTransactions); i++)
-		g_failedTransactions[i] = 0;
+	db_startUpgrading();
 }
 
 public void SQLTxn_CreateDatabaseFailed(Handle db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
 {
 	SetFailState("[SurfTimer] Database tables could not be created! Error: %s", error);
+}
+
+void db_startUpgrading()
+{
+	Transaction tTransaction = new Transaction();
+	tTransaction.AddQuery("SELECT prespeed FROM ck_zones LIMIT 1", 0);
+	tTransaction.AddQuery("SELECT ck_maptier.ranked, ck_playerrank.style FROM ck_maptier, ck_playerrank LIMIT 1", 1);
+	tTransaction.AddQuery("SELECT wrcppoints FROM ck_playerrank LIMIT 1", 2);
+	tTransaction.AddQuery("SELECT teleside FROM ck_playeroptions LIMIT 1", 3);
+	g_dDb.Execute(tTransaction, SQLTxn_CheckDatabaseUpgradesSuccess, SQLTxn_CheckDatabaseUpgradesFailed);
+}
+
+public void SQLTxn_CheckDatabaseUpgradesSuccess(Handle db, any data, int numQueries, Handle[] results, any[] queryData)
+{
+	PrintToServer("[SurfTimer] All tables are up to date!");
+}
+
+public void SQLTxn_CheckDatabaseUpgradesFailed(Handle db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
+{
+	PrintToServer("[SurfTimer] Upgrading database... (Version: %d)", queryData[failIndex]);
+	db_upgradeDatabase(queryData[failIndex]);
 }
 
 public void db_upgradeDatabase(int ver)
@@ -176,13 +175,12 @@ public void db_upgradeDatabase(int ver)
 public void SQLTxn_UpgradeDatabaseSuccess(Database db, int userid, int numQueries, DBResultSet[] results, any[] queryData)
 {
 	PrintToServer("surftimer | Database upgrade was successful");
-	return;
+	db_startUpgrading();
 }
 
 public void SQLTxn_UpgradeDatabaseFailed(Database db, int userid, int numQueries, const char[] error, int failIndex, any[] queryData)
 {
 	PrintToServer("surftimer | Database upgrade failed (Error: %s)", error);
-	return;
 }
 
 /* Admin Delete Menu */

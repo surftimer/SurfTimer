@@ -671,9 +671,6 @@ Database g_dDb = null;
 // Used to check if SQL changes are being made
 bool g_bInTransactionChain = false;
 
-// Used to track failed transactions when making database changes
-int g_failedTransactions[7];
-
 // Used to track if sql tables are being renamed
 bool g_bRenaming = false;
 
