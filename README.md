@@ -63,13 +63,19 @@ Yes, but not any more than other projects currently and for past years.
 *   If there are no errors, (warnings are fine, for now) move .smx files from compiled to /plugins
 *   Copy the rest of the files from this repository to your csgo directory
 *   Edit configs (databases.cfg, admins, etc.)
-*   Run `scripts/mysql-files/checkpoints-upgrade.sql` in your SurfTimer database
 
 ## Upgrading
 
+### Upgrading from old checkpoints
+
+*   Download the latest version from the release page [here](https://github.com/olokos/Surftimer-olokos/releases/latest)
+*   Copy the files to your csgo directory
+*   Edit configs (mysql db, etc, to do)
+*   Run `scripts/mysql-files/checkpoints-upgrade.sql` in your SurfTimer database
+
 ### Upgrading from SurfTimer (fluffys)
 
-*   Download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
+*   Download the latest version from the release page [here](https://github.com/olokos/Surftimer-olokos/releases/latest)
 *   Copy the files to your csgo directory <br> - an update script can be found [here](https://github.com/z4lab/z4lab-surftimer/blob/master/scripts/upgrade_scripts/upgrade-fluffy.sh)
 *   Edit configs (mysql db, etc, to do)
 *   Run `scripts/mysql-files/upgrade-fluffy.sql` in your SurfTimer database
