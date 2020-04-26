@@ -63,37 +63,7 @@ public void sqlSetSQLMode(Database db, DBResultSet results, const char[] error, 
 	g_bRenaming = false;
 	g_bInTransactionChain = false;
 
-	// If tables haven't been created yet.
-	if (!SQL_FastQuery(g_hDb, "SELECT steamid FROM ck_playerrank LIMIT 1"))
-	{
-		db_createTables();
-		return;
-	}
-	else
-	{
-		// Check for db upgrades
-		if (!SQL_FastQuery(g_hDb, "SELECT prespeed FROM ck_zones LIMIT 1"))
-		{
-			db_upgradeDatabase(0);
-			return;
-		}
-		else if(!SQL_FastQuery(g_hDb, "SELECT ranked FROM ck_maptier LIMIT 1") || !SQL_FastQuery(g_hDb, "SELECT style FROM ck_playerrank LIMIT 1;"))
-		{
-			db_upgradeDatabase(1);
-			return;
-		}
-		else if (!SQL_FastQuery(g_hDb, "SELECT wrcppoints FROM ck_playerrank LIMIT 1"))
-		{
-			db_upgradeDatabase(2);
-		}
-		else if (!SQL_FastQuery(g_hDb, "SELECT teleside FROM ck_playeroptions LIMIT 1"))
-		{
-			db_upgradeDatabase(3);
-		}
-	}
-
-	for (int i = 0; i < sizeof(g_failedTransactions); i++)
-		g_failedTransactions[i] = 0;
+	db_createTables();
 }
 
 public void db_createTables()
@@ -122,6 +92,30 @@ public void db_createTables()
 public void SQLTxn_CreateDatabaseSuccess(Handle db, any data, int numQueries, Handle[] results, any[] queryData)
 {
 	PrintToServer("[SurfTimer] Database tables succesfully created!");
+	
+	// Check for db upgrades
+	if (!SQL_FastQuery(g_hDb, "SELECT prespeed FROM ck_zones LIMIT 1"))
+	{
+		db_upgradeDatabase(0);
+		return;
+	}
+	// SELECT ck_maptier.ranked, ck_playerrank.style FROM ck_maptier, ck_playerrank LIMIT 1;
+	else if(!SQL_FastQuery(g_hDb, "SELECT ranked FROM ck_maptier LIMIT 1") || !SQL_FastQuery(g_hDb, "SELECT style FROM ck_playerrank LIMIT 1;"))
+	{
+		db_upgradeDatabase(1);
+		return;
+	}
+	else if (!SQL_FastQuery(g_hDb, "SELECT wrcppoints FROM ck_playerrank LIMIT 1"))
+	{
+		db_upgradeDatabase(2);
+	}
+	else if (!SQL_FastQuery(g_hDb, "SELECT teleside FROM ck_playeroptions LIMIT 1"))
+	{
+		db_upgradeDatabase(3);
+	}
+
+	for (int i = 0; i < sizeof(g_failedTransactions); i++)
+		g_failedTransactions[i] = 0;
 }
 
 public void SQLTxn_CreateDatabaseFailed(Handle db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
