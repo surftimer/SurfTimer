@@ -117,6 +117,7 @@ public void SQLTxn_CreateDatabaseFailed(Handle db, any data, int numQueries, con
 public void db_upgradeDatabase(int ver)
 {
 	Transaction tTransation = new Transaction();
+
 	if (ver == 0)
 	{
 		// SurfTimer v2.01 -> SurfTimer v2.1
@@ -153,6 +154,11 @@ public void db_upgradeDatabase(int ver)
 	{
 		tTransation.AddQuery("ALTER TABLE ck_playeroptions2 ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER centrehud;");
 		tTransation.AddQuery("ALTER TABLE ck_spawnlocations DROP PRIMARY KEY, ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER stage, ADD PRIMARY KEY (mapname, zonegroup, stage, teleside);");
+	}
+	else
+	{
+		delete tTransation;
+		return;
 	}
 
 	g_dDb.Execute(tTransation, SQLTxn_UpgradeDatabaseSuccess, SQLTxn_UpgradeDatabaseFailed);
