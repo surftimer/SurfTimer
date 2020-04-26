@@ -116,47 +116,61 @@ public void SQLTxn_CreateDatabaseFailed(Handle db, any data, int numQueries, con
 
 public void db_upgradeDatabase(int ver)
 {
-  if (ver == 0)
-  {
-	// SurfTimer v2.01 -> SurfTimer v2.1
-	char query[128];
-	for (int i = 1; i < 11; i++)
+	Transaction tTransation = new Transaction();
+	if (ver == 0)
 	{
-	  Format(query, sizeof(query), "ALTER TABLE ck_maptier DROP COLUMN btier%i", i);
-	  SQL_FastQuery(g_hDb, query);
+		// SurfTimer v2.01 -> SurfTimer v2.1
+		char query[128];
+		for (int i = 1; i < 11; i++)
+		{
+			Format(query, sizeof(query), "ALTER TABLE ck_maptier DROP COLUMN btier%i", i);
+			tTransation.AddQuery(query);
+		}
+
+		tTransation.AddQuery("ALTER TABLE ck_maptier ADD COLUMN maxvelocity FLOAT NOT NULL DEFAULT '3500.0';");
+		tTransation.AddQuery("ALTER TABLE ck_maptier ADD COLUMN announcerecord INT(11) NOT NULL DEFAULT '0';");
+		tTransation.AddQuery("ALTER TABLE ck_maptier ADD COLUMN gravityfix INT(11) NOT NULL DEFAULT '1';");
+		tTransation.AddQuery("ALTER TABLE ck_zones ADD COLUMN `prespeed` int(64) NOT NULL DEFAULT '350';");
+		tTransation.AddQuery("ALTER TABLE ck_maptier ADD INDEX tier (mapname, tier);");
+		tTransation.AddQuery("ALTER TABLE ck_maptier ADD INDEX mapsettings (mapname, maxvelocity, announcerecord, gravityfix);");
+		tTransation.AddQuery("UPDATE ck_maptier a, ck_mapsettings b SET a.maxvelocity = b.maxvelocity WHERE a.mapname = b.mapname;");
+		tTransation.AddQuery("UPDATE ck_maptier a, ck_mapsettings b SET a.announcerecord = b.announcerecord WHERE a.mapname = b.mapname;");
+		tTransation.AddQuery("UPDATE ck_maptier a, ck_mapsettings b SET a.gravityfix = b.gravityfix WHERE a.mapname = b.mapname;");
+		tTransation.AddQuery("UPDATE ck_zones a, ck_mapsettings b SET a.prespeed = b.startprespeed WHERE a.mapname = b.mapname AND zonetype = 1;");
+		tTransation.AddQuery("DROP TABLE IF EXISTS ck_mapsettings;");
 	}
-	
-	SQL_FastQuery(g_hDb, "ALTER TABLE ck_maptier ADD COLUMN maxvelocity FLOAT NOT NULL DEFAULT '3500.0';");
-	SQL_FastQuery(g_hDb, "ALTER TABLE ck_maptier ADD COLUMN announcerecord INT(11) NOT NULL DEFAULT '0';");
-	SQL_FastQuery(g_hDb, "ALTER TABLE ck_maptier ADD COLUMN gravityfix INT(11) NOT NULL DEFAULT '1';");
-	SQL_FastQuery(g_hDb, "ALTER TABLE ck_zones ADD COLUMN `prespeed` int(64) NOT NULL DEFAULT '350';");
-	SQL_FastQuery(g_hDb, "CREATE INDEX tier ON ck_maptier (mapname, tier);");
-	SQL_FastQuery(g_hDb, "CREATE INDEX mapsettings ON ck_maptier (mapname, maxvelocity, announcerecord, gravityfix);");
-	SQL_FastQuery(g_hDb, "UPDATE ck_maptier a, ck_mapsettings b SET a.maxvelocity = b.maxvelocity WHERE a.mapname = b.mapname;");
-	SQL_FastQuery(g_hDb, "UPDATE ck_maptier a, ck_mapsettings b SET a.announcerecord = b.announcerecord WHERE a.mapname = b.mapname;");
-	SQL_FastQuery(g_hDb, "UPDATE ck_maptier a, ck_mapsettings b SET a.gravityfix = b.gravityfix WHERE a.mapname = b.mapname;");
-	SQL_FastQuery(g_hDb, "UPDATE ck_zones a, ck_mapsettings b SET a.prespeed = b.startprespeed WHERE a.mapname = b.mapname AND zonetype = 1;");
-	SQL_FastQuery(g_hDb, "DROP TABLE ck_mapsettings;");
-  }
-  else if (ver == 1)
-  {
-	// SurfTimer v2.1 -> v2.2
-	SQL_FastQuery(g_hDb, "ALTER TABLE ck_maptier ADD COLUMN ranked INT(11) NOT NULL DEFAULT '1';");
-	SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank DROP PRIMARY KEY, ADD COLUMN style INT(11) NOT NULL DEFAULT '0', ADD PRIMARY KEY (steamid, style);");
-  }
-  else if (ver == 2)
-  {
-	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN wrcppoints INT(11) NOT NULL DEFAULT 0 AFTER `wrbpoints`;");
-  }
-  else if (ver == 3)
-  {
-	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER centrehud;");
-	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_spawnlocations DROP PRIMARY KEY, ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER stage, ADD PRIMARY KEY (mapname, zonegroup, stage, teleside);");
-  }
+	else if (ver == 1)
+	{
+		// SurfTimer v2.1 -> v2.2
+		tTransation.AddQuery("ALTER TABLE ck_maptier ADD COLUMN ranked INT(11) NOT NULL DEFAULT '1';");
+		tTransation.AddQuery("ALTER TABLE ck_playerrank DROP PRIMARY KEY, ADD COLUMN style INT(11) NOT NULL DEFAULT '0', ADD PRIMARY KEY (steamid, style);");
+	}
+	else if (ver == 2)
+	{
+		tTransation.AddQuery("ALTER TABLE ck_playerrank ADD COLUMN wrcppoints INT(11) NOT NULL DEFAULT 0 AFTER `wrbpoints`;");
+	}
+	else if (ver == 3)
+	{
+		tTransation.AddQuery("ALTER TABLE ck_playeroptions2 ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER centrehud;");
+		tTransation.AddQuery("ALTER TABLE ck_spawnlocations DROP PRIMARY KEY, ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER stage, ADD PRIMARY KEY (mapname, zonegroup, stage, teleside);");
+	}
+
+	g_dDb.Execute(tTransation, SQLTxn_UpgradeDatabaseSuccess, SQLTxn_UpgradeDatabaseFailed);
+}
+
+public void SQLTxn_UpgradeDatabaseSuccess(Database db, int userid, int numQueries, DBResultSet[] results, any[] queryData)
+{
+	PrintToServer("surftimer | Database upgrade was successful");
+	return;
+}
+
+public void SQLTxn_UpgradeDatabaseFailed(Database db, int userid, int numQueries, const char[] error, int failIndex, any[] queryData)
+{
+	PrintToServer("surftimer | Database upgrade failed (Error: %s)", error);
+	return;
 }
 
 /* Admin Delete Menu */
-
 public void sql_DeleteMenuView(Handle owner, Handle hndl, const char[] error, any data)
 {
 	int client = GetClientFromSerial(data);
