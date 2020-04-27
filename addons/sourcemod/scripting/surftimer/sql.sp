@@ -8696,6 +8696,7 @@ public void db_selectMapCurrentWR(Handle owner, Handle hndl, const char[] error,
 	if (hndl == null)
 	{
 		LogError("[SurfTimer] SQL Error (db_selectMapCurrentWR): %s", error);
+		CloseHandle(pack);
 		return;
 	}
 
@@ -8706,7 +8707,6 @@ public void db_selectMapCurrentWR(Handle owner, Handle hndl, const char[] error,
 		ReadPackString(pack, szSteamId, sizeof(szSteamId));
 		ReadPackString(pack, szStyleType, sizeof(szStyleType));
 		int iLevel = ReadPackCell(pack);
-		CloseHandle(pack);
 
 		char sSteamId[32];
 		SQL_FetchString(hndl, 1, sSteamId, sizeof(sSteamId));
@@ -8763,6 +8763,8 @@ public void db_selectMapCurrentWR(Handle owner, Handle hndl, const char[] error,
 			}
 		}
 	}
+	
+	CloseHandle(pack);
 }
 
 // sm_pr command
