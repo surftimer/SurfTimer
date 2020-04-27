@@ -4903,8 +4903,10 @@ void PrintCSGOHUDText(int client, const char[] format, any ...)
 	VFormat(buff, sizeof(buff), format, 3);
 	Format(buff, sizeof(buff), "</font>%s ", buff);
 
-	for(int i = strlen(buff); i < sizeof(buff); i++)
+	for(int i = strlen(buff); i < sizeof(buff) - 1; i++)
 		buff[i] = '\n';
+	
+	buff[sizeof(buff) - 1] = '\0';
 
 	Protobuf pb = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_RELIABLE | USERMSG_BLOCKHOOKS));
 	pb.SetInt("msg_dst", 4);
