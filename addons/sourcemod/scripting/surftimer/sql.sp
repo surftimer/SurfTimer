@@ -299,27 +299,43 @@ public int callback_Confirm(Menu menu, MenuAction action, int client, int key)
 			char steamID[32];
 			menu.GetItem(key, steamID, 32);
 			
-			char szQuery[512];
+			char szQuery[512], szQuerySelect[512];
+
+			Handle pack = CreateDataPack();
+			WritePackString(pack, steamID);
 			
 			switch(g_SelectedEditOption[client])
 			{
 				case 0:
 				{
+					WritePackString(pack, "");
+					WritePackCell(pack, 0);
+
 					FormatEx(szQuery, 512, sql_MainDeleteQeury, "ck_playertimes", g_EditingMap[client], g_SelectedStyle[client], steamID, "");
+					FormatEx(szQuerySelect, 512, sql_selectMapRecordDeletion, "runtimepro", "ck_playertimes", g_EditingMap[client], g_SelectedStyle[client], "runtimepro", "");
 				}
 				case 1:
 				{
+					WritePackString(pack, "stage");
+					WritePackCell(pack, g_SelectedType[client]);
+
 					char stageQuery[32];
 					FormatEx(stageQuery, 32, "AND stage='%i'", g_SelectedType[client]);
 					FormatEx(szQuery, 512, sql_MainDeleteQeury, "ck_wrcps", g_EditingMap[client], g_SelectedStyle[client], steamID, stageQuery);
+					FormatEx(szQuerySelect, 512, sql_selectMapRecordDeletion, "runtimepro", "ck_wrcps", g_EditingMap[client], g_SelectedStyle[client], "runtimepro", stageQuery);
 				}
 				case 2:
 				{
+					WritePackString(pack, "bonus");
+					WritePackCell(pack, g_SelectedType[client]);
+
 					char zoneQuery[32];
 					FormatEx(zoneQuery, 32, "AND zonegroup='%i'", g_SelectedType[client]);
 					FormatEx(szQuery, 512, sql_MainDeleteQeury, "ck_bonus", g_EditingMap[client], g_SelectedStyle[client], steamID, zoneQuery);
+					FormatEx(szQuerySelect, 512, sql_selectMapRecordDeletion, "runtime", "ck_bonus", g_EditingMap[client], g_SelectedStyle[client], "runtime", zoneQuery);
 				}
 			}
+			SQL_TQuery(g_hDb, db_selectMapCurrentWR, szQuerySelect, pack, DBPrio_High);
 			SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
 			
 			// Looking for online player to refresh his record after deleting it.
@@ -8673,6 +8689,82 @@ public int ChooseMapMenuHandler(Menu menu, MenuAction action, int param1, int pa
 	}
 	else if (action == MenuAction_End)
 		delete menu;
+}
+
+public void db_selectMapCurrentWR(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_selectMapCurrentWR): %s", error);
+		CloseHandle(pack);
+		return;
+	}
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	{
+		ResetPack(pack);
+		char szSteamId[32], szStyleType[5];
+		ReadPackString(pack, szSteamId, sizeof(szSteamId));
+		ReadPackString(pack, szStyleType, sizeof(szStyleType));
+		int iLevel = ReadPackCell(pack);
+
+		char sSteamId[32];
+		SQL_FetchString(hndl, 1, sSteamId, sizeof(sSteamId));
+		int iStyle = SQL_FetchInt(hndl, 2);
+
+		if (StrEqual(szSteamId, sSteamId))
+		{
+			// Check if backup exists
+			char sPathBack[256];
+			if (StrEqual(szStyleType, "bonus"))
+				if (iStyle == 0)
+					BuildPath(Path_SM, sPathBack, sizeof(sPathBack), "%s%s_bonus_%i.rec.bak", CK_REPLAY_PATH, g_szMapName, iLevel);
+				else
+					BuildPath(Path_SM, sPathBack, sizeof(sPathBack), "%s%s_bonus_%i_style_%i.rec.bak", CK_REPLAY_PATH, g_szMapName, iLevel, iStyle);
+			else if (StrEqual(szStyleType, "stage"))
+				if (iStyle == 0)
+					BuildPath(Path_SM, sPathBack, sizeof(sPathBack), "%s%s_stage_%i.rec.bak", CK_REPLAY_PATH, g_szMapName, iLevel);
+				else
+					BuildPath(Path_SM, sPathBack, sizeof(sPathBack), "%s%s_stage_%i_style_%i.rec.bak", CK_REPLAY_PATH, g_szMapName, iLevel, iStyle);
+			else if (StrEqual(szStyleType, ""))
+				if (iStyle == 0)
+					BuildPath(Path_SM, sPathBack, sizeof(sPathBack), "%s%s.rec.bak", CK_REPLAY_PATH, g_szMapName);
+				else
+					BuildPath(Path_SM, sPathBack, sizeof(sPathBack), "%s%s_style_%i.rec.bak", CK_REPLAY_PATH, g_szMapName, iStyle);
+			
+			if (FileExists(sPathBack))
+			{
+				char sPath[256];
+				if (StrEqual(szStyleType, "bonus"))
+					if (iStyle == 0)
+						BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, g_szMapName, iLevel);
+					else
+						BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s_bonus_%i_style_%i.rec", CK_REPLAY_PATH, g_szMapName, iLevel, iStyle);
+				else if (StrEqual(szStyleType, "stage"))
+					if (iStyle == 0)
+						BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s_stage_%i.rec", CK_REPLAY_PATH, g_szMapName, iLevel);
+					else
+						BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s_stage_%i_style_%i.rec", CK_REPLAY_PATH, g_szMapName, iLevel, iStyle);
+				else if (StrEqual(szStyleType, ""))
+					if (iStyle == 0)
+						BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s.rec", CK_REPLAY_PATH, g_szMapName);
+					else
+						BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s_style_%i.rec", CK_REPLAY_PATH, g_szMapName, iStyle);
+				
+				if (FileExists(sPath))
+				{
+					DeleteFile(sPath);
+					RenameFile(sPathBack, sPath);
+					setReplayTime(0, 0, 0);
+
+					CreateTimer(5.0, FixBot_Off, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
+					CreateTimer(10.0, FixBot_On, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
+				}
+			}
+		}
+	}
+	
+	CloseHandle(pack);
 }
 
 // sm_pr command
