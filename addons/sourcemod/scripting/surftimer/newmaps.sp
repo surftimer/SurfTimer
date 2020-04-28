@@ -4,8 +4,6 @@ void CreateCommandsNewMap()
 	RegConsoleCmd("sm_nm", Client_NewMap, "[surftimer] shows new maps");
 	RegAdminCmd("sm_addnewmap", Client_AddNewMap, ADMFLAG_ROOT, "[surftimer] add a new map");
 	RegAdminCmd("sm_anm", Client_AddNewMap, ADMFLAG_ROOT, "[surftimer] add a new map");
-
-	db_present();
 }
 
 public Action Client_NewMap(int client, int args)

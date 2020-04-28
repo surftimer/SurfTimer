@@ -1681,19 +1681,6 @@ public void OnMapStart()
 	if (!g_bRenaming && !g_bInTransactionChain)
 	checkSpawnPoints();
 
-	db_viewMapSettings();
-
-
-	/// Start Loading Server Settings
-	ConVar cvHibernateWhenEmpty = FindConVar("sv_hibernate_when_empty");
-
-	if (!g_bRenaming && !g_bInTransactionChain && (IsServerProcessing() || !cvHibernateWhenEmpty.BoolValue))
-	{
-		LogToFileEx(g_szLogFile, "[surftimer] Starting to load server settings");
-		g_fServerLoading[0] = GetGameTime();
-		db_selectMapZones();
-	}
-
 	// Get Map Tag
 	ExplodeString(g_szMapName, "_", g_szMapPrefix, 2, 32);
 
@@ -1874,19 +1861,8 @@ public void OnConfigsExecuted()
 	GetConVarString(g_hChatPrefix, g_szMenuPrefix, sizeof(g_szMenuPrefix));
 	CRemoveColors(g_szMenuPrefix, sizeof(g_szMenuPrefix));
 
-	if (GetConVarBool(g_hDBMapcycle))
-		db_selectMapCycle();
-	else if (!GetConVarBool(g_hMultiServerMapcycle))
-		readMapycycle();
-	else
-		readMultiServerMapcycle();
-
 	if (GetConVarBool(g_hEnforceDefaultTitles))
 		ReadDefaultTitlesWhitelist();
-
-	// Count the amount of bonuses and then set skillgroups
-	if (!g_bRenaming && !g_bInTransactionChain)
-		db_selectBonusCount();
 
 	ServerCommand("sv_pure 0");
 
@@ -1970,7 +1946,9 @@ public void OnClientPutInServer(int client)
 
 	// Position Restoring
 	if (GetConVarBool(g_hcvarRestore) && !g_bRenaming && !g_bInTransactionChain)
-	db_selectLastRun(client);
+	{
+		db_selectLastRun(client);
+	}
 
 	if (g_bLateLoaded && IsPlayerAlive(client))
 	PlayerSpawn(client);
