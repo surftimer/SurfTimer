@@ -1303,9 +1303,11 @@ public void db_updatePoints(int client, int style)
 	{
 		if (IsValidClient(client))
 		{
+			char szName2[MAX_NAME_LENGTH * 2 + 1];
 			GetClientName(client, szName, MAX_NAME_LENGTH);
+			SQL_EscapeString(g_hDb, szName, szName2, MAX_NAME_LENGTH * 2 + 1);
 			GetClientAuthId(client, AuthId_Steam2, szSteamId, MAX_NAME_LENGTH, true);
-			Format(szQuery, 512, sql_updatePlayerRankPoints2, szName, g_pr_points[client][style], g_Points[client][style][3], g_Points[client][style][4], g_Points[client][style][6], g_Points[client][style][5], g_Points[client][style][2], g_Points[client][style][0], g_Points[client][style][1], g_pr_finishedmaps[client][style], g_pr_finishedbonuses[client][style], g_pr_finishedstages[client][style], g_WRs[client][style][0], g_WRs[client][style][1], g_WRs[client][style][2], g_Top10Maps[client][style], g_GroupMaps[client][style], g_szCountry[client], szSteamId, style);
+			Format(szQuery, 512, sql_updatePlayerRankPoints2, szName2, g_pr_points[client][style], g_Points[client][style][3], g_Points[client][style][4], g_Points[client][style][6], g_Points[client][style][5], g_Points[client][style][2], g_Points[client][style][0], g_Points[client][style][1], g_pr_finishedmaps[client][style], g_pr_finishedbonuses[client][style], g_pr_finishedstages[client][style], g_WRs[client][style][0], g_WRs[client][style][1], g_WRs[client][style][2], g_Top10Maps[client][style], g_GroupMaps[client][style], g_szCountry[client], szSteamId, style);
 			SQL_TQuery(g_hDb, sql_updatePlayerRankPointsCallback, szQuery, pack, DBPrio_Low);
 		}
 	}
@@ -5983,8 +5985,8 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 	if (!IsValidClient(data) || IsFakeClient(data))
 		return;
 
-	char szName[32];
-	GetClientName(data, szName, 32);
+	char szName[MAX_NAME_LENGTH];
+	GetClientName(data, szName, MAX_NAME_LENGTH);
 
 	char szQuery[1024];
 
@@ -6060,9 +6062,8 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 	{ // No record found from database - Let's insert
 
 		// Escape name for SQL injection protection
-		char szName2[MAX_NAME_LENGTH * 2 + 1], szUName[MAX_NAME_LENGTH];
-		GetClientName(data, szUName, MAX_NAME_LENGTH);
-		SQL_EscapeString(g_hDb, szUName, szName2, MAX_NAME_LENGTH);
+		char szName2[MAX_NAME_LENGTH * 2 + 1];
+		SQL_EscapeString(g_hDb, szName, szName2, MAX_NAME_LENGTH * 2 + 1);
 
 		// Move required information in datapack
 		Handle pack = CreateDataPack();
@@ -6073,9 +6074,9 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 		WritePackCell(pack, data);
 
 		if (style == 0)
-			Format(szQuery, 1024, sql_insertNewWrcp, g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage, g_iWrcpVelsStartNew[data][stage][0], g_iWrcpVelsStartNew[data][stage][1], g_iWrcpVelsStartNew[data][stage][2], g_iWrcpVelsEndNew[data][stage][0], g_iWrcpVelsEndNew[data][stage][1], g_iWrcpVelsEndNew[data][stage][2]);
+			Format(szQuery, 1024, sql_insertNewWrcp, g_szSteamID[data], szName2, g_szMapName, g_fFinalWrcpTime[data], stage, g_iWrcpVelsStartNew[data][stage][0], g_iWrcpVelsStartNew[data][stage][1], g_iWrcpVelsStartNew[data][stage][2], g_iWrcpVelsEndNew[data][stage][0], g_iWrcpVelsEndNew[data][stage][1], g_iWrcpVelsEndNew[data][stage][2]);
 		else if (style != 0)
-			Format(szQuery, 1024, sql_insertNewWrcpStyle, g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage, style, g_iWrcpVelsStartNew[data][stage][0], g_iWrcpVelsStartNew[data][stage][1], g_iWrcpVelsStartNew[data][stage][2], g_iWrcpVelsEndNew[data][stage][0], g_iWrcpVelsEndNew[data][stage][1], g_iWrcpVelsEndNew[data][stage][2]);
+			Format(szQuery, 1024, sql_insertNewWrcpStyle, g_szSteamID[data], szName2, g_szMapName, g_fFinalWrcpTime[data], stage, style, g_iWrcpVelsStartNew[data][stage][0], g_iWrcpVelsStartNew[data][stage][1], g_iWrcpVelsStartNew[data][stage][2], g_iWrcpVelsEndNew[data][stage][0], g_iWrcpVelsEndNew[data][stage][1], g_iWrcpVelsEndNew[data][stage][2]);
 
 		SQL_TQuery(g_hDb, SQL_UpdateWrcpRecordCallback, szQuery, pack, DBPrio_Low);
 
