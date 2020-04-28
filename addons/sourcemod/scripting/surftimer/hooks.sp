@@ -1194,7 +1194,52 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		g_LastButton[client] = buttons;
 
 		BeamBox_OnPlayerRunCmd(client);
+
+		// Do not record frames where the player was afk in start zone
+		if (!IsFakeClient(client)) 
+		{
+			float vVelocity[3];
+			GetEntPropVector(client, Prop_Data, "m_vecVelocity", vVelocity);
+			float velocity = GetVectorLength(vVelocity);
+			
+			// Player is afk, stop recording if recording
+			if (velocity == 0.0)
+			{
+				if (g_iClientInZone[client][0] == 1 || g_iClientInZone[client][0] == 5)
+				{
+					// Check if the replay is recording
+					if (g_hRecording[client] != null) 
+						StopRecording(client);
+					
+					if (g_StageRecStartFrame[client] != -1)
+						g_StageRecStartFrame[client] = -1;
+				}
+				else if (g_iClientInZone[client][0] == 3)
+				{
+					if (g_StageRecStartFrame[client] != -1)
+						g_StageRecStartFrame[client] = -1;
+				}
+			}
+			else
+			{
+				if (g_iClientInZone[client][0] == 1 || g_iClientInZone[client][0] == 5)
+				{
+					if (g_hRecording[client] == null)
+						StartRecording(client);
+
+					if (g_StageRecStartFrame[client] == -1)
+						Stage_StartRecording(client);
+				}
+				else if (g_iClientInZone[client][0] == 3)
+				{
+					if (g_StageRecStartFrame[client] == -1)
+						Stage_StartRecording(client);
+				}
+			}
+		}
 	}
+	
+
 
 	// Strafe Sync taken from shavit's bhop timer
 	g_fAngleCache[client] = angles[1];

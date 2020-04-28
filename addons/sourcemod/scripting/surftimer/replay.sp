@@ -1187,7 +1187,7 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 
 public void Stage_StartRecording(int client)
 {
-	if (!IsValidClient(client) || IsFakeClient(client))
+	if (!IsValidClient(client) || IsFakeClient(client) || !g_bhasStages || g_bSavingWrcpReplay[client])
 		return;
 
 	GetClientAbsOrigin(client, g_fStageInitialPosition[client]);
@@ -1213,7 +1213,7 @@ public void Stage_StartRecording(int client)
 
 public void Stage_SaveRecording(int client, int stage, char[] time)
 {
-	if (!IsValidClient(client) || g_hRecording[client] == null) 
+	if (!IsValidClient(client) || g_hRecording[client] == null || g_bSavingWrcpReplay[client]) 
 		return;
 
 	char szName[MAX_NAME_LENGTH];
@@ -1277,6 +1277,7 @@ public void Stage_SaveRecording(int client, int stage, char[] time)
 	}
 
 	WriteRecordToDisk(sPath2, header);
+	g_StageRecStartFrame[client] = -1;
 	if (g_bSavingWrcpReplay[client])
 		g_bSavingWrcpReplay[client] = false;
 }
