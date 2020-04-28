@@ -1293,7 +1293,7 @@ public void db_updatePoints(int client, int style)
 	char szQuery[512];
 	char szName[MAX_NAME_LENGTH * 2 + 1];
 	char szSteamId[32];
-	if (client > MAXPLAYERS && g_pr_RankingRecalc_InProgress || client > MAXPLAYERS && g_bProfileRecalc[client])
+	if (client > MAXPLAYERS && (g_pr_RankingRecalc_InProgress || g_bProfileRecalc[client]))
 	{
 		SQL_EscapeString(g_hDb, g_pr_szName[client], szName, MAX_NAME_LENGTH * 2 + 1);
 		Format(szQuery, 512, sql_updatePlayerRankPoints, szName, g_pr_points[client][style], g_Points[client][style][3], g_Points[client][style][4], g_Points[client][style][6], g_Points[client][style][5], g_Points[client][style][2], g_Points[client][style][0], g_Points[client][style][1], g_pr_finishedmaps[client][style], g_pr_finishedbonuses[client][style], g_pr_finishedstages[client][style], g_WRs[client][style][0], g_WRs[client][style][1], g_WRs[client][style][2], g_Top10Maps[client][style], g_GroupMaps[client][style], g_pr_szSteamID[client], style);
@@ -1327,7 +1327,7 @@ public void sql_updatePlayerRankPointsCallback(Handle owner, Handle hndl, const 
 	CloseHandle(pack);
 
 	// If was recalculating points, go to the next player, announce or end calculating
-	if (data > MAXPLAYERS && g_pr_RankingRecalc_InProgress || data > MAXPLAYERS && g_bProfileRecalc[data])
+	if (data > MAXPLAYERS && (g_pr_RankingRecalc_InProgress || g_bProfileRecalc[data]))
 	{
 		if (g_bProfileRecalc[data] && !g_pr_RankingRecalc_InProgress)
 		{
