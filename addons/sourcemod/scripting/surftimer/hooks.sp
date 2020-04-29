@@ -459,10 +459,11 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		else
 		{
 			char szChatRank[1024];
-			Format(szChatRank, 1024, "%s", g_pr_chat_coloredrank[client]);
+			Format(szChatRank, sizeof(szChatRank), "%s", g_pr_chat_coloredrank[client]);
+
 			char szChatRankColor[1024];
-			Format(szChatRankColor, 1024, "%s", g_pr_chat_coloredrank[client]);
-			CGetRankColor(szChatRankColor, 1024);
+			Format(szChatRankColor, sizeof(szChatRankColor), "%s", g_pr_chat_coloredrank[client]);
+			CGetRankColor(szChatRankColor, sizeof(szChatRankColor));
 
 			if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
 				Format(szName, sizeof(szName), "{%s}%s", szChatRankColor, szName);
@@ -493,12 +494,11 @@ public Action Say_Hook(int client, const char[] command, int argc)
 
 public void CGetRankColor(char[] sMsg, int iSize) // edit from CProcessVariables - colorvars
 {
-	if (!Init()) {
-		return;
-	}
-
-	char[] sOut = new char[iSize]; char[] sCode = new char[iSize]; char[] sColor = new char[iSize];
-	int iOutPos = 0; int iCodePos = -1;
+	char[] sOut = new char[iSize];
+	char[] sCode = new char[iSize];
+	char[] sColor = new char[iSize];
+	int iOutPos = 0;
+	int iCodePos = -1;
 	int iMsgLen = strlen(sMsg);
 	int dev = 0;
 
@@ -516,7 +516,9 @@ public void CGetRankColor(char[] sMsg, int iSize) // edit from CProcessVariables
 				String_ToLower(sCode, sCode, iSize);
 
 				if (CGetColor(sCode, sColor, iSize)) {
-					if(dev == 1) break;
+					if(dev == 1) {
+						break;
+					}
 					dev++;
 				} else {
 					Format(sOut, iSize, "%s{%s}", sOut, sCode);
@@ -1192,7 +1194,52 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		g_LastButton[client] = buttons;
 
 		BeamBox_OnPlayerRunCmd(client);
+
+		// Do not record frames where the player was afk in start zone
+		if (!IsFakeClient(client)) 
+		{
+			float vVelocity[3];
+			GetEntPropVector(client, Prop_Data, "m_vecVelocity", vVelocity);
+			float velocity = GetVectorLength(vVelocity);
+			
+			// Player is afk, stop recording if recording
+			if (velocity == 0.0)
+			{
+				if (g_iClientInZone[client][0] == 1 || g_iClientInZone[client][0] == 5)
+				{
+					// Check if the replay is recording
+					if (g_hRecording[client] != null) 
+						StopRecording(client);
+					
+					if (g_StageRecStartFrame[client] != -1)
+						g_StageRecStartFrame[client] = -1;
+				}
+				else if (g_iClientInZone[client][0] == 3)
+				{
+					if (g_StageRecStartFrame[client] != -1)
+						g_StageRecStartFrame[client] = -1;
+				}
+			}
+			else
+			{
+				if (g_iClientInZone[client][0] == 1 || g_iClientInZone[client][0] == 5)
+				{
+					if (g_hRecording[client] == null)
+						StartRecording(client);
+
+					if (g_StageRecStartFrame[client] == -1)
+						Stage_StartRecording(client);
+				}
+				else if (g_iClientInZone[client][0] == 3)
+				{
+					if (g_StageRecStartFrame[client] == -1)
+						Stage_StartRecording(client);
+				}
+			}
+		}
 	}
+	
+
 
 	// Strafe Sync taken from shavit's bhop timer
 	g_fAngleCache[client] = angles[1];

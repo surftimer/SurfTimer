@@ -33,7 +33,7 @@ Yes, but not any more than other projects currently and for past years.
 * [SourceMod Includes](https://www.sourcemod.net/downloads.php?branch=stable)
 * [Sourcemod-Discord API](https://github.com/Deathknife/sourcemod-discord)
 * [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
-* [colorvariables](https://github.com/olokos/Chat-Processor/blob/master/scripting/include/colorvariables.inc)
+* [ColorLib](https://github.com/c0rp3n/colorlib-sm/tree/master/addons/sourcemod/scripting/include)
 
 **Recommended:**
 * [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (Suppresses console warnings)
@@ -66,19 +66,26 @@ Yes, but not any more than other projects currently and for past years.
 
 ## Upgrading
 
+### Upgrading from old checkpoints
+
+*   Download the latest version from the release page [here](https://github.com/olokos/Surftimer-olokos/releases/latest)
+*   Copy the files to your csgo directory
+*   Edit configs (mysql db, etc, to do)
+*   Run `scripts/mysql-files/checkpoints-upgrade.sql` in your SurfTimer database
+
 ### Upgrading from SurfTimer (fluffys)
 
-*   Download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
-*   Copy the files to your csgo directory <br> - an update script can be found [here](https://github.com/z4lab/z4lab-surftimer/blob/master/scripts/upgrade_scripts/upgrade-fluffy.sh)
+*   Download the latest version from the release page [here](https://github.com/olokos/Surftimer-olokos/releases/latest)
+*   Copy the files to your csgo directory <br> - an update script can be found [here](https://github.com/olokos/Surftimer-olokos/blob/master/scripts/upgrade_scripts/upgrade-fluffy.sh)
 *   Edit configs (mysql db, etc, to do)
-*   Run `mysql-files/upgrade-fluffy.sql` in your surftimer db
+*   Run `scripts/mysql-files/upgrade-fluffy.sql` in your SurfTimer database
 
 ### Upgrading from ckSurf (nikooo777)
 
-*   Download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
+*   Download the latest version from the release page [here](https://github.com/olokos/Surftimer-olokos/releases/latest)
 *   Copy the files to your csgo directory
 *   Remove all old ckSurf data you don't want anymore
-*   Run `mysql-files/upgrade-niko.sql` in your ckSurf db
+*   Run `scripts/mysql-files/upgrade-niko.sql` in your ckSurf db
 *   Edit configs (mysql db, etc, to do)
 
 
