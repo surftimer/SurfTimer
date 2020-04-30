@@ -1369,9 +1369,10 @@ public void db_updatePoints(int client, int style)
 	WritePackCell(pack, client);
 	WritePackCell(pack, style);
 
-	char szQuery[512];
+	char szQuery[1024];
 	char szName[MAX_NAME_LENGTH * 2 + 1];
 	char szSteamId[32];
+
 	if (client > MAXPLAYERS && (g_pr_RankingRecalc_InProgress || g_bProfileRecalc[client]))
 	{
 		g_dDb.Escape(g_pr_szName[client], szName, MAX_NAME_LENGTH * 2 + 1);
