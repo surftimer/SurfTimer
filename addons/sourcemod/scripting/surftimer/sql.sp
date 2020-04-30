@@ -1379,17 +1379,14 @@ public void db_updatePoints(int client, int style)
 		Format(szQuery, sizeof(szQuery), sql_updatePlayerRankPoints, szName, g_pr_points[client][style], g_Points[client][style][3], g_Points[client][style][4], g_Points[client][style][6], g_Points[client][style][5], g_Points[client][style][2], g_Points[client][style][0], g_Points[client][style][1], g_pr_finishedmaps[client][style], g_pr_finishedbonuses[client][style], g_pr_finishedstages[client][style], g_WRs[client][style][0], g_WRs[client][style][1], g_WRs[client][style][2], g_Top10Maps[client][style], g_GroupMaps[client][style], g_pr_szSteamID[client], style);
 		g_dDb.Query(sql_updatePlayerRankPointsCallback, szQuery, pack, DBPrio_Low);
 	}
-	else
+	else if (IsValidClient(client))
 	{
-		if (IsValidClient(client))
-		{
-			char szName2[MAX_NAME_LENGTH * 2 + 1];
-			GetClientName(client, szName, MAX_NAME_LENGTH);
-			g_dDb.Escape(szName, szName2, MAX_NAME_LENGTH * 2 + 1);
-			GetClientAuthId(client, AuthId_Steam2, szSteamId, MAX_NAME_LENGTH, true);
-			Format(szQuery, sizeof(szQuery), sql_updatePlayerRankPoints2, szName2, g_pr_points[client][style], g_Points[client][style][3], g_Points[client][style][4], g_Points[client][style][6], g_Points[client][style][5], g_Points[client][style][2], g_Points[client][style][0], g_Points[client][style][1], g_pr_finishedmaps[client][style], g_pr_finishedbonuses[client][style], g_pr_finishedstages[client][style], g_WRs[client][style][0], g_WRs[client][style][1], g_WRs[client][style][2], g_Top10Maps[client][style], g_GroupMaps[client][style], g_szCountry[client], szSteamId, style);
-			g_dDb.Query(sql_updatePlayerRankPointsCallback, szQuery, pack, DBPrio_Low);
-		}
+		char szName2[MAX_NAME_LENGTH * 2 + 1];
+		GetClientName(client, szName, MAX_NAME_LENGTH);
+		g_dDb.Escape(szName, szName2, MAX_NAME_LENGTH * 2 + 1);
+		GetClientAuthId(client, AuthId_Steam2, szSteamId, MAX_NAME_LENGTH, true);
+		Format(szQuery, sizeof(szQuery), sql_updatePlayerRankPoints2, szName2, g_pr_points[client][style], g_Points[client][style][3], g_Points[client][style][4], g_Points[client][style][6], g_Points[client][style][5], g_Points[client][style][2], g_Points[client][style][0], g_Points[client][style][1], g_pr_finishedmaps[client][style], g_pr_finishedbonuses[client][style], g_pr_finishedstages[client][style], g_WRs[client][style][0], g_WRs[client][style][1], g_WRs[client][style][2], g_Top10Maps[client][style], g_GroupMaps[client][style], g_szCountry[client], szSteamId, style);
+		g_dDb.Query(sql_updatePlayerRankPointsCallback, szQuery, pack, DBPrio_Low);
 	}
 }
 
