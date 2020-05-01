@@ -1,6 +1,9 @@
 name: Compile with SourceMod
 
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+      - master
 
 jobs:
   build:
