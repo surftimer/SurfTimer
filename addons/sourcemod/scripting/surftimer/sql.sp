@@ -113,8 +113,6 @@ public void SQLTxn_CreateDatabaseSuccess(Handle db, any data, int numQueries, DB
 			}
 		}
 	}
-	
-	db_startUpgrading();
 }
 
 public void SQLTxn_CreateDatabaseFailed(Handle db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)

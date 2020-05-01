@@ -188,6 +188,10 @@ void CreateCommands()
 	RegConsoleCmd("sm_nctriggers", Command_ToggleNcTriggers, "[surftimer] [settings] on/off - toggle triggers while noclipping");
 	RegConsoleCmd("sm_autoreset", Command_ToggleAutoReset, "[surftimer] [settings] on/off - toggle auto reset for your current map/bonus run if your above your pb");
 
+	// Run database upgrading
+	RegAdminCmd("sm_surftimer_upgrade", Command_DatabaseUpgrade, ADMFLAG_ROOT, "Upgrading database");
+	RegAdminCmd("sm_surftimer_migrate", Command_DatabaseUpgrade, ADMFLAG_ROOT, "Upgrading database");
+
 }
 
 void CreateVIPCommands()

@@ -1570,6 +1570,7 @@ char RadioCMDS[][] =  // Disable radio commands
 #include "surftimer/mapsettings.sp"
 #include "surftimer/cvote.sp"
 #include "surftimer/vip.sp"
+#include "surftimer/upgrades.sp"
 
 /*====================================
 =               Events               =
