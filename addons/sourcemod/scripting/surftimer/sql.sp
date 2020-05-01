@@ -203,8 +203,8 @@ public void db_upgradeDatabase(int version)
 	}
 	else if (version == 3)
 	{
-		tTransaction.AddQuery("ALTER TABLE ck_playeroptions2 ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER centrehud;", 1);
-		tTransaction.AddQuery("ALTER TABLE ck_spawnlocations DROP PRIMARY KEY, ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER stage, ADD PRIMARY KEY (mapname, zonegroup, stage, teleside);", 1);
+		tTransaction.AddQuery("ALTER TABLE ck_playeroptions2 DROP COLUMN teleside, ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER centrehud;", 1);
+		tTransaction.AddQuery("ALTER TABLE ck_spawnlocations DROP PRIMARY KEY, DROP COLUMN teleside, ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER stage, ADD PRIMARY KEY (mapname, zonegroup, stage, teleside);", 1);
 	}
 	else if (version == 4)
 	{
