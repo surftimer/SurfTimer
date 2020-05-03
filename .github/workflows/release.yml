@@ -48,6 +48,16 @@ jobs:
           git clone https://github.com/Deathknife/sourcemod-discord.git
           mv sourcemod-discord/include/* $INCLUDE_PATH
       
+      - name: Set up python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.x'
+        
+      - name: Install python dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install pyyaml
+
       - name: Generate colorlib_map.inc
         run: |
           wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/tools/color_gen.py -P $TOOLS_PATH
