@@ -4901,10 +4901,10 @@ void PrintCSGOHUDText(int client, const char[] format, any ...)
 {
 	char buff[MAX_HINT_SIZE];
 	VFormat(buff, sizeof(buff), format, 3);
-	Format(buff, sizeof(buff), "</font>%s ", buff);
+	Format(buff, sizeof(buff), "</font>%s", buff);
 
 	for(int i = strlen(buff); i < sizeof(buff) - 1; i++)
-		buff[i] = '\n';
+		buff[i] = ' ';
 	
 	buff[sizeof(buff) - 1] = '\0';
 
