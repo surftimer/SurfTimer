@@ -501,7 +501,7 @@ public Action RemoveRagdoll(Handle timer, any victim)
 		int player_ragdoll;
 		player_ragdoll = GetEntDataEnt2(victim, g_ragdolls);
 		if (player_ragdoll != -1)
-			RemoveEdict(player_ragdoll);
+			RemoveEntity(player_ragdoll);
 	}
 	return Plugin_Handled;
 }
