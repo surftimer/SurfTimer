@@ -2284,7 +2284,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 						{
 							GetEdictClassname(weapon, szclass, sizeof(szclass));
 							RemovePlayerItem(i, weapon);
-							RemoveEdict(weapon);
+							RemoveEntity(weapon);
 							int equipweapon = GetPlayerWeaponSlot(i, 2);
 							if (equipweapon != -1)
 								EquipPlayerWeapon(i, equipweapon);

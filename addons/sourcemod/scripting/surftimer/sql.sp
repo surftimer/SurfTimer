@@ -388,7 +388,7 @@ public void db_selectSpawnLocationsCallback(Handle owner, Handle hndl, const cha
 	{
 		LogError("[SurfTimer] SQL Error (db_selectSpawnLocationsCallback): %s ", error);
 		if (!g_bServerDataLoaded)
-			db_ClearLatestRecords();
+			db_GetDynamicTimelimit();
 		return;
 	}
 
@@ -414,7 +414,7 @@ public void db_selectSpawnLocationsCallback(Handle owner, Handle hndl, const cha
 	}
 
 	if (!g_bServerDataLoaded)
-		db_ClearLatestRecords();
+		db_GetDynamicTimelimit();
 }
 
 /*===================================
@@ -5072,15 +5072,6 @@ public void sql_CountRankedPlayers2Callback(Handle owner, Handle hndl, const cha
 		db_selectSpawnLocations();
 
 	return;
-}
-
-
-public void db_ClearLatestRecords()
-{
-	g_dDb.Query(SQL_CheckCallback, "DELETE FROM ck_latestrecords WHERE date < NOW() - INTERVAL 1 WEEK", DBPrio_Low);
-
-	if (!g_bServerDataLoaded)
-		db_GetDynamicTimelimit();
 }
 
 public void db_viewUnfinishedMaps(int client, char szSteamId[32])

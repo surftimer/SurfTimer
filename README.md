@@ -18,6 +18,7 @@ Yes, but not any more than other projects currently and for past years.
 * [SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable)
 * [Metamod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable)
 * [SourceMod-Discord API](https://github.com/Deathknife/sourcemod-discord)
+* [Precompiled SurfTimer + Discord-API](https://github.com/olokos/Surftimer-olokos/releases/latest)
 * A MySQL Database (MySQL 5.7, MySQL 8+, MariaDB supported)
 
 <sup>(We only support the latest stable version of Sourcemod.)</sup>
@@ -27,17 +28,18 @@ Yes, but not any more than other projects currently and for past years.
 * [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604)
 * [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
 
-**Compilation Requirements (Includes):**
+**Recommended:**
+* [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (Suppresses console warnings)
+* [Stripper:Source](https://forums.alliedmods.net/showthread.php?t=39439) (Allows you to add/modify/removes entities from maps, recommended filter file included)
+
+## Compile from source
+The Include files from the following extensions and plugins are required to compile SurfTimer:
 * [SMJansson](https://github.com/JoinedSenses/SourceMod-IncludeLibrary/blob/master/include/smjansson.inc)
 * [SMLib (Transitional Syntax Branch)](https://github.com/bcserv/smlib/tree/transitional_syntax)
 * [SourceMod Includes](https://www.sourcemod.net/downloads.php?branch=stable)
 * [Sourcemod-Discord API](https://github.com/Deathknife/sourcemod-discord)
 * [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
 * [ColorLib](https://github.com/c0rp3n/colorlib-sm/tree/master/addons/sourcemod/scripting/include)
-
-**Recommended:**
-* [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (Suppresses console warnings)
-* [Stripper:Source](https://forums.alliedmods.net/showthread.php?t=39439) (Allows you to add/modify/removes entities from maps, recommended filter file included)
 
 ## Issue Rules
 
