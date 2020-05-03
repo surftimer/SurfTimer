@@ -114,7 +114,7 @@ public void db_upgradeDatabase(int version)
 public void SQLTxn_UpgradeDatabaseSuccess(Database db, int version, int numQueries, DBResultSet[] results, any[] queryData)
 {
 	PrintToServer("surftimer | Database upgrade (Version %d) was successful", version);
-	db_startUpgrading();
+	db_upgradeDatabase(version + 1);
 }
 
 public void SQLTxn_UpgradeDatabaseFailed(Database db, int version, int numQueries, const char[] error, int failIndex, any[] queryData)
