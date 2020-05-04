@@ -12,7 +12,7 @@
 
 ##### Does it mean this version is buggy?
 
-><sup>Yes, but not any more than other projects currently and for past years.</sup>
+>Yes, but not any more than other projects currently and for past years.
 
 **Pull requests and any contributions are welcome and encouraged!**
 
