@@ -1,16 +1,17 @@
 # Surftimer-olokos for CS:GO
 
-_I have renamed the repository to Surftimer-olokos just to make it obvious, that we're entering a new chapter in CS:GO surf community, a milestone._
+<sup>I have renamed the repository to Surftimer-olokos just to make it obvious, that we're entering a new chapter in CS:GO surf community, a milestone.</sup>
 
 ## Project Goals
 
 As you probably all know there are quite some bugs in all open-source versions of cksurf or surftimer.
 Our main goal with this project to have a bug-free, properly optimized surf timer that would work as we all expect it to, across all configurations.
+
 Because of this, we will be putting new features and additions on the side, as they can potentially introduce new, unknown issues and there's plenty of those already.
 
-**Does it mean this version is buggy?**
+##### Does it mean this version is buggy?
 
-Yes, but not any more than other projects currently and for past years.
+><sup>Yes, but not any more than other projects currently and for past years.</sup>
 
 **Pull requests and any contributions are welcome and encouraged!**
 
