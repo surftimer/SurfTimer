@@ -37,8 +37,9 @@
 * [SMLib](https://github.com/bcserv/smlib/tree/transitional_syntax)
 * [ColorLib](https://github.com/c0rp3n/colorlib-sm/tree/master/addons/sourcemod/scripting/include)
 * [Cleaner](https://github.com/Accelerator74/Cleaner)
-* [Stripper](https://forums.alliedmods.net/showthread.php?t=39439) (recommended filter file included)
-<sup>All optional are required to compile it manually!</sup>
+* [Stripper](https://forums.alliedmods.net/showthread.php?t=39439) (recommended filter included)
+
+*(All optional are required to compile it manually!)*
 
 ## Issue Rules
 
