@@ -4,10 +4,9 @@
 
 ## Project Goals
 
-As you probably all know there are quite some bugs in all open-source versions of cksurf or surftimer.
+*As you probably all know there are quite some bugs in all open-source versions of cksurf or surftimer.
 Our main goal with this project to have a bug-free, properly optimized surf timer that would work as we all expect it to, across all configurations.
-
-Because of this, we will be putting new features and additions on the side, as they can potentially introduce new, unknown issues and there's plenty of those already.
+Because of this, we will be putting new features and additions on the side, as they can potentially introduce new, unknown issues and there's plenty of those already.*
 
 ##### Does it mean this version is buggy?
 
