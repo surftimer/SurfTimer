@@ -10,38 +10,35 @@
 
 *Because of this, we will be putting new features and additions on the side, as they can potentially introduce new, unknown issues and there's plenty of those already.*
 
-##### Does it mean this version is buggy?
+#### Does it mean this version is buggy?
 
 >Yes, but not any more than other projects currently and for past years.
 
 **Pull requests and any contributions are welcome and encouraged!**
 
-## Installation and Requirements
+## Installation
+
+#### Requirements
 * [SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable)
 * [Metamod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable)
-* [SourceMod-Discord API](https://github.com/Deathknife/sourcemod-discord)
 * [Precompiled SurfTimer + Discord-API](https://github.com/olokos/Surftimer-olokos/releases/latest)
-* A MySQL Database (MySQL 5.7, MySQL 8+, MariaDB supported)
+* A MySQL Database (MySQL 5.7 / 8+ / MariaDB supported)
 
-<sup>(We only support the latest stable version of Sourcemod.)</sup>
+<details>
+	 <summary>A installation guide</summary>
+	following soon
+	</details>
 
-**Extensions:**
-* [DHooks](https://forums.alliedmods.net/showthread.php?t=180114) - **Recommended:** [Detours Build](https://forums.alliedmods.net/showpost.php?p=2588686&postcount=589) for SourceMod 1.10 Stable
+#### Optional
+* [DHooks](https://forums.alliedmods.net/showpost.php?p=2588686&postcount=589)
 * [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604)
 * [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
-
-**Recommended:**
-* [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (Suppresses console warnings)
-* [Stripper:Source](https://forums.alliedmods.net/showthread.php?t=39439) (Allows you to add/modify/removes entities from maps, recommended filter file included)
-
-## Compile from source
-The Include files from the following extensions and plugins are required to compile SurfTimer:
-* [SMJansson](https://github.com/JoinedSenses/SourceMod-IncludeLibrary/blob/master/include/smjansson.inc)
-* [SMLib (Transitional Syntax Branch)](https://github.com/bcserv/smlib/tree/transitional_syntax)
-* [SourceMod Includes](https://www.sourcemod.net/downloads.php?branch=stable)
 * [Sourcemod-Discord API](https://github.com/Deathknife/sourcemod-discord)
-* [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
+* [SMLib](https://github.com/bcserv/smlib/tree/transitional_syntax)
 * [ColorLib](https://github.com/c0rp3n/colorlib-sm/tree/master/addons/sourcemod/scripting/include)
+* [Cleaner](https://github.com/Accelerator74/Cleaner)
+* [Stripper](https://forums.alliedmods.net/showthread.php?t=39439) (recommended filter file included)
+<sup>All optional are required to compile it manually!</sup>
 
 ## Issue Rules
 
