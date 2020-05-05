@@ -26,7 +26,7 @@
 
 - Prerequisites:
 	- Ensure your timer version is up to date with the [latest release](https://github.com/olokos/Surftimer-olokos/releases/latest)
-	- [SourceMod](https://www.sourcemod.net/downloads.php?branch=stable) and [Metamod](https://www.sourcemm.net/downloads.php/?branch=stable) are up to date (support will only be given for latest stable versions)
+	- [SourceMod](https://www.sourcemod.net/downloads.php?branch=stable) and [Metamod](https://www.sourcemm.net/downloads.php/?branch=stable) are up to date (support only for latest stable)
 	- Ensure [includes](https://github.com/olokos/Surftimer-olokos#Optional) for compilation are up to date
 	- Stock timer without any additional changes
 - Follow the template
@@ -45,11 +45,6 @@
 * [Precompiled Surftimer + Discord-API](https://github.com/olokos/Surftimer-olokos/releases/latest)
 * A MySQL Database (MySQL 5.7 / 8+ / MariaDB supported)
 
-<details>
-	 <summary>A installation guide</summary>
-	following soon
-	</details>
-
 #### Optional
 * [DHooks](https://forums.alliedmods.net/showpost.php?p=2588686&postcount=589)
 * [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604)
@@ -62,7 +57,17 @@
 
 *(All optional are required to compile it manually!)*
 
-
+#### Installation guide
+	* Download [Requirements](https://github.com/olokos/Surftimer-olokos#Requirements) & [Optional](https://github.com/olokos/Surftimer-olokos#Optional)
+	* Edit sourcemod.cfg
+	* 
+	* 
+	* 
+	* 
+	* 
+	* 
+	
+	
 ## Upgrading
 
 #### Upgrade from pre v.285 checkpoints
