@@ -18,8 +18,8 @@ rm -f "${SERVERDIR}/addons/sourcemod/scripting/ckSurf-telefinder.sp"
 rm -f "${SERVERDIR}/addons/sourcemod/scripting/ckSurf.sp"
 rm -rf "${SERVERDIR}/addons/sourcemod/scripting/ckSurf"
 
-rm -f "${SERVERDIR}/addons/sourcemod/scripting/plugins/ckSurf.smx"
-rm -f "${SERVERDIR}/addons/sourcemod/scripting/plugins/disabled/ckSurf-telefinder.smx"
-rm -f "${SERVERDIR}/addons/sourcemod/scripting/plugins/disabled/ckSurf-telefinder.smx"
+rm -f "${SERVERDIR}/addons/sourcemod/plugins/ckSurf.smx"
+rm -f "${SERVERDIR}/addons/sourcemod/plugins/disabled/ckSurf-telefinder.smx"
+rm -f "${SERVERDIR}/addons/sourcemod/plugins/disabled/ckSurf-telefinder.smx"
 
 mv "${SERVERDIR}/cfg/sourcemod/configs/ckSurf" "${SERVERDIR}/cfg/sourcemod/configs/ckSurf-old"
