@@ -1,4 +1,4 @@
-/* Updrade for upgrading from flufflys SurfTimer to our z4lab-surftimer */
+/* Updrade for upgrading from flufflys SurfTimer to our surftimer-olokos */
 
 /* Fixing timer crash after upgrading to our timer */ 
 
