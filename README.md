@@ -43,18 +43,20 @@
 
 ## Issue Rules
 
+**We are only helping with timer related bugs, any host related issue will be closed immediately**
 **If any of the rules listed below are not followed, you must expect the issue to be closed immediately.**
 
-- Requirements:
-	- Ensure your timer version is up to date with the latest release
-	- SourceMod and Metamod are up to date (support will only be given for latest stable versions)
-	- Ensure includes for compilation are up to date
-	- Using the stock timer without any additional changes
-- You're following the template
+- Prerequisites:
+	- Ensure your timer version is up to date with the [latest release](https://github.com/olokos/Surftimer-olokos/releases/latest)
+	- [SourceMod](https://www.sourcemod.net/downloads.php?branch=stable) and [Metamod](https://www.sourcemm.net/downloads.php/?branch=stable) are up to date (support will only be given for latest stable versions)
+	- Ensure [includes](https://github.com/olokos/Surftimer-olokos#Optional) for compilation are up to date
+	- Stock timer without any additional changes
+- Follow the template!
 	- That means you won't delete any pre-entered questions!
-- You're giving clear information
-- You won't edit issues - you always write a new comment below!
-- **Any community/server specific bug/suggestion will be ignored/closed!**
+- Give clear and as precise information as you can
+	- If applicable include related logs / configs (posted to [pastebin](https://pastebin.com/))
+- Don't edit issues 
+	- Always write a new comment below!
 
 ## Fresh Install
 
