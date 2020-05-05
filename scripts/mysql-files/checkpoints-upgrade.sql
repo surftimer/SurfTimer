@@ -99,3 +99,5 @@ ALTER TABLE `ck_bonus` ADD `velStartXY` INT NOT NULL AFTER `runtime`, ADD `velSt
 ALTER TABLE `ck_wrcps` ADD `velStartXY` INT NOT NULL AFTER `runtimepro`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`;
 
 ALTER TABLE `ck_playeroptions2` ADD `velcmphud` INT NOT NULL DEFAULT 1 AFTER `teleside`, ADD `velcmpchat` INT NOT NULL DEFAULT 1 AFTER `velcmphud`;
+
+ALTER TABLE `ck_wrcps` ADD INDEX `selectwrcps` (`mapname`, `stage`, `runtimepro`);
