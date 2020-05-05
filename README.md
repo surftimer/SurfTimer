@@ -2,6 +2,7 @@
 
 <sup>I have renamed the repository to Surftimer-olokos just to make it obvious, that we're entering a new chapter in CS:GO surf community, a milestone.</sup>
 
+
 ## Project Goals
 
 *As you probably all know there are quite some bugs in all open-source versions of cksurf or surftimer.*
@@ -16,12 +17,32 @@
 
 **Pull requests and any contributions are welcome and encouraged!**
 
+
+## Issue Rules
+
+**We are only helping with timer related bugs, any host related issue will be closed immediately.**
+
+**If any of the rules listed below are not followed, you must expect the issue to be closed immediately.**
+
+- Prerequisites:
+	- Ensure your timer version is up to date with the [latest release](https://github.com/olokos/Surftimer-olokos/releases/latest)
+	- [SourceMod](https://www.sourcemod.net/downloads.php?branch=stable) and [Metamod](https://www.sourcemm.net/downloads.php/?branch=stable) are up to date (support will only be given for latest stable versions)
+	- Ensure [includes](https://github.com/olokos/Surftimer-olokos#Optional) for compilation are up to date
+	- Stock timer without any additional changes
+- Follow the template
+	- That means you won't delete any pre-entered questions!
+- Give clear and as precise information as you can
+	- If applicable include related logs / configs (posted to [pastebin](https://pastebin.com/))
+- Don't edit issues 
+	- Always write a new comment below!
+	
+	
 ## Installation
 
 #### Requirements
 * [SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable)
 * [Metamod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable)
-* [Precompiled SurfTimer + Discord-API](https://github.com/olokos/Surftimer-olokos/releases/latest)
+* [Precompiled Surftimer + Discord-API](https://github.com/olokos/Surftimer-olokos/releases/latest)
 * A MySQL Database (MySQL 5.7 / 8+ / MariaDB supported)
 
 <details>
@@ -41,56 +62,29 @@
 
 *(All optional are required to compile it manually!)*
 
-## Issue Rules
-
-**We are only helping with timer related bugs, any host related issue will be closed immediately**
-**If any of the rules listed below are not followed, you must expect the issue to be closed immediately.**
-
-- Prerequisites:
-	- Ensure your timer version is up to date with the [latest release](https://github.com/olokos/Surftimer-olokos/releases/latest)
-	- [SourceMod](https://www.sourcemod.net/downloads.php?branch=stable) and [Metamod](https://www.sourcemm.net/downloads.php/?branch=stable) are up to date (support will only be given for latest stable versions)
-	- Ensure [includes](https://github.com/olokos/Surftimer-olokos#Optional) for compilation are up to date
-	- Stock timer without any additional changes
-- Follow the template!
-	- That means you won't delete any pre-entered questions!
-- Give clear and as precise information as you can
-	- If applicable include related logs / configs (posted to [pastebin](https://pastebin.com/))
-- Don't edit issues 
-	- Always write a new comment below!
-
-## Fresh Install
-
-*   Clone or download the repository ([Link](https://github.com/olokos/Surftimer-olokos-public/archive/master.zip))
-*   Obtain all of the [compilation requirements](https://github.com/olokos/Surftimer-olokos#installation-and-requirements)
-*   Download latest stable SourceMod version (1.10+) for your OS ([Link](https://www.sourcemod.net/downloads.php?branch=stable))
-*   Windows: Put spcomp.exe and compile.exe in scripting folder and double click compile.exe
-*   If there are no errors, (warnings are fine, for now) move .smx files from compiled to /plugins
-*   Copy the rest of the files from this repository to your csgo directory
-*   Edit configs (databases.cfg, admins, etc.)
 
 ## Upgrading
 
-### Upgrading from old checkpoints
+#### Upgrade from pre v.285 checkpoints
 
-*   Download the latest version from the release page [here](https://github.com/olokos/Surftimer-olokos/releases/latest)
-*   Copy the files to your csgo directory
-*   Edit configs (mysql db, etc, to do)
-*   Run `scripts/mysql-files/checkpoints-upgrade.sql` in your SurfTimer database
+*   Follow [installation](https://github.com/olokos/Surftimer-olokos#Installation)
+*   Run `CSGOFOLDER/scripts/mysql-files/checkpoints-upgrade.sql` in your surftimer database
 
-### Upgrading from SurfTimer (fluffys)
+#### Upgrade from SurfTimer ([fluffys](https://github.com/fluffyst/Surftimer))
 
-*   Download the latest version from the release page [here](https://github.com/olokos/Surftimer-olokos/releases/latest)
-*   Copy the files to your csgo directory <br> - an update script can be found [here](https://github.com/olokos/Surftimer-olokos/blob/master/scripts/upgrade_scripts/upgrade-fluffy.sh)
-*   Edit configs (mysql db, etc, to do)
-*   Run `scripts/mysql-files/upgrade-fluffy.sql` in your SurfTimer database
+*   Run the upgrade script `CSGOFOLDER/scripts/upgrade_scripts/upgrade-fluffy.sh` (edit the defined path)
+*   Follow [installation](https://github.com/olokos/Surftimer-olokos#Installation)
+*   Edit configs (maybe c/p some rank names from old configs)
+*   Run `CSGOFOLDER/scripts/mysql-files/upgrade-fluffy.sql` in your surftimer database
+*   Run `CSGOFOLDER/scripts/mysql-files/checkpoints-upgrade.sql` in your surftimer database
 
-### Upgrading from ckSurf (nikooo777)
+#### Upgrade from ckSurf ([nikooo777](https://github.com/nikooo777/ckSurf))
 
-*   Download the latest version from the release page [here](https://github.com/olokos/Surftimer-olokos/releases/latest)
-*   Copy the files to your csgo directory
-*   Remove all old ckSurf data you don't want anymore
-*   Run `scripts/mysql-files/upgrade-niko.sql` in your ckSurf db
-*   Edit configs (mysql db, etc, to do)
+*   Run the upgrade script `CSGOFOLDER/scripts/upgrade_scripts/upgrade-nikooo.sh` (edit the defined path)
+*   Follow [installation](https://github.com/olokos/Surftimer-olokos#Installation)
+*   Edit configs (maybe c/p some rank names from old configs)
+*   Run `CSGOFOLDER/scripts/mysql-files/upgrade-niko.sql` in your surftimer database
+*   Run `CSGOFOLDER/scripts/mysql-files/checkpoints-upgrade.sql` in your surftimer database
 
 
 ## Point System
@@ -142,27 +136,15 @@ Take surf_aircontrol_nbv for example: (You can use sm_mi to see this menu)
   
 </details>
 
+
 ## Credits
 
-Extensions used in this version:
-*   [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556) (KyleS)
-*   [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604) (Thrawn2)
-*   [DHooks](https://forums.alliedmods.net/showthread.php?t=180114) (Dr!fter)
-*   [Discord API](https://github.com/Deathknife/sourcemod-discord) (Deathknife)
-*   [Trails Chroma](https://github.com/Nickelony/Trails-Chroma) (Nickelony)
-<details>
-  <summary>forked from fluffys - contributors</summary> 
-  
-*   Jonitaikaponi - Original ckSurf creator
-*   sneaK
-*   nikooo777 - ckSurf 1.19 Fork
-*   fluffys
-*   Jakeey802
+*   [Jonitaikaponi](https://github.com/jonitaikaponi) - Original ckSurf creator
+*   [sneaK](https://github.com/sneak-it)
+*   [nikooo777](https://github.com/nikooo777)
+*   [fluffys](https://github.com/fluffyst)
+*   [Jakeey802](https://github.com/Jakeey802)
 *   Grandpa Goose
-  
-</details>
-
-*	[Ace](https://github.com/13ace37) [xace.ch](https://xace.ch)
-*	[olokos](https://github.com/olokos) [Steam](https://steamcommunity.com/id/olokos/) [My server](https://kiepownica.pl/)
-*	and many, many more people who contributed to the project!
-
+*   [Ace](https://github.com/13ace37)
+*   [olokos](https://github.com/olokos)
+*   And many, many more who contributed to the project!
