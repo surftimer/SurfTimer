@@ -4,8 +4,8 @@
 #   upgrade script from flufflys timer   #
 ##########################################
 
-# change this setting to your install directory
-SERVERDIR="/srv/csgo-server/csgo"
+# change this to your csgo directory, if not running from "upgrade_scripts" folder
+SERVERDIR="../.."
 
 rm -rf "${SERVERDIR}/sound/quake"
 rm "${SERVERDIR}/sound/surftimer/*.mp3"
