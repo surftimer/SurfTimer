@@ -124,7 +124,7 @@
 #define MAX_LOCS 1024
 
 //CSGO HUD Hint Fix
-#define MAX_HINT_SIZE 225
+#define MAX_HINT_SIZE 227
 
 /*====================================
 =            Enumerations            =
