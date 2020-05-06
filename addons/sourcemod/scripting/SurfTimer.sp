@@ -1907,10 +1907,6 @@ public void OnClientPutInServer(int client)
 	SDKHook(client, SDKHook_PostThinkPost, Hook_PostThinkPost);
 	SDKHook(client, SDKHook_OnTakeDamage, Hook_OnTakeDamage);
 	SDKHook(client, SDKHook_PreThink, OnPlayerThink);
-	SDKHook(client, SDKHook_PreThinkPost, OnPlayerThink);
-	SDKHook(client, SDKHook_Think, OnPlayerThink);
-	SDKHook(client, SDKHook_PostThink, OnPlayerThink);
-	SDKHook(client, SDKHook_PostThinkPost, OnPlayerThink);
 
 	// Footsteps
 	if (!IsFakeClient(client))
@@ -2041,10 +2037,6 @@ public void OnClientDisconnect(int client)
 	SDKUnhook(client, SDKHook_PostThinkPost, Hook_PostThinkPost);
 	SDKUnhook(client, SDKHook_OnTakeDamage, Hook_OnTakeDamage);
 	SDKUnhook(client, SDKHook_PreThink, OnPlayerThink);
-	SDKUnhook(client, SDKHook_PreThinkPost, OnPlayerThink);
-	SDKUnhook(client, SDKHook_Think, OnPlayerThink);
-	SDKUnhook(client, SDKHook_PostThink, OnPlayerThink);
-	SDKUnhook(client, SDKHook_PostThinkPost, OnPlayerThink);
 
 	if (client == g_RecordBot)
 	{
