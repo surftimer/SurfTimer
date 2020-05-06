@@ -2663,6 +2663,10 @@ public int BonusTopMenuHandler(Menu menu, MenuAction action, int param1, int par
 	{
 		db_selectBonusTopSurfers(param1, g_szMapName, param2 + 1);
 	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
 }
 
 public void OptionMenu(int client)
@@ -4309,6 +4313,10 @@ public int HookZonesMenuHandler(Menu menu, MenuAction action, int param1, int pa
 		{
 			if (IsValidClient(param1))
 				g_iSelectedTrigger[param1] = -1;
+		}
+		case MenuAction_End:
+		{
+			delete menu;
 		}
 	}
 }
