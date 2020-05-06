@@ -595,13 +595,16 @@ public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontB
 
 public Action Hook_SetTransmit(int entity, int client)
 {
-	if (client != entity && (0 < entity <= MaxClients) && IsValidClient(client))
+	if (client != entity && IsValidClient(client))
 	{
-		if (g_bHide[client] && entity != g_SpecTarget[client])
+		if (g_bHide[client] && entity != g_SpecTarget[client]) {
 			return Plugin_Handled;
-		else
-			if (entity == g_InfoBot && entity != g_SpecTarget[client])
+		}
+		else {
+			if (entity == g_InfoBot && entity != g_SpecTarget[client]) {
 				return Plugin_Handled;
+			}
+		}
 	}
 	return Plugin_Continue;
 }
