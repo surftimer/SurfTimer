@@ -1160,7 +1160,10 @@ public void LimitSpeed(int client)
 
 public void LimitSpeedNew(int client)
 {
-	if (!IsValidClient(client) || !IsPlayerAlive(client) || IsFakeClient(client) || g_mapZonesCount <= 0 || g_bPracticeMode[client] || g_mapZonesTypeCount[g_iClientInZone[client][2]][2] == 0 || g_iClientInZone[client][3] < 0 || g_iClientInZone[client][0] == 2 || g_iClientInZone[client][0] == 4 || g_iClientInZone[client][0] >= 6 || GetConVarInt(g_hLimitSpeedType) == 0 || g_iCurrentStyle[client] == 7)
+	if (!IsValidClient(client) || !IsPlayerAlive(client) || IsFakeClient(client))
+		return;
+	
+	if (g_mapZonesCount <= 0 || g_bPracticeMode[client] || g_mapZonesTypeCount[g_iClientInZone[client][2]][2] == 0 || g_iClientInZone[client][3] < 0 || g_iClientInZone[client][0] == 2 || g_iClientInZone[client][0] == 4 || g_iClientInZone[client][0] >= 6 || GetConVarInt(g_hLimitSpeedType) == 0 || g_iCurrentStyle[client] == 7)
 		return;
 
 	if (GetConVarInt(g_hLimitSpeedType) == 0 || !g_bInStartZone[client] && !g_bInStageZone[client])
@@ -1171,9 +1174,6 @@ public void LimitSpeedNew(int client)
 
 	if (speedCap <= 0.0)
 		return;
-
-	float fVel[3];
-	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
 
 	if (g_bInStartZone[client] || g_bInStageZone[client])
 	{
@@ -1189,10 +1189,13 @@ public void LimitSpeedNew(int client)
 		}
 	}
 
+	float fVel[3];
+	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
+	
 	// Determine how much each vector must be scaled for the magnitude to equal the limit
 	// Derived from Pythagorean theorem, where the hypotenuse represents the magnitude of velocity,
 	// and the two legs represent the x and y velocity components.
-  // As a side effect, velocity component signs are also handled.
+    // As a side effect, velocity component signs are also handled.
 	float scale = speedCap / SquareRoot( Pow(fVel[0], 2.0) + Pow(fVel[1], 2.0) );
 
 	// A scale < 1 indicates a magnitude > limit

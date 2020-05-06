@@ -1925,14 +1925,13 @@ public void OnClientConnected(int client)
 public void OnClientPutInServer(int client)
 {
 	if (!IsValidClient(client))
-	return;
+		return;
 
 	// Defaults
 	SetClientDefaults(client);
 	Command_Restart(client, 1);
 
 	// SDKHooks
-	SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
 	SDKHook(client, SDKHook_PostThinkPost, Hook_PostThinkPost);
 	SDKHook(client, SDKHook_OnTakeDamage, Hook_OnTakeDamage);
 	SDKHook(client, SDKHook_PreThink, OnPlayerThink);

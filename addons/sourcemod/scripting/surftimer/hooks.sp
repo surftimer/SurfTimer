@@ -75,7 +75,7 @@ public Action Event_OnFire(Handle event, const char[] name, bool dontBroadcast)
 public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-	if (client != 0)
+	if (IsValidClient(client))
 	{
 		g_SpecTarget[client] = -1;
 		g_bPause[client] = false;
@@ -110,7 +110,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		}
 
 		// Strip Weapons
-		if ((GetClientTeam(client) > 1) && IsValidClient(client))
+		if ((GetClientTeam(client) > 1))
 		{
 			StripAllWeapons(client);
 			if (!IsFakeClient(client))
@@ -151,6 +151,8 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 
 			return Plugin_Continue;
 		}
+
+		SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
 
 		// Change Player Skin
 		if (GetConVarBool(g_hPlayerSkinChange) && (GetClientTeam(client) > 1))
@@ -575,15 +577,19 @@ public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontB
 	{
 		char szName[64];
 		char disconnectReason[64];
-		int clientid = GetEventInt(event, "userid");
-		int client = GetClientOfUserId(clientid);
-		if (!IsValidClient(client) || IsFakeClient(client))
+		int client = GetClientOfUserId(GetEventInt(event, "userid"));
+
+		if (!IsValidClient(client) || IsFakeClient(client)) {
 			return Plugin_Handled;
+		}
+		
 		GetEventString(event, "name", szName, sizeof(szName));
 		GetEventString(event, "reason", disconnectReason, sizeof(disconnectReason));
-		for (int i = 1; i <= MaxClients; i++)
-			if (IsValidClient(i) && i != client && !IsFakeClient(i))
+		for (int i = 1; i <= MaxClients; i++) {
+			if (IsValidClient(i) && i != client && !IsFakeClient(i)) {
 				CPrintToChat(i, "%t", "Disconnected1", szName, disconnectReason);
+			}
+		}
 		return Plugin_Handled;
 	}
 	else
@@ -611,9 +617,11 @@ public Action Hook_SetTransmit(int entity, int client)
 
 public Action Event_OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
 {
-	int client = GetEventInt(event, "userid");
+	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if (IsValidClient(client))
 	{
+		SDKUnhook(client, SDKHook_SetTransmit, Hook_SetTransmit);
+		
 		if (!IsFakeClient(client))
 		{
 			if (g_hRecording[client] != null)
