@@ -11,7 +11,7 @@ void db_startUpgrading()
 	tTransaction.AddQuery("SELECT prespeed FROM ck_zones LIMIT 1", 0);
 	tTransaction.AddQuery("SELECT ck_maptier.ranked, ck_playerrank.style FROM ck_maptier, ck_playerrank LIMIT 1", 1);
 	tTransaction.AddQuery("SELECT wrcppoints FROM ck_playerrank LIMIT 1", 2);
-	tTransaction.AddQuery("SELECT teleside FROM ck_playeroptions LIMIT 1", 3);
+	tTransaction.AddQuery("SELECT teleside FROM ck_playeroptions2 LIMIT 1", 3);
 	tTransaction.AddQuery("SELECT velEndXYZ FROM ck_checkpoints LIMIT 1", 4);
 	g_dDb.Execute(tTransaction, SQLTxn_CheckDatabaseUpgradesSuccess, SQLTxn_CheckDatabaseUpgradesFailed);
 }
