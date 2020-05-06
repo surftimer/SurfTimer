@@ -2254,43 +2254,34 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 	}
 	else if (convar == g_hPointSystem)
 	{
-		if (GetConVarBool(g_hPointSystem))
+		for (int i = 1; i <= MaxClients; i++)
 		{
-			for (int i = 1; i <= MaxClients; i++)
-				if (IsValidClient(i))
-					CreateTimer(0.0, SetClanTag, i, TIMER_FLAG_NO_MAPCHANGE);
-		}
-		else
-		{
-			for (int i = 1; i <= MaxClients; i++)
-				if (IsValidClient(i))
-				{
+			if (IsValidClient(i))
+			{
+				if (!GetConVarBool(g_hPointSystem)) {
 					Format(g_pr_rankname[i], 128, "");
-					CreateTimer(0.0, SetClanTag, i, TIMER_FLAG_NO_MAPCHANGE);
 				}
+				CreateTimer(0.0, SetClanTag, i, TIMER_FLAG_NO_MAPCHANGE);
+			}
 		}
 	}
 	else if (convar == g_hCvarNoBlock)
 	{
-		if (GetConVarBool(g_hCvarNoBlock))
-		{
-			for (int client = 1; client <= MAXPLAYERS; client++)
-				if (IsValidEntity(client))
+		for (int client = 1; client <= MAXPLAYERS; client++) {
+			if (IsValidEntity(client)) {
+				if (GetConVarBool(g_hCvarNoBlock)) {
 					SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
-
-		}
-		else
-		{
-			for (int client = 1; client <= MAXPLAYERS; client++)
-				if (IsValidEntity(client))
+				}
+				else {
 					SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 5, 4, true);
+				}
+			}
 		}
 	}
 	else if (convar == g_hCleanWeapons)
 	{
 		if (GetConVarBool(g_hCleanWeapons))
 		{
-			char szclass[32];
 			for (int i = 1; i <= MaxClients; i++)
 			{
 				if (IsValidClient(i) && IsPlayerAlive(i))
@@ -2300,7 +2291,6 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 						int weapon = GetPlayerWeaponSlot(i, j);
 						if (weapon != -1 && j != 2)
 						{
-							GetEdictClassname(weapon, szclass, sizeof(szclass));
 							RemovePlayerItem(i, weapon);
 							RemoveEntity(weapon);
 							int equipweapon = GetPlayerWeaponSlot(i, 2);
@@ -2441,67 +2431,67 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 	else if (convar == g_hzoneStartColor)
 	{
 		char color[24];
-		Format(color, 28, "%s", newValue[0]);
+		Format(color, sizeof(color), "%s", newValue[0]);
 		StringRGBtoInt(color, g_iZoneColors[1]);
 	}
 	else if (convar == g_hzoneEndColor)
 	{
 		char color[24];
-		Format(color, 28, "%s", newValue[0]);
+		Format(color, sizeof(color), "%s", newValue[0]);
 		StringRGBtoInt(color, g_iZoneColors[2]);
 	}
 	else if (convar == g_hzoneCheckerColor)
 	{
 		char color[24];
-		Format(color, 28, "%s", newValue[0]);
+		Format(color, sizeof(color), "%s", newValue[0]);
 		StringRGBtoInt(color, g_iZoneColors[10]);
 	}
 	else if (convar == g_hzoneBonusStartColor)
 	{
 		char color[24];
-		Format(color, 28, "%s", newValue[0]);
+		Format(color, sizeof(color), "%s", newValue[0]);
 		StringRGBtoInt(color, g_iZoneColors[3]);
 	}
 	else if (convar == g_hzoneBonusEndColor)
 	{
 		char color[24];
-		Format(color, 28, "%s", newValue[0]);
+		Format(color, sizeof(color), "%s", newValue[0]);
 		StringRGBtoInt(color, g_iZoneColors[4]);
 	}
 	else if (convar == g_hzoneStageColor)
 	{
 		char color[24];
-		Format(color, 28, "%s", newValue[0]);
+		Format(color, sizeof(color), "%s", newValue[0]);
 		StringRGBtoInt(color, g_iZoneColors[5]);
 	}
 	else if (convar == g_hzoneCheckpointColor)
 	{
 		char color[24];
-		Format(color, 28, "%s", newValue[0]);
+		Format(color, sizeof(color), "%s", newValue[0]);
 		StringRGBtoInt(color, g_iZoneColors[6]);
 	}
 	else if (convar == g_hzoneSpeedColor)
 	{
 		char color[24];
-		Format(color, 28, "%s", newValue[0]);
+		Format(color, sizeof(color), "%s", newValue[0]);
 		StringRGBtoInt(color, g_iZoneColors[7]);
 	}
 	else if (convar == g_hzoneTeleToStartColor)
 	{
 		char color[24];
-		Format(color, 28, "%s", newValue[0]);
+		Format(color, sizeof(color), "%s", newValue[0]);
 		StringRGBtoInt(color, g_iZoneColors[8]);
 	}
 	else if (convar == g_hzoneValidatorColor)
 	{
 		char color[24];
-		Format(color, 28, "%s", newValue[0]);
+		Format(color, sizeof(color), "%s", newValue[0]);
 		StringRGBtoInt(color, g_iZoneColors[9]);
 	}
 	else if (convar == g_hzoneStopColor)
 	{
 		char color[24];
-		Format(color, 28, "%s", newValue[0]);
+		Format(color, sizeof(color), "%s", newValue[0]);
 		StringRGBtoInt(color, g_iZoneColors[0]);
 	}
 	else if (convar == g_hZonerFlag)
