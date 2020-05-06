@@ -1,5 +1,6 @@
 static int g_iCount = -1;
 static int g_iCounter = -1;
+static float g_fStart = 0.0;
 
 public Action Command_DatabaseUpgrade(int client, int args)
 {
@@ -118,9 +119,13 @@ public void sqlGetCheckpointsCount(Database db, DBResultSet results, const char[
 	if (results.HasResults && results.FetchRow())
 	{
 		g_iCount = results.FetchInt(0);
+		g_fStart = GetEngineTime();
 	}
 
-	g_dDb.Query(sqlSelectOldCheckpoints, "SELECT * FROM ck_checkpoints;");
+	if (g_iCount > 0)
+	{
+		g_dDb.Query(sqlSelectOldCheckpoints, "SELECT * FROM ck_checkpoints;");
+	}
 }
 
 public void sqlSelectOldCheckpoints(Database db, DBResultSet results, const char[] error, any data)
@@ -263,10 +268,11 @@ public void sqlSelectOldCheckpoints(Database db, DBResultSet results, const char
 public void SQLTxn_InsertCheckpouintsSuccess(Handle db, any data, int numQueries, Handle[] results, any[] queryData)
 {
 	g_iCounter++;
-	PrintToServer("%d of %d transactions done.", g_iCounter, g_iCount);
 
 	if (g_iCounter == g_iCount)
 	{
+		float fTime = GetEngineTime() - g_fStart;
+		PrintToServer("%fs for %d transactions with a total amount of %d queries", fTime, g_iCount, g_iCount*35);
 		db_upgradeDatabase(5);
 	}
 }
