@@ -18,35 +18,12 @@ void db_startUpgrading()
 
 public void SQLTxn_CheckDatabaseUpgradesSuccess(Handle db, any data, int numQueries, Handle[] results, any[] queryData)
 {
-	PrintToServer("[SurfTimer] All tables are up to date!");
-
-	db_present();
-	db_viewMapSettings();
-
-	/// Start Loading Server Settings
-	ConVar cvHibernateWhenEmpty = FindConVar("sv_hibernate_when_empty");
-
-	if (!g_bRenaming && !g_bInTransactionChain && (IsServerProcessing() || !cvHibernateWhenEmpty.BoolValue))
-	{
-		LogToFileEx(g_szLogFile, "[surftimer] Starting to load server settings");
-		g_fServerLoading[0] = GetGameTime();
-		db_selectMapZones();
-	}
-
-	if (!g_bRenaming && !g_bInTransactionChain)
-		db_selectBonusCount();
-
-	if (GetConVarBool(g_hDBMapcycle))
-		db_selectMapCycle();
-	else if (!GetConVarBool(g_hMultiServerMapcycle))
-		readMapycycle();
-	else
-		readMultiServerMapcycle();
+	LogMessage("[SurfTimer] All tables are up to date!");
 }
 
 public void SQLTxn_CheckDatabaseUpgradesFailed(Handle db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
 {
-	PrintToServer("[SurfTimer] Upgrading database... (Version: %d)", queryData[failIndex]);
+	LogMessage("[SurfTimer] Upgrading database... (Version: %d)", queryData[failIndex]);
 	db_upgradeDatabase(queryData[failIndex]);
 }
 
@@ -113,7 +90,7 @@ public void db_upgradeDatabase(int version)
 
 public void SQLTxn_UpgradeDatabaseSuccess(Database db, int version, int numQueries, DBResultSet[] results, any[] queryData)
 {
-	PrintToServer("surftimer | Database upgrade (Version %d) was successful", version);
+	LogMessage("surftimer | Database upgrade (Version %d) was successful", version);
 	db_upgradeDatabase(version + 1);
 }
 
