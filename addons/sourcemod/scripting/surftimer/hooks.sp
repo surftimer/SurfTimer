@@ -648,9 +648,7 @@ public Action Event_OnRoundEnd(Handle event, const char[] name, bool dontBroadca
 
 public void OnPlayerThink(int entity)
 {
-	if (IsValidClient(entity) && !IsFakeClient(entity))
-		LimitSpeedNew(entity);
-
+	LimitSpeedNew(entity);
 	SetEntPropEnt(entity, Prop_Send, "m_bSpotted", 0);
 }
 
