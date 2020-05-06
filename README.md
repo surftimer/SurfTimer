@@ -163,5 +163,5 @@ Take surf_aircontrol_nbv for example: (You can use sm_mi to see this menu)
 *   [Jakeey802](https://github.com/Jakeey802)
 *   Grandpa Goose
 *   [Ace](https://github.com/13ace37) [xace.ch](https://xace.ch)
-*   [olokos](https://github.com/olokos) [Steam](https://steamcommunity.com/id/olokos/) [My server (running dev version](https://kiepownica.pl/)
+*   [olokos](https://github.com/olokos) [Steam](https://steamcommunity.com/id/olokos/) [My server (running dev version)](https://kiepownica.pl/)
 *   And many, many more who contributed to the project!
