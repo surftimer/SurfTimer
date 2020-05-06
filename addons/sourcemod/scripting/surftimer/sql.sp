@@ -9915,6 +9915,7 @@ public void sqlcreatePlayertimesIndex(Database db, DBResultSet results, const ch
 		return;
 	}
 }
+
 public void sqlcreateBonusIndex(Database db, DBResultSet results, const char[] error, any data)
 {
 	if (db == null || strlen(error))
