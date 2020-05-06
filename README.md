@@ -16,7 +16,7 @@
 >Yes, but not any more than other projects currently and for past years.
 
 **Pull requests and any contributions are welcome and encouraged!**
-
+**Our [discord](https://discord.gg/5dsFHeR) is a good place for dev talk and help!**
 
 ## Issue Rules
 
@@ -63,7 +63,7 @@
 
 *   Download [Requirements](https://github.com/olokos/Surftimer-olokos#Requirements) & [Optional](https://github.com/olokos/Surftimer-olokos#Optional)
 *   Add a entry in `csgo/addons/sourcemod/configs/databases.cfg` called `surftimer` (create a new mysql user)
-*   (Opt.) Run `csgo/scripts/mysql-files/ck_maptier.sql` & `csgo/scripts/mysql-files/zones.sql` in your surftimer database (if you want to use the premade zones & maptiers)
+*   (Opt.) Run `csgo/scripts/mysql-files/ck_maptier.sql` & `csgo/scripts/mysql-files/ck_zones.sql` in your surftimer database (if you want to use the premade zones & maptiers)
 *   Move unwanted plugins in `csgo/addons/sourcemod/plugins` to `csgo/addons/sourcemod/plugins/disabled`
 *   Upload all files into your `csgo` folder
 *   (If [fastDL](https://www.youtube.com/watch?v=a77mZKlDoic):) Upload `csgo/sound` folder
