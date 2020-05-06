@@ -973,8 +973,10 @@ public bool checkSpam(int client)
 
 stock bool IsValidClient(int client)
 {
-	if (client >= 1 && client <= MaxClients && IsValidEntity(client) && IsClientConnected(client) && IsClientInGame(client))
+	if (client > 0 && client <= MaxClients && IsClientInGame(client))
+	{
 		return true;
+	}
 	return false;
 }
 
