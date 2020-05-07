@@ -65,14 +65,13 @@ int IsInsideZone (float location[3], float extraSize = 0.0)
 
 public void loadAllClientSettings()
 {
-	for (int i = 1; i < MAXPLAYERS + 1; i++)
+	for (int i = 1; i <= MAXPLAYERS; i++)
 	{
 		if (IsValidClient(i) && !IsFakeClient(i) && !g_bSettingsLoaded[i] && !g_bLoadingSettings[i])
 		{
 			g_iSettingToLoad[i] = 0;
 			LoadClientSetting(i, 0);
 			g_bLoadingSettings[i] = true;
-			break;
 		}
 	}
 

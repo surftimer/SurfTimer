@@ -3367,7 +3367,7 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 		}
 
 		// Seach for next client to load
-		for (int i = 1; i < MAXPLAYERS + 1; i++)
+		for (int i = 1; i <= MAXPLAYERS; i++)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && !g_bSettingsLoaded[i] && !g_bLoadingSettings[i])
 			{
