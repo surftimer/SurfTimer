@@ -569,9 +569,14 @@ public Action Command_createPlayerCheckpoint(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 	
-	if (g_iClientInZone[client][0] == 1 || g_iClientInZone[client][0] == 5)
+	if ((g_iClientInZone[client][0] == 1 || g_iClientInZone[client][0] == 5) && g_fLastSpeed[client] > 0) //make sure client isnt moving while making startpos with loc
 	{
 		CPrintToChat(client, "%t", "PracticeInStartZone", g_szChatPrefix);
+		return Plugin_Handled;
+	}
+	if (g_bNoClip[client] || (!g_bNoClip[client] && (GetGameTime() - g_fLastTimeNoClipUsed[client]) < 3.0)) //dont allow making start loc with noclip
+	{
+		CPrintToChat(client, "%t", "NoclipSaveloc", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 

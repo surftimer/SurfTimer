@@ -137,8 +137,11 @@ public void CL_OnStartTimerPress(int client)
 		}
 	}
 
-	// Play Start Sound
-	PlayButtonSound(client);
+	// Play Start Sound if not in practicemode
+	if (!g_bPracticeMode[client])
+	{
+		PlayButtonSound(client);
+	}
 
 	// Start recording for record bot
 	if (((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) || (!IsFakeClient(client) && GetConVarBool(g_hBonusBot))) && !g_hRecording[client])
