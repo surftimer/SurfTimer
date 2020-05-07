@@ -131,7 +131,7 @@ public int Handle_VoteMenuChangeMap(Menu menu, MenuAction action, int param1, in
 		/* 0=yes, 1=no */
 		if (param1 == 0) // yes
 		{
-			CreateTimer(5.0, Change_Map, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
+			CreateTimer(5.0, Change_Map, _, TIMER_FLAG_NO_MAPCHANGE);
 			CPrintToChatAll("%t", "CVote11", g_szChatPrefix, mapnameforvote);
 		}
 		else // No

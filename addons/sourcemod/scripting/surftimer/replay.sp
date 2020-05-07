@@ -381,13 +381,13 @@ public void LoadReplays()
 	}
 
 	if (g_bMapReplay[0])
-		CreateTimer(1.0, RefreshBot, TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(1.0, RefreshBot, _, TIMER_FLAG_NO_MAPCHANGE);
 
 	if (g_BonusBotCount > 0)
-		CreateTimer(1.0, RefreshBonusBot, TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(1.0, RefreshBonusBot, _, TIMER_FLAG_NO_MAPCHANGE);
 
 	if (g_bhasStages)
-		CreateTimer(1.0, RefreshWrcpBot, TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(1.0, RefreshWrcpBot, _, TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public void PlayRecord(int client, int type, int style)
@@ -733,7 +733,7 @@ public void LoadRecordReplay()
 	}
 	else
 	{
-		CreateTimer(1.0, RefreshBot, TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(1.0, RefreshBot, _, TIMER_FLAG_NO_MAPCHANGE);
 	}
 }
 public Action RefreshBonusBot(Handle timer)
@@ -793,7 +793,7 @@ public void LoadBonusReplay()
 	else
 	{
 		// Make sure bot_quota is set correctly and try again
-		CreateTimer(1.0, RefreshBonusBot, TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(1.0, RefreshBonusBot, _, TIMER_FLAG_NO_MAPCHANGE);
 	}
 }
 
@@ -853,7 +853,7 @@ public void LoadWrcpReplay()
 	else
 	{
 		// Make sure bot_quota is set correctly and try again
-		CreateTimer(1.0, RefreshWrcpBot, TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(1.0, RefreshWrcpBot, _, TIMER_FLAG_NO_MAPCHANGE);
 	}
 }
 

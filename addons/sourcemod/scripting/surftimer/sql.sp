@@ -1338,7 +1338,7 @@ public void sql_updatePlayerRankPointsCallback(Handle owner, Handle hndl, const 
 				if (IsValidClient(i))
 				{
 					if (StrEqual(g_szSteamID[i], g_pr_szSteamID[data]))
-					CalculatePlayerRank(i, 0);
+						CalculatePlayerRank(i, 0);
 				}
 			}
 		}
@@ -1368,7 +1368,7 @@ public void sql_updatePlayerRankPointsCallback(Handle owner, Handle hndl, const 
 				g_pr_RankingRecalc_InProgress = false;
 
 				if (IsValidClient(g_pr_Recalc_AdminID))
-					CreateTimer(0.1, RefreshAdminMenu, g_pr_Recalc_AdminID, TIMER_FLAG_NO_MAPCHANGE);
+					CreateTimer(0.1, RefreshAdminMenu, GetClientUserId(g_pr_Recalc_AdminID), TIMER_FLAG_NO_MAPCHANGE);
 			}
 			g_pr_Recalc_ClientID++;
 		}
@@ -1414,7 +1414,7 @@ public void sql_updatePlayerRankPointsCallback(Handle owner, Handle hndl, const 
 		}
 		g_pr_Calculating[data] = false;
 		db_GetPlayerRank(data, style);
-		CreateTimer(1.0, SetClanTag, data, TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(1.0, SetClanTag, GetClientUserId(data), TIMER_FLAG_NO_MAPCHANGE);
 	}
 }
 
@@ -2006,7 +2006,7 @@ public void sql_selectMapRecordCallback(Handle owner, Handle hndl, const char[] 
 		if (!g_bServerDataLoaded)
 		{
 			db_viewMapProRankCount();
-			CreateTimer(3.0, RefreshZonesTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
+			CreateTimer(3.0, RefreshZonesTimer, _, TIMER_FLAG_NO_MAPCHANGE);
 		}
 		return;
 	}
@@ -2075,7 +2075,7 @@ public void sql_selectMapRecordCallback(Handle owner, Handle hndl, const char[] 
 	if (!g_bServerDataLoaded)
 	{
 		db_viewMapProRankCount();
-		CreateTimer(3.0, RefreshZonesTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(3.0, RefreshZonesTimer, _, TIMER_FLAG_NO_MAPCHANGE);
 	}
 	return;
 }
@@ -3339,7 +3339,7 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 		if (GetConVarBool(g_hTeleToStartWhenSettingsLoaded))
 		{
 			Command_Restart(client, 1);
-			CreateTimer(0.1, RestartPlayer, client);
+			CreateTimer(0.1, RestartPlayer, GetClientUserId(client));
 		}
 
 		// Seach for next client to load
@@ -5441,7 +5441,7 @@ public void sql_selectRankedPlayersCallback(Handle owner, Handle hndl, const cha
 			if (IsValidClient(g_pr_Recalc_AdminID))
 			{
 				PrintToConsole(g_pr_Recalc_AdminID, ">> Recalculation finished");
-				CreateTimer(0.1, RefreshAdminMenu, g_pr_Recalc_AdminID, TIMER_FLAG_NO_MAPCHANGE);
+				CreateTimer(0.1, RefreshAdminMenu, GetClientUserId(g_pr_Recalc_AdminID), TIMER_FLAG_NO_MAPCHANGE);
 			}
 		}
 
@@ -8746,8 +8746,8 @@ public void db_selectMapCurrentWR(Handle owner, Handle hndl, const char[] error,
 					RenameFile(sPathBack, sPath);
 					setReplayTime(0, 0, 0);
 
-					CreateTimer(5.0, FixBot_Off, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
-					CreateTimer(10.0, FixBot_On, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
+					CreateTimer(5.0, FixBot_Off, _, TIMER_FLAG_NO_MAPCHANGE);
+					CreateTimer(10.0, FixBot_On, _, TIMER_FLAG_NO_MAPCHANGE);
 				}
 			}
 		}

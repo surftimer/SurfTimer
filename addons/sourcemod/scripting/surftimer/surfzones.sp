@@ -702,11 +702,13 @@ public void DrawBeamBox(int client)
 	int zColor[4];
 	getZoneTeamColor(g_CurrentZoneTeam[client], zColor);
 	TE_SendBeamBoxToClient(client, g_Positions[client][1], g_Positions[client][0], g_BeamSprite, g_HaloSprite, 0, 30, 1.0, 1.0, 1.0, 2, 0.0, zColor, 0, 1);
-	CreateTimer(1.0, BeamBox, client, TIMER_REPEAT);
+	CreateTimer(1.0, BeamBox, GetClientUserId(client), TIMER_REPEAT);
 }
 
-public Action BeamBox(Handle timer, any client)
+public Action BeamBox(Handle timer, any userid)
 {
+	int client = GetClientOfUserId(userid);
+
 	if (IsClientInGame(client))
 	{
 		if (g_Editing[client] == 2)
@@ -1673,7 +1675,7 @@ public int Handle_ZoneSettingMenu(Handle tMenu, MenuAction action, int client, i
 						SetConVarInt(g_hZonesToDisplay, 1);
 				}
 			}
-			CreateTimer(0.1, RefreshZoneSettings, client, TIMER_FLAG_NO_MAPCHANGE);
+			CreateTimer(0.1, RefreshZoneSettings, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 		}
 		case MenuAction_Cancel:
 		{

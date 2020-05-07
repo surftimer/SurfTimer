@@ -161,7 +161,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 
 			GetConVarString(g_hPlayerModel, szBuffer, 256);
 			SetEntityModel(client, szBuffer);
-			CreateTimer(1.0, SetArmsModel, client, TIMER_FLAG_NO_MAPCHANGE);
+			CreateTimer(1.0, SetArmsModel, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 		}
 
 		// 1st Spawn & T/CT
@@ -177,12 +177,12 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 
 
 			StartRecording(client);
-			CreateTimer(1.5, CenterMsgTimer, client, TIMER_FLAG_NO_MAPCHANGE);
+			CreateTimer(1.5, CenterMsgTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 
 			if (g_bCenterSpeedDisplay[client])
 			{
 				SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
-				CreateTimer(0.1, CenterSpeedDisplayTimer, client, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
+				CreateTimer(0.1, CenterSpeedDisplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
 			}
 
 			g_bFirstSpawn[client] = false;
@@ -233,10 +233,10 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		}
 
 		// Hide Radar
-		CreateTimer(0.0, HideHud, client, TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(0.0, HideHud, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 
 		// Set Clantag
-		CreateTimer(1.5, SetClanTag, client, TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(1.5, SetClanTag, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 
 		// Set Speclist
 		Format(g_szPlayerPanelText[client], 512, "");
@@ -626,7 +626,7 @@ public Action Event_OnPlayerDeath(Handle event, const char[] name, bool dontBroa
 		{
 			if (g_hRecording[client] != null)
 				StopRecording(client);
-			CreateTimer(2.0, RemoveRagdoll, client);
+			CreateTimer(2.0, RemoveRagdoll, GetClientUserId(client));
 		}
 		else
 			if (g_hBotMimicsRecord[client] != null)
@@ -1350,7 +1350,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 		{
 			if (!g_bJumpZoneTimer[client])
 			{
-				CreateTimer(1.0, StartJumpZonePrintTimer, client);
+				CreateTimer(1.0, StartJumpZonePrintTimer, GetClientUserId(client));
 				CPrintToChat(client, "%t", "Hooks10", g_szChatPrefix);
 				Handle pack;
 				CreateDataTimer(0.05, DelayedVelocityCap, pack);
@@ -1415,7 +1415,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 						g_bJumpedInZone[client] = true;
 						g_bResetOneJump[client] = true;
 						g_fJumpedInZoneTime[client] = GetGameTime();
-						CreateTimer(1.0, ResetOneJump, client, TIMER_FLAG_NO_MAPCHANGE);
+						CreateTimer(1.0, ResetOneJump, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 					}
 					else
 					{
@@ -1440,12 +1440,17 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 	return Plugin_Continue;
 }
 
-public Action ResetOneJump(Handle timer, any client)
+public Action ResetOneJump(Handle timer, any userid)
 {
-	if (g_bResetOneJump[client])
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
 	{
-		g_bJumpedInZone[client] = false;
-		g_bResetOneJump[client] = false;
+		if (g_bResetOneJump[client])
+		{
+			g_bJumpedInZone[client] = false;
+			g_bResetOneJump[client] = false;
+		}
 	}
 }
 
@@ -1454,6 +1459,8 @@ public Action DelayedVelocityCap(Handle timer, Handle pack)
 	ResetPack(pack);
 	int client = ReadPackCell(pack);
 	float speedCap = ReadPackFloat(pack);
+	delete pack;
+	
 	float CurVelVec[3];
 
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
