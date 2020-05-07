@@ -176,9 +176,9 @@ public Action CKTimer2(Handle timer)
 				case 60:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
 				case 30:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
 				case 10:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
-				case 3:CPrintToChatAll("%s {green}3!", g_szChatPrefix);
-				case 2:CPrintToChatAll("%s {orange}2!", g_szChatPrefix);
-				case 1:CPrintToChatAll("%s {red}1!", g_szChatPrefix);	
+				case 3:CPrintToChatAll("%t", "TimeleftThree", g_szChatPrefix);
+				case 2:CPrintToChatAll("%t", "TimeleftTwo", g_szChatPrefix);
+				case 1:CPrintToChatAll("%t", "TimeleftOne", g_szChatPrefix);	
 				case 0:
 				{
 					if (!g_bRoundEnd)
