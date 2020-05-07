@@ -506,10 +506,10 @@ public void db_viewMapRankPro(int client)
 
 	// "SELECT COUNT(*) FROM ck_playertimes WHERE runtimepro <= (SELECT runtimepro FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > -1.0) AND mapname = '%s' AND runtimepro > -1.0";
 	Format(szQuery, sizeof(szQuery), sql_selectPlayerRankProTime, g_szSteamID[client], g_szMapName, g_szMapName);
-	g_dDb.Query(db_viewMapRankProCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(db_viewMapRankProCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_viewMapRankProCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void db_viewMapRankProCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
 	if (hndl == null)
 	{
@@ -518,7 +518,11 @@ public void db_viewMapRankProCallback(Handle owner, Handle hndl, const char[] er
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-		g_MapRank[client] = SQL_FetchInt(hndl, 0);
+		int client = GetClientOfUserId(userid);
+		if (IsClientInGame(client))
+		{
+			g_MapRank[client] = SQL_FetchInt(hndl, 0);
+		}
 	}
 }
 
@@ -1437,91 +1441,96 @@ public void db_viewPlayerPoints(int client)
 
 	// "SELECT steamid, name, points, finishedmapspro, country, lastseen, timealive, timespec, connections from ck_playerrank where steamid='%s'";
 	Format(szQuery, sizeof(szQuery), sql_selectRankedPlayer, g_szSteamID[client]);
-	g_dDb.Query(db_viewPlayerPointsCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(db_viewPlayerPointsCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_viewPlayerPointsCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void db_viewPlayerPointsCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
-	if (hndl == null)
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
 	{
-		LogError("[SurfTimer] SQL Error (db_viewPlayerPointsCallback): %s", error);
-		if (!g_bSettingsLoaded[client])
-			LoadClientSetting(client, g_iSettingToLoad[client]);
-		return;
-	}
-	// SELECT steamid, name, points, finishedmapspro, country, lastseen, timealive, timespec, connections from ck_playerrank where steamid='%s';
-	// Old player - get points
-	if (SQL_HasResultSet(hndl))
-	{
-		int style;
-		
-		while (SQL_FetchRow(hndl))
+		if (hndl == null)
 		{
-			style = SQL_FetchInt(hndl, 10);
-			g_pr_points[client][style] = SQL_FetchInt(hndl, 2);
-			g_pr_finishedmaps[client][style] = SQL_FetchInt(hndl, 3);
-			g_pr_finishedmaps_perc[client][style] = (float(g_pr_finishedmaps[client][style]) / float(g_pr_MapCount[0])) * 100.0;
-			if (style == 0)
-			{
-				g_iPlayTimeAlive[client] = SQL_FetchInt(hndl, 6);
-				g_iPlayTimeSpec[client] = SQL_FetchInt(hndl, 7);
-				g_iTotalConnections[client] = SQL_FetchInt(hndl, 8);
-			}
+			LogError("[SurfTimer] SQL Error (db_viewPlayerPointsCallback): %s", error);
+			if (!g_bSettingsLoaded[client])
+				LoadClientSetting(client, g_iSettingToLoad[client]);
+			return;
 		}
-		
-		g_iTotalConnections[client]++;
-
-		char updateConnections[1024];
-		Format(updateConnections, 1024, "UPDATE ck_playerrank SET connections = connections + 1 WHERE steamid = '%s';", g_szSteamID[client]);
-		g_dDb.Query(SQL_CheckCallback, updateConnections, DBPrio_Low);
-
-		// Debug
-		g_fTick[client][1] = GetGameTime();
-		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPlayerPoints in %fs", g_szSteamID[client], tick);
-		g_fTick[client][0] = GetGameTime();
-		
-		// Count players rank
-		if (IsValidClient(client))
-			for (int i = 0; i < MAX_STYLES; i++)
-				db_GetPlayerRank(client, i);
-	}
-	else
-	{
-		if (IsValidClient(client))
+		// SELECT steamid, name, points, finishedmapspro, country, lastseen, timealive, timespec, connections from ck_playerrank where steamid='%s';
+		// Old player - get points
+		if (SQL_HasResultSet(hndl))
 		{
-			// New player - insert
-			char szQuery[512];
-			char szUName[MAX_NAME_LENGTH];
+			int style;
+			
+			while (SQL_FetchRow(hndl))
+			{
+				style = SQL_FetchInt(hndl, 10);
+				g_pr_points[client][style] = SQL_FetchInt(hndl, 2);
+				g_pr_finishedmaps[client][style] = SQL_FetchInt(hndl, 3);
+				g_pr_finishedmaps_perc[client][style] = (float(g_pr_finishedmaps[client][style]) / float(g_pr_MapCount[0])) * 100.0;
+				if (style == 0)
+				{
+					g_iPlayTimeAlive[client] = SQL_FetchInt(hndl, 6);
+					g_iPlayTimeSpec[client] = SQL_FetchInt(hndl, 7);
+					g_iTotalConnections[client] = SQL_FetchInt(hndl, 8);
+				}
+			}
+			
+			g_iTotalConnections[client]++;
 
-			if (IsValidClient(client))
-				GetClientName(client, szUName, MAX_NAME_LENGTH);
-			else
-				return;
-
-			// SQL injection protection
-			char szName[MAX_NAME_LENGTH * 2 + 1];
-			g_dDb.Escape(szUName, szName, MAX_NAME_LENGTH * 2 + 1);
-
-			char szSteamId64[64];
-			GetClientAuthId(client, AuthId_SteamID64, szSteamId64, MAX_NAME_LENGTH, true);
-
-			Format(szQuery, sizeof(szQuery), sql_insertPlayerRank, g_szSteamID[client], szSteamId64, szName, g_szCountry[client], GetTime());
-			g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
-
-			// Play time
-			g_iPlayTimeAlive[client] = 0;
-			g_iPlayTimeSpec[client] = 0;
+			char updateConnections[1024];
+			Format(updateConnections, 1024, "UPDATE ck_playerrank SET connections = connections + 1 WHERE steamid = '%s';", g_szSteamID[client]);
+			g_dDb.Query(SQL_CheckCallback, updateConnections, DBPrio_Low);
 
 			// Debug
 			g_fTick[client][1] = GetGameTime();
 			float tick = g_fTick[client][1] - g_fTick[client][0];
 			LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPlayerPoints in %fs", g_szSteamID[client], tick);
 			g_fTick[client][0] = GetGameTime();
-
+			
 			// Count players rank
-			for (int i = 0; i < MAX_STYLES; i++)
-				db_GetPlayerRank(client, i);
+			if (IsValidClient(client))
+				for (int i = 0; i < MAX_STYLES; i++)
+					db_GetPlayerRank(client, i);
+		}
+		else
+		{
+			if (IsValidClient(client))
+			{
+				// New player - insert
+				char szQuery[512];
+				char szUName[MAX_NAME_LENGTH];
+
+				if (IsValidClient(client))
+					GetClientName(client, szUName, MAX_NAME_LENGTH);
+				else
+					return;
+
+				// SQL injection protection
+				char szName[MAX_NAME_LENGTH * 2 + 1];
+				g_dDb.Escape(szUName, szName, MAX_NAME_LENGTH * 2 + 1);
+
+				char szSteamId64[64];
+				GetClientAuthId(client, AuthId_SteamID64, szSteamId64, MAX_NAME_LENGTH, true);
+
+				Format(szQuery, sizeof(szQuery), sql_insertPlayerRank, g_szSteamID[client], szSteamId64, szName, g_szCountry[client], GetTime());
+				g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
+
+				// Play time
+				g_iPlayTimeAlive[client] = 0;
+				g_iPlayTimeSpec[client] = 0;
+
+				// Debug
+				g_fTick[client][1] = GetGameTime();
+				float tick = g_fTick[client][1] - g_fTick[client][0];
+				LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPlayerPoints in %fs", g_szSteamID[client], tick);
+				g_fTick[client][0] = GetGameTime();
+
+				// Count players rank
+				for (int i = 0; i < MAX_STYLES; i++)
+					db_GetPlayerRank(client, i);
+			}
 		}
 	}
 }
@@ -2203,65 +2212,71 @@ public void db_selectBonusesInMap(int client, char mapname[128])
 	// SELECT mapname, zonegroup, zonename FROM `ck_zones` WHERE mapname LIKE '%c%s%c' AND zonegroup > 0 GROUP BY zonegroup;
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), sql_selectBonusesInMap, PERCENT, mapname, PERCENT);
-	g_dDb.Query(db_selectBonusesInMapCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(db_selectBonusesInMapCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_selectBonusesInMapCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void db_selectBonusesInMapCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
 	if (hndl == null)
 	{
 		LogError("[SurfTimer] SQL Error (db_selectBonusesInMapCallback): %s", error);
 		return;
 	}
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
 	{
-		char mapname[128], MenuTitle[248], BonusName[128], MenuID[248];
-		int zGrp;
-
-		if (SQL_GetRowCount(hndl) == 1)
+		if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 		{
+			char mapname[128], MenuTitle[248], BonusName[128], MenuID[248];
+			int zGrp;
+
+			if (SQL_GetRowCount(hndl) == 1)
+			{
+				SQL_FetchString(hndl, 0, mapname, 128);
+				db_selectBonusTopSurfers(client, mapname, SQL_FetchInt(hndl, 1));
+				return;
+			}
+
+			Menu listBonusesinMapMenu = new Menu(MenuHandler_SelectBonusinMap);
+
 			SQL_FetchString(hndl, 0, mapname, 128);
-			db_selectBonusTopSurfers(client, mapname, SQL_FetchInt(hndl, 1));
-			return;
-		}
-
-		Menu listBonusesinMapMenu = new Menu(MenuHandler_SelectBonusinMap);
-
-		SQL_FetchString(hndl, 0, mapname, 128);
-		zGrp = SQL_FetchInt(hndl, 1);
-		Format(MenuTitle, 248, "Choose a Bonus in %s", mapname);
-		listBonusesinMapMenu.SetTitle(MenuTitle);
-
-		SQL_FetchString(hndl, 2, BonusName, 128);
-
-		if (!BonusName[0])
-			Format(BonusName, 128, "bonus %i", zGrp);
-
-		Format(MenuID, 248, "%s-%i", mapname, zGrp);
-
-		listBonusesinMapMenu.AddItem(MenuID, BonusName);
-
-
-		while (SQL_FetchRow(hndl))
-		{
-			SQL_FetchString(hndl, 2, BonusName, 128);
 			zGrp = SQL_FetchInt(hndl, 1);
+			Format(MenuTitle, 248, "Choose a Bonus in %s", mapname);
+			listBonusesinMapMenu.SetTitle(MenuTitle);
 
-			if (StrEqual(BonusName, "NULL", false))
+			SQL_FetchString(hndl, 2, BonusName, 128);
+
+			if (!BonusName[0])
 				Format(BonusName, 128, "bonus %i", zGrp);
 
 			Format(MenuID, 248, "%s-%i", mapname, zGrp);
 
 			listBonusesinMapMenu.AddItem(MenuID, BonusName);
-		}
 
-		listBonusesinMapMenu.ExitButton = true;
-		listBonusesinMapMenu.Display(client, 60);
-	}
-	else
-	{
-		CPrintToChat(client, "%t", "SQL2", g_szChatPrefix);
-		return;
+
+			while (SQL_FetchRow(hndl))
+			{
+				SQL_FetchString(hndl, 2, BonusName, 128);
+				zGrp = SQL_FetchInt(hndl, 1);
+
+				if (StrEqual(BonusName, "NULL", false))
+					Format(BonusName, 128, "bonus %i", zGrp);
+
+				Format(MenuID, 248, "%s-%i", mapname, zGrp);
+
+				listBonusesinMapMenu.AddItem(MenuID, BonusName);
+			}
+
+			listBonusesinMapMenu.ExitButton = true;
+			listBonusesinMapMenu.Display(client, 60);
+		}
+		else
+		{
+			CPrintToChat(client, "%t", "SQL2", g_szChatPrefix);
+			return;
+		}
 	}
 }
 
@@ -2382,10 +2397,10 @@ public void db_currentRunRank(int client)
 
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), "SELECT count(runtimepro)+1 FROM `ck_playertimes` WHERE `mapname` = '%s' AND `runtimepro` < %f;", g_szMapName, g_fFinalTime[client]);
-	g_dDb.Query(SQL_CurrentRunRankCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(SQL_CurrentRunRankCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_CurrentRunRankCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void SQL_CurrentRunRankCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
 	if (hndl == null)
 	{
@@ -2399,7 +2414,12 @@ public void SQL_CurrentRunRankCallback(Handle owner, Handle hndl, const char[] e
 		rank = SQL_FetchInt(hndl, 0);
 	}
 
-	MapFinishedMsgs(client, rank);
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
+	{
+		MapFinishedMsgs(client, rank);
+	}
 }
 
 // Get clients record from database
@@ -3037,84 +3057,89 @@ public void db_viewPersonalRecords(int client, char szSteamId[32], char szMapNam
 
 	char szQuery[1024];
 	Format(szQuery, sizeof(szQuery), sql_selectPersonalRecords, szSteamId, szMapName);
-	g_dDb.Query(SQL_selectPersonalRecordsCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(SQL_selectPersonalRecordsCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
 
-public void SQL_selectPersonalRecordsCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void SQL_selectPersonalRecordsCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
-	if (hndl == null)
-	{
-		LogError("[Surftimer] SQL Error (SQL_selectPersonalRecordsCallback): %s", error);
-		if (!g_bSettingsLoaded[client])
-			LoadClientSetting(client, g_iSettingToLoad[client]);
-		return;
-	}
+	int client = GetClientOfUserId(userid);
 
-	g_fPersonalRecord[client] = 0.0;
-	Format(g_szPersonalRecord[client], 64, "NONE");
-	for (int i = 1; i < MAX_STYLES; i++)
+	if (IsValidClient(client))
 	{
-		Format(g_szPersonalStyleRecord[i][client], 64, "NONE");
-		g_fPersonalStyleRecord[i][client] = 0.0;
-	}
-
-	for (int i = 0; i < 3; i++)
-		g_iStartVelsRecord[client][0][i] = 0;
-
-	if (SQL_HasResultSet(hndl))
-	{
-		int style;
-		while (SQL_FetchRow(hndl))
+		if (hndl == null)
 		{
-			style = SQL_FetchInt(hndl, 1);
-			if (style == 0)
-			{
-				g_fPersonalRecord[client] = SQL_FetchFloat(hndl, 0);
-
-				g_iStartVelsRecord[client][0][0] = SQL_FetchInt(hndl, 2);
-				g_iStartVelsRecord[client][0][1] = SQL_FetchInt(hndl, 3);
-				g_iStartVelsRecord[client][0][2] = SQL_FetchInt(hndl, 4);
-
-				if (g_fPersonalRecord[client] > 0.0)
-				{
-					FormatTimeFloat(client, g_fPersonalRecord[client], 3, g_szPersonalRecord[client], 64);
-					// Time found, get rank in current map
-					db_viewMapRankPro(client);
-				}
-			}
-			else
-			{
-				g_fPersonalStyleRecord[style][client] = SQL_FetchFloat(hndl, 0);
-
-				if (g_fPersonalStyleRecord[style][client] > 0.0)
-				{
-					FormatTimeFloat(client, g_fPersonalStyleRecord[style][client], 3, g_szPersonalStyleRecord[style][client], 64);
-					// Time found, get rank in current map
-					db_viewStyleMapRank(client, style);
-				}
-			}
+			LogError("[Surftimer] SQL Error (SQL_selectPersonalRecordsCallback): %s", error);
+			if (!g_bSettingsLoaded[client])
+				LoadClientSetting(client, g_iSettingToLoad[client]);
+			return;
 		}
-	}
-	else
-	{
-		Format(g_szPersonalRecord[client], 64, "NONE");
-		g_fPersonalRecord[client] = 0.0;
 
+		g_fPersonalRecord[client] = 0.0;
+		Format(g_szPersonalRecord[client], 64, "NONE");
 		for (int i = 1; i < MAX_STYLES; i++)
 		{
 			Format(g_szPersonalStyleRecord[i][client], 64, "NONE");
 			g_fPersonalStyleRecord[i][client] = 0.0;
 		}
-	}
 
-	if (!g_bSettingsLoaded[client])
-	{
-		g_fTick[client][1] = GetGameTime();
-		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[Surftimer] %s: Finished db_viewPersonalRecords in %fs", g_szSteamID[client], tick);
-		g_fTick[client][0] = GetGameTime();
-		LoadClientSetting(client, g_iSettingToLoad[client]);
+		for (int i = 0; i < 3; i++)
+			g_iStartVelsRecord[client][0][i] = 0;
+
+		if (SQL_HasResultSet(hndl))
+		{
+			int style;
+			while (SQL_FetchRow(hndl))
+			{
+				style = SQL_FetchInt(hndl, 1);
+				if (style == 0)
+				{
+					g_fPersonalRecord[client] = SQL_FetchFloat(hndl, 0);
+
+					g_iStartVelsRecord[client][0][0] = SQL_FetchInt(hndl, 2);
+					g_iStartVelsRecord[client][0][1] = SQL_FetchInt(hndl, 3);
+					g_iStartVelsRecord[client][0][2] = SQL_FetchInt(hndl, 4);
+
+					if (g_fPersonalRecord[client] > 0.0)
+					{
+						FormatTimeFloat(client, g_fPersonalRecord[client], 3, g_szPersonalRecord[client], 64);
+						// Time found, get rank in current map
+						db_viewMapRankPro(client);
+					}
+				}
+				else
+				{
+					g_fPersonalStyleRecord[style][client] = SQL_FetchFloat(hndl, 0);
+
+					if (g_fPersonalStyleRecord[style][client] > 0.0)
+					{
+						FormatTimeFloat(client, g_fPersonalStyleRecord[style][client], 3, g_szPersonalStyleRecord[style][client], 64);
+						// Time found, get rank in current map
+						db_viewStyleMapRank(client, style);
+					}
+				}
+			}
+		}
+		else
+		{
+			Format(g_szPersonalRecord[client], 64, "NONE");
+			g_fPersonalRecord[client] = 0.0;
+
+			for (int i = 1; i < MAX_STYLES; i++)
+			{
+				Format(g_szPersonalStyleRecord[i][client], 64, "NONE");
+				g_fPersonalStyleRecord[i][client] = 0.0;
+			}
+		}
+
+		if (!g_bSettingsLoaded[client])
+		{
+			g_fTick[client][1] = GetGameTime();
+			float tick = g_fTick[client][1] - g_fTick[client][0];
+			LogToFileEx(g_szLogFile, "[Surftimer] %s: Finished db_viewPersonalRecords in %fs", g_szSteamID[client], tick);
+			g_fTick[client][0] = GetGameTime();
+			LoadClientSetting(client, g_iSettingToLoad[client]);
+		}
 	}
 }
 
@@ -3278,10 +3303,10 @@ public void db_viewCheckpoints(int client, char szSteamID[32], char szMapName[12
 {
 	char szQuery[1024];
 	Format(szQuery, sizeof(szQuery), sql_selectCheckpoints, szMapName, szSteamID);
-	g_dDb.Query(SQL_selectCheckpointsCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(SQL_selectCheckpointsCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
 	// fluffys come back
 	if (hndl == null)
@@ -3292,8 +3317,10 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 
 	int zoneGrp, cp, index;
 
+	int client = GetClientOfUserId(userid);
+
 	if (!IsValidClient(client))
-	return;
+		return;
 
 	if (SQL_HasResultSet(hndl))
 	{
@@ -3471,8 +3498,12 @@ public void SQLTxn_UpdateCheckpointsSuccess(Handle db, any data, int numQueries,
 	return;
 }
 
-public void SQLTxn_UpdateCheckpointsFailed(Handle db, any client, int numQueries, const char[] error, int failIndex, any[] queryData)
+public void SQLTxn_UpdateCheckpointsFailed(Handle db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
 {
+	ResetPack(data);
+	int client = ReadPackCell(data);
+	CloseHandle(data);
+	
 	if (IsValidClient(client))
 		CPrintToChat(client, "%t", "SQL10", g_szChatPrefix, error);
 	PrintToServer("[Surftimer] Zone Removal Failed. Error: %s", error);
@@ -3698,103 +3729,108 @@ public void db_viewPersonalBonusRecords(int client, char szSteamId[32])
 	char szQuery[1024];
 	// "SELECT runtime, zonegroup, style FROM ck_bonus WHERE steamid = '%s AND mapname = '%s' AND runtime > '0.0'";
 	Format(szQuery, sizeof(szQuery), sql_selectPersonalBonusRecords, szSteamId, g_szMapName);
-	g_dDb.Query(SQL_selectPersonalBonusRecordsCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(SQL_selectPersonalBonusRecordsCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_selectPersonalBonusRecordsCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void SQL_selectPersonalBonusRecordsCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
-	if (hndl == null)
+	int client = GetClientOfUserId(userid);
+	
+	if (IsValidClient(client))
 	{
-		LogError("[Surftimer] SQL Error (SQL_selectPersonalBonusRecordsCallback): %s", error);
+		if (hndl == null)
+		{
+			LogError("[Surftimer] SQL Error (SQL_selectPersonalBonusRecordsCallback): %s", error);
+			if (!g_bSettingsLoaded[client])
+				LoadClientSetting(client, g_iSettingToLoad[client]);
+			return;
+		}
+
+		int zgroup;
+		int style;
+
+		for (int i = 0; i < MAXZONEGROUPS; i++)
+		{
+			g_fPersonalRecordBonus[i][client] = 0.0;
+			Format(g_szPersonalRecordBonus[i][client], 64, "N/A");
+
+			for (int j = 0; j < 3; j++)
+			{
+				int k;
+				if (i == 0)
+					k = i + 1;
+				else
+					k = i;
+
+				g_iStartVelsRecord[client][k][j] = 0;
+				g_iEndVelsRecord[client][k][j] = 0;
+			}
+
+			for (int s = 1; s < MAX_STYLES; s++)
+			{
+				g_fStylePersonalRecordBonus[s][i][client] = 0.0;
+				Format(g_szStylePersonalRecordBonus[s][i][client], 64, "N/A");
+			}
+		}
+
+		if (SQL_HasResultSet(hndl))
+		{
+			while (SQL_FetchRow(hndl))
+			{
+				zgroup = SQL_FetchInt(hndl, 1);
+				style = SQL_FetchInt(hndl, 2);
+
+				if (style == 0)
+				{
+					g_fPersonalRecordBonus[zgroup][client] = SQL_FetchFloat(hndl, 0);
+
+					g_iStartVelsRecord[client][zgroup][0] = SQL_FetchInt(hndl, 3);
+					g_iStartVelsRecord[client][zgroup][1] = SQL_FetchInt(hndl, 4);
+					g_iStartVelsRecord[client][zgroup][2] = SQL_FetchInt(hndl, 5);
+					g_iEndVelsRecord[client][zgroup][0] = SQL_FetchInt(hndl, 6);
+					g_iEndVelsRecord[client][zgroup][1] = SQL_FetchInt(hndl, 7);
+					g_iEndVelsRecord[client][zgroup][2] = SQL_FetchInt(hndl, 8);
+
+					if (g_fPersonalRecordBonus[zgroup][client] > 0.0)
+					{
+						FormatTimeFloat(client, g_fPersonalRecordBonus[zgroup][client], 3, g_szPersonalRecordBonus[zgroup][client], 64);
+						db_viewMapRankBonus(client, zgroup, 0); // get rank
+					}
+					else
+					{
+						Format(g_szPersonalRecordBonus[zgroup][client], 64, "N/A");
+						g_fPersonalRecordBonus[zgroup][client] = 0.0;
+					}
+				}
+				else
+				{
+					g_fStylePersonalRecordBonus[style][zgroup][client] = SQL_FetchFloat(hndl, 0);
+
+					if (g_fStylePersonalRecordBonus[style][zgroup][client] > 0.0)
+					{
+						FormatTimeFloat(client, g_fStylePersonalRecordBonus[style][zgroup][client], 3, g_szStylePersonalRecordBonus[style][zgroup][client], 64);
+						db_viewMapRankBonusStyle(client, zgroup, 0, style);
+					}
+					else
+					{
+						Format(g_szPersonalRecordBonus[zgroup][client], 64, "N/A");
+						g_fPersonalRecordBonus[zgroup][client] = 0.0;
+					}
+				}
+			}
+		}
+
 		if (!g_bSettingsLoaded[client])
+		{
+			g_fTick[client][1] = GetGameTime();
+			float tick = g_fTick[client][1] - g_fTick[client][0];
+			LogToFileEx(g_szLogFile, "[Surftimer] %s: Finished db_viewPersonalBonusRecords in %fs", g_szSteamID[client], tick);
+			g_fTick[client][0] = GetGameTime();
+
 			LoadClientSetting(client, g_iSettingToLoad[client]);
+		}
 		return;
 	}
-
-	int zgroup;
-	int style;
-
-	for (int i = 0; i < MAXZONEGROUPS; i++)
-	{
-		g_fPersonalRecordBonus[i][client] = 0.0;
-		Format(g_szPersonalRecordBonus[i][client], 64, "N/A");
-
-		for (int j = 0; j < 3; j++)
-		{
-			int k;
-			if (i == 0)
-				k = i + 1;
-			else
-				k = i;
-
-			g_iStartVelsRecord[client][k][j] = 0;
-			g_iEndVelsRecord[client][k][j] = 0;
-		}
-
-		for (int s = 1; s < MAX_STYLES; s++)
-		{
-			g_fStylePersonalRecordBonus[s][i][client] = 0.0;
-			Format(g_szStylePersonalRecordBonus[s][i][client], 64, "N/A");
-		}
-	}
-
-	if (SQL_HasResultSet(hndl))
-	{
-		while (SQL_FetchRow(hndl))
-		{
-			zgroup = SQL_FetchInt(hndl, 1);
-			style = SQL_FetchInt(hndl, 2);
-
-			if (style == 0)
-			{
-				g_fPersonalRecordBonus[zgroup][client] = SQL_FetchFloat(hndl, 0);
-
-				g_iStartVelsRecord[client][zgroup][0] = SQL_FetchInt(hndl, 3);
-				g_iStartVelsRecord[client][zgroup][1] = SQL_FetchInt(hndl, 4);
-				g_iStartVelsRecord[client][zgroup][2] = SQL_FetchInt(hndl, 5);
-				g_iEndVelsRecord[client][zgroup][0] = SQL_FetchInt(hndl, 6);
-				g_iEndVelsRecord[client][zgroup][1] = SQL_FetchInt(hndl, 7);
-				g_iEndVelsRecord[client][zgroup][2] = SQL_FetchInt(hndl, 8);
-
-				if (g_fPersonalRecordBonus[zgroup][client] > 0.0)
-				{
-					FormatTimeFloat(client, g_fPersonalRecordBonus[zgroup][client], 3, g_szPersonalRecordBonus[zgroup][client], 64);
-					db_viewMapRankBonus(client, zgroup, 0); // get rank
-				}
-				else
-				{
-					Format(g_szPersonalRecordBonus[zgroup][client], 64, "N/A");
-					g_fPersonalRecordBonus[zgroup][client] = 0.0;
-				}
-			}
-			else
-			{
-				g_fStylePersonalRecordBonus[style][zgroup][client] = SQL_FetchFloat(hndl, 0);
-
-				if (g_fStylePersonalRecordBonus[style][zgroup][client] > 0.0)
-				{
-					FormatTimeFloat(client, g_fStylePersonalRecordBonus[style][zgroup][client], 3, g_szStylePersonalRecordBonus[style][zgroup][client], 64);
-					db_viewMapRankBonusStyle(client, zgroup, 0, style);
-				}
-				else
-				{
-					Format(g_szPersonalRecordBonus[zgroup][client], 64, "N/A");
-					g_fPersonalRecordBonus[zgroup][client] = 0.0;
-				}
-			}
-		}
-	}
-
-	if (!g_bSettingsLoaded[client])
-	{
-		g_fTick[client][1] = GetGameTime();
-		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[Surftimer] %s: Finished db_viewPersonalBonusRecords in %fs", g_szSteamID[client], tick);
-		g_fTick[client][0] = GetGameTime();
-
-		LoadClientSetting(client, g_iSettingToLoad[client]);
-	}
-	return;
 }
 
 public void db_viewFastestBonus()
@@ -5135,10 +5171,10 @@ public void db_viewUnfinishedMaps(int client, char szSteamId[32])
 	char szQuery[720];
 	// Gets all players unfinished maps and bonuses from the database
 	Format(szQuery, sizeof(szQuery), "SELECT mapname, zonegroup, zonename, (SELECT tier FROM ck_maptier d WHERE d.mapname = a.mapname) AS tier FROM ck_zones a WHERE (zonetype = 1 OR zonetype = 5) AND (SELECT runtimepro FROM ck_playertimes b WHERE b.mapname = a.mapname AND a.zonegroup = 0 AND b.style = %d AND steamid = '%s' UNION SELECT runtime FROM ck_bonus c WHERE c.mapname = a.mapname AND c.zonegroup = a.zonegroup AND c.style = %d AND steamid = '%s') IS NULL GROUP BY mapname, zonegroup ORDER BY tier, mapname, zonegroup ASC", g_ProfileStyleSelect[client], szSteamId, g_ProfileStyleSelect[client], szSteamId);
-	g_dDb.Query(db_viewUnfinishedMapsCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(db_viewUnfinishedMapsCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_viewUnfinishedMapsCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void db_viewUnfinishedMapsCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
 	if (hndl == null)
 	{
@@ -5200,7 +5236,7 @@ public void db_viewUnfinishedMapsCallback(Handle owner, Handle hndl, const char[
 						// Throttle messages to not cause errors on huge mapcycles
 						time = time + 0.1;
 						Handle pack = CreateDataPack();
-						WritePackCell(pack, client);
+						WritePackCell(pack, userid);
 						WritePackString(pack, consoleString);
 						CreateTimer(time, PrintUnfinishedLine, pack);
 
@@ -5237,6 +5273,9 @@ public void db_viewUnfinishedMapsCallback(Handle owner, Handle hndl, const char[
 				}
 			}
 		}
+
+		int client = GetClientOfUserId(userid);
+		
 		if (IsValidClient(client))
 		{
 			PrintToConsole(client, " ");
@@ -5249,17 +5288,20 @@ public void db_viewUnfinishedMapsCallback(Handle owner, Handle hndl, const char[
 			PrintToConsole(client, "------------------------------ Map Details -----------------------------");
 		}
 	}
-	return;
 }
 
 public Action PrintUnfinishedLine(Handle timer, any pack)
 {
 	ResetPack(pack);
-	int client = ReadPackCell(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
 	char teksti[1024];
 	ReadPackString(pack, teksti, 1024);
 	CloseHandle(pack);
-	PrintToConsole(client, teksti);
+	
+	if (IsClientInGame(client))
+	{
+		PrintToConsole(client, teksti);
+	}
 
 }
 
@@ -5480,111 +5522,113 @@ public void db_viewPlayerOptions(int client, char szSteamId[32])
 	g_bLoadedModules[client] = false;
 	char szQuery[1024];
 	Format(szQuery, sizeof(szQuery), sql_selectPlayerOptions, szSteamId);
-	g_dDb.Query(db_viewPlayerOptionsCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(db_viewPlayerOptionsCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_viewPlayerOptionsCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void db_viewPlayerOptionsCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
-	if (hndl == null)
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
 	{
-		LogError("[SurfTimer] SQL Error (db_viewPlayerOptionsCallback): %s", error);
-		if (!g_bSettingsLoaded[client])
-			LoadClientSetting(client, g_iSettingToLoad[client]);
-		return;
-	}
+		if (hndl == null)
+		{
+			LogError("[SurfTimer] SQL Error (db_viewPlayerOptionsCallback): %s", error);
+			if (!g_bSettingsLoaded[client])
+				LoadClientSetting(client, g_iSettingToLoad[client]);
+			return;
+		}
 
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-	{
-		// "SELECT timer, hide, sounds, chat, viewmodel, autobhop, checkpoints, gradient, speedmode, centrehud, module1c, module2c, module3c, module4c, module5c, module6c, sidehud, module1s, module2s, module3s, module4s, module5s, prestrafe FROM ck_playeroptions2 where steamid = '%s';"
+		if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+		{
+			// "SELECT timer, hide, sounds, chat, viewmodel, autobhop, checkpoints, gradient, speedmode, centrehud, module1c, module2c, module3c, module4c, module5c, module6c, sidehud, module1s, module2s, module3s, module4s, module5s, prestrafe FROM ck_playeroptions2 where steamid = '%s';"
 
-		g_bTimerEnabled[client] = view_as<bool>(SQL_FetchInt(hndl, 0));
-		g_bHide[client] = view_as<bool>(SQL_FetchInt(hndl, 1));
-		g_bEnableQuakeSounds[client] = view_as<bool>(SQL_FetchInt(hndl, 2));
-		g_bHideChat[client] = view_as<bool>(SQL_FetchInt(hndl, 3));
-		g_bViewModel[client] = view_as<bool>(SQL_FetchInt(hndl, 4));
-		g_bAutoBhopClient[client] = view_as<bool>(SQL_FetchInt(hndl, 5));
-		g_bCheckpointsEnabled[client] = view_as<bool>(SQL_FetchInt(hndl, 6));
-		g_SpeedGradient[client] = SQL_FetchInt(hndl, 7);
-		g_SpeedMode[client] = SQL_FetchInt(hndl, 8);
-		g_bCenterSpeedDisplay[client] = view_as<bool>(SQL_FetchInt(hndl, 9));
-		g_bCentreHud[client] = view_as<bool>(SQL_FetchInt(hndl, 10));
-		g_iTeleSide[client] = SQL_FetchInt(hndl, 11);
-		g_iCentreHudModule[client][0] = SQL_FetchInt(hndl, 12);
-		g_iCentreHudModule[client][1] = SQL_FetchInt(hndl, 13);
-		g_iCentreHudModule[client][2] = SQL_FetchInt(hndl, 14);
-		g_iCentreHudModule[client][3] = SQL_FetchInt(hndl, 15);
-		g_iCentreHudModule[client][4] = SQL_FetchInt(hndl, 16);
-		g_iCentreHudModule[client][5] = SQL_FetchInt(hndl, 17);
-		g_bSideHud[client] = view_as<bool>(SQL_FetchInt(hndl, 18));
-		g_iSideHudModule[client][0] = SQL_FetchInt(hndl, 19);
-		g_iSideHudModule[client][1] = SQL_FetchInt(hndl, 20);
-		g_iSideHudModule[client][2] = SQL_FetchInt(hndl, 21);
-		g_iSideHudModule[client][3] = SQL_FetchInt(hndl, 22);
-		g_iSideHudModule[client][4] = SQL_FetchInt(hndl, 23);
-		g_iPrespeedText[client] = view_as<bool>(SQL_FetchInt(hndl, 24));
-		g_iCpMessages[client] = view_as<bool>(SQL_FetchInt(hndl, 25));
-		g_iWrcpMessages[client] = view_as<bool>(SQL_FetchInt(hndl, 26));
-		
+			g_bTimerEnabled[client] = view_as<bool>(SQL_FetchInt(hndl, 0));
+			g_bHide[client] = view_as<bool>(SQL_FetchInt(hndl, 1));
+			g_bEnableQuakeSounds[client] = view_as<bool>(SQL_FetchInt(hndl, 2));
+			g_bHideChat[client] = view_as<bool>(SQL_FetchInt(hndl, 3));
+			g_bViewModel[client] = view_as<bool>(SQL_FetchInt(hndl, 4));
+			g_bAutoBhopClient[client] = view_as<bool>(SQL_FetchInt(hndl, 5));
+			g_bCheckpointsEnabled[client] = view_as<bool>(SQL_FetchInt(hndl, 6));
+			g_SpeedGradient[client] = SQL_FetchInt(hndl, 7);
+			g_SpeedMode[client] = SQL_FetchInt(hndl, 8);
+			g_bCenterSpeedDisplay[client] = view_as<bool>(SQL_FetchInt(hndl, 9));
+			g_bCentreHud[client] = view_as<bool>(SQL_FetchInt(hndl, 10));
+			g_iTeleSide[client] = SQL_FetchInt(hndl, 11);
+			g_iCentreHudModule[client][0] = SQL_FetchInt(hndl, 12);
+			g_iCentreHudModule[client][1] = SQL_FetchInt(hndl, 13);
+			g_iCentreHudModule[client][2] = SQL_FetchInt(hndl, 14);
+			g_iCentreHudModule[client][3] = SQL_FetchInt(hndl, 15);
+			g_iCentreHudModule[client][4] = SQL_FetchInt(hndl, 16);
+			g_iCentreHudModule[client][5] = SQL_FetchInt(hndl, 17);
+			g_bSideHud[client] = view_as<bool>(SQL_FetchInt(hndl, 18));
+			g_iSideHudModule[client][0] = SQL_FetchInt(hndl, 19);
+			g_iSideHudModule[client][1] = SQL_FetchInt(hndl, 20);
+			g_iSideHudModule[client][2] = SQL_FetchInt(hndl, 21);
+			g_iSideHudModule[client][3] = SQL_FetchInt(hndl, 22);
+			g_iSideHudModule[client][4] = SQL_FetchInt(hndl, 23);
+			g_iPrespeedText[client] = view_as<bool>(SQL_FetchInt(hndl, 24));
+			g_iCpMessages[client] = view_as<bool>(SQL_FetchInt(hndl, 25));
+			g_iWrcpMessages[client] = view_as<bool>(SQL_FetchInt(hndl, 26));
+			
 
-		// Functionality for normal spec list
-		if (g_iSideHudModule[client][0] == 5 && (g_iSideHudModule[client][1] == 0 && g_iSideHudModule[client][2] == 0 && g_iSideHudModule[client][3] == 0 && g_iSideHudModule[client][4] == 0))
-			g_bSpecListOnly[client] = true;
+			// Functionality for normal spec list
+			if (g_iSideHudModule[client][0] == 5 && (g_iSideHudModule[client][1] == 0 && g_iSideHudModule[client][2] == 0 && g_iSideHudModule[client][3] == 0 && g_iSideHudModule[client][4] == 0))
+				g_bSpecListOnly[client] = true;
+			else
+				g_bSpecListOnly[client] = false;
+			
+			g_bLoadedModules[client] = true;
+		}
 		else
-			g_bSpecListOnly[client] = false;
-		
-		g_bLoadedModules[client] = true;
+		{
+			char szQuery[512];
+
+			// "INSERT INTO ck_playeroptions2 (steamid, timer, hide, sounds, chat, viewmodel, autobhop, checkpoints, centrehud, module1c, module2c, module3c, module4c, module5c, module6c, sidehud, module1s, module2s, module3s, module4s, module5s) VALUES('%s', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i');";
+
+			Format(szQuery, sizeof(szQuery), sql_insertPlayerOptions, g_szSteamID[client]);
+			g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
+
+			g_bTimerEnabled[client] = true;
+			g_bHide[client] = false;
+			g_bEnableQuakeSounds[client] = true;
+			g_bHideChat[client] = false;
+			g_bViewModel[client] = true;
+			g_bAutoBhopClient[client] = true;
+			g_bCheckpointsEnabled[client] = true;
+			g_SpeedGradient[client] = 3;
+			g_SpeedMode[client] = 0;
+			g_bCenterSpeedDisplay[client] = false;
+			g_bCentreHud[client] = true;
+			g_iTeleSide[client] = 0;
+			g_iCentreHudModule[client][0] = 1;
+			g_iCentreHudModule[client][1] = 2;
+			g_iCentreHudModule[client][2] = 3;
+			g_iCentreHudModule[client][3] = 4;
+			g_iCentreHudModule[client][4] = 5;
+			g_iCentreHudModule[client][5] = 6;
+			g_bSideHud[client] = true;
+			g_iSideHudModule[client][0] = 5;
+			g_iSideHudModule[client][1] = 0;
+			g_iSideHudModule[client][2] = 0;
+			g_iSideHudModule[client][3] = 0;
+			g_iSideHudModule[client][4] = 0;
+			g_bSpecListOnly[client] = true;
+			g_iPrespeedText[client] = false;
+			g_iCpMessages[client] = false;
+			g_iWrcpMessages[client] = false;
+		}
+
+		if (!g_bSettingsLoaded[client])
+		{
+			g_fTick[client][1] = GetGameTime();
+			float tick = g_fTick[client][1] - g_fTick[client][0];
+			LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPlayerOptions in %fs", g_szSteamID[client], tick);
+			g_fTick[client][0] = GetGameTime();
+
+			LoadClientSetting(client, g_iSettingToLoad[client]);
+		}
 	}
-	else
-	{
-		char szQuery[512];
-		if (!IsValidClient(client))
-		return;
-
-		// "INSERT INTO ck_playeroptions2 (steamid, timer, hide, sounds, chat, viewmodel, autobhop, checkpoints, centrehud, module1c, module2c, module3c, module4c, module5c, module6c, sidehud, module1s, module2s, module3s, module4s, module5s) VALUES('%s', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i');";
-
-		Format(szQuery, sizeof(szQuery), sql_insertPlayerOptions, g_szSteamID[client]);
-		g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
-
-		g_bTimerEnabled[client] = true;
-		g_bHide[client] = false;
-		g_bEnableQuakeSounds[client] = true;
-		g_bHideChat[client] = false;
-		g_bViewModel[client] = true;
-		g_bAutoBhopClient[client] = true;
-		g_bCheckpointsEnabled[client] = true;
-		g_SpeedGradient[client] = 3;
-		g_SpeedMode[client] = 0;
-		g_bCenterSpeedDisplay[client] = false;
-		g_bCentreHud[client] = true;
-		g_iTeleSide[client] = 0;
-		g_iCentreHudModule[client][0] = 1;
-		g_iCentreHudModule[client][1] = 2;
-		g_iCentreHudModule[client][2] = 3;
-		g_iCentreHudModule[client][3] = 4;
-		g_iCentreHudModule[client][4] = 5;
-		g_iCentreHudModule[client][5] = 6;
-		g_bSideHud[client] = true;
-		g_iSideHudModule[client][0] = 5;
-		g_iSideHudModule[client][1] = 0;
-		g_iSideHudModule[client][2] = 0;
-		g_iSideHudModule[client][3] = 0;
-		g_iSideHudModule[client][4] = 0;
-		g_bSpecListOnly[client] = true;
-		g_iPrespeedText[client] = false;
-		g_iCpMessages[client] = false;
-		g_iWrcpMessages[client] = false;
-	}
-
-	if (!g_bSettingsLoaded[client])
-	{
-		g_fTick[client][1] = GetGameTime();
-		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPlayerOptions in %fs", g_szSteamID[client], tick);
-		g_fTick[client][0] = GetGameTime();
-
-		LoadClientSetting(client, g_iSettingToLoad[client]);
-	}
-	return;
 }
 
 public void db_updatePlayerOptions(int client)
@@ -6250,73 +6294,78 @@ public void db_viewPersonalStageRecords(int client, char szSteamId[32])
 
 	char szQuery[1024];
 	Format(szQuery, sizeof(szQuery), sql_selectStageTimes, szSteamId, g_szMapName);
-	g_dDb.Query(SQL_selectPersonalStageRecordsCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(SQL_selectPersonalStageRecordsCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_selectPersonalStageRecordsCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void SQL_selectPersonalStageRecordsCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
-	if (hndl == null)
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
 	{
-		LogError("[Surftimer] SQL Error (SQL_selectPersonalStageRecordsCallback): %s", error);
+		if (hndl == null)
+		{
+			LogError("[Surftimer] SQL Error (SQL_selectPersonalStageRecordsCallback): %s", error);
+			if (!g_bSettingsLoaded[client])
+				LoadClientSetting(client, g_iSettingToLoad[client]);
+			return;
+		}
+
+		int style;
+		int stage;
+		float time;
+
+		for (int i = 0; i < CPLIMIT; i++)
+		{
+			for (int k = 0; k < 3; k++)
+			{
+				g_iWrcpVelsStartRecord[client][i][k] = 0;
+				g_iWrcpVelsEndRecord[client][i][k] = 0;
+			}
+
+			for (int s = 0; s < MAX_STYLES; s++)
+			{
+				g_fWrcpRecord[client][i][s] = -1.0;
+			}
+		}
+
+		if (SQL_HasResultSet(hndl))
+		{
+			while (SQL_FetchRow(hndl))
+			{
+				stage = SQL_FetchInt(hndl, 1);
+				style = SQL_FetchInt(hndl, 2);
+				time = SQL_FetchFloat(hndl, 0);
+				g_iWrcpVelsStartRecord[client][stage][0] = SQL_FetchInt(hndl, 3);
+				g_iWrcpVelsStartRecord[client][stage][1] = SQL_FetchInt(hndl, 4);
+				g_iWrcpVelsStartRecord[client][stage][2] = SQL_FetchInt(hndl, 5);
+				g_iWrcpVelsEndRecord[client][stage][0] = SQL_FetchInt(hndl, 6);
+				g_iWrcpVelsEndRecord[client][stage][1] = SQL_FetchInt(hndl, 7);
+				g_iWrcpVelsEndRecord[client][stage][2] = SQL_FetchInt(hndl, 8);
+
+
+				g_fWrcpRecord[client][stage][style] = time;
+
+				if (style == 0)
+				{
+					db_viewStageRanks(client, stage);
+				}
+				else
+				{
+					db_viewStyleStageRanks(client, stage, style);
+				}
+			}
+		}
+
 		if (!g_bSettingsLoaded[client])
+		{
+			g_fTick[client][1] = GetGameTime();
+			float tick = g_fTick[client][1] - g_fTick[client][0];
+			LogToFileEx(g_szLogFile, "[Surftimer] %s: Finished db_viewPersonalStageRecords in %fs", g_szSteamID[client], tick);
+			g_fTick[client][0] = GetGameTime();
+
 			LoadClientSetting(client, g_iSettingToLoad[client]);
-		return;
-	}
-
-	int style;
-	int stage;
-	float time;
-
-	for (int i = 0; i < CPLIMIT; i++)
-	{
-		for (int k = 0; k < 3; k++)
-		{
-			g_iWrcpVelsStartRecord[client][i][k] = 0;
-			g_iWrcpVelsEndRecord[client][i][k] = 0;
 		}
-
-		for (int s = 0; s < MAX_STYLES; s++)
-		{
-			g_fWrcpRecord[client][i][s] = -1.0;
-		}
-	}
-
-	if (SQL_HasResultSet(hndl))
-	{
-		while (SQL_FetchRow(hndl))
-		{
-			stage = SQL_FetchInt(hndl, 1);
-			style = SQL_FetchInt(hndl, 2);
-			time = SQL_FetchFloat(hndl, 0);
-			g_iWrcpVelsStartRecord[client][stage][0] = SQL_FetchInt(hndl, 3);
-			g_iWrcpVelsStartRecord[client][stage][1] = SQL_FetchInt(hndl, 4);
-			g_iWrcpVelsStartRecord[client][stage][2] = SQL_FetchInt(hndl, 5);
-			g_iWrcpVelsEndRecord[client][stage][0] = SQL_FetchInt(hndl, 6);
-			g_iWrcpVelsEndRecord[client][stage][1] = SQL_FetchInt(hndl, 7);
-			g_iWrcpVelsEndRecord[client][stage][2] = SQL_FetchInt(hndl, 8);
-
-
-			g_fWrcpRecord[client][stage][style] = time;
-
-			if (style == 0)
-			{
-				db_viewStageRanks(client, stage);
-			}
-			else
-			{
-				db_viewStyleStageRanks(client, stage, style);
-			}
-		}
-	}
-
-	if (!g_bSettingsLoaded[client])
-	{
-		g_fTick[client][1] = GetGameTime();
-		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[Surftimer] %s: Finished db_viewPersonalStageRecords in %fs", g_szSteamID[client], tick);
-		g_fTick[client][0] = GetGameTime();
-
-		LoadClientSetting(client, g_iSettingToLoad[client]);
 	}
 }
 
@@ -6467,38 +6516,43 @@ public void db_viewWrcpMapRecord(int client)
 	char szQuery[1024];
 	Format(szQuery, sizeof(szQuery), "SELECT name, MIN(runtimepro) FROM ck_wrcps WHERE mapname = '%s' AND runtimepro > -1.0 AND stage = %s AND style = 0;", g_szMapName, g_szWrcpMapSelect[client]);
 
-	g_dDb.Query(sql_viewWrcpMapRecordCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(sql_viewWrcpMapRecordCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void sql_viewWrcpMapRecordCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void sql_viewWrcpMapRecordCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
 	if (hndl == null)
 	{
 		LogError("[SurfTimer] SQL Error (sql_viewWrcpMapRecordCallback): %s ", error);
 	}
 
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
 	{
-		if (SQL_IsFieldNull(hndl, 1))
+		if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 		{
-			CPrintToChat(client, "%t", "SQL24", g_szChatPrefix);
+			if (SQL_IsFieldNull(hndl, 1))
+			{
+				CPrintToChat(client, "%t", "SQL24", g_szChatPrefix);
+				return;
+			}
+
+			char szName[MAX_NAME_LENGTH];
+			float runtimepro;
+			char szRuntimepro[64];
+
+			SQL_FetchString(hndl, 0, szName, 128);
+			runtimepro = SQL_FetchFloat(hndl, 1);
+			FormatTimeFloat(0, runtimepro, 3, szRuntimepro, 64);
+
+			CPrintToChat(client, "%t", "SQL25", g_szChatPrefix, szName, szRuntimepro, g_szWrcpMapSelect[client], g_szMapName);
 			return;
 		}
-
-		char szName[MAX_NAME_LENGTH];
-		float runtimepro;
-		char szRuntimepro[64];
-
-		SQL_FetchString(hndl, 0, szName, 128);
-		runtimepro = SQL_FetchFloat(hndl, 1);
-		FormatTimeFloat(0, runtimepro, 3, szRuntimepro, 64);
-
-		CPrintToChat(client, "%t", "SQL25", g_szChatPrefix, szName, szRuntimepro, g_szWrcpMapSelect[client], g_szMapName);
-		return;
-	}
-	else
-	{
-		CPrintToChat(client, "%t", "SQL24", g_szChatPrefix);
+		else
+		{
+			CPrintToChat(client, "%t", "SQL24", g_szChatPrefix);
+		}
 	}
 }
 
@@ -7527,10 +7581,10 @@ public void db_selectMapRank(int client, char szSteamId[32], char szMapName[128]
 			Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `steamid` = '%s' AND `mapname` = '%s' AND style = 0 LIMIT 1;", szSteamId, szMapName);
 	else
 		Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `steamid` = '%s' AND `mapname` LIKE '%c%s%c' AND style = 0 LIMIT 1;", szSteamId, PERCENT, szMapName, PERCENT);
-	g_dDb.Query(db_selectMapRankCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(db_selectMapRankCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_selectMapRankCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void db_selectMapRankCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
 	if (hndl == null)
 	{
@@ -7538,34 +7592,39 @@ public void db_selectMapRankCallback(Handle owner, Handle hndl, const char[] err
 		return;
 	}
 
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
 	{
-		char szSteamId[32];
-		char playername[MAX_NAME_LENGTH];
-		char mapname[128];
-		float runtimepro;
+		if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+		{
+			char szSteamId[32];
+			char playername[MAX_NAME_LENGTH];
+			char mapname[128];
+			float runtimepro;
 
-		SQL_FetchString(hndl, 0, szSteamId, 32);
-		SQL_FetchString(hndl, 1, playername, MAX_NAME_LENGTH);
-		SQL_FetchString(hndl, 2, mapname, sizeof(mapname));
-		runtimepro = SQL_FetchFloat(hndl, 3);
+			SQL_FetchString(hndl, 0, szSteamId, 32);
+			SQL_FetchString(hndl, 1, playername, MAX_NAME_LENGTH);
+			SQL_FetchString(hndl, 2, mapname, sizeof(mapname));
+			runtimepro = SQL_FetchFloat(hndl, 3);
 
-		FormatTimeFloat(client, runtimepro, 3, g_szRuntimepro[client], sizeof(g_szRuntimepro));
+			FormatTimeFloat(client, runtimepro, 3, g_szRuntimepro[client], sizeof(g_szRuntimepro));
 
-		Handle pack = CreateDataPack();
-		WritePackCell(pack, client);
-		WritePackString(pack, szSteamId);
-		WritePackString(pack, playername);
-		WritePackString(pack, mapname);
+			Handle pack = CreateDataPack();
+			WritePackCell(pack, client);
+			WritePackString(pack, szSteamId);
+			WritePackString(pack, playername);
+			WritePackString(pack, mapname);
 
-		char szQuery[1024];
+			char szQuery[1024];
 
-		Format(szQuery, sizeof(szQuery), "SELECT count(name) FROM `ck_playertimes` WHERE `mapname` = '%s' AND style = 0;", mapname);
-		g_dDb.Query(db_SelectTotalMapCompletesCallback, szQuery, pack, DBPrio_Low);
-	}
-	else
-	{
-		CPrintToChat(client, "%t", "SQL28", g_szChatPrefix);
+			Format(szQuery, sizeof(szQuery), "SELECT count(name) FROM `ck_playertimes` WHERE `mapname` = '%s' AND style = 0;", mapname);
+			g_dDb.Query(db_SelectTotalMapCompletesCallback, szQuery, pack, DBPrio_Low);
+		}
+		else
+		{
+			CPrintToChat(client, "%t", "SQL28", g_szChatPrefix);
+		}
 	}
 }
 
@@ -7774,10 +7833,10 @@ public void db_selectBonusRank(int client, char szSteamId[32], char szMapName[12
 {
 	char szQuery[1024];
 	Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtime`, zonegroup FROM `ck_bonus` WHERE `steamid` = '%s' AND `mapname` LIKE '%c%s%c' AND zonegroup = %i AND style = 0 LIMIT 1;", szSteamId, PERCENT, szMapName, PERCENT, bonus);
-	g_dDb.Query(db_selectBonusRankCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(db_selectBonusRankCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_selectBonusRankCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void db_selectBonusRankCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
 	if (hndl == null)
 	{
@@ -7785,37 +7844,42 @@ public void db_selectBonusRankCallback(Handle owner, Handle hndl, const char[] e
 		return;
 	}
 
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
 	{
-		char szSteamId[32];
-		char playername[MAX_NAME_LENGTH];
-		char mapname[128];
-		float runtimepro;
-		int bonus;
+		if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+		{
+			char szSteamId[32];
+			char playername[MAX_NAME_LENGTH];
+			char mapname[128];
+			float runtimepro;
+			int bonus;
 
-		SQL_FetchString(hndl, 0, szSteamId, 32);
-		SQL_FetchString(hndl, 1, playername, MAX_NAME_LENGTH);
-		SQL_FetchString(hndl, 2, mapname, sizeof(mapname));
-		runtimepro = SQL_FetchFloat(hndl, 3);
-		bonus = SQL_FetchInt(hndl, 4);
+			SQL_FetchString(hndl, 0, szSteamId, 32);
+			SQL_FetchString(hndl, 1, playername, MAX_NAME_LENGTH);
+			SQL_FetchString(hndl, 2, mapname, sizeof(mapname));
+			runtimepro = SQL_FetchFloat(hndl, 3);
+			bonus = SQL_FetchInt(hndl, 4);
 
-		FormatTimeFloat(client, runtimepro, 3, g_szRuntimepro[client], sizeof(g_szRuntimepro));
+			FormatTimeFloat(client, runtimepro, 3, g_szRuntimepro[client], sizeof(g_szRuntimepro));
 
-		Handle pack = CreateDataPack();
-		WritePackCell(pack, client);
-		WritePackString(pack, szSteamId);
-		WritePackString(pack, playername);
-		WritePackString(pack, mapname);
-		WritePackCell(pack, bonus);
+			Handle pack = CreateDataPack();
+			WritePackCell(pack, client);
+			WritePackString(pack, szSteamId);
+			WritePackString(pack, playername);
+			WritePackString(pack, mapname);
+			WritePackCell(pack, bonus);
 
-		char szQuery[1024];
+			char szQuery[1024];
 
-		Format(szQuery, sizeof(szQuery), "SELECT count(name) FROM `ck_bonus` WHERE `mapname` = '%s' AND zonegroup = %i AND style = 0 AND runtime > 0.0;", mapname, bonus);
-		g_dDb.Query(db_SelectTotalBonusCompletesCallback, szQuery, pack, DBPrio_Low);
-	}
-	else
-	{
-		CPrintToChat(client, "%t", "SQL28", g_szChatPrefix);
+			Format(szQuery, sizeof(szQuery), "SELECT count(name) FROM `ck_bonus` WHERE `mapname` = '%s' AND zonegroup = %i AND style = 0 AND runtime > 0.0;", mapname, bonus);
+			g_dDb.Query(db_SelectTotalBonusCompletesCallback, szQuery, pack, DBPrio_Low);
+		}
+		else
+		{
+			CPrintToChat(client, "%t", "SQL28", g_szChatPrefix);
+		}
 	}
 }
 
@@ -7952,10 +8016,10 @@ public void db_selectPlayerRank(int client, int rank, char szSteamId[32])
 		Format(szQuery, sizeof(szQuery), "SELECT `name`, `points` FROM `ck_playerrank` WHERE `steamid` = '%s';", szSteamId);
 	}
 
-	g_dDb.Query(db_selectPlayerRankCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(db_selectPlayerRankCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_selectPlayerRankCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void db_selectPlayerRankCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
 	if (hndl == null)
 	{
@@ -7963,27 +8027,32 @@ public void db_selectPlayerRankCallback(Handle owner, Handle hndl, const char[] 
 		return;
 	}
 
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
 	{
-		char szName[32];
-		int points;
-		int rank;
-
-		SQL_FetchString(hndl, 0, szName, sizeof(szName));
-		points = SQL_FetchInt(hndl, 1);
-
-		if (g_rankArg[client] == -1)
+		if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 		{
-			rank = g_PlayerRank[client][0];
-			g_rankArg[client] = 1;
+			char szName[32];
+			int points;
+			int rank;
+
+			SQL_FetchString(hndl, 0, szName, sizeof(szName));
+			points = SQL_FetchInt(hndl, 1);
+
+			if (g_rankArg[client] == -1)
+			{
+				rank = g_PlayerRank[client][0];
+				g_rankArg[client] = 1;
+			}
+			else
+				rank = g_rankArg[client];
+
+			CPrintToChatAll("%t", "SQL39", g_szChatPrefix, szName, rank, g_pr_RankedPlayers, points);
 		}
 		else
-			rank = g_rankArg[client];
-
-		CPrintToChatAll("%t", "SQL39", g_szChatPrefix, szName, rank, g_pr_RankedPlayers, points);
+			CPrintToChat(client, "%t", "SQLTwo7", g_szChatPrefix);
 	}
-	else
-		CPrintToChat(client, "%t", "SQLTwo7", g_szChatPrefix);
 }
 
 public void db_selectPlayerRankUnknown(int client, char szName[128])
@@ -7993,10 +8062,10 @@ public void db_selectPlayerRankUnknown(int client, char szName[128])
 	g_dDb.Escape(szName, szNameE, MAX_NAME_LENGTH * 2 + 1);
 	Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `points` FROM `ck_playerrank` WHERE `name` LIKE '%c%s%c' ORDER BY `points` DESC LIMIT 0, 1;", PERCENT, szNameE, PERCENT);
 
-	g_dDb.Query(db_selectPlayerRankUnknownCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(db_selectPlayerRankUnknownCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_selectPlayerRankUnknownCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void db_selectPlayerRankUnknownCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
 	if (hndl == null)
 	{
@@ -8004,29 +8073,34 @@ public void db_selectPlayerRankUnknownCallback(Handle owner, Handle hndl, const 
 		return;
 	}
 
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
 	{
-		char szSteamId[32];
-		char szName[128];
-		int points;
+		if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+		{
+			char szSteamId[32];
+			char szName[128];
+			int points;
 
-		SQL_FetchString(hndl, 0, szSteamId, sizeof(szSteamId));
-		SQL_FetchString(hndl, 1, szName, sizeof(szName));
-		points = SQL_FetchInt(hndl, 2);
+			SQL_FetchString(hndl, 0, szSteamId, sizeof(szSteamId));
+			SQL_FetchString(hndl, 1, szName, sizeof(szName));
+			points = SQL_FetchInt(hndl, 2);
 
-		Handle pack = CreateDataPack();
-		WritePackString(pack, szSteamId);
-		WritePackString(pack, szName);
-		WritePackCell(pack, points);
-		WritePackCell(pack, client);
+			Handle pack = CreateDataPack();
+			WritePackString(pack, szSteamId);
+			WritePackString(pack, szName);
+			WritePackCell(pack, points);
+			WritePackCell(pack, client);
 
-		char szQuery[1024];
-		// "SELECT name FROM ck_playerrank WHERE points >= (SELECT points FROM ck_playerrank WHERE steamid = '%s') ORDER BY points";
-		Format(szQuery, sizeof(szQuery), sql_selectRankedPlayersRank, 0, szSteamId, 0);
-		g_dDb.Query(db_getPlayerRankUnknownCallback, szQuery, pack, DBPrio_Low);
+			char szQuery[1024];
+			// "SELECT name FROM ck_playerrank WHERE points >= (SELECT points FROM ck_playerrank WHERE steamid = '%s') ORDER BY points";
+			Format(szQuery, sizeof(szQuery), sql_selectRankedPlayersRank, 0, szSteamId, 0);
+			g_dDb.Query(db_getPlayerRankUnknownCallback, szQuery, pack, DBPrio_Low);
+		}
+		else
+			CPrintToChat(client, "%t", "SQLTwo7", g_szChatPrefix);
 	}
-	else
-		CPrintToChat(client, "%t", "SQLTwo7", g_szChatPrefix);
 }
 
 public void db_getPlayerRankUnknownCallback(Handle owner, Handle hndl, const char[] error, any pack)
@@ -8063,10 +8137,10 @@ public void db_selectMapImprovement(int client, char szMapName[128])
 	char szQuery[1024];
 
 	Format(szQuery, sizeof(szQuery), "SELECT mapname, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname AND b.style = 0) as total, (SELECT tier FROM ck_maptier b WHERE a.mapname = b.mapname) as tier FROM ck_playertimes a where mapname LIKE '%c%s%c' AND style = 0 LIMIT 1;", PERCENT, szMapName, PERCENT);
-	g_dDb.Query(db_selectMapImprovementCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(db_selectMapImprovementCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_selectMapImprovementCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void db_selectMapImprovementCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
 	if (hndl == null)
 	{
@@ -8074,253 +8148,258 @@ public void db_selectMapImprovementCallback(Handle owner, Handle hndl, const cha
 		return;
 	}
 
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
 	{
-		char szMapName[32];
-		int totalplayers;
-		int tier;
-
-		SQL_FetchString(hndl, 0, szMapName, sizeof(szMapName));
-		totalplayers = SQL_FetchInt(hndl, 1);
-		tier = SQL_FetchInt(hndl, 2);
-
-		g_szMiMapName[client] = szMapName;
-		int type;
-		type = g_MiType[client];
-
-		// Map Completion Points
-		int mapcompletion;
-		if (tier == 1)
-			mapcompletion = 25;
-		else if (tier == 2)
-			mapcompletion = 50;
-		else if (tier == 3)
-			mapcompletion = 100;
-		else if (tier == 4)
-			mapcompletion = 200;
-		else if (tier == 5)
-			mapcompletion = 400;
-		else if (tier == 6)
-			mapcompletion = 600;
-		else if (tier == 7)
-			mapcompletion = 800;
-		else if (tier == 8)
-			mapcompletion = 1000;
-		else // no tier
-			mapcompletion = 13;
-
-		// Calculate Group Ranks
-		float wrpoints;
-		// float points;
-		float g1points;
-		float g2points;
-		float g3points;
-		float g4points;
-		float g5points;
-
-		// Group 1
-		float fG1top;
-		int g1top;
-		int g1bot = 11;
-		fG1top = (float(totalplayers) * g_Group1Pc);
-		fG1top += 11.0; // Rank 11 is always End of Group 1
-		g1top = RoundToCeil(fG1top);
-
-		int g1difference = (g1top - g1bot);
-		if (g1difference < 4)
-			g1top = (g1bot + 4);
-
-
-		// Group 2
-		float fG2top;
-		int g2top;
-		int g2bot;
-		g2bot = g1top + 1;
-		fG2top = (float(totalplayers) * g_Group2Pc);
-		fG2top += 11.0;
-		g2top = RoundToCeil(fG2top);
-
-		int g2difference = (g2top - g2bot);
-		if (g2difference < 4)
-			g2top = (g2bot + 4);
-
-		// Group 3
-		float fG3top;
-		int g3top;
-		int g3bot;
-		g3bot = g2top + 1;
-		fG3top = (float(totalplayers) * g_Group3Pc);
-		fG3top += 11.0;
-		g3top = RoundToCeil(fG3top);
-
-		int g3difference = (g3top - g3bot);
-		if (g3difference < 4)
-			g3top = (g3bot + 4);
-
-		// Group 4
-		float fG4top;
-		int g4top;
-		int g4bot;
-		g4bot = g3top + 1;
-		fG4top = (float(totalplayers) * g_Group4Pc);
-		fG4top += 11.0;
-		g4top = RoundToCeil(fG4top);
-
-		int g4difference = (g4top - g4bot);
-		if (g4difference < 4)
-			g4top = (g4bot + 4);
-
-		// Group 5
-		float fG5top;
-		int g5top;
-		int g5bot;
-		g5bot = g4top + 1;
-		fG5top = (float(totalplayers) * g_Group5Pc);
-		fG5top += 11.0;
-		g5top = RoundToCeil(fG5top);
-
-		int g5difference = (g5top - g5bot);
-		if (g5difference < 4)
-			g5top = (g5bot + 4);
-
-		// WR Points
-		if (tier == 1)
+		if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 		{
-			wrpoints = ((float(totalplayers) * 1.75) / 6);
-			wrpoints += 58.5;
-			if (wrpoints < 250.0)
-				wrpoints = 250.0;
-		}
-		else if (tier == 2)
-		{
-			wrpoints = ((float(totalplayers) * 2.8) / 5);
-			wrpoints += 82.15;
-			if (wrpoints < 500.0)
-				wrpoints = 500.0;
-		}
-		else if (tier == 3)
-		{
-			wrpoints = ((float(totalplayers) * 3.5) / 4);
-			if (wrpoints < 750.0)
-				wrpoints = 750.0;
-			else
-				wrpoints += 117;
-		}
-		else if (tier == 4)
-		{
-			wrpoints = ((float(totalplayers) * 5.74) / 4);
-			if (wrpoints < 1000.0)
-				wrpoints = 1000.0;
-			else
-				wrpoints += 164.25;
-		}
-		else if (tier == 5)
-		{
-			wrpoints = ((float(totalplayers) * 7) / 4);
-			if (wrpoints < 1250.0)
-				wrpoints = 1250.0;
-			else
-				wrpoints += 234;
-		}
-		else if (tier == 6)
-		{
-			wrpoints = ((float(totalplayers) * 14) / 4);
-			if (wrpoints < 1500.0)
-				wrpoints = 1500.0;
-			else
-				wrpoints += 328;
-		}
-		else if (tier == 7)
-		{
-			wrpoints = ((float(totalplayers) * 21) / 4);
-			if (wrpoints < 1750.0)
-				wrpoints = 1750.0;
-			else
-				wrpoints += 420;
-		}
-		else if (tier == 8)
-		{
-			wrpoints = ((float(totalplayers) * 30) / 4);
-			if (wrpoints < 2000.0)
-				wrpoints = 2000.0;
-			else
-				wrpoints += 560;
-		}
-		else // no tier set
-			wrpoints = 25.0;
+			char szMapName[32];
+			int totalplayers;
+			int tier;
 
-		// Round WR points up
-		int iwrpoints;
-		iwrpoints = RoundToCeil(wrpoints);
+			SQL_FetchString(hndl, 0, szMapName, sizeof(szMapName));
+			totalplayers = SQL_FetchInt(hndl, 1);
+			tier = SQL_FetchInt(hndl, 2);
 
-		// Calculate Top 10 Points
-		int rank2;
-		float frank2;
-		int rank3;
-		float frank3;
-		int rank4;
-		float frank4;
-		int rank5;
-		float frank5;
-		int rank6;
-		float frank6;
-		int rank7;
-		float frank7;
-		int rank8;
-		float frank8;
-		int rank9;
-		float frank9;
-		int rank10;
-		float frank10;
+			g_szMiMapName[client] = szMapName;
+			int type;
+			type = g_MiType[client];
 
-		frank2 = (0.80 * iwrpoints);
-		rank2 += RoundToCeil(frank2);
-		frank3 = (0.75 * iwrpoints);
-		rank3 += RoundToCeil(frank3);
-		frank4 = (0.70 * iwrpoints);
-		rank4 += RoundToCeil(frank4);
-		frank5 = (0.65 * iwrpoints);
-		rank5 += RoundToCeil(frank5);
-		frank6 = (0.60 * iwrpoints);
-		rank6 += RoundToCeil(frank6);
-		frank7 = (0.55 * iwrpoints);
-		rank7 += RoundToCeil(frank7);
-		frank8 = (0.50 * iwrpoints);
-		rank8 += RoundToCeil(frank8);
-		frank9 = (0.45 * iwrpoints);
-		rank9 += RoundToCeil(frank9);
-		frank10 = (0.40 * iwrpoints);
-		rank10 += RoundToCeil(frank10);
+			// Map Completion Points
+			int mapcompletion;
+			if (tier == 1)
+				mapcompletion = 25;
+			else if (tier == 2)
+				mapcompletion = 50;
+			else if (tier == 3)
+				mapcompletion = 100;
+			else if (tier == 4)
+				mapcompletion = 200;
+			else if (tier == 5)
+				mapcompletion = 400;
+			else if (tier == 6)
+				mapcompletion = 600;
+			else if (tier == 7)
+				mapcompletion = 800;
+			else if (tier == 8)
+				mapcompletion = 1000;
+			else // no tier
+				mapcompletion = 13;
 
-		// Calculate Group Points
-		g1points = (wrpoints * 0.25);
-		g2points = (g1points / 1.5);
-		g3points = (g2points / 1.5);
-		g4points = (g3points / 1.5);
-		g5points = (g4points / 1.5);
+			// Calculate Group Ranks
+			float wrpoints;
+			// float points;
+			float g1points;
+			float g2points;
+			float g3points;
+			float g4points;
+			float g5points;
 
-		// Draw Menu Map Improvement Menu
-		if (type == 0)
-		{
-			Menu mi = CreateMenu(MapImprovementMenuHandler);
-			SetMenuTitle(mi, "[Point Reward: %s]\n------------------------------\nTier: %i\n \n[Completion Points]\n \nMap Finish Points: %i\n \n[Map Improvement Groups]\n \n[Group 1] Ranks 11-%i ~ %i Pts\n[Group 2] Ranks %i-%i ~ %i Pts\n[Group 3] Ranks %i-%i ~ %i Pts\n[Group 4] Ranks %i-%i ~ %i Pts\n[Group 5] Ranks %i-%i ~ %i Pts\n \nSR Pts: %i\n \nTotal Completions: %i\n \n",szMapName, tier, mapcompletion, g1top, RoundFloat(g1points), g2bot, g2top, RoundFloat(g2points), g3bot, g3top, RoundFloat(g3points), g4bot, g4top, RoundFloat(g4points), g5bot, g5top, RoundFloat(g5points), iwrpoints, totalplayers);
-			// AddMenuItem(mi, "", "", ITEMDRAW_SPACER);
-			AddMenuItem(mi, szMapName, "Top 10 Points");
-			SetMenuOptionFlags(mi, MENUFLAG_BUTTON_EXIT);
-			DisplayMenu(mi, client, MENU_TIME_FOREVER);
+			// Group 1
+			float fG1top;
+			int g1top;
+			int g1bot = 11;
+			fG1top = (float(totalplayers) * g_Group1Pc);
+			fG1top += 11.0; // Rank 11 is always End of Group 1
+			g1top = RoundToCeil(fG1top);
+
+			int g1difference = (g1top - g1bot);
+			if (g1difference < 4)
+				g1top = (g1bot + 4);
+
+
+			// Group 2
+			float fG2top;
+			int g2top;
+			int g2bot;
+			g2bot = g1top + 1;
+			fG2top = (float(totalplayers) * g_Group2Pc);
+			fG2top += 11.0;
+			g2top = RoundToCeil(fG2top);
+
+			int g2difference = (g2top - g2bot);
+			if (g2difference < 4)
+				g2top = (g2bot + 4);
+
+			// Group 3
+			float fG3top;
+			int g3top;
+			int g3bot;
+			g3bot = g2top + 1;
+			fG3top = (float(totalplayers) * g_Group3Pc);
+			fG3top += 11.0;
+			g3top = RoundToCeil(fG3top);
+
+			int g3difference = (g3top - g3bot);
+			if (g3difference < 4)
+				g3top = (g3bot + 4);
+
+			// Group 4
+			float fG4top;
+			int g4top;
+			int g4bot;
+			g4bot = g3top + 1;
+			fG4top = (float(totalplayers) * g_Group4Pc);
+			fG4top += 11.0;
+			g4top = RoundToCeil(fG4top);
+
+			int g4difference = (g4top - g4bot);
+			if (g4difference < 4)
+				g4top = (g4bot + 4);
+
+			// Group 5
+			float fG5top;
+			int g5top;
+			int g5bot;
+			g5bot = g4top + 1;
+			fG5top = (float(totalplayers) * g_Group5Pc);
+			fG5top += 11.0;
+			g5top = RoundToCeil(fG5top);
+
+			int g5difference = (g5top - g5bot);
+			if (g5difference < 4)
+				g5top = (g5bot + 4);
+
+			// WR Points
+			if (tier == 1)
+			{
+				wrpoints = ((float(totalplayers) * 1.75) / 6);
+				wrpoints += 58.5;
+				if (wrpoints < 250.0)
+					wrpoints = 250.0;
+			}
+			else if (tier == 2)
+			{
+				wrpoints = ((float(totalplayers) * 2.8) / 5);
+				wrpoints += 82.15;
+				if (wrpoints < 500.0)
+					wrpoints = 500.0;
+			}
+			else if (tier == 3)
+			{
+				wrpoints = ((float(totalplayers) * 3.5) / 4);
+				if (wrpoints < 750.0)
+					wrpoints = 750.0;
+				else
+					wrpoints += 117;
+			}
+			else if (tier == 4)
+			{
+				wrpoints = ((float(totalplayers) * 5.74) / 4);
+				if (wrpoints < 1000.0)
+					wrpoints = 1000.0;
+				else
+					wrpoints += 164.25;
+			}
+			else if (tier == 5)
+			{
+				wrpoints = ((float(totalplayers) * 7) / 4);
+				if (wrpoints < 1250.0)
+					wrpoints = 1250.0;
+				else
+					wrpoints += 234;
+			}
+			else if (tier == 6)
+			{
+				wrpoints = ((float(totalplayers) * 14) / 4);
+				if (wrpoints < 1500.0)
+					wrpoints = 1500.0;
+				else
+					wrpoints += 328;
+			}
+			else if (tier == 7)
+			{
+				wrpoints = ((float(totalplayers) * 21) / 4);
+				if (wrpoints < 1750.0)
+					wrpoints = 1750.0;
+				else
+					wrpoints += 420;
+			}
+			else if (tier == 8)
+			{
+				wrpoints = ((float(totalplayers) * 30) / 4);
+				if (wrpoints < 2000.0)
+					wrpoints = 2000.0;
+				else
+					wrpoints += 560;
+			}
+			else // no tier set
+				wrpoints = 25.0;
+
+			// Round WR points up
+			int iwrpoints;
+			iwrpoints = RoundToCeil(wrpoints);
+
+			// Calculate Top 10 Points
+			int rank2;
+			float frank2;
+			int rank3;
+			float frank3;
+			int rank4;
+			float frank4;
+			int rank5;
+			float frank5;
+			int rank6;
+			float frank6;
+			int rank7;
+			float frank7;
+			int rank8;
+			float frank8;
+			int rank9;
+			float frank9;
+			int rank10;
+			float frank10;
+
+			frank2 = (0.80 * iwrpoints);
+			rank2 += RoundToCeil(frank2);
+			frank3 = (0.75 * iwrpoints);
+			rank3 += RoundToCeil(frank3);
+			frank4 = (0.70 * iwrpoints);
+			rank4 += RoundToCeil(frank4);
+			frank5 = (0.65 * iwrpoints);
+			rank5 += RoundToCeil(frank5);
+			frank6 = (0.60 * iwrpoints);
+			rank6 += RoundToCeil(frank6);
+			frank7 = (0.55 * iwrpoints);
+			rank7 += RoundToCeil(frank7);
+			frank8 = (0.50 * iwrpoints);
+			rank8 += RoundToCeil(frank8);
+			frank9 = (0.45 * iwrpoints);
+			rank9 += RoundToCeil(frank9);
+			frank10 = (0.40 * iwrpoints);
+			rank10 += RoundToCeil(frank10);
+
+			// Calculate Group Points
+			g1points = (wrpoints * 0.25);
+			g2points = (g1points / 1.5);
+			g3points = (g2points / 1.5);
+			g4points = (g3points / 1.5);
+			g5points = (g4points / 1.5);
+
+			// Draw Menu Map Improvement Menu
+			if (type == 0)
+			{
+				Menu mi = CreateMenu(MapImprovementMenuHandler);
+				SetMenuTitle(mi, "[Point Reward: %s]\n------------------------------\nTier: %i\n \n[Completion Points]\n \nMap Finish Points: %i\n \n[Map Improvement Groups]\n \n[Group 1] Ranks 11-%i ~ %i Pts\n[Group 2] Ranks %i-%i ~ %i Pts\n[Group 3] Ranks %i-%i ~ %i Pts\n[Group 4] Ranks %i-%i ~ %i Pts\n[Group 5] Ranks %i-%i ~ %i Pts\n \nSR Pts: %i\n \nTotal Completions: %i\n \n",szMapName, tier, mapcompletion, g1top, RoundFloat(g1points), g2bot, g2top, RoundFloat(g2points), g3bot, g3top, RoundFloat(g3points), g4bot, g4top, RoundFloat(g4points), g5bot, g5top, RoundFloat(g5points), iwrpoints, totalplayers);
+				// AddMenuItem(mi, "", "", ITEMDRAW_SPACER);
+				AddMenuItem(mi, szMapName, "Top 10 Points");
+				SetMenuOptionFlags(mi, MENUFLAG_BUTTON_EXIT);
+				DisplayMenu(mi, client, MENU_TIME_FOREVER);
+			}
+			else // Draw Top 10 Points Menu
+			{
+				Menu mi = CreateMenu(MapImprovementTop10MenuHandler);
+				SetMenuTitle(mi, "[Point Reward: %s]\n------------------------------\nTier: %i\n \n[Completion Points]\n \nMap Finish Points: %i\n \n[Top 10 Points]\n \nRank 1: %i Pts\nRank 2: %i Pts\nRank 3: %i Pts\nRank 4: %i Pts\nRank 5: %i Pts\nRank 6: %i Pts\nRank 7: %i Pts\nRank 8: %i Pts\nRank 9: %i Pts\nRank 10: %i Pts\n \nTotal Completions: %i\n",szMapName, tier, mapcompletion, iwrpoints, rank2, rank3, rank4, rank5, rank6, rank7, rank8, rank9, rank10, totalplayers);
+				AddMenuItem(mi, "", "", ITEMDRAW_SPACER);
+				SetMenuOptionFlags(mi, MENUFLAG_BUTTON_EXIT);
+				DisplayMenu(mi, client, MENU_TIME_FOREVER);
+			}
 		}
-		else // Draw Top 10 Points Menu
+		else
 		{
-			Menu mi = CreateMenu(MapImprovementTop10MenuHandler);
-			SetMenuTitle(mi, "[Point Reward: %s]\n------------------------------\nTier: %i\n \n[Completion Points]\n \nMap Finish Points: %i\n \n[Top 10 Points]\n \nRank 1: %i Pts\nRank 2: %i Pts\nRank 3: %i Pts\nRank 4: %i Pts\nRank 5: %i Pts\nRank 6: %i Pts\nRank 7: %i Pts\nRank 8: %i Pts\nRank 9: %i Pts\nRank 10: %i Pts\n \nTotal Completions: %i\n",szMapName, tier, mapcompletion, iwrpoints, rank2, rank3, rank4, rank5, rank6, rank7, rank8, rank9, rank10, totalplayers);
-			AddMenuItem(mi, "", "", ITEMDRAW_SPACER);
-			SetMenuOptionFlags(mi, MENUFLAG_BUTTON_EXIT);
-			DisplayMenu(mi, client, MENU_TIME_FOREVER);
+			CPrintToChat(client, "%t", "SQL28", g_szChatPrefix);
 		}
-	}
-	else
-	{
-		CPrintToChat(client, "%t", "SQL28", g_szChatPrefix);
 	}
 }
 
@@ -8958,68 +9037,61 @@ public void db_CheckVIPAdmin(int client, char[] szSteamID)
 {
 	char szQuery[1024];
 	Format(szQuery, sizeof(szQuery), "SELECT vip, admin, zoner FROM ck_vipadmins WHERE steamid = '%s';", szSteamID);
-	g_dDb.Query(SQL_CheckVIPAdminCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(SQL_CheckVIPAdminCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
-	char szSteamId[32];
-	getSteamIDFromClient(client, szSteamId, 32);
+	int client = GetClientOfUserId(userid);
 
-	if (hndl == null)
+	if (IsValidClient(client))
 	{
-		LogError("[surftimer] SQL Error (SQL_CheckVIPAdminCallback): %s", error);
+		char szSteamId[32];
+		getSteamIDFromClient(client, szSteamId, 32);
+
+		if (hndl == null)
+		{
+			LogError("[surftimer] SQL Error (SQL_CheckVIPAdminCallback): %s", error);
+
+			if (!g_bSettingsLoaded[client])
+				LoadClientSetting(client, g_iSettingToLoad[client]);
+		}
+
+		g_bVip[client] = false;
+		g_bZoner[client] = false;
+
+		if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+		{
+			g_bVip[client] = view_as<bool>(SQL_FetchInt(hndl, 0));
+			g_bZoner[client] = view_as<bool>(SQL_FetchInt(hndl, 2));
+		}
+
+		if (!g_bVip[client] || !g_bZoner[client]) // No VIP or Zoner from database, let's check flags
+		{
+			if (CheckCommandAccess(client, "", g_VipFlag))
+				g_bVip[client] = true;
+
+			if (CheckCommandAccess(client, "", g_ZonerFlag))
+				g_bZoner[client] = true;
+		}
+
+		if (g_bCheckCustomTitle[client])
+		{
+			db_viewCustomTitles(client, szSteamId);
+			g_bCheckCustomTitle[client] = false;
+		}
 
 		if (!g_bSettingsLoaded[client])
+		{
+			g_fTick[client][1] = GetGameTime();
+			float tick = g_fTick[client][1] - g_fTick[client][0];
+			LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_CheckVIPAdmin in %fs", g_szSteamID[client], tick);
+			g_fTick[client][0] = GetGameTime();
+
+
 			LoadClientSetting(client, g_iSettingToLoad[client]);
+		}
 	}
-
-	g_bVip[client] = false;
-	g_bZoner[client] = false;
-
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-	{
-		g_bVip[client] = view_as<bool>(SQL_FetchInt(hndl, 0));
-		g_bZoner[client] = view_as<bool>(SQL_FetchInt(hndl, 2));
-	}
-
-	if (!g_bVip[client] || !g_bZoner[client]) // No VIP or Zoner from database, let's check flags
-	{
-		if (CheckCommandAccess(client, "", g_VipFlag))
-			g_bVip[client] = true;
-
-		if (CheckCommandAccess(client, "", g_ZonerFlag))
-			g_bZoner[client] = true;
-	}
-
-	if (g_bCheckCustomTitle[client])
-	{
-		db_viewCustomTitles(client, szSteamId);
-		g_bCheckCustomTitle[client] = false;
-	}
-
-	if (!g_bSettingsLoaded[client])
-	{
-		g_fTick[client][1] = GetGameTime();
-		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_CheckVIPAdmin in %fs", g_szSteamID[client], tick);
-		g_fTick[client][0] = GetGameTime();
-
-
-		LoadClientSetting(client, g_iSettingToLoad[client]);
-	}
-}
-
-public void SQL_InsertVipFromSourcebansCallback(Handle owner, Handle hndl, const char[] error, any client)
-{
-	if (hndl == null)
-	{
-		LogError("[surftimer] SQL Error (SQL_InsertVipFromSourcebansCallback): %s", error);
-	}
-
-	char szSteamId[32];
-	getSteamIDFromClient(client, szSteamId, 32);
-	db_CheckVIPAdmin(client, szSteamId);
 }
 
 public void db_checkCustomPlayerTitle(int client, char[] szSteamID, char[] arg)
@@ -9486,10 +9558,10 @@ public void db_updateColours(int client, char szSteamId[32], int newColour, int 
 		case 1: Format(szQuery, sizeof(szQuery), "UPDATE ck_vipadmins SET textcolour = %i WHERE steamid = '%s';", newColour, szSteamId);
 	}
 
-	g_dDb.Query(SQL_UpdatePlayerColoursCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(SQL_UpdatePlayerColoursCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_UpdatePlayerColoursCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void SQL_UpdatePlayerColoursCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
 	if (hndl == null)
 	{
@@ -9497,8 +9569,13 @@ public void SQL_UpdatePlayerColoursCallback(Handle owner, Handle hndl, const cha
 		return;
 	}
 
-	g_bUpdatingColours[client] = true;
-	db_viewCustomTitles(client, g_szSteamID[client]);
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
+	{
+		g_bUpdatingColours[client] = true;
+		db_viewCustomTitles(client, g_szSteamID[client]);
+	}
 }
 
 // fluffys end custom titles
@@ -9646,10 +9723,10 @@ public void db_setJoinMsg(int client, char[] szArg)
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), "UPDATE ck_vipadmins SET joinmsg = '%s' WHERE steamid = '%s';", szArg, g_szSteamID[client]);
 	Format(g_szCustomJoinMsg[client], sizeof(g_szCustomJoinMsg), "%s", szArg);
-	g_dDb.Query(SQL_SetJoinMsgCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(SQL_SetJoinMsgCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_SetJoinMsgCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void SQL_SetJoinMsgCallback(Handle owner, Handle hndl, const char[] error, any userid)
 {
 	if (hndl == null)
 	{
@@ -9657,10 +9734,15 @@ public void SQL_SetJoinMsgCallback(Handle owner, Handle hndl, const char[] error
 		return;
 	}
 
-	if (StrEqual(g_szCustomJoinMsg[client], "none"))
-		CPrintToChat(client, "%t", "SQLTwo5", g_szChatPrefix);
-	else
-		CPrintToChat(client, "%t", "SQLTwo6", g_szChatPrefix, g_szCustomJoinMsg[client]);
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
+	{
+		if (StrEqual(g_szCustomJoinMsg[client], "none"))
+			CPrintToChat(client, "%t", "SQLTwo5", g_szChatPrefix);
+		else
+			CPrintToChat(client, "%t", "SQLTwo6", g_szChatPrefix, g_szCustomJoinMsg[client]);
+	}
 }
 
 public void db_selectCPR(int client, int rank, const char szMapName[128], const char szSteamId[32])
