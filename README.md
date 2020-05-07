@@ -43,15 +43,15 @@
 
 * [SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable)
 * [Metamod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable)
+* [DHooks](https://forums.alliedmods.net/showpost.php?p=2588686&postcount=589)
+* [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604)
+* [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
+* [Sourcemod-Discord API](https://github.com/Deathknife/sourcemod-discord)
 * [Precompiled Surftimer + Discord-API](https://github.com/olokos/Surftimer-olokos/releases/latest)
 * A MySQL Database (MySQL 5.7 / 8+ / MariaDB supported)
 
 #### Optional
 
-* [DHooks](https://forums.alliedmods.net/showpost.php?p=2588686&postcount=589)
-* [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604)
-* [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
-* [Sourcemod-Discord API](https://github.com/Deathknife/sourcemod-discord)
 * [SMLib](https://github.com/bcserv/smlib/tree/transitional_syntax)
 * [ColorLib](https://github.com/c0rp3n/colorlib-sm/tree/master/addons/sourcemod/scripting/include)
 * [Cleaner](https://github.com/Accelerator74/Cleaner)
