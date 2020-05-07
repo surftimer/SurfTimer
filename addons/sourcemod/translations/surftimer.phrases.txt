@@ -75,6 +75,21 @@
 		"#format"	"{1:s},{2:s},{3:i}"
 		"en"		"{1} {blue}{2} {default}- {lightgreen}{3} seconds remaining"
 	}
+	"TimeleftThree"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {green}3!"
+	}
+	"TimeleftTwo"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {orange}2!"
+	}
+	"TimeleftOne"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {red}1!"
+	}
 	"TimeleftCounter"
 	{
 		"#format"	"{1:s},{2:s},{3:i}"
