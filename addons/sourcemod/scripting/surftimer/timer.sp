@@ -184,11 +184,7 @@ public Action CKTimer2(Handle timer)
 					if (!g_bRoundEnd)
 					{
 						g_bRoundEnd = true;
-						ServerCommand("mp_ignore_round_win_conditions 0");
-						ServerCommand("mp_timelimit 0");
-						ServerCommand("mp_maxrounds 0");
-						ServerCommand("mp_respawn_on_death_t 0");
-						ServerCommand("mp_respawn_on_death_ct 0");
+						ServerCommand("mp_ignore_round_win_conditions 0; mp_timelimit 0; mp_maxrounds 0; mp_respawn_on_death_t 0; mp_respawn_on_death_ct 0");
 						CreateTimer(1.0, TerminateRoundTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 					}
 				}
