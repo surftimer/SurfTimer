@@ -62,10 +62,6 @@ jobs:
         run: |
           wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/tools/color_gen.py -P $TOOLS_PATH
           python3 $TOOLS_PATH/color_gen.py --include-ref-colors --config "$TOOLS_PATH/colors.yaml" "$INCLUDE_PATH/colorlib_map.inc"
-      
-      - name: Increase MAX_NAME_LENGTH
-        run: sed -i 's/250/345/g' colorlib.inc
-        working-directory: ${{ env.INCLUDE_PATH }}/
 
       - name: Compile plugin
         run: |
