@@ -1651,6 +1651,8 @@ public void OnEntityCreated(int entity, const char[] classname) {
 
 public void OnMapStart()
 {
+	db_setupDatabase();
+	
 	CreateTimer(30.0, EnableJoinMsgs, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 
 	// Get mapname
@@ -1889,7 +1891,7 @@ public void OnClientConnected(int client)
 public void OnClientPutInServer(int client)
 {
 	if (!IsValidClient(client))
-	return;
+		return;
 
 	// Defaults
 	SetClientDefaults(client);
@@ -2621,7 +2623,6 @@ public void OnPluginStart()
 	CreateHooks();
 	CreateCommandListeners();
 
-	db_setupDatabase();
 	CreateCommandsNewMap();
 
 	// exec surftimer.cfg

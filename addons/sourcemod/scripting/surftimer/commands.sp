@@ -150,6 +150,7 @@ void CreateCommands()
 	RegAdminCmd("sm_test", sm_test, ADMFLAG_CUSTOM6);
 	RegAdminCmd("sm_vel", Client_GetVelocity, ADMFLAG_ROOT);
 	RegAdminCmd("sm_targetname", Client_TargetName, ADMFLAG_ROOT);
+	RegAdminCmd("sm_isloaded", Command_IsLoaded, ADMFLAG_ROOT);
 
 	// !Startpos -- Goose
 	RegConsoleCmd("sm_startpos", Command_Startpos, "[surftimer] Saves current location as new !r spawn.");
@@ -460,6 +461,11 @@ public Action Client_TargetName(int client, int args)
 	CPrintToChat(client, "%t", "Commands3", g_szChatPrefix, szClassName);
 
 	return Plugin_Handled;
+}
+
+public Action Command_IsLoaded(int client, int args)
+{
+	ReplyToCommand(client, "g_bServerDataLoaded: %d", g_bServerDataLoaded);
 }
 
 public Action Command_Vip(int client, int args)
