@@ -698,12 +698,6 @@ Handle g_PracticeFinishForward;
 // SQL driver
 Database g_dDb = null;
 
-// Used to check if SQL changes are being made
-bool g_bInTransactionChain = false;
-
-// Used to track if sql tables are being renamed
-bool g_bRenaming = false;
-
 // Used to track if a players settings have been loaded
 bool g_bSettingsLoaded[MAXPLAYERS + 1];
 
@@ -1679,7 +1673,6 @@ public void OnMapStart()
 	g_hMaxVelocity = FindConVar("sv_maxvelocity");
 
 	// Load spawns
-	if (!g_bRenaming && !g_bInTransactionChain)
 	checkSpawnPoints();
 
 	// Get Map Tag
@@ -1949,7 +1942,7 @@ public void OnClientPutInServer(int client)
 	FixPlayerName(client);
 
 	// Position Restoring
-	if (GetConVarBool(g_hcvarRestore) && !g_bRenaming && !g_bInTransactionChain)
+	if (GetConVarBool(g_hcvarRestore))
 	{
 		db_selectLastRun(client);
 	}
@@ -1960,7 +1953,7 @@ public void OnClientPutInServer(int client)
 	if (g_bTierFound)
 		AnnounceTimer[client] = CreateTimer(20.0, AnnounceMap, client, TIMER_FLAG_NO_MAPCHANGE);
 
-	if (!g_bRenaming && !g_bInTransactionChain && g_bServerDataLoaded && !g_bSettingsLoaded[client] && !g_bLoadingSettings[client])
+	if (g_bServerDataLoaded && !g_bSettingsLoaded[client] && !g_bLoadingSettings[client])
 	{
 		// Start loading client settings
 		g_bLoadingSettings[client] = true;
@@ -2065,7 +2058,7 @@ public void OnClientDisconnect(int client)
 	}
 
 	// Database
-	if (IsValidClient(client) && !g_bRenaming)
+	if (IsValidClient(client))
 	{
 		if (!g_bIgnoreZone[client] && !g_bPracticeMode[client])
 			db_insertLastPosition(client, g_szMapName, g_Stage[g_iClientInZone[client][2]][client], g_iClientInZone[client][2]);
