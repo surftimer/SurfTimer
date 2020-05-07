@@ -1,0 +1,232 @@
+modify:
+{
+	match:
+	{
+	"model" "*71"
+	"StartDisabled" "0"
+	"speed" "1200"
+	"spawnflags" "1"
+	"pushdir" "0 0 0"
+	"origin" "-6688 0 64"
+	"filtername" "two_1f"
+	"alternateticksfix" "0"
+	"classname" "trigger_push"
+	"hammerid" "3111"
+	"OnStartTouch" "!activator,AddOutput,classname ,0,-1"
+	}
+	delete:
+	{
+	"filtername" "two_1f"
+	"OnStartTouch" "!activator,AddOutput,classname ,0,-1"
+	}
+}
+
+modify:
+{
+	match:
+	{
+	"model" "*92"
+"StartDisabled" "0"
+"speed" "1500"
+"spawnflags" "1"
+"pushdir" "0 180 0"
+"origin" "3728 360 608"
+"filtername" "four_1f"
+"alternateticksfix" "0"
+"classname" "trigger_push"
+"hammerid" "23726"
+"OnStartTouch" "!activator,AddOutput,classname four_2,0,-1"
+	}
+	delete:
+	{
+	"filtername" "four_1f"
+	"OnStartTouch" "!activator,AddOutput,classname four_2,0,-1"
+	}
+}
+
+modify:
+{
+	match:
+	{
+	"model" "*93"
+	"StartDisabled" "0"
+	"speed" "1500"
+	"spawnflags" "1"
+	"pushdir" "0 180 0"
+	"origin" "3728 -360 608"
+	"filtername" "four_1f"
+	"alternateticksfix" "0"
+	"classname" "trigger_push"
+	"hammerid" "23747"
+	"OnStartTouch" "!activator,AddOutput,classname four_2,0,-1"
+	}
+	delete:
+	{
+	"filtername" "four_1f"
+	"OnStartTouch" "!activator,AddOutput,classname four_2,0,-1"
+	}
+}
+
+modify:
+{
+	match:
+	{
+	"model" "*85"
+	"StartDisabled" "0"
+	"speed" "600"
+	"spawnflags" "1"
+	"pushdir" "0 180 0"
+	"origin" "3440 944 960"
+	"filtername" "threeallow"
+	"alternateticksfix" "0"
+	"classname" "trigger_push"
+	"hammerid" "10576"
+	}
+	delete:
+	{
+	"filtername" "threeallow"
+	}
+}
+
+remove:
+{
+	"model" "*146"
+}
+
+remove:
+{
+	"model" "*220"
+}
+
+remove:
+{
+	"origin" "2064 32 171.339"
+	"targetname" "endofthreeblocker"
+	"Negated" "0"
+	"filtertype" "1"
+	"Filter01" "fourallow"
+	"classname" "filter_multi"
+	"hammerid" "130193"
+}
+
+add:
+{
+	"origin" "3836.3 -21.0 512.0"
+	"targetname" "aussurfs4"
+	"angles" "0 90 0"
+	"classname" "info_teleport_destination"
+}
+
+
+modify:
+{
+	match:
+	{
+	"model" "*334"
+	"target" "tvroom"
+	"StartDisabled" "0"
+	"spawnflags" "1"
+	"origin" "4476 -120 1832"
+	"classname" "trigger_teleport"
+	"hammerid" "368936"
+	"UseLandmarkAngles" "1"
+	}
+	replace:
+	{
+	"target" "aussurfs4"
+	"origin" "4075.9 430.9 -95.9"
+	}
+}
+
+
+modify:
+{
+	match:
+	{
+	"model" "*115"
+"StartDisabled" "0"
+"speed" "1200"
+"spawnflags" "1"
+"pushdir" "0 180 0"
+"origin" "-4768 0 -928"
+"filtername" "four_4f"
+"alternateticksfix" "0"
+"classname" "trigger_push"
+"hammerid" "67413"
+"OnEndTouch" "!activator,AddOutput,classname four_5,0,-1"
+	}
+	delete:
+	{
+	"filtername" "four_4f"
+	"OnEndTouch" "!activator,AddOutput,classname four_5,0,-1"
+	}
+}
+
+;modify:
+;{
+;	match:
+;	{
+;	"model" "*116"
+;"StartDisabled" "0"
+;"speed" "1600"
+;"spawnflags" "1"
+;"pushdir" "0 0 0"
+;"origin" "-6688 -944 -64"
+;"filtername" "four_6f"
+;"alternateticksfix" "0"
+;"classname" "trigger_push"
+;"hammerid" "68096"
+;"OnEndTouch" "!activator,AddOutput,classname four_7,0,-1"
+;	}
+;	delete:
+;	{
+;	"filtername" "four_6f"
+;	"OnEndTouch" "!activator,AddOutput,classname four_7,0,-1"
+;	}
+;}
+
+;modify:
+;{
+;	match:
+;	{
+;	"model" "*117"
+;"StartDisabled" "0"
+;"speed" "1600"
+;"spawnflags" "1"
+;"pushdir" "0 0 0"
+;"origin" "-6688 944 -64"
+;"filtername" "four_6f"
+;"alternateticksfix" "0"
+;"classname" "trigger_push"
+;"hammerid" "68118"
+;"OnEndTouch" "!activator,AddOutput,classname four_7,0,-1"
+;	}
+;	delete:
+;	{
+;	"filtername" "four_6f"
+;	"OnEndTouch" "!activator,AddOutput,classname four_7,0,-1"
+;	}
+;}
+
+modify:
+{
+	match:
+	{
+	"model" "*114"
+"StartDisabled" "0"
+"speed" "1000"
+"spawnflags" "1"
+"pushdir" "0 0 0"
+"origin" "-6688 0 -928"
+"filtername" "five_7f"
+"alternateticksfix" "0"
+"classname" "trigger_push"
+"hammerid" "66612"
+"OnEndTouch" "!activator,AddOutput,classname five_8,0,-1"
+	}
+	delete:
+	{
+	"filtername" "five_7f"
+	"OnEndTouch" "!activator,AddOutput,classname five_8,0,-1"
+	}
+}
