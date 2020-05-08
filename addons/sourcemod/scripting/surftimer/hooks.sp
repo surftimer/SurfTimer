@@ -1459,7 +1459,6 @@ public Action DelayedVelocityCap(Handle timer, Handle pack)
 	ResetPack(pack);
 	int client = ReadPackCell(pack);
 	float speedCap = ReadPackFloat(pack);
-	delete pack;
 	
 	float CurVelVec[3];
 
