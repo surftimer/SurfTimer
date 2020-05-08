@@ -468,10 +468,9 @@ public void CustomTitleMenu(int client)
 	if (!IsPlayerVip(client))
 		return;
 
-	char szName[64], szSteamID[32], szColour[3][96], szTitle[256], szItem[128], szItem2[128];
+	char szName[64], szColour[3][96], szTitle[256], szItem[128], szItem2[128];
 
 	GetClientName(client, szName, 64);
-	getSteamIDFromClient(client, szSteamID, 32);
 	getColourName(client, szColour[0], 32, g_iCustomColours[client][0]);
 	getColourName(client, szColour[1], 32, g_iCustomColours[client][1]);
 
