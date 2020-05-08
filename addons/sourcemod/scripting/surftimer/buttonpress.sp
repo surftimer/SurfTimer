@@ -932,6 +932,15 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 			return;
 		}
 
+		if (stage == 2 && g_wrcpStage2Fix[client])
+		{
+			CPrintToChat(client, "%t", "WrcpHackFix", g_szChatPrefix);
+			g_wrcpStage2Fix[client] = false;
+			return;
+		}
+
+		g_wrcpStage2Fix[client] = false;
+
 		char sz_srDiff[128];
 		float time = g_fFinalWrcpTime[client];
 		float f_srDiff = (g_fStageRecord[stage] - time);
