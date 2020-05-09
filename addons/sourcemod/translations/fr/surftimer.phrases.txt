@@ -1513,11 +1513,6 @@
 		"#format"	"{1:s}"
 		"fr"		"{1} Les messages de prestrafe sont maintenant {red}désactivés."
 	}
-	"StageNotRecorded"
-	{
-		"#format"	"{1:s}"
-		"fr"		"{1} Un glitch potentiel de S1 à S2 a été stoppée. Le temps de stage n'a pas été enregistré."
-	}
 	"StartPrestrafe"
 	{
 		"#format"	"{1:s},{2:s}"
@@ -1657,6 +1652,11 @@
 	{
 		"#format"	"{1:s},{2:s}"
 		"fr"		"{1} L'auto-reset est activé, mais vous n'avez pas été téléporté car vous surfez en {gold}{2}"
+	}
+	"StageNotRecorded"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {darkred}There was an error saving your stage 2 record, please restart."
 	}
 	"ShowVelocityCP"
 	{
