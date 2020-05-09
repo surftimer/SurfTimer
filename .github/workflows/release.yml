@@ -75,14 +75,14 @@ jobs:
           rm -rf $PLUGINS_PATH
           rsync -av --include='*/' --include="*.smx" --exclude="*" --prune-empty-dirs --remove-source-files $SCRIPTS_PATH/ $PLUGINS_PATH/
 
-      - name: Move folders (addons, materials, models, particles, sound) to build
+      - name: Move folders (addons, materials, models, particles, scripts, sound) to build
         run: |
           mkdir build
           mv ./{addons,cfg,maps,scripts,sound} build/
 
       - name: Add LICENSE to build package
         run: |
-          mv $GITHUB_WORKSPACE/{LICENSE,CREDITS.md,CVARS.txt,adminmenu_custom.txt} .
+          mv $GITHUB_WORKSPACE/{LICENSE,CHANGELOG.md} .
         working-directory: ./build
 
       - name: Remove unnecessary files and folders from build
