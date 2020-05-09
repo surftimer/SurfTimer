@@ -9978,7 +9978,7 @@ public void db_updateMapRankedStatus()
 
 public void sqlcreatePlayertimesIndex(Database db, DBResultSet results, const char[] error, any data)
 {
-	if (db == null || strlen(error))
+	if (db == null || (strlen(error) && StrContains(error, "Duplicate", false) == -1))
 	{
 		SetFailState("[SurfTimer] (sqlcreatePlayertimesIndex) Can't add playertimes index. Error: %s", error);
 		return;
@@ -9987,7 +9987,7 @@ public void sqlcreatePlayertimesIndex(Database db, DBResultSet results, const ch
 
 public void sqlcreateBonusIndex(Database db, DBResultSet results, const char[] error, any data)
 {
-	if (db == null || strlen(error))
+	if (db == null || (strlen(error) && StrContains(error, "Duplicate", false) == -1))
 	{
 		SetFailState("[SurfTimer] (sqlcreateBonusIndex) Can't add bonus index. Error: %s", error);
 		return;
