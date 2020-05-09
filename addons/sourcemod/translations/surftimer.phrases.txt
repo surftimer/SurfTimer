@@ -1533,6 +1533,11 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Prestrafe messages are now {red}disabled"
 	}
+	"StageNotRecorded"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {darkred}There was an error saving your stage 2 record, please restart."
+	} 
 	"StartPrestrafe"
 	{
 		"#format"	"{1:s},{2:s}"
