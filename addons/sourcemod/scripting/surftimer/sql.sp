@@ -595,7 +595,6 @@ public void RecalcPlayerRank(int client, char steamid[128])
 public void CalculatePlayerRank(int client, int style)
 {
 	char szQuery[255];
-	char szSteamId[32];
 	// Take old points into memory, so at the end you can show how much the points changed
 	g_pr_oldpoints[client][style] = g_pr_points[client][style];
 	// Initialize point calculatin
@@ -615,13 +614,11 @@ public void CalculatePlayerRank(int client, int style)
 	g_WRs[client][style][1] = 0; // WRBs
 	g_WRs[client][style][2] = 0; // WRCPs
 
-	getSteamIDFromClient(client, szSteamId, 32);
-
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackCell(pack, style);
 
-	Format(szQuery, 255, "SELECT name FROM ck_playerrank WHERE steamid = '%s' AND style = '%i';", szSteamId, style);
+	Format(szQuery, 255, "SELECT name FROM ck_playerrank WHERE steamid = '%s' AND style = '%i';", g_szSteamID[client], style);
 	SQL_TQuery(g_hDb, sql_CalcuatePlayerRankCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -641,9 +638,7 @@ public void sql_CalcuatePlayerRankCallback(Handle owner, Handle hndl, const char
 	int client = ReadPackCell(pack);
 	int style = ReadPackCell(pack);
 
-	char szSteamId[32], szSteamId64[64];
-
-	getSteamIDFromClient(client, szSteamId, 32);
+	char szSteamId64[64];
 
 	if (IsValidClient(client))
 		GetClientAuthId(client, AuthId_SteamID64, szSteamId64, MAX_NAME_LENGTH, true);
@@ -661,7 +656,7 @@ public void sql_CalcuatePlayerRankCallback(Handle owner, Handle hndl, const char
 
 		// Next up, calculate bonus points:
 		char szQuery[512];
-		Format(szQuery, 512, "SELECT mapname, (SELECT count(1)+1 FROM ck_bonus b WHERE a.mapname=b.mapname AND a.runtime > b.runtime AND a.zonegroup = b.zonegroup AND b.style = %i) AS `rank`, (SELECT count(1) FROM ck_bonus b WHERE a.mapname = b.mapname AND a.zonegroup = b.zonegroup AND b.style = %i) as total FROM ck_bonus a WHERE steamid = '%s' AND style = %i;", style, style, szSteamId, style);
+		Format(szQuery, 512, "SELECT mapname, (SELECT count(1)+1 FROM ck_bonus b WHERE a.mapname=b.mapname AND a.runtime > b.runtime AND a.zonegroup = b.zonegroup AND b.style = %i) AS `rank`, (SELECT count(1) FROM ck_bonus b WHERE a.mapname = b.mapname AND a.zonegroup = b.zonegroup AND b.style = %i) as total FROM ck_bonus a WHERE steamid = '%s' AND style = %i;", style, style, g_szSteamID[client], style);
 		SQL_TQuery(g_hDb, sql_CountFinishedBonusCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
@@ -682,7 +677,7 @@ public void sql_CalcuatePlayerRankCallback(Handle owner, Handle hndl, const char
 
 			// "INSERT INTO ck_playerrank (steamid, name, country) VALUES('%s', '%s', '%s');";
 			// No need to continue calculating, as the doesn't have any records.
-			Format(szQuery, 512, sql_insertPlayerRank, szSteamId, szSteamId64, szName, g_szCountry[client], GetTime(), style);
+			Format(szQuery, 512, sql_insertPlayerRank, g_szSteamID[client], szSteamId64, szName, g_szCountry[client], GetTime(), style);
 			SQL_TQuery(g_hDb, SQL_InsertPlayerCallBack, szQuery, client, DBPrio_Low);
 
 			g_pr_finishedmaps[client][style] = 0;
@@ -719,11 +714,9 @@ public void sql_CountFinishedBonusCallback(Handle owner, Handle hndl, const char
 	int client = ReadPackCell(pack);
 	int style = ReadPackCell(pack);
 
-	char szMap[128], szSteamId[32], szMapName2[128];
+	char szMap[128], szMapName2[128];
 	// int totalplayers
 	int rank;
-
-	getSteamIDFromClient(client, szSteamId, 32);
 	int finishedbonuses = 0;
 	int wrbs = 0;
 
@@ -859,7 +852,7 @@ public void sql_CountFinishedBonusCallback(Handle owner, Handle hndl, const char
 	g_WRs[client][style][1] = wrbs;
 	// Next up: Points from stages
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT mapname, stage, (select count(1)+1 from ck_wrcps b where a.mapname=b.mapname and a.runtimepro > b.runtimepro and a.style = b.style and a.stage = b.stage) AS `rank` FROM ck_wrcps a where steamid = '%s' AND style = %i;", szSteamId, style);
+	Format(szQuery, 512, "SELECT mapname, stage, (select count(1)+1 from ck_wrcps b where a.mapname=b.mapname and a.runtimepro > b.runtimepro and a.style = b.style and a.stage = b.stage) AS `rank` FROM ck_wrcps a where steamid = '%s' AND style = %i;", g_szSteamID[client], style);
 	SQL_TQuery(g_hDb, sql_CountFinishedStagesCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -881,9 +874,7 @@ public void sql_CountFinishedStagesCallback(Handle owner, Handle hndl, const cha
 	int client = ReadPackCell(pack);
 	int style = ReadPackCell(pack);
 
-	char szMap[128], szSteamId[32], szMapName2[128];
-
-	getSteamIDFromClient(client, szSteamId, 32);
+	char szMap[128], szMapName2[128];
 	int finishedstages = 0;
 	int rank;
 	int wrcps = 0;
@@ -922,7 +913,7 @@ public void sql_CountFinishedStagesCallback(Handle owner, Handle hndl, const cha
 
 	// Next up: Points from maps
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT mapname, (select count(1)+1 from ck_playertimes b where a.mapname=b.mapname and a.runtimepro > b.runtimepro AND b.style = %i) AS `rank`, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname AND b.style = %i) as total, (SELECT tier FROM `ck_maptier` b WHERE a.mapname = b.mapname) as tier FROM ck_playertimes a where steamid = '%s' AND style = %i;", style, style, szSteamId, style);
+	Format(szQuery, 512, "SELECT mapname, (select count(1)+1 from ck_playertimes b where a.mapname=b.mapname and a.runtimepro > b.runtimepro AND b.style = %i) AS `rank`, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname AND b.style = %i) as total, (SELECT tier FROM `ck_maptier` b WHERE a.mapname = b.mapname) as tier FROM ck_playertimes a where steamid = '%s' AND style = %i;", style, style, g_szSteamID[client], style);
 	SQL_TQuery(g_hDb, sql_CountFinishedMapsCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -9045,9 +9036,6 @@ public void db_CheckVIPAdmin(int client, char[] szSteamID)
 
 public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] error, any client)
 {
-	char szSteamId[32];
-	getSteamIDFromClient(client, szSteamId, 32);
-
 	if (hndl == null)
 	{
 		LogError("[surftimer] SQL Error (SQL_CheckVIPAdminCallback): %s", error);
@@ -9076,7 +9064,7 @@ public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] er
 
 	if (g_bCheckCustomTitle[client])
 	{
-		db_viewCustomTitles(client, szSteamId);
+		db_viewCustomTitles(client, g_szSteamID[client]);
 		g_bCheckCustomTitle[client] = false;
 	}
 
@@ -9099,9 +9087,7 @@ public void SQL_InsertVipFromSourcebansCallback(Handle owner, Handle hndl, const
 		LogError("[surftimer] SQL Error (SQL_InsertVipFromSourcebansCallback): %s", error);
 	}
 
-	char szSteamId[32];
-	getSteamIDFromClient(client, szSteamId, 32);
-	db_CheckVIPAdmin(client, szSteamId);
+	db_CheckVIPAdmin(client, g_szSteamID[client]);
 }
 
 public void db_checkCustomPlayerTitle(int client, char[] szSteamID, char[] arg)
