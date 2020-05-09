@@ -1613,7 +1613,7 @@ public void OnLibraryAdded(const char[] name)
 		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (IsClientInGame(i))
-				OnClientPutInServer(i);
+				OnClientPostAdminCheck(i);
 		}
 	}
 }
@@ -1912,7 +1912,7 @@ public void OnConfigsExecuted()
 
 }
 
-public void OnClientConnected(int client)
+public void OnClientPutInServer(int client)
 {
 	g_Stage[g_iClientInZone[client][2]][client] = 1;
 	g_WrcpStage[client] = 1;
@@ -1922,10 +1922,12 @@ public void OnClientConnected(int client)
 	g_wrcpStage2Fix[client] = true;
 }
 
-public void OnClientPutInServer(int client)
+public void OnClientPostAdminCheck(int client)
 {
 	if (!IsValidClient(client))
+	{
 		return;
+	}
 
 	// Defaults
 	SetClientDefaults(client);
@@ -1945,7 +1947,9 @@ public void OnClientPutInServer(int client)
 
 	// Footsteps
 	if (!IsFakeClient(client))
+	{
 		SendConVarValue(client, g_hFootsteps, "0");
+	}
 
 	g_bReportSuccess[client] = false;
 	g_fCommandLastUsed[client] = 0.0;
@@ -1962,29 +1966,43 @@ public void OnClientPutInServer(int client)
 		return;
 	}
 	else
+	{
 		g_MVPStars[client] = 0;
+	}
 
 	// Client Country
 	GetCountry(client);
 
 	if (LibraryExists("dhooks"))
+	{
 		DHookEntity(g_hTeleport, false, client);
+	}
 
 	// Get SteamID
-	GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], MAX_NAME_LENGTH, true);
+	if (!GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], MAX_NAME_LENGTH, true))
+	{
+		LogError("[SurfTimer] (OnClientPostAdminCheck) GetClientAuthId failed for client index %d.", client);
+		return;
+	}
 
 	// char fix
 	FixPlayerName(client);
 
 	// Position Restoring
 	if (GetConVarBool(g_hcvarRestore) && !g_bRenaming && !g_bInTransactionChain)
-	db_selectLastRun(client);
+	{
+		db_selectLastRun(client);
+	}
 
 	if (g_bLateLoaded && IsPlayerAlive(client))
-	PlayerSpawn(client);
+	{
+		PlayerSpawn(client);
+	}
 
 	if (g_bTierFound)
+	{
 		AnnounceTimer[client] = CreateTimer(20.0, AnnounceMap, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+	}
 
 	if (!g_bRenaming && !g_bInTransactionChain && g_bServerDataLoaded && !g_bSettingsLoaded[client] && !g_bLoadingSettings[client])
 	{

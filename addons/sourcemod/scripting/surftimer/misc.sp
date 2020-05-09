@@ -84,6 +84,16 @@ public void LoadClientSetting(int client, int setting)
 {
 	if (IsValidClient(client) && !IsFakeClient(client))
 	{
+		if (StrContains(g_szSteamID[client], "STOP_IGNORING_RETVALS", false) != -1)
+		{
+			// Get SteamID
+			if (!GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], MAX_NAME_LENGTH, true))
+			{
+				LogError("[SurfTimer] (LoadClientSetting) GetClientAuthId failed for client index %d.", client);
+				return;
+			}
+		}
+
 		switch (setting)
 		{
 			case 0: db_viewPersonalRecords(client, g_szSteamID[client], g_szMapName);
