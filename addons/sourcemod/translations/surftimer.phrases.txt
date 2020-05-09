@@ -1516,7 +1516,7 @@
 	"StageNotRecorded"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Potential S1 to S2 glitch stopped. Stage time was not recorded"
+		"en"		"{1} {darkred}There was an error saving your stage 2 record, please restart."
 	}
 	"StartPrestrafe"
 	{
