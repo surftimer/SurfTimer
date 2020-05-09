@@ -530,7 +530,9 @@ public Action LoadPlayerSettings(Handle timer)
 	for (int c = 1; c <= MaxClients; c++)
 	{
 		if (IsValidClient(c))
-			OnClientPutInServer(c);
+		{
+			OnClientPostAdminCheck(c);
+		}
 	}
 	return Plugin_Handled;
 }
