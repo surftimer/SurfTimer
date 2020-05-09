@@ -137,8 +137,11 @@ public void CL_OnStartTimerPress(int client)
 		}
 	}
 
-	// Play Start Sound
-	PlayButtonSound(client);
+	// Play Start Sound if not in practicemode
+	if (!g_bPracticeMode[client])
+	{
+		PlayButtonSound(client);
+	}
 
 	// Start recording for record bot
 	if (((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) || (!IsFakeClient(client) && GetConVarBool(g_hBonusBot))) && !g_hRecording[client])
@@ -928,6 +931,15 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 			CPrintToChat(client, "%t", "ErrorStageTime", g_szChatPrefix, stage);
 			return;
 		}
+
+		if (stage == 2 && g_wrcpStage2Fix[client])
+		{
+			CPrintToChat(client, "%t", "StageNotRecorded", g_szChatPrefix);
+			g_wrcpStage2Fix[client] = false;
+			return;
+		}
+
+		g_wrcpStage2Fix[client] = false;
 
 		char sz_srDiff[128];
 		float time = g_fFinalWrcpTime[client];

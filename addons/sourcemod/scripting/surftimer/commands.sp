@@ -468,10 +468,9 @@ public void CustomTitleMenu(int client)
 	if (!IsPlayerVip(client))
 		return;
 
-	char szName[64], szSteamID[32], szColour[3][96], szTitle[256], szItem[128], szItem2[128];
+	char szName[64], szColour[3][96], szTitle[256], szItem[128], szItem2[128];
 
 	GetClientName(client, szName, 64);
-	getSteamIDFromClient(client, szSteamID, 32);
 	getColourName(client, szColour[0], 32, g_iCustomColours[client][0]);
 	getColourName(client, szColour[1], 32, g_iCustomColours[client][1]);
 
@@ -565,9 +564,14 @@ public Action Command_createPlayerCheckpoint(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 	
-	if (g_iClientInZone[client][0] == 1 || g_iClientInZone[client][0] == 5)
+	if ((g_iClientInZone[client][0] == 1 || g_iClientInZone[client][0] == 5) && g_fLastSpeed[client] > 0) //make sure client isnt moving while making startpos with loc
 	{
 		CPrintToChat(client, "%t", "PracticeInStartZone", g_szChatPrefix);
+		return Plugin_Handled;
+	}
+	if (g_bNoClip[client] || (!g_bNoClip[client] && (GetGameTime() - g_fLastTimeNoClipUsed[client]) < 3.0)) //dont allow making start loc with noclip
+	{
+		CPrintToChat(client, "%t", "NoclipSaveloc", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 

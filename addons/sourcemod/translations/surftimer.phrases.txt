@@ -8,7 +8,12 @@
 	"PracticeInStartZone"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} You can't make a checkpoint inside the start zone!"
+		"en"		"{1} You must stand still on startzone to make a checkpoint!"
+	}
+	"NoclipSaveloc"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} You can't create a checkpoint with noclip!"
 	}
 	"ToogleCheckpoints1"
 	{
@@ -74,6 +79,21 @@
 	{
 		"#format"	"{1:s},{2:s},{3:i}"
 		"en"		"{1} {blue}{2} {default}- {lightgreen}{3} seconds remaining"
+	}
+	"TimeleftThree"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {green}3!"
+	}
+	"TimeleftTwo"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {orange}2!"
+	}
+	"TimeleftOne"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {red}1!"
 	}
 	"TimeleftCounter"
 	{
@@ -1517,7 +1537,7 @@
 	{
 		"#format"	"{1:s}"
 		"en"		"{1} {darkred}There was an error saving your stage 2 record, please restart."
-	}
+	} 
 	"StartPrestrafe"
 	{
 		"#format"	"{1:s},{2:s}"
@@ -1657,6 +1677,11 @@
 	{
 		"#format"	"{1:s},{2:s}"
 		"en"		"{1} Auto-reset is enabled, but you weren't teleported because you're surfing in {gold}{2}"
+	}
+	"StageNotRecorded"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {darkred}There was an error saving your stage 2 record, please restart."
 	}
 	"ShowVelocityCP"
 	{

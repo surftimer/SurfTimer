@@ -1215,7 +1215,7 @@
 	"StageNotRecorded"
 	{
 		"fr"		"{1} {darkred}Il y a eu une erreur lors de la sauvegarde de votre enregistrement de l'étape 2, veuillez recommencer."
-	}
+	} 
 	"StartPrestrafe"
 	{
 		"fr"		"{1} Prestrafe de départ: {2} u/s"
@@ -1327,6 +1327,11 @@
 	"AutoResetMessageStyle"
 	{
 		"fr"		"{1} L'auto-reset est activé, mais vous n'avez pas été téléporté car vous surfez en {gold}{2}"
+	}
+	"StageNotRecorded"
+	{
+		"#format"	"{1:s}"
+		"fr"		"{1} {darkred}Il y a eu une erreur lors de la sauvegarde de votre enregistrement de l'étape 2, veuillez recommencer."
 	}
 	"ShowVelocityCP"
 	{

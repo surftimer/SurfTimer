@@ -176,18 +176,15 @@ public Action CKTimer2(Handle timer)
 				case 60:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
 				case 30:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
 				case 10:CPrintToChatAll("%t", "TimeleftSeconds", g_szChatPrefix, g_szMapName, timeleft);
-				case 3:CPrintToChatAll("%s ~~~ MAP ENDING ~~~", g_szChatPrefix);
-				case 2:CPrintToChatAll("%s ~~~ MAP ENDING ~~~", g_szChatPrefix);
-				case 1:CPrintToChatAll("%s ~~~ MAP ENDING ~~~", g_szChatPrefix);
-				case 0:CreateTimer(14.0, ForceNextMap, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);	
-				case -1:
+				case 3:CPrintToChatAll("%t", "TimeleftThree", g_szChatPrefix);
+				case 2:CPrintToChatAll("%t", "TimeleftTwo", g_szChatPrefix);
+				case 1:CPrintToChatAll("%t", "TimeleftOne", g_szChatPrefix);	
+				case 0:
 				{
 					if (!g_bRoundEnd)
 					{
 						g_bRoundEnd = true;
-						ServerCommand("mp_ignore_round_win_conditions 0");
-						char szNextMap[128];
-						GetNextMap(szNextMap, 128);
+						ServerCommand("mp_ignore_round_win_conditions 0; mp_timelimit 0; mp_maxrounds 0; mp_respawn_on_death_t 0; mp_respawn_on_death_ct 0");
 						CreateTimer(1.0, TerminateRoundTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 					}
 				}
@@ -408,15 +405,6 @@ public Action SetClanTag(Handle timer, any client)
 	return Plugin_Handled;
 }
 
-public Action ForceNextMap(Handle timer)
-{
-	char szNextMap[128];
-	GetNextMap(szNextMap, 128);
-	ServerCommand("changelevel %s", szNextMap);
-	return Plugin_Handled;
-}
-
-
 public Action TerminateRoundTimer(Handle timer)
 {
 	CS_TerminateRound(1.0, CSRoundEnd_CTWin, true);
@@ -542,7 +530,9 @@ public Action LoadPlayerSettings(Handle timer)
 	for (int c = 1; c <= MaxClients; c++)
 	{
 		if (IsValidClient(c))
-			OnClientPutInServer(c);
+		{
+			OnClientPostAdminCheck(c);
+		}
 	}
 	return Plugin_Handled;
 }
