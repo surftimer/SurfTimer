@@ -1,0 +1,1334 @@
+"Phrases"
+{
+	"PracticeNormal"
+	{
+		"de"		"{1} Normaler Modus aktiviert. Wechsel in den Trainingsmodus mit {lightgreen}!tele"
+	}
+	"PracticeInStartZone"
+	{
+		"de"		"{1} Du kannst innerhalb der Startzone keinen Kontrollpunkt erstellen!"
+	}
+	"ToogleCheckpoints1"
+	{
+		"de"		"{1} Kontrollpunkte deaktiviert"
+	}
+	"ToggleCheckpoints2"
+	{
+		"de"		"{1} Kontrollpunkte aktiviert"
+	}
+	"ToggleCheckpoints3"
+	{
+		"de"		"{1} Kontrollpunkte werden aktiviert sobald du deinen Timer neu startest"
+	}
+	"HideChat1"
+	{
+		"de"		"{1} Chatausblendung aktiviert"
+	}
+	"HideChat2"
+	{
+		"de"		"{1} Chatausblendung deaktiviert"
+	}
+	"HideViewModel1"
+	{
+		"de"		"{1} Waffenansicht deaktiviert"
+	}
+	"HideViewModel2"
+	{
+		"de"		"{1} Waffenansicht aktiviert"
+	}
+	"AdvertBonus"
+	{
+		"de"		"{1} Benutze {lightgreen}!bonus {default}um zum Bonus Level zu gelangen"
+	}
+	"AdvertWRCP"
+	{
+		"de"		"{1} Mit {lightgreen}!srcp {default}kannst du deine Abschnittszeiten sehen"
+	}
+	"AvgTime"
+	{
+		"de"		"{1} Durschn. Kartenzeit: {lightgreen}{2} {default}[{lightgreen}{3}{default}]"
+	}
+	"AvgTimeBonus"
+	{
+		"de"		"{1} Durschn. Bonuszeit: {lightgreen}{2} {default}[{lightgreen}{3}{default}]"
+	}
+	"TimeleftMinutes"
+	{
+		"de"		"{1} {blue}{2} {default}- {lightgreen}{3} Minuten verbleibend"
+	}
+	"TimeleftSeconds"
+	{
+		"de"		"{1} {blue}{2} {default}- {lightgreen}{3} Sekunden verbleibend"
+	}
+	"TimeleftCounter"
+	{
+		"de"		"{1} {blue}{2} {default}- {lightgreen}{3} Sekunden verbleibend"
+	}
+	"MissedMapBest"
+	{
+		"de"		"{1} Du hast deine Bestzeit von [{lightgreen}{2}{default}] verpasst"
+	}
+	"SkillGroup"
+	{
+		"de"		"{1} Du bist nun eingestuft als {2}"
+	}
+	"Rc_PlayerRankStart"
+	{
+		"de"		"{1} Aktualisiere Profildaten"
+	}
+	"Rc_PlayerRankFinished"
+	{
+		"de"		"{1} Profile Aktualisiert. [{purple}{2}{default}]"
+	}
+	"Rc_PlayerRankFinished2"
+	{
+		"de"		"{1} {red}{2} {default}Profile Aktualisiert. [{purple}{3}{default}]"
+	}
+	"EarnedPoints"
+	{
+		"de"		"{1} {yellow}{2}{default} hat {purple}{3} {default}Punkte erhalten [{purple}{4}{default} Total]"
+	}
+	"EarnedPoints2"
+	{
+		"de"		"{1} {yellow}{2}{default} hat {purple}{3} {red}{4} {default}Punkte erhalten [{purple}{5}{default} Total]"
+	}
+	"NoPlayerTop"
+	{
+		"de"		"{1} Keine Spieler gefunden"
+	}
+	"NoRecordTop"
+	{
+		"de"		"{1} Keine Kartenzeiten gefunden"
+	}
+	"PrUpdateStarted"
+	{
+		"de"		"{1} Neuberechnung der Spielerrangliste. Dies kann eine weile dauern, bitte warte! [Du kannst den Fortschritt in der Konsole verfolgen]"
+	}
+	"PrUpdateFinished"
+	{
+		"de"		"{1} {lightgreen}Neuberechnung erfolgreich!"
+	}
+	"StopRecalculation"
+	{
+		"de"		"{1} Neuberechnung abgebrochen!"
+	}
+	"NewMapRecord"
+	{
+		"de"		"{1} {yellow}{2} {default}hat den Kartenrekord gebrochen!"
+	}
+	"ReplayFinishingMsg"
+	{
+		"de"		"{1} {yellow}{2}{default} hat beendet in [{lightgreen}{3}{default}]"
+	}
+	"ReplayFinishingMsgBonus"
+	{
+		"de"		"{1} {yellow}{2}{default} hat beendet [{orange}{3}{default}] in [{lightgreen}{4}{default}]"
+	}
+	"MapFinished1"
+	{
+		"de"		"{1} {yellow}{2}{default} beendet in {lightgreen}{3}{default}. [Rang: {lightgreen}{4}/{5} {default}{6} | Rekord: {lightgreen}{7}{default}]"
+	}
+	"MapFinished3"
+	{
+		"de"		"{1} {yellow}{2}{default} beendet in {lightgreen}{3}{default}. Eine Verbesserung der eigenen Bestzeit von [{lightgreen}{4}{default}]. [Rang: {lightgreen}{5}/{6} {default}{7} | Rekord: {lightgreen}{8}{default}]"
+	}
+	"MapFinished5"
+	{
+		"de"		"{1} {yellow}{2}{default} beendet in {lightgreen}{3}{default}. Eigene Bestzeit verpasst um [{red}{4}{default}]. [Rang: {lightgreen}{5}/{6} {default}{7} | Rekord: {lightgreen}{8}{default}]"
+	}
+	"BonusFinished1"
+	{
+		"de"		"{1} {yellow}{2}{default} beendet [{orange}{3}{default}] in {red}{4}{default}. Eigene Bestzeit verpasst um [{red}{5}{default}]. [Rang: {lightgreen}{6}/{7} {default}| Rekord: {lightgreen}{8}{default}]"
+	}
+	"BonusFinished2"
+	{
+		"de"		"{1} {yellow}{2} {default}schlägt den [{orange}{3}{default}] Rekord!"
+	}
+	"BonusFinished3"
+	{
+		"de"		"{1} {yellow}{2}{default} beendet [{orange}{3}{default}] in {lightgreen}{4}{default}. [Rang: {lightgreen}1/1 {default}| Rekord: {lightgreen}{5}{default}]"
+	}
+	"BonusFinished4"
+	{
+		"de"		"{1} {yellow}{2}{default} beendet [{orange}{3}{default}] in {lightgreen}{4}{default}. Verbesserung der Bestzeit um {lightgreen}{5}{default}. [Rang: {lightgreen}{6}/{7} {default}| Rekord: {lightgreen}{8}{default}]"
+	}
+	"BonusFinished5"
+	{
+		"de"		"{1} {yellow}{2}{default} beendet [{orange}{3}{default}] in {lightgreen}{4}{default}. Verbesserung der Bestzeit um {lightgreen}{5}{default}. [Rang: {lightgreen}{6}/{7} {default}| Rekord: {lightgreen}{8}{default}]"
+	}
+	"BonusFinished6"
+	{
+		"de"		"{1} {yellow}{2}{default} beendet [{orange}{3}{default}] in {lightgreen}{4}{default}. Verbesserung der Bestzeit um {lightgreen}{5}{default}. [Rang: {lightgreen}{6}/{7} {default}| Rekord: {lightgreen}{8}{default}]"
+	}
+	"BonusFinished7"
+	{
+		"de"		"{1} {yellow}{2}{default} beendet [{orange}{3}{default}] in {lightgreen}{4}{default}. [Rang: {lightgreen}{5}/{6} {default}| Rekord: {lightgreen}{7}{default}]"
+	}
+	"PlayerNotFound"
+	{
+		"de"		"{1} Spieler {2} nicht gefunden"
+	}
+	"ConsoleOutput"
+	{
+		"de"		"{1} Ausgabe in der Konsole!"
+	}
+	"PlayerHasNoMapRecords"
+	{
+		"de"		"{1} {yellow}{2} {default}hat keine Kartenzeiten"
+	}
+	"NoTopRecords"
+	{
+		"de"		"{1} Keine Kartenzeiten gefunden für {blue}{2}"
+	}
+	"Goto1"
+	{
+		"de"		"{1} {lightgreen}!goto {default}ist Serverseitig deaktiviert"
+	}
+	"Goto2"
+	{
+		"de"		"{1} {lightgreen}!goto {default} kann nicht verwendet werden, wenn Spieler blocken aktiviert ist"
+	}
+	"Goto3"
+	{
+		"de"		"{1} Benutze {lightgreen}!stop {default}um {lightgreen}!goto {default}zu nutzen"
+	}
+	"Goto5"
+	{
+		"de"		"{1} Spieler {2} hat sich zu dir Teleportiert"
+	}
+	"Goto6"
+	{
+		"de"		"{1} Du kannst dich nicht zu {2} Teleportieren, weil dieser geduckt war"
+	}
+	"Goto7"
+	{
+		"de"		"{1} Du kannst dich nicht zu {2} Teleportieren, weil dieser in der Luft war"
+	}
+	"RadioCommandsDisabled"
+	{
+		"de"		"{1} Funkbefehle sind deaktiviert"
+	}
+	"HidePlayers1"
+	{
+		"de"		"{1} Spieler verstecken ist deaktiviert"
+	}
+	"HidePlayers2"
+	{
+		"de"		"{1} Spieler verstecken ist aktiviert"
+	}
+	"Pause1"
+	{
+		"de"		"{1} Pause ist Serverseitig deaktiviert"
+	}
+	"Pause2"
+	{
+		"de"		"{1} Pause deaktiviert"
+	}
+	"Pause3"
+	{
+		"de"		"{1} Pause aktiviert"
+	}
+	"Pause Disabled"
+	{
+		"de"		"{1} Pause ist Serverseitig deaktiviert"
+	}
+	"QuakeSounds1"
+	{
+		"de"		"{1} Timer-Sounds aktiviert"
+	}
+	"QuakeSounds2"
+	{
+		"de"		"{1} Timer-Sounds deaktiviert"
+	}
+	"AutoBhop1"
+	{
+		"de"		"{1} AutoBhop aktiviert"
+	}
+	"AutoBhop2"
+	{
+		"de"		"{1} AutoBhop deaktiviert"
+	}
+	"AutoBhop3"
+	{
+		"de"		"{1} AutoBhop Serverseitig deaktiviert"
+	}
+	"HelpMsg"
+	{
+		"de"		"{1} Benutze {lightgreen}!help {default}für eine Liste aller Befehle"
+	}
+	"Disconnected1"
+	{
+		"de"		"Spieler {yellow}{1} {default}hat die Verbindung getrennt. [{2}]"
+	}
+	"Connected2"
+	{
+		"de"		"Spieler {yellow}{1} {default}hat sich Verbunden von {green}{2}"
+	}
+	"Connected1"
+	{
+		"de"		"Spieler {yellow}{1} {default}hat sich Verbunden"
+	}
+	"BPress1"
+	{
+		"de"		"{1} Die Servereinstellungen wurden noch nicht geladen, bitte warten"
+	}
+	"BPress2"
+	{
+		"de"		"{1} Deine Einstellungen werden noch geladen, bitte warten"
+	}
+	"BPress3"
+	{
+		"de"		"{1} Deine Einstellungen werden noch geladen, bitte warten"
+	}
+	"BPress4"
+	{
+		"de"		"{1} {yellow}{2}{default} beendet den Bonus in [{blue}{3}{default}]! [Übungsmodus]"
+	}
+	"BPress5"
+	{
+		"de"		"{1} {yellow}{2}{default} beendet die Karte in [{blue}{3}{default}]! [Übungsmodus]"
+	}
+	"BPress6"
+	{
+		"de"		"{1} {yellow}{2}{default} beendet {red}{3} {default}in {lightgreen}{4}{default}. Eigene Bestzeit verpasst um [{red}{5}{default}]. [Rang: {lightgreen}{6}/{7} {default}| Rekord: {lightgreen}{8}{default}]"
+	}
+	"ErrorStageTime"
+	{
+		"de"		"{1} Es ist ein Fehler bei deiner Zeit für {purple}Abschnitt {2} {default}aufgetreten"
+	}
+	"MSettings1"
+	{
+		"de"		"{1} Gebe die gewünschte Höchstgeschwindigkeit ein"
+	}
+	"MSettings2"
+	{
+		"de"		"{1} Current sv_maxvelocity: {2}"
+	}
+	"MSettings3"
+	{
+		"de"		"Server cvar 'sv_maxvelocity' geändert zu {1}"
+	}
+	"MSettings4"
+	{
+		"de"		"{1} Verwendung: sm_announcerecord <0/1/2> [0 = Alle, 1 = Nur PR, 2 = Nur KR] [Aktuell: {2}]"
+	}
+	"MSettings6"
+	{
+		"de"		"{1} Verwendung: sm_gravityfix <0/1> [0 Aktiviert, 1 Deaktiviert] [Aktuell {green}enabled{default}]"
+	}
+	"MSettings7"
+	{
+		"de"		"{1} Verwendung: sm_gravityfix <0/1> [0 Aktiviert, 1 Deaktiviert] [Aktuell {red}disabled{default}]"
+	}
+	"Commands1"
+	{
+		"de"		"{1} X: {2} Y: {3} Z: {4}"
+	}
+	"Commands2"
+	{
+		"de"		"{1} TN: {2}"
+	}
+	"Commands3"
+	{
+		"de"		"{1} TN: {2}"
+	}
+	"Commands4"
+	{
+		"de"		"{1} Eine Verlängerungsabstimmung kann erst bei 5 verbleibenden Minuten gestartet werden"
+	}
+	"Commands5"
+	{
+		"de"		"{1} Warte bis die aktuelle Abstimmung beendet ist"
+	}
+	"VoteStartedBy"
+	{
+		"de"		"{1} Verlängerungsabstimmung gestartet von {yellow}{2}"
+	}
+	"Commands7"
+	{
+		"de"		"{1} sm_tele #{2}"
+	}
+	"Commands8"
+	{
+		"de"		"{1} Wie hast du es über 1024 Speicherprotokolle geschafft ?"
+	}
+	"Commands9"
+	{
+		"de"		"{1} Verwendung: sm_tele #id"
+	}
+	"Commands10"
+	{
+		"de"		"{1} Ungültige id"
+	}
+	"Commands11"
+	{
+		"de"		"{1} Es sind keine gespeicherten Positionen vorhanden, verwende sm_saveloc um einen zu erstellen"
+	}
+	"Commands13"
+	{
+		"de"		"{1} Saveloc id wurde als #{2} gesetzt"
+	}
+	"NoBonusOnMap"
+	{
+		"de"		"{1} Auf dieser Karte gibt es keine Bonusabschnitte"
+	}
+	"InvalidBonusID"
+	{
+		"de"		"{1} Ungültige Bonus ID {2}"
+	}
+	"BTopUsage"
+	{
+		"de"		"{1} Verwendung: !btop <Bonus ID> <Kartenname>"
+	}
+	"Commands19"
+	{
+		"de"		"{1} Noclip aktiviert, Timer {red}deaktiviert"
+	}
+	"Commands20"
+	{
+		"de"		"{1} Noclip deaktiviert, verwende {lightgreen}!surftimer {default}um den Timer wieder zu verwenden"
+	}
+	"Commands31"
+	{
+		"de"		"{1} Timer {red}deaktiviert"
+	}
+	"Commands32"
+	{
+		"de"		"{1} Timer {green}aktiviert"
+	}
+	"Commands33"
+	{
+		"de"		"{1} Pausieren während der Timer gestoppt ist, ist nicht möglich"
+	}
+	"Commands34"
+	{
+		"de"		"{1} Willst du wirklich Neustarten ? Dann wiederhole {lightgreen}!r {default}"
+	}
+	"Commands37"
+	{
+		"de"		"{1} Es ist ein Fehler beim Anpassen deiner Zentral Anzeige aufgetreten"
+	}
+	"Commands38"
+	{
+		"de"		"{1} Um die alte Funktionalität wiederherzustellen, setzen sie Beobachtungsliste auf Modul 1."
+	}
+	"Commands39"
+	{
+		"de"		"{1} Es ist ein Fehler beim Anpassen deiner Seiten Anzeige aufgetreten"
+	}
+	"Commands40"
+	{
+		"de"		"{1} Verwendung: sm_mytitle \"Mein Benutzerdefinierter Titel\""
+	}
+	"Commands41"
+	{
+		"de"		"{1} Titel zu lang, maximal 20 Zeichen. [Farb Codes exkludiert]"
+	}
+	"Commands42"
+	{
+		"de"		"{1} Verwendung: sm_namecolour {Farbe}"
+	}
+	"Commands43"
+	{
+		"de"		"{1} Verwendung: sm_textcolour {Farbe}"
+	}
+	"Commands44"
+	{
+		"de"		"{1} Verfügbare Farben: {darkred}darkred {lightred}lightred {red}red {green}green {lime}lime {lightgreen}lightgreen {darkblue}darkblue {lightblue}lightblue {blue}blue {pink}pink {purple}purple {orange}orange {yellow}yellow {grey}grey {grey2}grey2 {default}default"
+	}
+	"Commands46"
+	{
+		"de"		"{1} Warte einen Moment bevor du diesen Befehl wieder verwendest"
+	}
+	"Commands47"
+	{
+		"de"		"{1} Auslöser umgeschaltet"
+	}
+	"Commands48"
+	{
+		"de"		"{1} Kartenende ist jetzt {green}aktiviert"
+	}
+	"Commands49"
+	{
+		"de"		"{1} Kartenende ist jetzt {red}deaktiviert"
+	}
+	"Commands50"
+	{
+		"de"		"{1} Wiederholungsmodus ist jetzt {green}aktiviert"
+	}
+	"Commands51"
+	{
+		"de"		"{1} Wiederholungsmodus ist jetzt {red}deaktiviert"
+	}
+	"Commands52"
+	{
+		"de"		"{1} Repariere die Wiederholungsbots"
+	}
+	"Commands54"
+	{
+		"de"		"{1} Verwendung: sm_noclipspeed #"
+	}
+	"Commands55"
+	{
+		"de"		"{1} Spieler {yellow}{2} {default}nicht gefunden auf {lightgreen}{3}"
+	}
+	"Commands56"
+	{
+		"de"		"{1} Spieler {yellow}{2} {default}nicht gefunden"
+	}
+	"NoZoneAccess"
+	{
+		"de"		"{1} Du hast keinen zugriff auf das Zonenmenü"
+	}
+	"Commands58"
+	{
+		"de"		"{1} Keine Kartenzonen gefunden!"
+	}
+	"TeleportingTo"
+	{
+		"de"		"{1} Teleportiere zu {2} at {3} {4} {5}"
+	}
+	"Commands60"
+	{
+		"de"		"{1} Gebe die Bonusnummer ein"
+	}
+	"Commands61"
+	{
+		"de"		"{1} Gebe erst die Bonus ID ein"
+	}
+	"Commands63"
+	{
+		"de"		"{1} [Sprachchat] Stummschaltungsabstimmung {yellow}{2} {default}gestartet von {yellow}{3}"
+	}
+	"Commands64"
+	{
+		"de"		"{1} [Textchat] Stummschaltungsabstimmung {yellow}{2} {default}gestartet von {yellow}{3}"
+	}
+	"Commands65"
+	{
+		"de"		"{1} Abstimmung fehlgeschlagen. {red}{2}%%%% {default}Stimmen benötigt. [Erhalten {lightgreen}{3}%%%% {default}von {lightgreen}{4} {default}Stimmen]"
+	}
+	"Commands66"
+	{
+		"de"		"{1} Abstimmung erfolgreich. Schalte {yellow}{2}{default} stumm. [Erhalten {lightgreen}{3}%%%% {default}von {lightgreen}{4} {default}Stimmen]"
+	}
+	"Commands67"
+	{
+		"de"		"{1} Abstimmung erfolgreich. Schalte {yellow}{2}{default} stumm. [Erhalten {lightgreen}{3}%%%% {default}von {lightgreen}{4} {default}Stimmen]"	}
+	"Commands68"
+	{
+		"de"		"{1} Neue Startposition gespeichert"
+	}
+	"Commands69"
+	{
+		"de"		"{1} Du musst in der Startzone sein um {lightgreen}!startpos {default} zu verwenden"
+	}
+	"Commands70"
+	{
+		"de"		"{1} Gebe deine Nachricht ein"
+	}
+	"Commands71"
+	{
+		"de"		"{1} Teleportation zur Endzone ist Deaktiviert"
+	}
+	"Commands72"
+	{
+		"de"		"{1} NoClip ist Deaktiviert solange du tot bist"
+	}
+	"Commands73"
+	{
+		"de"		"{1} Verwendung: sm_joinmsg \"{red}Meine coole {blue}Verbindungsnachricht{default}\""
+	}
+	"Commands74"
+	{
+		"de"		"{1} Verwendung: sm_brank #b"
+	}
+	"Commands76"
+	{
+		"de"		"{1} Verwendung: sm_brank #b Spieler"
+	}
+	"Commands78"
+	{
+		"de"		"{1} Zonen sind nun {green}sichtbar"
+	}
+	"Commands79"
+	{
+		"de"		"{1} Zonen sind nun {red}unsichtbar"
+	}
+	"VoteInProgress"
+	{
+		"de"		"{1} Eine Abstimmung ist bereits aktiv"
+	}
+	"Commands82"
+	{
+		"de"		"{1} Dein Timer muss aktiviert sein um {lightgreen}!startpos {default}zu verwenden"
+	}
+	"Commands83"
+	{
+		"de"		"{1} Startposition zurückgesetzt"
+	}
+	"Commands84"
+	{
+		"de"		"{1} Du musst die Karte zuerst beenden"
+	}
+	"Commands85"
+	{
+		"de"		"{1} Spieler nicht gefunden"
+	}
+	"Commands86"
+	{
+		"de"		"{1} g_hTriggerMultiple ist ungültig!"
+	}
+	"Commands87"
+	{
+		"de"		"{1} Dies ist eine lineare Karte."
+	}
+	"BotInUse"
+	{
+		"de"		"{1} {darkred}{2} Wiederholungsbot bereits in Verwendung"
+	}
+	"CVote2"
+	{
+		"de"		"{1} Verwendung: sm_cvote <extend, changemap, setnextmap> <Mapname>"
+	}
+	"CVote4"
+	{
+		"de"		"{1} Verwendung: sm_cvote <changemap> <Mapname>"
+	}
+	"CVote5"
+	{
+		"de"		"{1} Kartenänderungsabstimmung zu {blue}{2}{default}, gestartet von {yellow}{3}"
+	}
+	"CVote6"
+	{
+		"de"		"{1} Verwendung: sm_cvote <setnextmap> <Mapname>"
+	}
+	"CVote7"
+	{
+		"de"		"{1} Abstimmung für {blue}{2}{default} als folgekarte, gestartet von {yellow}{3}"
+	}
+	"CVote8"
+	{
+		"de"		"{1} Abstimmung gescheitert. {lightgreen}{2}%%%% {default}Stimmen benötigt. [Erhalten {lightgreen}{3}%%%% {default}von {lightgreen}{4} {default}Stimmen]"
+	}
+	"CVote9"
+	{
+		"de"		"{1} Abstimmung erfolgreich. [Erhalten {lightgreen}{2}%%%% {default}von {lightgreen}{3} {default}Stimmen]"
+	}
+	"CVote10"
+	{
+		"de"		"{1} Verlängere Karte um 10 Minuten"
+	}
+	"CVote11"
+	{
+		"de"		"{1} Ändere Karte zu: {2}"
+	}
+	"CVote12"
+	{
+		"de"		"{1} Abstimmung gescheitert"
+	}
+	"CVote13"
+	{
+		"de"		"{1} Setze folgekarte zu {2}"
+	}
+	"SQLTime1"
+	{
+		"de"		"{1} http://steamcommunity.com/profiles/{2}/"
+	}
+	"VIP1"
+	{
+		"de"		"{1} Verwendung: sm_givevip \"steamid\" \"viplvl\""
+	}
+	"VIP2"
+	{
+		"de"		"{1} Verwendung: sm_removevip \"steamid\""
+	}
+	"VIP3"
+	{
+		"de"		"{1} Verwendung: sm_addcredits \"steamid\" \"menge\""
+	}
+	"Timer1"
+	{
+		"de"		"{1} {2}"
+	}
+	"Timer2"
+	{
+		"de"		"{1} Folgekarte: {blue}{2}"
+	}
+	"SQLTwo1"
+	{
+		"de"		"{1} Karte nicht gefunden"
+	}
+	"SQLTwo2"
+	{
+		"de"		"{1} Du musst zuerst einen benutzerdefinierten Titel mit sm_mytitle festlegen, bevor du deine Namensfarbe ändern kannst"
+	}
+	"SQLTwo3"
+	{
+		"de"		"{1} u musst zuerst einen benutzerdefinierten Titel mit sm_mytitle festlegen, bevor du deine Nachrichtenfarbe ändern kannst"
+	}
+	"SQLTwo4.1"
+	{
+		"de"		"{darkred}--------------------ANKÜNDIGUNG--------------------"
+	}
+	"SQLTwo4.2"
+	{
+		"de"		"{1} {yellow}{2} {default}hat den {blue}{3} {default}Kartenrekord gebrochen {lime}{4} {default}mit einer Zeit von {lime}{5}"
+	}
+	"SQLTwo4.2Bonus"
+	{
+		"de"		"{1} {yellow}{2} {default}hat den {blue}{3} {yellow}{4} {default}Bonusrekord mit einer Zeit von {lime}{6} {default}gebrochen. [{lime}{5} {default}Server]"
+	}
+	"SQLTwo4.3"
+	{
+		"de"		"{darkred}---------------------------------------------------"
+	}
+	"SQLTwo5"
+	{
+		"de"		"{1} Deine Verbindungsnachricht wurde {darkred}deaktiviert"
+	}
+	"SQLTwo6"
+	{
+		"de"		"{1} Deine Verbindungsnachricht wurde gesezt zu: {2}"
+	}
+	"SQLTwo7"
+	{
+		"de"		"{1} Keine Ergebnisse gefunden"
+	}
+	"Admin1"
+	{
+		"de"		"{1} Gebe der Zone einen gültigen Namen"
+	}
+	"Admin2"
+	{
+		"de"		"{1} Zonenname zu lang. Maximal 128 zeichen"
+	}
+	"Admin3"
+	{
+		"de"		"{1} Bonusumbennung abgebrochen"
+	}
+	"Admin5"
+	{
+		"de"		"{1} Verwendung: sm_addmaptier <Tier>"
+	}
+	"Admin6"
+	{
+		"de"		"{1} Ungültige Tier Nummer. 1-8 sind gültig"
+	}
+	"Admin7"
+	{
+		"de"		"{1} Spawnpunkt bearbeitet"
+	}
+	"SpawnAdded"
+	{
+		"de"		"{1} Spawnpunkt hinzugefügt"
+	}
+	"Admin8"
+	{
+		"de"		"{1} Spawnpunkt entfernt"
+	}
+	"Admin9"
+	{
+		"de"		"{1} Kein Spawnpunkt zum löschen vorhanden!"
+	}
+	"Admin11"
+	{
+		"de"		"{1} Du hast keinen Zugriff auf den Adminmenü"
+	}
+	"Admin12"
+	{
+		"de"		"{1} Verwendung: sm_refreshprofile <steamid>"
+	}
+	"SurfZones1"
+	{
+		"de"		"{1} NoClip war, oder ist aktiviert, Timer bleibt deaktiviert"
+	}
+	"SurfZones3"
+	{
+		"de"		"{1} Zonen wurden neu geladen"
+	}
+	"SurfZones4"
+	{
+		"de"		"{1} Gebe den Bonusnamen ein oder breche mit lightgreen}!cancel {default}ab"
+	}
+	"SurfZones5"
+	{
+		"de"		"{1} Bonus Startzone erstellt"
+	}
+	"SurfZones6"
+	{
+		"de"		"{1} Bonus gespeichert!"
+	}
+	"SurfZones7"
+	{
+		"de"		"{1} Fehler in den Koordinaten, Bonus wurde nicht gespeichert"
+	}
+	"SurfZones8"
+	{
+		"de"		"{1} Zone gespeichert"
+	}
+	"SurfZones9"
+	{
+		"de"		"{1} Gebe den gewünschten Zielnamen ein ['reset' zum Abbrechen]"
+	}
+	"SurfZones10"
+	{
+		"de"		"{1} Gebe die gewünschte Vorgeschwindigkeit ein [Zwischen{lightgreen}{2}-{3}]"
+	}
+	"SurfZones12"
+	{
+		"de"		{1} Setze {2}-{3} Hookname zu {4}"
+	}
+	"SurfZones13"
+	{
+		"de"		"{1} Zonen gelöscht"
+	}
+	"Hooks1"
+	{
+		"de"		"{1} Abgebrochen"
+	}
+	"Hooks2"
+	{
+		"de"		"{1} Ungültiger Bonus"
+	}
+	"Hooks3"
+	{
+		"de"		"{1} Bonus {2} mit Hookzone verwenden"
+	}
+	"Hooks4"
+	{
+		"de"		"{1} {blue}{2} {default}Höchstgeschwindigkeit gesetzt zu {3}"
+	}
+	"Hooks5"
+	{
+		"de"		"{1} {2}-{3} setze zu {lime}{4}"
+	}
+	"Hooks6"
+	{
+		"de"		"{green}{1} {default}{2} {3}{default}: {4}"
+	}
+	"Hooks7"
+	{
+		"de"		"*TOT* {green}{1} {default}{2} {3}{default}: {4}"
+	}
+	"Hooks8"
+	{
+		"de"		"{1} {2}{default}: {3}"
+	}
+	"Hooks9"
+	{
+		"de"		"*TOT* {1} {2}{default}: {3}"
+	}
+	"Hooks10"
+	{
+		"de"		"{1} Springen ist in diesem Bereich nicht erlaubt"
+	}
+	"Hooks11"
+	{
+		"de"		"{1} Ducken ist in diesem Bereich nicht erlaubt"
+	}
+	"Hooks12"
+	{
+		"de"		"{1} Stil gesetzt zu {green}Normal{default}, A verwendet"
+	}
+	"Hooks13"
+	{
+		"de"		"{1} Stil gesetzt zu {green}Normal{default}, D verwendet"
+	}
+	"Hooks14"
+	{
+		"de"		"{1} Stil gesetzt zu {green}Normal"
+	}
+	"Hooks15"
+	{
+		"de"		"{1} {darkred}Du darfst nur einmal Springen innerhalb dieser Zone"
+	}
+	"Misc1"
+	{
+		"de"		"{1} Zonengruppe nicht gefunden"
+	}
+	"Misc2"
+	{
+		"de"		"{1} Zielzone nicht gefunden!"
+	}
+	"Misc3"
+	{
+		"de"		"{1} Keine Zonen in dieser Karte gefunden"
+	}
+	"Misc4"
+	{
+		"de"		"{1} {darkred}Höre auf zu spammen sonst wirst du gekickt!"
+	}
+	"Misc5"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den Rekord mit einer Zeit von {lightgreen}{3} {default}auf {blue}{4}"
+	}
+	"Misc6"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den Rekord mit einer Zeit von {lightgreen}{3} {default}für {orange}{4} {default}auf {blue}{5}"
+	}
+	"Misc7"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den {red}seitwärts {default}Rekord mit eine Zeit von: {lightgreen}{3} {default}auf {blue}{4}"
+	}
+	"Misc8"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den {red}halb-seitwärts {default}Rekord mit eine Zeit von: {lightgreen}{3} {default}auf {blue}{4}"
+	}
+	"Misc9"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den {red}rückwärts {default}Rekord mit eine Zeit von: {lightgreen}{3} {default}auf {blue}{4}"
+	}
+	"Misc10"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den {red}niedrige Schwerkraft {default}Rekord mit eine Zeit von: {lightgreen}{3} {default}auf {blue}{4}"
+	}
+	"Misc11"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den {red}Zeitlupen {default}Rekord mit eine Zeit von: {lightgreen}{3} {default}auf {blue}{4}"
+	}
+	"Misc12"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den {red}schnell vorwärts {default}Rekord mit eine Zeit von: {lightgreen}{3} {default}auf {blue}{4}"
+	}
+	"MiscFreestyle"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den {red}Freistil {default}Rekord mit eine Zeit von: {lightgreen}{3} {default}auf {blue}{4}"
+	}
+	"Misc13"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den {red}seitwärts {orange}{3} {default}Rekord mit eine Zeit von: {lightgreen}{4} {default}auf {blue}{5}"
+	}
+	"Misc14"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den {red}halb-seitwärts {orange}{3} {default}Rekord mit eine Zeit von: {lightgreen}{4} {default}auf {blue}{5}"
+	}
+	"Misc15"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den {red}rückwärts {orange}{3} {default}Rekord mit eine Zeit von: {lightgreen}{4} {default}auf {blue}{5}"
+	}
+	"Misc16"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den {red}niedrige Schwerkraft {orange}{3} {default}Rekord mit eine Zeit von: {lightgreen}{4} {default}auf {blue}{5}"
+	}
+	"Misc17"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den {red}Zeitlupen {orange}{3} {default}Rekord mit eine Zeit von: {lightgreen}{4} {default}auf {blue}{5}"
+	}
+	"Misc18"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den {red}schnell vorwärts {orange}{3} {default}Rekord mit eine Zeit von: {lightgreen}{4} {default}auf {blue}{5}"
+	}
+	"MiscFreestyleBonus"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den {red}Freistil{gold}{3} {default}Rekord mit eine Zeit von: {lightgreen}{4} {default}auf {blue}{5}"
+	}
+	"Misc19"
+	{
+		"de"		"{1} {darkred}Failed to save your data correctly! Please contact an admin"
+	}
+	"Misc20"
+	{
+		"de"		"{green}{1} {default}*BEOB* {2} {grey}{3}{default}: {4}"
+	}
+	"Misc21"
+	{
+		"de"		"{1}{blue}{2} {3}{default}: {4}"
+	}
+	"Misc22"
+	{
+		"de"		"*DEAD* {1}{blue}{2} {3}{default}: {4}"
+	}
+	"Misc23"
+	{
+		"de"		"{1}{orange}{2} {3}{default}: {4}"
+	}
+	"Misc24"
+	{
+		"de"		"*DEAD* {1}{orange}{2} {3}{default}: {4}"
+	}
+	"Misc25"
+	{
+		"de"		"*BEOB* {1} {grey}{2}{default}: {3}"
+	}
+	"Misc26"
+	{
+		"de"		"*BEOB* {grey}{1}{default}: {2}"
+	}
+	"Misc27"
+	{
+		"de"		"[{1}] *BEOB* {2}: {3}"
+	}
+	"Misc28"
+	{
+		"de"		"*BEOB* {1}: {2}"
+	}
+	"Misc29"
+	{
+		"de"		"{1} Du hast deine Bonus bestzeit von [{orange}{2}{default}] verpasst"
+	}
+	"Misc30"
+	{
+		"de"		"{1} CP [{lightgreen}{2}{default}]: {lightgreen}{3} {default}[PB: {4}{default} | {5}{default}]"
+	}
+	"Misc31"
+	{
+		"de"		"{1} {yellow}{2} {default}| CP [{lightgreen}{3}{default}]: {lightgreen}{4} {default}[PB: {5}{default} | {6}{default}]"
+	}
+	"Misc32"
+	{
+		"de"		"{1} CP [{lightgreen}{2}{default}]: {lightgreen}{3} {default}[PB: {lightgreen}N/A{default} | {4}{default}]"
+	}
+	"Misc33"
+	{
+		"de"		"{1} {yellow}{2} {default}| CP [{lightgreen}{3}{default}]: {lightgreen}{4} {default}[PB: {lightgreen}N/A{default} | {5}{default}]"
+	}
+	"Misc34"
+	{
+		"de"		"{1} {yellow}{2}{default} beendet {red}{3} {default}in [{lightgreen}{4}{default}]. [Rang: {lightgreen}{5}/{6} {default}| Rekord: {lightgreen}{7}{default}"
+	}
+	"Misc35"
+	{
+		"de"		"{1} {yellow}{2}{default} beendet {red}{3} {default}in [{lightgreen}{4}{default}]. Improving their best time by [{lightgreen}{5}{default}]. [Rank: {lightgreen}{6}/{7} {default}| Rekord: {lightgreen}{8}{default}]"
+	}
+	"Misc36"
+	{
+		"de"		"{1} {yellow}{2}{default} hat den {red}{3} {default}Kartenrekord gebrochen"
+	}
+	"Misc37"
+	{
+		"de"		"{1} {yellow}{2}{default} hat den [{orange}{3}{default}] {red}{4} {default}Rekord gebrochen!"
+	}
+	"Misc38"
+	{
+		"de"		"{1} {yellow}{2} {default}beendet [{orange}{3}{default}] {red}{4} {default}in {lightgreen}{5}{default}. [Rang: {lightgreen}1/1 {default}| Rekord: {lightgreen}{6}{default}]"
+	}
+	"Misc39"
+	{
+		"de"		"{1} {yellow}{2} {default}beendet [{orange}{3}{default}] {red}{4} {default}in {lightgreen}{5}{default}. Improving the best time by {lightgreen}{6}{default}. [Rank: {lightgreen}{7}/{8} {default}| Rekord: {lightgreen}{9}{default}]"
+	}
+	"Misc40"
+	{
+		"de"		"{1} {yellow}{2} {default}beendet [{orange}{3}{default}] {red}{4} {default}in {lightgreen}{5}{default}. Improving their best time by {lightgreen}{6}{default}. [Rank: {lightgreen}{7}/{8} {default}| Rekord: {lightgreen}{9}{default}]"
+	}
+	"Misc41"
+	{
+		"de"		"{1} {yellow}{2} {default}beendet [{orange}{3}{default}] {red}{4} {default}in {lightgreen}{5}{default}. [Rang: {lightgreen}{6}/{7} {default}| Rekord: {lightgreen}{8}{default}]"
+	}
+	"Misc42"
+	{
+		"de"		"{1} {yellow}{2} {default}beendet [{orange}{3}{default}] {red}{4} {default}in {lightgreen}{5}{default}. Missing their best time by {red}{6}{default}. [Rank: {lightgreen}{7}/{8} {default}| Rekord: {lightgreen}{9}{default}]"
+	}
+	"Misc43"
+	{
+		"de"		"{1} Dies ist eine VIP funktion"
+	}
+	"Misc44"
+	{
+		"de"		"{1} Fehlermeldung gesendet. Danke"
+	}
+	"Misc45"
+	{
+		"de"		"{1} Meldung gesendet. Danke"
+	}
+	"SQL1"
+	{
+		"de"		"{1} Neuberechnung in Arbeit. Bitte warten!"
+	}
+	"SQL2"
+	{
+		"de"		"{1} Keine Bonusse gefunden"
+	}
+	"SQL3"
+	{
+		"de"		"{1} Ungültige SteamID gefunden"
+	}
+	"SQL4"
+	{
+		"de"		"{1} Bonusname erfolgreich geändert"
+	}
+	"SQL5"
+	{
+		"de"		"{1} Zonenerstellung fehlgeschlagen, versuche einen fix. Versuche es bitte erneut"
+	}
+	"SQL6"
+	{
+		"de"		"{1} Ungültiger Zonengruppenindex ausgewählt, abbruch. [{2}]"
+	}
+	"SQL7"
+	{
+		"de"		"{1} Zonengruppe gelöscht"
+	}
+	"SQL8"
+	{
+		"de"		"{1} Zonengruppenlöschung fehlgeschlagen! [Fehler: {2}]"
+	}
+	"SQL9"
+	{
+		"de"		"{1} Zone erfolgreich gelöscht"
+	}
+	"SQL10"
+	{
+		"de"		"{1} {darkred}Zonenlöschung fehlgeschlagen! {default}Fehler: {2}"
+	}
+	"SQL11"
+	{
+		"de"		"{1} Abschnitt {2}:{default} {lightgreen}{3} {default}[{4}{default} | {5}{default}]"
+	}
+	"SQL12"
+	{
+		"de"		"{1} {yellow}{2} {default}| {purple}Abschnitt {3}:{default} {lightgreen}{4} {default}[{5}{default} | {6}{default}]"
+	}
+	"SQL13"
+	{
+		"de"		"{1} Beendet {default}Abschnitt {2} {red}{3} {default}in {lightgreen}{4} {5} {default}[Rang: {lightgreen}{6}/{7}{default}]"
+	}
+	"SQL14"
+	{
+		"de"		"{1} Beendet {default}Abschnitt {2} {red}{3} {default}in {lightgreen}{4} {5} {default}[Rang: {lightgreen}{6}/{7}{default}]"
+	}
+	"SQL15"
+	{
+		"de"		"{1} {yellow}{2} {default}bricht den [{purple}Abschnitt {3}{default}] Rekord! {lightgreen}{4} {5} {default}[Rang: {lightgreen}1/{6}{default}]"
+	}
+	"SQL16"
+	{
+		"de"		"{1} Abschnitt {2}{default}: {lightgreen}{3} {default}[{4}{default} | {5}{default}] [Rang: {lightgreen}{6}/{7}{default}]"
+	}
+	"SQL17"
+	{
+		"de"		"{1} {yellow}{2} {default}| Abschnitt {3}{default}: {lightgreen}{4} {default}[{5}{default} | {6}{default}] [Rang: {lightgreen}{7}/{8}{default}]"
+	}
+	"SQL18"
+	{
+		"de"		"{1} {yellow}{2} {default}hat einen neuen [{purple}Abschnitt {3}{default}] Rekord aufgestellt! {lightgreen}{4} {default}[Rang: {lightgreen}1/1{default}]"
+	}
+	"SQL19"
+	{
+		"de"		"{1} {yellow}{2} {default}hat den {red}{3}{default} [{purple}Abschnitt {4}{default}] Rekord! {lightgreen}{5} {6} {default}[Rang: {lightgreen}{7}/{8}{default}]"
+	}
+	"SQL20"
+	{
+		"de"		"{1} Abschnitt {2} {red}{3} {default}beendet in {lightgreen}{4} {5} {default}[Rang: {lightgreen}{6}/{7}{default}]"
+	}
+	"SQL21"
+	{
+		"de"		"{1} Abschnitt {2} {red}{3} {default}beendet in {lightgreen}{4} {5} {default}[Rang: {lightgreen}{6}/{7}{default}]"
+	}
+	"SQL22"
+	{
+		"de"		"{1} {yellow}{2} {default}hat den neuen {red}{3} {default}[{purple}Abschnitt {4}{default}] Rekord gesetzt! {lightgreen}{5} {default}[Rang: {lightgreen}1/1{default}]"
+	}
+	"SQL23"
+	{
+		"de"		"{1} Karte {blue}{2} {default}nicht gefunden oder sie ist linear"
+	}
+	"SQL24"
+	{
+		"de"		"{1} {red}Keinen Rekord gefunden"
+	}
+	"SQL25"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den Rekord mit einer Zeit von: {lightgreen}{3} {default}für {purple}Abschnitt {4} {default}auf {blue}{5}"
+	}
+	"SQL26"
+	{
+		"de"		"{1} Keine Abschnittsrekorde für {purple}Abschnitt {2} {default}auf {blue}{3}"
+	}
+	"SQL27"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den {red}{3} {default}Rekord mit einer Zeit von: {lightgreen}{4} {default}für {purple}Abschnitt {5} {default}auf {blue}{6}"
+	}
+	"SQL28"
+	{
+		"de"		"{1} Kein Ergebnis für Spieler / Karte gefunden"
+	}
+	"SQL29"
+	{
+		"de"		"{1} {yellow}{2} {default}Platz {lightgreen}{3}/{4} {default}{5} mit einer Zeit von {lightgreen}{6} {default}auf {blue}{7}"
+	}
+	"SQL30"
+	{
+		"de"		"{1} {yellow}{2} {default}Platz {lightgreen}{3}/{4} {default}mit einer Zeit von {lightgreen}{5} {default}auf {blue}{6}"
+	}
+	"SQL31"
+	{
+		"de"		"{1} {yellow}{2} {default}Platz {lightgreen}{3}/{4} {default}mit einer Zeit von {lightgreen}{5} {default}auf {blue}{6}"
+	}
+	"SQL32"
+	{
+		"de"		"{1} {yellow}{2} {default}Platz {lightgreen}{3}/{4} {default}{5} mit einer Zeit von {lightgreen}{6} {default}auf {blue}{7}"
+	}
+	"SQL33"
+	{
+		"de"		"{1} {yellow}{2} {default}Platz {lightgreen}{3}/{4} {default}{5} mit einer Zeit von {lightgreen}{6} {default}auf {blue}{7}"
+	}
+	"SQL34"
+	{
+		"de"		"{1} {yellow}{2} {default}Platz {lightgreen}{3}/{4} {default}mit einer Zeit von {lightgreen}{5} {default}auf {blue}{6}"
+	}
+	"SQL35"
+	{
+		"de"		"{1} {yellow}{2} {default}Platz {lightgreen}{3}/{4} {default}mit einer Zeit von {lightgreen}{5} {default}auf {blue}{6}"
+	}
+	"SQL36"
+	{
+		"de"		"{1} {yellow}{2} {default}Platz {lightgreen}{3}/{4} {default}mit einer Zeit von {lightgreen}{5} {default}für {orange}Bonus {6} {default}auf {blue}{7}"
+	}
+	"NoMapFound"
+	{
+		"de"		"{1} Kein Ergebnis gefunden für: {blue}{2}"
+	}
+	"SQL38"
+	{
+		"de"		"{1} {yellow}{2} {default}hält den Rekord mit einer Zeit von: {lightgreen}{3} {default}auf {blue}{4}"
+	}
+	"SQL39"
+	{
+		"de"		"{1} {yellow}{2} {default}Platz {lightgreen}{3}/{4} {default}mit {lightgreen}{5} {default}Punkten"
+	}
+	"SQL40"
+	{
+		"de"		"{1} Kein Ergebnis gefunden für: {yellow}{2}"
+	}
+	"DeleteRecordsNewValue"
+	{
+		"de"		"{1} Gebe einen neuen Wert ein, oder {darkred}cancel{default} zum abbrechen"
+	}
+	"DeleteRecordsDeletion"
+	{
+		"de"		"{1} Rekord gelöscht"
+	}
+	"InvalidRun"
+	{
+		"de"		"{1} {darkred}Du musst alle {2} durchqueren um deinen Lauf zu beenden"
+	}
+	"PrestrafeMessageToggleOn"
+	{
+		"de"		"{1} Startgeschwindigkeitsnachrichten sind nun {green}aktiviert"
+	}
+	"PrestrafeMessageToggleOff"
+	{
+		"de"		"{1} Startgeschwindigkeitsnachrichten sind nun {red}deaktiviert"
+	}
+	"StageNotRecorded"
+	{
+		"de"		"{1} {darkred}Beim Speichern deiner Zeit für Abschnitt 2 ist ein Fehler aufgetreten, bitte starte neu."
+	}
+	"StartPrestrafe"
+	{
+		"de"		"{1} Startgeschwindigkeit: {2} u/s"
+	}
+	"StagePrestrafe"
+	{
+		"de"		"{1} Abschnitt {2} Startgeschwindigkeit: {3} u/s"
+	}
+	"SilentSpecMessageToggleOn"
+	{
+		"de"		"{1} Stilles zugucken ist nun {green}aktiviert"
+	}
+	"SilentSpecMessageToggleOff"
+	{
+		"de"		"{1} Stilles zugucken ist nun {red}deaktiviert"
+	}
+	"ToggleWrcpsMessageToggleOn"
+	{
+		"de"		"{1} SRCP Nachrichten sind nun {green}aktiviert"
+	}
+	"ToggleWrcpsMessageToggleOff"
+	{
+		"de"		"{1} SRCP Nachrichten sind nun {red}deaktiviert"
+	}
+	"ToggleCpsMessageToggleOn"
+	{
+		"de"		"{1} CP Nachrichten sind nun {green}aktiviert"
+	}
+	"ToggleCpsMessageToggleOff"
+	{
+		"de"		"{1} CP Nachrichten sind nun {red}deaktiviert"
+	}
+	"QuakeToggleOn"
+	{
+		"de"		"{1} Timer Sounds sind nun {green}aktiviert"
+	}
+	"QuakeToggleOff"
+	{
+		"de"		"{1} Timer Sounds sind nun {red}deaktiviert"
+	}
+	"StartSideLeft"
+	{
+		"de"		"{1} Deine Startseite ist nun {blue}links"
+	}
+	"StartSideRight"
+	{
+		"de"		"{1} Deine Startseite ist nun {yellow}rechts"
+	}
+	"SpeedGradientWhite"
+	{
+		"de"		"{1} Dein Geschwindigkeitsgefälle ist nun {blue}Weiß"
+	}
+	"SpeedGradientGreen"
+	{
+		"de"		"{1} Dein Geschwindigkeitsgefälle ist nun {green}Grün"
+	}
+	"SpeedGradientRainbow"
+	{
+		"de"		"{1} Dein Geschwindigkeitsgefälle ist nun {pink}B{yellow}U{darkblue}N{green}T"
+	}
+	"SpeedGradientMomentum"
+	{
+		"de"		"{1} Dein Geschwindigkeitsgefälle ist nun {blue}Momen{red}tum"
+	}
+	"SpeedModeXY"
+	{
+		"de"		"{1} Dein Geschwindigkeitsgefälle ist nun {yellow}X{orange}Y"
+	}
+	"SpeedModeXYZ"
+	{
+		"de"		"{1} Dein Geschwindigkeitsgefälle ist nun {yellow}X{orange}Y{red}Z"
+	}
+	"SpeedModeZ"
+	{
+		"de"		"{1} Dein Geschwindigkeitsgefälle ist nun {red}Z"
+	}
+	"CenterSpeedOn"
+	{
+		"de"		"{1} Deine Zentrale Geschwindigkeitsanzeige ist nun {green}aktiviert"
+	}
+	"CenterSpeedOff"
+	{
+		"de"		"{1} Deine Zentrale Geschwindigkeitsanzeige ist nun {red}deaktiviert"
+	}
+	"TriggersEnabled"
+	{
+		"de"		"{1} Auslöser sind {green}aktiviert {default}während NoClip"
+	}
+	"TriggersDisabled"
+	{
+		"de"		"{1} Auslöser sind {red}deaktiviert {default}während NoClip"
+	}
+	"AutoResetDisabled"
+	{
+		"de"		"{1} Dein Timer setzt sich {green}nicht zurück{default}, wenn du deine Bestzeit verpasst hast"
+	}
+	"AutoResetEnabled"
+	{
+		"de"		"{1} Dein Timer setzt sich {red}zurück{default}, wenn du deine Bestzeit verpasst hast"
+	}
+	"AutoResetMessage1"
+	{
+		"de"		"{1} Du wurdest zurückgesetz, weil du sm_autoreset aktiviert hast"
+	}
+	"AutoResetMessage2"
+	{
+		"de"		"{1} Verwende {blue}sm_autoreset {default}zum deaktivieren"
+	}
+	"AutoResetMessageStyle"
+	{
+		"de"		"{1} Auto-reset ist aktiviert, aber du wurdest nicht zurückgesetz weil du in {gold}{2} {default}surfst"
+	}
+	"ShowVelocityCP"
+	{
+		"de"		"{1} Start: {yellow}{2} u/s {default}[WR {3} {default}| PB {4}{default}] | {5}: {yellow}{6} u/s {default}[WR {7} {default}| PB {8}{default}]"
+	}
+}

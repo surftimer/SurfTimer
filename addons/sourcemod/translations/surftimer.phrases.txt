@@ -1536,8 +1536,8 @@
 	"StageNotRecorded"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Potential S1 to S2 glitch stopped. Stage time was not recorded"
-	}
+		"en"		"{1} {darkred}There was an error saving your stage 2 record, please restart."
+	} 
 	"StartPrestrafe"
 	{
 		"#format"	"{1:s},{2:s}"
@@ -1677,6 +1677,11 @@
 	{
 		"#format"	"{1:s},{2:s}"
 		"en"		"{1} Auto-reset is enabled, but you weren't teleported because you're surfing in {gold}{2}"
+	}
+	"StageNotRecorded"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {darkred}There was an error saving your stage 2 record, please restart."
 	}
 	"ShowVelocityCP"
 	{
