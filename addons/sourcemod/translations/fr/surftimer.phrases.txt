@@ -1214,7 +1214,7 @@
 	}
 	"StageNotRecorded"
 	{
-		"fr"		"{1} Un glitch potentiel de S1 à S2 a été stoppée. Le temps de stage n'a pas été enregistré."
+		"fr"		"{1} {darkred}Il y a eu une erreur lors de la sauvegarde de votre enregistrement de l'étape 2, veuillez recommencer."
 	}
 	"StartPrestrafe"
 	{
