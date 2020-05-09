@@ -1676,7 +1676,7 @@
 	"StageNotRecorded"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} {darkred}Il y a eu une erreur lors de la sauvegarde de votre enregistrement de l'étape 2, veuillez recommencer."
+		"en"		"{1} {darkred}There was an error saving your stage 2 record, please restart."
 	}
 	"ShowVelocityCP"
 	{
