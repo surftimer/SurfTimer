@@ -9980,7 +9980,7 @@ public void sqlcreatePlayertimesIndex(Database db, DBResultSet results, const ch
 {
 	if (db == null || strlen(error))
 	{
-		SetFailState("[SurfTimer] (sqlcreatePlayertimesIndex) Can't add playertimes index.");
+		SetFailState("[SurfTimer] (sqlcreatePlayertimesIndex) Can't add playertimes index. Error: %s", error);
 		return;
 	}
 }
@@ -9989,7 +9989,7 @@ public void sqlcreateBonusIndex(Database db, DBResultSet results, const char[] e
 {
 	if (db == null || strlen(error))
 	{
-		SetFailState("[SurfTimer] (sqlcreateBonusIndex) Can't add bonus index.");
+		SetFailState("[SurfTimer] (sqlcreateBonusIndex) Can't add bonus index. Error: %s", error);
 		return;
 	}
 }
