@@ -1213,7 +1213,7 @@
 	}
 	"StageNotRecorded"
 	{
-		"de"		"{1} Potenzielle S1 -> S2 Störung erkannt, Abschnittszeit wurde nicht gespeichert"
+		"de"		"{1} {darkred}Beim Speichern deiner Zeit für Abschnitt 2 ist ein Fehler aufgetreten, bitte starte neu."
 	}
 	"StartPrestrafe"
 	{
