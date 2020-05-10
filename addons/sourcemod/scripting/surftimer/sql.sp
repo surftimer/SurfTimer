@@ -1779,6 +1779,7 @@ public void sql_selectPlayerProfileCallback(Handle owner, Handle hndl, const cha
 		GetArrayArray(g_hSkillGroups, index, RankValue, sizeof(SkillGroup));
 		char szSkillGroup[128];
 		Format(szSkillGroup, sizeof(szSkillGroup), RankValue.RankName);
+		CRemoveTags(szSkillGroup, sizeof(szSkillGroup));
 		ReplaceString(szSkillGroup, sizeof(szSkillGroup), "{style}", "");
 
 		char szRank[32];

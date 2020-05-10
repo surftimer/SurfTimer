@@ -2454,7 +2454,7 @@ public void SetSkillGroups()
 				RankValue.RankReq = rank;
 
 				// Remove colors from rank name
-				CRemoveColors(sRankName, 128);
+				CRemoveTags(sRankName, 128);
 
 				Format(RankValue.RankName, sizeof(SkillGroup::RankName), "%s", sRankName);
 				Format(RankValue.RankNameColored, sizeof(SkillGroup::RankNameColored), "%s", sRankNameColored);
@@ -2508,7 +2508,7 @@ public void SetPlayerRank(int client)
 		{
 			char szTitle[256];
 			Format(szTitle, 256, g_szEnforcedTitle[client]);
-			CRemoveColors(szTitle, 256);
+			CRemoveTags(szTitle, 256);
 			Format(g_pr_rankname[client], 256, szTitle);
 		}
 	}
