@@ -4958,7 +4958,7 @@ void PrintCSGOHUDText(int client, const char[] format, any ...)
 	Format(buff, sizeof(buff), "</font>%s", buff);
 
 	for(int i = strlen(buff); i < sizeof(buff) - 1; i++)
-		buff[i] = ' ';
+		buff[i] = '\n';
 	
 	buff[sizeof(buff) - 1] = '\0';
 
