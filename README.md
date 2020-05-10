@@ -44,7 +44,7 @@
 * [SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable)
 * [Metamod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable)
 * [DHooks](https://forums.alliedmods.net/showpost.php?p=2588686&postcount=589)
-* [SMJansson](https://github.com/JoinedSenses/SMJansson/blob/master/pawn/scripting/include/smjansson.inc)
+* [SMJansson](https://github.com/JoinedSenses/SMJansson)
 * [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
 * [Sourcemod-Discord API](https://github.com/Deathknife/sourcemod-discord)
 * [Precompiled Surftimer + Discord-API](https://github.com/olokos/Surftimer-olokos/releases/latest)
