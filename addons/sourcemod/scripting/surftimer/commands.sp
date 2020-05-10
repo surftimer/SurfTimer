@@ -1758,6 +1758,7 @@ public void SpecPlayer(int client, int args)
 				}
 				GetClientName(i, szPlayerName, MAX_NAME_LENGTH);
 				Format(szPlayerName2, 256, "%s (%s)", szPlayerName, g_pr_rankname[i]);
+				CRemoveTags(szPlayerName2, sizeof(szPlayerName2));
 				AddMenuItem(menu, szPlayerName, szPlayerName2);
 				playerCount++;
 				count++;
@@ -2070,6 +2071,7 @@ public void displayRanksMenu(int client)
 		else
 			Format(ChatLine, 512, "Rank %i: %s", RankValue.RankReq, RankValue.RankName);
 		
+		CRemoveTags(ChatLine, sizeof(ChatLine));
 		AddMenuItem(menu, "", ChatLine, ITEMDRAW_DISABLED);
 	}
 	SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
