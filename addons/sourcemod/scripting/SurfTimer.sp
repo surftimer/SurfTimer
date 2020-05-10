@@ -1777,7 +1777,7 @@ public void OnMapStart()
 	{
 		iEnt = GetArrayCell(g_hTriggerMultiple, i);
 
-		if (IsValidEntity(iEnt))
+		if (IsValidEntity(iEnt) && HasEntProp(iEnt, Prop_Send, "m_iName"))
 		{
 			char szTriggerName[128];
 			GetEntPropString(iEnt, Prop_Send, "m_iName", szTriggerName, 128, 0);
