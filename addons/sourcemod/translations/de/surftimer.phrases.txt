@@ -514,7 +514,8 @@
 	}
 	"Commands67"
 	{
-		"de"		"{1} Abstimmung erfolgreich. Schalte {yellow}{2}{default} stumm. [Erhalten {lightgreen}{3}%%%% {default}von {lightgreen}{4} {default}Stimmen]"	}
+		"de"		"{1} Abstimmung erfolgreich. Schalte {yellow}{2}{default} stumm. [Erhalten {lightgreen}{3}%%%% {default}von {lightgreen}{4} {default}Stimmen]"
+	}
 	"Commands68"
 	{
 		"de"		"{1} Neue Startposition gespeichert"
