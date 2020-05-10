@@ -95,13 +95,14 @@ public void sqlCheckNewMaps(Database db, DBResultSet results, const char[] error
 {
 	if (db == null || strlen(error))
 	{
-		LogError("[surftimer] SQL Error (sqlCheckNewMaps): %s", error);
-		return;
-	}
-
-	if (!results.HasResults)
-	{
-		db_upgradeDbNewMap();
+		if (StrContains(error, "exist", false) != -1)
+		{
+			db_upgradeDbNewMap();
+		}
+		else
+		{
+			LogError("[surftimer] (sqlCheckNewMaps) Failure with the table ck_newmaps. Error: %s", error);
+		}
 	}
 }
 

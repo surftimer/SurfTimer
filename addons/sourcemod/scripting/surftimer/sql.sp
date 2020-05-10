@@ -1983,7 +1983,7 @@ public void sql_selectMapRecordCallback(Handle owner, Handle hndl, const char[] 
 	{
 		if (StrContains(error, "Unknown column", false) != -1)
 		{
-			LogError("[Surftimer] Your database are not up to date! Please use the command \"sm_surftimer_upgrade\" to upgrade your database.");
+			LogError("[Surftimer] (sql_selectMapRecordCallback) Your database are not up to date! Please use the command \"sm_surftimer_upgrade\" to upgrade your database.");
 		}
 		else
 		{
@@ -3054,7 +3054,15 @@ public void SQL_selectPersonalRecordsCallback(Handle owner, Handle hndl, const c
 	{
 		if (hndl == null)
 		{
-			LogError("[Surftimer] SQL Error (SQL_selectPersonalRecordsCallback): %s", error);
+			if (StrContains(error, "Unknown column", false) != -1)
+			{
+				LogError("[Surftimer] (SQL_selectPersonalRecordsCallback) Your database are not up to date! Please use the command \"sm_surftimer_upgrade\" to upgrade your database.");
+			}
+			else
+			{
+				LogError("[Surftimer] SQL Error (SQL_selectPersonalRecordsCallback): %s", error);
+			}
+
 			if (!g_bSettingsLoaded[client])
 				LoadClientSetting(client, g_iSettingToLoad[client]);
 			return;
@@ -3246,7 +3254,7 @@ public void sql_selectRecordCheckpointsCallback(Handle owner, Handle hndl, const
 	{
 		if (StrContains(error, "Unknown column", false) != -1)
 		{
-			LogError("[Surftimer] Your database are not up to date! Please use the command \"sm_surftimer_upgrade\" to upgrade your database.");
+			LogError("[Surftimer] (sql_selectRecordCheckpointsCallback) Your database are not up to date! Please use the command \"sm_surftimer_upgrade\" to upgrade your database.");
 		}
 		else
 		{
@@ -3725,7 +3733,15 @@ public void SQL_selectPersonalBonusRecordsCallback(Handle owner, Handle hndl, co
 	{
 		if (hndl == null)
 		{
-			LogError("[Surftimer] SQL Error (SQL_selectPersonalBonusRecordsCallback): %s", error);
+			if (StrContains(error, "Unknown column", false) != -1)
+			{
+				LogError("[Surftimer] (SQL_selectPersonalBonusRecordsCallback) Your database are not up to date! Please use the command \"sm_surftimer_upgrade\" to upgrade your database.");
+			}
+			else
+			{
+				LogError("[Surftimer] SQL Error (SQL_selectPersonalBonusRecordsCallback): %s", error);
+			}
+
 			if (!g_bSettingsLoaded[client])
 				LoadClientSetting(client, g_iSettingToLoad[client]);
 			return;
@@ -3832,7 +3848,7 @@ public void SQL_selectFastestBonusCallback(Handle owner, Handle hndl, const char
 	{
 		if (StrContains(error, "Unknown column", false) != -1)
 		{
-			LogError("[Surftimer] Your database are not up to date! Please use the command \"sm_surftimer_upgrade\" to upgrade your database.");
+			LogError("[Surftimer] (SQL_selectFastestBonusCallback) Your database are not up to date! Please use the command \"sm_surftimer_upgrade\" to upgrade your database.");
 		}
 		else
 		{
@@ -7248,7 +7264,7 @@ public void SQL_selectPersonalBonusStylesRecordsCallback(Handle owner, Handle hn
 
 	if (hndl == null)
 	{
-		LogError("[SurfTimer] SQL Error (SQL_selectPersonalBonusRecordsCallback): %s", error);
+		LogError("[SurfTimer] SQL Error (SQL_selectPersonalBonusStylesRecordsCallback): %s", error);
 
 		if (style == 6)
 		{
