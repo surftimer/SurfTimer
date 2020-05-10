@@ -778,7 +778,7 @@
 	}
 	"SurfZones12"
 	{
-		"de"		{1} Setze {2}-{3} Hookname zu {4}"
+		"de"		"{1} Setze {2}-{3} Hookname zu {4}"
 	}
 	"SurfZones13"
 	{
