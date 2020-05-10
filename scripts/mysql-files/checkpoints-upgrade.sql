@@ -12,7 +12,7 @@ CREATE TABLE `ck_checkpointsnew` (
  `velAvgXY` int(11) DEFAULT 0,
  `velAvgXYZ` int(11) DEFAULT 0,
  `velAvgZ` int(11) DEFAULT 0,
- `zonegroup` int(12) DEFAULT 0,
+ `zonegroup` int(12) NOT NULL,
  PRIMARY KEY (`steamid`,`mapname`,`cp`,`zonegroup`)
 );
 

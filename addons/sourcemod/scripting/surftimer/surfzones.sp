@@ -22,7 +22,7 @@ public void CreateZoneEntity(int zoneIndex)
 		{
 			iEnt = GetArrayCell(g_hTriggerMultiple, i);
 
-			if (IsValidEntity(iEnt))
+			if (IsValidEntity(iEnt) && HasEntProp(iEnt, Prop_Send, "m_iName"))
 			{
 				char szTriggerName[128];
 				GetEntPropString(iEnt, Prop_Send, "m_iName", szTriggerName, 128, 0);
@@ -2444,7 +2444,7 @@ stock void RemoveZones()
 			 && IsValidEdict(i)
 			 && GetEdictClassname(i, sClassName, sizeof(sClassName))
 			 && StrContains(sClassName, "trigger_multiple") != -1
-			 && GetEntPropString(i, Prop_Data, "m_iName", sClassName, sizeof(sClassName))
+			 && (HasEntProp(i, Prop_Send, "m_iName") && GetEntPropString(i, Prop_Data, "m_iName", sClassName, sizeof(sClassName)))
 			 && StrContains(sClassName, "sm_ckZone") != -1)
 		{
 			// Don't destroy hooked zone entities

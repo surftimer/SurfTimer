@@ -934,7 +934,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 
 		if (stage == 2 && g_wrcpStage2Fix[client])
 		{
-			CPrintToChat(client, "%t", "WrcpHackFix", g_szChatPrefix);
+			CPrintToChat(client, "%t", "StageNotRecorded", g_szChatPrefix);
 			g_wrcpStage2Fix[client] = false;
 			return;
 		}
