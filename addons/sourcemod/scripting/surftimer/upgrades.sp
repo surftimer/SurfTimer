@@ -189,76 +189,216 @@ public void sqlSelectOldCheckpoints(Database db, DBResultSet results, const char
 			fCP35 = results.FetchFloat(36);
 			iZonegroup = results.FetchInt(37);
 
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '1', '%f', '%d');", sSteam, sMap, fCP1, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '2', '%f', '%d');", sSteam, sMap, fCP2, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '3', '%f', '%d');", sSteam, sMap, fCP3, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '4', '%f', '%d');", sSteam, sMap, fCP4, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '5', '%f', '%d');", sSteam, sMap, fCP5, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '6', '%f', '%d');", sSteam, sMap, fCP6, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '7', '%f', '%d');", sSteam, sMap, fCP7, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '8', '%f', '%d');", sSteam, sMap, fCP8, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '9', '%f', '%d');", sSteam, sMap, fCP9, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '10', '%f', '%d');", sSteam, sMap, fCP10, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '11', '%f', '%d');", sSteam, sMap, fCP11, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '12', '%f', '%d');", sSteam, sMap, fCP12, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '13', '%f', '%d');", sSteam, sMap, fCP13, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '14', '%f', '%d');", sSteam, sMap, fCP14, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '15', '%f', '%d');", sSteam, sMap, fCP15, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '16', '%f', '%d');", sSteam, sMap, fCP16, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '17', '%f', '%d');", sSteam, sMap, fCP17, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '18', '%f', '%d');", sSteam, sMap, fCP18, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '19', '%f', '%d');", sSteam, sMap, fCP19, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '20', '%f', '%d');", sSteam, sMap, fCP20, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '21', '%f', '%d');", sSteam, sMap, fCP21, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '22', '%f', '%d');", sSteam, sMap, fCP22, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '23', '%f', '%d');", sSteam, sMap, fCP23, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '24', '%f', '%d');", sSteam, sMap, fCP24, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '25', '%f', '%d');", sSteam, sMap, fCP25, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '26', '%f', '%d');", sSteam, sMap, fCP26, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '27', '%f', '%d');", sSteam, sMap, fCP27, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '28', '%f', '%d');", sSteam, sMap, fCP28, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '29', '%f', '%d');", sSteam, sMap, fCP29, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '30', '%f', '%d');", sSteam, sMap, fCP30, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '31', '%f', '%d');", sSteam, sMap, fCP31, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '32', '%f', '%d');", sSteam, sMap, fCP32, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '33', '%f', '%d');", sSteam, sMap, fCP33, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '34', '%f', '%d');", sSteam, sMap, fCP34, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
-			Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '35', '%f', '%d');", sSteam, sMap, fCP35, iZonegroup);
-			tTransaction.AddQuery(sBuffer);
+			if (fCP1 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '1', '%f', '%d');", sSteam, sMap, fCP1, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP2 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '2', '%f', '%d');", sSteam, sMap, fCP2, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP3 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '3', '%f', '%d');", sSteam, sMap, fCP3, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP4 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '4', '%f', '%d');", sSteam, sMap, fCP4, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP5 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '5', '%f', '%d');", sSteam, sMap, fCP5, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP6 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '6', '%f', '%d');", sSteam, sMap, fCP6, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP7 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '7', '%f', '%d');", sSteam, sMap, fCP7, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP8 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '8', '%f', '%d');", sSteam, sMap, fCP8, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP9 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '9', '%f', '%d');", sSteam, sMap, fCP9, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP10 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '10', '%f', '%d');", sSteam, sMap, fCP10, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP11 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '11', '%f', '%d');", sSteam, sMap, fCP11, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP12 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '12', '%f', '%d');", sSteam, sMap, fCP12, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP13 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '13', '%f', '%d');", sSteam, sMap, fCP13, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP14 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '14', '%f', '%d');", sSteam, sMap, fCP14, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP15 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '15', '%f', '%d');", sSteam, sMap, fCP15, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP16 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '16', '%f', '%d');", sSteam, sMap, fCP16, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP17 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '17', '%f', '%d');", sSteam, sMap, fCP17, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP18 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '18', '%f', '%d');", sSteam, sMap, fCP18, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP19 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '19', '%f', '%d');", sSteam, sMap, fCP19, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP20 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '20', '%f', '%d');", sSteam, sMap, fCP20, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP21 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '21', '%f', '%d');", sSteam, sMap, fCP21, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP22 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '22', '%f', '%d');", sSteam, sMap, fCP22, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP23 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '23', '%f', '%d');", sSteam, sMap, fCP23, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP24 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '24', '%f', '%d');", sSteam, sMap, fCP24, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP25 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '25', '%f', '%d');", sSteam, sMap, fCP25, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP26 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '26', '%f', '%d');", sSteam, sMap, fCP26, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP27 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '27', '%f', '%d');", sSteam, sMap, fCP27, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP28 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '28', '%f', '%d');", sSteam, sMap, fCP28, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP29 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '29', '%f', '%d');", sSteam, sMap, fCP29, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP30 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '30', '%f', '%d');", sSteam, sMap, fCP30, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP31 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '31', '%f', '%d');", sSteam, sMap, fCP31, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP32 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '32', '%f', '%d');", sSteam, sMap, fCP32, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP33 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '33', '%f', '%d');", sSteam, sMap, fCP33, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP34 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '34', '%f', '%d');", sSteam, sMap, fCP34, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
+			if (fCP35 != 0.0)
+			{
+				Format(sBuffer, sizeof(sBuffer), "INSERT INTO `ck_checkpointsnew` (`steamid`, `mapname`, `cp`, `time`, `zonegroup`) VALUES (\"%s\", \"%s\", '35', '%f', '%d');", sSteam, sMap, fCP35, iZonegroup);
+				tTransaction.AddQuery(sBuffer);
+			}
+			
 
 			g_dDb.Execute(tTransaction, SQLTxn_InsertCheckpouintsSuccess, SQLTxn_InsertCheckpouintsFailed);
 		}
