@@ -1188,7 +1188,10 @@ public void LimitSpeed(int client)
 
 public void LimitSpeedNew(int client)
 {
-	if (!IsValidClient(client) || !IsPlayerAlive(client) || IsFakeClient(client) || g_mapZonesCount <= 0 || g_bPracticeMode[client] || g_mapZonesTypeCount[g_iClientInZone[client][2]][2] == 0 || g_iClientInZone[client][3] < 0 || g_iClientInZone[client][0] == 2 || g_iClientInZone[client][0] == 4 || g_iClientInZone[client][0] >= 6 || GetConVarInt(g_hLimitSpeedType) == 0 || g_iCurrentStyle[client] == 7)
+	if (!IsValidClient(client) || !IsPlayerAlive(client) || IsFakeClient(client))
+		return;
+	
+	if (g_mapZonesCount <= 0 || g_bPracticeMode[client] || g_mapZonesTypeCount[g_iClientInZone[client][2]][2] == 0 || g_iClientInZone[client][3] < 0 || g_iClientInZone[client][0] == 2 || g_iClientInZone[client][0] == 4 || g_iClientInZone[client][0] >= 6 || GetConVarInt(g_hLimitSpeedType) == 0 || g_iCurrentStyle[client] == 7)
 		return;
 
 	if (GetConVarInt(g_hLimitSpeedType) == 0 || !g_bInStartZone[client] && !g_bInStageZone[client])
@@ -1199,9 +1202,6 @@ public void LimitSpeedNew(int client)
 
 	if (speedCap <= 0.0)
 		return;
-
-	float fVel[3];
-	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
 
 	if (g_bInStartZone[client] || g_bInStageZone[client])
 	{
@@ -1217,10 +1217,13 @@ public void LimitSpeedNew(int client)
 		}
 	}
 
+	float fVel[3];
+	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
+	
 	// Determine how much each vector must be scaled for the magnitude to equal the limit
 	// Derived from Pythagorean theorem, where the hypotenuse represents the magnitude of velocity,
 	// and the two legs represent the x and y velocity components.
-  // As a side effect, velocity component signs are also handled.
+    // As a side effect, velocity component signs are also handled.
 	float scale = speedCap / SquareRoot( Pow(fVel[0], 2.0) + Pow(fVel[1], 2.0) );
 
 	// A scale < 1 indicates a magnitude > limit
@@ -2478,7 +2481,7 @@ public void SetPlayerRank(int client)
 
 	if (g_hSkillGroups == null)
 	{
-		CreateTimer(5.0, reloadRank, client);
+		CreateTimer(5.0, reloadRank, GetClientUserId(client));
 		return;
 	}
 
@@ -3158,7 +3161,7 @@ public void LoadInfoBot()
 	else
 	{
 		setBotQuota();
-		CreateTimer(0.5, RefreshInfoBot, TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(0.5, RefreshInfoBot, _, TIMER_FLAG_NO_MAPCHANGE);
 	}
 }
 
@@ -4707,47 +4710,52 @@ public void TeleportToSaveloc(int client, int id)
 	DispatchKeyValue(client, "targetname", g_szSaveLocTargetname[id]);
 	SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, 0.0 } ));
 	TeleportEntity(client, g_fSaveLocCoords[id], g_fSaveLocAngle[id], g_fSaveLocVel[id]);
-	CreateTimer(0.1, noPrac, client);
+	CreateTimer(0.1, noPrac, GetClientUserId(client));
 }
 
-public Action noPrac(Handle timer, int client)//saveloc on start > startpos
+public Action noPrac(Handle timer, int userid)//saveloc on start > startpos
 {
-	if (g_iClientInZone[client][0] == 1 || g_iClientInZone[client][0] == 5)
-	{
-		g_bPracticeMode[client] = false;
-		if (g_bPause[client] == true)
-			PauseMethod(client);
-		//make sure timer enabled so run doesnt start in prac mode
-		if (!g_bTimerEnabled[client])
-			g_bTimerEnabled[client] = true;
-		g_bTimerRunning[client] = false;
-		g_bClientRestarting[client] = false;
-		g_bWrcpTimeractivated[client] = false;
-		g_bInStageZone[client] = false;
-		g_bInStartZone[client] = true;
-		g_bLeftZone[client] = false;
-		g_bInBhop[client] = false;
+	int client = GetClientOfUserId(userid);
 
-		// Reset Run Variables
-		tmpDiff[client] = 9999.0;
-		g_fPauseTime[client] = 0.0;
-		g_fStartPauseTime[client] = 0.0;
-		g_bPause[client] = false;
-		SetEntityMoveType(client, MOVETYPE_WALK);
-		SetEntityRenderMode(client, RENDER_NORMAL);
-		g_fCurrentRunTime[client] = 0.0;
-		g_bPositionRestored[client] = false;
-		g_bMissedMapBest[client] = true;
-		g_bMissedBonusBest[client] = true;
-		g_bTimerRunning[client] = true;
-		g_bTop10Time[client] = false;
-		// Strafe Sync
-		g_iGoodGains[client] = 0;
-		g_iTotalMeasures[client] = 0;
-		g_iCurrentCheckpoint[client] = 0;
-		g_iCheckpointsPassed[client] = 0;
-		g_bIsValidRun[client] = false;
-		Client_Stop(client, 0);
+	if (IsValidClient(client))
+	{
+		if (g_iClientInZone[client][0] == 1 || g_iClientInZone[client][0] == 5)
+		{
+			g_bPracticeMode[client] = false;
+			if (g_bPause[client] == true)
+				PauseMethod(client);
+			//make sure timer enabled so run doesnt start in prac mode
+			if (!g_bTimerEnabled[client])
+				g_bTimerEnabled[client] = true;
+			g_bTimerRunning[client] = false;
+			g_bClientRestarting[client] = false;
+			g_bWrcpTimeractivated[client] = false;
+			g_bInStageZone[client] = false;
+			g_bInStartZone[client] = true;
+			g_bLeftZone[client] = false;
+			g_bInBhop[client] = false;
+
+			// Reset Run Variables
+			tmpDiff[client] = 9999.0;
+			g_fPauseTime[client] = 0.0;
+			g_fStartPauseTime[client] = 0.0;
+			g_bPause[client] = false;
+			SetEntityMoveType(client, MOVETYPE_WALK);
+			SetEntityRenderMode(client, RENDER_NORMAL);
+			g_fCurrentRunTime[client] = 0.0;
+			g_bPositionRestored[client] = false;
+			g_bMissedMapBest[client] = true;
+			g_bMissedBonusBest[client] = true;
+			g_bTimerRunning[client] = true;
+			g_bTop10Time[client] = false;
+			// Strafe Sync
+			g_iGoodGains[client] = 0;
+			g_iTotalMeasures[client] = 0;
+			g_iCurrentCheckpoint[client] = 0;
+			g_iCheckpointsPassed[client] = 0;
+			g_bIsValidRun[client] = false;
+			Client_Stop(client, 0);
+		}
 	}
 }
 
@@ -4925,7 +4933,7 @@ public void SetDefaultTitle(int client, const char szTitle[256])
 	// Set the clients default title
 	g_bEnforceTitle[client] = true;
 	Format(g_szEnforcedTitle[client], sizeof(g_szEnforcedTitle), szTitle);
-	CreateTimer(1.0, SetClanTag, client, TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer(1.0, SetClanTag, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public int GetStyleIndex(char[] szBuffer)
