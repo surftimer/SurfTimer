@@ -9634,7 +9634,7 @@ public void SQL_SelectAnnouncementsCallback(Handle owner, Handle hndl, const cha
 	} 
 }
 
-public void db_insertAnnouncement(char szName[128], char szMapName[128], int szMode, char szTime[32], int szGroup)
+public void db_insertAnnouncement(int client, char szName[128], char szMapName[128], int szMode, char szTime[32], int szGroup)
 {
 	if (g_iServerID == -1)
 		return;
@@ -9642,8 +9642,8 @@ public void db_insertAnnouncement(char szName[128], char szMapName[128], int szM
 	char szQuery[512];
 	char szEscServerName[128];
 	g_dDb.Escape(g_sServerName, szEscServerName, sizeof(szEscServerName));
-	Format(szQuery, sizeof(szQuery), "INSERT INTO `ck_announcements` (`server`, `name`, `mapname`, `mode`, `time`, `group`) VALUES ('%s', '%s', '%s', '%i', '%s', '%i');", szEscServerName, szName, szMapName, szMode, szTime, szGroup);
-	g_dDb.Query(SQL_CheckCallback, szQuery, 1, DBPrio_Low);
+	Format(szQuery, sizeof(szQuery), "INSERT INTO `ck_announcements` (`server`, `steamid`, `name`, `mapname`, `mode`, `time`, `group`) VALUES ('%s', '%s', '%s', '%s', '%i', '%s', '%i');", szEscServerName, g_szSteamID[client], szName, szMapName, szMode, szTime, szGroup);
+	g_dDb.Query(SQL_InsertAnnouncementCallback, szQuery, 1, DBPrio_Low);
 }
 
 public void db_checkAnnouncements()
@@ -10016,6 +10016,22 @@ public void sqlcreateBonusIndex(Database db, DBResultSet results, const char[] e
 	if (db == null || (strlen(error) && StrContains(error, "Duplicate", false) == -1))
 	{
 		SetFailState("[SurfTimer] (sqlcreateBonusIndex) Can't add bonus index. Error: %s", error);
+		return;
+	}
+}
+
+public void SQL_InsertAnnouncementCallback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		if (StrContains(error, "Unknown column", false) != -1)
+		{
+			LogError("[Surftimer] (SQL_InsertAnnouncementCallback) Your database are not up to date! Please use the command \"sm_surftimer_upgrade\" to upgrade your database.");
+		}
+		else
+		{
+			LogError("[SurfTimer] SQL Error (SQL_InsertAnnouncementCallback): %s", error);
+		}
 		return;
 	}
 }

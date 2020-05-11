@@ -17,6 +17,8 @@ void db_startUpgrading()
 	tTransaction.AddQuery("SELECT wrcppoints FROM ck_playerrank LIMIT 1", 2);
 	tTransaction.AddQuery("SELECT teleside FROM ck_playeroptions2 LIMIT 1", 3);
 	tTransaction.AddQuery("SELECT velEndXYZ FROM ck_checkpoints LIMIT 1", 4);
+	// Version 5 will used in SQLTxn_InsertCheckpouintsSuccess callback
+	tTransaction.AddQuery("SELECT steamid FROM ck_announcements LIMIT 1", 6);
 	g_dDb.Execute(tTransaction, SQLTxn_CheckDatabaseUpgradesSuccess, SQLTxn_CheckDatabaseUpgradesFailed);
 }
 
@@ -87,6 +89,10 @@ public void db_upgradeDatabase(int version)
 		tTransaction.AddQuery("ALTER TABLE `ck_bonus` ADD `velStartXY` INT NOT NULL AFTER `runtime`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`;", 4);
 		tTransaction.AddQuery("ALTER TABLE `ck_wrcps` ADD `velStartXY` INT NOT NULL AFTER `runtimepro`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`;", 5);
 		tTransaction.AddQuery("ALTER TABLE `ck_playeroptions2` DROP COLUMN `velcmphud`, DROP COLUMN `velcmpchat`, ADD COLUMN `velcmphud` INT NOT NULL DEFAULT 1 AFTER `teleside`, ADD COLUMN `velcmpchat` INT NOT NULL DEFAULT 1 AFTER `velcmphud`;", 6);
+	}
+	else if (version == 6)
+	{
+		tTransaction.AddQuery("ALTER TABLE `ck_announcements` ADD `steamid` varchar(32) NOT NULL AFTER `server`;", 1);
 	}
 	else
 	{
