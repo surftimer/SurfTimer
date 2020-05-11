@@ -580,6 +580,11 @@ public void RecalcPlayerRank(int client, char steamid[128])
 //
 public void CalculatePlayerRank(int client, int style)
 {
+	if (!IsValidClient(client))
+	{
+		return;
+	}
+
 	char szQuery[255];
 	// Take old points into memory, so at the end you can show how much the points changed
 	g_pr_oldpoints[client][style] = g_pr_points[client][style];
@@ -5361,11 +5366,15 @@ public void sql_selectRankedPlayersCallback(Handle owner, Handle hndl, const cha
 		if (g_pr_TableRowCount == 0)
 		{
 			for (int c = 1; c <= MaxClients; c++)
-				if (1 <= c <= MaxClients && IsValidEntity(c) && IsValidClient(c))
+			{
+				if (IsValidClient(c))
 				{
 					if (g_bManualRecalc)
-					CPrintToChat(c, "%t", "PrUpdateFinished", g_szChatPrefix);
+					{
+						CPrintToChat(c, "%t", "PrUpdateFinished", g_szChatPrefix);
+					}
 				}
+			}
 				
 			g_bManualRecalc = false;
 			g_pr_RankingRecalc_InProgress = false;
