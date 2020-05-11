@@ -242,7 +242,7 @@ public Action Command_CenterSpeed(int client, int args) {
 	} else {
 		g_bCenterSpeedDisplay[client] = true;
 		SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
-		CreateTimer(0.1, CenterSpeedDisplayTimer, client, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
+		CreateTimer(0.1, CenterSpeedDisplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
 		CPrintToChat(client, "%t", "CenterSpeedOn", g_szChatPrefix);
 	}
 	return Plugin_Handled;
@@ -1951,7 +1951,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 	if (g_bCenterSpeedDisplay[client])
 	{
 		SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
-		CreateTimer(0.1, CenterSpeedDisplayTimer, client, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
+		CreateTimer(0.1, CenterSpeedDisplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
 	}
 
 	if (menu)
@@ -2340,8 +2340,7 @@ public int GoToMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 			}
 		}
 	}
-	else
-		if (action == MenuAction_End)
+	else if (action == MenuAction_End)
 	{
 		CloseHandle(menu);
 	}
@@ -2617,8 +2616,7 @@ public int TopMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 			case 2: BonusTopMenu(param1);
 		}
 	}
-	else
-		if (action == MenuAction_End)
+	else if (action == MenuAction_End)
 		CloseHandle(menu);
 }
 
@@ -2669,6 +2667,10 @@ public int BonusTopMenuHandler(Menu menu, MenuAction action, int param1, int par
 	{
 		db_selectBonusTopSurfers(param1, g_szMapName, param2 + 1);
 	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
 }
 
 public void OptionMenu(int client)
@@ -2705,8 +2707,7 @@ public int OptionMenuHandler(Menu menu, MenuAction action, int param1, int param
 			case 3: MiscellaneousOptions(param1);
 		}
 	}
-	else
-		if (action == MenuAction_End)
+	else if (action == MenuAction_End)
 	{
 		CloseHandle(menu);
 	}
@@ -2872,7 +2873,6 @@ public int CentreHudModulesMenuHandler(Menu menu, MenuAction action, int param1,
 		else
 		{
 			CPrintToChat(param1, "%t", "Commands37", g_szChatPrefix);
-			CloseHandle(menu);
 		}
 
 		g_iCentreHudModule[param1][module] = param2;
@@ -3008,7 +3008,6 @@ public int SideHudModulesMenuHandler(Menu menu, MenuAction action, int param1, i
 		else
 		{
 			CPrintToChat(param1, "%t", "Commands39", g_szChatPrefix);
-			CloseHandle(menu);
 		}
 
 		g_iSideHudModule[param1][module] = param2;
@@ -3524,14 +3523,11 @@ public int StageSelectMenuHandler(Menu menu, MenuAction action, int param1, int 
 		GetMenuItem(menu, param2, info, sizeof(info));
 		db_selectStageTopSurfers(param1, info, g_szWrcpMapSelect[param1]);
 	}
-	else
+	else if (action == MenuAction_End)
 	{
-		if (action == MenuAction_End)
-		{
-			if (IsValidClient(param1))
-				g_bSelectWrcp[param1] = false;
-			CloseHandle(menu);
-		}
+		if (IsValidClient(param1))
+			g_bSelectWrcp[param1] = false;
+		CloseHandle(menu);
 	}
 }
 
@@ -3544,14 +3540,11 @@ public int StageStyleSelectMenuHandler(Menu menu, MenuAction action, int param1,
 		GetMenuItem(menu, param2, info, sizeof(info));
 		db_selectStageStyleTopSurfers(param1, info, g_szWrcpMapSelect[param1], style);
 	}
-	else
+	else if (action == MenuAction_End)
 	{
-		if (action == MenuAction_End)
-		{
-			if (IsValidClient(param1))
-				g_bSelectWrcp[param1] = false;
-			CloseHandle(menu);
-		}
+		if (IsValidClient(param1))
+			g_bSelectWrcp[param1] = false;
+		CloseHandle(menu);
 	}
 }
 
@@ -3614,9 +3607,8 @@ public int StyleTypeSelectMenuHandler(Menu styleSelect, MenuAction action, int p
 			}
 		}
 	}
-	else
+	else if (action == MenuAction_End)
 	{
-		if (action == MenuAction_End)
 			CloseHandle(styleSelect);
 	}
 }
@@ -4042,8 +4034,8 @@ public Action Admin_FixBot(int client, int args)
 		return Plugin_Handled;
 
 	CPrintToChat(client, "%t", "Commands52", g_szChatPrefix);
-	CreateTimer(5.0, FixBot_Off, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
-	CreateTimer(10.0, FixBot_On, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer(5.0, FixBot_Off, _, TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer(10.0, FixBot_On, _, TIMER_FLAG_NO_MAPCHANGE);
 
 	return Plugin_Handled;
 }
@@ -4315,6 +4307,10 @@ public int HookZonesMenuHandler(Menu menu, MenuAction action, int param1, int pa
 		{
 			if (IsValidClient(param1))
 				g_iSelectedTrigger[param1] = -1;
+		}
+		case MenuAction_End:
+		{
+			delete menu;
 		}
 	}
 }
