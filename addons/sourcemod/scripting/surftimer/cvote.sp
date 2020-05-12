@@ -99,10 +99,10 @@ public int Handle_VoteMenuExtend(Menu menu, MenuAction action, int param1, int p
 
 		if (strcmp(item, VOTE_NO) == 0 && param1 == 1)
 		{
-			votes = totalVotes - winVotes;
+			votes = totalVotes - votes;
 		}
 
-		percent = votes / totalVotes;
+		percent = float(votes / totalVotes);
 
 		GetCurrentMaptime();
 		int iTimeLimit = GetConVarInt(mapTime);
