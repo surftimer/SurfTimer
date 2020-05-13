@@ -17,5 +17,8 @@ If applicable, add screenshots to help explain your problem.
 **Plugin List**
 List of all your current sourcemod plugins, if applicable to the issue.
 
+**Timer Version**
+The major timer version. If you are using an self-compiled version off release schedule, specify the commit.
+
 **Additional context**
 Add any other context about the problem here.
