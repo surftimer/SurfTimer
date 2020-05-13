@@ -3228,48 +3228,48 @@ public void CenterHudDead(int client)
 		{
 			Buttons = g_LastButton[ObservedUser];
 			if (Buttons & IN_MOVELEFT)
-				Format(sResult, sizeof(sResult), "<font color='#b8b'>A</font>");
+				Format(sResult, sizeof(sResult), "<font color='#00ff00'>A</font>");
 			else
 				Format(sResult, sizeof(sResult), "_");
 			if (Buttons & IN_FORWARD)
-				Format(sResult, sizeof(sResult), "%s <font color='#b8b'>W</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s <font color='#00ff00'>W</font>", sResult);
 			else
 				Format(sResult, sizeof(sResult), "%s _", sResult);
 			if (Buttons & IN_BACK)
-				Format(sResult, sizeof(sResult), "%s <font color='#b8b'>S</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s <font color='#00ff00'>S</font>", sResult);
 			else
 				Format(sResult, sizeof(sResult), "%s _", sResult);
 			if (Buttons & IN_MOVERIGHT)
-				Format(sResult, sizeof(sResult), "%s <font color='#b8b'>D</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s <font color='#00ff00'>D</font>", sResult);
 			else
 				Format(sResult, sizeof(sResult), "%s _", sResult);
 			if (Buttons & IN_DUCK)
-				Format(sResult, sizeof(sResult), "%s - <font color='#b8b'>C</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s - <font color='#00ff00'>+D</font>", sResult);
 			else
-				Format(sResult, sizeof(sResult), "%s - _", sResult);
+				Format(sResult, sizeof(sResult), "%s - __", sResult);
 			if (Buttons & IN_JUMP)
-				Format(sResult, sizeof(sResult), "%s <font color='#b8b'>J</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s <font color='#00ff00'>+J</font>", sResult);
 			else
-				Format(sResult, sizeof(sResult), "%s _", sResult);
+				Format(sResult, sizeof(sResult), "%s __", sResult);
 			if (Buttons & IN_LEFT)
-				Format(sResult, sizeof(sResult), "%s <font color='#b8b'>L</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s <font color='#00ff00'>+L</font>", sResult);
 			else
-				Format(sResult, sizeof(sResult), "%s _", sResult);
+				Format(sResult, sizeof(sResult), "%s __", sResult);
 			if (Buttons & IN_RIGHT)
-				Format(sResult, sizeof(sResult), "%s <font color='#b8b'>R</font>", sResult);
+				Format(sResult, sizeof(sResult), "%s <font color='#00ff00'>+R</font>", sResult);
 			else
-				Format(sResult, sizeof(sResult), "%s _", sResult);
-
+				Format(sResult, sizeof(sResult), "%s __", sResult);
+			
 			if (IsFakeClient(ObservedUser))
 			{
 				if (ObservedUser == g_RecordBot)
-					Format(obsAika, sizeof(obsAika), "<font color='#ec8'>%s</font>", g_szReplayTime);
+					Format(obsAika, sizeof(obsAika), "<font color='#FFFF00'>%s</font>", g_szReplayTime);
 				else if (ObservedUser == g_BonusBot)
-					Format(obsAika, sizeof(obsAika), "<font color='#ec8'>%s</font>", g_szBonusTime);
+					Format(obsAika, sizeof(obsAika), "<font color='#FFFF00'>%s</font>", g_szBonusTime);
 				else if (ObservedUser == g_WrcpBot)
-					Format(obsAika, sizeof(obsAika), "<font color='#ec8'>%s</font>", g_szWrcpReplayTime[g_iCurrentlyPlayingStage]);
-
-				PrintCSGOHUDText(client, "<pre>%s\nSpeed: <font color='#5e5'>%i u/s\n%s</pre>", obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
+					Format(obsAika, sizeof(obsAika), "<font color='#FFFF00'>%s</font>", g_szWrcpReplayTime[g_iCurrentlyPlayingStage]);
+				
+				PrintCSGOHUDText(client, "<pre><font face=''>%s\nSpeed: <font color='#66bbff'>%i</font> u/s\nKeys: %s</pre>", obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
 				return;
 			}
 			else if (g_bTimerRunning[ObservedUser])
@@ -3283,9 +3283,9 @@ public void CenterHudDead(int client)
 				FormatTimeFloat(client, obsTimer, 3, obsAika, sizeof(obsAika));
 			}
 			else if (!g_bTimerEnabled[ObservedUser])
-				obsAika = "<font color='#f32'>Disabled</font>";
+				obsAika = "<font color='#FF0000'>Disabled</font>";
 			else {
-				obsAika = "<font color='#f32'>00:00:00</font>";
+				obsAika = "<font color='#FF0000'>00:00:00</font>";
 			}
 			char timerText[32] = "";
 			if (g_iClientInZone[ObservedUser][2] > 0)
@@ -3295,7 +3295,7 @@ public void CenterHudDead(int client)
 			else if (g_iCurrentStyle[ObservedUser] != 0)
 				Format(timerText, 32, "%s ", g_szStyleHud[ObservedUser]);
 
-			PrintCSGOHUDText(client, "<pre>%s<font color='#5e5'>%s</font>\nSpeed: <font color='#5e5'>%i u/s\n%s</pre>", timerText, obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
+			PrintCSGOHUDText(client, "<pre><font face=''>%s <font color='#00ff00'>%s</font>\nSpeed: <font color='#66bbff'>%i</font> u/s\nKeys: %s</pre>", timerText, obsAika, RoundToNearest(g_fLastSpeed[ObservedUser]), sResult);
 		}
 	}
 	else
