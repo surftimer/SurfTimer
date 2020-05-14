@@ -957,7 +957,7 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 						g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
 
 						StopPlayerMimic(g_BonusBot);
-						CreateTimer(0.1, RefreshBonusBot, TIMER_FLAG_NO_MAPCHANGE);
+						CreateTimer(0.1, RefreshBonusBot, _, TIMER_FLAG_NO_MAPCHANGE);
 						return;
 					}
 				}
