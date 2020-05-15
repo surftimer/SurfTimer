@@ -930,9 +930,14 @@ public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int
 
 public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &impulse, int &weapon, float angles[3], float vel[3])
 {
+	if (client != g_RecordBot && client != g_BonusBot && client != g_WrcpBot)
+	{
+		// ServerCommand("sm_fixbot");
+		return;
+	}
 	if (g_hBotMimicsRecord[client] != null)
 	{
-		if (!IsPlayerAlive(client) || GetClientTeam(client) < CS_TEAM_T)
+		if (!IsPlayerAlive(client) || GetClientTeam(client) < CS_TEAM_T || IsClientSourceTV(client))
 			return;
 
 		if (g_BotMimicTick[client] >= g_BotMimicRecordTickCount[client] || g_bReplayAtEnd[client])
@@ -950,6 +955,10 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 						g_iCurrentBonusReplayIndex = 0;
 						PlayRecord(g_BonusBot, 1, 0);
 						g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
+
+						StopPlayerMimic(g_BonusBot);
+						CreateTimer(0.1, RefreshBonusBot, _, TIMER_FLAG_NO_MAPCHANGE);
+						return;
 					}
 				}
 				else
@@ -960,6 +969,13 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 					else
 						g_iCurrentBonusReplayIndex = 0;
 
+					g_iSelectedReplayType = 1;
+
+					// g_bManualBonusReplayPlayback = true;
+					g_iManualBonusReplayCount = 99;
+					g_iSelectedBonusReplayStyle = 0;
+					// g_iCurrentBonusReplayIndex = 99;
+					g_iManualBonusToReplay = 1;
 					PlayRecord(g_BonusBot, 1, 0);
 					g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
 				}
@@ -972,9 +988,14 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 						g_iManualReplayCount++;
 					else
 					{
-						g_iManualReplayCount = 0;
 						g_bManualReplayPlayback = false;
+						g_iSelectedReplayType = 0;
+						g_iManualReplayCount = 99;
+						g_iSelectedReplayStyle = 0;
 						PlayRecord(g_RecordBot, 0, 0);
+						StopPlayerMimic(g_RecordBot);
+						CreateTimer(0.1, RefreshBot, TIMER_FLAG_NO_MAPCHANGE);
+						return;
 					}
 				}
 			}
@@ -1030,6 +1051,9 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 					}
 
 					g_StageReplaysLoop++;
+					g_iSelectedReplayType = 2;
+					g_iManualStageReplayCount = 0;
+					g_iSelectedReplayStage = g_StageReplayCurrentStage;
 					PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0);
 				}
 			}
@@ -1096,6 +1120,11 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 				}
 				else if (g_iSelectedReplayType == 1 && g_iSelectedBonusReplayStyle > 0)
 					Format(sPath, sizeof(sPath), "%s%s_bonus_%d_style_%d.rec", CK_REPLAY_PATH, g_szMapName, bonus, g_iSelectedBonusReplayStyle);
+			}
+			else if (client == g_WrcpBot)
+			{
+				int stage = g_iSelectedReplayStage;
+				Format(sPath, sizeof(sPath), "%s%s_stage_%d.rec", CK_REPLAY_PATH, g_szMapName, stage);
 			}
 
 			BuildPath(Path_SM, sPath, sizeof(sPath), "%s", sPath);
