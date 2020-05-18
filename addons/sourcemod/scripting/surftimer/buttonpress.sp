@@ -133,7 +133,7 @@ public void CL_OnStartTimerPress(int client)
 			if (g_bShowSpeedDifferenceHud[client])
 				g_fLastDifferenceSpeed[client] = GetGameTime();
 
-			CPrintToChat(client, "%s {default}Speed: {yellow}%d u/s {default}[SR: %s {default}| PB: %s{default}]", g_szChatPrefix, g_iStartVelsNew[client][zgrp][1], szDiff ,szDiff2);
+			CPrintToChat(client, "%s {default}Speed: {yellow}%d u/s {default}[WR: %s {default}| PB: %s{default}]", g_szChatPrefix, g_iStartVelsNew[client][zgrp][1], szDiff ,szDiff2);
 		}
 	}
 
@@ -202,7 +202,7 @@ public void CL_OnEndTimerPress(int client)
 				
 	// Print Speed if velocity setting
 
-	CPrintToChat(client, "%s {default}Speed: {yellow}%d {default}[SR: %s {default}| PB: %s{default}]", g_szChatPrefix, g_iEndVelsNew[client][zGroup][1], szDiff ,szDiff2);
+	CPrintToChat(client, "%s {default}Speed: {yellow}%d {default}[WR: %s {default}| PB: %s{default}]", g_szChatPrefix, g_iEndVelsNew[client][zGroup][1], szDiff ,szDiff2);
 
 	// Print bot finishing message to spectators
 	if (IsFakeClient(client) && g_bTimerRunning[client])
@@ -883,7 +883,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 				if (g_bShowSpeedDifferenceHud[client])
 					g_fLastDifferenceSpeed[client] = GetGameTime();
 				
-				CPrintToChat(client, "%s {default}Stage %d: {yellow}%d u/s {default}[SR: %s {default}| PB: %s{default}]", g_szChatPrefix, stage, g_iWrcpVelsStartNew[client][stage][1], szDiff ,szDiff2);
+				CPrintToChat(client, "%s {default}Stage %d: {yellow}%d u/s {default}[WR: %s {default}| PB: %s{default}]", g_szChatPrefix, stage, g_iWrcpVelsStartNew[client][stage][1], szDiff ,szDiff2);
 			}
 		}
 	}
