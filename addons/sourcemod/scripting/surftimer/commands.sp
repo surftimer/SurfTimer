@@ -1482,6 +1482,7 @@ public void TopMenuStyleSelect(int client)
 	AddMenuItem(menu, "", "Low-Gravity");
 	AddMenuItem(menu, "", "Slow Motion");
 	AddMenuItem(menu, "", "Fast Forwards");
+	AddMenuItem(menu, "", "Freestyle");
 	SetMenuExitButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
 }
