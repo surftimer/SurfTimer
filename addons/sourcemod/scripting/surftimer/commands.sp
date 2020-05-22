@@ -753,6 +753,20 @@ public Action Command_Teleport(int client, int args)
 		PauseMethod(client);
 
 	teleportClient(client, g_iClientInZone[client][2], g_Stage[g_iClientInZone[client][2]][client], false);
+
+	if (g_iCurrentStyle[client] == 4) // 4 low gravity
+		SetEntityGravity(client, 0.5);
+	else if (g_iCurrentStyle[client] == 5)// 5 slowmo
+		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 0.5);
+	else if (g_iCurrentStyle[client] == 6)// 6 fastforward
+		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.5);
+
+	if (g_iCurrentStyle[client] < 4) // 0 normal, 1 hsw, 2 sw, 3 bw
+	{
+		SetEntityGravity(client, 1.0); // normal gravity
+		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0); // normal speed
+	}
+
 	return Plugin_Handled;
 }
 
