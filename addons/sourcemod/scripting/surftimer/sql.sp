@@ -513,7 +513,7 @@ public void db_viewMapRankProCallback(Handle owner, Handle hndl, const char[] er
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
 		int client = GetClientOfUserId(userid);
-		if (IsClientInGame(client))
+		if (IsValidClient(client))
 		{
 			g_MapRank[client] = SQL_FetchInt(hndl, 0);
 		}
