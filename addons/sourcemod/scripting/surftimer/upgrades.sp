@@ -106,7 +106,7 @@ public void db_upgradeDatabase(int version)
 		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velStartXYZ` INT NOT NULL DEFAULT 0;", 8);
 		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velStartZ` INT NOT NULL DEFAULT 0;", 9);
 		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velEndXY` INT NOT NULL DEFAULT 0;", 10);
-		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velEndXYZ` INT NOT NULL DEFAULT 0;", 11;
+		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velEndXYZ` INT NOT NULL DEFAULT 0;", 11);
 		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velEndZ` INT NOT NULL DEFAULT 0;", 12);
 		tTransaction.AddQuery("ALTER TABLE `ck_wrcps` MODIFY `velStartXY` INT NOT NULL DEFAULT 0;", 13);
 		tTransaction.AddQuery("ALTER TABLE `ck_wrcps` MODIFY `velStartXYZ` INT NOT NULL DEFAULT 0;", 14);
