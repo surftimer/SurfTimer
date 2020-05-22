@@ -9818,9 +9818,16 @@ public void SQL_SelectCPRCallback(Handle owner, Handle hndl, const char[] error,
 		ResetPack(pack);
 		int client = ReadPackCell(pack);
 
-		for (int i = 1; i < 36; i++)
+		for (int i = 0; i <= 35; i++)
 		{
-			g_fClientCPs[client][i] = SQL_FetchFloat(hndl, i - 1);
+			float fBuffer = 0.0;
+
+			if (!SQL_IsFieldNull(hndl, i))
+			{
+				fBuffer = SQL_FetchFloat(hndl, i);
+			}
+
+			g_fClientCPs[client][i] = fBuffer;
 		}
 		db_selectCPRTarget(pack);
 
