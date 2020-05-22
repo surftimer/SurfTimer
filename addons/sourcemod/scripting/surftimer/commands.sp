@@ -40,6 +40,7 @@ void CreateCommands()
 	RegConsoleCmd("+noclip", NoClip, "[surftimer] Player noclip on");
 	RegConsoleCmd("-noclip", UnNoClip, "[surftimer] Player noclip off");
 	RegConsoleCmd("sm_nc", Command_ckNoClip, "[surftimer] Player noclip on/off");
+	RegConsoleCmd("sm_st_version", Command_STVersion, "[surftimer] Print the surftimer version into chat/console");
 
 	// Teleportation Commands
 	RegConsoleCmd("sm_stages", Command_SelectStage, "[surftimer] Opens up the stage selector");
@@ -1472,6 +1473,12 @@ public Action Command_ckNoClip(int client, int args)
 	}
 
 	return Plugin_Handled;
+}
+
+public Action Command_STVersion(int client, int args)
+{
+	ReplyToCommand(client, "SurfTimer Version: %s", VERSION);
+	ReplyToCommand(client, "Compiled with %s", SOURCEMOD_VERSION);
 }
 
 public Action Client_Top(int client, int args)
