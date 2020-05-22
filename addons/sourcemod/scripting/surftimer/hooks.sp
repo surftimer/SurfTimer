@@ -1354,7 +1354,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 				CPrintToChat(client, "%t", "Hooks10", g_szChatPrefix);
 				Handle pack;
 				CreateDataTimer(0.05, DelayedVelocityCap, pack);
-				WritePackCell(pack, client);
+				WritePackCell(pack, GetClientUserId(client));
 				WritePackFloat(pack, 0.0);
 				g_bJumpZoneTimer[client] = true;
 			}
@@ -1428,7 +1428,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 							CPrintToChat(client, "%t", "Hooks15", g_szChatPrefix);
 							Handle pack;
 							CreateDataTimer(0.05, DelayedVelocityCap, pack);
-							WritePackCell(pack, client);
+							WritePackCell(pack, GetClientUserId(client));
 							WritePackFloat(pack, 0.0);
 						}
 					}
@@ -1457,23 +1457,27 @@ public Action ResetOneJump(Handle timer, any userid)
 public Action DelayedVelocityCap(Handle timer, Handle pack)
 {
 	ResetPack(pack);
-	int client = ReadPackCell(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
 	float speedCap = ReadPackFloat(pack);
+	delete pack;
 	
-	float CurVelVec[3];
+	if (IsValidClient(client))
+	{
+		float CurVelVec[3];
 
-	GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
+		GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
 
-	if (CurVelVec[0] == 0.0)
-		CurVelVec[0] = 1.0;
-	if (CurVelVec[1] == 0.0)
-		CurVelVec[1] = 1.0;
-	if (CurVelVec[2] == 0.0)
-		CurVelVec[2] = 1.0;
+		if (CurVelVec[0] == 0.0)
+			CurVelVec[0] = 1.0;
+		if (CurVelVec[1] == 0.0)
+			CurVelVec[1] = 1.0;
+		if (CurVelVec[2] == 0.0)
+			CurVelVec[2] = 1.0;
 
-	NormalizeVector(CurVelVec, CurVelVec);
-	ScaleVector(CurVelVec, speedCap);
-	TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
+		NormalizeVector(CurVelVec, CurVelVec);
+		ScaleVector(CurVelVec, speedCap);
+		TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
+	}
 }
 
 public Action Hook_SetTriggerTransmit(int entity, int client)
