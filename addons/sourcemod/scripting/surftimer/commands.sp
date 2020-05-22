@@ -1772,16 +1772,20 @@ public void SpecPlayer(int client, int args)
 		// add players
 		for (int i = 1; i <= MaxClients; i++)
 		{
-			if (IsValidClient(i) && IsPlayerAlive(i) && i != client && !IsFakeClient(i))
+			if (i != client && IsValidClient(i) && IsPlayerAlive(i) && !IsFakeClient(i))
 			{
 				if (count == 0)
 				{
 					int bestrank = 99999999;
 					for (int x = 1; x <= MaxClients; x++)
 					{
-						if (IsValidClient(x) && IsPlayerAlive(x) && x != client && !IsFakeClient(x) && g_PlayerRank[x][0] > 0)
-							if (g_PlayerRank[x][0] <= bestrank)
-							bestrank = g_PlayerRank[x][0];
+						if (x != client && IsValidClient(x) && IsPlayerAlive(x) && !IsFakeClient(x) && g_PlayerRank[x][0] > 0)
+						{
+							if (g_PlayerRank[x][0] >= bestrank)
+							{
+								bestrank = g_PlayerRank[x][0];
+							}
+						}
 					}
 					char szMenu[128];
 					Format(szMenu, 128, "Highest ranked player (#%i)", bestrank);
