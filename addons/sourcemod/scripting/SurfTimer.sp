@@ -35,7 +35,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "285.7"
+#define VERSION "285.95"
 
 // Database Definitions
 #define MYSQL 0
@@ -696,19 +696,7 @@ Handle g_PracticeFinishForward;
 /*----------  SQL Variables  ----------*/
 
 // SQL driver
-Handle g_hDb = null;
-
-// Database type
-int g_DbType;
-
-// Used to check if SQL changes are being made
-bool g_bInTransactionChain = false;
-
-// Used to track failed transactions when making database changes
-int g_failedTransactions[7];
-
-// Used to track if sql tables are being renamed
-bool g_bRenaming = false;
+Database g_dDb = null;
 
 // Used to track if a players settings have been loaded
 bool g_bSettingsLoaded[MAXPLAYERS + 1];
@@ -1576,6 +1564,7 @@ char RadioCMDS[][] =  // Disable radio commands
 #include "surftimer/mapsettings.sp"
 #include "surftimer/cvote.sp"
 #include "surftimer/vip.sp"
+#include "surftimer/upgrades.sp"
 
 /*====================================
 =               Events               =
@@ -1662,6 +1651,8 @@ public void OnEntityCreated(int entity, const char[] classname) {
 
 public void OnMapStart()
 {
+	db_setupDatabase();
+	
 	CreateTimer(30.0, EnableJoinMsgs, _, TIMER_FLAG_NO_MAPCHANGE);
 
 	// Get mapname
@@ -1684,21 +1675,7 @@ public void OnMapStart()
 	g_hMaxVelocity = FindConVar("sv_maxvelocity");
 
 	// Load spawns
-	if (!g_bRenaming && !g_bInTransactionChain)
 	checkSpawnPoints();
-
-	db_viewMapSettings();
-
-
-	/// Start Loading Server Settings
-	ConVar cvHibernateWhenEmpty = FindConVar("sv_hibernate_when_empty");
-
-	if (!g_bRenaming && !g_bInTransactionChain && (IsServerProcessing() || !cvHibernateWhenEmpty.BoolValue))
-	{
-		LogToFileEx(g_szLogFile, "[surftimer] Starting to load server settings");
-		g_fServerLoading[0] = GetGameTime();
-		db_selectMapZones();
-	}
 
 	// Get Map Tag
 	ExplodeString(g_szMapName, "_", g_szMapPrefix, 2, 32);
@@ -1880,19 +1857,8 @@ public void OnConfigsExecuted()
 	GetConVarString(g_hChatPrefix, g_szMenuPrefix, sizeof(g_szMenuPrefix));
 	CRemoveTags(g_szMenuPrefix, sizeof(g_szMenuPrefix));
 
-	if (GetConVarBool(g_hDBMapcycle))
-		db_selectMapCycle();
-	else if (!GetConVarBool(g_hMultiServerMapcycle))
-		readMapycycle();
-	else
-		readMultiServerMapcycle();
-
 	if (GetConVarBool(g_hEnforceDefaultTitles))
 		ReadDefaultTitlesWhitelist();
-
-	// Count the amount of bonuses and then set skillgroups
-	if (!g_bRenaming && !g_bInTransactionChain)
-		db_selectBonusCount();
 
 	ServerCommand("sv_pure 0");
 
@@ -1989,7 +1955,7 @@ public void OnClientPostAdminCheck(int client)
 	FixPlayerName(client);
 
 	// Position Restoring
-	if (GetConVarBool(g_hcvarRestore) && !g_bRenaming && !g_bInTransactionChain)
+	if (GetConVarBool(g_hcvarRestore))
 	{
 		db_selectLastRun(client);
 	}
@@ -2004,7 +1970,7 @@ public void OnClientPostAdminCheck(int client)
 		AnnounceTimer[client] = CreateTimer(20.0, AnnounceMap, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 	}
 
-	if (!g_bRenaming && !g_bInTransactionChain && g_bServerDataLoaded && !g_bSettingsLoaded[client] && !g_bLoadingSettings[client])
+	if (g_bServerDataLoaded && !g_bSettingsLoaded[client] && !g_bLoadingSettings[client])
 	{
 		// Start loading client settings
 		g_bLoadingSettings[client] = true;
@@ -2109,7 +2075,7 @@ public void OnClientDisconnect(int client)
 	}
 
 	// Database
-	if (IsValidClient(client) && !g_bRenaming)
+	if (IsValidClient(client))
 	{
 		if (!g_bIgnoreZone[client] && !g_bPracticeMode[client])
 			db_insertLastPosition(client, g_szMapName, g_Stage[g_iClientInZone[client][2]][client], g_iClientInZone[client][2]);
@@ -2662,7 +2628,6 @@ public void OnPluginStart()
 	CreateHooks();
 	CreateCommandListeners();
 
-	db_setupDatabase();
 	CreateCommandsNewMap();
 
 	// exec surftimer.cfg

@@ -40,6 +40,7 @@ void CreateCommands()
 	RegConsoleCmd("+noclip", NoClip, "[surftimer] Player noclip on");
 	RegConsoleCmd("-noclip", UnNoClip, "[surftimer] Player noclip off");
 	RegConsoleCmd("sm_nc", Command_ckNoClip, "[surftimer] Player noclip on/off");
+	RegConsoleCmd("sm_st_version", Command_STVersion, "[surftimer] Print the surftimer version into chat/console");
 
 	// Teleportation Commands
 	RegConsoleCmd("sm_stages", Command_SelectStage, "[surftimer] Opens up the stage selector");
@@ -150,6 +151,7 @@ void CreateCommands()
 	RegAdminCmd("sm_test", sm_test, ADMFLAG_CUSTOM6);
 	RegAdminCmd("sm_vel", Client_GetVelocity, ADMFLAG_ROOT);
 	RegAdminCmd("sm_targetname", Client_TargetName, ADMFLAG_ROOT);
+	RegAdminCmd("sm_isloaded", Command_IsLoaded, ADMFLAG_ROOT);
 
 	// !Startpos -- Goose
 	RegConsoleCmd("sm_startpos", Command_Startpos, "[surftimer] Saves current location as new !r spawn.");
@@ -187,6 +189,10 @@ void CreateCommands()
 	RegConsoleCmd("sm_centerspeed", Command_CenterSpeed, "[surftimer] [settings] on/off - toggle center speed display");
 	RegConsoleCmd("sm_nctriggers", Command_ToggleNcTriggers, "[surftimer] [settings] on/off - toggle triggers while noclipping");
 	RegConsoleCmd("sm_autoreset", Command_ToggleAutoReset, "[surftimer] [settings] on/off - toggle auto reset for your current map/bonus run if your above your pb");
+
+	// Run database upgrading
+	RegAdminCmd("sm_surftimer_upgrade", Command_DatabaseUpgrade, ADMFLAG_ROOT, "Upgrading database");
+	RegAdminCmd("sm_surftimer_migrate", Command_DatabaseUpgrade, ADMFLAG_ROOT, "Upgrading database");
 
 }
 
@@ -352,10 +358,10 @@ public Action Command_DeleteRecords(int client, int args)
 	if(args > 0)
 	{
 		char sqlStripped[128];
-		GetCmdArg(1, sqlStripped[client], 128);
-		SQL_EscapeString(g_hDb, sqlStripped, g_EditingMap[client], 256);
+		GetCmdArg(1, sqlStripped[client], sizeof(sqlStripped));
+		g_dDb.Escape(sqlStripped, g_EditingMap[client], sizeof(g_EditingMap[]));
 	} else
-		Format(g_EditingMap[client], 256, g_szMapName);
+		Format(g_EditingMap[client], sizeof(g_EditingMap[]), g_szMapName);
 	
 	ShowMainDeleteMenu(client);
 	return Plugin_Handled;
@@ -387,24 +393,24 @@ public int ShowMainDeleteMenuHandler(Menu menu, MenuAction action, int client, i
 		{
 			case 0:
 			{
-				FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_playertimes", g_EditingMap[client], g_SelectedStyle[client], "", "runtimepro");
+				FormatEx(szQuery, sizeof(szQuery), sql_MainEditQuery, "runtimepro", "ck_playertimes", g_EditingMap[client], g_SelectedStyle[client], "", "runtimepro");
 			}
 			case 1:
 			{
 				char stageQuery[32];
-				FormatEx(stageQuery, 32, "AND stage='%i' ", g_SelectedType[client]);
-				FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_wrcps", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtimepro");
+				FormatEx(stageQuery, sizeof(stageQuery), "AND stage='%i' ", g_SelectedType[client]);
+				FormatEx(szQuery, sizeof(szQuery), sql_MainEditQuery, "runtimepro", "ck_wrcps", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtimepro");
 			}
 			case 2:
 			{
 				char stageQuery[32];
-				FormatEx(stageQuery, 32, "AND zonegroup='%i' ", g_SelectedType[client]);
-				FormatEx(szQuery, 512, sql_MainEditQuery, "runtime", "ck_bonus", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtime");
+				FormatEx(stageQuery, sizeof(stageQuery), "AND zonegroup='%i' ", g_SelectedType[client]);
+				FormatEx(szQuery, sizeof(szQuery), sql_MainEditQuery, "runtime", "ck_bonus", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtime");
 			}
 		}
 		
 		PrintToServer(szQuery);
-		SQL_TQuery(g_hDb, sql_DeleteMenuView, szQuery, GetClientSerial(client));
+		g_dDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client));
 	}
 	else if(action == MenuAction_End)
 		delete menu;
@@ -431,8 +437,8 @@ public Action sm_test(int client, int args)
 {
 	char arg[128];
 	char found[128];
-	GetCmdArg(1, arg, 128);
-	FindMap(arg, found, 128);
+	GetCmdArg(1, arg, sizeof(arg));
+	FindMap(arg, found, sizeof(found));
 	CPrintToChat(client, "arg: %s | found: %s", arg, found);
 	return Plugin_Handled;
 }
@@ -451,11 +457,16 @@ public Action Client_TargetName(int client, int args)
 	char szTargetName[128];
 	char szClassName[128];
 	GetEntPropString(client, Prop_Data, "m_iName", szTargetName, sizeof(szTargetName));
-	GetEntityClassname(client, szClassName, 128);
+	GetEntityClassname(client, szClassName, sizeof(szClassName));
 	CPrintToChat(client, "%t", "Commands2", g_szChatPrefix, szTargetName);
 	CPrintToChat(client, "%t", "Commands3", g_szChatPrefix, szClassName);
 
 	return Plugin_Handled;
+}
+
+public Action Command_IsLoaded(int client, int args)
+{
+	ReplyToCommand(client, "g_bServerDataLoaded: %d", g_bServerDataLoaded);
 }
 
 public Action Command_Vip(int client, int args)
@@ -470,13 +481,13 @@ public void CustomTitleMenu(int client)
 
 	char szName[64], szColour[3][96], szTitle[256], szItem[128], szItem2[128];
 
-	GetClientName(client, szName, 64);
-	getColourName(client, szColour[0], 32, g_iCustomColours[client][0]);
-	getColourName(client, szColour[1], 32, g_iCustomColours[client][1]);
+	GetClientName(client, szName, sizeof(szName));
+	getColourName(client, szColour[0], sizeof(szColour[]), g_iCustomColours[client][0]);
+	getColourName(client, szColour[1], sizeof(szColour[]), g_iCustomColours[client][1]);
 
-	Format(szTitle, 256, "Custom Titles Menu: %s\nCustom Title: %s\n \n", szName, g_szCustomTitle[client]);
-	Format(szItem, 128, "Name Colour: %s", szColour[0]);
-	Format(szItem2, 128, "Text Colour: %s", szColour[1]);
+	Format(szTitle, sizeof(szTitle), "Custom Titles Menu: %s\nCustom Title: %s\n \n", szName, g_szCustomTitle[client]);
+	Format(szItem, sizeof(szItem), "Name Colour: %s", szColour[0]);
+	Format(szItem2, sizeof(szItem2), "Text Colour: %s", szColour[1]);
 
 	Menu menu = CreateMenu(CustomTitleMenuHandler);
 	SetMenuTitle(menu, szTitle);
@@ -671,9 +682,9 @@ public void SaveLocMenu(int client)
 	for (int i = 1; i <= g_iSaveLocCount; i++)
 	{
 		unix = GetTime() - g_iSaveLocUnix[i];
-		diffForHumans(unix, szBuffer, 128, 1);
+		diffForHumans(unix, szBuffer, sizeof(szBuffer), 1);
 		Format(szItem, sizeof(szItem), "#%d - %s - %s", i, g_szSaveLocClientName[i], szBuffer);
-		IntToString(i, szId, 32);
+		IntToString(i, szId, sizeof(szId));
 		AddMenuItem(menu, szId, szItem);
 	}
 
@@ -708,7 +719,7 @@ public int SaveLocListHandler(Menu menu, MenuAction action, int param1, int para
 	{
 		g_iMenuPosition[param1] = param2;
 		char szId[32];
-		GetMenuItem(menu, param2, szId, 32);
+		GetMenuItem(menu, param2, szId, sizeof(szId));
 		int id = StringToInt(szId);
 		CPrintToChat(param1, "%t", "Commands13", g_szChatPrefix, id);
 		TeleportToSaveloc(param1, id);
@@ -940,7 +951,7 @@ public void ListStages(int client, int zonegroup)
 				{
 					amount++;
 					Format(StageName, sizeof(StageName), "Stage %i", (amount + 1));
-					IntToString(amount + 1, ZoneInfo, 6);
+					IntToString(amount + 1, ZoneInfo, sizeof(ZoneInfo));
 					AddMenuItem(sMenu, ZoneInfo, StageName);
 				}
 			}
@@ -1462,6 +1473,12 @@ public Action Command_ckNoClip(int client, int args)
 	}
 
 	return Plugin_Handled;
+}
+
+public Action Command_STVersion(int client, int args)
+{
+	ReplyToCommand(client, "SurfTimer Version: %s", VERSION);
+	ReplyToCommand(client, "Compiled with %s", SOURCEMOD_VERSION);
 }
 
 public Action Client_Top(int client, int args)
