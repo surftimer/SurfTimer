@@ -4942,7 +4942,7 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 		{
 			// Delay the switch to spec so the client sees the new bot name
 			Handle pack;
-			CreateDataTimer(0.2, SpecBot, pack);
+			CreateTimer(0.2, SpecBot, pack);
 			WritePackCell(pack, GetClientUserId(param1));
 			WritePackCell(pack, bot);
 		}

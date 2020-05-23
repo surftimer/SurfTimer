@@ -1353,7 +1353,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 				CreateTimer(1.0, StartJumpZonePrintTimer, GetClientUserId(client));
 				CPrintToChat(client, "%t", "Hooks10", g_szChatPrefix);
 				Handle pack;
-				CreateDataTimer(0.05, DelayedVelocityCap, pack);
+				CreateTimer(0.05, DelayedVelocityCap, pack);
 				WritePackCell(pack, GetClientUserId(client));
 				WritePackFloat(pack, 0.0);
 				g_bJumpZoneTimer[client] = true;
@@ -1427,7 +1427,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 						{
 							CPrintToChat(client, "%t", "Hooks15", g_szChatPrefix);
 							Handle pack;
-							CreateDataTimer(0.05, DelayedVelocityCap, pack);
+							CreateTimer(0.05, DelayedVelocityCap, pack);
 							WritePackCell(pack, GetClientUserId(client));
 							WritePackFloat(pack, 0.0);
 						}

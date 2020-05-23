@@ -1935,7 +1935,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 
 		Handle pack;
 		int style = 0;
-		CreateDataTimer(1.0, UpdatePlayerProfile, pack, TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(1.0, UpdatePlayerProfile, pack, TIMER_FLAG_NO_MAPCHANGE);
 		WritePackCell(pack, GetClientUserId(client));
 		WritePackCell(pack, style);
 
