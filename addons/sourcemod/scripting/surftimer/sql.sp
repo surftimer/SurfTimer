@@ -86,8 +86,6 @@ public void db_createTables()
 
 public void SQLTxn_CreateDatabaseSuccess(Handle db, any data, int numQueries, DBResultSet[] results, any[] queryData)
 {
-	PrintToServer("[SurfTimer] Database tables succesfully created!");
-
 	for (int i = 0; i < numQueries; i++)
 	{
 		if (queryData[i] == 3 || queryData[i] == 8)
