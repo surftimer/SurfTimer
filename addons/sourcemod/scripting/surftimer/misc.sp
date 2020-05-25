@@ -24,7 +24,7 @@ void setBotQuota()
 		SetConVarInt(hBotQuota, count, false, false);
 	}
 
-	CloseHandle(hBotQuota);
+	delete hBotQuota;
 
 	return;
 }
@@ -653,8 +653,7 @@ public void readMultiServerMapcycle()
 	else
 		SetFailState("[surftimer] %s is empty or does not exist.", MULTI_SERVER_MAPCYCLE);
 
-	if (fileHandle != null)
-		CloseHandle(fileHandle);
+	delete fileHandle;
 
 	return;
 }
@@ -1654,10 +1653,10 @@ stock int TraceClientViewEntity(int client)
 	if (TR_DidHit(tr))
 	{
 		pEntity = TR_GetEntityIndex(tr);
-		CloseHandle(tr);
+		delete tr;
 		return pEntity;
 	}
-	CloseHandle(tr);
+	delete tr;
 	return -1;
 }
 
@@ -2466,8 +2465,8 @@ public void SetSkillGroups()
 				PushArrayArray(g_hSkillGroups, RankValue, sizeof(RankValue));
 			} while (KvGotoNextKey(hKeyValues));
 		}
-		if (hKeyValues != null)
-			CloseHandle(hKeyValues);
+		
+		delete hKeyValues;
 	}
 	else
 		SetFailState("[surftimer] %s not found.", SKILLGROUP_PATH);
@@ -2781,7 +2780,7 @@ public void SpecList(int client)
 		Handle panel = CreatePanel();
 		DrawPanelText(panel, g_szPlayerPanelText[client]);
 		SendPanelToClient(panel, client, PanelHandler, 1);
-		CloseHandle(panel);
+		delete panel;
 	}
 }
 
@@ -3211,11 +3210,9 @@ public void SetInfoBotName(int ent)
 	float ftime = float(iInfoBotTimeleft);
 	char szTime[32];
 	FormatTimeFloat(g_InfoBot, ftime, 4, szTime, sizeof(szTime));
-	Handle hTmp;
-	hTmp = FindConVar("mp_timelimit");
+	Handle hTmp = FindConVar("mp_timelimit");
 	int iTimeLimit = GetConVarInt(hTmp);
-	if (hTmp != null)
-		CloseHandle(hTmp);
+	delete hTmp;
 	if (GetConVarBool(g_hMapEnd) && iTimeLimit > 0)
 		Format(szBuffer, sizeof(szBuffer), "%s (in %s)", sNextMap, szTime);
 	else
@@ -3815,7 +3812,7 @@ public void SideHudAlive(int client)
 		DrawPanelText(panel, szPanel);
 
 		SendPanelToClient(panel, client, PanelHandler, 1);
-		CloseHandle(panel);
+		delete panel;
 	}
 }
 
@@ -4852,7 +4849,7 @@ public void ReadDefaultTitlesWhitelist()
 			if (StrContains(line, "//", true) == -1)
 				PushArrayString(g_DefaultTitlesWhitelist, line);
 		}
-		CloseHandle(whitelist);
+		delete whitelist;
 	}
 	else
 		LogError("[SurfTimer] %s not found", DEFAULT_TITLES_WHITELIST_PATH);

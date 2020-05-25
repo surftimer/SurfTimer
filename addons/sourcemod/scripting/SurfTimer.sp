@@ -1575,9 +1575,11 @@ public void OnLibraryAdded(const char[] name)
 {
 	Handle tmp = FindPluginByFile("mapchooser_extended.smx");
 	if ((StrEqual("mapchooser", name)) || (tmp != null && GetPluginStatus(tmp) == Plugin_Running))
+	{
 		g_bMapChooser = true;
-	if (tmp != null)
-		CloseHandle(tmp);
+	}
+
+	delete tmp;
 
 	// botmimic 2
 	if (StrEqual(name, "dhooks") && g_hTeleport == null)
@@ -1585,9 +1587,14 @@ public void OnLibraryAdded(const char[] name)
 		// Optionally setup a hook on CBaseEntity::Teleport to keep track of sudden place changes
 		Handle hGameData = LoadGameConfigFile("sdktools.games");
 		if (hGameData == null)
+		{
 			return;
+		}
+
 		int iOffset = GameConfGetOffset(hGameData, "Teleport");
-		CloseHandle(hGameData);
+
+		delete hGameData;
+		
 		if (iOffset == -1)
 			return;
 
@@ -1739,8 +1746,7 @@ public void OnMapStart()
 
 	// Hook Zones
 	iEnt = -1;
-	if (g_hTriggerMultiple != null)
-		CloseHandle(g_hTriggerMultiple);
+	delete g_hTriggerMultiple;
 
 	g_hTriggerMultiple = CreateArray(256);
 	while ((iEnt = FindEntityByClassname(iEnt, "trigger_multiple")) != -1)
@@ -1768,8 +1774,7 @@ public void OnMapStart()
 
 	// info_teleport_destinations
 	iEnt = -1;
-	if (g_hDestinations != null)
-		CloseHandle(g_hDestinations);
+	delete g_hDestinations;
 
 	g_hDestinations = CreateArray(128);
 	while ((iEnt = FindEntityByClassname(iEnt, "info_teleport_destination")) != -1)
@@ -1810,17 +1815,9 @@ public void OnMapEnd()
 	g_WrcpBot = -1;
 	db_Cleanup();
 
-	if (g_hSkillGroups != null)
-		CloseHandle(g_hSkillGroups);
-	g_hSkillGroups = null;
-
-	if (g_hBotTrail[0] != null)
-		CloseHandle(g_hBotTrail[0]);
-	g_hBotTrail[0] = null;
-
-	if (g_hBotTrail[1] != null)
-		CloseHandle(g_hBotTrail[1]);
-	g_hBotTrail[1] = null;
+	delete g_hSkillGroups;
+	delete g_hBotTrail[0];
+	delete g_hBotTrail[1];
 
 	Format(g_szMapName, sizeof(g_szMapName), "");
 
@@ -1832,21 +1829,9 @@ public void OnMapEnd()
 	}
 
 	// Hook Zones
-	if (g_hTriggerMultiple != null)
-	{
-		ClearArray(g_hTriggerMultiple);
-		CloseHandle(g_hTriggerMultiple);
-	}
-
-	g_hTriggerMultiple = null;
 	delete g_hTriggerMultiple;
-
-	CloseHandle(g_mTriggerMultipleMenu);
-
-	if (g_hDestinations != null)
-		CloseHandle(g_hDestinations);
-
-	g_hDestinations = null;
+	delete g_mTriggerMultipleMenu;
+	delete g_hDestinations;
 }
 
 public void OnConfigsExecuted()
@@ -2031,10 +2016,9 @@ public void OnClientAuthorized(int client)
 
 public void OnClientDisconnect(int client)
 {
-	if (IsFakeClient(client) && g_hRecordingAdditionalTeleport[client] != null)
+	if (IsFakeClient(client))
 	{
-		CloseHandle(g_hRecordingAdditionalTeleport[client]);
-		g_hRecordingAdditionalTeleport[client] = null;
+		delete g_hRecordingAdditionalTeleport[client];
 	}
 
 	db_savePlayTime(client);
@@ -2136,9 +2120,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 				else
 					ServerCommand("bot_quota 0");
 
-			if (g_hBotTrail[0] != null)
-				CloseHandle(g_hBotTrail[0]);
-			g_hBotTrail[0] = null;
+			delete g_hBotTrail[0];
 		}
 	}
 	else if (convar == g_hBonusBot)
@@ -2172,9 +2154,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 				else
 					ServerCommand("bot_quota 0");
 
-			if (g_hBotTrail[1] != null)
-				CloseHandle(g_hBotTrail[1]);
-			g_hBotTrail[1] = null;
+			delete g_hBotTrail[1];
 		}
 	}
 	else if (convar == g_hWrcpBot)
@@ -2660,7 +2640,7 @@ public void OnPluginStart()
 		return;
 	}
 	int iOffset = GameConfGetOffset(hGameData, "Teleport");
-	CloseHandle(hGameData);
+	delete hGameData;
 	if (iOffset == -1)
 		return;
 
