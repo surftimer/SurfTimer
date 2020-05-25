@@ -86,8 +86,6 @@ public void db_createTables()
 
 public void SQLTxn_CreateDatabaseSuccess(Handle db, any data, int numQueries, DBResultSet[] results, any[] queryData)
 {
-	PrintToServer("[SurfTimer] Database tables succesfully created!");
-
 	for (int i = 0; i < numQueries; i++)
 	{
 		if (queryData[i] == 3 || queryData[i] == 8)
@@ -513,7 +511,7 @@ public void db_viewMapRankProCallback(Handle owner, Handle hndl, const char[] er
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
 		int client = GetClientOfUserId(userid);
-		if (IsClientInGame(client))
+		if (IsValidClient(client))
 		{
 			g_MapRank[client] = SQL_FetchInt(hndl, 0);
 		}
@@ -9821,9 +9819,16 @@ public void SQL_SelectCPRCallback(Handle owner, Handle hndl, const char[] error,
 		ResetPack(pack);
 		int client = ReadPackCell(pack);
 
-		for (int i = 1; i < 36; i++)
+		for (int i = 0; i <= 35; i++)
 		{
-			g_fClientCPs[client][i] = SQL_FetchFloat(hndl, i - 1);
+			float fBuffer = 0.0;
+
+			if (!SQL_IsFieldNull(hndl, i))
+			{
+				fBuffer = SQL_FetchFloat(hndl, i);
+			}
+
+			g_fClientCPs[client][i] = fBuffer;
 		}
 		db_selectCPRTarget(pack);
 
