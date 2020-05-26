@@ -84,8 +84,8 @@ public void db_selectVipStatus(char szSteamId[128], int iVip, int type)
 		WritePackString(pack, szSteamId);
 		WritePackCell(pack, iVip);
 		
-		Format(szQuery, 256, "SELECT steamid, vip, active FROM ck_vipadmins WHERE steamid = '%s';", szSteamId);
-		SQL_TQuery(g_hDb, db_selectVipStatusCallback, szQuery, pack, DBPrio_Low);
+		Format(szQuery, sizeof(szQuery), "SELECT steamid, vip, active FROM ck_vipadmins WHERE steamid = '%s';", szSteamId);
+		g_dDb.Query(db_selectVipStatusCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
 	{
@@ -102,12 +102,12 @@ public void db_selectVipStatus(char szSteamId[128], int iVip, int type)
 				}
 			}
 		}
-		Format(szQuery, 256, "UPDATE ck_vipadmins SET inuse = 0, active = 0 WHERE steamid = '%s';", szSteamId);
-		SQL_TQuery(g_hDb, db_removeVipCallback, szQuery, client, DBPrio_Low);
+		Format(szQuery, sizeof(szQuery), "UPDATE ck_vipadmins SET inuse = 0, active = 0 WHERE steamid = '%s';", szSteamId);
+		g_dDb.Query(db_removeVipCallback, szQuery, client, DBPrio_Low);
 	}
 }
 
-public void db_selectVipStatusCallback(Handle owner, Handle hndl, const char[] error, any pack)
+public void db_selectVipStatusCallback(Handle owner, Handle hndl, const char[] error, DataPack pack)
 {
 	if (hndl == null)
 	{
@@ -119,7 +119,7 @@ public void db_selectVipStatusCallback(Handle owner, Handle hndl, const char[] e
 	ResetPack(pack);
 	ReadPackString(pack, szSteamId, sizeof(szSteamId));
 	int iVip = ReadPackCell(pack);
-	CloseHandle(pack);
+	delete pack;
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
@@ -190,11 +190,11 @@ public void db_insertVip(char szSteamId[128], int iVip)
 	WritePackString(pack, szSteamId);
 	WritePackCell(pack, iVip);
 
-	Format(szQuery, 256, "INSERT INTO ck_vipadmins (steamid, title, namecolour, textcolour, inuse, vip, admin, zoner) VALUES ('%s', '%s', %i, 0, 1 , %i, 0, 0);", szSteamId, szTitle, colour, iVip);
-	SQL_TQuery(g_hDb, db_insertVipCallback, szQuery, pack, DBPrio_Low);
+	Format(szQuery, sizeof(szQuery), "INSERT INTO ck_vipadmins (steamid, title, namecolour, textcolour, inuse, vip, admin, zoner) VALUES ('%s', '%s', %i, 0, 1 , %i, 0, 0);", szSteamId, szTitle, colour, iVip);
+	g_dDb.Query(db_insertVipCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void db_insertVipCallback(Handle owner, Handle hndl, const char[] error, any pack)
+public void db_insertVipCallback(Handle owner, Handle hndl, const char[] error, DataPack pack)
 {
 	if (hndl == null)
 	{
@@ -207,7 +207,7 @@ public void db_insertVipCallback(Handle owner, Handle hndl, const char[] error, 
 	ResetPack(pack);
 	ReadPackString(pack, szSteamId, 128);
 	// iVip = ReadPackCell(pack);
-	CloseHandle(pack);
+	delete pack;
 
 	// Find Client
 	int client = -1;
@@ -257,6 +257,6 @@ public void db_updateVip(char szSteamId[128], int iVip)
 	WritePackString(pack, szSteamId);
 	WritePackCell(pack, iVip);
 
-	Format(szQuery, 256, "UPDATE ck_vipadmins SET title = '%s', namecolour = %i, textcolour = 0, inuse = 1, vip = %i WHERE steamid = '%s';", szTitle, colour, iVip, szSteamId);
-	SQL_TQuery(g_hDb, db_insertVipCallback, szQuery, pack, DBPrio_Low);
+	Format(szQuery, sizeof(szQuery), "UPDATE ck_vipadmins SET title = '%s', namecolour = %i, textcolour = 0, inuse = 1, vip = %i WHERE steamid = '%s';", szTitle, colour, iVip, szSteamId);
+	g_dDb.Query(db_insertVipCallback, szQuery, pack, DBPrio_Low);
 }

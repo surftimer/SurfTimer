@@ -24,7 +24,7 @@ void setBotQuota()
 		SetConVarInt(hBotQuota, count, false, false);
 	}
 
-	CloseHandle(hBotQuota);
+	delete hBotQuota;
 
 	return;
 }
@@ -65,14 +65,13 @@ int IsInsideZone (float location[3], float extraSize = 0.0)
 
 public void loadAllClientSettings()
 {
-	for (int i = 1; i < MAXPLAYERS + 1; i++)
+	for (int i = 1; i <= MAXPLAYERS; i++)
 	{
 		if (IsValidClient(i) && !IsFakeClient(i) && !g_bSettingsLoaded[i] && !g_bLoadingSettings[i])
 		{
 			g_iSettingToLoad[i] = 0;
 			LoadClientSetting(i, 0);
 			g_bLoadingSettings[i] = true;
-			break;
 		}
 	}
 
@@ -654,8 +653,7 @@ public void readMultiServerMapcycle()
 	else
 		SetFailState("[surftimer] %s is empty or does not exist.", MULTI_SERVER_MAPCYCLE);
 
-	if (fileHandle != null)
-		CloseHandle(fileHandle);
+	delete fileHandle;
 
 	return;
 }
@@ -799,35 +797,54 @@ public void parseColorsFromString(char[] ParseString, int size)
 public void checkSpawnPoints()
 {
 	int tEnt, ctEnt;
-	float f_spawnLocation[3], f_spawnAngle[3];
 
 	if (FindEntityByClassname(ctEnt, "info_player_counterterrorist") == -1 || FindEntityByClassname(tEnt, "info_player_terrorist") == -1) // No proper zones were found, try to recreate
 	{
 		// Check if spawn point has been added to the database with !addspawn
 		char szQuery[256];
-		Format(szQuery, 256, "SELECT pos_x, pos_y, pos_z, ang_x, ang_y, ang_z FROM ck_spawnlocations WHERE mapname = '%s' AND zonegroup = 0;", g_szMapName);
-		Handle query = SQL_Query(g_hDb, szQuery);
-		if (query == INVALID_HANDLE)
-		{
-			char szError[255];
-			SQL_GetError(g_hDb, szError, sizeof(szError));
-			PrintToServer("Failed to query map's spawn points (error: %s)", szError);
-		}
-		else
-		{
-			if (SQL_HasResultSet(query) && SQL_FetchRow(query))
-			{
-				f_spawnLocation[0] = SQL_FetchFloat(query, 0);
-				f_spawnLocation[1] = SQL_FetchFloat(query, 1);
-				f_spawnLocation[2] = SQL_FetchFloat(query, 2);
-				f_spawnAngle[0] = SQL_FetchFloat(query, 3);
-				f_spawnAngle[1] = SQL_FetchFloat(query, 4);
-				f_spawnAngle[2] = SQL_FetchFloat(query, 5);
-			}
-			CloseHandle(query);
-		}
+		Format(szQuery, sizeof(szQuery), "SELECT pos_x, pos_y, pos_z, ang_x, ang_y, ang_z FROM ck_spawnlocations WHERE mapname = '%s' AND zonegroup = 0;", g_szMapName);
+		
+		DataPack pack = new DataPack();
+		pack.WriteCell(tEnt);
+		pack.WriteCell(ctEnt);
+		g_dDb.Query(sqlSelectSpawnPoints, szQuery, pack);
+	}
+}
 
-		if (f_spawnLocation[0] == 0.0 && f_spawnLocation[1] == 0.0 && f_spawnLocation[2] == 0.0) // No spawnpoint added to map with !addspawn, try to find spawns from map
+public void sqlSelectSpawnPoints(Database db, DBResultSet results, const char[] error, DataPack pack)
+{
+	if (db == null || strlen(error))
+	{
+		LogError("[Surftimer] SQL Error (sqlSelectSpawnPoints): %s", error);
+		delete pack;
+		return;
+	}
+
+	pack.Reset();
+
+	int tEnt = pack.ReadCell();
+	int ctEnt = pack.ReadCell();
+
+	delete pack;
+
+	float fSpawnLocation[3], fSpawnAngle[3];
+
+	if (results.HasResults)
+	{
+		if (results.FetchRow())
+		{
+			fSpawnLocation[0] = results.FetchFloat(0);
+			fSpawnLocation[1] = results.FetchFloat(1);
+			fSpawnLocation[2] = results.FetchFloat(2);
+			fSpawnAngle[0] = results.FetchFloat(3);
+			fSpawnAngle[1] = results.FetchFloat(4);
+			fSpawnAngle[2] = results.FetchFloat(5);
+		}
+	}
+
+	if (ctEnt == -1 || tEnt == -1)
+	{
+		if (fSpawnLocation[0] == 0.0 && fSpawnLocation[1] == 0.0 && fSpawnLocation[2] == 0.0) // No spawnpoint added to map with !addspawn, try to find spawns from map
 		{
 			PrintToServer("surftimer | No valid spawns found in the map.");
 			int zoneEnt = -1;
@@ -835,20 +852,20 @@ public void checkSpawnPoints()
 
 			if (zoneEnt != -1)
 			{
-				GetEntPropVector(zoneEnt, Prop_Data, "m_angRotation", f_spawnAngle);
-				GetEntPropVector(zoneEnt, Prop_Send, "m_vecOrigin", f_spawnLocation);
+				GetEntPropVector(zoneEnt, Prop_Data, "m_angRotation", fSpawnAngle);
+				GetEntPropVector(zoneEnt, Prop_Send, "m_vecOrigin", fSpawnLocation);
 
-				PrintToServer("surftimer | Found info_player_teamspawn in location %f, %f, %f", f_spawnLocation[0], f_spawnLocation[1], f_spawnLocation[2]);
+				PrintToServer("surftimer | Found info_player_teamspawn in location %f, %f, %f", fSpawnLocation[0], fSpawnLocation[1], fSpawnLocation[2]);
 			}
 			else
 			{
 				zoneEnt = FindEntityByClassname(zoneEnt, "info_player_start"); // Random spawn
 				if (zoneEnt != -1)
 				{
-					GetEntPropVector(zoneEnt, Prop_Data, "m_angRotation", f_spawnAngle);
-					GetEntPropVector(zoneEnt, Prop_Send, "m_vecOrigin", f_spawnLocation);
+					GetEntPropVector(zoneEnt, Prop_Data, "m_angRotation", fSpawnAngle);
+					GetEntPropVector(zoneEnt, Prop_Send, "m_vecOrigin", fSpawnLocation);
 
-					PrintToServer("surftimer | Found info_player_start in location %f, %f, %f", f_spawnLocation[0], f_spawnLocation[1], f_spawnLocation[2]);
+					PrintToServer("surftimer | Found info_player_start in location %f, %f, %f", fSpawnLocation[0], fSpawnLocation[1], fSpawnLocation[2]);
 				}
 				else
 				{
@@ -868,8 +885,8 @@ public void checkSpawnPoints()
 			ActivateEntity(pointCT);
 			if (IsValidEntity(pointT) && IsValidEntity(pointCT) && DispatchSpawn(pointT) && DispatchSpawn(pointCT))
 			{
-				TeleportEntity(pointT, f_spawnLocation, f_spawnAngle, NULL_VECTOR);
-				TeleportEntity(pointCT, f_spawnLocation, f_spawnAngle, NULL_VECTOR);
+				TeleportEntity(pointT, fSpawnLocation, fSpawnAngle, NULL_VECTOR);
+				TeleportEntity(pointCT, fSpawnLocation, fSpawnAngle, NULL_VECTOR);
 				count++;
 			}
 		}
@@ -895,8 +912,8 @@ public void checkSpawnPoints()
 		{
 			if (tEnt == 0)
 			{
-				GetEntPropVector(ent, Prop_Data, "m_angRotation", f_spawnAngle);
-				GetEntPropVector(ent, Prop_Send, "m_vecOrigin", f_spawnLocation);
+				GetEntPropVector(ent, Prop_Data, "m_angRotation", fSpawnAngle);
+				GetEntPropVector(ent, Prop_Send, "m_vecOrigin", fSpawnLocation);
 			}
 			tEnt++;
 		}
@@ -904,8 +921,8 @@ public void checkSpawnPoints()
 		{
 			if (ctEnt == 0 && tEnt == 0)
 			{
-				GetEntPropVector(ent, Prop_Data, "m_angRotation", f_spawnAngle);
-				GetEntPropVector(ent, Prop_Send, "m_vecOrigin", f_spawnLocation);
+				GetEntPropVector(ent, Prop_Data, "m_angRotation", fSpawnAngle);
+				GetEntPropVector(ent, Prop_Send, "m_vecOrigin", fSpawnLocation);
 			}
 			ctEnt++;
 		}
@@ -920,7 +937,7 @@ public void checkSpawnPoints()
 					if (IsValidEntity(spawnpoint) && DispatchSpawn(spawnpoint))
 					{
 						ActivateEntity(spawnpoint);
-						TeleportEntity(spawnpoint, f_spawnLocation, f_spawnAngle, NULL_VECTOR);
+						TeleportEntity(spawnpoint, fSpawnLocation, fSpawnAngle, NULL_VECTOR);
 						tEnt++;
 					}
 				}
@@ -934,7 +951,7 @@ public void checkSpawnPoints()
 					if (IsValidEntity(spawnpoint) && DispatchSpawn(spawnpoint))
 					{
 						ActivateEntity(spawnpoint);
-						TeleportEntity(spawnpoint, f_spawnLocation, f_spawnAngle, NULL_VECTOR);
+						TeleportEntity(spawnpoint, fSpawnLocation, fSpawnAngle, NULL_VECTOR);
 						ctEnt++;
 					}
 				}
@@ -1636,10 +1653,10 @@ stock int TraceClientViewEntity(int client)
 	if (TR_DidHit(tr))
 	{
 		pEntity = TR_GetEntityIndex(tr);
-		CloseHandle(tr);
+		delete tr;
 		return pEntity;
 	}
-	CloseHandle(tr);
+	delete tr;
 	return -1;
 }
 
@@ -1902,7 +1919,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		if (g_bMapSRVRecord[client])
 		{
 			if (GetConVarBool(g_hRecordAnnounce))
-				db_insertAnnouncement(szName, g_szMapName, 0, g_szFinalTime[client], 0);
+				db_insertAnnouncement(client, szName, g_szMapName, 0, g_szFinalTime[client], 0);
 			char buffer[1024];
 			GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
 			if (!StrEqual(buffer, ""))
@@ -2042,7 +2059,7 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 	if (g_bBonusSRVRecord[client])
 	{
 		if (GetConVarBool(g_hRecordAnnounce))
-			db_insertAnnouncement(szName, g_szMapName, 1, g_szFinalTime[client], zGroup);
+			db_insertAnnouncement(client, szName, g_szMapName, 1, g_szFinalTime[client], zGroup);
 		char buffer[1024], buffer1[1024];
 		GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
 		GetConVarString(g_hRecordAnnounceDiscordBonus, buffer1, 1024);
@@ -2448,8 +2465,8 @@ public void SetSkillGroups()
 				PushArrayArray(g_hSkillGroups, RankValue, sizeof(RankValue));
 			} while (KvGotoNextKey(hKeyValues));
 		}
-		if (hKeyValues != null)
-			CloseHandle(hKeyValues);
+		
+		delete hKeyValues;
 	}
 	else
 		SetFailState("[surftimer] %s not found.", SKILLGROUP_PATH);
@@ -2763,7 +2780,7 @@ public void SpecList(int client)
 		Handle panel = CreatePanel();
 		DrawPanelText(panel, g_szPlayerPanelText[client]);
 		SendPanelToClient(panel, client, PanelHandler, 1);
-		CloseHandle(panel);
+		delete panel;
 	}
 }
 
@@ -3193,11 +3210,9 @@ public void SetInfoBotName(int ent)
 	float ftime = float(iInfoBotTimeleft);
 	char szTime[32];
 	FormatTimeFloat(g_InfoBot, ftime, 4, szTime, sizeof(szTime));
-	Handle hTmp;
-	hTmp = FindConVar("mp_timelimit");
+	Handle hTmp = FindConVar("mp_timelimit");
 	int iTimeLimit = GetConVarInt(hTmp);
-	if (hTmp != null)
-		CloseHandle(hTmp);
+	delete hTmp;
 	if (GetConVarBool(g_hMapEnd) && iTimeLimit > 0)
 		Format(szBuffer, sizeof(szBuffer), "%s (in %s)", sNextMap, szTime);
 	else
@@ -3797,7 +3812,7 @@ public void SideHudAlive(int client)
 		DrawPanelText(panel, szPanel);
 
 		SendPanelToClient(panel, client, PanelHandler, 1);
-		CloseHandle(panel);
+		delete panel;
 	}
 }
 
@@ -4834,7 +4849,7 @@ public void ReadDefaultTitlesWhitelist()
 			if (StrContains(line, "//", true) == -1)
 				PushArrayString(g_DefaultTitlesWhitelist, line);
 		}
-		CloseHandle(whitelist);
+		delete whitelist;
 	}
 	else
 		LogError("[SurfTimer] %s not found", DEFAULT_TITLES_WHITELIST_PATH);
