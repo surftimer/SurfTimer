@@ -4612,7 +4612,7 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 	hook.SetContent("@here");
-	hook.SetUsername("webhookName");
+	hook.SetUsername(webhook);
 
 	//Format the message
 	char szTitle[256];
@@ -4651,7 +4651,7 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
 	hook.SetContent("@here");
-	hook.SetUsername("webhookName");
+	hook.SetUsername(webhook);
 
 	//Format the message
 	char szTitle[256];
