@@ -4602,30 +4602,42 @@ public void totalTimeForHumans(int unix, char[] buffer, int size)
 
 public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char szTime[32])
 {
+	//Get the WebHook
 	char webhook[1024], webhookName[1024];
 	GetConVarString(g_hRecordAnnounceDiscord, webhook, 1024);
 	GetConVarString(g_dcMapRecordName, webhookName, 1024);
 	if (StrEqual(webhook, ""))
 		return;
 
-	// Send Discord Announcement
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
+	hook.SetContent("@here");
+	hook.SetUsername("webhookName");
 
-	hook.SetUsername(webhookName);
+	//Format the message
+	char szTitle[256];
 
-	// Format The Message
-	char szMessage[256];
+	Format(szTitle, sizeof(sz_Title), "New server record on %s!", g_sServerName);
 
-	Format(szMessage, sizeof(szMessage), "```md\n# New Server Record on %s #\n\n[%s] beat the server record on < %s > with a time of < %s > ]:```", g_sServerName, szName, szMapName, szTime);
+	//Create the embed message
+	MessageEmbed Embed = new MessageEmbed();
 
-	hook.SetContent(szMessage);
+	Embed.SetColor("#ff2222");
+	Embed.SetTitle(szTitle);
+	Embed.AddField("Player", szName, true);
+	Embed.AddField("Map", szMapName, true);
+	Embed.AddField("Time", szTime, false);
+
+	//Send the message
+	hook.Embed(Embed);
+
 	hook.Send();
 	delete hook;
 }
 
 public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], char szTime[32], int zGroup)
 {
+	//Get the WebHook
 	char webhook[1024], webhookN[1024], webhookName[1024];
 	GetConVarString(g_hRecordAnnounceDiscord, webhookN, 1024);
 	GetConVarString(g_hRecordAnnounceDiscordBonus, webhook, 1024);
@@ -4636,19 +4648,29 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 		else
 			webhook = webhookN;
 
-
- 	// Send Discord Announcement
 	DiscordWebHook hook = new DiscordWebHook(webhook);
 	hook.SlackMode = true;
+	hook.SetContent("@here");
+	hook.SetUsername("webhookName");
 
-	hook.SetUsername(webhookName);
+	//Format the message
+	char szTitle[256];
 
-	// Format The Message
-	char szMessage[256];
+	Format(szTitle, sizeof(sz_Title), "New server bonus record on %s!", g_sServerName);
 
-	Format(szMessage, sizeof(szMessage), "```md\n# New Bonus Server Record on %s #\n\n[%s] beat the bonus %i server record on < %s > with a time of < %s > ]:```", g_sServerName, szName, zGroup, szMapName, szTime);
+	//Create the embed message
+	MessageEmbed Embed = new MessageEmbed();
 
-	hook.SetContent(szMessage);
+	Embed.SetColor("#0018FF");
+	Embed.SetTitle(szTitle);
+	Embed.AddField("Player", szName, true);
+	Embed.AddField("Map", szMapName, true);
+	Embed.AddField("Bonus", zGroup, true);
+	Embed.AddField("Time", szTime, false);
+
+	//Send the message
+	hook.Embed(Embed);
+
 	hook.Send();
 	delete hook;
 }
