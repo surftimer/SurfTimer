@@ -4617,7 +4617,7 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 	//Format the message
 	char szTitle[256];
 
-	Format(szTitle, sizeof(sz_Title), "New server record on %s!", g_sServerName);
+	Format(szTitle, sizeof(szTitle), "New server record on %s!", g_sServerName);
 
 	//Create the embed message
 	MessageEmbed Embed = new MessageEmbed();
@@ -4656,7 +4656,7 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 	//Format the message
 	char szTitle[256];
 
-	Format(szTitle, sizeof(sz_Title), "New server bonus record on %s!", g_sServerName);
+	Format(szTitle, sizeof(szTitle), "New server bonus record on %s!", g_sServerName);
 
 	//Create the embed message
 	MessageEmbed Embed = new MessageEmbed();
@@ -4665,7 +4665,9 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 	Embed.SetTitle(szTitle);
 	Embed.AddField("Player", szName, true);
 	Embed.AddField("Map", szMapName, true);
-	Embed.AddField("Bonus", zGroup, true);
+	char szGroup[8];
+	IntToString(zGroup, szGroup, sizeof(szGroup));
+	Embed.AddField("Bonus", szGroup, true);
 	Embed.AddField("Time", szTime, false);
 
 	//Send the message
