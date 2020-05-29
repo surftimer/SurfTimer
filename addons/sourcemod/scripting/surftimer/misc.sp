@@ -4631,13 +4631,13 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 
 		char szColor[128];
 		GetConVarString(g_dcColor, szColor, 128);
-
+		char szTimeDiscord[128];
+		Format(szTimeDiscord, sizeof(szTimeDiscord), "%s (-%s)", szTime, szTimeDifference);
 		Embed.SetColor(szColor);
 		Embed.SetTitle(szTitle);
 		Embed.AddField("Player", szName, true);
-		Embed.AddField("Time", szTime, true);
-		Embed.AddField("Improved by", szTimeDifference, true);
-		Embed.AddField("Map", szMapName, false);
+		Embed.AddField("Time", szTimeDiscord, true);
+		Embed.AddField("Map", szMapName, true);
 
 		//Send the message
 		hook.Embed(Embed);
@@ -4662,7 +4662,7 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 		// Format The Message
 		char szMessage[256];
 
-		Format(szMessage, sizeof(szMessage), "```md\n# New Server Record on %s #\n\n[%s] beat the server record on < %s > with a time of < %s > ]:```", g_sServerName, szName, szMapName, szTime);
+		Format(szMessage, sizeof(szMessage), "```md\n# New Server Record on %s #\n\n[%s] beat the server record on < %s > with a time of < %s (-%s) > ]:```", g_sServerName, szName, szMapName, szTime, szTimeDifference);
 
 		hook.SetContent(szMessage);
 		hook.Send();
@@ -4707,11 +4707,13 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 		char szColor[128];
 		GetConVarString(g_dcColor, szColor, 128);
 
+		char szTimeDiscord[128];
+		Format(szTimeDiscord, sizeof(szTimeDiscord), "%s (-%s)", szTime, szTimeDifference);
+
 		Embed.SetColor(szColor);
 		Embed.SetTitle(szTitle);
 		Embed.AddField("Player", szName, true);
-		Embed.AddField("Time", szTime, true);
-		Embed.AddField("Improvement", szTimeDifference, true);
+		Embed.AddField("Time", szTimeDiscord, true);
 		Embed.AddField("Map", szMapName, true);
 		char szGroup[8];
 		IntToString(zGroup, szGroup, sizeof(szGroup));
@@ -4745,7 +4747,7 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 		// Format The Message
 		char szMessage[256];
 
-		Format(szMessage, sizeof(szMessage), "```md\n# New Bonus Server Record on %s #\n\n[%s] beat the bonus %i server record on < %s > with a time of < %s > ]:```", g_sServerName, szName, zGroup, szMapName, szTime);
+		Format(szMessage, sizeof(szMessage), "```md\n# New Bonus Server Record on %s #\n\n[%s] beat the bonus %i server record on < %s > with a time of < %s (-%s) > ]:```", g_sServerName, szName, zGroup, szMapName, szTime, szTimeDifference);
 
 		hook.SetContent(szMessage);
 		hook.Send();
