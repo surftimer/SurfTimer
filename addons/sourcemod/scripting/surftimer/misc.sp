@@ -1923,7 +1923,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 			char buffer[1024];
 			GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
 			if (!StrEqual(buffer, ""))
-				sendDiscordAnnouncement(szName, g_szMapName, g_szFinalTime[client]);
+				sendDiscordAnnouncement(szName, g_szMapName, g_szFinalTime[client], g_szTimeDifference[client]);
 		}
 
 		if (g_bTop10Time[client])
@@ -2064,7 +2064,7 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 		GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
 		GetConVarString(g_hRecordAnnounceDiscordBonus, buffer1, 1024);
 		if (!StrEqual(buffer, "") && !StrEqual(buffer1, ""))
-			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup);
+			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup, g_szBonusTimeDifference[client]);
 	}
 
 	/* Start function call */
@@ -4600,7 +4600,7 @@ public void totalTimeForHumans(int unix, char[] buffer, int size)
 	}
 }
 
-public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char szTime[32])
+public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char szTime[32], char szTimeDifference[32])
 {
 	//Test which style to use
 	if (!GetConVarBool(g_dcKSFStyle))
@@ -4636,6 +4636,7 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 		Embed.SetTitle(szTitle);
 		Embed.AddField("Player", szName, true);
 		Embed.AddField("Time", szTime, true);
+		Embed.AddField("Improved by", szTimeDifference, true);
 		Embed.AddField("Map", szMapName, false);
 
 		//Send the message
@@ -4669,7 +4670,7 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 	}
 }
 
-public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], char szTime[32], int zGroup)
+public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], char szTime[32], int zGroup, char szTimeDifference[32])
 {
 	//Test which style to use
 	if (!GetConVarBool(g_dcKSFStyle))
@@ -4710,7 +4711,8 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 		Embed.SetTitle(szTitle);
 		Embed.AddField("Player", szName, true);
 		Embed.AddField("Time", szTime, true);
-		Embed.AddField("Map", szMapName, false);
+		Embed.AddField("Improvement", szTimeDifference, true);
+		Embed.AddField("Map", szMapName, true);
 		char szGroup[8];
 		IntToString(zGroup, szGroup, sizeof(szGroup));
 		Embed.AddField("Bonus", szGroup, true);
