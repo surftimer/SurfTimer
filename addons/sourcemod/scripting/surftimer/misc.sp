@@ -4632,7 +4632,7 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 		char szColor[128];
 		GetConVarString(g_dcColor, szColor, 128);
 		char szTimeDiscord[128];
-		Format(szTimeDiscord, sizeof(szTimeDiscord), "%s (-%s)", szTime, szTimeDifference);
+		Format(szTimeDiscord, sizeof(szTimeDiscord), "%s (%s)", szTime, szTimeDifference);
 		Embed.SetColor(szColor);
 		Embed.SetTitle(szTitle);
 		Embed.AddField("Player", szName, true);
@@ -4708,7 +4708,7 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 		GetConVarString(g_dcColor, szColor, 128);
 
 		char szTimeDiscord[128];
-		Format(szTimeDiscord, sizeof(szTimeDiscord), "%s (-%s)", szTime, szTimeDifference);
+		Format(szTimeDiscord, sizeof(szTimeDiscord), "%s (%s)", szTime, szTimeDifference);
 
 		Embed.SetColor(szColor);
 		Embed.SetTitle(szTitle);
