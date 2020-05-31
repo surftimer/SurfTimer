@@ -4662,7 +4662,7 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 		// Format The Message
 		char szMessage[256];
 
-		Format(szMessage, sizeof(szMessage), "```md\n# New Server Record on %s #\n\n[%s] beat the server record on < %s > with a time of < %s (-%s) > ]:```", g_sServerName, szName, szMapName, szTime, szTimeDifference);
+		Format(szMessage, sizeof(szMessage), "```md\n# New Server Record on %s #\n\n[%s] beat the server record on < %s > with a time of < %s (%s) > ]:```", g_sServerName, szName, szMapName, szTime, szTimeDifference);
 
 		hook.SetContent(szMessage);
 		hook.Send();
@@ -4747,7 +4747,7 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 		// Format The Message
 		char szMessage[256];
 
-		Format(szMessage, sizeof(szMessage), "```md\n# New Bonus Server Record on %s #\n\n[%s] beat the bonus %i server record on < %s > with a time of < %s (-%s) > ]:```", g_sServerName, szName, zGroup, szMapName, szTime, szTimeDifference);
+		Format(szMessage, sizeof(szMessage), "```md\n# New Bonus Server Record on %s #\n\n[%s] beat the bonus %i server record on < %s > with a time of < %s (%s) > ]:```", g_sServerName, szName, zGroup, szMapName, szTime, szTimeDifference);
 
 		hook.SetContent(szMessage);
 		hook.Send();
