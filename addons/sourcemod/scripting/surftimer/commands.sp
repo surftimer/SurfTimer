@@ -3619,6 +3619,7 @@ public Action Client_SelectStyleSW(int client, int args)
 	Format(g_szStyleHud[param1], 32, "[SW]");
 	g_bRankedStyle[param1] = true;
 	g_bFunStyle[param1] = false;
+	Command_Restart(param1, 1);
 }
 
 
@@ -3626,13 +3627,14 @@ public Action Client_SelectStyleHSW(int client, int args)
 {
 	if (!IsValidClient(client))
 		return Plugin_Handled;
-	
+
 	g_iCurrentStyle[param1] = 2;
 	g_iInitalStyle[param1] = 2;
 	Format(g_szInitalStyle[param1], 128, "Half-Sideways");
 	Format(g_szStyleHud[param1], 32, "[HSW]");
 	g_bRankedStyle[param1] = true;
 	g_bFunStyle[param1] = false;
+	Command_Restart(param1, 1);
 
 }
 
@@ -3647,6 +3649,7 @@ public Action Client_SelectStyleBW(int client, int args)
 	Format(g_szStyleHud[param1], 32, "[BW]");
 	g_bRankedStyle[param1] = true;
 	g_bFunStyle[param1] = false;
+	Command_Restart(param1, 1);
 }
 
 public Action Client_SelectStyleLG(int client, int args)
@@ -3661,6 +3664,7 @@ public Action Client_SelectStyleLG(int client, int args)
 	SetEntityGravity(param1, 0.5);
 	g_bRankedStyle[param1] = false;
 	g_bFunStyle[param1] = true;
+	Command_Restart(param1, 1);
 }
 
 public Action Client_SelectStyleSM(int client, int args)
@@ -3675,6 +3679,7 @@ public Action Client_SelectStyleSM(int client, int args)
 	SetEntPropFloat(param1, Prop_Data, "m_flLaggedMovementValue", 0.5);
 	g_bRankedStyle[param1] = false;
 	g_bFunStyle[param1] = true;
+	Command_Restart(param1, 1);
 }
 
 public Action Client_SelectStyleFF(int client, int args)
@@ -3689,6 +3694,7 @@ public Action Client_SelectStyleFF(int client, int args)
 	SetEntPropFloat(param1, Prop_Data, "m_flLaggedMovementValue", 1.5);
 	g_bRankedStyle[param1] = false;
 	g_bFunStyle[param1] = true;
+	Command_Restart(param1, 1);
 }
 
 public Action Client_SelectStyleFS(int client, int args)
@@ -3704,6 +3710,7 @@ public Action Client_SelectStyleFS(int client, int args)
 	g_bFunStyle[param1] = true;
 	g_bAutoBhop = true;
 	g_bAutoBhopClient[param1] = true;
+	Command_Restart(param1, 1);
 }
 
 public void styleSelectMenu(int client)
