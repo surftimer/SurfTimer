@@ -181,7 +181,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 
 	// Check clients tele side
 	int teleside = g_iTeleSide[client];
-	
+
 	int zoneID = getZoneID(zonegroup, zone);
 	if (!StrEqual("player", g_mapZones[zoneID].TargetName))
 		DispatchKeyValue(client, "targetname", g_mapZones[zoneID].TargetName);
@@ -803,7 +803,7 @@ public void checkSpawnPoints()
 		// Check if spawn point has been added to the database with !addspawn
 		char szQuery[256];
 		Format(szQuery, sizeof(szQuery), "SELECT pos_x, pos_y, pos_z, ang_x, ang_y, ang_z FROM ck_spawnlocations WHERE mapname = '%s' AND zonegroup = 0;", g_szMapName);
-		
+
 		DataPack pack = new DataPack();
 		pack.WriteCell(tEnt);
 		pack.WriteCell(ctEnt);
@@ -1189,7 +1189,7 @@ public void LimitSpeedNew(int client)
 {
 	if (!IsValidClient(client) || !IsPlayerAlive(client) || IsFakeClient(client))
 		return;
-	
+
 	if (g_mapZonesCount <= 0 || g_bPracticeMode[client] || g_mapZonesTypeCount[g_iClientInZone[client][2]][2] == 0 || g_iClientInZone[client][3] < 0 || g_iClientInZone[client][0] == 2 || g_iClientInZone[client][0] == 4 || g_iClientInZone[client][0] >= 6 || GetConVarInt(g_hLimitSpeedType) == 0 || g_iCurrentStyle[client] == 7)
 		return;
 
@@ -1218,7 +1218,7 @@ public void LimitSpeedNew(int client)
 
 	float fVel[3];
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
-	
+
 	// Determine how much each vector must be scaled for the magnitude to equal the limit
 	// Derived from Pythagorean theorem, where the hypotenuse represents the magnitude of velocity,
 	// and the two legs represent the x and y velocity components.
@@ -1483,7 +1483,7 @@ int GetAllSpeedTypes(int client)
 
 	if (!IsValidClient(client))
 		return speed;
-		
+
 	float fVelocity[3];
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
 
@@ -2465,7 +2465,7 @@ public void SetSkillGroups()
 				PushArrayArray(g_hSkillGroups, RankValue, sizeof(RankValue));
 			} while (KvGotoNextKey(hKeyValues));
 		}
-		
+
 		delete hKeyValues;
 	}
 	else
@@ -3855,7 +3855,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, int spee
 	}
 
 	g_fCheckpointTimesNew[zonegroup][client][zone] = time;
-	
+
 	for (int i = 0; i < 3; i++)
 	{
 		g_iCheckpointVelsEndNew[zonegroup][client][zone][i] = speed[i];
@@ -3983,24 +3983,24 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, int spee
 				speedType = 0;
 			else
 				speedType = 1;
-				
+
 			compare = g_iCheckpointVelsStartServerRecord[zonegroup][zone - 1][speedType];
 			compare2 = g_iCheckpointVelsStartNew[zonegroup][client][zone - 1][speedType];
 		}
-		
+
 		if (compare == 0)
 			startSpeedDiffWR = compare2;
 		else if (compare > compare2)
 			startSpeedDiffWR = (compare - compare2);
 		else
 			startSpeedDiffWR = (compare2 - compare);
-		
+
 		if (compare2 > compare)
 			Format(szStartWR, sizeof(szStartWR), "+%d", startSpeedDiffWR);
 		else
 			Format(szStartWR, sizeof(szStartWR), "-%d", startSpeedDiffWR);
-			
-	
+
+
 		// WR End Speed
 		int f_srDiffVel;
 		if (g_iCheckpointVelsEndServerRecord[zonegroup][zone][speedType] == 0)
@@ -4023,7 +4023,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, int spee
 			Format(sz_srDiffVel, 128, "%s", sz_srDiffVel_colorless);
 			Format(szEndWR, sizeof(szEndWR), sz_srDiffVel);
 		}
-		
+
 		// PB Start Speed
 		if (zone == 0)
 		{
@@ -4035,21 +4035,21 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, int spee
 			compare = g_iCheckpointVelsStartRecord[zonegroup][client][zone - 1][speedType];
 			compare2 = g_iCheckpointVelsStartNew[zonegroup][client][zone - 1][speedType];
 		}
-		
+
 		if (compare == 0)
 			startSpeedDiffPB = compare2;
 		else if (compare > compare2)
 			startSpeedDiffPB = (compare - compare2);
 		else
 			startSpeedDiffPB = (compare2 - compare);
-		
+
 		if (compare2 > compare)
 			Format(szStartPB, sizeof(szStartPB), "+%d", startSpeedDiffPB);
 		else
 			Format(szStartPB, sizeof(szStartPB), "-%d", startSpeedDiffPB);
 
 		// PB End Speed
-		
+
 		savedSpeed = g_iCheckpointVelsEndRecord[zonegroup][client][zone][speedType];
 		currentSpeed = speed[speedType];
 
@@ -4075,7 +4075,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, int spee
 			Format(szEnd, sizeof(szEnd), szDiffVel);
 			// Format(szDiff, 128, "%s%s", szDiff, szDiffVel);
 		}
-		
+
 		if (g_fCheckpointTimesRecord[zonegroup][client][zone] <= 0.0)
 			Format(szDiff, 128, "");
 
@@ -4144,20 +4144,20 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, int spee
 				compare = g_iCheckpointVelsStartServerRecord[zonegroup][zone - 1][speedType];
 				compare2 = g_iCheckpointVelsStartNew[zonegroup][client][zone - 1][speedType];
 			}
-			
+
 			if (compare == 0)
 				startSpeedDiffWR = compare2;
 			else if (compare > compare2)
 				startSpeedDiffWR = (compare - compare2);
 			else
 				startSpeedDiffWR = (compare2 - compare);
-			
+
 			if (compare2 > compare)
 				Format(szStartWR, sizeof(szStartWR), "+%d", startSpeedDiffWR);
 			else
 				Format(szStartWR, sizeof(szStartWR), "-%d", startSpeedDiffWR);
-				
-		
+
+
 			// WR End Speed
 			int f_srDiffVel;
 			if (g_iCheckpointVelsEndServerRecord[zonegroup][zone][speedType] == 0)
@@ -4639,6 +4639,28 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 		Embed.AddField("Time", szTimeDiscord, true);
 		Embed.AddField("Map", szMapName, true);
 
+		//Send the main image of the map
+		char szUrlMain[1024];
+		GetConVarString(g_dcUrl_main, szUrlMain, 1024);
+		if (!StrEqual(szUrlMain, ""))
+		{
+			StrCat(szUrlMain, sizeof(szUrlMain), szMapName);
+			StrCat(szUrlMain, sizeof(szUrlMain), ".jpg");
+			Embed.SetImage(szUrlMain);
+		}
+
+
+		//Send the thumb image of the map
+		char szUrlThumb[1024];
+		GetConVarString(g_dcUrl_thumb, szUrlThumb, 1024);
+		if (!StrEqual(szUrlThumb, ""))
+		{
+			StrCat(szUrlThumb, sizeof(szUrlThumb), szMapName);
+			StrCat(szUrlThumb, sizeof(szUrlThumb), ".jpg");
+			Embed.SetThumb(szUrlThumb);
+		}
+
+
 		//Send the message
 		hook.Embed(Embed);
 
@@ -4718,6 +4740,26 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 		char szGroup[8];
 		IntToString(zGroup, szGroup, sizeof(szGroup));
 		Embed.AddField("Bonus", szGroup, true);
+
+		//Send the main image of the map
+		char szUrlMain[1024];
+		GetConVarString(g_dcUrl_main, szUrlMain, 1024);
+		if (!StrEqual(szUrlMain, ""))
+		{
+			StrCat(szUrlMain, sizeof(szUrlMain), szMapName);
+			StrCat(szUrlMain, sizeof(szUrlMain), ".jpg");
+			Embed.SetImage(szUrlMain);
+		}
+
+		//Send the thumb image of the map
+		char szUrlThumb[1024];
+		GetConVarString(g_dcUrl_thumb, szUrlThumb, 1024);
+		if (!StrEqual(szUrlThumb, ""))
+		{
+			StrCat(szUrlThumb, sizeof(szUrlThumb), szMapName);
+			StrCat(szUrlThumb, sizeof(szUrlThumb), ".jpg");
+			Embed.SetThumb(szUrlThumb);
+		}
 
 		//Send the message
 		hook.Embed(Embed);
@@ -5083,7 +5125,7 @@ void PrintCSGOHUDText(int client, const char[] format, any ...)
 
 	for(int i = strlen(buff); i < sizeof(buff) - 1; i++)
 		buff[i] = '\n';
-	
+
 	buff[sizeof(buff) - 1] = '\0';
 
 	Protobuf pb = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_RELIABLE | USERMSG_BLOCKHOOKS));
