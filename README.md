@@ -78,7 +78,14 @@
 *   Connect and [zone](https://youtu.be/YIpKIAqtDp4) the maps (Use !hookzone first) & set map settings
 *   Continue this for all maps
 *   Done !
-	
+
+#### Notes regarding Discord
+
+If you choose to use the various discord features, please make sure of the followings:
+
+*   If you setup a mentions other that @here or @everyone, you use the ID of the role, and not just @rolename. To get the id of the role, you have to type "\@rolename" in a discord channel and copy the output.
+*   If you want to use custom thumbnails/images, make sure they have the exact same name as the map in question, and that they are in the .jpg format. Furthermore, don't forget to add "/" at the end of the url, without the "".
+*   To edit the color of the embeds, use the hexadecimal color format, you can generate it at [this adress](https://www.color-hex.com/color-palette/25362).
 	
 ## Upgrading
 
