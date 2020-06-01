@@ -4639,15 +4639,27 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 		Embed.AddField("Time", szTimeDiscord, true);
 		Embed.AddField("Map", szMapName, true);
 
-		//Send the image of the map
-		char szUrl[1024];
-		GetConVarString(g_dcUrl, szUrl, 1024);
-		if (!StrEqual(szUrl, ""))
+		//Send the main image of the map
+		char szUrlMain[1024];
+		GetConVarString(g_dcUrl_main, szUrlMain, 1024);
+		if (!StrEqual(szUrlMain, ""))
 		{
-			StrCat(szUrl, sizeof(szUrl), szMapName);
-			StrCat(szUrl, sizeof(szUrl), ".jpg");
+			StrCat(szUrlMain, sizeof(szUrlMain), szMapName);
+			StrCat(szUrlMain, sizeof(szUrlMain), ".jpg");
+			Embed.SetImage(szUrlMain);
 		}
-		Embed.SetImage(szUrl);
+
+
+		//Send the thumb image of the map
+		char szUrlThumb[1024];
+		GetConVarString(g_dcUrl_thumb, szUrlThumb, 1024);
+		if (!StrEqual(szUrlThumb, ""))
+		{
+			StrCat(szUrlThumb, sizeof(szUrlThumb), szMapName);
+			StrCat(szUrlThumb, sizeof(szUrlThumb), ".jpg");
+			Embed.SetThumb(szUrlThumb);
+		}
+
 
 		//Send the message
 		hook.Embed(Embed);
@@ -4729,15 +4741,25 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 		IntToString(zGroup, szGroup, sizeof(szGroup));
 		Embed.AddField("Bonus", szGroup, true);
 
-		//Send the image of the map
-		char szUrl[1024];
-		GetConVarString(g_dcUrl, szUrl, 1024);
-		if (!StrEqual(szUrl, ""))
+		//Send the main image of the map
+		char szUrlMain[1024];
+		GetConVarString(g_dcUrl_main, szUrlMain, 1024);
+		if (!StrEqual(szUrlMain, ""))
 		{
-			StrCat(szUrl, sizeof(szUrl), szMapName);
-			StrCat(szUrl, sizeof(szUrl), ".jpg");
+			StrCat(szUrlMain, sizeof(szUrlMain), szMapName);
+			StrCat(szUrlMain, sizeof(szUrlMain), ".jpg");
+			Embed.SetImage(szUrlMain);
 		}
-		Embed.SetImage(szUrl);
+
+		//Send the thumb image of the map
+		char szUrlThumb[1024];
+		GetConVarString(g_dcUrl_thumb, szUrlThumb, 1024);
+		if (!StrEqual(szUrlThumb, ""))
+		{
+			StrCat(szUrlThumb, sizeof(szUrlThumb), szMapName);
+			StrCat(szUrlThumb, sizeof(szUrlThumb), ".jpg");
+			Embed.SetThumb(szUrlThumb);
+		}
 
 		//Send the message
 		hook.Embed(Embed);

@@ -226,8 +226,8 @@ public Action Command_DiscordTest(int client, int args)
 	{
 		return Plugin_Handled;
 	}
-	sendDiscordAnnouncement("Player_Name", "Map_Name", "0:00", "0:00");
-	sendDiscordAnnouncementBonus("Player_Name", "Map_Name", "0:00", 1, "0:00");
+	sendDiscordAnnouncement("Test Player", "surf_utopia_v3", "0:00:00", "0:00:00");
+	sendDiscordAnnouncementBonus("Test Player", "surf_utopia_v3", "0:00:00", 1, "0:00:00");
 	CPrintToChat(client, "%t", "Discord_Test", g_szChatPrefix);
 	return Plugin_Handled;
 }
