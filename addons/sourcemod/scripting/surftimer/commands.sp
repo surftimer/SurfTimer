@@ -3613,13 +3613,13 @@ public Action Client_SelectStyleSW(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	g_iCurrentStyle[clinet] = 1;
-	g_iInitalStyle[clinet] = 1;
-	Format(g_szInitalStyle[clinet], 128, "Sideways");
-	Format(g_szStyleHud[clinet], 32, "[SW]");
-	g_bRankedStyle[clinet] = true;
-	g_bFunStyle[clinet] = false;
-	Command_Restart(clinet, 1);
+	g_iCurrentStyl[client] = 1;
+	g_iInitalStyl[client] = 1;
+	Format(g_szInitalStyl[client], 128, "Sideways");
+	Format(g_szStyleHu[client], 32, "[SW]");
+	g_bRankedStyl[client] = true;
+	g_bFunStyl[client] = false;
+	Command_Restar[client] 1);
 	return Plugin_Handled;
 }
 
@@ -3629,13 +3629,13 @@ public Action Client_SelectStyleHSW(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	g_iCurrentStyle[clinet] = 2;
-	g_iInitalStyle[clinet] = 2;
-	Format(g_szInitalStyle[clinet], 128, "Half-Sideways");
-	Format(g_szStyleHud[clinet], 32, "[HSW]");
-	g_bRankedStyle[clinet] = true;
-	g_bFunStyle[clinet] = false;
-	Command_Restart(clinet, 1);
+	g_iCurrentStyl[client] = 2;
+	g_iInitalStyl[client] = 2;
+	Format(g_szInitalStyl[client], 128, "Half-Sideways");
+	Format(g_szStyleHu[client], 32, "[HSW]");
+	g_bRankedStyl[client] = true;
+	g_bFunStyl[client] = false;
+	Command_Restar[client] 1);
 	return Plugin_Handled;
 
 }
@@ -3645,13 +3645,13 @@ public Action Client_SelectStyleBW(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 		
-	g_iCurrentStyle[clinet] = 3;
-	g_iInitalStyle[clinet] = 3;
-	Format(g_szInitalStyle[clinet], 128, "Backwards");
-	Format(g_szStyleHud[clinet], 32, "[BW]");
-	g_bRankedStyle[clinet] = true;
-	g_bFunStyle[clinet] = false;
-	Command_Restart(clinet, 1);
+	g_iCurrentStyl[client] = 3;
+	g_iInitalStyl[client] = 3;
+	Format(g_szInitalStyl[client], 128, "Backwards");
+	Format(g_szStyleHu[client], 32, "[BW]");
+	g_bRankedStyl[client] = true;
+	g_bFunStyl[client] = false;
+	Command_Restar[client] 1);
 	return Plugin_Handled;
 }
 
@@ -3660,14 +3660,14 @@ public Action Client_SelectStyleLG(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 		
-	g_iCurrentStyle[clinet] = 4;
-	g_iInitalStyle[clinet] = 4;
-	Format(g_szInitalStyle[clinet], 128, "Low-Gravity");
-	Format(g_szStyleHud[clinet], 32, "[LG]");
-	SetEntityGravity(clinet, 0.5);
-	g_bRankedStyle[clinet] = false;
-	g_bFunStyle[clinet] = true;
-	Command_Restart(clinet, 1);
+	g_iCurrentStyl[client] = 4;
+	g_iInitalStyl[client] = 4;
+	Format(g_szInitalStyl[client], 128, "Low-Gravity");
+	Format(g_szStyleHu[client], 32, "[LG]");
+	SetEntityGravit[client] 0.5);
+	g_bRankedStyl[client] = false;
+	g_bFunStyl[client] = true;
+	Command_Restar[client] 1);
 	return Plugin_Handled;
 }
 
@@ -3676,14 +3676,14 @@ public Action Client_SelectStyleSM(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 		
-	g_iCurrentStyle[clinet] = 5;
-	g_iInitalStyle[clinet] = 5;
-	Format(g_szInitalStyle[clinet], 128, "Slow Motion");
-	Format(g_szStyleHud[clinet], 32, "[SM]");
-	SetEntPropFloat(clinet, Prop_Data, "m_flLaggedMovementValue", 0.5);
-	g_bRankedStyle[clinet] = false;
-	g_bFunStyle[clinet] = true;
-	Command_Restart(clinet, 1);
+	g_iCurrentStyl[client] = 5;
+	g_iInitalStyl[client] = 5;
+	Format(g_szInitalStyl[client], 128, "Slow Motion");
+	Format(g_szStyleHu[client], 32, "[SM]");
+	SetEntPropFloa[client] Prop_Data, "m_flLaggedMovementValue", 0.5);
+	g_bRankedStyl[client] = false;
+	g_bFunStyl[client] = true;
+	Command_Restar[client] 1);
 	return Plugin_Handled;
 }
 
@@ -3692,9 +3692,9 @@ public Action Client_SelectStyleFF(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 		
-	g_iCurrentStyle[clinet] = 6;
-	g_iInitalStyle[clinet] = 6;
-	Format(g_szInitalStyle[clinet], 128, "Fast Forward");
+	g_iCurrentStyl[client] = 6;
+	g_iInitalStyl[client] = 6;
+	Format(g_szInitalStyl[client], 128, "Fast Forward");
 	Format(g_szStyleHud[client], 32, "[FF]");
 	SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.5);
 	g_bRankedStyle[client] = false;
