@@ -146,6 +146,13 @@ void CreateCommands()
 	// Styles
 	RegConsoleCmd("sm_style", Client_SelectStyle, "[surftimer] open style select menu.");
 	RegConsoleCmd("sm_styles", Client_SelectStyle, "[surftimer] open style select menu.");
+	RegConsoleCmd("sm_sw", Client_SelectStyleSW, "[surftimer] open style select menu.");
+	RegConsoleCmd("sm_hsw", Client_SelectStyleHSW, "[surftimer] open style select menu.");
+	RegConsoleCmd("sm_bw", Client_SelectStyleBW, "[surftimer] open style select menu.");
+	RegConsoleCmd("sm_lg", Client_SelectStyleLG, "[surftimer] open style select menu.");
+	RegConsoleCmd("sm_sm", Client_SelectStyleSM, "[surftimer] open style select menu.");
+	RegConsoleCmd("sm_ff", Client_SelectStyleFF, "[surftimer] open style select menu.");
+	RegConsoleCmd("sm_fs", Client_SelectStyleFS, "[surftimer] open style select menu.");
 
 	// Test
 	RegAdminCmd("sm_test", sm_test, ADMFLAG_CUSTOM6);
@@ -3599,6 +3606,104 @@ public Action Client_SelectStyle(int client, int args)
 {
 	styleSelectMenu(client);
 	return Plugin_Handled;
+}
+
+public Action Client_SelectStyleSW(int client, int args)
+{
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+
+	g_iCurrentStyle[param1] = 1;
+	g_iInitalStyle[param1] = 1;
+	Format(g_szInitalStyle[param1], 128, "Sideways");
+	Format(g_szStyleHud[param1], 32, "[SW]");
+	g_bRankedStyle[param1] = true;
+	g_bFunStyle[param1] = false;
+}
+
+
+public Action Client_SelectStyleHSW(int client, int args)
+{
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+	
+	g_iCurrentStyle[param1] = 2;
+	g_iInitalStyle[param1] = 2;
+	Format(g_szInitalStyle[param1], 128, "Half-Sideways");
+	Format(g_szStyleHud[param1], 32, "[HSW]");
+	g_bRankedStyle[param1] = true;
+	g_bFunStyle[param1] = false;
+
+}
+
+public Action Client_SelectStyleBW(int client, int args)
+{
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+		
+	g_iCurrentStyle[param1] = 3;
+	g_iInitalStyle[param1] = 3;
+	Format(g_szInitalStyle[param1], 128, "Backwards");
+	Format(g_szStyleHud[param1], 32, "[BW]");
+	g_bRankedStyle[param1] = true;
+	g_bFunStyle[param1] = false;
+}
+
+public Action Client_SelectStyleLG(int client, int args)
+{
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+		
+	g_iCurrentStyle[param1] = 4;
+	g_iInitalStyle[param1] = 4;
+	Format(g_szInitalStyle[param1], 128, "Low-Gravity");
+	Format(g_szStyleHud[param1], 32, "[LG]");
+	SetEntityGravity(param1, 0.5);
+	g_bRankedStyle[param1] = false;
+	g_bFunStyle[param1] = true;
+}
+
+public Action Client_SelectStyleSM(int client, int args)
+{
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+		
+	g_iCurrentStyle[param1] = 5;
+	g_iInitalStyle[param1] = 5;
+	Format(g_szInitalStyle[param1], 128, "Slow Motion");
+	Format(g_szStyleHud[param1], 32, "[SM]");
+	SetEntPropFloat(param1, Prop_Data, "m_flLaggedMovementValue", 0.5);
+	g_bRankedStyle[param1] = false;
+	g_bFunStyle[param1] = true;
+}
+
+public Action Client_SelectStyleFF(int client, int args)
+{
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+		
+	g_iCurrentStyle[param1] = 6;
+	g_iInitalStyle[param1] = 6;
+	Format(g_szInitalStyle[param1], 128, "Fast Forward");
+	Format(g_szStyleHud[param1], 32, "[FF]");
+	SetEntPropFloat(param1, Prop_Data, "m_flLaggedMovementValue", 1.5);
+	g_bRankedStyle[param1] = false;
+	g_bFunStyle[param1] = true;
+}
+
+public Action Client_SelectStyleFS(int client, int args)
+{
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+		
+	g_iCurrentStyle[param1] = 7;
+	g_iInitalStyle[param1] = 7;
+	Format(g_szInitalStyle[param1], 128, "Freestyle");
+	Format(g_szStyleHud[param1], 32, "[FS]");
+	g_bRankedStyle[param1] = false;
+	g_bFunStyle[param1] = true;
+	g_bAutoBhop = true;
+	g_bAutoBhopClient[param1] = true;
 }
 
 public void styleSelectMenu(int client)
