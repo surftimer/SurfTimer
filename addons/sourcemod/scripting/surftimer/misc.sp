@@ -4755,6 +4755,27 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 	}
 }
 
+bool IsPlayerVip(int client, bool admin = true, bool reply = false)
+{
+	if (admin)
+	{
+		if (CheckCommandAccess(client, "", ADMFLAG_ROOT))
+			return true;
+	}
+
+	if (!g_bVip[client] && !g_iHasEnforcedTitle[client])
+	{
+		if (reply)
+		{
+			CPrintToChat(client, "%t", "Misc43", g_szChatPrefix);
+			PrintToConsole(client, "SurfTimer | This is a VIP feature");
+		}
+		return false;
+	}
+
+	return true;
+}
+
 public float GetStrafeSync(int client, bool sync)
 {
 	// Strafe sync taken from shavit's bhop timer
