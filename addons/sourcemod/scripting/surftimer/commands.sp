@@ -146,13 +146,20 @@ void CreateCommands()
 	// Styles
 	RegConsoleCmd("sm_style", Client_SelectStyle, "[surftimer] open style select menu.");
 	RegConsoleCmd("sm_styles", Client_SelectStyle, "[surftimer] open style select menu.");
-	RegConsoleCmd("sm_sw", Client_SelectStyleSW, "[surftimer] open style select menu.");
-	RegConsoleCmd("sm_hsw", Client_SelectStyleHSW, "[surftimer] open style select menu.");
-	RegConsoleCmd("sm_bw", Client_SelectStyleBW, "[surftimer] open style select menu.");
-	RegConsoleCmd("sm_lg", Client_SelectStyleLG, "[surftimer] open style select menu.");
-	RegConsoleCmd("sm_sm", Client_SelectStyleSM, "[surftimer] open style select menu.");
-	RegConsoleCmd("sm_ff", Client_SelectStyleFF, "[surftimer] open style select menu.");
-	RegConsoleCmd("sm_fs", Client_SelectStyleFS, "[surftimer] open style select menu.");
+	RegConsoleCmd("sm_sw", Client_SelectStyleSW, "[surftimer] Switches to sideways.");
+	RegConsoleCmd("sm_hsw", Client_SelectStyleHSW, "[surftimer] Switches to half-sideways.");
+	RegConsoleCmd("sm_bw", Client_SelectStyleBW, "[surftimer] Switches to backwards.");
+	RegConsoleCmd("sm_lg", Client_SelectStyleLG, "[surftimer] Switches to low gravity.");
+	RegConsoleCmd("sm_sm", Client_SelectStyleSM, "[surftimer] Switches to slow motion.");
+	RegConsoleCmd("sm_faf", Client_SelectStyleFF, "[surftimer] Switches to fast fowardd.");
+	RegConsoleCmd("sm_fs", Client_SelectStyleFS, "[surftimer] Switches to freestyle.");
+	RegConsoleCmd("sm_sideways", Client_SelectStyleSW, "[surftimer] Switches to sideways.");
+	RegConsoleCmd("sm_halfsideways", Client_SelectStyleHSW, "[surftimer] Switches to half-sideways.");
+	RegConsoleCmd("sm_backwards", Client_SelectStyleBW, "[surftimer] Switches to backwards.");
+	RegConsoleCmd("sm_lowgravity", Client_SelectStyleLG, "[surftimer] Switches to low gravity.");
+	RegConsoleCmd("sm_slowmotion", Client_SelectStyleSM, "[surftimer] Switches to slow motion.");
+	RegConsoleCmd("sm_fastfoward", Client_SelectStyleFF, "[surftimer] Switches to fast foward.");
+	RegConsoleCmd("sm_freestyle", Client_SelectStyleFS, "[surftimer] Switches to freestyle.");
 
 	// Test
 	RegAdminCmd("sm_test", sm_test, ADMFLAG_CUSTOM6);
