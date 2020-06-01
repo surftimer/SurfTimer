@@ -120,6 +120,7 @@ ConVar g_dcTitleBonus = null;
 ConVar g_dcMention = null;
 ConVar g_dcKSFStyle = null;
 ConVar g_dcTest = null;
+ConVar g_dcUrl = null;
 ConVar g_drDeleteSecurity = null;
 ConVar g_iAdminCountryTags = null;
 ConVar g_iVIPCommands = null;
@@ -179,6 +180,7 @@ void CreateConVars()
 	g_dcMention = CreateConVar("ck_discord_mention", "@here", "Group to mention when somebody sets a record. Leave blank to disable. For a group other than @here or @everyone, use backslash@groupname in the discord's chat.", FCVAR_NOTIFY);
 	g_dcKSFStyle = CreateConVar("ck_discord_ksf_style", "0", "Wether or not to use the KSF style for discord announcements. Set to 1 for KSF style.", FCVAR_NOTIFY);
 	g_dcTest = CreateConVar("ck_discord_test", "0", "Wether or not discord testing is enabled. If it is, type !ck_discord_test to test it.", FCVAR_NOTIFY);
+	g_dcUrl = CreateConvar("ck_discord_url", "", "The base url of where the Discord images are stored. Leave blank to disable.");
 	g_drDeleteSecurity = AutoExecConfig_CreateConVar("ck_dr_delete_security", "1", "(1 / 0) Enable/Disable delete security for !dr command", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_iAdminCountryTags = AutoExecConfig_CreateConVar("ck_admin_country_tags", "0", "(1 / 0) Enable/Disable country tags for admins", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_replayBotDelay = AutoExecConfig_CreateConVar("ck_replay_bot_delay", "10", "Delay in seconds after initial mapstart after the bots join the server", FCVAR_NOTIFY, true, 10.0);
@@ -342,7 +344,7 @@ void CreateConVars()
 	// Discord
 	g_hRecordAnnounceDiscord = AutoExecConfig_CreateConVar("ck_announce_records_discord", "", "Web hook link to announce records to discord, keep empty to disable");
 
-	g_hRecordAnnounceDiscordBonus = AutoExecConfig_CreateConVar("ck_announce_bonus_records_discord", "", "Web hook link to announce bonus records to discord, keep empty to use ck_announce_records_discord");	
+	g_hRecordAnnounceDiscordBonus = AutoExecConfig_CreateConVar("ck_announce_bonus_records_discord", "", "Web hook link to announce bonus records to discord, keep empty to use ck_announce_records_discord");
 
 	g_hReportBugsDiscord = AutoExecConfig_CreateConVar("ck_report_discord", "", "Web hook link to report bugs to discord, keep empty to disable");
 
