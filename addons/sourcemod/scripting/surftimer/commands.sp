@@ -570,6 +570,12 @@ public Action Command_normalMode(int client, int args)
 		return Plugin_Handled;
 
 	Client_Stop(client, 1);
+	g_iCurrentStyle[client] = 0;
+	g_iInitalStyle[client] = 0;
+	Format(g_szInitalStyle[client], 128, "Normal");
+	Format(g_szStyleHud[client], 32, "");
+	g_bRankedStyle[client] = true;
+	g_bFunStyle[client] = false;
 	g_bPracticeMode[client] = false;
 	Command_Restart(client, 1);
 
@@ -3613,6 +3619,7 @@ public Action Client_SelectStyleSW(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
+	Client_Stop(client, 1);
 	g_iCurrentStyle[client] = 1;
 	g_iInitalStyle[client] = 1;
 	Format(g_szInitalStyle[client], 128, "Sideways");
@@ -3629,6 +3636,7 @@ public Action Client_SelectStyleHSW(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
+	Client_Stop(client, 1);
 	g_iCurrentStyle[client] = 2;
 	g_iInitalStyle[client] = 2;
 	Format(g_szInitalStyle[client], 128, "Half-Sideways");
@@ -3644,7 +3652,8 @@ public Action Client_SelectStyleBW(int client, int args)
 {
 	if (!IsValidClient(client))
 		return Plugin_Handled;
-		
+
+	Client_Stop(client, 1);
 	g_iCurrentStyle[client] = 3;
 	g_iInitalStyle[client] = 3;
 	Format(g_szInitalStyle[client], 128, "Backwards");
@@ -3659,7 +3668,8 @@ public Action Client_SelectStyleLG(int client, int args)
 {
 	if (!IsValidClient(client))
 		return Plugin_Handled;
-		
+
+	Client_Stop(client, 1);
 	g_iCurrentStyle[client] = 4;
 	g_iInitalStyle[client] = 4;
 	Format(g_szInitalStyle[client], 128, "Low-Gravity");
@@ -3675,7 +3685,8 @@ public Action Client_SelectStyleSM(int client, int args)
 {
 	if (!IsValidClient(client))
 		return Plugin_Handled;
-		
+
+	Client_Stop(client, 1);
 	g_iCurrentStyle[client] = 5;
 	g_iInitalStyle[client] = 5;
 	Format(g_szInitalStyle[client], 128, "Slow Motion");
@@ -3691,7 +3702,8 @@ public Action Client_SelectStyleFF(int client, int args)
 {
 	if (!IsValidClient(client))
 		return Plugin_Handled;
-		
+
+	Client_Stop(client, 1);
 	g_iCurrentStyle[client] = 6;
 	g_iInitalStyle[client] = 6;
 	Format(g_szInitalStyle[client], 128, "Fast Forward");
@@ -3707,7 +3719,8 @@ public Action Client_SelectStyleFS(int client, int args)
 {
 	if (!IsValidClient(client))
 		return Plugin_Handled;
-		
+
+	Client_Stop(client, 1);
 	g_iCurrentStyle[client] = 7;
 	g_iInitalStyle[client] = 7;
 	Format(g_szInitalStyle[client], 128, "Freestyle");
