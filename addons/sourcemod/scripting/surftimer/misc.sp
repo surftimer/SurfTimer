@@ -1923,7 +1923,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 			char buffer[1024];
 			GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
 			if (!StrEqual(buffer, ""))
-				sendDiscordAnnouncement(szName, g_szMapName, g_szFinalTime[client]);
+				sendDiscordAnnouncement(szName, g_szMapName, g_szFinalTime[client], g_szTimeDifference[client]);
 		}
 
 		if (g_bTop10Time[client])
@@ -2064,7 +2064,7 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 		GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
 		GetConVarString(g_hRecordAnnounceDiscordBonus, buffer1, 1024);
 		if (!StrEqual(buffer, "") && !StrEqual(buffer1, ""))
-			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup);
+			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup, g_szBonusTimeDifference[client]);
 	}
 
 	/* Start function call */
@@ -4600,80 +4600,160 @@ public void totalTimeForHumans(int unix, char[] buffer, int size)
 	}
 }
 
-public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char szTime[32])
+public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char szTime[32], char szTimeDifference[32])
 {
-	char webhook[1024], webhookName[1024];
-	GetConVarString(g_hRecordAnnounceDiscord, webhook, 1024);
-	GetConVarString(g_dcMapRecordName, webhookName, 1024);
-	if (StrEqual(webhook, ""))
-		return;
-
-	// Send Discord Announcement
-	DiscordWebHook hook = new DiscordWebHook(webhook);
-	hook.SlackMode = true;
-
-	hook.SetUsername(webhookName);
-
-	// Format The Message
-	char szMessage[256];
-
-	Format(szMessage, sizeof(szMessage), "```md\n# New Server Record on %s #\n\n[%s] beat the server record on < %s > with a time of < %s > ]:```", g_sServerName, szName, szMapName, szTime);
-
-	hook.SetContent(szMessage);
-	hook.Send();
-	delete hook;
-}
-
-public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], char szTime[32], int zGroup)
-{
-	char webhook[1024], webhookN[1024], webhookName[1024];
-	GetConVarString(g_hRecordAnnounceDiscord, webhookN, 1024);
-	GetConVarString(g_hRecordAnnounceDiscordBonus, webhook, 1024);
-	GetConVarString(g_dcBonusRecordName, webhookName, 1024);
-	if (StrEqual(webhook, ""))
-		if (StrEqual(webhookN, ""))
+	//Test which style to use
+	if (!GetConVarBool(g_dcKSFStyle))
+	{
+		//Get the WebHook
+		char webhook[1024], webhookName[1024];
+		GetConVarString(g_hRecordAnnounceDiscord, webhook, 1024);
+		GetConVarString(g_dcMapRecordName, webhookName, 1024);
+		if (StrEqual(webhook, ""))
 			return;
-		else
-			webhook = webhookN;
 
-
- 	// Send Discord Announcement
-	DiscordWebHook hook = new DiscordWebHook(webhook);
-	hook.SlackMode = true;
-
-	hook.SetUsername(webhookName);
-
-	// Format The Message
-	char szMessage[256];
-
-	Format(szMessage, sizeof(szMessage), "```md\n# New Bonus Server Record on %s #\n\n[%s] beat the bonus %i server record on < %s > with a time of < %s > ]:```", g_sServerName, szName, zGroup, szMapName, szTime);
-
-	hook.SetContent(szMessage);
-	hook.Send();
-	delete hook;
-}
-
-bool IsPlayerVip(int client, bool admin = true, bool reply = false)
-{
-	if (admin)
-	{
-		if (CheckCommandAccess(client, "", ADMFLAG_ROOT))
-			return true;
-	}
-
-	if (!g_bVip[client] && !g_iHasEnforcedTitle[client])
-	{
-		if (reply)
+		DiscordWebHook hook = new DiscordWebHook(webhook);
+		char szMention[128];
+		hook.SlackMode = true;
+		GetConVarString(g_dcMention, szMention, 128);
+		if (!StrEqual(szMention, "")) //Checks if mention is disabled
 		{
-			CPrintToChat(client, "%t", "Misc43", g_szChatPrefix);
-			PrintToConsole(client, "SurfTimer | This is a VIP feature");
+			hook.SetContent(szMention);
 		}
-		return false;
-	}
+		hook.SetUsername(webhookName);
 
-	return true;
+		//Format the message
+		char szTitle[256];
+		GetConVarString(g_dcTitle, szTitle, 256);
+		ReplaceString(szTitle, sizeof(szTitle), "{Server_Name}", g_sServerName);
+		//Create the embed message
+		MessageEmbed Embed = new MessageEmbed();
+
+		char szColor[128];
+		GetConVarString(g_dcColor, szColor, 128);
+		char szTimeDiscord[128];
+		Format(szTimeDiscord, sizeof(szTimeDiscord), "%s (%s)", szTime, szTimeDifference);
+		Embed.SetColor(szColor);
+		Embed.SetTitle(szTitle);
+		Embed.AddField("Player", szName, true);
+		Embed.AddField("Time", szTimeDiscord, true);
+		Embed.AddField("Map", szMapName, true);
+
+		//Send the message
+		hook.Embed(Embed);
+
+		hook.Send();
+		delete hook;
+	}
+	else
+	{
+		char webhook[1024], webhookName[1024];
+		GetConVarString(g_hRecordAnnounceDiscord, webhook, 1024);
+		GetConVarString(g_dcMapRecordName, webhookName, 1024);
+		if (StrEqual(webhook, ""))
+			return;
+
+		// Send Discord Announcement
+		DiscordWebHook hook = new DiscordWebHook(webhook);
+		hook.SlackMode = true;
+
+		hook.SetUsername(webhookName);
+
+		// Format The Message
+		char szMessage[256];
+
+		Format(szMessage, sizeof(szMessage), "```md\n# New Server Record on %s #\n\n[%s] beat the server record on < %s > with a time of < %s (%s) > ]:```", g_sServerName, szName, szMapName, szTime, szTimeDifference);
+
+		hook.SetContent(szMessage);
+		hook.Send();
+		delete hook;
+	}
 }
 
+public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], char szTime[32], int zGroup, char szTimeDifference[32])
+{
+	//Test which style to use
+	if (!GetConVarBool(g_dcKSFStyle))
+	{
+		//Get the WebHook
+		char webhook[1024], webhookN[1024], webhookName[1024];
+		GetConVarString(g_hRecordAnnounceDiscord, webhookN, 1024);
+		GetConVarString(g_hRecordAnnounceDiscordBonus, webhook, 1024);
+		GetConVarString(g_dcBonusRecordName, webhookName, 1024);
+		if (StrEqual(webhook, ""))
+			if (StrEqual(webhookN, ""))
+				return;
+			else
+				webhook = webhookN;
+
+		DiscordWebHook hook = new DiscordWebHook(webhook);
+		hook.SlackMode = true;
+		char szMention[128];
+		GetConVarString(g_dcMention, szMention, 128);
+		if (!StrEqual(szMention, "")) //Checks if mention is disabled
+		{
+			hook.SetContent(szMention);
+		}
+		hook.SetUsername(webhookName);
+
+		//Format the message
+		char szTitle[256];
+		GetConVarString(g_dcTitleBonus, szTitle, 256);
+		ReplaceString(szTitle, sizeof(szTitle), "{Server_Name}", g_sServerName);
+
+		//Create the embed message
+		MessageEmbed Embed = new MessageEmbed();
+
+		char szColor[128];
+		GetConVarString(g_dcColor, szColor, 128);
+
+		char szTimeDiscord[128];
+		Format(szTimeDiscord, sizeof(szTimeDiscord), "%s (%s)", szTime, szTimeDifference);
+
+		Embed.SetColor(szColor);
+		Embed.SetTitle(szTitle);
+		Embed.AddField("Player", szName, true);
+		Embed.AddField("Time", szTimeDiscord, true);
+		Embed.AddField("Map", szMapName, true);
+		char szGroup[8];
+		IntToString(zGroup, szGroup, sizeof(szGroup));
+		Embed.AddField("Bonus", szGroup, true);
+
+		//Send the message
+		hook.Embed(Embed);
+
+		hook.Send();
+		delete hook;
+	}
+	else
+	{
+		char webhook[1024], webhookN[1024], webhookName[1024];
+		GetConVarString(g_hRecordAnnounceDiscord, webhookN, 1024);
+		GetConVarString(g_hRecordAnnounceDiscordBonus, webhook, 1024);
+		GetConVarString(g_dcBonusRecordName, webhookName, 1024);
+		if (StrEqual(webhook, ""))
+			if (StrEqual(webhookN, ""))
+				return;
+			else
+				webhook = webhookN;
+
+
+	 	// Send Discord Announcement
+		DiscordWebHook hook = new DiscordWebHook(webhook);
+		hook.SlackMode = true;
+
+		hook.SetUsername(webhookName);
+
+		// Format The Message
+		char szMessage[256];
+
+		Format(szMessage, sizeof(szMessage), "```md\n# New Bonus Server Record on %s #\n\n[%s] beat the bonus %i server record on < %s > with a time of < %s (%s) > ]:```", g_sServerName, szName, zGroup, szMapName, szTime, szTimeDifference);
+
+		hook.SetContent(szMessage);
+		hook.Send();
+		delete hook;
+	}
+}
 
 public float GetStrafeSync(int client, bool sync)
 {

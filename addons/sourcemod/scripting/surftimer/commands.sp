@@ -160,6 +160,7 @@ void CreateCommands()
 	// Discord
 	RegConsoleCmd("sm_bug", Command_Bug, "[surftimer] report a bug to our discord");
 	RegConsoleCmd("sm_calladmin", Command_Calladmin, "[surftimer] sends a message to the staff");
+	RegConsoleCmd("sm_ck_discord_test", Command_DiscordTest, "[surftimer] [discord] Allows to test the discord webhook");
 
 	// CPR
 	RegConsoleCmd("sm_cpr", Command_CPR, "[surftimer] Compare clients time to another clients time");
@@ -217,6 +218,18 @@ void CreateVIPCommands()
 		RegAdminCmd("sm_removevip", VIP_RemoveVip, ADMFLAG_ROOT, "[surftimer] Remove a players VIP");
 		RegAdminCmd("sm_addcredits", VIP_GiveCredits, ADMFLAG_ROOT, "[surftimer] Give a player credits");
 	}
+}
+
+public Action Command_DiscordTest(int client, int args)
+{
+	if (!GetConVarBool(g_dcTest))
+	{
+		return Plugin_Handled;
+	}
+	sendDiscordAnnouncement("Player Name", "Map Name", "0:00", "0:00");
+	sendDiscordAnnouncementBonus("Player Name", "Map Name", "0:00", 1, "0:00");
+	CPrintToChat(client, "%t", "Discord_Test", g_szChatPrefix);
+	return Plugin_Handled;
 }
 
 public Action Command_ToggleAutoReset(int client, int args) {
