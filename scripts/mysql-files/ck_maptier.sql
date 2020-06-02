@@ -5,14 +5,15 @@ CREATE TABLE `ck_maptier` (
   `tier` int(12) NOT NULL,
   `maxvelocity` float NOT NULL DEFAULT '3500',
   `announcerecord` int(11) NOT NULL DEFAULT '0',
-  `gravityfix` int(11) NOT NULL DEFAULT '1'
+  `gravityfix` int(11) NOT NULL DEFAULT '1',
+  `ranked` INT(11) NOT NULL DEFAULT '1'
 ) DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `ck_maptier`
 --
 
-INSERT INTO `ck_maptier` (`mapname`, `tier`, `maxvelocity`, `announcerecord`, `gravityfix`) VALUES
+INSERT INTO `ck_maptier` (`mapname`, `tier`, `maxvelocity`, `announcerecord`, `gravityfix`, `ranked`) VALUES
 ('surf_004_fix', 3, 3500, 1, 1, 1),
 ('surf_1day', 3, 3500, 1, 1, 1),
 ('surf_2012_beta12', 3, 3500, 1, 1, 1),
