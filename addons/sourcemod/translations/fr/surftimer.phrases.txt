@@ -1,5 +1,10 @@
 "Phrases"
 {
+	"Discord_Test"
+	{
+		"#format"	"{1:s}"
+		"fr"		"{1} Test discord envoyé."
+	}
 	"PracticeNormal"
 	{
 		"fr"		"{1} Mode normal activé. Passer en mode entrainement en tapant {lightgreen}!tele"
