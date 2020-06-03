@@ -151,7 +151,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_bw", Client_SelectStyleBW, "[surftimer] Switches to backwards.");
 	RegConsoleCmd("sm_lg", Client_SelectStyleLG, "[surftimer] Switches to low gravity.");
 	RegConsoleCmd("sm_sm", Client_SelectStyleSM, "[surftimer] Switches to slow motion.");
-	RegConsoleCmd("sm_faf", Client_SelectStyleFF, "[surftimer] Switches to fast fowardd.");
+	RegConsoleCmd("sm_ffw", Client_SelectStyleFF, "[surftimer] Switches to fast fowardd.");
 	RegConsoleCmd("sm_fs", Client_SelectStyleFS, "[surftimer] Switches to freestyle.");
 	RegConsoleCmd("sm_sideways", Client_SelectStyleSW, "[surftimer] Switches to sideways.");
 	RegConsoleCmd("sm_halfsideways", Client_SelectStyleHSW, "[surftimer] Switches to half-sideways.");
