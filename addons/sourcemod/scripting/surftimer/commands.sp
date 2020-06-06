@@ -1,4 +1,4 @@
-/* 
+/*
 	SurfTimer Commands
 	TODO: Cleanup and sort commands
 */
@@ -160,6 +160,7 @@ void CreateCommands()
 	// Discord
 	RegConsoleCmd("sm_bug", Command_Bug, "[surftimer] report a bug to our discord");
 	RegConsoleCmd("sm_calladmin", Command_Calladmin, "[surftimer] sends a message to the staff");
+	RegConsoleCmd("sm_ck_discord_test", Command_DiscordTest, "[surftimer] [discord] Allows to test the discord webhook");
 
 	// CPR
 	RegConsoleCmd("sm_cpr", Command_CPR, "[surftimer] Compare clients time to another clients time");
@@ -219,6 +220,18 @@ void CreateVIPCommands()
 	}
 }
 
+public Action Command_DiscordTest(int client, int args)
+{
+	if (!GetConVarBool(g_dcTest))
+	{
+		return Plugin_Handled;
+	}
+	sendDiscordAnnouncement("Test Player", "surf_utopia_v3", "0:00:00", "0:00:00");
+	sendDiscordAnnouncementBonus("Test Player", "surf_utopia_v3", "0:00:00", 1, "0:00:00");
+	CPrintToChat(client, "%t", "Discord_Test", g_szChatPrefix);
+	return Plugin_Handled;
+}
+
 public Action Command_ToggleAutoReset(int client, int args) {
 	if (g_iAutoReset[client]) {
 		g_iAutoReset[client] = false;
@@ -255,7 +268,7 @@ public Action Command_CenterSpeed(int client, int args) {
 }
 
 public Action Command_ChangeSpeedMode(int client, int args) {
-	if (g_SpeedMode[client] == 0) { 
+	if (g_SpeedMode[client] == 0) {
 		g_SpeedMode[client]++;
 		CPrintToChat(client, "%t", "SpeedModeXYZ", g_szChatPrefix);
 	} else if (g_SpeedMode[client] == 1) {
@@ -269,7 +282,7 @@ public Action Command_ChangeSpeedMode(int client, int args) {
 }
 
 public Action Command_ChangeSpeedGradient(int client, int args) {
-	if (g_SpeedGradient[client] == 0) { 
+	if (g_SpeedGradient[client] == 0) {
 		g_SpeedGradient[client]++;
 		CPrintToChat(client, "%t", "SpeedGradientGreen", g_szChatPrefix);
 	} else if (g_SpeedGradient[client] == 1) {
@@ -331,7 +344,7 @@ public Action Command_ToggleCps(int client, int args) {
 
 public Action Command_SilentSpec(int client, int args) {
 	if (!IsPlayerVip(client)) return Plugin_Handled;
-	
+
 	if (g_iSilentSpectate[client]) {
 		g_iSilentSpectate[client] = false;
 		CPrintToChat(client, "%t", "SilentSpecMessageToggleOff", g_szChatPrefix);
@@ -362,7 +375,7 @@ public Action Command_DeleteRecords(int client, int args)
 		g_dDb.Escape(sqlStripped, g_EditingMap[client], sizeof(g_EditingMap[]));
 	} else
 		Format(g_EditingMap[client], sizeof(g_EditingMap[]), g_szMapName);
-	
+
 	ShowMainDeleteMenu(client);
 	return Plugin_Handled;
 }
@@ -371,11 +384,11 @@ public void ShowMainDeleteMenu(int client)
 {
 	Menu editing = new Menu(ShowMainDeleteMenuHandler);
 	editing.SetTitle("%s Records Editing Menu - %s\n► Select the type of the record you would like to delete\n ", g_szMenuPrefix, g_EditingMap[client]);
-	
+
 	editing.AddItem("0", "Map Record");
 	editing.AddItem("1", "Stage Record");
 	editing.AddItem("2", "Bonus Record");
-	
+
 	editing.Display(client, MENU_TIME_FOREVER);
 }
 
@@ -386,9 +399,9 @@ public int ShowMainDeleteMenuHandler(Menu menu, MenuAction action, int client, i
 		g_SelectedEditOption[client] = key;
 		g_SelectedStyle[client] = 0;
 		g_SelectedType[client] = 1;
-		
+
 		char szQuery[512];
-		
+
 		switch(key)
 		{
 			case 0:
@@ -408,7 +421,7 @@ public int ShowMainDeleteMenuHandler(Menu menu, MenuAction action, int client, i
 				FormatEx(szQuery, sizeof(szQuery), sql_MainEditQuery, "runtime", "ck_bonus", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtime");
 			}
 		}
-		
+
 		PrintToServer(szQuery);
 		g_dDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client));
 	}
@@ -514,7 +527,7 @@ public int CustomTitleMenuHandler(Handle menu, MenuAction action, int param1, in
 		}
 	}
 	else if (action == MenuAction_End)
-		CloseHandle(menu);
+		delete menu;
 }
 
 public Action Command_VoteExtend(int client, int args)
@@ -574,7 +587,7 @@ public Action Command_createPlayerCheckpoint(int client, int args)
 {
 	if (!IsValidClient(client))
 		return Plugin_Handled;
-	
+
 	if ((g_iClientInZone[client][0] == 1 || g_iClientInZone[client][0] == 5) && g_fLastSpeed[client] > 0) //make sure client isnt moving while making startpos with loc
 	{
 		CPrintToChat(client, "%t", "PracticeInStartZone", g_szChatPrefix);
@@ -617,7 +630,7 @@ public Action Command_goToPlayerCheckpoint(int client, int args)
 {
 	if (!IsValidClient(client))
 		return Plugin_Handled;
-	
+
 	if (g_iSaveLocCount > 0)
 	{
 		if (args == 0)
@@ -979,7 +992,7 @@ public int MenuHandler_SelectStage(Menu tMenu, MenuAction action, int client, in
 		}
 		case MenuAction_End:
 		{
-			CloseHandle(tMenu);
+			delete tMenu;
 		}
 	}
 }
@@ -1512,7 +1525,7 @@ public int TopMenuStyleSelectHandler(Handle menu, MenuAction action, int param1,
 		ckTopMenu(param1, param2);
 	}
 	else if (action == MenuAction_End)
-		CloseHandle(menu);
+		delete menu;
 }
 
 public Action Client_MapTop(int client, int args)
@@ -1772,16 +1785,20 @@ public void SpecPlayer(int client, int args)
 		// add players
 		for (int i = 1; i <= MaxClients; i++)
 		{
-			if (IsValidClient(i) && IsPlayerAlive(i) && i != client && !IsFakeClient(i))
+			if (i != client && IsValidClient(i) && IsPlayerAlive(i) && !IsFakeClient(i))
 			{
 				if (count == 0)
 				{
 					int bestrank = 99999999;
 					for (int x = 1; x <= MaxClients; x++)
 					{
-						if (IsValidClient(x) && IsPlayerAlive(x) && x != client && !IsFakeClient(x) && g_PlayerRank[x][0] > 0)
-							if (g_PlayerRank[x][0] <= bestrank)
-							bestrank = g_PlayerRank[x][0];
+						if (x != client && IsValidClient(x) && IsPlayerAlive(x) && !IsFakeClient(x) && g_PlayerRank[x][0] > 0)
+						{
+							if (g_PlayerRank[x][0] >= bestrank)
+							{
+								bestrank = g_PlayerRank[x][0];
+							}
+						}
 					}
 					char szMenu[128];
 					Format(szMenu, 128, "Highest ranked player (#%i)", bestrank);
@@ -1898,11 +1915,10 @@ public int SpecMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 			}
 		}
 	}
-	else
-		if (action == MenuAction_End)
-		{
-			CloseHandle(menu);
-		}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
 }
 
 public Action Client_AutoBhop(int client, int args)
@@ -1971,7 +1987,7 @@ void SpeedMode(int client, bool menu = false)
 		g_SpeedMode[client]++;
 	else
 		g_SpeedMode[client] = 0;
-	
+
 	if (menu)
 		MiscellaneousOptions(client);
 }
@@ -1979,7 +1995,7 @@ void SpeedMode(int client, bool menu = false)
 void CenterSpeedDisplay(int client, bool menu = false)
 {
 	g_bCenterSpeedDisplay[client] = !g_bCenterSpeedDisplay[client];
-	
+
 	if (g_bCenterSpeedDisplay[client])
 	{
 		SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
@@ -1996,7 +2012,7 @@ void TeleSide(int client, bool menu = false)
 		g_iTeleSide[client]++;
 	else
 		g_iTeleSide[client] = 0;
-	
+
 	if (menu)
 		MiscellaneousOptions(client);
 }
@@ -2007,7 +2023,7 @@ void PrespeedText(int client, bool menu = false)
 		g_iPrespeedText[client] = false;
 	else
 		g_iPrespeedText[client] = true;
-	
+
 	if (menu)
 		MiscellaneousOptions(client);
 }
@@ -2074,7 +2090,7 @@ public Action Client_Help(int client, int args)
 public int HelpMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_End)
-		CloseHandle(menu);
+		delete menu;
 }
 
 public Action Client_Ranks(int client, int args)
@@ -2102,7 +2118,7 @@ public void displayRanksMenu(int client)
 			Format(ChatLine, 512, "Rank %i-%i: %s", RankValue.RankBot, RankValue.RankTop, RankValue.RankName);
 		else
 			Format(ChatLine, 512, "Rank %i: %s", RankValue.RankReq, RankValue.RankName);
-		
+
 		CRemoveTags(ChatLine, sizeof(ChatLine));
 		AddMenuItem(menu, "", ChatLine, ITEMDRAW_DISABLED);
 	}
@@ -2114,7 +2130,7 @@ public int ShowRanksMenuHandler(Menu menu, MenuAction action, int param1, int pa
 {
 	if (action == MenuAction_End)
 	{
-		CloseHandle(menu);
+		delete menu;
 	}
 }
 
@@ -2155,7 +2171,7 @@ public Action Client_Profile(int client, int args)
 		}
 	}
 
-	// Select which style 
+	// Select which style
 	ProfileMenuStyleSelect(client, style, szName);
 	return Plugin_Handled;
 }
@@ -2269,7 +2285,7 @@ public int ProfilePlayerSelectMenuHandler(Handle menu, MenuAction action, int pa
 				{
 					GetClientAuthId(i, AuthId_Steam2, szSteamId, 32, true);
 					db_viewPlayerProfile(param1, g_ProfileStyleSelect[param1], szSteamId, true, szPlayerName);
-					break;	
+					break;
 				}
 			}
 		}
@@ -2374,7 +2390,7 @@ public int GoToMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 	}
 	else if (action == MenuAction_End)
 	{
-		CloseHandle(menu);
+		delete menu;
 	}
 }
 
@@ -2470,7 +2486,7 @@ public Action Client_GoTo(int client, int args)
 					}
 					else
 					{
-						CloseHandle(menu);
+						delete menu;
 					}
 				}
 				else
@@ -2649,7 +2665,7 @@ public int TopMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 		}
 	}
 	else if (action == MenuAction_End)
-		CloseHandle(menu);
+		delete menu;
 }
 
 public void SelectMapTop(int client, int style)
@@ -2741,7 +2757,7 @@ public int OptionMenuHandler(Menu menu, MenuAction action, int param1, int param
 	}
 	else if (action == MenuAction_End)
 	{
-		CloseHandle(menu);
+		delete menu;
 	}
 }
 
@@ -2770,7 +2786,7 @@ public void CentreHudOptions(int client, int item)
 		item = 0;
 	else if (item < 12)
 		item = 6;
-		
+
 	DisplayMenuAtItem(menu, client, item, MENU_TIME_FOREVER);
 }
 
@@ -2815,12 +2831,12 @@ public int CentreHudOptionsHandler(Menu menu, MenuAction action, int param1, int
 				module = 0;
 
 			CentreHudModulesMenu(param1, module, szTitle);
-		}	
+		}
 	}
 	else if (action == MenuAction_Cancel)
 		OptionMenu(param1);
 	else if (action == MenuAction_End)
-		CloseHandle(menu);
+		delete menu;
 }
 
 public void CentreHudModulesMenu(int client, int module, const char[] szTitle)
@@ -2913,7 +2929,7 @@ public int CentreHudModulesMenuHandler(Menu menu, MenuAction action, int param1,
 	else if (action == MenuAction_Cancel)
 		CentreHudOptions(param1, 0);
 	else if (action == MenuAction_End)
-		CloseHandle(menu);
+		delete menu;
 }
 
 public void SideHudOptions(int client, int item)
@@ -2969,7 +2985,7 @@ public int SideHudOptionsHandler(Menu menu, MenuAction action, int param1, int p
 	else if (action == MenuAction_Cancel)
 		OptionMenu(param1);
 	else if (action == MenuAction_End)
-		CloseHandle(menu);
+		delete menu;
 }
 
 public void SideHudModulesMenu(int client, int module, char[] szTitle)
@@ -3054,7 +3070,7 @@ public int SideHudModulesMenuHandler(Menu menu, MenuAction action, int param1, i
 	else if (action == MenuAction_Cancel)
 		SideHudOptions(param1, 0);
 	else if (action == MenuAction_End)
-		CloseHandle(menu);
+		delete menu;
 }
 
 public void MiscellaneousOptions(int client)
@@ -3073,7 +3089,7 @@ public void MiscellaneousOptions(int client)
 		AddMenuItem(menu, "", "[ON] Timer Sounds");
 	else
 		AddMenuItem(menu, "", "[OFF] Timer Sounds");
-	
+
 	// Tele Side
 	if (g_iTeleSide[client] == 0)
 		AddMenuItem(menu, "", "[LEFT] Start Side");
@@ -3089,7 +3105,7 @@ public void MiscellaneousOptions(int client)
 		AddMenuItem(menu, "", "[RAINBOW] Speed Gradient");
 	else
 		AddMenuItem(menu, "", "[MOMENTUM] Speed Gradient");
-	
+
 	// Speed Mode
 	if (g_SpeedMode[client] == 0)
 		AddMenuItem(menu, "", "[XY] Speed Mode");
@@ -3121,7 +3137,7 @@ public void MiscellaneousOptions(int client)
 		AddMenuItem(menu, "", "[ON] Prestrafe Message");
 	else
 		AddMenuItem(menu, "", "[OFF] Prestrafe Message");
-	
+
 	SetMenuExitBackButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
 }
@@ -3146,7 +3162,7 @@ public int MiscellaneousOptionsHandler(Menu menu, MenuAction action, int param1,
 	else if (action == MenuAction_Cancel)
 		OptionMenu(param1);
 	else if (action == MenuAction_End)
-		CloseHandle(menu);
+		delete menu;
 }
 
 // fluffys
@@ -3559,7 +3575,7 @@ public int StageSelectMenuHandler(Menu menu, MenuAction action, int param1, int 
 	{
 		if (IsValidClient(param1))
 			g_bSelectWrcp[param1] = false;
-		CloseHandle(menu);
+		delete menu;
 	}
 }
 
@@ -3576,7 +3592,7 @@ public int StageStyleSelectMenuHandler(Menu menu, MenuAction action, int param1,
 	{
 		if (IsValidClient(param1))
 			g_bSelectWrcp[param1] = false;
-		CloseHandle(menu);
+		delete menu;
 	}
 }
 
@@ -3641,7 +3657,7 @@ public int StyleTypeSelectMenuHandler(Menu styleSelect, MenuAction action, int p
 	}
 	else if (action == MenuAction_End)
 	{
-			CloseHandle(styleSelect);
+			delete styleSelect;
 	}
 }
 
@@ -3736,7 +3752,7 @@ public int StyleSelectMenuHandler(Menu menu, MenuAction action, int param1, int 
 		if (action == MenuAction_Cancel)
 			styleSelectMenu(param1);
 		if (action == MenuAction_End)
-			CloseHandle(menu);
+			delete menu;
 	}
 }
 
@@ -3956,9 +3972,9 @@ public Action Command_ToggleTriggers(int client, int args)
 
 	g_bShowTriggers[client] = !g_bShowTriggers[client];
 
-	if (g_bShowTriggers[client]) 
+	if (g_bShowTriggers[client])
 		++g_iTriggerTransmitCount;
-	else 
+	else
 		--g_iTriggerTransmitCount;
 
 	CPrintToChat(client, "%t", "Commands47", g_szChatPrefix);
@@ -3991,7 +4007,7 @@ void TransmitTriggers(bool transmit)
 
 		// Is this entity's model a VBSP model?
 		GetEntPropString(entity, Prop_Data, "m_ModelName", sBuffer, 2);
-		if (sBuffer[0] != '*') 
+		if (sBuffer[0] != '*')
 		{
 			// The entity must have been created by a plugin and assigned some random model.
 			// Skipping in order to avoid console spam.
@@ -4003,12 +4019,12 @@ void TransmitTriggers(bool transmit)
 		int edictFlags = GetEdictFlags(entity);
 
 		// Determine whether to transmit or not
-		if (transmit) 
+		if (transmit)
 		{
 			effectFlags &= ~EF_NODRAW;
 			edictFlags &= ~FL_EDICT_DONTSEND;
-		} 
-		else 
+		}
+		else
 		{
 			effectFlags |= EF_NODRAW;
 			edictFlags |= FL_EDICT_DONTSEND;
@@ -4335,7 +4351,7 @@ public int HookZonesMenuHandler(Menu menu, MenuAction action, int param1, int pa
 			SetMenuOptionFlags(menu2, MENUFLAG_BUTTON_EXIT);
 			DisplayMenu(menu2, param1, MENU_TIME_FOREVER);
 		}
-		case MenuAction_Cancel: 
+		case MenuAction_Cancel:
 		{
 			if (IsValidClient(param1))
 				g_iSelectedTrigger[param1] = -1;
@@ -4475,7 +4491,7 @@ public int HookZoneTypeHandler(Menu menu, MenuAction action, int param1, int par
 	switch (action)
 	{
 		case MenuAction_Select:
-		{	
+		{
 			char szTriggerIndex[128];
 			GetMenuItem(menu, param2, szTriggerIndex, sizeof(szTriggerIndex));
 			int index = StringToInt(szTriggerIndex);
@@ -4555,7 +4571,7 @@ public Action Command_Startpos(int client, int args)
 
 	if (g_bTimerEnabled[client])
 		Startpos(client);
-	else 
+	else
 		CReplyToCommand(client, "%t", "Commands82", g_szChatPrefix);
 
 	return Plugin_Handled;
@@ -4613,7 +4629,7 @@ public int ReportBugHandler(Menu menu, MenuAction action, int param1, int param2
 		CPrintToChat(param1, "%t", "Commands70", g_szChatPrefix);
 	}
 	else if (action == MenuAction_End)
-		CloseHandle(menu);
+		delete menu;
 }
 
 public Action Command_Calladmin(int client, int args)
@@ -4737,7 +4753,7 @@ public void PlayRecordMenu(int client)
 				AddMenuItem(menu, "", "Stage Replay");
 				break;
 			}
-			
+
 			if (i == g_TotalStages)
 				AddMenuItem(menu, "", "Stage Replay", ITEMDRAW_DISABLED);
 		}

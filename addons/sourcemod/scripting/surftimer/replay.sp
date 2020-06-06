@@ -116,8 +116,8 @@ public void StopRecording(int client)
 	if (!IsValidClient(client) || g_hRecording[client] == null)
 		return;
 
-	CloseHandle(g_hRecording[client]);
-	CloseHandle(g_hRecordingAdditionalTeleport[client]);
+	delete g_hRecording[client];
+	delete g_hRecordingAdditionalTeleport[client];
 	g_hRecording[client] = null;
 	g_hRecordingAdditionalTeleport[client] = null;
 
@@ -182,7 +182,7 @@ public void SaveRecording(int client, int zgroup, int style)
 	if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > 0)
 		SetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath2, g_hRecordingAdditionalTeleport[client]);
 	else
-		CloseHandle(g_hRecordingAdditionalTeleport[client]);
+		delete g_hRecordingAdditionalTeleport[client];
 
 	g_hRecordingAdditionalTeleport[client] = null;
 
@@ -234,7 +234,7 @@ public void LoadReplays()
 		GetTrieValue(g_hLoadedRecordsAdditionalTeleport, sKey, hAT);
 		delete hAT;
 	}
-	CloseHandle(hSnapshot);
+	delete hSnapshot;
 	ClearTrie(g_hLoadedRecordsAdditionalTeleport);
 
 	g_bFirstStageReplay = false;
@@ -299,7 +299,7 @@ public void LoadReplays()
 			if (RenameFile(newPath, sPath))
 				PrintToServer("SurfTimer | Succesfully renamed bonus record file to: %s", newPath);
 		}
-		CloseHandle(hFilex);
+		delete hFilex;
 	}
 	hFilex = null;
 	delete hFilex;
@@ -566,7 +566,7 @@ public void WriteRecordToDisk(const char[] sPath, FileHeader header)
 		}
 	}
 
-	CloseHandle(hFile);
+	delete hFile;
 	LoadReplays();
 }
 
@@ -579,7 +579,7 @@ public void LoadRecordFromFile(const char[] path, FileHeader header, bool header
 	ReadFileCell(hFile, iMagic, 4);
 	if (iMagic != BM_MAGIC)
 	{
-		CloseHandle(hFile);
+		delete hFile;
 		return;
 	}
 	int iBinaryFormatVersion;
@@ -588,7 +588,7 @@ public void LoadRecordFromFile(const char[] path, FileHeader header, bool header
 
 	if (iBinaryFormatVersion > BINARY_FORMAT_VERSION)
 	{
-		CloseHandle(hFile);
+		delete hFile;
 		return;
 	}
 
@@ -621,7 +621,7 @@ public void LoadRecordFromFile(const char[] path, FileHeader header, bool header
 
 	if (headerOnly)
 	{
-		CloseHandle(hFile);
+		delete hFile;
 		return;
 	}
 
@@ -670,9 +670,9 @@ public void LoadRecordFromFile(const char[] path, FileHeader header, bool header
 	if (GetArraySize(hAdditionalTeleport) > 0)
 		SetTrieValue(g_hLoadedRecordsAdditionalTeleport, path, hAdditionalTeleport);
 	else
-		CloseHandle(hAdditionalTeleport);
+		delete hAdditionalTeleport;
 
-	CloseHandle(hFile);
+	delete hFile;
 
 	return;
 }

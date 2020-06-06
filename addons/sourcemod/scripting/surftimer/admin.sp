@@ -609,7 +609,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 
 	if (action == MenuAction_End)
 	{
-		CloseHandle(menu);
+		delete menu;
 	}
 }
 

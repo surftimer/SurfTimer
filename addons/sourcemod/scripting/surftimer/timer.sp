@@ -165,12 +165,10 @@ public Action CKTimer2(Handle timer)
 
 	if (GetConVarBool(g_hMapEnd))
 	{
-		Handle hTmp;
-		hTmp = FindConVar("mp_timelimit");
-		int iTimeLimit;
-		iTimeLimit = GetConVarInt(hTmp);
-		if (hTmp != null)
-			CloseHandle(hTmp);
+		Handle hTmp = FindConVar("mp_timelimit");
+		int iTimeLimit = GetConVarInt(hTmp);
+		delete hTmp;
+
 		if (iTimeLimit > 0)
 		{
 			int timeleft;
