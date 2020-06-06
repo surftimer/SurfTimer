@@ -5300,7 +5300,7 @@ public void db_viewUnfinishedMapsCallback(Handle owner, Handle hndl, const char[
 						Handle pack = CreateDataPack();
 						WritePackCell(pack, userid);
 						WritePackString(pack, consoleString);
-						CreateTimer(time, PrintUnfinishedLine, pack);
+						CreateDataTimer(time, PrintUnfinishedLine, pack);
 
 						mapUnfinished = false;
 						bonusUnfinished = false;
@@ -5358,7 +5358,6 @@ public Action PrintUnfinishedLine(Handle timer, any pack)
 	int client = GetClientOfUserId(ReadPackCell(pack));
 	char teksti[1024];
 	ReadPackString(pack, teksti, 1024);
-	CloseHandle(pack);
 	
 	if (IsClientInGame(client))
 	{

@@ -78,7 +78,6 @@ public Action UpdatePlayerProfile(Handle timer, Handle pack)
 	ResetPack(pack);
 	int client = GetClientOfUserId(ReadPackCell(pack));
 	int style = ReadPackCell(pack);
-	delete pack;
 
 	if (IsValidClient(client) && !IsFakeClient(client))
 		db_updateStat(client, style);
@@ -308,7 +307,6 @@ public Action BonusReplayTimer(Handle timer, Handle pack)
 	ResetPack(pack);
 	int client = GetClientOfUserId(ReadPackCell(pack));
 	int zGrp = ReadPackCell(pack);
-	delete pack;
 
 	if (IsValidClient(client) && !IsFakeClient(client))
 		SaveRecording(client, zGrp, 0);
@@ -324,7 +322,6 @@ public Action StyleReplayTimer(Handle timer, Handle pack)
 	ResetPack(pack);
 	int client = GetClientOfUserId(ReadPackCell(pack));
 	int style = ReadPackCell(pack);
-	delete pack;
 
 	if (IsValidClient(client) && !IsFakeClient(client))
 		SaveRecording(client, 0, style);
@@ -340,7 +337,6 @@ public Action StyleBonusReplayTimer(Handle timer, Handle pack)
 	int client = GetClientOfUserId(ReadPackCell(pack));
 	int zGrp = ReadPackCell(pack);
 	int style = ReadPackCell(pack);
-	delete pack;
 
 	if (IsValidClient(client) && !IsFakeClient(client))
 		SaveRecording(client, zGrp, style);
@@ -675,7 +671,6 @@ public Action SpecBot(Handle timer, Handle pack)
 	ResetPack(pack);
 	int client = GetClientOfUserId(ReadPackCell(pack));
 	int bot = ReadPackCell(pack);
-	delete pack;
 
 	ChangeClientTeam(client, 1);
 	SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", bot);
