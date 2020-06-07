@@ -850,6 +850,7 @@ public void sql_CountFinishedBonusCallback(Handle owner, Handle hndl, const char
 		char szQuery[512];
 		Format(szQuery, sizeof(szQuery), "SELECT mapname, stage, (select count(1)+1 from ck_wrcps b where a.mapname=b.mapname and a.runtimepro > b.runtimepro and a.style = b.style and a.stage = b.stage) AS `rank` FROM ck_wrcps a where steamid = '%s' AND style = %i;", g_szSteamID[client], style);
 		g_dDb.Query(sql_CountFinishedStagesCallback, szQuery, pack, DBPrio_Low);
+		return;
 	}
 
 	delete pack;
@@ -916,6 +917,7 @@ public void sql_CountFinishedStagesCallback(Handle owner, Handle hndl, const cha
 		char szQuery[512];
 		Format(szQuery, sizeof(szQuery), "SELECT mapname, (select count(1)+1 from ck_playertimes b where a.mapname=b.mapname and a.runtimepro > b.runtimepro AND b.style = %i) AS `rank`, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname AND b.style = %i) as total, (SELECT tier FROM `ck_maptier` b WHERE a.mapname = b.mapname) as tier FROM ck_playertimes a where steamid = '%s' AND style = %i;", style, style, g_szSteamID[client], style);
 		g_dDb.Query(sql_CountFinishedMapsCallback, szQuery, pack, DBPrio_Low);
+		return;
 	}
 	
 	delete pack;
