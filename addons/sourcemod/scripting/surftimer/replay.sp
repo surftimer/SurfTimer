@@ -994,7 +994,7 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 						g_iSelectedReplayStyle = 0;
 						PlayRecord(g_RecordBot, 0, 0);
 						StopPlayerMimic(g_RecordBot);
-						CreateTimer(0.1, RefreshBot, TIMER_FLAG_NO_MAPCHANGE);
+						CreateTimer(0.1, RefreshBot, _, TIMER_FLAG_NO_MAPCHANGE);
 						return;
 					}
 				}

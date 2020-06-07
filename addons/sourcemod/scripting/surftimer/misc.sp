@@ -805,8 +805,8 @@ public void checkSpawnPoints()
 		Format(szQuery, sizeof(szQuery), "SELECT pos_x, pos_y, pos_z, ang_x, ang_y, ang_z FROM ck_spawnlocations WHERE mapname = '%s' AND zonegroup = 0;", g_szMapName);
 
 		DataPack pack = new DataPack();
-		pack.WriteCell(tEnt);
-		pack.WriteCell(ctEnt);
+		pack.WriteCell(EntIndexToEntRef(tEnt));
+		pack.WriteCell(EntIndexToEntRef(ctEnt));
 		g_dDb.Query(sqlSelectSpawnPoints, szQuery, pack);
 	}
 }
@@ -822,8 +822,8 @@ public void sqlSelectSpawnPoints(Database db, DBResultSet results, const char[] 
 
 	pack.Reset();
 
-	int tEnt = pack.ReadCell();
-	int ctEnt = pack.ReadCell();
+	int tEnt = EntRefToEntIndex(pack.ReadCell());
+	int ctEnt = EntRefToEntIndex(pack.ReadCell());
 
 	delete pack;
 
@@ -3395,6 +3395,7 @@ public void CenterHudAlive(int client)
 						case 4: Format(module[i], 128, "LG %s", module[i]);
 						case 5: Format(module[i], 128, "SM %s", module[i]);
 						case 6: Format(module[i], 128, "FF %s", module[i]);
+						case 7: Format(module[i], 128, "FS %s", module[i]);
 					}
 				}
 			}
