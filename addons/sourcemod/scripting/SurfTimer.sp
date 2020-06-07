@@ -1747,13 +1747,13 @@ public void OnMapStart()
 	// Hook Zones
 	iEnt = -1;
 	delete g_hTriggerMultiple;
-
 	g_hTriggerMultiple = CreateArray(256);
 	while ((iEnt = FindEntityByClassname(iEnt, "trigger_multiple")) != -1)
 	{
 		PushArrayCell(g_hTriggerMultiple, iEnt);
 	}
 
+	delete g_mTriggerMultipleMenu;
 	g_mTriggerMultipleMenu = CreateMenu(HookZonesMenuHandler);
 	SetMenuTitle(g_mTriggerMultipleMenu, "Select a trigger");
 
@@ -1827,11 +1827,6 @@ public void OnMapEnd()
 		g_fWrcpMenuLastQuery[client] = 0.0;
 		g_bWrcpTimeractivated[client] = false;
 	}
-
-	// Hook Zones
-	delete g_hTriggerMultiple;
-	delete g_mTriggerMultipleMenu;
-	delete g_hDestinations;
 }
 
 public void OnConfigsExecuted()
