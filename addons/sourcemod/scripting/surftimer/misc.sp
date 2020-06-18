@@ -1923,7 +1923,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 			char buffer[1024];
 			GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
 			if (!StrEqual(buffer, ""))
-				sendDiscordAnnouncement(szName, g_szMapName, g_szFinalTime[client], g_szTimeDifference[client]);
+				sendDiscordAnnouncement(szName, g_szMapName, g_szFinalTime[client], szRecordDiff);
 		}
 
 		if (g_bTop10Time[client])
@@ -2064,7 +2064,7 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 		GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
 		GetConVarString(g_hRecordAnnounceDiscordBonus, buffer1, 1024);
 		if (!StrEqual(buffer, "") && !StrEqual(buffer1, ""))
-			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup, g_szBonusTimeDifference[client]);
+			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup, szRecordDiff);
 	}
 
 	/* Start function call */
@@ -4601,7 +4601,7 @@ public void totalTimeForHumans(int unix, char[] buffer, int size)
 	}
 }
 
-public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char szTime[32], char szTimeDifference[32])
+public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char szTime[32], char szRecordDiff[32])
 {
 	//Test which style to use
 	if (!GetConVarBool(g_dcKSFStyle))
@@ -4633,7 +4633,7 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 		char szColor[128];
 		GetConVarString(g_dcColor, szColor, 128);
 		char szTimeDiscord[128];
-		Format(szTimeDiscord, sizeof(szTimeDiscord), "%s (%s)", szTime, szTimeDifference);
+		Format(szTimeDiscord, sizeof(szTimeDiscord), "%s (%s)", szTime, szRecordDiff);
 		Embed.SetColor(szColor);
 		Embed.SetTitle(szTitle);
 		Embed.AddField("Player", szName, true);
@@ -4685,7 +4685,7 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 		// Format The Message
 		char szMessage[256];
 
-		Format(szMessage, sizeof(szMessage), "```md\n# New Server Record on %s #\n\n[%s] beat the server record on < %s > with a time of < %s (%s) > ]:```", g_sServerName, szName, szMapName, szTime, szTimeDifference);
+		Format(szMessage, sizeof(szMessage), "```md\n# New Server Record on %s #\n\n[%s] beat the server record on < %s > with a time of < %s (%s) > ]:```", g_sServerName, szName, szMapName, szTime, szRecordDiff);
 
 		hook.SetContent(szMessage);
 		hook.Send();
@@ -4693,7 +4693,7 @@ public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char 
 	}
 }
 
-public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], char szTime[32], int zGroup, char szTimeDifference[32])
+public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], char szTime[32], int zGroup, char szRecordDiff[54])
 {
 	//Test which style to use
 	if (!GetConVarBool(g_dcKSFStyle))
@@ -4731,7 +4731,7 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 		GetConVarString(g_dcColor, szColor, 128);
 
 		char szTimeDiscord[128];
-		Format(szTimeDiscord, sizeof(szTimeDiscord), "%s (%s)", szTime, szTimeDifference);
+		Format(szTimeDiscord, sizeof(szTimeDiscord), "%s (%s)", szTime, szRecordDiff);
 
 		Embed.SetColor(szColor);
 		Embed.SetTitle(szTitle);
@@ -4790,7 +4790,7 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 		// Format The Message
 		char szMessage[256];
 
-		Format(szMessage, sizeof(szMessage), "```md\n# New Bonus Server Record on %s #\n\n[%s] beat the bonus %i server record on < %s > with a time of < %s (%s) > ]:```", g_sServerName, szName, zGroup, szMapName, szTime, szTimeDifference);
+		Format(szMessage, sizeof(szMessage), "```md\n# New Bonus Server Record on %s #\n\n[%s] beat the bonus %i server record on < %s > with a time of < %s (%s) > ]:```", g_sServerName, szName, zGroup, szMapName, szTime, szRecordDiff);
 
 		hook.SetContent(szMessage);
 		hook.Send();
