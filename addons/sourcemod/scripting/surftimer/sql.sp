@@ -9272,7 +9272,8 @@ public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] er
 			LoadClientSetting(client, g_iSettingToLoad[client]);
 		}
 
-		db_CheckVIPAdmin(client, g_szSteamID[client]);
+		//db_CheckVIPAdmin(client, g_szSteamID[client]); this causes infinite loop
+		// more details in https://github.com/surftimer/Surftimer-olokos/issues/184
 	}
 }
 
