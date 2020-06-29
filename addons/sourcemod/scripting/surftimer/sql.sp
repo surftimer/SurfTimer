@@ -1739,7 +1739,7 @@ public void sql_selectPlayerProfileCallback(Handle owner, Handle hndl, const cha
 	}
 
 	ResetPack(pack);
-	int client = ReadPackCell(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
 	int style = ReadPackCell(pack);
 	char szSteamId[32], szName2[MAX_NAME_LENGTH];
 	ReadPackString(pack, szSteamId, sizeof(szSteamId));
@@ -1754,7 +1754,7 @@ public void sql_selectPlayerProfileCallback(Handle owner, Handle hndl, const cha
 		char szName[MAX_NAME_LENGTH], szSteamId2[32], szCountry[64];
 
 		SQL_FetchString(hndl, 0, szSteamId2, sizeof(szSteamId2));
-		Format(g_szProfileSteamId[client], sizeof(g_szProfileSteamId), szSteamId2);
+		Format(g_szProfileSteamId[client], sizeof(g_szProfileSteamId[]), szSteamId2);
 		SQL_FetchString(hndl, 2, szName, sizeof(szName));
 		Format(g_szProfileName[client], sizeof(g_szProfileName), szName);
 		SQL_FetchString(hndl, 3, szCountry, sizeof(szCountry));
@@ -9272,7 +9272,8 @@ public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] er
 			LoadClientSetting(client, g_iSettingToLoad[client]);
 		}
 
-		db_CheckVIPAdmin(client, g_szSteamID[client]);
+		//db_CheckVIPAdmin(client, g_szSteamID[client]); this causes infinite loop
+		// more details in https://github.com/surftimer/Surftimer-olokos/issues/184
 	}
 }
 

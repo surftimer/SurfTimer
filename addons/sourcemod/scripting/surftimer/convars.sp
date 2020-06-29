@@ -1,3 +1,5 @@
+#include <autoexecconfig>
+
 /*----------  CVars  ----------*/
 // Zones
 bool g_bZoner[MAXPLAYERS + 1];
