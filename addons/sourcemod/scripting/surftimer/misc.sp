@@ -1918,6 +1918,10 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		// Send Announcements
 		if (g_bMapSRVRecord[client])
 		{
+			RecordDiff = g_fOldRecordMapTime - g_fFinalTime[client];
+			FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 32);
+			Format(szRecordDiff, 32, "-%s", szRecordDiff);
+
 			if (GetConVarBool(g_hRecordAnnounce))
 				db_insertAnnouncement(client, szName, g_szMapName, 0, g_szFinalTime[client], 0);
 			char buffer[1024];
@@ -2058,6 +2062,10 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 	// Send Announcements
 	if (g_bBonusSRVRecord[client])
 	{
+		RecordDiff = g_fOldBonusRecordTime[zGroup] - g_fFinalTime[client];
+		FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
+		Format(szRecordDiff, 54, "-%s", szRecordDiff);
+
 		if (GetConVarBool(g_hRecordAnnounce))
 			db_insertAnnouncement(client, szName, g_szMapName, 1, g_szFinalTime[client], zGroup);
 		char buffer[1024], buffer1[1024];
