@@ -1433,7 +1433,7 @@ public void db_viewPlayerPoints(int client)
 	g_bPrestigeAvoid[client] = false;
 	
 	if (!g_bPrestigeCheck[client]) {
-		if (GetConVarBool(g_hPrestigeVip) && (IsPlayerVip(client, false, false)) {
+		if (GetConVarBool(g_hPrestigeVip) && (IsPlayerVip(client, false, false))) {
 			g_bPrestigeCheck[client] = true;
 			g_bPrestigeAvoid[client] = true;
 		}
