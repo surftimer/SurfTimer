@@ -183,6 +183,12 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	int teleside = g_iTeleSide[client];
 
 	int zoneID = getZoneID(zonegroup, zone);
+	// Check if requested zone teleport is valid (non-linear map)
+	if(zoneID == -1) {
+		CPrintToChat(client, "Invalid stage or map has no stages!");
+		return;
+	}
+	
 	if (!StrEqual("player", g_mapZones[zoneID].TargetName))
 		DispatchKeyValue(client, "targetname", g_mapZones[zoneID].TargetName);
 
