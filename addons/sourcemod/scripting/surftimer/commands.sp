@@ -4495,12 +4495,6 @@ public int HookZonesMenuHandler(Menu menu, MenuAction action, int param1, int pa
 			if (IsValidClient(param1))
 				g_iSelectedTrigger[param1] = -1;
 		}
-		case MenuAction_End:
-		{
-			if (IsValidClient(param1))
-				g_iSelectedTrigger[param1] = -1;
-			delete menu;
-		}
 	}
 }
 
@@ -4553,8 +4547,6 @@ public int HookZoneHandler(Menu menu, MenuAction action, int param1, int param2)
 		case MenuAction_Cancel: g_iSelectedTrigger[param1] = -1;
 		case MenuAction_End:
 		{
-			if (IsValidClient(param1))
-				g_iSelectedTrigger[param1] = -1;
 			delete menu;
 		}
 	}
