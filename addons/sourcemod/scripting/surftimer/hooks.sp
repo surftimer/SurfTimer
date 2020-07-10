@@ -939,8 +939,170 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		else if (!g_bInStartZone[client] && !g_bInStageZone[client] && val < -0.75)
 		g_KeyCount[client] = 0;
 	}
+	else if (g_iCurrentStyle[client] == 4) // Low-gravity
+	{
+		if (g_bInStartZone[client] || g_bInStageZone[client])
+		{
+			ResetGravity(client);
+			
+			if (GetConVarInt(g_hLimitSpeedType) == 1)
+			{
+
+					// This logic for detecting bhops is pretty terrible and should be reworked -sneaK
+				g_iTicksOnGround[client] = 0;
+				float time = GetGameTime();
+				float cTime = time - g_iLastJump[client];
+				if (!g_bInBhop[client])
+				{
+					if (g_bFirstJump[client])
+					{
+						if (cTime > 0.8)
+						{
+							g_bFirstJump[client] = true;
+							g_iLastJump[client] = GetGameTime();
+						}
+						else
+						{
+							g_iLastJump[client] = GetGameTime();
+							g_bInBhop[client] = true;
+						}
+					}
+					else
+					{
+						g_iLastJump[client] = GetGameTime();
+						g_bFirstJump[client] = true;
+					}
+				}
+				else
+				{
+					if (cTime > 1)
+					{
+						g_bInBhop[client] = false;
+						g_iLastJump[client] = GetGameTime();
+					}
+					else
+					{
+						g_iLastJump[client] = GetGameTime();
+					}
+				}
+			}
+
+			if (GetConVarBool(g_hOneJumpLimit) && GetConVarInt(g_hLimitSpeedType) == 1)
+			{
+				if (g_bInStartZone[client] || g_bInStageZone[client])
+				{
+					int zoneid = g_iClientInZone[client][3];
+					if (zoneid < 0)
+						zoneid = 0;
+					if (g_mapZones[zoneid].OneJumpLimit == 1)
+					{
+						if (!g_bJumpedInZone[client])
+						{
+							g_bJumpedInZone[client] = true;
+							g_bResetOneJump[client] = true;
+							g_fJumpedInZoneTime[client] = GetGameTime();
+							CreateTimer(1.0, ResetOneJump, client, TIMER_FLAG_NO_MAPCHANGE);
+						}
+						else
+						{
+							g_bResetOneJump[client] = false;
+							float time = GetGameTime();
+							float time2 = time - g_fJumpedInZoneTime[client];
+							g_bJumpedInZone[client] = false;
+							if (time2 <= 0.9)
+							{
+								CPrintToChat(client, "%t", "Hooks15", g_szChatPrefix);
+								Handle pack;
+								CreateDataTimer(0.05, DelayedVelocityCap, pack);
+								WritePackCell(pack, client);
+								WritePackFloat(pack, 0.0);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	else if (g_iCurrentStyle[client] == 5) // Slow Motion
 	{
+		if (g_bInStartZone[client] || g_bInStageZone[client])
+		{
+			if (GetConVarInt(g_hLimitSpeedType) == 1)
+			{
+					// This logic for detecting bhops is pretty terrible and should be reworked -sneaK
+				g_iTicksOnGround[client] = 0;
+				float time = GetGameTime();
+				float cTime = time - g_iLastJump[client];
+				if (!g_bInBhop[client])
+				{
+					if (g_bFirstJump[client])
+					{
+						if (cTime > 0.8)
+						{
+							g_bFirstJump[client] = true;
+							g_iLastJump[client] = GetGameTime();
+						}
+						else
+						{
+							g_iLastJump[client] = GetGameTime();
+							g_bInBhop[client] = true;
+						}
+					}
+					else
+					{
+						g_iLastJump[client] = GetGameTime();
+						g_bFirstJump[client] = true;
+					}
+				}
+				else
+				{
+					if (cTime > 1)
+					{
+						g_bInBhop[client] = false;
+						g_iLastJump[client] = GetGameTime();
+					}
+					else
+					{
+						g_iLastJump[client] = GetGameTime();
+					}
+				}
+			}
+
+			if (GetConVarBool(g_hOneJumpLimit) && GetConVarInt(g_hLimitSpeedType) == 1)
+			{
+				if (g_bInStartZone[client] || g_bInStageZone[client])
+				{
+					int zoneid = g_iClientInZone[client][3];
+					if (zoneid < 0)
+						zoneid = 0;
+					if (g_mapZones[zoneid].OneJumpLimit == 1)
+					{
+						if (!g_bJumpedInZone[client])
+						{
+							g_bJumpedInZone[client] = true;
+							g_bResetOneJump[client] = true;
+							g_fJumpedInZoneTime[client] = GetGameTime();
+							CreateTimer(1.0, ResetOneJump, client, TIMER_FLAG_NO_MAPCHANGE);
+						}
+						else
+						{
+							g_bResetOneJump[client] = false;
+							float time = GetGameTime();
+							float time2 = time - g_fJumpedInZoneTime[client];
+							g_bJumpedInZone[client] = false;
+							if (time2 <= 0.9)
+							{
+								CPrintToChat(client, "%t", "Hooks15", g_szChatPrefix);
+								Handle pack;
+								CreateDataTimer(0.05, DelayedVelocityCap, pack);
+								WritePackCell(pack, client);
+								WritePackFloat(pack, 0.0);
+							}
+						}
+					}
+				}
+			}
+		}
 		// Maybe fix ramp glitches in slow motion, using https://forums.alliedmods.net/showthread.php?t=277523
 
 		// Set up and do tracehull to find out if the player landed on a surf
