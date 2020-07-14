@@ -1158,7 +1158,7 @@ int g_pr_AllPlayers[MAX_STYLES];
 int g_pr_RankedPlayers[MAX_STYLES];
 
 // Total map count in mapcycle
-int g_pr_MapCount[7];
+int g_pr_MapCount[9];
 
 // The amount of clients that get recalculated in a full recalculation
 int g_pr_TableRowCount;
