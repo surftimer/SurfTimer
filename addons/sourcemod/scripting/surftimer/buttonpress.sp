@@ -370,6 +370,7 @@ public void CL_OnEndTimerPress(int client)
 					CreateTimer(0.0, ReplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 				}
 
+				g_fOldRecordMapTime = g_fRecordMapTime;
 				g_bMapSRVRecord[client] = true;
 				g_fRecordMapTime = g_fFinalTime[client];
 				Format(g_szRecordPlayer, MAX_NAME_LENGTH, "%s", szName);
@@ -402,6 +403,7 @@ public void CL_OnEndTimerPress(int client)
 					g_bCheckpointRecordFound[zGroup] = true;
 				}
 
+				g_fOldRecordMapTime = g_fRecordMapTime;
 				// wrCredits = fcTierCredits;
 			}
 
