@@ -56,14 +56,18 @@ jobs:
           python-version: '3.x'
         
       - name: Install python dependencies
+        run: python3 -m pip install --upgrade pip setuptools wheel
+        
+      - name: Download colorlib-gen
+        run: git clone https://github.com/c0rp3n/colorlib-gen.git $TOOLS_PATH/gen
+        
+      - name: Install colorlib-gen
         run: |
-          python3 -m pip install --upgrade pip
-          pip install pyyaml
-
+          cd $TOOLS_PATH/gen/
+          pip install -r ./requirements.txt
+          python3 ./setup.py install
       - name: Generate colorlib_map.inc
-        run: |
-          wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/tools/color_gen.py -P $TOOLS_PATH
-          python3 $TOOLS_PATH/color_gen.py --include-ref-colors --config "$TOOLS_PATH/colors.yaml" "$INCLUDE_PATH/colorlib_map.inc"
+        run: colorlib_gen -re --config "$TOOLS_PATH/colors.yaml" "$INCLUDE_PATH/colorlib_map.inc"
 
       - name: Compile plugin
         run: |
