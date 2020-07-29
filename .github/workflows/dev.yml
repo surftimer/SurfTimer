@@ -58,11 +58,11 @@ jobs:
         run: python3 -m pip install --upgrade pip setuptools wheel
         
       - name: Download colorlib-gen
-        run: git clone https://github.com/c0rp3n/colorlib-gen.git $TOOLS_PATH
+        run: git clone https://github.com/c0rp3n/colorlib-gen.git $TOOLS_PATH/gen
         
       - name: Install colorlib-gen
         run: |
-          cd $TOOLS_PATH/colorlib-gen
+          cd $TOOLS_PATH/gen/colorlib-gen
           pip install -r ./requirements.txt
           python3 ./setup.py install
 
