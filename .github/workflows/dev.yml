@@ -62,7 +62,7 @@ jobs:
         
       - name: Install colorlib-gen
         run: |
-          cd $TOOLS_PATH/gen/colorlib-gen
+          cd $TOOLS_PATH/gen/
           pip install -r ./requirements.txt
           python3 ./setup.py install
 
