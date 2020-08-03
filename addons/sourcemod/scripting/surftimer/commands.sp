@@ -4007,12 +4007,9 @@ public Action Command_Repeat(int client, int args)
 
 public Action Admin_FixBot(int client, int args)
 {
-	if (!g_bZoner[client] && !CheckCommandAccess(client, "", ADMFLAG_ROOT))
-		return Plugin_Handled;
-
-	CPrintToChat(client, "%t", "Commands52", g_szChatPrefix);
-	CreateTimer(5.0, FixBot_Off, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
-	CreateTimer(10.0, FixBot_On, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
+	CReplyToCommand(client, "%t", "Commands52", g_szChatPrefix);
+	CreateTimer(5.0, FixBot_Off, _, TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer(10.0, FixBot_On, _, TIMER_FLAG_NO_MAPCHANGE);
 
 	return Plugin_Handled;
 }
