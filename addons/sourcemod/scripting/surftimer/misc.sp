@@ -4812,7 +4812,7 @@ bool IsPlayerVip(int client, bool admin = true, bool reply = false)
 			return true;
 	}
 
-	if (!g_bVip[client])
+	if (!g_bVip[client] && !g_iHasEnforcedTitle[client])
 	{
 		if (reply)
 		{
@@ -5034,8 +5034,10 @@ public void LoadDefaultTitle(int client)
 					{
 						KvGetString(kv, "title", szBuffer, sizeof(szBuffer));
 						SetDefaultTitle(client, szBuffer);
+						g_iHasEnforcedTitle[client] = true;
 						break;
 					} else {
+						g_iHasEnforcedTitle[client] = false;
 						continue;
 					}
 

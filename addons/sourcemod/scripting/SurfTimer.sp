@@ -1300,6 +1300,7 @@ bool g_bEnforceTitle[MAXPLAYERS + 1];
 int g_iEnforceTitleType[MAXPLAYERS + 1];
 char g_szEnforcedTitle[MAXPLAYERS + 1][256];
 Handle g_DefaultTitlesWhitelist = null;
+bool g_iHasEnforcedTitle[MAXPLAYERS + 1];
 
 // Prespeed in zones
 int g_iWaitingForResponse[MAXPLAYERS + 1];
