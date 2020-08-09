@@ -650,6 +650,8 @@ public void OnPlayerThink(int entity)
 		LimitSpeedNew(entity);
 
 	SetEntPropEnt(entity, Prop_Send, "m_bSpotted", 0);
+
+	sv_noclipspeed.FloatValue = g_iNoclipSpeed[entity];
 }
 
 

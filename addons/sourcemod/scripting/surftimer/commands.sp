@@ -4031,9 +4031,6 @@ public Action Command_GiveKnife(int client, int args)
 
 public Action Command_NoclipSpeed(int client, int args)
 {
-	if (!IsPlayerZoner(client))
-		return Plugin_Handled;
-
 	if (args == 0)
 	{
 		CPrintToChat(client, "%t", "Commands54", g_szChatPrefix);
@@ -4041,9 +4038,15 @@ public Action Command_NoclipSpeed(int client, int args)
 	}
 	else
 	{
-		char arg1[128];
-		GetCmdArg(1, arg1, sizeof(arg1));
-		ServerCommand("sv_noclipspeed %s", arg1);
+		char arg[16];
+		GetCmdArg(1, arg, sizeof(arg));
+		
+		sv_noclipspeed.ReplicateToClient(client, arg);
+		
+		float speed = StringToFloat(arg);
+		g_iNoclipSpeed[client] = speed;
+		
+		CReplyToCommand(client, "%s sv_noclipspeed set to %f", g_szChatPrefix, speed);
 	}
 
 	return Plugin_Handled;
