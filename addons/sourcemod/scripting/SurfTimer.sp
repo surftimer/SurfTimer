@@ -776,9 +776,6 @@ bool g_iCpMessages[MAXPLAYERS + 1];
 // WRCP Messages
 bool g_iWrcpMessages[MAXPLAYERS + 1];
 
-// trails chroma stuff
-bool g_iHasEnforcedTitle[MAXPLAYERS + 1];
-
 // disable noclip triggers toggle
 bool g_iDisableTriggers[MAXPLAYERS + 1];
 
@@ -897,9 +894,6 @@ Handle g_hRecordingAdditionalTeleport[MAXPLAYERS + 1];
 
 // Is mimicing a record
 Handle g_hBotMimicsRecord[MAXPLAYERS + 1] = { null, ... };
-
-// Timer to refresh bot trails
-Handle g_hBotTrail[2] = { null, null };
 
 // Replay start position
 float g_fInitialPosition[MAXPLAYERS + 1][3];
@@ -1306,6 +1300,7 @@ bool g_bEnforceTitle[MAXPLAYERS + 1];
 int g_iEnforceTitleType[MAXPLAYERS + 1];
 char g_szEnforcedTitle[MAXPLAYERS + 1][256];
 Handle g_DefaultTitlesWhitelist = null;
+bool g_iHasEnforcedTitle[MAXPLAYERS + 1];
 
 // Prespeed in zones
 int g_iWaitingForResponse[MAXPLAYERS + 1];
@@ -1816,8 +1811,6 @@ public void OnMapEnd()
 	db_Cleanup();
 
 	delete g_hSkillGroups;
-	delete g_hBotTrail[0];
-	delete g_hBotTrail[1];
 
 	Format(g_szMapName, sizeof(g_szMapName), "");
 
@@ -2115,7 +2108,6 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 				else
 					ServerCommand("bot_quota 0");
 
-			delete g_hBotTrail[0];
 		}
 	}
 	else if (convar == g_hBonusBot)
@@ -2149,7 +2141,6 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 				else
 					ServerCommand("bot_quota 0");
 
-			delete g_hBotTrail[1];
 		}
 	}
 	else if (convar == g_hWrcpBot)
