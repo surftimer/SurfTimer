@@ -393,6 +393,10 @@ public Action Say_Hook(int client, const char[] command, int argc)
 						}
 					}
 
+					if (g_bLogQueries)
+					{
+						LogToFile(g_szQueryFile, "Say_Hook - szQuery: %s", szQuery);
+					}
 					g_dDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client));
 				}
 			}

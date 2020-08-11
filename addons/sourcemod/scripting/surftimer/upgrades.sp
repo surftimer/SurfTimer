@@ -76,6 +76,10 @@ public void db_upgradeDatabase(int version)
 	}
 	else if (version == 4)
 	{
+		if (g_bLogQueries)
+		{
+			LogToFile(g_szQueryFile, "db_upgradeDatabase.3 - szQuery: CREATE TABLE IF NOT EXISTS `ck_checkpointsnew`( `steamid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL, `mapname` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL, `cp` int(11) NOT NULL, `time` float NOT NULL, `velStartXY` int(11) DEFAULT 0, `velStartXYZ` int(11) DEFAULT 0, `velStartZ` int(11) DEFAULT 0, `velEndXY` int(11) DEFAULT 0, `velEndXYZ` int(11) DEFAULT 0, `velEndZ` int(11) DEFAULT 0, `velAvgXY` int(11) DEFAULT 0, `velAvgXYZ` int(11) DEFAULT 0, `velAvgZ` int(11) DEFAULT 0, `zonegroup` int(12) NOT NULL, PRIMARY KEY (`steamid`,`mapname`,`cp`,`zonegroup`)) DEFAULT CHARSET=utf8mb4;");
+		}
 		g_dDb.Query(sqlCreateCheckPointsNew, "CREATE TABLE IF NOT EXISTS `ck_checkpointsnew`( `steamid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL, `mapname` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL, `cp` int(11) NOT NULL, `time` float NOT NULL, `velStartXY` int(11) DEFAULT 0, `velStartXYZ` int(11) DEFAULT 0, `velStartZ` int(11) DEFAULT 0, `velEndXY` int(11) DEFAULT 0, `velEndXYZ` int(11) DEFAULT 0, `velEndZ` int(11) DEFAULT 0, `velAvgXY` int(11) DEFAULT 0, `velAvgXYZ` int(11) DEFAULT 0, `velAvgZ` int(11) DEFAULT 0, `zonegroup` int(12) NOT NULL, PRIMARY KEY (`steamid`,`mapname`,`cp`,`zonegroup`)) DEFAULT CHARSET=utf8mb4;");
 		
 		delete tTransaction;
@@ -132,6 +136,10 @@ public void sqlCreateCheckPointsNew(Database db, DBResultSet results, const char
 		return;
 	}
 
+	if (g_bLogQueries)
+	{
+		LogToFile(g_szQueryFile, "sqlCreateCheckPointsNew - szQuery: SELECT COUNT(steamid) FROM ck_checkpoints;");
+	}
 	g_dDb.Query(sqlGetCheckpointsCount, "SELECT COUNT(steamid) FROM ck_checkpoints;");
 }
 
@@ -151,6 +159,10 @@ public void sqlGetCheckpointsCount(Database db, DBResultSet results, const char[
 
 	if (g_iCount > 0)
 	{
+		if (g_bLogQueries)
+		{
+			LogToFile(g_szQueryFile, "sqlGetCheckpointsCount - szQuery: SELECT * FROM ck_checkpoints;");
+		}
 		g_dDb.Query(sqlSelectOldCheckpoints, "SELECT * FROM ck_checkpoints;");
 	}
 }
