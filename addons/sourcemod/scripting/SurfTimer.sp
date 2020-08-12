@@ -218,8 +218,6 @@ float g_fTick[MAXPLAYERS + 1][2];
 float g_fServerLoading[2];
 float g_fClientsLoading[MAXPLAYERS + 1][2];
 char g_szLogFile[PLATFORM_MAX_PATH];
-
-bool g_bLogQueries = false;
 char g_szQueryFile[PLATFORM_MAX_PATH];
 
 // PR Commands

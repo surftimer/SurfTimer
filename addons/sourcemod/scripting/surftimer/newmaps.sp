@@ -28,7 +28,7 @@ public int NewMapMenuHandler(Menu menu, MenuAction action, int param1, int param
 public void db_ViewNewestMaps(int client)
 {
 	char sql_selectNewestMaps[] = "SELECT mapname, date FROM ck_newmaps ORDER BY date DESC LIMIT 50";
-	if (g_bLogQueries)
+	if (g_cLogQueries.BoolValue)
 	{
 		LogToFile(g_szQueryFile, "db_ViewNewestMaps - szQuery: %s", sql_selectNewestMaps);
 	}
@@ -85,7 +85,7 @@ public void db_InsertNewestMaps()
 {
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), "INSERT INTO ck_newmaps (mapname) VALUES('%s');", g_szMapName);
-	if (g_bLogQueries)
+	if (g_cLogQueries.BoolValue)
 	{
 		LogToFile(g_szQueryFile, "db_InsertNewestMaps - szQuery: %s", szQuery);
 	}
@@ -96,7 +96,7 @@ public void db_InsertNewestMaps()
 public void db_present()
 {
 	// Check for db upgrades
-	if (g_bLogQueries)
+	if (g_cLogQueries.BoolValue)
 	{
 		LogToFile(g_szQueryFile, "db_present - szQuery: SELECT mapname FROM ck_newmaps LIMIT 1");
 	}
@@ -120,7 +120,7 @@ public void sqlCheckNewMaps(Database db, DBResultSet results, const char[] error
 
 public void db_upgradeDbNewMap()
 {
-	if (g_bLogQueries)
+	if (g_cLogQueries.BoolValue)
 	{
 		LogToFile(g_szQueryFile, "db_upgradeDbNewMap - szQuery: CREATE TABLE IF NOT EXISTS ck_newmaps (mapname VARCHAR(32), date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(mapname)) DEFAULT CHARSET=utf8mb4;");
 	}

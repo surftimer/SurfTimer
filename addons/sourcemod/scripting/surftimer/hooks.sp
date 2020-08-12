@@ -393,7 +393,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 						}
 					}
 
-					if (g_bLogQueries)
+					if (g_cLogQueries.BoolValue)
 					{
 						LogToFile(g_szQueryFile, "Say_Hook - szQuery: %s", szQuery);
 					}

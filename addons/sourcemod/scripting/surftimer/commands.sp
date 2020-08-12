@@ -436,8 +436,7 @@ public int ShowMainDeleteMenuHandler(Menu menu, MenuAction action, int client, i
 			}
 		}
 
-		PrintToServer(szQuery);
-		if (g_bLogQueries)
+		if (g_cLogQueries.BoolValue)
 		{
 			LogToFile(g_szQueryFile, "ShowMainDeleteMenuHandler - szQuery: %s", szQuery);
 		}

@@ -813,7 +813,7 @@ public void checkSpawnPoints()
 		DataPack pack = new DataPack();
 		pack.WriteCell(EntIndexToEntRef(tEnt));
 		pack.WriteCell(EntIndexToEntRef(ctEnt));
-		if (g_bLogQueries)
+		if (g_cLogQueries.BoolValue)
 		{
 			LogToFile(g_szQueryFile, "checkSpawnPoints - szQuery: %s", szQuery);
 		}
