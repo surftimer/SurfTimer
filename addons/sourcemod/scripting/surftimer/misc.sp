@@ -5214,3 +5214,13 @@ bool CGetColor(const char[] sName, char[] sColor, int iColorSize)
 
 	return false;
 }
+
+bool IsValidDatabase(Database db, const char[] error)
+{
+    if (db == null || strlen(error))
+    {
+        return false;
+    }
+
+    return true;
+}
