@@ -268,6 +268,10 @@ public void db_viewMapSettings()
 {
 	char szQuery[2048];
 	Format(szQuery, sizeof(szQuery), "SELECT `mapname`, `maxvelocity`, `announcerecord`, `gravityfix` FROM `ck_maptier` WHERE `mapname` = '%s'", g_szMapName);
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_viewMapSettings - szQuery: %s", szQuery);
+	}
 	g_dDb.Query(sql_viewMapSettingsCallback, szQuery, DBPrio_High);
 }
 
@@ -304,6 +308,10 @@ public void db_updateMapSettings()
 {
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), "UPDATE `ck_maptier` SET `maxvelocity` = '%f', `announcerecord` = '%f', `gravityfix` = %i WHERE `mapname` = '%s';", g_fMaxVelocity, g_fAnnounceRecord, view_as<int>(g_bGravityFix), g_szMapName);
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_updateMapSettings - szQuery: %s", szQuery);
+	}
 	g_dDb.Query(sql_insertMapSettingsCallback, szQuery, DBPrio_Low);
 }
 
@@ -311,6 +319,10 @@ public void db_unlimitAllStages(char[] szMapName)
 {
 	char szQuery[256];
 	Format(szQuery, sizeof(szQuery), "UPDATE ck_zones SET prespeed = 0.0 WHERE mapname = '%s' AND zonetype = 3;", g_szMapName);
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_unlimitAllStages - szQuery: %s", szQuery);
+	}
 	g_dDb.Query(SQL_UnlimitAllStagesCallback, szQuery, DBPrio_Low);
 }
 
@@ -318,6 +330,10 @@ public void db_removeOnejumplimit(char[] szMapName)
 {
 	char szQuery[256];
 	Format(szQuery, sizeof(szQuery), "UPDATE ck_zones SET onejumplimit = 0 WHERE mapname = '%s';", g_szMapName);
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_removeOnejumplimit - szQuery: %s", szQuery);
+	}
 	g_dDb.Query(SQL_removeOnejumplimitCallback, szQuery, DBPrio_Low);
 }
 
