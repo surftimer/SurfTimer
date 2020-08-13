@@ -13,8 +13,7 @@ void db_startUpgrading()
 	tTransaction.AddQuery("SELECT wrcppoints FROM ck_playerrank LIMIT 1", 2);
 	tTransaction.AddQuery("SELECT ck_playeroptions2.teleside, ck_spawnlocations.teleside FROM ck_playeroptions2, ck_spawnlocations LIMIT 1", 3);
 	tTransaction.AddQuery("SELECT velEndXYZ FROM ck_checkpoints LIMIT 1", 4);
-	// Version 5 will used in SQLTxn_InsertCheckpouintsSuccess callback
-	tTransaction.AddQuery("SELECT steamid FROM ck_announcements LIMIT 1", 6);
+	tTransaction.AddQuery("SELECT steamid FROM ck_announcements LIMIT 1", 5);
 	g_dDb.Execute(tTransaction, SQLTxn_CheckDatabaseUpgradesSuccess, SQLTxn_CheckDatabaseUpgradesFailed);
 }
 
@@ -93,27 +92,26 @@ void db_upgradeDatabase(int version, const char[] error = "")
 	else if (version == 5)
 	{
 		tTransaction.AddQuery("ALTER TABLE `ck_announcements` ADD `steamid` varchar(32) NOT NULL AFTER `server`;", 1);
-	}
-	else if (version == 6)
-	{
-		tTransaction.AddQuery("ALTER TABLE `ck_playertimes` MODIFY `velStartXY` INT NOT NULL DEFAULT 0;", 1);
-		tTransaction.AddQuery("ALTER TABLE `ck_playertimes` MODIFY `velStartXYZ` INT NOT NULL DEFAULT 0;", 2);
-		tTransaction.AddQuery("ALTER TABLE `ck_playertimes` MODIFY `velStartZ` INT NOT NULL DEFAULT 0;", 3);
-		tTransaction.AddQuery("ALTER TABLE `ck_playertimes` MODIFY `velEndXY` INT NOT NULL DEFAULT 0;", 4);
-		tTransaction.AddQuery("ALTER TABLE `ck_playertimes` MODIFY `velEndXYZ` INT NOT NULL DEFAULT 0;", 5);
-		tTransaction.AddQuery("ALTER TABLE `ck_playertimes` MODIFY `velEndZ` INT NOT NULL DEFAULT 0;", 6);
-		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velStartXY` INT NOT NULL DEFAULT 0;", 7);
-		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velStartXYZ` INT NOT NULL DEFAULT 0;", 8);
-		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velStartZ` INT NOT NULL DEFAULT 0;", 9);
-		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velEndXY` INT NOT NULL DEFAULT 0;", 10);
-		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velEndXYZ` INT NOT NULL DEFAULT 0;", 11);
-		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velEndZ` INT NOT NULL DEFAULT 0;", 12);
-		tTransaction.AddQuery("ALTER TABLE `ck_wrcps` MODIFY `velStartXY` INT NOT NULL DEFAULT 0;", 13);
-		tTransaction.AddQuery("ALTER TABLE `ck_wrcps` MODIFY `velStartXYZ` INT NOT NULL DEFAULT 0;", 14);
-		tTransaction.AddQuery("ALTER TABLE `ck_wrcps` MODIFY `velStartZ` INT NOT NULL DEFAULT 0;", 15);
-		tTransaction.AddQuery("ALTER TABLE `ck_wrcps` MODIFY `velEndXY` INT NOT NULL DEFAULT 0;", 16);
-		tTransaction.AddQuery("ALTER TABLE `ck_wrcps` MODIFY `velEndXYZ` INT NOT NULL DEFAULT 0;", 17);
-		tTransaction.AddQuery("ALTER TABLE `ck_wrcps` MODIFY `velEndZ` INT NOT NULL DEFAULT 0;", 18);
+
+		// to support older versions
+		tTransaction.AddQuery("ALTER TABLE `ck_playertimes` MODIFY `velStartXY` INT NOT NULL DEFAULT 0;", 2);
+		tTransaction.AddQuery("ALTER TABLE `ck_playertimes` MODIFY `velStartXYZ` INT NOT NULL DEFAULT 0;", 3);
+		tTransaction.AddQuery("ALTER TABLE `ck_playertimes` MODIFY `velStartZ` INT NOT NULL DEFAULT 0;", 4);
+		tTransaction.AddQuery("ALTER TABLE `ck_playertimes` MODIFY `velEndXY` INT NOT NULL DEFAULT 0;", 5);
+		tTransaction.AddQuery("ALTER TABLE `ck_playertimes` MODIFY `velEndXYZ` INT NOT NULL DEFAULT 0;", 6);
+		tTransaction.AddQuery("ALTER TABLE `ck_playertimes` MODIFY `velEndZ` INT NOT NULL DEFAULT 0;", 7);
+		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velStartXY` INT NOT NULL DEFAULT 0;", 8);
+		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velStartXYZ` INT NOT NULL DEFAULT 0;", 9);
+		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velStartZ` INT NOT NULL DEFAULT 0;", 10);
+		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velEndXY` INT NOT NULL DEFAULT 0;", 11);
+		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velEndXYZ` INT NOT NULL DEFAULT 0;", 12);
+		tTransaction.AddQuery("ALTER TABLE `ck_bonus` MODIFY `velEndZ` INT NOT NULL DEFAULT 0;", 13);
+		tTransaction.AddQuery("ALTER TABLE `ck_wrcps` MODIFY `velStartXY` INT NOT NULL DEFAULT 0;", 14);
+		tTransaction.AddQuery("ALTER TABLE `ck_wrcps` MODIFY `velStartXYZ` INT NOT NULL DEFAULT 0;", 15);
+		tTransaction.AddQuery("ALTER TABLE `ck_wrcps` MODIFY `velStartZ` INT NOT NULL DEFAULT 0;", 16);
+		tTransaction.AddQuery("ALTER TABLE `ck_wrcps` MODIFY `velEndXY` INT NOT NULL DEFAULT 0;", 17);
+		tTransaction.AddQuery("ALTER TABLE `ck_wrcps` MODIFY `velEndXYZ` INT NOT NULL DEFAULT 0;", 18);
+		tTransaction.AddQuery("ALTER TABLE `ck_wrcps` MODIFY `velEndZ` INT NOT NULL DEFAULT 0;", 19);
 	}
 	else
 	{
