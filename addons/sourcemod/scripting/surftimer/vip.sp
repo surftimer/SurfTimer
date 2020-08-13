@@ -115,9 +115,9 @@ public void db_selectVipStatus(char szSteamId[128], int iVip, int type)
 	}
 }
 
-public void db_selectVipStatusCallback(Handle owner, Handle hndl, const char[] error, DataPack pack)
+public void db_selectVipStatusCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
-	if (hndl == null)
+	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (db_selectVipStatusCallback): %s", error);
 		return;
@@ -129,13 +129,13 @@ public void db_selectVipStatusCallback(Handle owner, Handle hndl, const char[] e
 	int iVip = ReadPackCell(pack);
 	delete pack;
 
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	if (results.HasResults && results.FetchRow())
 	{
 		// Exisiting Player
 		int iVipCompare, active;
-		SQL_FetchString(hndl, 0, szSteamId, 128);
-		iVipCompare = SQL_FetchInt(hndl, 1);
-		active = SQL_FetchInt(hndl, 2);
+		results.FetchString(0, szSteamId, 128);
+		iVipCompare = results.FetchInt(1);
+		active = results.FetchInt(2);
 
 		// Check to see if need to update
 		if (active == 1)
@@ -159,9 +159,9 @@ public void db_selectVipStatusCallback(Handle owner, Handle hndl, const char[] e
 	}
 }
 
-public void db_removeVipCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void db_removeVipCallback(Database db, DBResultSet results, const char[] error, any client)
 {
-	if (hndl == null)
+	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (db_removeVipCallback): %s", error);
 		return;
@@ -206,9 +206,9 @@ public void db_insertVip(char szSteamId[128], int iVip)
 	g_dDb.Query(db_insertVipCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void db_insertVipCallback(Handle owner, Handle hndl, const char[] error, DataPack pack)
+public void db_insertVipCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
-	if (hndl == null)
+	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (db_insertVipCallback): %s", error);
 		return;
