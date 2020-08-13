@@ -92,11 +92,11 @@ SELECT * FROM (
 ALTER TABLE ck_checkpoints RENAME TO ck_checkpointsold;
 ALTER TABLE ck_checkpointsnew RENAME TO ck_checkpoints;
 
-ALTER TABLE `ck_playertimes` ADD `velStartXY` INT NOT NULL AFTER `runtimepro`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`;
+ALTER TABLE `ck_playertimes` ADD `velStartXY` INT NOT NULL DEFAULT 0 AFTER `runtimepro`, ADD `velStartXYZ` INT NOT NULL DEFAULT 0 AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL DEFAULT 0 AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL DEFAULT 0 AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL DEFAULT 0 AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL DEFAULT 0 AFTER `velEndXYZ`;
 
-ALTER TABLE `ck_bonus` ADD `velStartXY` INT NOT NULL AFTER `runtime`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`;
+ALTER TABLE `ck_bonus` ADD `velStartXY` INT NOT NULL DEFAULT 0 AFTER `runtime`, ADD `velStartXYZ` INT NOT NULL DEFAULT 0 AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL DEFAULT 0 AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL DEFAULT 0 AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL DEFAULT 0 AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL DEFAULT 0 AFTER `velEndXYZ`;
 
-ALTER TABLE `ck_wrcps` ADD `velStartXY` INT NOT NULL AFTER `runtimepro`, ADD `velStartXYZ` INT NOT NULL AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL AFTER `velEndXYZ`;
+ALTER TABLE `ck_wrcps` ADD `velStartXY` INT NOT NULL DEFAULT 0 AFTER `runtimepro`, ADD `velStartXYZ` INT NOT NULL DEFAULT 0 AFTER `velStartXY`, ADD `velStartZ` INT NOT NULL DEFAULT 0 AFTER `velStartXYZ`, ADD `velEndXY` INT NOT NULL DEFAULT 0 AFTER `velStartZ`, ADD `velEndXYZ` INT NOT NULL DEFAULT 0 AFTER `velEndXY`, ADD `velEndZ` INT NOT NULL DEFAULT 0 AFTER `velEndXYZ`;
 
 ALTER TABLE `ck_playeroptions2` ADD `velcmphud` INT NOT NULL DEFAULT 1 AFTER `teleside`, ADD `velcmpchat` INT NOT NULL DEFAULT 1 AFTER `velcmphud`;
 
