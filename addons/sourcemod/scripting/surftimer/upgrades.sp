@@ -11,9 +11,10 @@ void db_startUpgrading()
 	tTransaction.AddQuery("SELECT prespeed FROM ck_zones LIMIT 1", 0);
 	tTransaction.AddQuery("SELECT ck_maptier.ranked, ck_playerrank.style FROM ck_maptier, ck_playerrank LIMIT 1", 1);
 	tTransaction.AddQuery("SELECT wrcppoints FROM ck_playerrank LIMIT 1", 2);
-	tTransaction.AddQuery("SELECT ck_playeroptions2.teleside, ck_spawnlocations.teleside FROM ck_playeroptions2, ck_spawnlocations LIMIT 1", 3);
-	tTransaction.AddQuery("SELECT velEndXYZ FROM ck_checkpoints LIMIT 1", 4);
-	tTransaction.AddQuery("SELECT steamid FROM ck_announcements LIMIT 1", 5);
+	tTransaction.AddQuery("SELECT teleside FROM ck_playeroptions2 LIMIT 1", 3);
+	tTransaction.AddQuery("SELECT teleside FROM ck_spawnlocations LIMIT 1", 4);
+	tTransaction.AddQuery("SELECT velEndXYZ FROM ck_checkpoints LIMIT 1", 5);
+	tTransaction.AddQuery("SELECT steamid FROM ck_announcements LIMIT 1", 6);
 	g_dDb.Execute(tTransaction, SQLTxn_CheckDatabaseUpgradesSuccess, SQLTxn_CheckDatabaseUpgradesFailed);
 }
 
@@ -25,10 +26,10 @@ public void SQLTxn_CheckDatabaseUpgradesSuccess(Handle db, any data, int numQuer
 public void SQLTxn_CheckDatabaseUpgradesFailed(Handle db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
 {
 	LogMessage("[SurfTimer] Upgrading database... (Version: %d)", queryData[failIndex]);
-	db_upgradeDatabase(queryData[failIndex], error);
+	db_upgradeDatabase(queryData[failIndex]);
 }
 
-void db_upgradeDatabase(int version, const char[] error = "")
+void db_upgradeDatabase(int version)
 {
 	Transaction tTransaction = new Transaction();
 
@@ -66,30 +67,19 @@ void db_upgradeDatabase(int version, const char[] error = "")
 	}
 	else if (version == 3)
 	{
-		if (StrContains(error, "unknown column", false) != -1)
-		{
-			if (StrContains(error, "ck_playeroptions2.teleside", false) != -1)
-			{
-				tTransaction.AddQuery("ALTER TABLE ck_playeroptions2 ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER centrehud;", 1);
-			}
-			else
-			{
-				tTransaction.AddQuery("ALTER TABLE ck_spawnlocations DROP PRIMARY KEY, ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER stage, ADD PRIMARY KEY (mapname, zonegroup, stage, teleside);", 2);
-			}
-		}
-		else
-		{
-			delete tTransaction;
-			db_upgradeDatabase(4);
-			return;
-		}
+		tTransaction.AddQuery("ALTER TABLE ck_playeroptions2 ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER centrehud;", 1);
 	}
 	else if (version == 4)
 	{
-		delete tTransaction;
-		SetFailState("Please execute the mysql upgrade script \"upgrade-checkpoints.sql\" in your \"scripts/mysql-files/upgrading\" folder.");
+		tTransaction.AddQuery("ALTER TABLE ck_spawnlocations DROP PRIMARY KEY, ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER stage, ADD PRIMARY KEY (mapname, zonegroup, stage, teleside);", 1);
 	}
 	else if (version == 5)
+	{
+		delete tTransaction;
+		LogError("Please execute the mysql upgrade script \"upgrade-checkpoints.sql\" in your \"scripts/mysql-files/upgrading\" folder. After this run this command again!");
+		return;
+	}
+	else if (version == 6)
 	{
 		tTransaction.AddQuery("ALTER TABLE `ck_announcements` ADD `steamid` varchar(32) NOT NULL AFTER `server`;", 1);
 
@@ -127,14 +117,7 @@ public void SQLTxn_UpgradeDatabaseSuccess(Database db, int version, int numQueri
 {
 	LogMessage("surftimer | Database upgrade (Version %d) was successful", version);
 
-	if (version == 3)
-	{
-		db_upgradeDatabase(3);
-	}
-	else
-	{
-		db_upgradeDatabase(version + 1);
-	}
+	db_upgradeDatabase(version + 1);
 }
 
 public void SQLTxn_UpgradeDatabaseFailed(Database db, int version, int numQueries, const char[] error, int failIndex, any[] queryData)
