@@ -1,7 +1,3 @@
-static int g_iCount = -1;
-static int g_iCounter = -1;
-static float g_fStart = 0.0;
-
 public Action Command_DatabaseUpgrade(int client, int args)
 {
     ReplyToCommand(client, "Starting database upgrade...");
@@ -121,6 +117,7 @@ void db_upgradeDatabase(int version, const char[] error = "")
 	}
 	else
 	{
+		LogMessage("surftimer | Database is up to date.");
 		delete tTransaction;
 		return;
 	}
@@ -132,7 +129,7 @@ public void SQLTxn_UpgradeDatabaseSuccess(Database db, int version, int numQueri
 {
 	LogMessage("surftimer | Database upgrade (Version %d) was successful", version);
 
-	if (version != 3)
+	if (version == 3)
 	{
 		db_upgradeDatabase(3);
 	}
