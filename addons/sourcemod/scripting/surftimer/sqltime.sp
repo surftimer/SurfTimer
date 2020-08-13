@@ -2,6 +2,10 @@ public void db_viewPlayerInfo(int client, char szSteamId[32])
 {
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), "SELECT steamid, steamid64, name, country, lastseen, joined, connections, timealive, timespec FROM ck_playerrank WHERE steamid = '%s';", szSteamId);
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_viewPlayerInfo - szQuery: %s", szQuery);
+	}
 	g_dDb.Query(SQL_ViewPlayerInfoCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
@@ -86,6 +90,10 @@ public void db_savePlayTime(int client)
 {
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), "UPDATE ck_playerrank SET timealive = timealive + %i, timespec = timespec + %i WHERE steamid = '%s';", g_iPlayTimeAliveSession[client], g_iPlayTimeSpecSession[client], g_szSteamID[client]);
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_savePlayTime- szQuery: %s", szQuery);
+	}
 	g_dDb.Query(SQL_SavePlayTimeCallback, szQuery, _, DBPrio_Low);
 }
 

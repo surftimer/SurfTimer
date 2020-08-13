@@ -85,6 +85,10 @@ public void db_selectVipStatus(char szSteamId[128], int iVip, int type)
 		WritePackCell(pack, iVip);
 		
 		Format(szQuery, sizeof(szQuery), "SELECT steamid, vip, active FROM ck_vipadmins WHERE steamid = '%s';", szSteamId);
+		if (g_cLogQueries.BoolValue)
+		{
+			LogToFile(g_szQueryFile, "db_selectVipStatus - szQuery: %s", szQuery);
+		}
 		g_dDb.Query(db_selectVipStatusCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
@@ -103,6 +107,10 @@ public void db_selectVipStatus(char szSteamId[128], int iVip, int type)
 			}
 		}
 		Format(szQuery, sizeof(szQuery), "UPDATE ck_vipadmins SET inuse = 0, active = 0 WHERE steamid = '%s';", szSteamId);
+		if (g_cLogQueries.BoolValue)
+		{
+			LogToFile(g_szQueryFile, "db_selectVipStatus - szQuery: %s", szQuery);
+		}
 		g_dDb.Query(db_removeVipCallback, szQuery, client, DBPrio_Low);
 	}
 }
@@ -191,6 +199,10 @@ public void db_insertVip(char szSteamId[128], int iVip)
 	WritePackCell(pack, iVip);
 
 	Format(szQuery, sizeof(szQuery), "INSERT INTO ck_vipadmins (steamid, title, namecolour, textcolour, inuse, vip, admin, zoner) VALUES ('%s', '%s', %i, 0, 1 , %i, 0, 0);", szSteamId, szTitle, colour, iVip);
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_insertVip - szQuery: %s", szQuery);
+	}
 	g_dDb.Query(db_insertVipCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -258,5 +270,9 @@ public void db_updateVip(char szSteamId[128], int iVip)
 	WritePackCell(pack, iVip);
 
 	Format(szQuery, sizeof(szQuery), "UPDATE ck_vipadmins SET title = '%s', namecolour = %i, textcolour = 0, inuse = 1, vip = %i WHERE steamid = '%s';", szTitle, colour, iVip, szSteamId);
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_updateVip - szQuery: %s", szQuery);
+	}
 	g_dDb.Query(db_insertVipCallback, szQuery, pack, DBPrio_Low);
 }

@@ -129,6 +129,7 @@ ConVar g_iAdminCountryTags = null;
 ConVar g_iVIPCommands = null;
 ConVar g_replayBotDelay = null;
 ConVar g_AllowPause = null;
+ConVar g_cLogQueries = null;
 
 void CreateConVars()
 {
@@ -465,6 +466,8 @@ void CreateConVars()
 	//Allow pausing
 	g_AllowPause = AutoExecConfig_CreateConVar("ck_allow_pause", "1", "on/off - Allows players to pause their timer", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	HookConVarChange(g_AllowPause, OnSettingChanged);
+
+	g_cLogQueries = AutoExecConfig_CreateConVar("ck_enable_query_logging", "0", "Enable logging of all queries? This can impact the I/O Load and is only useful for debugging.", _, true, 0.0, true, 1.0);
 
 	AutoExecConfig_ExecuteFile();
 	AutoExecConfig_CleanFile();

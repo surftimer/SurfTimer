@@ -218,6 +218,7 @@ float g_fTick[MAXPLAYERS + 1][2];
 float g_fServerLoading[2];
 float g_fClientsLoading[MAXPLAYERS + 1][2];
 char g_szLogFile[PLATFORM_MAX_PATH];
+char g_szQueryFile[PLATFORM_MAX_PATH];
 
 // PR Commands
 int g_iPrTarget[MAXPLAYERS + 1];
@@ -1673,6 +1674,7 @@ public void OnMapStart()
 	if (!DirExists("addons/sourcemod/logs/surftimer"))
 		CreateDirectory("addons/sourcemod/logs/surftimer", 511);
 	BuildPath(Path_SM, g_szLogFile, sizeof(g_szLogFile), "logs/surftimer/%s.log", g_szMapName);
+	BuildPath(Path_SM, g_szQueryFile, sizeof(g_szQueryFile), "logs/surftimer/query.log", g_szMapName);
 
 	// Get map maxvelocity
 	g_hMaxVelocity = FindConVar("sv_maxvelocity");
