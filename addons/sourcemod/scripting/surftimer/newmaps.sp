@@ -67,7 +67,7 @@ public void sql_selectNewestMapsCallback(Database db, DBResultSet results, const
 		else
 		{
 			menu.OptionFlags = MENUFLAG_BUTTON_EXIT;
-			int client = GetClientUserId(userid);
+			int client = GetClientOfUserId(userid);
 
 			if (IsClientInGame(client))
 			{
