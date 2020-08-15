@@ -5839,21 +5839,17 @@ public void sql_selectRankedPlayersCallback(Database db, DBResultSet results, co
 
 		while (results.FetchRow())
 		{
-			PrintToConsoleAll("sql_selectRankedPlayersCallback - i: %d, x: %d", i, x);
 			if (i <= x)
 			{
 				g_pr_points[i][0] = 0;
 				results.FetchString(0, g_pr_szSteamID[i], 32);
 				results.FetchString(1, g_pr_szName[i], 64);
 
-				PrintToConsoleAll("sql_selectRankedPlayersCallback - steamid: %s, name: %s", g_pr_szSteamID[i], g_pr_szName[i]);
-
 				g_bProfileRecalc[i] = true;
 				i++;
 			}
 			if (i == x)
 			{
-				PrintToConsoleAll("CalculatePlayerRank");
 				CalculatePlayerRank(66, 0);
 			}
 		}
