@@ -5941,57 +5941,6 @@ public void SQL_CheckCallback(Database db, DBResultSet results, const char[] err
 	}
 }
 
-public void SQL_CheckCallback2(Database db, DBResultSet results, const char[] error, any data)
-{
-	if (!IsValidDatabase(db, error))
-	{
-		LogError("[SurfTimer] SQL Error (SQL_CheckCallback2): %s", error);
-		return;
-	}
-
-	db_viewMapProRankCount();
-	db_GetMapRecord_Pro();
-}
-
-public void SQL_CheckCallback3(Database db, DBResultSet results, const char[] error, DataPack data)
-{
-	if (!IsValidDatabase(db, error))
-	{
-		LogError("[SurfTimer] SQL Error (SQL_CheckCallback3): %s", error);
-		delete data;
-		return;
-	}
-
-	char steamid[128];
-
-	ResetPack(data);
-	int client = ReadPackCell(data);
-	ReadPackString(data, steamid, 128);
-	delete data;
-
-	RecalcPlayerRank(client, steamid);
-	db_viewMapProRankCount();
-	db_GetMapRecord_Pro();
-}
-
-public void SQL_CheckCallback4(Database db, DBResultSet results, const char[] error, DataPack data)
-{
-	if (!IsValidDatabase(db, error))
-	{
-		LogError("[SurfTimer] SQL Error (SQL_CheckCallback4): %s", error);
-		delete data;
-		return;
-	}
-	char steamid[128];
-
-	ResetPack(data);
-	int client = ReadPackCell(data);
-	ReadPackString(data, steamid, 128);
-	delete data;
-
-	RecalcPlayerRank(client, steamid);
-}
-
 /*==================================
 =          PLAYER OPTIONS          =
 ==================================*/
