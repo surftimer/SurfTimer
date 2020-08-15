@@ -381,35 +381,45 @@ public Action SetClanTag(Handle timer, any userid)
 		}
 	}
 
-	if (g_iEnforceTitleType[client] == 0)
-	{
-		return Plugin_Handled;
-	}
-
 	if (GetConVarBool(g_hCountry))
 	{
 		char szTabRank[1024], szTabClanTag[1024];
-		Format(szTabRank, sizeof(szTabRank), "%s", g_pr_chat_coloredrank[client]);
+
+		if (g_iEnforceTitleType[client] == 1 || g_iEnforceTitleType[client] == 2) {
+			Format(szTabRank, sizeof(szTabRank), "%s", g_pr_chat_coloredrank[client]);
+		}
+
 		CRemoveTags(szTabRank, sizeof(szTabRank));
-		Format(szTabClanTag, sizeof(szTabClanTag), "%s | %s", g_szCountryCode[client], szTabRank);
+
+		if (strlen(szTabRank) > 1) {
+			Format(szTabClanTag, sizeof(szTabClanTag), "%s | %s", g_szCountryCode[client], szTabRank);
+		}
+		else {
+			strcopy(szTabClanTag, sizeof(szTabClanTag), g_szCountryCode[client]);
+		}
 		
 		if (GetConVarBool(g_iAdminCountryTags) && (GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) {
 			CS_SetClientClanTag(client, szTabRank);
-		} 
-		else {
+		} else
+		{
 			CS_SetClientClanTag(client, szTabClanTag);
 		}
 	}
 	else if (GetConVarBool(g_hPointSystem))
 	{
 		char szTabRank[1024], szTabClanTag[1024];
-		Format(szTabRank, sizeof(szTabRank), "%s", g_pr_chat_coloredrank[client]);
+
+		if (g_iEnforceTitleType[client] == 1 || g_iEnforceTitleType[client] == 2) {
+			Format(szTabRank, sizeof(szTabRank), "%s", g_pr_chat_coloredrank[client]);
+		}
+
 		CRemoveTags(szTabRank, sizeof(szTabRank));
+
 		Format(szTabClanTag, sizeof(szTabClanTag), "%s", szTabRank);
 		
 		if (GetConVarBool(g_iAdminCountryTags) && (GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) {
 			CS_SetClientClanTag(client, szTabRank);
-		} 
+		}
 		else {
 			CS_SetClientClanTag(client, szTabClanTag);
 		}
