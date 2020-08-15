@@ -465,14 +465,18 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		else
 		{
 			char szChatRank[1024];
-			Format(szChatRank, sizeof(szChatRank), "%s", g_pr_chat_coloredrank[client]);
 
-			char szChatRankColor[1024];
-			Format(szChatRankColor, sizeof(szChatRankColor), "%s", g_pr_chat_coloredrank[client]);
-			CGetRankColor(szChatRankColor, sizeof(szChatRankColor));
+			if(g_iEnforceTitleType[client] == 2 || g_iEnforceTitleType[client] == 0)
+			{
+				Format(szChatRank, sizeof(szChatRank), "%s", g_pr_chat_coloredrank[client]);
 
-			if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
-				Format(szName, sizeof(szName), "{%s}%s", szChatRankColor, szName);
+				char szChatRankColor[1024];
+				Format(szChatRankColor, sizeof(szChatRankColor), "%s", g_pr_chat_coloredrank[client]);
+				CGetRankColor(szChatRankColor, sizeof(szChatRankColor));
+
+				if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
+					Format(szName, sizeof(szName), "{%s}%s", szChatRankColor, szName);
+			}
 
 			if (GetConVarBool(g_hCountry) && (GetConVarBool(g_hPointSystem)))
 			{
