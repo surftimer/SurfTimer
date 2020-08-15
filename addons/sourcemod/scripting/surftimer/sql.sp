@@ -2717,17 +2717,17 @@ public void SQL_UpdateRecordProCallback2(Database db, DBResultSet results, const
 		{
 			rank = (results.FetchInt(0)+1);
 		}
-		g_MapRank[data] = rank;
+		g_MapRank[client] = rank;
 		
 		for (int i = 0; i < 3; i ++)
-			g_iStartVelsRecord[data][0][i] = g_iStartVelsNew[data][0][i];
+			g_iStartVelsRecord[client][0][i] = g_iStartVelsNew[client][0][i];
 
 		if (rank <= 10 && rank > 1)
-			g_bTop10Time[data] = true;
+			g_bTop10Time[client] = true;
 		else
-			g_bTop10Time[data] = false;
+			g_bTop10Time[client] = false;
 
-		MapFinishedMsgs(data);
+		MapFinishedMsgs(client);
 
 		if (g_bInsertNewTime)
 		{
