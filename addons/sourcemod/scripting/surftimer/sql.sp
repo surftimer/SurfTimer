@@ -2681,24 +2681,21 @@ public void SQL_UpdateRecordProCallback(Database db, DBResultSet results, const 
 		return;
 	}
 
-	if (data != INVALID_HANDLE)
-	{
-		ResetPack(data);
-		float time = ReadPackFloat(data);
-		int client = GetClientOfUserId(ReadPackCell(data));
-		delete data;
+	ResetPack(data);
+	float time = ReadPackFloat(data);
+	int client = GetClientOfUserId(ReadPackCell(data));
+	delete data;
 
-		if (IsValidClient(client))
+	if (IsValidClient(client))
+	{
+		// Find out how many times are are faster than the players time
+		char szQuery[512];
+		Format(szQuery, sizeof(szQuery), "SELECT count(runtimepro) FROM `ck_playertimes` WHERE `mapname` = '%s' AND `runtimepro` < %f-(1E-3) AND style = 0;", g_szMapName, time);
+		if (g_cLogQueries.BoolValue)
 		{
-			// Find out how many times are are faster than the players time
-			char szQuery[512];
-			Format(szQuery, sizeof(szQuery), "SELECT count(runtimepro) FROM `ck_playertimes` WHERE `mapname` = '%s' AND `runtimepro` < %f-(1E-3) AND style = 0;", g_szMapName, time);
-			if (g_cLogQueries.BoolValue)
-			{
-				LogToFile(g_szQueryFile, "SQL_UpdateRecordProCallback - szQuery: %s", szQuery);
-			}
-			g_dDb.Query(SQL_UpdateRecordProCallback2, szQuery, client, DBPrio_Low);
+			LogToFile(g_szQueryFile, "SQL_UpdateRecordProCallback - szQuery: %s", szQuery);
 		}
+		g_dDb.Query(SQL_UpdateRecordProCallback2, szQuery, GetClientUserId(client), DBPrio_Low);
 	}
 }
 
@@ -2720,17 +2717,17 @@ public void SQL_UpdateRecordProCallback2(Database db, DBResultSet results, const
 		{
 			rank = (results.FetchInt(0)+1);
 		}
-		g_MapRank[data] = rank;
+		g_MapRank[client] = rank;
 		
 		for (int i = 0; i < 3; i ++)
-			g_iStartVelsRecord[data][0][i] = g_iStartVelsNew[data][0][i];
+			g_iStartVelsRecord[client][0][i] = g_iStartVelsNew[client][0][i];
 
 		if (rank <= 10 && rank > 1)
-			g_bTop10Time[data] = true;
+			g_bTop10Time[client] = true;
 		else
-			g_bTop10Time[data] = false;
+			g_bTop10Time[client] = false;
 
-		MapFinishedMsgs(data);
+		MapFinishedMsgs(client);
 
 		if (g_bInsertNewTime)
 		{
@@ -6600,7 +6597,7 @@ public void SQL_UpdateWrcpRecordCallback2(Database db, DBResultSet results, cons
 {
 	if (!IsValidDatabase(db, error))
 	{
-		LogError("[SurfTimer] SQL Error (SQL_UpdateRecordProCallback2): %s", error);
+		LogError("[SurfTimer] SQL Error (SQL_UpdateWrcpRecordCallback2): %s", error);
 		delete data;
 		return;
 	}
