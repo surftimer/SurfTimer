@@ -1283,14 +1283,6 @@ public void LimitMaxSpeed(int client, float fMaxSpeed)
 	}
 }
 
-public bool Base_TraceFilter(int entity, int contentsMask, any data)
-{
-	if (entity != data)
-		return (false);
-
-	return (true);
-}
-
 public void SetClientDefaults(int client)
 {
 	float GameTime = GetGameTime();
@@ -2814,25 +2806,6 @@ public bool TraceRayDontHitSelf(int entity, int mask, any data)
 stock int BooltoInt(bool status)
 {
 	return (status) ? 1:0;
-}
-
-public void PlayQuakeSound_Spec(int client, char[] buffer)
-{
-	int SpecMode;
-	for (int x = 1; x <= MaxClients; x++)
-	{
-		if (IsValidClient(x) && !IsPlayerAlive(x))
-		{
-			SpecMode = GetEntProp(x, Prop_Send, "m_iObserverMode");
-			if (SpecMode == 4 || SpecMode == 5)
-			{
-				int Target = GetEntPropEnt(x, Prop_Send, "m_hObserverTarget");
-				if (Target == client)
-					if (g_bEnableQuakeSounds[x])
-					ClientCommand(x, buffer);
-			}
-		}
-	}
 }
 
 public void AttackProtection(int client, int &buttons)

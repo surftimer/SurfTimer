@@ -711,20 +711,6 @@ public Action Event_OnRoundStart(Handle event, const char[] name, bool dontBroad
 	return Plugin_Continue;
 }
 
-public Action OnTouchAllTriggers(int entity, int other)
-{
-	if (other >= 1 && other <= MaxClients && IsFakeClient(other))
-		return Plugin_Handled;
-	return Plugin_Continue;
-}
-
-public Action OnEndTouchAllTriggers(int entity, int other)
-{
-	if (other >= 1 && other <= MaxClients && IsFakeClient(other))
-		return Plugin_Handled;
-	return Plugin_Continue;
-}
-
 // PushFix by Mev, George, & Blacky
 // https://forums.alliedmods.net/showthread.php?t=267131
 public Action OnTouchPushTrigger(int entity, int other)

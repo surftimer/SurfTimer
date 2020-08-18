@@ -94,11 +94,11 @@ public int MapSettingsMenuHandler(Handle menu, MenuAction action, int param1, in
 			}
 			case 5:
 			{
-				db_unlimitAllStages(g_szMapName);
+				db_unlimitAllStages();
 			}
 			case 6:
 			{
-				db_removeOnejumplimit(g_szMapName);
+				db_removeOnejumplimit();
 			}
 		}
 	}
@@ -315,7 +315,7 @@ public void db_updateMapSettings()
 	g_dDb.Query(sql_insertMapSettingsCallback, szQuery, _, DBPrio_Low);
 }
 
-public void db_unlimitAllStages(char[] szMapName)
+public void db_unlimitAllStages()
 {
 	char szQuery[256];
 	Format(szQuery, sizeof(szQuery), "UPDATE ck_zones SET prespeed = 0.0 WHERE mapname = '%s' AND zonetype = 3;", g_szMapName);
@@ -326,7 +326,7 @@ public void db_unlimitAllStages(char[] szMapName)
 	g_dDb.Query(SQL_UnlimitAllStagesCallback, szQuery, _, DBPrio_Low);
 }
 
-public void db_removeOnejumplimit(char[] szMapName)
+public void db_removeOnejumplimit()
 {
 	char szQuery[256];
 	Format(szQuery, sizeof(szQuery), "UPDATE ck_zones SET onejumplimit = 0 WHERE mapname = '%s';", g_szMapName);

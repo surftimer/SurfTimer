@@ -656,24 +656,6 @@ public void EndTouch(int client, int action[3])
 	}
 }
 
-public void InitZoneVariables()
-{
-	g_mapZonesCount = 0;
-	for (int i = 0; i < MAXZONES; i++)
-	{
-		g_mapZones[i].ZoneId = -1;
-		g_mapZones[i].PointA = view_as<float>({ -1.0, -1.0, -1.0 });
-		g_mapZones[i].PointB = view_as<float>({ -1.0, -1.0, -1.0 });
-		g_mapZones[i].ZoneId = -1;
-		g_mapZones[i].ZoneType = -1;
-		g_mapZones[i].ZoneTypeId = -1;
-		g_mapZones[i].ZoneGroup = -1;
-		Format(g_mapZones[i].ZoneName, sizeof(MapZone::ZoneName), "");
-		g_mapZones[i].Vis = 0;
-		g_mapZones[i].Team = 0;
-	}
-}
-
 public void getZoneTeamColor(int team, int color[4])
 {
 	switch (team)
@@ -2366,53 +2348,6 @@ public void GetClientSelectedZone(int client, int &team, int &vis)
 		Array_Copy(g_mapZones[g_ClientSelectedZone[client]].PointB, g_Positions[client][1], 3);
 		team = g_mapZones[g_ClientSelectedZone[client]].Team;
 		vis = g_mapZones[g_ClientSelectedZone[client]].Vis;
-	}
-}
-
-public void ClearZonesMenu(int client)
-{
-	Menu hClearZonesMenu = new Menu(MenuHandler_ClearZones);
-
-	hClearZonesMenu.SetTitle("Are you sure, you want to clear all zones on this map?");
-	hClearZonesMenu.AddItem("", "NO GO BACK!");
-	hClearZonesMenu.AddItem("", "NO GO BACK!");
-	hClearZonesMenu.AddItem("", "YES! DO IT!");
-
-	hClearZonesMenu.Display(client, 20);
-}
-
-public int MenuHandler_ClearZones(Handle tMenu, MenuAction action, int client, int item)
-{
-	switch (action)
-	{
-		case MenuAction_Select:
-		{
-			if (item == 2)
-			{
-				for (int i = 0; i < MAXZONES; i++)
-				{
-					g_mapZones[i].ZoneId = -1;
-					g_mapZones[i].PointA = view_as<float>({-1.0, -1.0, -1.0});
-					g_mapZones[i].PointB = view_as<float>({-1.0, -1.0, -1.0});
-					g_mapZones[i].ZoneId = -1;
-					g_mapZones[i].ZoneType = -1;
-					g_mapZones[i].ZoneTypeId = -1;
-					Format(g_mapZones[i].ZoneName, sizeof(MapZone::ZoneName), "");
-					g_mapZones[i].Vis = 0;
-					g_mapZones[i].Team = 0;
-				}
-				g_mapZonesCount = 0;
-				db_deleteMapZones();
-				CPrintToChat(client, "%t", "SurfZones13", g_szChatPrefix);
-				RemoveZones();
-			}
-			resetSelection(client);
-			ZoneMenu(client);
-		}
-		case MenuAction_End:
-		{
-			delete tMenu;
-		}
 	}
 }
 
