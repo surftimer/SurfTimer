@@ -34,7 +34,7 @@ public void OnConnect(Database db, const char[] error, any data)
 	if (strcmp(szIdent, "mysql", false) == 0)
 	{
 		// https://github.com/nikooo777/ckSurf/pull/58
-		g_dDb.Query(sqlSetSQLMode, "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
+		g_dDb.Query(sqlSetSQLMode, "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));", _, DBPrio_Low);
 	}
 	else
 	{
@@ -96,11 +96,11 @@ public void SQLTxn_CreateDatabaseSuccess(Handle db, any data, int numQueries, DB
 				{
 					if (queryData[i] == 3)
 					{
-						g_dDb.Query(sqlcreatePlayertimesIndex, sql_createPlayertimesIndex);
+						g_dDb.Query(sqlcreatePlayertimesIndex, sql_createPlayertimesIndex, _, DBPrio_Low);
 					}
 					else
 					{
-						g_dDb.Query(sqlcreateBonusIndex, sql_createBonusIndex);
+						g_dDb.Query(sqlcreateBonusIndex, sql_createBonusIndex, _, DBPrio_Low);
 					}
 				}
 			}
@@ -141,9 +141,9 @@ public void SQLTxn_CreateDatabaseFailed(Handle db, any data, int numQueries, con
 }
 
 /* Admin Delete Menu */
-public void sql_DeleteMenuView(Database db, DBResultSet results, const char[] error, any data)
+public void sql_DeleteMenuView(Database db, DBResultSet results, const char[] error, int serial)
 {
-	int client = GetClientFromSerial(data);
+	int client = GetClientFromSerial(serial);
 	
 	Menu editing = new Menu(callback_DeleteRecord);
 	editing.SetTitle("%s Records Editing Menu - %s\n► Editing %s record\n► Press the menu item to delete the record\n ", g_szMenuPrefix, g_EditingMap[client], g_EditTypes[g_SelectedEditOption[client]]);
@@ -180,7 +180,7 @@ public void sql_DeleteMenuView(Database db, DBResultSet results, const char[] er
 			results.FetchString(1, playerName, 32);
 			runTime = results.FetchFloat(2);
 			char szRunTime[128];
-			FormatTimeFloat(data, runTime, 3, szRunTime, sizeof(szRunTime));
+			FormatTimeFloat(client, runTime, 3, szRunTime, sizeof(szRunTime));
 			FormatEx(menuFormat, sizeof(menuFormat), "Rank: %d ► %s - %s", i, playerName, szRunTime);
 			ReplaceString(playerName, 32, ";;;", ""); // make sure the client dont has this in their name.
 			
@@ -229,7 +229,7 @@ public int callback_DeleteRecord(Menu menu, MenuAction action, int client, int k
 			{
 				LogToFile(g_szQueryFile, "callback_DeleteRecord - szQuery: %s", szQuery);
 			}
-			g_dDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client));
+			g_dDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client), DBPrio_Low);
 			return 0;
 		}
 	
@@ -327,7 +327,7 @@ public int callback_Confirm(Menu menu, MenuAction action, int client, int key)
 			{
 				LogToFile(g_szQueryFile, "callback_Confirm - szQuery: %s", szQuery);
 			}
-			g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
+			g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 			
 			// Looking for online player to refresh his record after deleting it.
 			char player_steamID[32];
@@ -372,7 +372,7 @@ public void db_deleteSpawnLocations(int zGrp, int teleside)
 	{
 		LogToFile(g_szQueryFile, "db_deleteSpawnLocations - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_CheckCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 }
 
 
@@ -425,7 +425,7 @@ public void db_selectSpawnLocations()
 	{
 		LogToFile(g_szQueryFile, "db_selectSpawnLocations - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(db_selectSpawnLocationsCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(db_selectSpawnLocationsCallback, szQuery, _, DBPrio_Low);
 }
 
 public void db_selectSpawnLocationsCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -476,7 +476,7 @@ public void db_viewMapProRankCount()
 	{
 		LogToFile(g_szQueryFile, "db_viewMapProRankCount - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(sql_selectPlayerProCountCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(sql_selectPlayerProCountCallback, szQuery, _, DBPrio_Low);
 }
 
 public void sql_selectPlayerProCountCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -719,7 +719,7 @@ public void sql_CalcuatePlayerRankCallback(Database db, DBResultSet results, con
 			{
 				LogToFile(g_szQueryFile, "sql_CalcuatePlayerRankCallback - szQuery: %s", szQuery);
 			}
-			g_dDb.Query(SQL_InsertPlayerCallBack, szQuery, client, DBPrio_Low);
+			g_dDb.Query(SQL_InsertPlayerCallBack, szQuery, GetClientUserId(client), DBPrio_Low);
 
 			g_pr_finishedmaps[client][style] = 0;
 			g_pr_finishedmaps_perc[client][style] = 0.0;
@@ -1546,7 +1546,7 @@ public void db_viewPlayerPointsCallback(Database db, DBResultSet results, const 
 			{
 				LogToFile(g_szQueryFile, "db_viewPlayerPointsCallback - szQuery: %s", updateConnections);
 			}
-			g_dDb.Query(SQL_CheckCallback, updateConnections, DBPrio_Low);
+			g_dDb.Query(SQL_CheckCallback, updateConnections, _, DBPrio_Low);
 
 			// Debug
 			g_fTick[client][1] = GetGameTime();
@@ -1584,7 +1584,7 @@ public void db_viewPlayerPointsCallback(Database db, DBResultSet results, const 
 				{
 					LogToFile(g_szQueryFile, "db_viewPlayerPointsCallback - szQuery: %s", szQuery);
 				}
-				g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
+				g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 
 				// Play time
 				g_iPlayTimeAlive[client] = 0;
@@ -2094,7 +2094,7 @@ public void db_GetMapRecord_Pro()
 	{
 		LogToFile(g_szQueryFile, "db_GetMapRecord_Pro - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(sql_selectMapRecordCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(sql_selectMapRecordCallback, szQuery, _, DBPrio_Low);
 }
 
 public void sql_selectMapRecordCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -2219,21 +2219,21 @@ public void db_selectMapTopSurfers(int client, char mapname[128])
 	g_dDb.Query(sql_selectTopSurfersCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void sql_selectTopSurfersCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void sql_selectTopSurfersCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (sql_selectTopSurfersCallback): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
-	ResetPack(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
 	char szMap[128];
-	ReadPackString(data, szMap, 128);
-	int style = 0; // ReadPackCell(data);
-	delete data;
+	ReadPackString(pack, szMap, 128);
+	int style = 0; // ReadPackCell(pack);
+	delete pack;
 
 	if (IsValidClient(client))
 	{
@@ -2435,21 +2435,21 @@ public void db_selectBonusTopSurfers(int client, char mapname[128], int zGrp)
 	g_dDb.Query(sql_selectTopBonusSurfersCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void sql_selectTopBonusSurfersCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void sql_selectTopBonusSurfersCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (sql_selectTopBonusSurfersCallback): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
-	ResetPack(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
 	char szMap[128];
-	ReadPackString(data, szMap, 128);
-	int zGrp = ReadPackCell(data);
-	delete data;
+	ReadPackString(pack, szMap, 128);
+	int zGrp = ReadPackCell(pack);
+	delete pack;
 
 	if (IsValidClient(client))
 	{
@@ -2570,10 +2570,10 @@ public void db_selectRecord(int client)
 	{
 		LogToFile(g_szQueryFile, "db_selectRecord - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(sql_selectRecordCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(sql_selectRecordCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void sql_selectRecordCallback(Database db, DBResultSet results, const char[] error, any data)
+public void sql_selectRecordCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -2581,7 +2581,9 @@ public void sql_selectRecordCallback(Database db, DBResultSet results, const cha
 		return;
 	}
 
-	if (!IsValidClient(data))
+	int client = GetClientOfUserId(userid);
+
+	if (!IsValidClient(client))
 	{
 		return;
 	}
@@ -2595,9 +2597,9 @@ public void sql_selectRecordCallback(Database db, DBResultSet results, const cha
 		float time = results.FetchFloat(0);
 
 		// If old time was slower than the new time, update record
-		if ((g_fFinalTime[data] <= time || time <= 0.0))
+		if ((g_fFinalTime[client] <= time || time <= 0.0))
 		{
-			db_updateRecordPro(data);
+			db_updateRecordPro(client);
 		}
 	}
 	else
@@ -2605,15 +2607,15 @@ public void sql_selectRecordCallback(Database db, DBResultSet results, const cha
 
 		// Escape name for SQL injection protection
 		char szName[MAX_NAME_LENGTH * 2 + 1], szUName[MAX_NAME_LENGTH];
-		GetClientName(data, szUName, MAX_NAME_LENGTH);
+		GetClientName(client, szUName, MAX_NAME_LENGTH);
 		g_dDb.Escape(szUName, szName, MAX_NAME_LENGTH);
 
 		// Move required information in datapack
 		Handle pack = CreateDataPack();
-		WritePackFloat(pack, g_fFinalTime[data]);
-		WritePackCell(pack, GetClientUserId(data));
+		WritePackFloat(pack, g_fFinalTime[client]);
+		WritePackCell(pack, GetClientUserId(client));
 
-		Format(szQuery, sizeof(szQuery), sql_insertPlayerTime, g_szSteamID[data], g_szMapName, szName, g_fFinalTime[data], g_iStartVelsNew[data][0][0], g_iStartVelsNew[data][0][1], g_iStartVelsNew[data][0][2], g_iEndVelsNew[data][0][0], g_iEndVelsNew[data][0][1], g_iEndVelsNew[data][0][2], 0);
+		Format(szQuery, sizeof(szQuery), sql_insertPlayerTime, g_szSteamID[client], g_szMapName, szName, g_fFinalTime[client], g_iStartVelsNew[client][0][0], g_iStartVelsNew[client][0][1], g_iStartVelsNew[client][0][2], g_iEndVelsNew[client][0][0], g_iEndVelsNew[client][0][1], g_iEndVelsNew[client][0][2], 0);
 		if (g_cLogQueries.BoolValue)
 		{
 			LogToFile(g_szQueryFile, "sql_selectRecordCallback - szQuery: %s", szQuery);
@@ -2654,19 +2656,19 @@ public void db_updateRecordPro(int client)
 }
 
 
-public void SQL_UpdateRecordProCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void SQL_UpdateRecordProCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (SQL_UpdateRecordProCallback): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
-	ResetPack(data);
-	float time = ReadPackFloat(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
-	delete data;
+	ResetPack(pack);
+	float time = ReadPackFloat(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	delete pack;
 
 	if (IsValidClient(client))
 	{
@@ -2681,7 +2683,7 @@ public void SQL_UpdateRecordProCallback(Database db, DBResultSet results, const 
 	}
 }
 
-public void SQL_UpdateRecordProCallback2(Database db, DBResultSet results, const char[] error, any data)
+public void SQL_UpdateRecordProCallback2(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -2689,7 +2691,7 @@ public void SQL_UpdateRecordProCallback2(Database db, DBResultSet results, const
 		return;
 	}
 
-	int client = GetClientOfUserId(data);
+	int client = GetClientOfUserId(userid);
 
 	if (IsValidClient(client))
 	{
@@ -2732,14 +2734,14 @@ public void db_viewAllRecords(int client, char szSteamId[32])
 		{
 			LogToFile(g_szQueryFile, "db_viewAllRecords - szQuery: %s", szQuery);
 		}
-		g_dDb.Query(SQL_ViewAllRecordsCallback, szQuery, client, DBPrio_Low);
+		g_dDb.Query(SQL_ViewAllRecordsCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 	}
 	else if (IsClientInGame(client))
 		CPrintToChat(client, "%t", "SQL3", g_szChatPrefix);
 }
 
 
-public void SQL_ViewAllRecordsCallback(Database db, DBResultSet results, const char[] error, any data)
+public void SQL_ViewAllRecordsCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -2752,107 +2754,113 @@ public void SQL_ViewAllRecordsCallback(Database db, DBResultSet results, const c
 	int mapcount = 0;
 	char szName[MAX_NAME_LENGTH];
 	char szSteamId[32];
-	if (results.HasResults)
+
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
 	{
-		float time;
-		char szMapName[128];
-		char szMapName2[128];
-		char szQuery[1024];
-		Format(szUncMaps, sizeof(szUncMaps), "");
-		g_totalMapsCompleted[data] = results.RowCount;
-
-		g_CompletedMenu = CreateMenu(FinishedMapsMenuHandler);
-		SetMenuPagination(g_CompletedMenu, 5);
-		g_mapsCompletedLoop[data] = 0;
-
-		while (results.FetchRow())
+		if (results.HasResults)
 		{
-			results.FetchString(0, szName, MAX_NAME_LENGTH);
-			results.FetchString(1, szSteamId, MAX_NAME_LENGTH);
-			results.FetchString(2, szMapName, 128);
+			float time;
+			char szMapName[128];
+			char szMapName2[128];
+			char szQuery[1024];
+			Format(szUncMaps, sizeof(szUncMaps), "");
+			g_totalMapsCompleted[client] = results.RowCount;
 
-			time = results.FetchFloat(3);
+			g_CompletedMenu = CreateMenu(FinishedMapsMenuHandler);
+			SetMenuPagination(g_CompletedMenu, 5);
+			g_mapsCompletedLoop[client] = 0;
 
-			int tier = results.FetchInt(5);
-
-			int mapfound = false;
-
-			// map in rotation?
-			for (int i = 0; i < GetArraySize(g_MapList); i++)
+			while (results.FetchRow())
 			{
-				GetArrayString(g_MapList, i, szMapName2, sizeof(szMapName2));
-				if (StrEqual(szMapName2, szMapName, false))
+				results.FetchString(0, szName, MAX_NAME_LENGTH);
+				results.FetchString(1, szSteamId, MAX_NAME_LENGTH);
+				results.FetchString(2, szMapName, 128);
+
+				time = results.FetchFloat(3);
+
+				int tier = results.FetchInt(5);
+
+				int mapfound = false;
+
+				// map in rotation?
+				for (int i = 0; i < GetArraySize(g_MapList); i++)
 				{
-					if (!bHeader)
+					GetArrayString(g_MapList, i, szMapName2, sizeof(szMapName2));
+					if (StrEqual(szMapName2, szMapName, false))
 					{
-						PrintToConsole(data, " ");
-						PrintToConsole(data, "-------------");
-						PrintToConsole(data, "Finished Maps");
-						PrintToConsole(data, "Player: %s", szName);
-						PrintToConsole(data, "SteamID: %s", szSteamId);
-						PrintToConsole(data, "-------------");
-						PrintToConsole(data, " ");
-						bHeader = true;
-						CPrintToChat(data, "%t", "ConsoleOutput", g_szChatPrefix);
+						if (!bHeader)
+						{
+							PrintToConsole(client, " ");
+							PrintToConsole(client, "-------------");
+							PrintToConsole(client, "Finished Maps");
+							PrintToConsole(client, "Player: %s", szName);
+							PrintToConsole(client, "SteamID: %s", szSteamId);
+							PrintToConsole(client, "-------------");
+							PrintToConsole(client, " ");
+							bHeader = true;
+							CPrintToChat(client, "%t", "ConsoleOutput", g_szChatPrefix);
+						}
+						Handle pack = CreateDataPack();
+						WritePackString(pack, szName);
+						WritePackString(pack, szSteamId);
+						WritePackString(pack, szMapName);
+						WritePackFloat(pack, time);
+						WritePackCell(pack, GetClientUserId(client));
+						WritePackCell(pack, tier);
+						Format(szQuery, sizeof(szQuery), sql_selectPlayerRankProTime, szSteamId, szMapName, szMapName);
+						if (g_cLogQueries.BoolValue)
+						{
+							LogToFile(g_szQueryFile, "SQL_ViewAllRecordsCallback - szQuery: %s", szQuery);
+						}
+						g_dDb.Query(SQL_ViewAllRecordsCallback2, szQuery, pack, DBPrio_Low);
+						mapfound = true;
+						continue;
 					}
-					Handle pack = CreateDataPack();
-					WritePackString(pack, szName);
-					WritePackString(pack, szSteamId);
-					WritePackString(pack, szMapName);
-					WritePackFloat(pack, time);
-					WritePackCell(pack, GetClientUserId(data));
-					WritePackCell(pack, tier);
-					Format(szQuery, sizeof(szQuery), sql_selectPlayerRankProTime, szSteamId, szMapName, szMapName);
-					if (g_cLogQueries.BoolValue)
+				}
+				if (!mapfound)
+				{
+					mapcount++;
+					g_uncMapsCompleted[client] = mapcount;
+					if (!mapfound && mapcount == 1)
 					{
-						LogToFile(g_szQueryFile, "SQL_ViewAllRecordsCallback - szQuery: %s", szQuery);
+						Format(szUncMaps, sizeof(szUncMaps), "%s", szMapName);
 					}
-					g_dDb.Query(SQL_ViewAllRecordsCallback2, szQuery, pack, DBPrio_Low);
-					mapfound = true;
-					continue;
-				}
-			}
-			if (!mapfound)
-			{
-				mapcount++;
-				g_uncMapsCompleted[data] = mapcount;
-				if (!mapfound && mapcount == 1)
-				{
-					Format(szUncMaps, sizeof(szUncMaps), "%s", szMapName);
-				}
-				else
-				{
-					if (!mapfound && mapcount > 1)
+					else
 					{
-						Format(szUncMaps, sizeof(szUncMaps), "%s, %s", szUncMaps, szMapName);
+						if (!mapfound && mapcount > 1)
+						{
+							Format(szUncMaps, sizeof(szUncMaps), "%s, %s", szUncMaps, szMapName);
+						}
 					}
 				}
 			}
 		}
-	}
-	if (!StrEqual(szUncMaps, ""))
-	{
-		if (!bHeader)
+		if (!StrEqual(szUncMaps, ""))
 		{
-			CPrintToChat(data, "%t", "ConsoleOutput", g_szChatPrefix);
-			PrintToConsole(data, " ");
-			PrintToConsole(data, "-------------");
-			PrintToConsole(data, "Finished Maps");
-			PrintToConsole(data, "Player: %s", szName);
-			PrintToConsole(data, "SteamID: %s", szSteamId);
-			PrintToConsole(data, "-------------");
-			PrintToConsole(data, " ");
+			if (!bHeader)
+			{
+				CPrintToChat(client, "%t", "ConsoleOutput", g_szChatPrefix);
+				PrintToConsole(client, " ");
+				PrintToConsole(client, "-------------");
+				PrintToConsole(client, "Finished Maps");
+				PrintToConsole(client, "Player: %s", szName);
+				PrintToConsole(client, "SteamID: %s", szSteamId);
+				PrintToConsole(client, "-------------");
+				PrintToConsole(client, " ");
+			}
+			PrintToConsole(client, "Times on maps which are not in the mapcycle.txt (Records still count but you dont get points): %s", szUncMaps);
 		}
-		PrintToConsole(data, "Times on maps which are not in the mapcycle.txt (Records still count but you dont get points): %s", szUncMaps);
-	}
-	if (!bHeader && StrEqual(szUncMaps, ""))
-	{
-		ProfileMenu2(data, g_ProfileStyleSelect[data], "", g_szSteamID[data]);
-		CPrintToChat(data, "%t", "PlayerHasNoMapRecords", g_szChatPrefix, g_szProfileName[data]);
+		if (!bHeader && StrEqual(szUncMaps, ""))
+		{
+			ProfileMenu2(client, g_ProfileStyleSelect[client], "", g_szSteamID[client]);
+			CPrintToChat(client, "%t", "PlayerHasNoMapRecords", g_szChatPrefix, g_szProfileName[client]);
+		}
 	}
 }
 
-public void SQL_ViewAllRecordsCallback2(Database db, DBResultSet results, const char[] error, any data)
+public void SQL_ViewAllRecordsCallback2(Database db, DBResultSet results, const char[] error, any pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -2869,27 +2877,27 @@ public void SQL_ViewAllRecordsCallback2(Database db, DBResultSet results, const 
 
 		int rank = results.FetchInt(0);
 
-		WritePackCell(data, rank);
-		ResetPack(data);
-		ReadPackString(data, szName, MAX_NAME_LENGTH);
-		ReadPackString(data, szSteamId, 32);
-		ReadPackString(data, szMapName, 128);
+		WritePackCell(pack, rank);
+		ResetPack(pack);
+		ReadPackString(pack, szName, MAX_NAME_LENGTH);
+		ReadPackString(pack, szSteamId, 32);
+		ReadPackString(pack, szMapName, 128);
 
 		Format(szQuery, sizeof(szQuery), sql_selectPlayerProCount, szMapName);
 		if (g_cLogQueries.BoolValue)
 		{
 			LogToFile(g_szQueryFile, "SQL_ViewAllRecordsCallback2 - szQuery: %s", szQuery);
 		}
-		g_dDb.Query(SQL_ViewAllRecordsCallback3, szQuery, data, DBPrio_Low);
+		g_dDb.Query(SQL_ViewAllRecordsCallback3, szQuery, pack, DBPrio_Low);
 	}
 }
 
-public void SQL_ViewAllRecordsCallback3(Database db, DBResultSet results, const char[] error, DataPack data)
+public void SQL_ViewAllRecordsCallback3(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (SQL_ViewAllRecordsCallback3): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
@@ -2906,15 +2914,15 @@ public void SQL_ViewAllRecordsCallback3(Database db, DBResultSet results, const 
 		// fluffys
 		char szValue[128];
 
-		ResetPack(data);
-		ReadPackString(data, szName, MAX_NAME_LENGTH);
-		ReadPackString(data, szSteamId, 32);
-		ReadPackString(data, szMapName, 128);
-		float time = ReadPackFloat(data);
-		int client = GetClientOfUserId(ReadPackCell(data));
-		int tier = ReadPackCell(data);
-		int rank = ReadPackCell(data);
-		delete data;
+		ResetPack(pack);
+		ReadPackString(pack, szName, MAX_NAME_LENGTH);
+		ReadPackString(pack, szSteamId, 32);
+		ReadPackString(pack, szMapName, 128);
+		float time = ReadPackFloat(pack);
+		int client = GetClientOfUserId(ReadPackCell(pack));
+		int tier = ReadPackCell(pack);
+		int rank = ReadPackCell(pack);
+		delete pack;
 
 		if (IsValidClient(client))
 		{
@@ -2970,9 +2978,9 @@ public void db_viewTop10Records(int client, char szSteamId[32], int type)
 {
 	// "SELECT db1.name, db2.steamid, db2.mapname, db2.runtimepro as overall, db1.steamid, db3.tier FROM ck_playertimes as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid INNER JOIN ck_maptier AS db3 ON db2.mapname = db3.mapname WHERE db2.steamid = '%s' AND db2.style = %i AND db1.style = %i AND db2.runtimepro > -1.0 ORDER BY mapname ASC;";
 
-	Handle data = CreateDataPack();
-	WritePackCell(data, GetClientUserId(client));
-	WritePackCell(data, type);
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, GetClientUserId(client));
+	WritePackCell(pack, type);
 
 	char szQuery[1024];
 	Format(szQuery, sizeof(szQuery), sql_selectPersonalAllRecords, szSteamId, g_ProfileStyleSelect[client], g_ProfileStyleSelect[client]);
@@ -2983,7 +2991,7 @@ public void db_viewTop10Records(int client, char szSteamId[32], int type)
 		{
 			LogToFile(g_szQueryFile, "db_viewTop10Records - szQuery: %s", szQuery);
 		}
-		g_dDb.Query(SQL_ViewTop10RecordsCallback, szQuery, data, DBPrio_Low);
+		g_dDb.Query(SQL_ViewTop10RecordsCallback, szQuery, pack, DBPrio_Low);
 	}
 	else if (IsClientInGame(client))
 		CPrintToChat(client, "%t", "SQL3", g_szChatPrefix);
@@ -2999,11 +3007,11 @@ public void SQL_ViewTop10RecordsCallback(Database db, DBResultSet results, const
 	}
 
 	ResetPack(pack);
-	int data = GetClientOfUserId(ReadPackCell(pack));
+	int client = GetClientOfUserId(ReadPackCell(pack));
 	int type = ReadPackCell(pack);
 	delete pack;
 
-	if (IsValidClient(data))
+	if (IsValidClient(client))
 	{
 		int bHeader = false;
 		char szUncMaps[1024];
@@ -3035,25 +3043,25 @@ public void SQL_ViewTop10RecordsCallback(Database db, DBResultSet results, const
 					{
 						if (!bHeader)
 						{
-							PrintToConsole(data, " ");
-							PrintToConsole(data, "-------------");
+							PrintToConsole(client, " ");
+							PrintToConsole(client, "-------------");
 							if (type == 0)
-								PrintToConsole(data, "Top 10 Maps");
+								PrintToConsole(client, "Top 10 Maps");
 							else
-								PrintToConsole(data, "World Records");
-							PrintToConsole(data, "Player: %s", szName);
-							PrintToConsole(data, "SteamID: %s", szSteamId);
-							PrintToConsole(data, "-------------");
-							PrintToConsole(data, " ");
+								PrintToConsole(client, "World Records");
+							PrintToConsole(client, "Player: %s", szName);
+							PrintToConsole(client, "SteamID: %s", szSteamId);
+							PrintToConsole(client, "-------------");
+							PrintToConsole(client, " ");
 							bHeader = true;
-							CPrintToChat(data, "%t", "ConsoleOutput", g_szChatPrefix);
+							CPrintToChat(client, "%t", "ConsoleOutput", g_szChatPrefix);
 						}
 						Handle pack2 = CreateDataPack();
 						WritePackString(pack2, szName);
 						WritePackString(pack2, szSteamId);
 						WritePackString(pack2, szMapName);
 						WritePackFloat(pack2, time);
-						WritePackCell(pack2, GetClientUserId(data));
+						WritePackCell(pack2, GetClientUserId(client));
 						WritePackCell(pack2, type);
 
 						Format(szQuery, sizeof(szQuery), sql_selectPlayerRankProTime, szSteamId, szMapName, szMapName);
@@ -3087,29 +3095,29 @@ public void SQL_ViewTop10RecordsCallback(Database db, DBResultSet results, const
 		{
 			if (!bHeader)
 			{
-				CPrintToChat(data, "%t", "ConsoleOutput", g_szChatPrefix);
-				PrintToConsole(data, " ");
-				PrintToConsole(data, "-------------");
+				CPrintToChat(client, "%t", "ConsoleOutput", g_szChatPrefix);
+				PrintToConsole(client, " ");
+				PrintToConsole(client, "-------------");
 				if (type == 0)
-					PrintToConsole(data, "Top 10 Maps");
+					PrintToConsole(client, "Top 10 Maps");
 				else
-					PrintToConsole(data, "World Records");
-				PrintToConsole(data, "Player: %s", szName);
-				PrintToConsole(data, "SteamID: %s", szSteamId);
-				PrintToConsole(data, "-------------");
-				PrintToConsole(data, " ");
+					PrintToConsole(client, "World Records");
+				PrintToConsole(client, "Player: %s", szName);
+				PrintToConsole(client, "SteamID: %s", szSteamId);
+				PrintToConsole(client, "-------------");
+				PrintToConsole(client, " ");
 			}
-			PrintToConsole(data, "Times on maps which are not in the mapcycle.txt (Records still count but you dont get points): %s", szUncMaps);
+			PrintToConsole(client, "Times on maps which are not in the mapcycle.txt (Records still count but you dont get points): %s", szUncMaps);
 		}
 		if (!bHeader && StrEqual(szUncMaps, ""))
 		{
-			ProfileMenu2(data, g_ProfileStyleSelect[data], "", g_szSteamID[data]);
-			CPrintToChat(data, "%t", "PlayerHasNoMapRecords", g_szChatPrefix, g_szProfileName[data]);
+			ProfileMenu2(client, g_ProfileStyleSelect[client], "", g_szSteamID[client]);
+			CPrintToChat(client, "%t", "PlayerHasNoMapRecords", g_szChatPrefix, g_szProfileName[client]);
 		}
 	}
 }
 
-public void SQL_ViewTop10RecordsCallback2(Database db, DBResultSet results, const char[] error, any data)
+public void SQL_ViewTop10RecordsCallback2(Database db, DBResultSet results, const char[] error, any pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -3126,27 +3134,27 @@ public void SQL_ViewTop10RecordsCallback2(Database db, DBResultSet results, cons
 
 		int rank = results.FetchInt(0);
 
-		WritePackCell(data, rank);
-		ResetPack(data);
-		ReadPackString(data, szName, MAX_NAME_LENGTH);
-		ReadPackString(data, szSteamId, 32);
-		ReadPackString(data, szMapName, 128);
+		WritePackCell(pack, rank);
+		ResetPack(pack);
+		ReadPackString(pack, szName, MAX_NAME_LENGTH);
+		ReadPackString(pack, szSteamId, 32);
+		ReadPackString(pack, szMapName, 128);
 
 		Format(szQuery, sizeof(szQuery), sql_selectPlayerProCount, szMapName);
 		if (g_cLogQueries.BoolValue)
 		{
 			LogToFile(g_szQueryFile, "SQL_ViewTop10RecordsCallback2 - szQuery: %s", szQuery);
 		}
-		g_dDb.Query(SQL_ViewTop10RecordsCallback3, szQuery, data, DBPrio_Low);
+		g_dDb.Query(SQL_ViewTop10RecordsCallback3, szQuery, pack, DBPrio_Low);
 	}
 }
 
-public void SQL_ViewTop10RecordsCallback3(Database db, DBResultSet results, const char[] error, DataPack data)
+public void SQL_ViewTop10RecordsCallback3(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (SQL_ViewAllRecordsCallback3): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
@@ -3165,15 +3173,15 @@ public void SQL_ViewTop10RecordsCallback3(Database db, DBResultSet results, cons
 		// fluffys
 		char szValue[128];
 
-		ResetPack(data);
-		ReadPackString(data, szName, MAX_NAME_LENGTH);
-		ReadPackString(data, szSteamId, 32);
-		ReadPackString(data, szMapName, 128);
-		float time = ReadPackFloat(data);
-		int client = GetClientOfUserId(ReadPackCell(data));
-		int type = ReadPackCell(data);
-		int rank = ReadPackCell(data);
-		delete data;
+		ResetPack(pack);
+		ReadPackString(pack, szName, MAX_NAME_LENGTH);
+		ReadPackString(pack, szSteamId, 32);
+		ReadPackString(pack, szMapName, 128);
+		float time = ReadPackFloat(pack);
+		int client = GetClientOfUserId(ReadPackCell(pack));
+		int type = ReadPackCell(pack);
+		int rank = ReadPackCell(pack);
+		delete pack;
 
 		FormatTimeFloat(client, time, 3, szTime, sizeof(szTime));
 
@@ -3205,17 +3213,19 @@ public void SQL_ViewTop10RecordsCallback3(Database db, DBResultSet results, cons
 public void db_selectPlayer(int client)
 {
 	char szQuery[255];
+	
 	if (!IsValidClient(client))
-	return;
+		return;
+
 	Format(szQuery, sizeof(szQuery), sql_selectPlayer, g_szSteamID[client], g_szMapName);
 	if (g_cLogQueries.BoolValue)
 	{
 		LogToFile(g_szQueryFile, "db_selectPlayer - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_SelectPlayerCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(SQL_SelectPlayerCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_SelectPlayerCallback(Database db, DBResultSet results, const char[] error, any data)
+public void SQL_SelectPlayerCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -3223,8 +3233,9 @@ public void SQL_SelectPlayerCallback(Database db, DBResultSet results, const cha
 		return;
 	}
 
-	if (!results.HasResults && !results.FetchRow() && !IsValidClient(data))
-		db_insertPlayer(data);
+	int client = GetClientOfUserId(userid);
+	if (!results.HasResults && !results.FetchRow() && IsValidClient(client))
+		db_insertPlayer(client);
 }
 
 public void db_insertPlayer(int client)
@@ -3244,7 +3255,7 @@ public void db_insertPlayer(int client)
 	{
 		LogToFile(g_szQueryFile, "db_insertPlayer - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_InsertPlayerCallBack, szQuery, client, DBPrio_Low);
+	g_dDb.Query(SQL_InsertPlayerCallBack, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
 // Getting player settings starts here
@@ -3371,7 +3382,7 @@ public void db_deleteTmp(int client)
 	{
 		LogToFile(g_szQueryFile, "db_deleteTmp - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_CheckCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 }
 
 public void db_selectLastRun(int client)
@@ -3384,10 +3395,10 @@ public void db_selectLastRun(int client)
 	{
 		LogToFile(g_szQueryFile, "db_selectLastRun - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_LastRunCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(SQL_LastRunCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_LastRunCallback(Database db, DBResultSet results, const char[] error, any data)
+public void SQL_LastRunCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -3395,27 +3406,31 @@ public void SQL_LastRunCallback(Database db, DBResultSet results, const char[] e
 		return;
 	}
 
-	g_bTimerRunning[data] = false;
-	if (results.HasResults && results.FetchRow() && IsValidClient(data))
+	
+
+	int client = GetClientOfUserId(userid);
+	
+	g_bTimerRunning[client] = false;
+	if (results.HasResults && results.FetchRow() && IsValidClient(client))
 	{
 
 		// "SELECT cords1,cords2,cords3, angle1, angle2, angle3,runtimeTmp, EncTickrate, Stage, zonegroup FROM ck_playertemp WHERE steamid = '%s' AND mapname = '%s';";
 
 		// Get last psition
-		g_fPlayerCordsRestore[data][0] = results.FetchFloat(0);
-		g_fPlayerCordsRestore[data][1] = results.FetchFloat(1);
-		g_fPlayerCordsRestore[data][2] = results.FetchFloat(2);
-		g_fPlayerAnglesRestore[data][0] = results.FetchFloat(3);
-		g_fPlayerAnglesRestore[data][1] = results.FetchFloat(4);
-		g_fPlayerAnglesRestore[data][2] = results.FetchFloat(5);
+		g_fPlayerCordsRestore[client][0] = results.FetchFloat(0);
+		g_fPlayerCordsRestore[client][1] = results.FetchFloat(1);
+		g_fPlayerCordsRestore[client][2] = results.FetchFloat(2);
+		g_fPlayerAnglesRestore[client][0] = results.FetchFloat(3);
+		g_fPlayerAnglesRestore[client][1] = results.FetchFloat(4);
+		g_fPlayerAnglesRestore[client][2] = results.FetchFloat(5);
 
 
 		int zGroup;
 		zGroup = results.FetchInt(9);
 
-		g_iClientInZone[data][2] = zGroup;
+		g_iClientInZone[client][2] = zGroup;
 
-		g_Stage[zGroup][data] = results.FetchInt(8);
+		g_Stage[zGroup][client] = results.FetchInt(8);
 
 		// Set new start time
 		float fl_time = results.FetchFloat(6);
@@ -3424,27 +3439,27 @@ public void SQL_LastRunCallback(Database db, DBResultSet results, const char[] e
 		{
 			if (fl_time > 0.0)
 			{
-				g_fStartTime[data] = GetGameTime() - fl_time;
-				g_bTimerRunning[data] = true;
+				g_fStartTime[client] = GetGameTime() - fl_time;
+				g_bTimerRunning[client] = true;
 			}
 
 			if (results.FetchFloat(0) == -1.0 && results.FetchFloat(1) == -1.0 && results.FetchFloat(2) == -1.0)
 			{
-				g_bRestorePosition[data] = false;
-				g_bRestorePositionMsg[data] = false;
+				g_bRestorePosition[client] = false;
+				g_bRestorePositionMsg[client] = false;
 			}
 			else
 			{
-				if (g_bLateLoaded && IsPlayerAlive(data) && !g_specToStage[data])
+				if (g_bLateLoaded && IsPlayerAlive(client) && !g_specToStage[client])
 				{
-					g_bPositionRestored[data] = true;
-					TeleportEntity(data, g_fPlayerCordsRestore[data], g_fPlayerAnglesRestore[data], NULL_VECTOR);
-					g_bRestorePosition[data] = false;
+					g_bPositionRestored[client] = true;
+					TeleportEntity(client, g_fPlayerCordsRestore[client], g_fPlayerAnglesRestore[client], NULL_VECTOR);
+					g_bRestorePosition[client] = false;
 				}
 				else
 				{
-					g_bRestorePosition[data] = true;
-					g_bRestorePositionMsg[data] = true;
+					g_bRestorePosition[client] = true;
+					g_bRestorePositionMsg[client] = true;
 				}
 
 			}
@@ -3453,7 +3468,7 @@ public void SQL_LastRunCallback(Database db, DBResultSet results, const char[] e
 	else
 	{
 
-		g_bTimerRunning[data] = false;
+		g_bTimerRunning[client] = false;
 	}
 }
 
@@ -3478,7 +3493,7 @@ public void db_viewRecordCheckpointInMap()
 	{
 		LogToFile(g_szQueryFile, "db_viewRecordCheckpointInMap - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(sql_selectRecordCheckpointsCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(sql_selectRecordCheckpointsCallback, szQuery, _, DBPrio_Low);
 }
 
 public void sql_selectRecordCheckpointsCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -3723,12 +3738,12 @@ public void db_UpdateCheckpoints(int client, char szSteamID[32], int zGroup)
 	}
 }
 
-public void SQLTxn_UpdateCheckpointsSuccess(Handle db, DataPack data, int numQueries, Handle[] results, any[] queryData)
+public void SQLTxn_UpdateCheckpointsSuccess(Handle db, DataPack pack, int numQueries, Handle[] results, any[] queryData)
 {
-	ResetPack(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
-	int zonegrp = ReadPackCell(data);
-	delete data;
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int zonegrp = ReadPackCell(pack);
+	delete pack;
 
 	if (IsValidClient(client))
 	{
@@ -3736,11 +3751,11 @@ public void SQLTxn_UpdateCheckpointsSuccess(Handle db, DataPack data, int numQue
 	}
 }
 
-public void SQLTxn_UpdateCheckpointsFailed(Handle db, DataPack data, int numQueries, const char[] error, int failIndex, any[] queryData)
+public void SQLTxn_UpdateCheckpointsFailed(Handle db, DataPack pack, int numQueries, const char[] error, int failIndex, any[] queryData)
 {
-	ResetPack(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
-	delete data;
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	delete pack;
 	
 	if (IsValidClient(client))
 		CPrintToChat(client, "%t", "SQL10", g_szChatPrefix, error);
@@ -3748,18 +3763,18 @@ public void SQLTxn_UpdateCheckpointsFailed(Handle db, DataPack data, int numQuer
 	LogError("[SurfTimer] Error updating checkpoints: %s", error);
 }
 
-public void SQL_updateCheckpointsCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void SQL_updateCheckpointsCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[Surftimer] SQL Error (SQL_updateCheckpointsCallback): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
-	ResetPack(data);
-	int client = ReadPackCell(data);
-	int zonegrp = ReadPackCell(data);
-	delete data;
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	int zonegrp = ReadPackCell(pack);
+	delete pack;
 
 	db_viewCheckpointsinZoneGroup(client, g_szSteamID[client], g_szMapName, zonegrp);
 }
@@ -3772,7 +3787,7 @@ public void db_deleteCheckpoints()
 	{
 		LogToFile(g_szQueryFile, "db_deleteCheckpoints - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_deleteCheckpointsCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(SQL_deleteCheckpointsCallback, szQuery, _, DBPrio_Low);
 }
 
 public void SQL_deleteCheckpointsCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -3798,7 +3813,7 @@ public void db_insertMapTier(int tier)
 		{
 			LogToFile(g_szQueryFile, "db_insertMapTier - szQuery: %s", szQuery);
 		}
-		g_dDb.Query(db_insertMapTierCallback, szQuery, 1, DBPrio_Low);
+		g_dDb.Query(db_insertMapTierCallback, szQuery, _, DBPrio_Low);
 	}
 	else
 	{
@@ -3807,7 +3822,7 @@ public void db_insertMapTier(int tier)
 		{
 			LogToFile(g_szQueryFile, "db_insertMapTier - szQuery: %s", szQuery);
 		}
-		g_dDb.Query(db_insertMapTierCallback, szQuery, 1, DBPrio_Low);
+		g_dDb.Query(db_insertMapTierCallback, szQuery, _, DBPrio_Low);
 	}
 }
 
@@ -3832,7 +3847,7 @@ public void db_selectMapTier()
 	{
 		LogToFile(g_szQueryFile, "db_selectMapTier - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_selectMapTierCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(SQL_selectMapTierCallback, szQuery, _, DBPrio_Low);
 }
 
 public void SQL_selectMapTierCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -3952,20 +3967,20 @@ public void db_viewMapRankBonus(int client, int zgroup, int type)
 	g_dDb.Query(db_viewMapRankBonusCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void db_viewMapRankBonusCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void db_viewMapRankBonusCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (db_viewMapRankBonusCallback): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
-	ResetPack(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
-	int zgroup = ReadPackCell(data);
-	int type = ReadPackCell(data);
-	delete data;
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int zgroup = ReadPackCell(pack);
+	int type = ReadPackCell(pack);
+	delete pack;
 
 	if (IsValidClient(client))
 	{
@@ -4122,7 +4137,7 @@ public void db_viewFastestBonus()
 	{
 		LogToFile(g_szQueryFile, "db_viewFastestBonus - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_selectFastestBonusCallback, szQuery, 1, DBPrio_High);
+	g_dDb.Query(SQL_selectFastestBonusCallback, szQuery, _, DBPrio_High);
 }
 
 public void SQL_selectFastestBonusCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -4227,7 +4242,7 @@ public void db_deleteBonus()
 	{
 		LogToFile(g_szQueryFile, "db_deleteBonus - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_deleteBonusCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(SQL_deleteBonusCallback, szQuery, _, DBPrio_Low);
 }
 public void db_viewBonusTotalCount()
 {
@@ -4238,7 +4253,7 @@ public void db_viewBonusTotalCount()
 	{
 		LogToFile(g_szQueryFile, "db_viewBonusTotalCount - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_selectBonusTotalCountCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(SQL_selectBonusTotalCountCallback, szQuery, _, DBPrio_Low);
 }
 
 public void SQL_selectBonusTotalCountCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -4291,19 +4306,19 @@ public void db_insertBonus(int client, char szSteamId[32], char szUName[MAX_NAME
 	g_dDb.Query(SQL_insertBonusCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void SQL_insertBonusCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void SQL_insertBonusCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[Surftimer] SQL Error (SQL_insertBonusCallback): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
-	ResetPack(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
-	int zgroup = ReadPackCell(data);
-	delete data;
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int zgroup = ReadPackCell(pack);
+	delete pack;
 
 	if (IsValidClient(client))
 	{
@@ -4337,19 +4352,19 @@ public void db_updateBonus(int client, char szSteamId[32], char szUName[MAX_NAME
 }
 
 
-public void SQL_updateBonusCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void SQL_updateBonusCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[Surftimer] SQL Error (SQL_updateBonusCallback): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
-	ResetPack(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
-	int zgroup = ReadPackCell(data);
-	delete data;
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int zgroup = ReadPackCell(pack);
+	delete pack;
 
 	if (IsValidClient(client))
 	{
@@ -4382,7 +4397,7 @@ public void db_selectBonusCount()
 	{
 		LogToFile(g_szQueryFile, "db_selectBonusCount - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_selectBonusCountCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(SQL_selectBonusCountCallback, szQuery, _, DBPrio_Low);
 }
 
 public void SQL_selectBonusCountCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -4437,21 +4452,21 @@ public void db_setZoneNames(int client, char szName[128])
 	g_dDb.Query(sql_setZoneNamesCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void sql_setZoneNamesCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void sql_setZoneNamesCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (sql_setZoneNamesCallback): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
 	char szName[64];
-	ResetPack(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
-	int zonegrp = ReadPackCell(data);
-	ReadPackString(data, szName, 64);
-	delete data;
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int zonegrp = ReadPackCell(pack);
+	ReadPackString(pack, szName, 64);
+	delete pack;
 
 	if (IsValidClient(client))
 	{
@@ -4482,7 +4497,7 @@ public void db_checkAndFixZoneIds()
 	{
 		LogToFile(g_szQueryFile, "db_checkAndFixZoneIds - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(db_checkAndFixZoneIdsCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(db_checkAndFixZoneIdsCallback, szQuery, _, DBPrio_Low);
 }
 
 public void db_checkAndFixZoneIdsCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -4537,7 +4552,7 @@ public void db_checkAndFixZoneIdsCallback(Database db, DBResultSet results, cons
 			{
 				LogToFile(g_szQueryFile, "db_checkAndFixZoneIdsCallback - szQuery: %s", szQuery);
 			}
-			g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
+			g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 			// SQL_FastQuery(g_hDb, szQuery);
 
 			for (int k = 0; k < checker; k++)
@@ -4600,7 +4615,7 @@ public void db_insertZone(int zoneid, int zonetype, int zonetypeid, float pointa
 	{
 		LogToFile(g_szQueryFile, "db_insertZone - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_insertZonesCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(SQL_insertZonesCallback, szQuery, _, DBPrio_Low);
 }
 
 public void SQL_insertZonesCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -4631,7 +4646,7 @@ public void db_insertZoneHook(int zoneid, int zonetype, int zonetypeid, int vis,
 	{
 		LogToFile(g_szQueryFile, "db_insertZoneHook - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_insertZonesCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(SQL_insertZonesCallback, szQuery, _, DBPrio_Low);
 }
 
 public void db_saveZones()
@@ -4642,7 +4657,7 @@ public void db_saveZones()
 	{
 		LogToFile(g_szQueryFile, "db_saveZones - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_saveZonesCallBack, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(SQL_saveZonesCallBack, szQuery, _, DBPrio_Low);
 }
 
 public void SQL_saveZonesCallBack(Database db, DBResultSet results, const char[] error, any data)
@@ -4675,7 +4690,7 @@ public void db_updateZone(int zoneid, int zonetype, int zonetypeid, float[] Poin
 	{
 		LogToFile(g_szQueryFile, "db_updateZone - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_updateZoneCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(SQL_updateZoneCallback, szQuery, _, DBPrio_Low);
 }
 
 public void SQL_updateZoneCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -4750,10 +4765,10 @@ public void db_selectzoneTypeIds(int zonetype, int client, int zonegrp)
 	{
 		LogToFile(g_szQueryFile, "db_selectzoneTypeIds - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_selectzoneTypeIdsCallback, szQuery, client, DBPrio_Low);
+	g_dDb.Query(SQL_selectzoneTypeIdsCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_selectzoneTypeIdsCallback(Database db, DBResultSet results, const char[] error, any data)
+public void SQL_selectzoneTypeIdsCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -4774,37 +4789,43 @@ public void SQL_selectzoneTypeIdsCallback(Database db, DBResultSet results, cons
 		char MenuNum[24], MenuInfo[6], MenuItemName[24];
 		int x = 0;
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0) //fluffys AntiJump(9), AntiDuck(10)
-		switch (g_CurrentZoneType[data]) {
-			case 0:Format(MenuItemName, 24, "Stop");
-			case 1:Format(MenuItemName, 24, "Start");
-			case 2:Format(MenuItemName, 24, "End");
-			case 3: {
-				Format(MenuItemName, 24, "Stage");
-				x = 2;
-			}
-			case 4:Format(MenuItemName, 24, "Checkpoint");
-			case 5:Format(MenuItemName, 24, "Speed");
-			case 6:Format(MenuItemName, 24, "TeleToStart");
-			case 7:Format(MenuItemName, 24, "Validator");
-			case 8:Format(MenuItemName, 24, "Checker");
-			// fluffys
-			case 9:Format(MenuItemName, 24, "AntiJump");
-			case 10:Format(MenuItemName, 24, "AntiDuck");
-			case 11:Format(MenuItemName, 24, "MaxSpeed");
-			default:Format(MenuItemName, 24, "Unknown");
-		}
 
-		for (int k = 0; k < 35; k++)
+		int client = GetClientOfUserId(userid);
+
+		if (IsValidClient(client))
 		{
-			if (availableids[k] == 0)
-			{
-				Format(MenuNum, sizeof(MenuNum), "%s-%i", MenuItemName, (k + x));
-				Format(MenuInfo, sizeof(MenuInfo), "%i", k);
-				TypeMenu.AddItem(MenuInfo, MenuNum);
+			switch (g_CurrentZoneType[client]) {
+				case 0:Format(MenuItemName, 24, "Stop");
+				case 1:Format(MenuItemName, 24, "Start");
+				case 2:Format(MenuItemName, 24, "End");
+				case 3: {
+					Format(MenuItemName, 24, "Stage");
+					x = 2;
+				}
+				case 4:Format(MenuItemName, 24, "Checkpoint");
+				case 5:Format(MenuItemName, 24, "Speed");
+				case 6:Format(MenuItemName, 24, "TeleToStart");
+				case 7:Format(MenuItemName, 24, "Validator");
+				case 8:Format(MenuItemName, 24, "Checker");
+				// fluffys
+				case 9:Format(MenuItemName, 24, "AntiJump");
+				case 10:Format(MenuItemName, 24, "AntiDuck");
+				case 11:Format(MenuItemName, 24, "MaxSpeed");
+				default:Format(MenuItemName, 24, "Unknown");
 			}
+
+			for (int k = 0; k < 35; k++)
+			{
+				if (availableids[k] == 0)
+				{
+					Format(MenuNum, sizeof(MenuNum), "%s-%i", MenuItemName, (k + x));
+					Format(MenuInfo, sizeof(MenuInfo), "%i", k);
+					TypeMenu.AddItem(MenuInfo, MenuNum);
+				}
+			}
+			TypeMenu.ExitButton = true;
+			TypeMenu.Display(client, MENU_TIME_FOREVER);
 		}
-		TypeMenu.ExitButton = true;
-		TypeMenu.Display(data, MENU_TIME_FOREVER);
 	}
 }
 
@@ -4816,7 +4837,7 @@ public void db_selectMapZones()
 	{
 		LogToFile(g_szQueryFile, "db_selectMapZones - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_selectMapZonesCallback, szQuery, 1, DBPrio_High);
+	g_dDb.Query(SQL_selectMapZonesCallback, szQuery, _, DBPrio_High);
 }
 
 public void SQL_selectMapZonesCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -5032,7 +5053,7 @@ public void SQL_selectMapZonesCallback(Database db, DBResultSet results, const c
 			{
 				LogToFile(g_szQueryFile, "SQL_selectMapZonesCallback - szQuery: %s", szQuery);
 			}
-			g_dDb.Query(sql_zoneFixCallback, szQuery, -1, DBPrio_Low);
+			g_dDb.Query(sql_zoneFixCallback, szQuery, _, DBPrio_Low);
 			return;
 		}
 
@@ -5064,7 +5085,7 @@ public void SQL_selectMapZonesCallback(Database db, DBResultSet results, const c
 				{
 					LogToFile(g_szQueryFile, "SQL_selectMapZonesCallback - szQuery: %s", szQuery);
 				}
-				g_dDb.Query(sql_zoneFixCallback, szQuery, -1, DBPrio_Low);
+				g_dDb.Query(sql_zoneFixCallback, szQuery, _, DBPrio_Low);
 				return;
 			}
 			else if (zoneTypeIdChecker[i][k][x] > 1)
@@ -5123,7 +5144,7 @@ public void sql_zoneFixCallback2(Database db, DBResultSet results, const char[] 
 	{
 		LogToFile(g_szQueryFile, "sql_zoneFixCallback2 - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(sql_zoneFixCallback, szQuery, -1, DBPrio_Low);
+	g_dDb.Query(sql_zoneFixCallback, szQuery, _, DBPrio_Low);
 }
 
 public void db_deleteMapZones()
@@ -5134,7 +5155,7 @@ public void db_deleteMapZones()
 	{
 		LogToFile(g_szQueryFile, "db_deleteMapZones - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_deleteMapZonesCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(SQL_deleteMapZonesCallback, szQuery, _, DBPrio_Low);
 }
 
 public void SQL_deleteMapZonesCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -5208,12 +5229,12 @@ public void db_insertLastPosition(int client, char szMapName[128], int stage, in
 	}
 }
 
-public void db_insertLastPositionCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void db_insertLastPositionCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (db_insertLastPositionCallback): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
@@ -5221,13 +5242,13 @@ public void db_insertLastPositionCallback(Database db, DBResultSet results, cons
 	char szMapName[128];
 	char szSteamID[32];
 
-	ResetPack(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
-	ReadPackString(data, szMapName, 128);
-	ReadPackString(data, szSteamID, 32);
-	int stage = ReadPackCell(data);
-	int zgroup = ReadPackCell(data);
-	delete data;
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	ReadPackString(pack, szMapName, 128);
+	ReadPackString(pack, szSteamID, 32);
+	int stage = ReadPackCell(pack);
+	int zgroup = ReadPackCell(pack);
+	delete pack;
 
 	if (IsValidClient(client))
 	{
@@ -5241,7 +5262,7 @@ public void db_insertLastPositionCallback(Database db, DBResultSet results, cons
 			{
 				LogToFile(g_szQueryFile, "db_insertLastPositionCallback - szQuery: %s", szQuery);
 			}
-			g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
+			g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 		}
 		else
 		{
@@ -5250,7 +5271,7 @@ public void db_insertLastPositionCallback(Database db, DBResultSet results, cons
 			{
 				LogToFile(g_szQueryFile, "db_insertLastPositionCallback - szQuery: %s", szQuery);
 			}
-			g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
+			g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 		}
 	}
 }
@@ -5263,7 +5284,7 @@ public void db_deletePlayerTmps()
 	{
 		LogToFile(g_szQueryFile, "db_deletePlayerTmps - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 }
 
 public void db_ViewLatestRecords(int client)
@@ -5346,7 +5367,7 @@ public void db_InsertLatestRecords(char szSteamID[32], char szName[128], float F
 	{
 		LogToFile(g_szQueryFile, "db_InsertLatestRecords - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 }
 
 public void db_CalcAvgRunTime()
@@ -5357,7 +5378,7 @@ public void db_CalcAvgRunTime()
 	{
 		LogToFile(g_szQueryFile, "db_CalcAvgRunTime - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_db_CalcAvgRunTimeCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(SQL_db_CalcAvgRunTimeCallback, szQuery, _, DBPrio_Low);
 }
 
 public void SQL_db_CalcAvgRunTimeCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -5396,7 +5417,7 @@ public void db_CalcAvgRunTimeBonus()
 	{
 		LogToFile(g_szQueryFile, "db_CalcAvgRunTimeBonus - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_db_CalcAvgRunBonusTimeCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(SQL_db_CalcAvgRunBonusTimeCallback, szQuery, _, DBPrio_Low);
 }
 
 public void SQL_db_CalcAvgRunBonusTimeCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -5451,7 +5472,7 @@ public void db_GetDynamicTimelimit()
 	{
 		LogToFile(g_szQueryFile, "db_GetDynamicTimelimit - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_db_GetDynamicTimelimitCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(SQL_db_GetDynamicTimelimitCallback, szQuery, _, DBPrio_Low);
 }
 
 
@@ -5734,19 +5755,19 @@ public Action PrintUnfinishedLine(Handle timer, DataPack pack)
 
 }
 
-public void sql_selectPlayerNameCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void sql_selectPlayerNameCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (sql_selectPlayerNameCallback): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
-	ResetPack(data);
-	int clientid = ReadPackCell(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
-	delete data;
+	ResetPack(pack);
+	int clientid = ReadPackCell(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	delete pack;
 
 	if (results.HasResults && results.FetchRow())
 	{
@@ -5865,25 +5886,25 @@ public void db_Cleanup()
 	{
 		LogToFile(g_szQueryFile, "db_Cleanup - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_CheckCallback, szQuery);
+	g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 
 	// times
 	if (g_cLogQueries.BoolValue)
 	{
 		LogToFile(g_szQueryFile, "db_Cleanup - szQuery:DELETE FROM ck_playertimes where runtimepro = -1.0");
 	}
-	g_dDb.Query(SQL_CheckCallback, "DELETE FROM ck_playertimes where runtimepro = -1.0");
+	g_dDb.Query(SQL_CheckCallback, "DELETE FROM ck_playertimes where runtimepro = -1.0", _, DBPrio_Low);
 
 	// fluffys pointless players
 	if (g_cLogQueries.BoolValue)
 	{
 		LogToFile(g_szQueryFile, "db_Cleanup - szQuery: DELETE FROM ck_playerrank WHERE `points` <= 0");
 	}
-	g_dDb.Query(SQL_CheckCallback, "DELETE FROM ck_playerrank WHERE `points` <= 0");
+	g_dDb.Query(SQL_CheckCallback, "DELETE FROM ck_playerrank WHERE `points` <= 0", _, DBPrio_Low);
 
 }
 
-public void SQL_InsertPlayerCallBack(Database db, DBResultSet results, const char[] error, any data)
+public void SQL_InsertPlayerCallBack(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -5891,8 +5912,9 @@ public void SQL_InsertPlayerCallBack(Database db, DBResultSet results, const cha
 		return;
 	}
 
-	if (IsClientInGame(data))
-		db_UpdateLastSeen(data);
+	int client = GetClientOfUserId(userid);
+	if (IsClientInGame(client))
+		db_UpdateLastSeen(client);
 }
 
 public void db_UpdateLastSeen(int client)
@@ -5905,7 +5927,7 @@ public void db_UpdateLastSeen(int client)
 		{
 			LogToFile(g_szQueryFile, "db_UpdateLastSeen - szQuery: %s", szQuery);
 		}
-		g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
+		g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 	}
 }
 
@@ -6004,7 +6026,7 @@ public void db_viewPlayerOptionsCallback(Database db, DBResultSet results, const
 			{
 				LogToFile(g_szQueryFile, "db_viewPlayerOptionsCallback - szQuery: %s", szQuery);
 			}
-			g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
+			g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 
 			g_bTimerEnabled[client] = true;
 			g_bHide[client] = false;
@@ -6059,7 +6081,7 @@ public void db_updatePlayerOptions(int client)
 		{
 			LogToFile(g_szQueryFile, "db_updatePlayerOptions - szQuery: %s", szQuery);
 		}
-		g_dDb.Query(SQL_CheckCallback, szQuery, client, DBPrio_Low);
+		g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 	}
 }
 
@@ -6241,7 +6263,7 @@ public void db_selectTotalBonusCount()
 	{
 		LogToFile(g_szQueryFile, "db_selectTotalBonusCount - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(sql_selectTotalBonusCountCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(sql_selectTotalBonusCountCallback, szQuery, _, DBPrio_Low);
 }
 
 public void sql_selectTotalBonusCountCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -6272,7 +6294,7 @@ public void db_selectTotalStageCount()
 	{
 		LogToFile(g_szQueryFile, "db_selectTotalStageCount - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(sql_selectTotalStageCountCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(sql_selectTotalStageCountCallback, szQuery, _, DBPrio_Low);
 }
 
 public void sql_selectTotalStageCountCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -6333,18 +6355,18 @@ public void sql_selectWrcpRecordCallback(Database db, DBResultSet results, const
 	}
 
 	ResetPack(packx);
-	int data = GetClientOfUserId(ReadPackCell(packx));
+	int client = GetClientOfUserId(ReadPackCell(packx));
 	int style = ReadPackCell(packx);
 	int stage = ReadPackCell(packx);
 	delete packx;
 
-	if (!IsValidClient(data) || IsFakeClient(data))
+	if (!IsValidClient(client) || IsFakeClient(client))
 	{
 		return;
 	}
 
 	char szName[MAX_NAME_LENGTH];
-	GetClientName(data, szName, MAX_NAME_LENGTH);
+	GetClientName(client, szName, MAX_NAME_LENGTH);
 
 	char szQuery[1024];
 
@@ -6353,13 +6375,13 @@ public void sql_selectWrcpRecordCallback(Database db, DBResultSet results, const
 
 	char sz_srDiff[128];
 	char szDiff[128];
-	float time = g_fFinalWrcpTime[data];
+	float time = g_fFinalWrcpTime[client];
 	float f_srDiff;
 	float fDiff;
 
 	// PB
-	fDiff = (g_fWrcpRecord[data][stage][style] - time);
-	FormatTimeFloat(data, fDiff, 3, szDiff, 128);
+	fDiff = (g_fWrcpRecord[client][stage][style] - time);
+	FormatTimeFloat(client, fDiff, 3, szDiff, 128);
 
 	if (fDiff > 0)
 		Format(szDiff, 128, "%cPB: %c-%s%c", WHITE, LIGHTGREEN, szDiff, WHITE);
@@ -6372,7 +6394,7 @@ public void sql_selectWrcpRecordCallback(Database db, DBResultSet results, const
 	else // styles
 		f_srDiff = (g_fStyleStageRecord[style][stage] - time);
 
-	FormatTimeFloat(data, f_srDiff, 3, sz_srDiff, 128);
+	FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
 
 	if (f_srDiff > 0)
 		Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
@@ -6385,34 +6407,34 @@ public void sql_selectWrcpRecordCallback(Database db, DBResultSet results, const
 		float stagetime = results.FetchFloat(0);
 
 		// If old time was slower than the new time, update record
-		if ((g_fFinalWrcpTime[data] <= stagetime || stagetime <= 0.0))
+		if ((g_fFinalWrcpTime[client] <= stagetime || stagetime <= 0.0))
 		{
-			db_updateWrcpRecord(data, style, stage);
+			db_updateWrcpRecord(client, style, stage);
 		}
 		else
 		{ // fluffys come back
 			char szSpecMessage[512];
 
-			g_bStageSRVRecord[data][stage] = false;
+			g_bStageSRVRecord[client][stage] = false;
 			if (style == 0)
 			{
-				CPrintToChat(data, "%t", "SQL11", g_szChatPrefix, stage, g_szFinalWrcpTime[data], szDiff, sz_srDiff);
+				CPrintToChat(client, "%t", "SQL11", g_szChatPrefix, stage, g_szFinalWrcpTime[client], szDiff, sz_srDiff);
 
-				Format(szSpecMessage, sizeof(szSpecMessage), "%t", "SQL12", g_szChatPrefix, szName, stage, g_szFinalWrcpTime[data], szDiff, sz_srDiff);
+				Format(szSpecMessage, sizeof(szSpecMessage), "%t", "SQL12", g_szChatPrefix, szName, stage, g_szFinalWrcpTime[client], szDiff, sz_srDiff);
 			}
 			else if (style != 0) // styles
 			{
-				CPrintToChat(data, "%t", "SQL13", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalWrcpTime[data], sz_srDiff, g_StyleStageRank[style][data][stage], g_TotalStageStyleRecords[style][stage]);
-				Format(szSpecMessage, sizeof(szSpecMessage), "%t", "SQL14", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalWrcpTime[data], sz_srDiff, g_StyleStageRank[style][data][stage], g_TotalStageStyleRecords[style][stage]);
+				CPrintToChat(client, "%t", "SQL13", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalWrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
+				Format(szSpecMessage, sizeof(szSpecMessage), "%t", "SQL14", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalWrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
 			}
-			CheckpointToSpec(data, szSpecMessage);
+			CheckpointToSpec(client, szSpecMessage);
 
-			if (g_bRepeat[data])
+			if (g_bRepeat[client])
 			{
 				if (stage <= 1)
-					Command_Restart(data, 1);
+					Command_Restart(client, 1);
 				else
-					teleportClient(data, 0, stage, false);
+					teleportClient(client, 0, stage, false);
 			}
 		}
 	}
@@ -6425,16 +6447,16 @@ public void sql_selectWrcpRecordCallback(Database db, DBResultSet results, const
 
 		// Move required information in datapack
 		Handle pack = CreateDataPack();
-		WritePackFloat(pack, g_fFinalWrcpTime[data]);
+		WritePackFloat(pack, g_fFinalWrcpTime[client]);
 		WritePackCell(pack, style);
 		WritePackCell(pack, stage);
 		WritePackCell(pack, 1);
-		WritePackCell(pack, GetClientUserId(data));
+		WritePackCell(pack, GetClientUserId(client));
 
 		if (style == 0)
-			Format(szQuery, sizeof(szQuery), sql_insertNewWrcp, g_szSteamID[data], szName2, g_szMapName, g_fFinalWrcpTime[data], stage, g_iWrcpVelsStartNew[data][stage][0], g_iWrcpVelsStartNew[data][stage][1], g_iWrcpVelsStartNew[data][stage][2], g_iWrcpVelsEndNew[data][stage][0], g_iWrcpVelsEndNew[data][stage][1], g_iWrcpVelsEndNew[data][stage][2]);
+			Format(szQuery, sizeof(szQuery), sql_insertNewWrcp, g_szSteamID[client], szName2, g_szMapName, g_fFinalWrcpTime[client], stage, g_iWrcpVelsStartNew[client][stage][0], g_iWrcpVelsStartNew[client][stage][1], g_iWrcpVelsStartNew[client][stage][2], g_iWrcpVelsEndNew[client][stage][0], g_iWrcpVelsEndNew[client][stage][1], g_iWrcpVelsEndNew[client][stage][2]);
 		else if (style != 0)
-			Format(szQuery, sizeof(szQuery), sql_insertNewWrcpStyle, g_szSteamID[data], szName2, g_szMapName, g_fFinalWrcpTime[data], stage, style, g_iWrcpVelsStartNew[data][stage][0], g_iWrcpVelsStartNew[data][stage][1], g_iWrcpVelsStartNew[data][stage][2], g_iWrcpVelsEndNew[data][stage][0], g_iWrcpVelsEndNew[data][stage][1], g_iWrcpVelsEndNew[data][stage][2]);
+			Format(szQuery, sizeof(szQuery), sql_insertNewWrcpStyle, g_szSteamID[client], szName2, g_szMapName, g_fFinalWrcpTime[client], stage, style, g_iWrcpVelsStartNew[client][stage][0], g_iWrcpVelsStartNew[client][stage][1], g_iWrcpVelsStartNew[client][stage][2], g_iWrcpVelsEndNew[client][stage][0], g_iWrcpVelsEndNew[client][stage][1], g_iWrcpVelsEndNew[client][stage][2]);
 
 		if (g_cLogQueries.BoolValue)
 		{
@@ -6442,7 +6464,7 @@ public void sql_selectWrcpRecordCallback(Database db, DBResultSet results, const
 		}
 		g_dDb.Query(SQL_UpdateWrcpRecordCallback, szQuery, pack, DBPrio_Low);
 
-		g_bStageSRVRecord[data][stage] = false;
+		g_bStageSRVRecord[client][stage] = false;
 	}
 }
 
@@ -6482,21 +6504,21 @@ public void db_updateWrcpRecord(int client, int style, int stage)
 }
 
 
-public void SQL_UpdateWrcpRecordCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void SQL_UpdateWrcpRecordCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[Surftimer] SQL Error (SQL_UpdateWrcpRecordCallback): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
-	ResetPack(data);
-	float stagetime = ReadPackFloat(data);
-	int style = ReadPackCell(data);
-	int stage = ReadPackCell(data);
-	int zero = ReadPackCell(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
+	ResetPack(pack);
+	float stagetime = ReadPackFloat(pack);
+	int style = ReadPackCell(pack);
+	int stage = ReadPackCell(pack);
+	int zero = ReadPackCell(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
 
 	if (IsValidClient(client))
 	{
@@ -6522,26 +6544,26 @@ public void SQL_UpdateWrcpRecordCallback(Database db, DBResultSet results, const
 		{
 			LogToFile(g_szQueryFile, "SQL_UpdateWrcpRecordCallback - szQuery: %s", szQuery);
 		}
-		g_dDb.Query(SQL_UpdateWrcpRecordCallback2, szQuery, data, DBPrio_Low);
+		g_dDb.Query(SQL_UpdateWrcpRecordCallback2, szQuery, pack, DBPrio_Low);
 	}
 }
 
-public void SQL_UpdateWrcpRecordCallback2(Database db, DBResultSet results, const char[] error, DataPack data)
+public void SQL_UpdateWrcpRecordCallback2(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (SQL_UpdateWrcpRecordCallback2): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
-	ResetPack(data);
-	float time = ReadPackFloat(data);
-	int style = ReadPackCell(data);
-	int stage = ReadPackCell(data);
-	bool bInsert = view_as<bool>(ReadPackCell(data));
-	int client = GetClientOfUserId(ReadPackCell(data));
-	delete data;
+	ResetPack(pack);
+	float time = ReadPackFloat(pack);
+	int style = ReadPackCell(pack);
+	int stage = ReadPackCell(pack);
+	bool bInsert = view_as<bool>(ReadPackCell(pack));
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	delete pack;
 
 	if (IsValidClient(client))
 	{
@@ -6893,7 +6915,7 @@ public void db_GetTotalStages()
 	{
 		LogToFile(g_szQueryFile, "db_GetTotalStages - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(db_GetTotalStagesCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(db_GetTotalStagesCallback, szQuery, _, DBPrio_Low);
 }
 
 public void db_GetTotalStagesCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -7168,7 +7190,7 @@ public void db_viewStageRecords()
 	{
 		LogToFile(g_szQueryFile, "db_viewStageRecords - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(sql_viewStageRecordsCallback, szQuery, 0, DBPrio_Low);
+	g_dDb.Query(sql_viewStageRecordsCallback, szQuery, _, DBPrio_Low);
 }
 
 public void sql_viewStageRecordsCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -7268,7 +7290,7 @@ public void db_viewTotalStageRecords()
 	{
 		LogToFile(g_szQueryFile, "db_viewTotalStageRecords - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(sql_viewTotalStageRecordsCallback, szQuery, 0, DBPrio_Low);
+	g_dDb.Query(sql_viewTotalStageRecordsCallback, szQuery, _, DBPrio_Low);
 }
 
 public void sql_viewTotalStageRecordsCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -7367,11 +7389,11 @@ public void sql_selectStyleRecordCallback(Database db, DBResultSet results, cons
 	}
 
 	ResetPack(stylepack);
-	int data = GetClientOfUserId(ReadPackCell(stylepack));
+	int client = GetClientOfUserId(ReadPackCell(stylepack));
 	int style = ReadPackCell(stylepack);
 	delete stylepack;
 
-	if (!IsValidClient(data))
+	if (!IsValidClient(client))
 	{
 		return;
 	}
@@ -7385,9 +7407,9 @@ public void sql_selectStyleRecordCallback(Database db, DBResultSet results, cons
 		float time = results.FetchFloat(0);
 
 		// If old time was slower than the new time, update record
-		if ((g_fFinalTime[data] <= time || time <= 0.0))
+		if ((g_fFinalTime[client] <= time || time <= 0.0))
 		{
-			db_updateStyleRecord(data, style);
+			db_updateStyleRecord(client, style);
 		}
 	}
 	else
@@ -7395,18 +7417,18 @@ public void sql_selectStyleRecordCallback(Database db, DBResultSet results, cons
 
 	// Escape name for SQL injection protection
 	char szName[MAX_NAME_LENGTH * 2 + 1], szUName[MAX_NAME_LENGTH];
-	GetClientName(data, szUName, MAX_NAME_LENGTH);
+	GetClientName(client, szUName, MAX_NAME_LENGTH);
 	g_dDb.Escape(szUName, szName, MAX_NAME_LENGTH);
 
 	// Move required information in datapack
 	Handle pack = CreateDataPack();
-	WritePackFloat(pack, g_fFinalTime[data]);
-	WritePackCell(pack, GetClientUserId(data));
+	WritePackFloat(pack, g_fFinalTime[client]);
+	WritePackCell(pack, GetClientUserId(client));
 	WritePackCell(pack, style);
 
 	g_StyleMapTimesCount[style]++;
 
-	Format(szQuery, sizeof(szQuery), "INSERT INTO ck_playertimes (steamid, mapname, name, runtimepro, style) VALUES ('%s', '%s', '%s', '%f', %i)", g_szSteamID[data], g_szMapName, szName, g_fFinalTime[data], style);
+	Format(szQuery, sizeof(szQuery), "INSERT INTO ck_playertimes (steamid, mapname, name, runtimepro, style) VALUES ('%s', '%s', '%s', '%f', %i)", g_szSteamID[client], g_szMapName, szName, g_fFinalTime[client], style);
 	if (g_cLogQueries.BoolValue)
 	{
 		LogToFile(g_szQueryFile, "sql_selectStyleRecordCallback - szQuery: %s", szQuery);
@@ -7462,9 +7484,9 @@ public void SQL_UpdateStyleRecordCallback(Database db, DBResultSet results, cons
 
 	if (IsValidClient(client))
 	{
-		Handle data = CreateDataPack();
-		WritePackCell(data, GetClientUserId(client));
-		WritePackCell(data, style);
+		pack = CreateDataPack();
+		WritePackCell(pack, GetClientUserId(client));
+		WritePackCell(pack, style);
 
 		// Find out how many times are are faster than the players time
 		char szQuery[512];
@@ -7473,7 +7495,7 @@ public void SQL_UpdateStyleRecordCallback(Database db, DBResultSet results, cons
 		{
 			LogToFile(g_szQueryFile, "SQL_UpdateStyleRecordCallback - szQuery: %s", szQuery);
 		}
-		g_dDb.Query(SQL_UpdateStyleRecordCallback2, szQuery, data, DBPrio_Low);
+		g_dDb.Query(SQL_UpdateStyleRecordCallback2, szQuery, pack, DBPrio_Low);
 	}
 }
 
@@ -7585,31 +7607,31 @@ public void db_viewStyleMapRank(int client, int style)
 	if (!IsValidClient(client))
 	return;
 
-	Handle data = CreateDataPack();
-	WritePackCell(data, GetClientUserId(client));
-	WritePackCell(data, style);
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, GetClientUserId(client));
+	WritePackCell(pack, style);
 
 	Format(szQuery, sizeof(szQuery), "SELECT COUNT(*) FROM ck_playertimes WHERE runtimepro <= (SELECT runtimepro FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND style = %i AND runtimepro > -1.0) AND mapname = '%s' AND style = %i AND runtimepro > -1.0;", g_szSteamID[client], g_szMapName, style, g_szMapName, style);
 	if (g_cLogQueries.BoolValue)
 	{
 		LogToFile(g_szQueryFile, "db_viewStyleMapRank - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(db_viewStyleMapRankCallback, szQuery, data, DBPrio_Low);
+	g_dDb.Query(db_viewStyleMapRankCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void db_viewStyleMapRankCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void db_viewStyleMapRankCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (db_viewStyleMapRankCallback): %s ", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
-	ResetPack(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
-	int style = ReadPackCell(data);
-	delete data;
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int style = ReadPackCell(pack);
+	delete pack;
 
 	if (IsValidClient(client))
 	{
@@ -7655,20 +7677,20 @@ public void db_insertBonusStyle(int client, char szSteamId[32], char szUName[128
 	g_dDb.Query(SQL_insertBonusStyleCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void SQL_insertBonusStyleCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void SQL_insertBonusStyleCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (SQL_insertBonusStyleCallback): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
-	ResetPack(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
-	int zgroup = ReadPackCell(data);
-	int style = ReadPackCell(data);
-	delete data;
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int zgroup = ReadPackCell(pack);
+	int style = ReadPackCell(pack);
+	delete pack;
 
 	if (IsValidClient(client))
 	{
@@ -7693,21 +7715,21 @@ public void db_viewMapRankBonusStyle(int client, int zgroup, int type, int style
 	g_dDb.Query(db_viewMapRankBonusStyleCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void db_viewMapRankBonusStyleCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void db_viewMapRankBonusStyleCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (db_viewMapRankBonusStyleCallback): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
-	ResetPack(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
-	int zgroup = ReadPackCell(data);
-	int type = ReadPackCell(data);
-	int style = ReadPackCell(data);
-	delete data;
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int zgroup = ReadPackCell(pack);
+	int type = ReadPackCell(pack);
+	int style = ReadPackCell(pack);
+	delete pack;
 
 	if (IsValidClient(client))
 	{
@@ -7753,20 +7775,20 @@ public void db_updateBonusStyle(int client, char szSteamId[32], char szUName[128
 }
 
 
-public void SQL_updateBonusStyleCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void SQL_updateBonusStyleCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (SQL_updateBonusStyleCallback): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
-	ResetPack(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
-	int zgroup = ReadPackCell(data);
-	int style = ReadPackCell(data);
-	delete data;
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int zgroup = ReadPackCell(pack);
+	int style = ReadPackCell(pack);
+	delete pack;
 
 	if (IsValidClient(client))
 	{
@@ -8353,19 +8375,19 @@ public void db_selectMapRankUnknown(int client, char szMapName[128], int rank)
 	g_dDb.Query(db_selectMapRankUnknownCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void db_selectMapRankUnknownCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void db_selectMapRankUnknownCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (db_selectMapRankUnknownCallback): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
-	ResetPack(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
-	int rank = ReadPackCell(data);
-	delete data;
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int rank = ReadPackCell(pack);
+	delete pack;
 
 	if (IsValidClient(client))
 	{
@@ -8383,7 +8405,7 @@ public void db_selectMapRankUnknownCallback(Database db, DBResultSet results, co
 
 			FormatTimeFloat(client, runtimepro, 3, g_szRuntimepro[client], sizeof(g_szRuntimepro));
 
-			Handle pack = CreateDataPack();
+			pack = CreateDataPack();
 			WritePackCell(pack, GetClientUserId(client));
 			WritePackCell(pack, rank);
 			WritePackString(pack, szSteamId);
@@ -9113,7 +9135,7 @@ public void db_selectCurrentMapImprovement()
 	{
 		LogToFile(g_szQueryFile, "db_selectCurrentMapImprovement - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(db_selectMapCurrentImprovementCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(db_selectMapCurrentImprovementCallback, szQuery, _, DBPrio_Low);
 }
 
 public void db_selectMapCurrentImprovementCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -10214,9 +10236,9 @@ public void SQL_viewCustomTitlesCallback(Database db, DBResultSet results, const
 
 public void db_viewPlayerColours(int client, char szSteamId[32], int type)
 {
-	Handle data = CreateDataPack();
-	WritePackCell(data, GetClientUserId(client));
-	WritePackCell(data, type); // 10 = name colour, 1 = text colour
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, GetClientUserId(client));
+	WritePackCell(pack, type); // 10 = name colour, 1 = text colour
 
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), "SELECT steamid, namecolour, textcolour FROM ck_vipadmins WHERE `steamid` = '%s';", szSteamId);
@@ -10225,22 +10247,22 @@ public void db_viewPlayerColours(int client, char szSteamId[32], int type)
 	{
 		LogToFile(g_szQueryFile, "db_viewPlayerColours - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_ViewPlayerColoursCallback, szQuery, data, DBPrio_Low);
+	g_dDb.Query(SQL_ViewPlayerColoursCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void SQL_ViewPlayerColoursCallback(Database db, DBResultSet results, const char[] error, DataPack data)
+public void SQL_ViewPlayerColoursCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
 	if (!IsValidDatabase(db, error))
 	{
 		LogError("[surftimer] SQL Error (SQL_ViewPlayerColoursCallback): %s", error);
-		delete data;
+		delete pack;
 		return;
 	}
 
-	ResetPack(data);
-	int client = GetClientOfUserId(ReadPackCell(data));
-	int type = ReadPackCell(data); // 0 = name colour, 1 = text colour
-	delete data;
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int type = ReadPackCell(pack); // 0 = name colour, 1 = text colour
+	delete pack;
 
 	if (results.HasResults && results.FetchRow())
 	{
@@ -10387,7 +10409,7 @@ public void db_selectAnnouncements()
 	{
 		LogToFile(g_szQueryFile, "db_selectAnnouncements - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_SelectAnnouncementsCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(SQL_SelectAnnouncementsCallback, szQuery, _, DBPrio_Low);
 }
 
 public void SQL_SelectAnnouncementsCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -10434,7 +10456,7 @@ public void db_insertAnnouncement(int client, char szName[128], char szMapName[1
 	{
 		LogToFile(g_szQueryFile, "db_insertAnnouncement - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_InsertAnnouncementCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(SQL_InsertAnnouncementCallback, szQuery, _, DBPrio_Low);
 }
 
 public void db_checkAnnouncements()
@@ -10447,7 +10469,7 @@ public void db_checkAnnouncements()
 	{
 		LogToFile(g_szQueryFile, "db_checkAnnouncements - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_CheckAnnouncementsCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(SQL_CheckAnnouncementsCallback, szQuery, _, DBPrio_Low);
 }
 
 public void SQL_CheckAnnouncementsCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -10494,7 +10516,7 @@ public void db_selectMapCycle()
 	{
 		LogToFile(g_szQueryFile, "db_selectMapCycle - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_SelectMapCycleCallback, szQuery, 1, DBPrio_Low);
+	g_dDb.Query(SQL_SelectMapCycleCallback, szQuery, _, DBPrio_Low);
 }
 
 public void SQL_SelectMapCycleCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -10832,7 +10854,7 @@ public void db_updateMapRankedStatus()
 	{
 		LogToFile(g_szQueryFile, "db_updateMapRankedStatus - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 }
 
 public void sqlcreatePlayertimesIndex(Database db, DBResultSet results, const char[] error, any data)

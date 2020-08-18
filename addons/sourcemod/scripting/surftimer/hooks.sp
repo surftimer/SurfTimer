@@ -397,7 +397,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					{
 						LogToFile(g_szQueryFile, "Say_Hook - szQuery: %s", szQuery);
 					}
-					g_dDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client));
+					g_dDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client), DBPrio_Low);
 				}
 			}
 

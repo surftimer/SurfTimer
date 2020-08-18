@@ -817,7 +817,7 @@ public void checkSpawnPoints()
 		{
 			LogToFile(g_szQueryFile, "checkSpawnPoints - szQuery: %s", szQuery);
 		}
-		g_dDb.Query(sqlSelectSpawnPoints, szQuery, pack);
+		g_dDb.Query(sqlSelectSpawnPoints, szQuery, pack, DBPrio_Low);
 	}
 }
 

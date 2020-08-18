@@ -440,7 +440,7 @@ public int ShowMainDeleteMenuHandler(Menu menu, MenuAction action, int client, i
 		{
 			LogToFile(g_szQueryFile, "ShowMainDeleteMenuHandler - szQuery: %s", szQuery);
 		}
-		g_dDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client));
+		g_dDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client), DBPrio_Low);
 	}
 	else if(action == MenuAction_End)
 		delete menu;

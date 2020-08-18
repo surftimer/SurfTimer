@@ -272,7 +272,7 @@ public void db_viewMapSettings()
 	{
 		LogToFile(g_szQueryFile, "db_viewMapSettings - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(sql_viewMapSettingsCallback, szQuery, DBPrio_High);
+	g_dDb.Query(sql_viewMapSettingsCallback, szQuery, _, DBPrio_High);
 }
 
 public void sql_viewMapSettingsCallback(Database db, DBResultSet results, const char[] error, any pack)
@@ -312,7 +312,7 @@ public void db_updateMapSettings()
 	{
 		LogToFile(g_szQueryFile, "db_updateMapSettings - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(sql_insertMapSettingsCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(sql_insertMapSettingsCallback, szQuery, _, DBPrio_Low);
 }
 
 public void db_unlimitAllStages(char[] szMapName)
@@ -323,7 +323,7 @@ public void db_unlimitAllStages(char[] szMapName)
 	{
 		LogToFile(g_szQueryFile, "db_unlimitAllStages - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_UnlimitAllStagesCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(SQL_UnlimitAllStagesCallback, szQuery, _, DBPrio_Low);
 }
 
 public void db_removeOnejumplimit(char[] szMapName)
@@ -334,7 +334,7 @@ public void db_removeOnejumplimit(char[] szMapName)
 	{
 		LogToFile(g_szQueryFile, "db_removeOnejumplimit - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_removeOnejumplimitCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(SQL_removeOnejumplimitCallback, szQuery, _, DBPrio_Low);
 }
 
 public void SQL_UnlimitAllStagesCallback(Database db, DBResultSet results, const char[] error, any data)
