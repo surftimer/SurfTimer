@@ -53,9 +53,10 @@ jobs:
       
       - name: Add dhooks include
         run: | 
+          mkdir temp && cd temp
           curl -s "https://forums.alliedmods.net/attachment.php?attachmentid=181953&d=1591738802" -o dhooks.zip
           unzip dhooks.zip
-          cp addons/sourcemod/scripting/include/dhooks.inc $INCLUDE_PATH
+          cp addons/sourcemod/scripting/include/dhooks.inc $INCLUDE_PATH/dhooks.inc
       
       - name: Set up python
         uses: actions/setup-python@v1
