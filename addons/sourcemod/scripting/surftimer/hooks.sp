@@ -250,6 +250,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 	}
 	else if (IsFakeClient(client)) 
 	{
+		SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
 		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
 	}
 	return Plugin_Continue;
