@@ -648,7 +648,7 @@ void CalculatePlayerRank(int client, int style)
 	WritePackCell(pack, client);
 	WritePackCell(pack, style);
 
-	Format(szQuery, sizeof(szQuery), "SELECT name FROM ck_playerrank WHERE steamid = '%s' AND style = '%i';", g_pr_szSteamID[client], style);
+	Format(szQuery, sizeof(szQuery), "SELECT name FROM ck_playerrank WHERE steamid = '%s' AND style = '%i';", IsValidClient(client) ? g_szSteamID[client] : g_pr_szSteamID[client], style);
 	if (g_cLogQueries.BoolValue)
 	{
 		LogToFile(g_szQueryFile, "CalculatePlayerRank - szQuery: %s", szQuery);
@@ -695,6 +695,7 @@ public void sql_CalcuatePlayerRankCallback(Database db, DBResultSet results, con
 	}
 	else
 	{
+		delete pack;
 		// Players first time on server
 		if (client <= MaxClients)
 		{
