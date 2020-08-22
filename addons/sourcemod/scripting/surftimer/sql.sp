@@ -10912,6 +10912,7 @@ public void SQLTxn_WipePlayerSuccess(Handle db, DataPack pack, int numQueries, H
 
 	if (IsValidClient(client))
 	{
+		PrintToChat(client, "Player %s has been wiped!");
 		PrintToConsole(client, "Player %s has been wiped!");
 	}
 
@@ -10950,6 +10951,7 @@ public void SQLTxn_WipePlayerFailed(Handle db, DataPack pack, int numQueries, co
 
 	if (IsValidClient(client))
 	{
+		PrintToChat(client, "[SurfTimer] Wipe of player %s failed! Error (Query: %d): %s", queryData[failIndex], error);
 		PrintToConsole(client, "[SurfTimer] Wipe of player %s failed! Error (Query: %d): %s", queryData[failIndex], error);
 	}
 }
