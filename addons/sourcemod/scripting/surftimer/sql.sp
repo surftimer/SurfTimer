@@ -10869,96 +10869,83 @@ public void SQL_InsertAnnouncementCallback(Database db, DBResultSet results, con
 	}
 }
 
-public void db_resetPlayerRecords(int client, char szSteamID[32])
+public void db_WipePlayer(int client, char szSteamID[32])
 {
-	char szQuery[256];
-	g_dDb.Format(szQuery, sizeof(szQuery), sql_resetRecords, szSteamID);
-	if (g_cLogQueries.BoolValue)
-	{
-		LogToFile(g_szQueryFile, "db_resetPlayerRecords.1 - szQuery: %s", szQuery);
-	}
-	g_dDb.Query(SQL_CheckCallback, szQuery);
-	PrintToConsole(client, "map times of %s cleared.", szSteamID);
-
-	Handle pack = CreateDataPack();
-	WritePackCell(pack, GetClientUserId(client));
-	WritePackString(pack, szSteamID);
-
-	if (g_cLogQueries.BoolValue)
-	{
-		LogToFile(g_szQueryFile, "db_resetPlayerRecords.2 - szQuery: %s", szQuery);
-	}
-	g_dDb.Query(SQL_PlayerReset, "UPDATE ck_playerrank SET multiplier ='0'", pack);
-
-	for (int i = 1; i <= MaxClients; i++)
-	{
-		if (IsValidClient(i))
-		{
-			if (StrEqual(g_szSteamID[i], szSteamID))
-			{
-				Format(g_szPersonalRecord[i], 64, "NONE");
-				g_fPersonalRecord[i] = 0.0;
-				g_MapRank[i] = 99999;
-			}
-		}
-	}
-}
-
-public void db_resetPlayerRecords2(int client, char szSteamID[32], char szMapName[64])
-{
+	Transaction tTransaction = new Transaction();
 	char szQuery[256];
 
-	g_dDb.Format(szQuery, sizeof(szQuery), sql_resetRecords2, szSteamID, szMapName);
+	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_playertimes WHERE steamid = \"%s\";", szSteamID);
+	tTransaction.AddQuery(szQuery);
+	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_bonus WHERE steamid = \"%s\";", szSteamID);
+	tTransaction.AddQuery(szQuery);
+	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_checkpoints WHERE steamid = \"%s\";", szSteamID);
+	tTransaction.AddQuery(szQuery);
+	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_playerrank WHERE steamid = \"%s\";", szSteamID);
+	tTransaction.AddQuery(szQuery);
+	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_wrcps WHERE steamid = \"%s\";", szSteamID);
+	tTransaction.AddQuery(szQuery);
+	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_playeroptions2 WHERE steamid = \"%s\";", szSteamID);
+	tTransaction.AddQuery(szQuery);
 
-	Handle pack = CreateDataPack();
-	WritePackCell(pack, GetClientUserId(client));
-	WritePackString(pack, szSteamID);
-
-	if (g_cLogQueries.BoolValue)
-	{
-		LogToFile(g_szQueryFile, "db_resetPlayerRecords2 - szQuery: %s", szQuery);
-	}
-	g_dDb.Query(SQL_PlayerReset, szQuery, pack);
-	PrintToConsole(client, "map times of %s on %s cleared.", szSteamID, szMapName);
-
-	if (StrEqual(szMapName, g_szMapName))
-	{
-		for (int i = 1; i <= MaxClients; i++)
-		{
-			if (IsValidClient(i))
-			{
-				if (StrEqual(g_szSteamID[i], szSteamID))
-				{
-					Format(g_szPersonalRecord[i], 64, "NONE");
-					g_fPersonalRecord[i] = 0.0;
-					g_MapRank[i] = 99999;
-				}
-			}
-		}
-	}
+	DataPack pack = new DataPack();
+	pack.WriteCell(GetClientUserId(client));
+	pack.WriteString(szSteamID);
+	g_dDb.Execute(tTransaction, SQLTxn_WipePlayerSuccess, SQLTxn_WipePlayerFailed, pack);
 }
 
-public void SQL_PlayerReset(Database db, DBResultSet results, const char[] error, DataPack pack)
+
+public void SQLTxn_WipePlayerSuccess(Handle db, DataPack pack, int numQueries, Handle[] results, any[] queryData)
 {
-	if (!IsValidDatabase(db, error))
-	{
-		LogError("[%s] SQL Error (SQL_PlayerReset): %s", g_szChatPrefix, error);
-		return;
-	}
+	pack.Reset();
 
-	char szSteamID[128];
+	int client = GetClientOfUserId(pack.ReadCell());
 
-	ResetPack(pack);
-	int userid = ReadPackCell(pack);
-	ReadPackString(pack, szSteamID, sizeof(szSteamID));
+	char szSteamID[32];
+	pack.ReadString(szSteamID, sizeof(szSteamID));
+
 	delete pack;
 
-	int client = GetClientOfUserId(userid);
 
 	if (IsValidClient(client))
 	{
-		RecalcPlayerRank(client, szSteamID);
-		db_viewMapProRankCount();
-		db_GetMapRecord_Pro();
+		PrintToConsole(client, "Player %s has been wiped!");
+	}
+
+	char sBuffer[32];
+
+	for(int i = 1; i <= MaxClients; i++)
+	{
+		if (!IsClientInGame(i))
+			continue;
+			
+		GetClientAuthId(i, AuthId_Steam2, sBuffer, sizeof(sBuffer));
+		if (StrEqual(sBuffer, szSteamID, false))
+		{
+			g_bSettingsLoaded[client] = false;
+			g_bLoadingSettings[client] = true;
+			g_iSettingToLoad[client] = 0;
+			LoadClientSetting(client, g_iSettingToLoad[client]);
+			break;
+		}
+	}
+}
+
+public void SQLTxn_WipePlayerFailed(Handle db, DataPack pack, int numQueries, const char[] error, int failIndex, any[] queryData)
+{
+	pack.Reset();
+
+	int client = GetClientOfUserId(pack.ReadCell());
+
+	char szSteamID[32];
+	pack.ReadString(szSteamID, sizeof(szSteamID));
+
+	delete pack;
+
+
+	LogError("[SurfTimer] Wipe of player %s failed! Error (Query: %d): %s", queryData[failIndex], error);
+
+	if (IsValidClient(client))
+	{
+		PrintToConsole(client, "[SurfTimer] Wipe of player %s failed! Error (Query: %d): %s", queryData[failIndex], error);
 	}
 }

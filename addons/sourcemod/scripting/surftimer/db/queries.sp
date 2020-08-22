@@ -82,8 +82,6 @@ char sql_selectPlayerRankProTime[] = "SELECT COUNT(*) FROM ck_playertimes WHERE 
 char sql_selectAllMapTimesinMap[] = "SELECT runtimepro from ck_playertimes WHERE mapname = '%s';";
 char sql_selectAVGruntimepro[] = "SELECT AVG(runtimepro) FROM ck_playertimes WHERE mapname = '%s';";
 char sql_selectMapRecordDeletion[] = "SELECT MIN(%s), steamid, style FROM %s WHERE mapname='%s' AND style='%i' AND %s > -1.0 %s";
-char sql_resetRecords[] = "DELETE FROM ck_playertimes WHERE steamid = '%s'";
-char sql_resetRecords2[] = "DELETE FROM ck_playertimes WHERE steamid = '%s' AND mapname LIKE '%s';";
 
 // ck_spawnlocations
 char sql_createSpawnLocations[] = "CREATE TABLE IF NOT EXISTS ck_spawnlocations (mapname VARCHAR(54) NOT NULL, pos_x FLOAT NOT NULL, pos_y FLOAT NOT NULL, pos_z FLOAT NOT NULL, ang_x FLOAT NOT NULL, ang_y FLOAT NOT NULL, ang_z FLOAT NOT NULL,  `vel_x` float NOT NULL DEFAULT '0', `vel_y` float NOT NULL DEFAULT '0', `vel_z` float NOT NULL DEFAULT '0', zonegroup INT(12) DEFAULT 0, stage INT(12) DEFAULT 0, teleside INT(11) DEFAULT 0, PRIMARY KEY(mapname, zonegroup, stage, teleside)) DEFAULT CHARSET=utf8mb4;";
