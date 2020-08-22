@@ -10868,3 +10868,97 @@ public void SQL_InsertAnnouncementCallback(Database db, DBResultSet results, con
 		return;
 	}
 }
+
+public void db_resetPlayerRecords(int client, char szSteamID[32])
+{
+	char szQuery[256];
+	g_dDb.Format(szQuery, sizeof(szQuery), sql_resetRecords, szSteamID);
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_resetPlayerRecords.1 - szQuery: %s", szQuery);
+	}
+	g_dDb.Query(SQL_CheckCallback, szQuery);
+	PrintToConsole(client, "map times of %s cleared.", szSteamID);
+
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, GetClientUserId(client));
+	WritePackString(pack, szSteamID);
+
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_resetPlayerRecords.2 - szQuery: %s", szQuery);
+	}
+	g_dDb.Query(SQL_PlayerReset, "UPDATE ck_playerrank SET multiplier ='0'", pack);
+
+	for (int i = 1; i <= MaxClients; i++)
+	{
+		if (IsValidClient(i))
+		{
+			if (StrEqual(g_szSteamID[i], szSteamID))
+			{
+				Format(g_szPersonalRecord[i], 64, "NONE");
+				g_fPersonalRecord[i] = 0.0;
+				g_MapRank[i] = 99999;
+			}
+		}
+	}
+}
+
+public void db_resetPlayerRecords2(int client, char szSteamID[32], char szMapName[64])
+{
+	char szQuery[256];
+
+	g_dDb.Format(szQuery, sizeof(szQuery), sql_resetRecords2, szSteamID, szMapName);
+
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, GetClientUserId(client));
+	WritePackString(pack, szSteamID);
+
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_resetPlayerRecords2 - szQuery: %s", szQuery);
+	}
+	g_dDb.Query(SQL_PlayerReset, szQuery, pack);
+	PrintToConsole(client, "map times of %s on %s cleared.", szSteamID, szMapName);
+
+	if (StrEqual(szMapName, g_szMapName))
+	{
+		for (int i = 1; i <= MaxClients; i++)
+		{
+			if (IsValidClient(i))
+			{
+				if (StrEqual(g_szSteamID[i], szSteamID))
+				{
+					Format(g_szPersonalRecord[i], 64, "NONE");
+					g_fPersonalRecord[i] = 0.0;
+					g_MapRank[i] = 99999;
+				}
+			}
+		}
+	}
+}
+
+public void SQL_PlayerReset(Database db, DBResultSet results, const char[] error, DataPack pack)
+{
+	if (!IsValidDatabase(db, error))
+	{
+		LogError("[%s] SQL Error (SQL_PlayerReset): %s", g_szChatPrefix, error);
+		return;
+	}
+
+	char szSteamID[128];
+
+	ResetPack(pack);
+	int userid = ReadPackCell(pack);
+	ReadPackString(pack, szSteamID, sizeof(szSteamID));
+	delete pack;
+
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
+	{
+		RecalcPlayerRank(client, szSteamID);
+		db_viewMapProRankCount();
+		db_GetMapRecord_Pro();
+	}
+}

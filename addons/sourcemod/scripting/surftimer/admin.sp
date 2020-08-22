@@ -621,14 +621,46 @@ public Action Admin_RefreshProfile(int client, int args)
 	{
 		char szSteamID[128];
 		char szArg[128];
-		Format(szSteamID, 128, "");
+		Format(szSteamID, sizeof(szArg), "");
 		for (int i = 1; i < 6; i++)
 		{
-			GetCmdArg(i, szArg, 128);
+			GetCmdArg(i, szArg, sizeof(szArg));
 			if (!StrEqual(szArg, "", false))
-				Format(szSteamID, 128, "%s%s", szSteamID, szArg);
+				Format(szSteamID, sizeof(szArg), "%s%s", szSteamID, szArg);
 		}
 		RecalcPlayerRank(client, szSteamID);
+	}
+	return Plugin_Handled;
+}
+
+public Action Admin_ResetRecords(int client, int args)
+{
+	if (args < 1)
+	{
+		ReplyToCommand(client, "[CK] Usage: sm_resetplayertimes <steamid> [<mapname>]");
+		return Plugin_Handled;
+	}
+	else
+	{
+		char szSteamID[32];
+		char szArg[128];
+		Format(szSteamID, sizeof(szSteamID), "");
+		for (int i = 1; i < 6; i++)
+		{
+			GetCmdArg(i, szArg, sizeof(szArg));
+			if (!StrEqual(szArg, "", false))
+				Format(szSteamID, sizeof(szSteamID), "%s%s", szSteamID, szArg);
+		}
+		if (args == 5)
+		{
+			db_resetPlayerRecords(client, szSteamID);
+		}
+		else if (args == 6)
+		{
+			char szMapName[64];
+			GetCmdArg(6, szMapName, sizeof(szMapName));
+			db_resetPlayerRecords2(client, szSteamID, szMapName);
+		}
 	}
 	return Plugin_Handled;
 }
