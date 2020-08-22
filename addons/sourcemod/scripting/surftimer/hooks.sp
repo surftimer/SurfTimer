@@ -149,6 +149,9 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 				SetEntityGravity(client, 0.0);
 			}
 
+			SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
+			SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
+
 			return Plugin_Continue;
 		}
 
@@ -247,11 +250,6 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		// Give Player Kevlar + Helmet
 		GivePlayerItem(client, "item_assaultsuit");
 		
-	}
-	else if (IsFakeClient(client)) 
-	{
-		SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
-		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
 	}
 	return Plugin_Continue;
 }
