@@ -10886,6 +10886,10 @@ public void db_WipePlayer(int client, char szSteamID[32])
 	tTransaction.AddQuery(szQuery);
 	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_playeroptions2 WHERE steamid = \"%s\";", szSteamID);
 	tTransaction.AddQuery(szQuery);
+	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_latestrecords WHERE steamid = \"%s\";", szSteamID);
+	tTransaction.AddQuery(szQuery);
+	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_playertemp WHERE steamid = \"%s\";", szSteamID);
+	tTransaction.AddQuery(szQuery);
 
 	DataPack pack = new DataPack();
 	pack.WriteCell(GetClientUserId(client));
