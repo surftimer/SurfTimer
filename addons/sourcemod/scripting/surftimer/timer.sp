@@ -386,10 +386,8 @@ public Action SetClanTag(Handle timer, any userid)
 		char szTabRank[1024], szTabClanTag[1024];
 
 		if (g_iEnforceTitleType[client] == 1 || g_iEnforceTitleType[client] == 2) {
-			Format(szTabRank, sizeof(szTabRank), "%s", g_pr_chat_coloredrank[client]);
+			Format(szTabRank, sizeof(szTabRank), "%s", g_pr_rankname[client]);
 		}
-
-		CRemoveTags(szTabRank, sizeof(szTabRank));
 
 		if (strlen(szTabRank) > 1) {
 			Format(szTabClanTag, sizeof(szTabClanTag), "%s | %s", g_szCountryCode[client], szTabRank);
