@@ -3211,54 +3211,6 @@ public void SQL_ViewTop10RecordsCallback3(Database db, DBResultSet results, cons
 	}
 }
 
-public void db_selectPlayer(int client)
-{
-	char szQuery[255];
-	
-	if (!IsValidClient(client))
-		return;
-
-	Format(szQuery, sizeof(szQuery), sql_selectPlayer, g_szSteamID[client], g_szMapName);
-	if (g_cLogQueries.BoolValue)
-	{
-		LogToFile(g_szQueryFile, "db_selectPlayer - szQuery: %s", szQuery);
-	}
-	g_dDb.Query(SQL_SelectPlayerCallback, szQuery, GetClientUserId(client), DBPrio_Low);
-}
-
-public void SQL_SelectPlayerCallback(Database db, DBResultSet results, const char[] error, int userid)
-{
-	if (!IsValidDatabase(db, error))
-	{
-		LogError("[SurfTimer] SQL Error (SQL_SelectPlayerCallback): %s", error);
-		return;
-	}
-
-	int client = GetClientOfUserId(userid);
-	if (!results.HasResults && !results.FetchRow() && IsValidClient(client))
-		db_insertPlayer(client);
-}
-
-public void db_insertPlayer(int client)
-{
-	char szQuery[255];
-	char szUName[MAX_NAME_LENGTH];
-	if (IsValidClient(client))
-	{
-		GetClientName(client, szUName, MAX_NAME_LENGTH);
-	}
-	else
-	return;
-	char szName[MAX_NAME_LENGTH * 2 + 1];
-	g_dDb.Escape(szUName, szName, MAX_NAME_LENGTH * 2 + 1);
-	Format(szQuery, sizeof(szQuery), sql_insertPlayer, g_szSteamID[client], g_szMapName, szName);
-	if (g_cLogQueries.BoolValue)
-	{
-		LogToFile(g_szQueryFile, "db_insertPlayer - szQuery: %s", szQuery);
-	}
-	g_dDb.Query(SQL_InsertPlayerCallBack, szQuery, GetClientUserId(client), DBPrio_Low);
-}
-
 // Getting player settings starts here
 public void db_viewPersonalRecords(int client, char szSteamId[32], char szMapName[128])
 {
@@ -3764,42 +3716,6 @@ public void SQLTxn_UpdateCheckpointsFailed(Handle db, DataPack pack, int numQuer
 	LogError("[SurfTimer] Error updating checkpoints: %s", error);
 }
 
-public void SQL_updateCheckpointsCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
-{
-	if (!IsValidDatabase(db, error))
-	{
-		LogError("[Surftimer] SQL Error (SQL_updateCheckpointsCallback): %s", error);
-		delete pack;
-		return;
-	}
-	ResetPack(pack);
-	int client = ReadPackCell(pack);
-	int zonegrp = ReadPackCell(pack);
-	delete pack;
-
-	db_viewCheckpointsinZoneGroup(client, g_szSteamID[client], g_szMapName, zonegrp);
-}
-
-public void db_deleteCheckpoints()
-{
-	char szQuery[258];
-	Format(szQuery, sizeof(szQuery), sql_deleteCheckpoints, g_szMapName);
-	if (g_cLogQueries.BoolValue)
-	{
-		LogToFile(g_szQueryFile, "db_deleteCheckpoints - szQuery: %s", szQuery);
-	}
-	g_dDb.Query(SQL_deleteCheckpointsCallback, szQuery, _, DBPrio_Low);
-}
-
-public void SQL_deleteCheckpointsCallback(Database db, DBResultSet results, const char[] error, any data)
-{
-	if (!IsValidDatabase(db, error))
-	{
-		LogError("[SurfTimer] SQL Error (SQL_deleteCheckpointsCallback): %s", error);
-		return;
-	}
-}
-
 /*===================================
 =              MAPTIER              =
 ===================================*/
@@ -4235,16 +4151,6 @@ public void SQL_selectFastestBonusCallback(Database db, DBResultSet results, con
 	return;
 }
 
-public void db_deleteBonus()
-{
-	char szQuery[1024];
-	Format(szQuery, sizeof(szQuery), sql_deleteBonus, g_szMapName);
-	if (g_cLogQueries.BoolValue)
-	{
-		LogToFile(g_szQueryFile, "db_deleteBonus - szQuery: %s", szQuery);
-	}
-	g_dDb.Query(SQL_deleteBonusCallback, szQuery, _, DBPrio_Low);
-}
 public void db_viewBonusTotalCount()
 {
 	char szQuery[1024];
@@ -4378,15 +4284,6 @@ public void SQL_updateBonusCallback(Database db, DBResultSet results, const char
 		db_viewMapRankBonus(client, zgroup, 2);
 
 		CalculatePlayerRank(client, 0);
-	}
-}
-
-public void SQL_deleteBonusCallback(Database db, DBResultSet results, const char[] error, any data)
-{
-	if (!IsValidDatabase(db, error))
-	{
-		LogError("[SurfTimer] SQL Error (SQL_deleteBonusCallback): %s", error);
-		return;
 	}
 }
 
@@ -5148,26 +5045,6 @@ public void sql_zoneFixCallback2(Database db, DBResultSet results, const char[] 
 	g_dDb.Query(sql_zoneFixCallback, szQuery, _, DBPrio_Low);
 }
 
-public void db_deleteMapZones()
-{
-	char szQuery[258];
-	Format(szQuery, sizeof(szQuery), sql_deleteMapZones, g_szMapName);
-	if (g_cLogQueries.BoolValue)
-	{
-		LogToFile(g_szQueryFile, "db_deleteMapZones - szQuery: %s", szQuery);
-	}
-	g_dDb.Query(SQL_deleteMapZonesCallback, szQuery, _, DBPrio_Low);
-}
-
-public void SQL_deleteMapZonesCallback(Database db, DBResultSet results, const char[] error, any data)
-{
-	if (!IsValidDatabase(db, error))
-	{
-		LogError("[SurfTimer] SQL Error (SQL_deleteMapZonesCallback): %s", error);
-		return;
-	}
-}
-
 public void db_deleteZone(int client, int zoneid)
 {
 	char szQuery[258];
@@ -5275,17 +5152,6 @@ public void db_insertLastPositionCallback(Database db, DBResultSet results, cons
 			g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 		}
 	}
-}
-
-public void db_deletePlayerTmps()
-{
-	char szQuery[64];
-	Format(szQuery, sizeof(szQuery), "delete FROM ck_playertemp");
-	if (g_cLogQueries.BoolValue)
-	{
-		LogToFile(g_szQueryFile, "db_deletePlayerTmps - szQuery: %s", szQuery);
-	}
-	g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 }
 
 public void db_ViewLatestRecords(int client)
@@ -7527,81 +7393,6 @@ public void SQL_UpdateStyleRecordCallback2(Database db, DBResultSet results, con
 	}
 }
 
-public void db_GetStyleMapRecord_Pro(int style)
-{
-	g_fRecordStyleMapTime[style] = 9999999.0;
-	char szQuery[512];
-	Format(szQuery, sizeof(szQuery), "SELECT MIN(runtimepro), name, steamid FROM ck_playertimes WHERE mapname = '%s' AND style = %i AND runtimepro > -1.0", g_szMapName, style);
-	if (g_cLogQueries.BoolValue)
-	{
-		LogToFile(g_szQueryFile, "db_GetStyleMapRecord_Pro - szQuery: %s", szQuery);
-	}
-	g_dDb.Query(sql_selectStyleMapRecordCallback, szQuery, style, DBPrio_Low);
-}
-
-public void sql_selectStyleMapRecordCallback(Database db, DBResultSet results, const char[] error, int style)
-{
-	if (!IsValidDatabase(db, error))
-	{
-		LogError("[SurfTimer] SQL Error (sql_selectStyleMapRecordCallback): %s", error);
-		return;
-	}
-
-	if (results.HasResults && results.FetchRow())
-	{
-		g_fRecordStyleMapTime[style] = results.FetchFloat(0);
-		if (g_fRecordStyleMapTime[style] > -1.0 && !results.IsFieldNull(0))
-		{
-			g_fRecordStyleMapTime[style] = results.FetchFloat(0);
-			FormatTimeFloat(0, g_fRecordStyleMapTime[style], 3, g_szRecordStyleMapTime[style], 64);
-			results.FetchString(1, g_szRecordStylePlayer[style], MAX_NAME_LENGTH);
-			results.FetchString(2, g_szRecordStyleMapSteamID[style], MAX_NAME_LENGTH);
-		}
-		else
-		{
-			Format(g_szRecordStyleMapTime[style], 64, "N/A");
-			g_fRecordStyleMapTime[style] = 9999999.0;
-		}
-	}
-	else
-	{
-		Format(g_szRecordStyleMapTime[style], 64, "N/A");
-		g_fRecordStyleMapTime[style] = 9999999.0;
-	}
-	return;
-}
-
-public void db_viewStyleMapRankCount(int style)
-{
-	g_StyleMapTimesCount[style] = 0;
-	char szQuery[512];
-	Format(szQuery, sizeof(szQuery), "SELECT COUNT(*) FROM ck_playertimes WHERE mapname = '%s' AND style = %i AND runtimepro  > -1.0;", g_szMapName, style);
-
-	if (g_cLogQueries.BoolValue)
-	{
-		LogToFile(g_szQueryFile, "db_viewStyleMapRankCount - szQuery: %s", szQuery);
-	}
-	g_dDb.Query(sql_selectStylePlayerCountCallback, szQuery, style, DBPrio_Low);
-}
-
-public void sql_selectStylePlayerCountCallback(Database db, DBResultSet results, const char[] error, int style)
-{
-	if (!IsValidDatabase(db, error))
-	{
-		LogError("[SurfTimer] SQL Error (sql_selectStylePlayerCountCallback): %s", error);
-		return;
-	}
-
-	if (results.HasResults && results.FetchRow()){
-		g_StyleMapTimesCount[style] = results.FetchInt(0);
-	}
-	else {
-		g_StyleMapTimesCount[style] = 0;
-	}
-
-	return;
-}
-
 public void db_viewStyleMapRank(int client, int style)
 {
 	char szQuery[512];
@@ -7836,85 +7627,6 @@ public void db_viewBonusStyleRunRank(Database db, DBResultSet results, const cha
 		}
 
 		PrintChatBonusStyle(client, zGroup, style, rank);
-	}
-}
-
-public void db_viewPersonalBonusStylesRecords(int client, char szSteamId[32], int style)
-{
-	Handle pack = CreateDataPack();
-	WritePackCell(pack, GetClientUserId(client));
-	WritePackCell(pack, style);
-
-	char szQuery[1024];
-	// "SELECT runtime, zonegroup FROM ck_bonus WHERE steamid = '%s' AND mapname = '%s' AND runtime > '0.0'";
-	Format(szQuery, sizeof(szQuery), "SELECT runtime, zonegroup FROM ck_bonus WHERE steamid = '%s' AND mapname = '%s' AND style = '%i' AND runtime > '0.0'", szSteamId, g_szMapName, style);
-	if (g_cLogQueries.BoolValue)
-	{
-		LogToFile(g_szQueryFile, "db_viewPersonalBonusStylesRecords - szQuery: %s", szQuery);
-	}
-	g_dDb.Query(SQL_selectPersonalBonusStylesRecordsCallback, szQuery, pack, DBPrio_Low);
-}
-
-public void SQL_selectPersonalBonusStylesRecordsCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
-{
-	ResetPack(pack);
-	int client = GetClientOfUserId(ReadPackCell(pack));
-	int style = ReadPackCell(pack);
-	delete pack;
-
-	if (!IsValidDatabase(db, error))
-	{
-		LogError("[SurfTimer] SQL Error (SQL_selectPersonalBonusStylesRecordsCallback): %s", error);
-
-		if (style == 6)
-		{
-			if (IsValidClient(client) && !g_bSettingsLoaded[client])
-			{
-				db_viewPersonalBonusRecords(client, g_szSteamID[client]);
-			}
-		}
-
-		return;
-	}
-
-	if (IsValidClient(client))
-	{
-		int zgroup;
-
-		for (int i = 0; i < MAXZONEGROUPS; i++)
-		{
-			g_fStylePersonalRecordBonus[style][i][client] = 0.0;
-			Format(g_szStylePersonalRecordBonus[style][i][client], 64, "N/A");
-		}
-
-		if (results.HasResults)
-		{
-			while (results.FetchRow())
-			{
-				zgroup = results.FetchInt(1);
-				g_fStylePersonalRecordBonus[style][zgroup][client] = results.FetchFloat(0);
-
-				if (g_fStylePersonalRecordBonus[style][zgroup][client] > 0.0)
-				{
-					FormatTimeFloat(client, g_fStylePersonalRecordBonus[style][zgroup][client], 3, g_szStylePersonalRecordBonus[style][zgroup][client], 64);
-					// db_viewMapRankBonus(client, zgroup, 0); // get rank
-					db_viewMapRankBonusStyle(client, zgroup, 0, style);
-				}
-				else
-				{
-					Format(g_szStylePersonalRecordBonus[style][zgroup][client], 64, "N/A");
-					g_fStylePersonalRecordBonus[style][zgroup][client] = 0.0;
-				}
-			}
-		}
-
-		if (style == 6)
-		{
-			if (!g_bSettingsLoaded[client])
-			{
-				db_viewPersonalBonusRecords(client, g_szSteamID[client]);
-			}
-		}
 	}
 }
 
@@ -10129,17 +9841,6 @@ public void db_toggleCustomPlayerTitle(int client, char[] szSteamID)
 		LogToFile(g_szQueryFile, "db_toggleCustomPlayerTitle - szQuery: %s", szQuery);
 	}
 	g_dDb.Query(SQL_insertCustomPlayerTitleCallback, szQuery, pack, DBPrio_Low);
-}
-
-public void SQL_toggleCustomPlayerTitleCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
-{
-	ResetPack(pack);
-	int client = ReadPackCell(pack);
-	char szSteamID[32];
-	ReadPackString(pack, szSteamID, 32);
-	delete pack;
-	
-	SetPlayerRank(client);
 }
 
 public void db_viewCustomTitles(int client, char[] szSteamID)

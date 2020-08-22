@@ -45,22 +45,6 @@ public Action RefreshZonesTimer(Handle timer)
 	return Plugin_Handled;
 }
 
-public Action SetPlayerWeapons(Handle timer, any client)
-{
-	if ((GetClientTeam(client) > 1) && IsValidClient(client))
-	{
-		StripAllWeapons(client);
-		if (!IsFakeClient(client))
-			GivePlayerItem(client, "weapon_usp_silencer");
-		int weapon;
-		weapon = GetPlayerWeaponSlot(client, 2);
-		if (weapon != -1 && !IsFakeClient(client))
-			SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
-	}
-
-	return Plugin_Handled;
-}
-
 public Action PlayerRanksTimer(Handle timer)
 {
 	for (int i = 1; i <= MaxClients; i++)
@@ -81,14 +65,6 @@ public Action UpdatePlayerProfile(Handle timer, Handle pack)
 
 	if (IsValidClient(client) && !IsFakeClient(client))
 		db_updateStat(client, style);
-
-	return Plugin_Handled;
-}
-
-public Action StartTimer(Handle timer, any client)
-{
-	if (IsValidClient(client) && !IsFakeClient(client))
-		CL_OnStartTimerPress(client);
 
 	return Plugin_Handled;
 }
@@ -566,17 +542,6 @@ public Action StartJumpZonePrintTimer(Handle timer, any userid)
 	}
 
 	return Plugin_Handled;
-}
-
-
-public Action Block2Unload(Handle timer, any client)
-{
-	ServerCommand("sm plugins unload block2");
-}
-
-public Action Block2Load(Handle timer, any client)
-{
-	ServerCommand("sm plugins load block2");
 }
 
 // Replay Bot Fixes
