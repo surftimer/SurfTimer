@@ -267,32 +267,36 @@ public Action Command_SetGravityFix(int client, int args)
 public void db_viewMapSettings()
 {
 	char szQuery[2048];
-	Format(szQuery, 2048, "SELECT `mapname`, `maxvelocity`, `announcerecord`, `gravityfix` FROM `ck_maptier` WHERE `mapname` = '%s'", g_szMapName);
-	SQL_TQuery(g_hDb, sql_viewMapSettingsCallback, szQuery, DBPrio_High);
+	Format(szQuery, sizeof(szQuery), "SELECT `mapname`, `maxvelocity`, `announcerecord`, `gravityfix` FROM `ck_maptier` WHERE `mapname` = '%s'", g_szMapName);
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_viewMapSettings - szQuery: %s", szQuery);
+	}
+	g_dDb.Query(sql_viewMapSettingsCallback, szQuery, DBPrio_High);
 }
 
-public void sql_viewMapSettingsCallback(Handle owner, Handle hndl, const char[] error, any pack)
+public void sql_viewMapSettingsCallback(Database db, DBResultSet results, const char[] error, any pack)
 {
-	if (hndl == null)
+	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (sql_viewMapSettingsCallback): %s", error);
 	}
 
-	if (SQL_HasResultSet(hndl) && SQL_GetRowCount(hndl) > 0)
+	if (results.HasResults && results.RowCount > 0)
 	{
-		while (SQL_FetchRow(hndl))
+		while (results.FetchRow())
 		{
-			g_fMaxVelocity = SQL_FetchFloat(hndl, 1);
-			g_fAnnounceRecord = SQL_FetchFloat(hndl, 2);
-			g_bGravityFix = view_as<bool>(SQL_FetchInt(hndl, 3));
+			g_fMaxVelocity = results.FetchFloat(1);
+			g_fAnnounceRecord = results.FetchFloat(2);
+			g_bGravityFix = view_as<bool>(results.FetchInt(3));
 		}
 		setMapSettings();
 	}
 }
 
-public void sql_insertMapSettingsCallback(Handle owner, Handle hndl, const char[] error, any pack)
+public void sql_insertMapSettingsCallback(Database db, DBResultSet results, const char[] error, any pack)
 {
-	if (hndl == null)
+	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (sql_insertMapSettingsCallback): %s", error);
 	}
@@ -303,27 +307,39 @@ public void sql_insertMapSettingsCallback(Handle owner, Handle hndl, const char[
 public void db_updateMapSettings()
 {
 	char szQuery[512];
-	Format(szQuery, 512, "UPDATE `ck_maptier` SET `maxvelocity` = '%f', `announcerecord` = '%f', `gravityfix` = %i WHERE `mapname` = '%s';", g_fMaxVelocity, g_fAnnounceRecord, view_as<int>(g_bGravityFix), g_szMapName);
-	SQL_TQuery(g_hDb, sql_insertMapSettingsCallback, szQuery, DBPrio_Low);
+	Format(szQuery, sizeof(szQuery), "UPDATE `ck_maptier` SET `maxvelocity` = '%f', `announcerecord` = '%f', `gravityfix` = %i WHERE `mapname` = '%s';", g_fMaxVelocity, g_fAnnounceRecord, view_as<int>(g_bGravityFix), g_szMapName);
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_updateMapSettings - szQuery: %s", szQuery);
+	}
+	g_dDb.Query(sql_insertMapSettingsCallback, szQuery, DBPrio_Low);
 }
 
 public void db_unlimitAllStages(char[] szMapName)
 {
 	char szQuery[256];
-	Format(szQuery, 256, "UPDATE ck_zones SET prespeed = 0.0 WHERE mapname = '%s' AND zonetype = 3;", g_szMapName);
-	SQL_TQuery(g_hDb, SQL_UnlimitAllStagesCallback, szQuery, DBPrio_Low);
+	Format(szQuery, sizeof(szQuery), "UPDATE ck_zones SET prespeed = 0.0 WHERE mapname = '%s' AND zonetype = 3;", g_szMapName);
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_unlimitAllStages - szQuery: %s", szQuery);
+	}
+	g_dDb.Query(SQL_UnlimitAllStagesCallback, szQuery, DBPrio_Low);
 }
 
 public void db_removeOnejumplimit(char[] szMapName)
 {
 	char szQuery[256];
-	Format(szQuery, 256, "UPDATE ck_zones SET onejumplimit = 0 WHERE mapname = '%s';", g_szMapName);
-	SQL_TQuery(g_hDb, SQL_removeOnejumplimitCallback, szQuery, DBPrio_Low);
+	Format(szQuery, sizeof(szQuery), "UPDATE ck_zones SET onejumplimit = 0 WHERE mapname = '%s';", g_szMapName);
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_removeOnejumplimit - szQuery: %s", szQuery);
+	}
+	g_dDb.Query(SQL_removeOnejumplimitCallback, szQuery, DBPrio_Low);
 }
 
-public void SQL_UnlimitAllStagesCallback(Handle owner, Handle hndl, const char[] error, any data)
+public void SQL_UnlimitAllStagesCallback(Database db, DBResultSet results, const char[] error, any data)
 {
-	if (hndl == null)
+	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (SQL_UnlimitAllStagesCallback): %s", error);
 		return;
@@ -332,9 +348,9 @@ public void SQL_UnlimitAllStagesCallback(Handle owner, Handle hndl, const char[]
 	db_selectMapZones();
 }
 
-public void SQL_removeOnejumplimitCallback(Handle owner, Handle hndl, const char[] error, any data)
+public void SQL_removeOnejumplimitCallback(Database db, DBResultSet results, const char[] error, any data)
 {
-	if (hndl == null)
+	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (SQL_removeOnejumplimitCallback): %s", error);
 		return;

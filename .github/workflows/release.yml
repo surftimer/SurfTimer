@@ -1,0 +1,153 @@
+name: Compile with SourceMod
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sm_version: [ "1.10", "1.11" ]
+
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set environment variables
+        run: |
+          TOOLS_PATH=$GITHUB_WORKSPACE/tools
+          echo ::set-env name=TOOLS_PATH::$TOOLS_PATH
+          SOURCEMOD_PATH=$GITHUB_WORKSPACE/addons/sourcemod
+          echo ::set-env name=SOURCEMOD_PATH::$SOURCEMOD_PATH
+          echo ::set-env name=PLUGINS_PATH::$SOURCEMOD_PATH/plugins
+          echo ::set-env name=SCRIPTS_PATH::$SOURCEMOD_PATH/scripting
+          echo ::set-env name=INCLUDE_PATH::$SOURCEMOD_PATH/scripting/include
+
+      - name: Setup SourcePawn Compiler ${{ matrix.SM_VERSION }}
+        uses: rumblefrog/setup-sp@master
+        with:
+          version: ${{ matrix.SM_VERSION }}
+
+      - name: Create dependency directories
+        run: mkdir $INCLUDE_PATH/smlib
+
+      - name: Fetch plugin dependencies
+        run: |
+          wget https://raw.githubusercontent.com/bcserv/smlib/transitional_syntax/scripting/include/smlib.inc -P $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/KyleSanderson/SteamWorks/master/Pawn/includes/SteamWorks.inc -P $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/JoinedSenses/SourceMod-IncludeLibrary/master/include/smjansson.inc -P $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/addons/sourcemod/scripting/include/colorlib.inc -P $INCLUDE_PATH
+          wget https://github.com/Impact123/AutoExecConfig/raw/development/autoexecconfig.inc -P $INCLUDE_PATH
+          
+          git clone -b transitional_syntax https://github.com/bcserv/smlib.git
+          mv smlib/scripting/include/* $INCLUDE_PATH
+
+          git clone https://github.com/Deathknife/sourcemod-discord.git
+          mv sourcemod-discord/include/* $INCLUDE_PATH
+      
+      - name: Add dhooks include
+        run: | 
+          mkdir temp && cd temp
+          curl -s "https://forums.alliedmods.net/attachment.php?attachmentid=181953&d=1591738802" -o dhooks.zip
+          unzip dhooks.zip
+          cp addons/sourcemod/scripting/include/dhooks.inc $INCLUDE_PATH/dhooks.inc
+
+      - name: Set up python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.x'
+        
+      - name: Install python dependencies
+        run: python3 -m pip install --upgrade pip setuptools wheel
+        
+      - name: Download colorlib-gen
+        run: git clone https://github.com/c0rp3n/colorlib-gen.git $TOOLS_PATH/gen
+        
+      - name: Install colorlib-gen
+        run: |
+          cd $TOOLS_PATH/gen/
+          pip install -r ./requirements.txt
+          python3 ./setup.py install
+      - name: Generate colorlib_map.inc
+        run: colorlib_gen -re --config "$TOOLS_PATH/colors.yaml" "$INCLUDE_PATH/colorlib_map.inc"
+
+      - name: Compile plugin
+        run: |
+          echo -e "\nCompiling SurfTimer.sp..."
+          spcomp -w234 -O2 -v2 -i $INCLUDE_PATH SurfTimer.sp
+        working-directory: ${{ env.SCRIPTS_PATH }}/
+
+      - name: Move compiled plugins
+        run: |
+          rm -rf $PLUGINS_PATH
+          rsync -av --include='*/' --include="*.smx" --exclude="*" --prune-empty-dirs --remove-source-files $SCRIPTS_PATH/ $PLUGINS_PATH/
+
+      - name: Move folders (addons, materials, models, particles, scripts, sound) to build
+        run: |
+          mkdir build
+          mv ./{addons,cfg,maps,scripts,sound} build/
+
+      - name: Add LICENSE to build package
+        run: |
+          mv $GITHUB_WORKSPACE/{LICENSE,CHANGELOG.md} .
+        working-directory: ./build
+
+      - name: Remove unnecessary files and folders from build
+        run: |
+          rm -rf addons/sourcemod/scripting
+          rm -rf addons/sourcemod/configs/{*.cfg,*.ini}
+        working-directory: ./build
+
+      - name: Download SteamWorks and DHooks
+        run: |
+          wget http://users.alliedmods.net/~kyles/builds/SteamWorks/SteamWorks-git132-linux.tar.gz -O steamworks_linux.tar.gz
+          wget http://users.alliedmods.net/~kyles/builds/SteamWorks/SteamWorks-git132-windows.zip -O steamworks_windows.zip
+          curl -s "https://forums.alliedmods.net/attachment.php?attachmentid=180932&d=1587473886" -o dhooks.zip
+          curl -s "https://forums.alliedmods.net/attachment.php?attachmentid=133799&d=1400973546" -o smjansson.zip
+
+      - name: Unpacking SteamWorks, DHooks and SMJansson
+        run: |
+          tar xfv steamworks_linux.tar.gz
+          unzip -o steamworks_windows.zip
+          unzip dhooks.zip
+          unzip smjansson.zip
+      
+      - name: Move SteamWorks, DHooks and SMJansson files
+        run: |
+          mkdir -p build/addons/sourcemod/extensions/
+          cp addons/sourcemod/extensions/SteamWorks.ext.so build/addons/sourcemod/extensions/
+          cp addons/sourcemod/extensions/SteamWorks.ext.dll build/addons/sourcemod/extensions/
+          cp addons/sourcemod/extensions/dhooks.ext.so build/addons/sourcemod/extensions/
+          cp addons/sourcemod/extensions/dhooks.ext.dll build/addons/sourcemod/extensions/
+          cp smjansson.ext.so build/addons/sourcemod/extensions/
+          cp smjansson.ext.dll build/addons/sourcemod/extensions/
+      
+      - name: Compress release package
+        run: 7z a -r -p$GITHUB_SHA -mx=9 -mhe -t7z SurfTimer.zip *
+        working-directory: ./build
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }
+          asset_path: ./build/SurfTimer.zip
+          asset_name: SurfTimer.zip
+          asset_content_type: application/zip

@@ -1,0 +1,85 @@
+name: Compile with SourceMod
+
+on:
+  push:
+    branches-ignore:
+      - master
+  pull_request:
+    branches-ignore:
+      - master    
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sm_version: [ "1.10", "1.11" ]
+
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set environment variables
+        run: |
+          TOOLS_PATH=$GITHUB_WORKSPACE/tools
+          echo ::set-env name=TOOLS_PATH::$TOOLS_PATH
+          SOURCEMOD_PATH=$GITHUB_WORKSPACE/addons/sourcemod
+          echo ::set-env name=SOURCEMOD_PATH::$SOURCEMOD_PATH
+          echo ::set-env name=SCRIPTS_PATH::$SOURCEMOD_PATH/scripting
+          echo ::set-env name=INCLUDE_PATH::$SOURCEMOD_PATH/scripting/include
+
+      - name: Setup SourcePawn Compiler ${{ matrix.SM_VERSION }}
+        uses: rumblefrog/setup-sp@master
+        with:
+          version: ${{ matrix.SM_VERSION }}
+
+      - name: Create dependency directories
+        run: mkdir $INCLUDE_PATH/smlib
+
+      - name: Fetch plugin dependencies
+        run: |
+          wget https://raw.githubusercontent.com/bcserv/smlib/transitional_syntax/scripting/include/smlib.inc -P $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/KyleSanderson/SteamWorks/master/Pawn/includes/SteamWorks.inc -P $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/JoinedSenses/SourceMod-IncludeLibrary/master/include/smjansson.inc -P $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/addons/sourcemod/scripting/include/colorlib.inc -P $INCLUDE_PATH
+          wget https://github.com/Impact123/AutoExecConfig/raw/development/autoexecconfig.inc -P $INCLUDE_PATH
+          
+          git clone -b transitional_syntax https://github.com/bcserv/smlib.git
+          mv smlib/scripting/include/* $INCLUDE_PATH
+
+          git clone https://github.com/Deathknife/sourcemod-discord.git
+          mv sourcemod-discord/include/* $INCLUDE_PATH
+      
+      - name: Add dhooks include
+        run: | 
+          mkdir temp && cd temp
+          curl -s "https://forums.alliedmods.net/attachment.php?attachmentid=181953&d=1591738802" -o dhooks.zip
+          unzip dhooks.zip
+          cp addons/sourcemod/scripting/include/dhooks.inc $INCLUDE_PATH/dhooks.inc
+      
+      - name: Set up python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.x'
+        
+      - name: Install python dependencies
+        run: python3 -m pip install --upgrade pip setuptools wheel
+        
+      - name: Download colorlib-gen
+        run: git clone https://github.com/c0rp3n/colorlib-gen.git $TOOLS_PATH/gen
+        
+      - name: Install colorlib-gen
+        run: |
+          cd $TOOLS_PATH/gen/
+          pip install -r ./requirements.txt
+          python3 ./setup.py install
+
+      - name: Generate colorlib_map.inc
+        run: colorlib_gen -re --config "$TOOLS_PATH/colors.yaml" "$INCLUDE_PATH/colorlib_map.inc"
+
+      - name: Compile plugin
+        run: |
+          echo -e "\nCompiling SurfTimer.sp..."
+          spcomp -w234 -O2 -v2 -i $INCLUDE_PATH SurfTimer.sp
+        working-directory: ${{ env.SCRIPTS_PATH }}/

@@ -1,0 +1,39 @@
+colors:
+  default:      engine 1
+  prefix:       green
+  reply2cmd:    engine 1
+  showactivity: engine 1
+  error:        red
+  highlight:    orange
+  player:       yellow
+  settings:     darkred
+  command:      darkred
+  team 0:       0x08
+  team 1:       0x09
+  team 2:       0x11
+  teamcolor:    0x03
+  gray:         grey
+  gray2:        grey2
+  bluegray:     bluegrey
+  steelblue:    grey2
+  pink:         orchid
+  lightblue:    bluegrey
+  olive:        lightgreen
+ref_colors:
+  red:          0x07
+  lightred:     0x0F
+  darkred:      0x02
+  bluegrey:     0x0A
+  blue:         0x0B
+  darkblue:     0x0C
+  purple:       0x03
+  orchid:       0x0E
+  orange:       0x10
+  yellow:       0x09
+  gold:         0x10
+  lightgreen:   0x05
+  green:        0x04
+  lime:         0x06
+  grey:         0x08
+  grey2:        0x0D
+

@@ -75,7 +75,7 @@ public Action Event_OnFire(Handle event, const char[] name, bool dontBroadcast)
 public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-	if (client != 0)
+	if (IsValidClient(client))
 	{
 		g_SpecTarget[client] = -1;
 		g_bPause[client] = false;
@@ -110,7 +110,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		}
 
 		// Strip Weapons
-		if ((GetClientTeam(client) > 1) && IsValidClient(client))
+		if ((GetClientTeam(client) > 1))
 		{
 			StripAllWeapons(client);
 			if (!IsFakeClient(client))
@@ -152,6 +152,8 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 			return Plugin_Continue;
 		}
 
+		SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
+
 		// Change Player Skin
 		if (GetConVarBool(g_hPlayerSkinChange) && (GetClientTeam(client) > 1))
 		{
@@ -159,7 +161,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 
 			GetConVarString(g_hPlayerModel, szBuffer, 256);
 			SetEntityModel(client, szBuffer);
-			CreateTimer(1.0, SetArmsModel, client, TIMER_FLAG_NO_MAPCHANGE);
+			CreateTimer(1.0, SetArmsModel, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 		}
 
 		// 1st Spawn & T/CT
@@ -175,12 +177,12 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 
 
 			StartRecording(client);
-			CreateTimer(1.5, CenterMsgTimer, client, TIMER_FLAG_NO_MAPCHANGE);
+			CreateTimer(1.5, CenterMsgTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 
 			if (g_bCenterSpeedDisplay[client])
 			{
 				SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
-				CreateTimer(0.1, CenterSpeedDisplayTimer, client, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
+				CreateTimer(0.1, CenterSpeedDisplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
 			}
 
 			g_bFirstSpawn[client] = false;
@@ -231,10 +233,10 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		}
 
 		// Hide Radar
-		CreateTimer(0.0, HideHud, client, TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(0.0, HideHud, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 
 		// Set Clantag
-		CreateTimer(1.5, SetClanTag, client, TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(1.5, SetClanTag, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 
 		// Set Speclist
 		Format(g_szPlayerPanelText[client], 512, "");
@@ -375,23 +377,27 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					{
 						case 0:
 						{
-							FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_playertimes", g_EditingMap[client], g_SelectedStyle[client], "", "runtimepro");
+							FormatEx(szQuery, sizeof(szQuery), sql_MainEditQuery, "runtimepro", "ck_playertimes", g_EditingMap[client], g_SelectedStyle[client], "", "runtimepro");
 						}
 						case 1:
 						{
 							char stageQuery[32];
-							FormatEx(stageQuery, 32, "AND stage='%i' ", g_SelectedType[client]);
-							FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_wrcps", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtimepro");
+							FormatEx(stageQuery, sizeof(stageQuery), "AND stage='%i' ", g_SelectedType[client]);
+							FormatEx(szQuery, sizeof(szQuery), sql_MainEditQuery, "runtimepro", "ck_wrcps", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtimepro");
 						}
 						case 2:
 						{
 							char stageQuery[32];
-							FormatEx(stageQuery, 32, "AND zonegroup='%i' ", g_SelectedType[client]);
-							FormatEx(szQuery, 512, sql_MainEditQuery, "runtime", "ck_bonus", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtime");
+							FormatEx(stageQuery, sizeof(stageQuery), "AND zonegroup='%i' ", g_SelectedType[client]);
+							FormatEx(szQuery, sizeof(szQuery), sql_MainEditQuery, "runtime", "ck_bonus", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtime");
 						}
 					}
 
-					SQL_TQuery(g_hDb, sql_DeleteMenuView, szQuery, GetClientSerial(client));
+					if (g_cLogQueries.BoolValue)
+					{
+						LogToFile(g_szQueryFile, "Say_Hook - szQuery: %s", szQuery);
+					}
+					g_dDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client));
 				}
 			}
 
@@ -459,13 +465,18 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		else
 		{
 			char szChatRank[1024];
-			Format(szChatRank, 1024, "%s", g_pr_chat_coloredrank[client]);
-			char szChatRankColor[1024];
-			Format(szChatRankColor, 1024, "%s", g_pr_chat_coloredrank[client]);
-			CGetRankColor(szChatRankColor, 1024);
 
-			if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
-				Format(szName, sizeof(szName), "{%s}%s", szChatRankColor, szName);
+			if(g_iEnforceTitleType[client] == 2 || g_iEnforceTitleType[client] == 0)
+			{
+				Format(szChatRank, sizeof(szChatRank), "%s", g_pr_chat_coloredrank[client]);
+
+				char szChatRankColor[1024];
+				Format(szChatRankColor, sizeof(szChatRankColor), "%s", g_pr_chat_coloredrank[client]);
+				CGetRankColor(szChatRankColor, sizeof(szChatRankColor));
+
+				if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
+					Format(szName, sizeof(szName), "{%s}%s", szChatRankColor, szName);
+			}
 
 			if (GetConVarBool(g_hCountry) && (GetConVarBool(g_hPointSystem)))
 			{
@@ -493,12 +504,11 @@ public Action Say_Hook(int client, const char[] command, int argc)
 
 public void CGetRankColor(char[] sMsg, int iSize) // edit from CProcessVariables - colorvars
 {
-	if (!Init()) {
-		return;
-	}
-
-	char[] sOut = new char[iSize]; char[] sCode = new char[iSize]; char[] sColor = new char[iSize];
-	int iOutPos = 0; int iCodePos = -1;
+	char[] sOut = new char[iSize];
+	char[] sCode = new char[iSize];
+	char[] sColor = new char[iSize];
+	int iOutPos = 0;
+	int iCodePos = -1;
 	int iMsgLen = strlen(sMsg);
 	int dev = 0;
 
@@ -516,7 +526,9 @@ public void CGetRankColor(char[] sMsg, int iSize) // edit from CProcessVariables
 				String_ToLower(sCode, sCode, iSize);
 
 				if (CGetColor(sCode, sColor, iSize)) {
-					if(dev == 1) break;
+					if(dev == 1) {
+						break;
+					}
 					dev++;
 				} else {
 					Format(sOut, iSize, "%s{%s}", sOut, sCode);
@@ -573,15 +585,19 @@ public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontB
 	{
 		char szName[64];
 		char disconnectReason[64];
-		int clientid = GetEventInt(event, "userid");
-		int client = GetClientOfUserId(clientid);
-		if (!IsValidClient(client) || IsFakeClient(client))
+		int client = GetClientOfUserId(GetEventInt(event, "userid"));
+
+		if (!IsValidClient(client) || IsFakeClient(client)) {
 			return Plugin_Handled;
+		}
+		
 		GetEventString(event, "name", szName, sizeof(szName));
 		GetEventString(event, "reason", disconnectReason, sizeof(disconnectReason));
-		for (int i = 1; i <= MaxClients; i++)
-			if (IsValidClient(i) && i != client && !IsFakeClient(i))
+		for (int i = 1; i <= MaxClients; i++) {
+			if (IsValidClient(i) && i != client && !IsFakeClient(i)) {
 				CPrintToChat(i, "%t", "Disconnected1", szName, disconnectReason);
+			}
+		}
 		return Plugin_Handled;
 	}
 	else
@@ -593,27 +609,32 @@ public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontB
 
 public Action Hook_SetTransmit(int entity, int client)
 {
-	if (client != entity && (0 < entity <= MaxClients) && IsValidClient(client))
+	if (client != entity && IsValidClient(client))
 	{
-		if (g_bHide[client] && entity != g_SpecTarget[client])
+		if (g_bHide[client] && entity != g_SpecTarget[client]) {
 			return Plugin_Handled;
-		else
-			if (entity == g_InfoBot && entity != g_SpecTarget[client])
+		}
+		else {
+			if (entity == g_InfoBot && entity != g_SpecTarget[client]) {
 				return Plugin_Handled;
+			}
+		}
 	}
 	return Plugin_Continue;
 }
 
 public Action Event_OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
 {
-	int client = GetEventInt(event, "userid");
+	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if (IsValidClient(client))
 	{
+		SDKUnhook(client, SDKHook_SetTransmit, Hook_SetTransmit);
+		
 		if (!IsFakeClient(client))
 		{
 			if (g_hRecording[client] != null)
 				StopRecording(client);
-			CreateTimer(2.0, RemoveRagdoll, client);
+			CreateTimer(2.0, RemoveRagdoll, GetClientUserId(client));
 		}
 		else
 			if (g_hBotMimicsRecord[client] != null)
@@ -646,9 +667,7 @@ public Action Event_OnRoundEnd(Handle event, const char[] name, bool dontBroadca
 
 public void OnPlayerThink(int entity)
 {
-	if (IsValidClient(entity) && !IsFakeClient(entity))
-		LimitSpeedNew(entity);
-
+	LimitSpeedNew(entity);
 	SetEntPropEnt(entity, Prop_Send, "m_bSpotted", 0);
 }
 
@@ -1192,7 +1211,52 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		g_LastButton[client] = buttons;
 
 		BeamBox_OnPlayerRunCmd(client);
+
+		// Do not record frames where the player was afk in start zone
+		if (!IsFakeClient(client)) 
+		{
+			float vVelocity[3];
+			GetEntPropVector(client, Prop_Data, "m_vecVelocity", vVelocity);
+			float velocity = GetVectorLength(vVelocity);
+			
+			// Player is afk, stop recording if recording
+			if (velocity == 0.0)
+			{
+				if (g_iClientInZone[client][0] == 1 || g_iClientInZone[client][0] == 5)
+				{
+					// Check if the replay is recording
+					if (g_hRecording[client] != null) 
+						StopRecording(client);
+					
+					if (g_StageRecStartFrame[client] != -1)
+						g_StageRecStartFrame[client] = -1;
+				}
+				else if (g_iClientInZone[client][0] == 3)
+				{
+					if (g_StageRecStartFrame[client] != -1)
+						g_StageRecStartFrame[client] = -1;
+				}
+			}
+			else
+			{
+				if (g_iClientInZone[client][0] == 1 || g_iClientInZone[client][0] == 5)
+				{
+					if (g_hRecording[client] == null)
+						StartRecording(client);
+
+					if (g_StageRecStartFrame[client] == -1)
+						Stage_StartRecording(client);
+				}
+				else if (g_iClientInZone[client][0] == 3)
+				{
+					if (g_StageRecStartFrame[client] == -1)
+						Stage_StartRecording(client);
+				}
+			}
+		}
 	}
+	
+
 
 	// Strafe Sync taken from shavit's bhop timer
 	g_fAngleCache[client] = angles[1];
@@ -1294,11 +1358,11 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 		{
 			if (!g_bJumpZoneTimer[client])
 			{
-				CreateTimer(1.0, StartJumpZonePrintTimer, client);
+				CreateTimer(1.0, StartJumpZonePrintTimer, GetClientUserId(client));
 				CPrintToChat(client, "%t", "Hooks10", g_szChatPrefix);
 				Handle pack;
 				CreateDataTimer(0.05, DelayedVelocityCap, pack);
-				WritePackCell(pack, client);
+				WritePackCell(pack, GetClientUserId(client));
 				WritePackFloat(pack, 0.0);
 				g_bJumpZoneTimer[client] = true;
 			}
@@ -1359,7 +1423,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 						g_bJumpedInZone[client] = true;
 						g_bResetOneJump[client] = true;
 						g_fJumpedInZoneTime[client] = GetGameTime();
-						CreateTimer(1.0, ResetOneJump, client, TIMER_FLAG_NO_MAPCHANGE);
+						CreateTimer(1.0, ResetOneJump, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 					}
 					else
 					{
@@ -1367,12 +1431,12 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 						float time = GetGameTime();
 						float time2 = time - g_fJumpedInZoneTime[client];
 						g_bJumpedInZone[client] = false;
-						if (time2 <= 0.9)
+						if (time2 <= 0.9 && !(g_iCurrentStyle[client] == 7))
 						{
 							CPrintToChat(client, "%t", "Hooks15", g_szChatPrefix);
 							Handle pack;
 							CreateDataTimer(0.05, DelayedVelocityCap, pack);
-							WritePackCell(pack, client);
+							WritePackCell(pack, GetClientUserId(client));
 							WritePackFloat(pack, 0.0);
 						}
 					}
@@ -1384,34 +1448,43 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 	return Plugin_Continue;
 }
 
-public Action ResetOneJump(Handle timer, any client)
+public Action ResetOneJump(Handle timer, any userid)
 {
-	if (g_bResetOneJump[client])
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
 	{
-		g_bJumpedInZone[client] = false;
-		g_bResetOneJump[client] = false;
+		if (g_bResetOneJump[client])
+		{
+			g_bJumpedInZone[client] = false;
+			g_bResetOneJump[client] = false;
+		}
 	}
 }
 
 public Action DelayedVelocityCap(Handle timer, Handle pack)
 {
 	ResetPack(pack);
-	int client = ReadPackCell(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
 	float speedCap = ReadPackFloat(pack);
-	float CurVelVec[3];
+	
+	if (IsValidClient(client))
+	{
+		float CurVelVec[3];
 
-	GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
+		GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
 
-	if (CurVelVec[0] == 0.0)
-		CurVelVec[0] = 1.0;
-	if (CurVelVec[1] == 0.0)
-		CurVelVec[1] = 1.0;
-	if (CurVelVec[2] == 0.0)
-		CurVelVec[2] = 1.0;
+		if (CurVelVec[0] == 0.0)
+			CurVelVec[0] = 1.0;
+		if (CurVelVec[1] == 0.0)
+			CurVelVec[1] = 1.0;
+		if (CurVelVec[2] == 0.0)
+			CurVelVec[2] = 1.0;
 
-	NormalizeVector(CurVelVec, CurVelVec);
-	ScaleVector(CurVelVec, speedCap);
-	TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
+		NormalizeVector(CurVelVec, CurVelVec);
+		ScaleVector(CurVelVec, speedCap);
+		TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
+	}
 }
 
 public Action Hook_SetTriggerTransmit(int entity, int client)

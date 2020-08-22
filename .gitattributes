@@ -1,0 +1,3 @@
+# SourcePawn linguist file
+*.sp linguist-language=SourcePawn
+*.inc linguist-language=SourcePawn

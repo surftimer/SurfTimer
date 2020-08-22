@@ -22,7 +22,7 @@ public void CreateZoneEntity(int zoneIndex)
 		{
 			iEnt = GetArrayCell(g_hTriggerMultiple, i);
 
-			if (IsValidEntity(iEnt))
+			if (IsValidEntity(iEnt) && HasEntProp(iEnt, Prop_Send, "m_iName"))
 			{
 				char szTriggerName[128];
 				GetEntPropString(iEnt, Prop_Send, "m_iName", szTriggerName, 128, 0);
@@ -419,7 +419,7 @@ public void StartTouch(int client, int action[3])
 						g_bIsValidRun[client] = true;
 
 					if (g_iCurrentStyle[client] == 0)
-						Checkpoint(client, action[1], g_iClientInZone[client][2], time);
+						Checkpoint(client, action[1], g_iClientInZone[client][2], time, GetAllSpeedTypes(client));
 
 					lastCheckpoint[g_iClientInZone[client][2]][client] = action[1];
 				}
@@ -448,7 +448,7 @@ public void StartTouch(int client, int action[3])
 				if (g_iCurrentStyle[client] == 0)
 				{
 					float time = g_fCurrentRunTime[client];
-					Checkpoint(client, action[1], g_iClientInZone[client][2], time);
+					Checkpoint(client, action[1], g_iClientInZone[client][2], time, GetAllSpeedTypes(client));
 					lastCheckpoint[g_iClientInZone[client][2]][client] = action[1];
 				}
 			}
@@ -545,6 +545,38 @@ public void EndTouch(int client, int action[3])
 		// fluffys
 		else if (action[0] == 3) // fluffys stage
 		{
+			float fVelocity[3];
+			GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+			int zoneGrp = action[2];
+			int zone = action[1];
+			// int mode = g_SpeedMode[client];
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][0] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0))); // XY
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][1] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0))); // XYZ
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][2] = RoundToNearest(fVelocity[2]); // Z
+			
+			// int idiff, speedMode = g_SpeedMode[client];
+			int idiff, speedMode;
+
+			if (g_mapZones[zone].PreSpeed > 250.0)
+				speedMode = 0;
+			else
+				speedMode = 1;
+				
+			if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
+				idiff = g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode];
+			else if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] > g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode])
+				idiff = (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] - g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode]);
+			else
+				idiff = (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] - g_iCheckpointVelsStartServerRecord[0][zone][speedMode]);
+			
+			if (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] > g_iCheckpointVelsStartServerRecord[0][zone][speedMode] || g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
+				Format(g_szLastSpeedDifference[client], 128, "(WR +%d)", idiff);
+			else
+				Format(g_szLastSpeedDifference[client], 128, "(WR -%d)", idiff);
+
+
+			g_fLastDifferenceSpeed[client] = GetGameTime();
+			
 			// targetname filters
 			if (StrEqual(g_szMapName, "surf_treespam") && g_Stage[g_iClientInZone[client][2]][client] == 4)
 			{
@@ -567,6 +599,40 @@ public void EndTouch(int client, int action[3])
 			if (!g_bPracticeMode[client] && g_bTimerEnabled[client])
 				CL_OnStartWrcpTimerPress(client);
 
+		}
+		else if (action[0] == 4) // stage & cp
+		{
+			// If velocity
+			float fVelocity[3];
+			GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+			int zoneGrp = action[2];
+			int zone = g_iClientInZone[client][1];
+			// int mode = g_SpeedMode[client];
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][0] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0))); // XY
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][1] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0))); // XYZ
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][2] = RoundToNearest(fVelocity[2]); // Z
+
+			// int idiff, speedMode = g_SpeedMode[client];
+			int idiff, speedMode = 0;
+
+			if (g_mapZones[zone].PreSpeed > 250.0)
+				speedMode = 0;
+			else
+				speedMode = 1;
+				
+			if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
+				idiff = g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode];
+			else if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] > g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode])
+				idiff = (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] - g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode]);
+			else
+				idiff = (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] - g_iCheckpointVelsStartServerRecord[0][zone][speedMode]);
+			
+			if (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] > g_iCheckpointVelsStartServerRecord[0][zone][speedMode] || g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
+				Format(g_szLastSpeedDifference[client], 128, "(WR +%d)", idiff);
+			else
+				Format(g_szLastSpeedDifference[client], 128, "(WR -%d)", idiff);
+			
+			g_fLastDifferenceSpeed[client] = GetGameTime();
 		}
 		else if (action[0] == 9) // fluffys nojump
 		{
@@ -636,11 +702,13 @@ public void DrawBeamBox(int client)
 	int zColor[4];
 	getZoneTeamColor(g_CurrentZoneTeam[client], zColor);
 	TE_SendBeamBoxToClient(client, g_Positions[client][1], g_Positions[client][0], g_BeamSprite, g_HaloSprite, 0, 30, 1.0, 1.0, 1.0, 2, 0.0, zColor, 0, 1);
-	CreateTimer(1.0, BeamBox, client, TIMER_REPEAT);
+	CreateTimer(1.0, BeamBox, GetClientUserId(client), TIMER_REPEAT);
 }
 
-public Action BeamBox(Handle timer, any client)
+public Action BeamBox(Handle timer, any userid)
 {
+	int client = GetClientOfUserId(userid);
+
 	if (IsClientInGame(client))
 	{
 		if (g_Editing[client] == 2)
@@ -1607,7 +1675,7 @@ public int Handle_ZoneSettingMenu(Handle tMenu, MenuAction action, int client, i
 						SetConVarInt(g_hZonesToDisplay, 1);
 				}
 			}
-			CreateTimer(0.1, RefreshZoneSettings, client, TIMER_FLAG_NO_MAPCHANGE);
+			CreateTimer(0.1, RefreshZoneSettings, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 		}
 		case MenuAction_Cancel:
 		{
@@ -2378,7 +2446,7 @@ stock void RemoveZones()
 			 && IsValidEdict(i)
 			 && GetEdictClassname(i, sClassName, sizeof(sClassName))
 			 && StrContains(sClassName, "trigger_multiple") != -1
-			 && GetEntPropString(i, Prop_Data, "m_iName", sClassName, sizeof(sClassName))
+			 && (HasEntProp(i, Prop_Send, "m_iName") && GetEntPropString(i, Prop_Data, "m_iName", sClassName, sizeof(sClassName)))
 			 && StrContains(sClassName, "sm_ckZone") != -1)
 		{
 			// Don't destroy hooked zone entities
