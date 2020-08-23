@@ -5,9 +5,6 @@
 #include <cstrike>
 #include <surftimer>
 
-EngineVersion g_Game;
-
-
 Handle g_hEntity;
 Handle g_hTMEntity;
 
@@ -22,8 +19,8 @@ public Plugin myinfo =
 
 public void OnPluginStart()
 {
-	g_Game = GetEngineVersion();
-	if(g_Game != Engine_CSGO && g_Game != Engine_CSS)
+	EngineVersion eGame = GetEngineVersion();
+	if(eGame != Engine_CSGO && eGame != Engine_CSS)
 	{
 		SetFailState("[Surf Timer][TDF] This plugin is for CSGO/CSS only.");	
 	}
@@ -57,11 +54,8 @@ public void OnMapStart()
 
 public void OnMapEnd()
 {
-	if (g_hEntity != null)
-		g_hEntity.Close();
-	
-	g_hEntity = null;
 	delete g_hEntity;
+	delete g_hTMEntity;
 }
 
 
@@ -100,6 +94,8 @@ public int TD_MenuHandler(Menu menu, MenuAction action, int param1, int param2)
 		GetEntPropVector(entity, Prop_Send, "m_vecOrigin", position);
 
 		surftimer_SafeTeleport(param1, position, NULL_VECTOR, NULL_VECTOR, true);
+	} else if (action == MenuAction_End) {
+		delete menu;
 	}
 }
 
@@ -136,5 +132,7 @@ public int TM_MenuHandler(Menu menu, MenuAction action, int param1, int param2)
 		GetEntPropVector(entity, Prop_Send, "m_vecOrigin", position);
 
 		surftimer_SafeTeleport(param1, position, NULL_VECTOR, NULL_VECTOR, true);
+	} else if (action == MenuAction_End) {
+		delete menu;
 	}
 }
