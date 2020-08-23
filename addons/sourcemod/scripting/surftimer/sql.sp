@@ -686,7 +686,7 @@ public void sql_CalcuatePlayerRankCallback(Database db, DBResultSet results, con
 
 		// Next up, calculate bonus points:
 		char szQuery[512];
-		Format(szQuery, sizeof(szQuery), "SELECT mapname, (SELECT count(1)+1 FROM ck_bonus b WHERE a.mapname=b.mapname AND a.runtime > b.runtime AND a.zonegroup = b.zonegroup AND b.style = %i) AS `rank`, (SELECT count(1) FROM ck_bonus b WHERE a.mapname = b.mapname AND a.zonegroup = b.zonegroup AND b.style = %i) as total FROM ck_bonus a WHERE steamid = '%s' AND style = %i;", style, style, g_pr_szSteamID[client], style);
+		Format(szQuery, sizeof(szQuery), "SELECT mapname, (SELECT count(1)+1 FROM ck_bonus b WHERE a.mapname=b.mapname AND a.runtime > b.runtime AND a.zonegroup = b.zonegroup AND b.style = %i) AS `rank`, (SELECT count(1) FROM ck_bonus b WHERE a.mapname = b.mapname AND a.zonegroup = b.zonegroup AND b.style = %i) as total FROM ck_bonus a WHERE steamid = '%s' AND style = %i;", style, style, IsValidClient(client) ? g_szSteamID[client] : g_pr_szSteamID[client], style);
 		if (g_cLogQueries.BoolValue)
 		{
 			LogToFile(g_szQueryFile, "sql_CalcuatePlayerRankCallback - szQuery: %s", szQuery);
@@ -894,7 +894,7 @@ public void sql_CountFinishedBonusCallback(Database db, DBResultSet results, con
 	g_WRs[client][style][1] = wrbs;
 	// Next up: Points from stages
 	char szQuery[512];
-	Format(szQuery, sizeof(szQuery), "SELECT mapname, stage, (select count(1)+1 from ck_wrcps b where a.mapname=b.mapname and a.runtimepro > b.runtimepro and a.style = b.style and a.stage = b.stage) AS `rank` FROM ck_wrcps a where steamid = '%s' AND style = %i;", g_pr_szSteamID[client], style);
+	Format(szQuery, sizeof(szQuery), "SELECT mapname, stage, (select count(1)+1 from ck_wrcps b where a.mapname=b.mapname and a.runtimepro > b.runtimepro and a.style = b.style and a.stage = b.stage) AS `rank` FROM ck_wrcps a where steamid = '%s' AND style = %i;", IsValidClient(client) ? g_szSteamID[client] : g_pr_szSteamID[client], style);
 	if (g_cLogQueries.BoolValue)
 	{
 		LogToFile(g_szQueryFile, "sql_CountFinishedBonusCallback - szQuery: %s", szQuery);
@@ -960,7 +960,7 @@ public void sql_CountFinishedStagesCallback(Database db, DBResultSet results, co
 
 	// Next up: Points from maps
 	char szQuery[512];
-	Format(szQuery, sizeof(szQuery), "SELECT mapname, (select count(1)+1 from ck_playertimes b where a.mapname=b.mapname and a.runtimepro > b.runtimepro AND b.style = %i) AS `rank`, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname AND b.style = %i) as total, (SELECT tier FROM `ck_maptier` b WHERE a.mapname = b.mapname) as tier FROM ck_playertimes a where steamid = '%s' AND style = %i;", style, style, g_pr_szSteamID[client], style);
+	Format(szQuery, sizeof(szQuery), "SELECT mapname, (select count(1)+1 from ck_playertimes b where a.mapname=b.mapname and a.runtimepro > b.runtimepro AND b.style = %i) AS `rank`, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname AND b.style = %i) as total, (SELECT tier FROM `ck_maptier` b WHERE a.mapname = b.mapname) as tier FROM ck_playertimes a where steamid = '%s' AND style = %i;", style, style, IsValidClient(client) ? g_szSteamID[client] : g_pr_szSteamID[client], style);
 	if (g_cLogQueries.BoolValue)
 	{
 		LogToFile(g_szQueryFile, "sql_CountFinishedStagesCallback - szQuery: %s", szQuery);
