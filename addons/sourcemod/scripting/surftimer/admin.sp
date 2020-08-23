@@ -637,7 +637,7 @@ public Action Admin_ResetRecords(int client, int args)
 {
 	if (args < 1)
 	{
-		ReplyToCommand(client, "[CK] Usage: sm_resetplayertimes <steamid>");
+		ReplyToCommand(client, "%s Usage: sm_resetplayertimes <steamid>", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 	else
