@@ -10912,8 +10912,8 @@ public void SQLTxn_WipePlayerSuccess(Handle db, DataPack pack, int numQueries, H
 
 	if (IsValidClient(client))
 	{
-		PrintToChat(client, "Player %s has been wiped!");
-		PrintToConsole(client, "Player %s has been wiped!");
+		PrintToChat(client, "Player %s has been wiped!", szSteamID);
+		PrintToConsole(client, "Player %s has been wiped!", szSteamID);
 	}
 
 	char sBuffer[32];
