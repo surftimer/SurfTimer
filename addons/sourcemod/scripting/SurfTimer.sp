@@ -1926,6 +1926,8 @@ public void OnClientPostAdminCheck(int client)
 		return;
 	}
 
+	strcopy(g_pr_szSteamID[client], sizeof(g_pr_szSteamID[]), g_szSteamID[client]);
+
 	// char fix
 	FixPlayerName(client);
 

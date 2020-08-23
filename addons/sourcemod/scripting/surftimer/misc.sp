@@ -91,6 +91,8 @@ public void LoadClientSetting(int client, int setting)
 				LogError("[SurfTimer] (LoadClientSetting) GetClientAuthId failed for client index %d.", client);
 				return;
 			}
+
+			strcopy(g_pr_szSteamID[client], sizeof(g_pr_szSteamID[]), g_szSteamID[client]);
 		}
 
 		switch (setting)
