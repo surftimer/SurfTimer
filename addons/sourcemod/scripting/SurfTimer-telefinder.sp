@@ -61,6 +61,7 @@ public void OnMapEnd()
 		g_hEntity.Close();
 	
 	g_hEntity = null;
+	delete g_hEntity;
 }
 
 
