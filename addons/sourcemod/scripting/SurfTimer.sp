@@ -1866,7 +1866,7 @@ public void OnClientPutInServer(int client)
 
 public void OnClientPostAdminCheck(int client)
 {
-	if (!IsValidClient(client))
+	if (client < 1)
 	{
 		return;
 	}
@@ -2008,10 +2008,7 @@ public void OnClientAuthorized(int client)
 
 public void OnClientDisconnect(int client)
 {
-	if (IsFakeClient(client))
-	{
-		delete g_hRecordingAdditionalTeleport[client];
-	}
+	delete g_hRecordingAdditionalTeleport[client];
 
 	db_savePlayTime(client);
 

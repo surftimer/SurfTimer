@@ -101,9 +101,6 @@ public void StartRecording(int client)
 
 public void StopRecording(int client)
 {
-	if (!IsValidClient(client) || g_hRecording[client] == null)
-		return;
-
 	delete g_hRecording[client];
 	delete g_hRecordingAdditionalTeleport[client];
 	g_hRecording[client] = null;
@@ -847,9 +844,6 @@ public void LoadWrcpReplay()
 
 public void StopPlayerMimic(int client)
 {
-	if (!IsValidClient(client))
-		return;
-
 	g_BotMimicTick[client] = 0;
 	g_CurrentAdditionalTeleportIndex[client] = 0;
 	g_BotMimicRecordTickCount[client] = 0;
