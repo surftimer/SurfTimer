@@ -7,15 +7,15 @@ public Action reloadRank(Handle timer, any userid)
 	return Plugin_Handled;
 }
 
-public Action AnnounceMap(Handle timer, any userid)
+public Action AnnounceMap(Handle timer, int userid)
 {
 	int client = GetClientOfUserId(userid);
 	
 	if (IsValidClient(client))
 	{
 		CPrintToChat(client, "%t", "Timer1", g_szChatPrefix, g_sTierString);
-		AnnounceTimer[client] = null;
 	}
+	
 	return Plugin_Handled;
 }
 

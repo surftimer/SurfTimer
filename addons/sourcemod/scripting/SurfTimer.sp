@@ -369,9 +369,6 @@ bool g_bTierEntryFound;
 // Tier data found in ZGrp
 bool g_bTierFound;
 
-// Tier announce timer
-Handle AnnounceTimer[MAXPLAYERS + 1];
-
 /*----------  Zone Variables  ----------*/
 
 // Ignore end zone end touch if teleporting from inside a zone
@@ -1945,7 +1942,7 @@ public void OnClientPostAdminCheck(int client)
 
 	if (g_bTierFound)
 	{
-		AnnounceTimer[client] = CreateTimer(20.0, AnnounceMap, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(20.0, AnnounceMap, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 	}
 
 	if (g_bServerDataLoaded && !g_bSettingsLoaded[client] && !g_bLoadingSettings[client])
