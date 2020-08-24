@@ -3567,7 +3567,7 @@ public void SQL_selectCheckpointsCallback(Database db, DBResultSet results, cons
 		if (GetConVarBool(g_hTeleToStartWhenSettingsLoaded))
 		{
 			Command_Restart(client, 1);
-			CreateTimer(0.1, RestartPlayer, GetClientUserId(client));
+			CreateTimer(0.1, RestartPlayer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 		}
 
 		// Seach for next client to load
@@ -5556,7 +5556,7 @@ public void db_viewUnfinishedMapsCallback(Database db, DBResultSet results, cons
 						Handle pack = CreateDataPack();
 						WritePackCell(pack, userid);
 						WritePackString(pack, consoleString);
-						CreateDataTimer(time, PrintUnfinishedLine, pack);
+						CreateDataTimer(time, PrintUnfinishedLine, pack, TIMER_FLAG_NO_MAPCHANGE);
 
 						mapUnfinished = false;
 						bonusUnfinished = false;

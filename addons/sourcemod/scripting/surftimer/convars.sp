@@ -8,7 +8,6 @@ ConVar g_hZonerFlag = null;
 ConVar g_hZoneDisplayType = null;								// How zones are displayed (lower edge, full)
 ConVar g_hZonesToDisplay = null;								// Which zones are displayed
 ConVar g_hChecker;												// Zone refresh rate
-Handle g_hZoneTimer = INVALID_HANDLE;
 // Zone Colors
 int g_iZoneColors[ZONEAMOUNT+2][4];								// ZONE COLOR TYPES: Stop(0), Start(1), End(2), BonusStart(3), BonusEnd(4), Stage(5),
 char g_szZoneColors[ZONEAMOUNT+2][24];							// Checkpoint(6), Speed(7), TeleToStart(8), Validator(9), Chekcer(10)

@@ -630,7 +630,7 @@ public Action Event_OnPlayerDeath(Handle event, const char[] name, bool dontBroa
 		{
 			if (g_hRecording[client] != null)
 				StopRecording(client);
-			CreateTimer(2.0, RemoveRagdoll, GetClientUserId(client));
+			CreateTimer(2.0, RemoveRagdoll, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 		}
 		else
 			if (g_hBotMimicsRecord[client] != null)
@@ -1340,10 +1340,10 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 		{
 			if (!g_bJumpZoneTimer[client])
 			{
-				CreateTimer(1.0, StartJumpZonePrintTimer, GetClientUserId(client));
+				CreateTimer(1.0, StartJumpZonePrintTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 				CPrintToChat(client, "%t", "Hooks10", g_szChatPrefix);
 				Handle pack;
-				CreateDataTimer(0.05, DelayedVelocityCap, pack);
+				CreateDataTimer(0.05, DelayedVelocityCap, pack, TIMER_FLAG_NO_MAPCHANGE);
 				WritePackCell(pack, GetClientUserId(client));
 				WritePackFloat(pack, 0.0);
 				g_bJumpZoneTimer[client] = true;
@@ -1417,7 +1417,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 						{
 							CPrintToChat(client, "%t", "Hooks15", g_szChatPrefix);
 							Handle pack;
-							CreateDataTimer(0.05, DelayedVelocityCap, pack);
+							CreateDataTimer(0.05, DelayedVelocityCap, pack, TIMER_FLAG_NO_MAPCHANGE);
 							WritePackCell(pack, GetClientUserId(client));
 							WritePackFloat(pack, 0.0);
 						}

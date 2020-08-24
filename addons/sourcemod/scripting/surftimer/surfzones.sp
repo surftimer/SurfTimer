@@ -684,7 +684,7 @@ public void DrawBeamBox(int client)
 	int zColor[4];
 	getZoneTeamColor(g_CurrentZoneTeam[client], zColor);
 	TE_SendBeamBoxToClient(client, g_Positions[client][1], g_Positions[client][0], g_BeamSprite, g_HaloSprite, 0, 30, 1.0, 1.0, 1.0, 2, 0.0, zColor, 0, 1);
-	CreateTimer(1.0, BeamBox, GetClientUserId(client), TIMER_REPEAT);
+	CreateTimer(1.0, BeamBox, GetClientUserId(client), TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action BeamBox(Handle timer, any userid)
