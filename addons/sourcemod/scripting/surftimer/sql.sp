@@ -10875,21 +10875,21 @@ public void db_WipePlayer(int client, char szSteamID[32])
 	char szQuery[256];
 
 	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_playertimes WHERE steamid = \"%s\";", szSteamID);
-	tTransaction.AddQuery(szQuery);
+	tTransaction.AddQuery(szQuery, 1);
 	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_bonus WHERE steamid = \"%s\";", szSteamID);
-	tTransaction.AddQuery(szQuery);
+	tTransaction.AddQuery(szQuery, 2);
 	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_checkpoints WHERE steamid = \"%s\";", szSteamID);
-	tTransaction.AddQuery(szQuery);
+	tTransaction.AddQuery(szQuery, 3);
 	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_playerrank WHERE steamid = \"%s\";", szSteamID);
-	tTransaction.AddQuery(szQuery);
+	tTransaction.AddQuery(szQuery, 4);
 	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_wrcps WHERE steamid = \"%s\";", szSteamID);
-	tTransaction.AddQuery(szQuery);
+	tTransaction.AddQuery(szQuery, 5);
 	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_playeroptions2 WHERE steamid = \"%s\";", szSteamID);
-	tTransaction.AddQuery(szQuery);
+	tTransaction.AddQuery(szQuery, 6);
 	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_latestrecords WHERE steamid = \"%s\";", szSteamID);
-	tTransaction.AddQuery(szQuery);
+	tTransaction.AddQuery(szQuery, 7);
 	Format(szQuery, sizeof(szQuery), "DELETE FROM ck_playertemp WHERE steamid = \"%s\";", szSteamID);
-	tTransaction.AddQuery(szQuery);
+	tTransaction.AddQuery(szQuery, 8);
 
 	DataPack pack = new DataPack();
 	pack.WriteCell(GetClientUserId(client));
@@ -10947,11 +10947,11 @@ public void SQLTxn_WipePlayerFailed(Handle db, DataPack pack, int numQueries, co
 	delete pack;
 
 
-	LogError("[SurfTimer] Wipe of player %s failed! Error (Query: %d): %s", queryData[failIndex], error);
+	LogError("[SurfTimer] Wipe of player %s failed! Error (Query: %d): %s", szSteamID, queryData[failIndex], error);
 
 	if (IsValidClient(client))
 	{
-		PrintToChat(client, "[SurfTimer] Wipe of player %s failed! Error (Query: %d): %s", queryData[failIndex], error);
-		PrintToConsole(client, "[SurfTimer] Wipe of player %s failed! Error (Query: %d): %s", queryData[failIndex], error);
+		PrintToChat(client, "[SurfTimer] Wipe of player %s failed! Error (Query: %d): %s", szSteamID, queryData[failIndex], error);
+		PrintToConsole(client, "[SurfTimer] Wipe of player %s failed! Error (Query: %d): %s", szSteamID, queryData[failIndex], error);
 	}
 }
