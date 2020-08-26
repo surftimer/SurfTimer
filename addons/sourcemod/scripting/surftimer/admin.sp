@@ -621,14 +621,34 @@ public Action Admin_RefreshProfile(int client, int args)
 	{
 		char szSteamID[128];
 		char szArg[128];
-		Format(szSteamID, 128, "");
+		Format(szSteamID, sizeof(szArg), "");
 		for (int i = 1; i < 6; i++)
 		{
-			GetCmdArg(i, szArg, 128);
+			GetCmdArg(i, szArg, sizeof(szArg));
 			if (!StrEqual(szArg, "", false))
-				Format(szSteamID, 128, "%s%s", szSteamID, szArg);
+				Format(szSteamID, sizeof(szArg), "%s%s", szSteamID, szArg);
 		}
 		RecalcPlayerRank(client, szSteamID);
+	}
+	return Plugin_Handled;
+}
+
+public Action Admin_ResetRecords(int client, int args)
+{
+	if (args < 1)
+	{
+		ReplyToCommand(client, "%s Usage: sm_wipeplayer <steamid>", g_szChatPrefix);
+		return Plugin_Handled;
+	}
+	else
+	{
+		char szArg[32];
+		GetCmdArgString(szArg, sizeof(szArg));
+
+		StripQuotes(szArg);
+		TrimString(szArg);
+
+		db_WipePlayer(client, szArg);
 	}
 	return Plugin_Handled;
 }
