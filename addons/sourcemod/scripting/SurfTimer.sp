@@ -24,7 +24,6 @@
 #undef REQUIRE_PLUGIN
 #include <dhooks>
 #include <mapchooser>
-#include <discord>
 #include <surftimer>
 #include <surftimer_discord>
 

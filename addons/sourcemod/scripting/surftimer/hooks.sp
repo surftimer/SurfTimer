@@ -334,7 +334,10 @@ public Action Say_Hook(int client, const char[] command, int argc)
 				case 2:
 				{
 					// Calladmin
-					CallAdmin(client, sText);
+					if (g_bDiscord)
+					{
+						CallAdmin(client, sText);
+					}
 				}
 				case 3:
 				{
