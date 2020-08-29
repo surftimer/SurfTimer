@@ -30,14 +30,13 @@ public int Native_SendBugReport(Handle plugin, int numParams)
 {
 	int client = GetNativeCell(1);
 
-	char sWebhook[1024], sBotName[64], sBugType[32], sServerName[256], sMap[128], szSteamID[32], sBugMessage[256];
+	char sWebhook[1024], sBotName[64], sBugType[32], sServerName[256], sMap[128], sBugMessage[256];
 
 	GetNativeString(2, sWebhook, sizeof(sWebhook));
 	GetNativeString(3, sBotName, sizeof(sBotName));
 	GetNativeString(4, sBugType, sizeof(sBugType));
 	GetNativeString(5, sServerName, sizeof(sServerName));
 	GetNativeString(6, sMap, sizeof(sMap));
-	GetNativeString(7, szSteamID, sizeof(szSteamID));
 	GetNativeString(8, sBugMessage, sizeof(sBugMessage));
 
 	// Send Discord Announcement
@@ -54,12 +53,13 @@ public int Native_SendBugReport(Handle plugin, int numParams)
 	Embed.SetTitle(sTitle);
 
 	// Format Player
-	char sName[MAX_NAME_LENGTH];
+	char sName[MAX_NAME_LENGTH], sSteamID[32];
 	GetClientName(client, sName, sizeof(sName));
+	GetClientAuthId(client, AuthId_Steam2, sSteamID, sizeof(sSteamID));
 
 	// Format Message
 	char sMessage[512];
-	Format(sMessage, sizeof(sMessage), "%s (%s): %s", sName, szSteamID, sBugMessage);
+	Format(sMessage, sizeof(sMessage), "%s (%s): %s", sName, sSteamID, sBugMessage);
 	Embed.AddField("", sMessage, true);
 
 	hook.Embed(Embed);

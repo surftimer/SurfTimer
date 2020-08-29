@@ -4928,7 +4928,7 @@ public void SendBugReport(int client)
 	char dcBugTrackerName[64];
 	GetConVarString(g_dcBugTrackerName, dcBugTrackerName, sizeof(dcBugTrackerName));
 
-	SurfTimer_SendBugReport(client, webhook, dcBugTrackerName, g_sBugType[client], g_sServerName, g_szMapName, g_szSteamID[client], g_sBugMsg[client]);
+	SurfTimer_SendBugReport(client, webhook, dcBugTrackerName, g_sBugType[client], g_sServerName, g_szMapName, g_sBugMsg[client]);
 
 	CPrintToChat(client, "%t", "Misc44", g_szChatPrefix);
 }
