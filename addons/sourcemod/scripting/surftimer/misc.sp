@@ -1936,7 +1936,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 				db_insertAnnouncement(client, szName, g_szMapName, 0, g_szFinalTime[client], 0);
 			char buffer[1024];
 			GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
-			if (!StrEqual(buffer, ""))
+			if (g_bDiscord && !StrEqual(buffer, ""))
 				sendDiscordAnnouncement(szName, g_szMapName, g_szFinalTime[client], szRecordDiff);
 		}
 
@@ -2081,7 +2081,7 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 		char buffer[1024], buffer1[1024];
 		GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
 		GetConVarString(g_hRecordAnnounceDiscordBonus, buffer1, 1024);
-		if (!StrEqual(buffer, "") && !StrEqual(buffer1, ""))
+		if (g_bDiscord && !StrEqual(buffer, "") && !StrEqual(buffer1, ""))
 			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup, szRecordDiff);
 	}
 
