@@ -26,6 +26,7 @@
 #include <mapchooser>
 #include <discord>
 #include <surftimer>
+#include <surftimer_discord>
 
 /*===================================
 =            Definitions            =
@@ -35,8 +36,6 @@
 #pragma newdecls required
 #pragma semicolon 1
 
-// Plugin Info
-#define VERSION "1.0.2"
 
 // Database Definitions
 #define MYSQL 0
@@ -1540,6 +1539,8 @@ char RadioCMDS[][] =  // Disable radio commands
 	"go_b", "sorry", "needrop"
 };
 
+bool g_bDiscord = false;
+
 /*======  End of Declarations  ======*/
 
 /*====================================
@@ -1569,6 +1570,11 @@ char RadioCMDS[][] =  // Disable radio commands
 
 public void OnLibraryAdded(const char[] name)
 {
+	if (StrEqual(name, "surftimer_discord", false))
+	{
+		g_bDiscord = true;
+	}
+
 	Handle tmp = FindPluginByFile("mapchooser_extended.smx");
 	if ((StrEqual("mapchooser", name)) || (tmp != null && GetPluginStatus(tmp) == Plugin_Running))
 	{
@@ -1638,9 +1644,17 @@ public void OnPluginEnd()
 public void OnLibraryRemoved(const char[] name)
 {
 	if (StrEqual(name, "adminmenu"))
+	{
 		g_hAdminMenu = null;
-	if (StrEqual(name, "dhooks"))
+	}
+	else if (StrEqual(name, "dhooks"))
+	{
 		g_hTeleport = null;
+	}
+	else if (StrEqual(name, "surftimer_discord"))
+	{
+		g_bDiscord = false;
+	}
 }
 
 public void OnEntityCreated(int entity, const char[] classname) {
@@ -2679,7 +2693,7 @@ public void OnPluginStart()
 
 public void OnAllPluginsLoaded()
 {
-	// nothing
+	g_bDiscord = LibraryExists("surftimer_discord");
 }
 
 /*======  End of Events  ======*/

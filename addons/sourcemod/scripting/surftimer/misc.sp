@@ -4925,34 +4925,10 @@ public void SendBugReport(int client)
 	if (StrEqual(webhook, ""))
 		return;
 
-	// Send Discord Announcement
-	DiscordWebHook hook = new DiscordWebHook(webhook);
-	hook.SlackMode = true;
-
 	char dcBugTrackerName[64];
 	GetConVarString(g_dcBugTrackerName, dcBugTrackerName, sizeof(dcBugTrackerName));
 
-	hook.SetUsername(dcBugTrackerName);
-
-	MessageEmbed Embed = new MessageEmbed();
-
-	// Format Title
-	char sTitle[256];
-	Format(sTitle, sizeof(sTitle), "Bug Type: %s ║ Server: %s ║ Map: %s", g_sBugType[client], g_sServerName, g_szMapName);
-	Embed.SetTitle(sTitle);
-
-	// Format Player
-	char sName[MAX_NAME_LENGTH];
-	GetClientName(client, sName, sizeof(sName));
-
-	// Format Message
-	char sMessage[512];
-	Format(sMessage, sizeof(sMessage), "%s (%s): %s", sName, g_szSteamID[client], g_sBugMsg[client]);
-	Embed.AddField("", sMessage, true);
-
-	hook.Embed(Embed);
-	hook.Send();
-	delete hook;
+	SurfTimer_SendBugReport(client, webhook, dcBugTrackerName, g_sBugType[client], g_sServerName, g_szMapName, g_szSteamID[client], g_sBugMsg[client]);
 
 	CPrintToChat(client, "%t", "Misc44", g_szChatPrefix);
 }
