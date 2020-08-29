@@ -30,14 +30,12 @@ public int Native_SendBugReport(Handle plugin, int numParams)
 {
 	int client = GetNativeCell(1);
 
-	char sWebhook[1024], sBotName[64], sBugType[32], sServerName[256], sMap[128], sBugMessage[256];
+	char sWebhook[1024], sBotName[64], sTitle[256], sBugMessage[256];
 
 	GetNativeString(2, sWebhook, sizeof(sWebhook));
 	GetNativeString(3, sBotName, sizeof(sBotName));
-	GetNativeString(4, sBugType, sizeof(sBugType));
-	GetNativeString(5, sServerName, sizeof(sServerName));
-	GetNativeString(6, sMap, sizeof(sMap));
-	GetNativeString(8, sBugMessage, sizeof(sBugMessage));
+	GetNativeString(4, sTitle, sizeof(sTitle));
+	GetNativeString(5, sBugMessage, sizeof(sBugMessage));
 
 	// Send Discord Announcement
 	DiscordWebHook hook = new DiscordWebHook(sWebhook);
@@ -46,10 +44,6 @@ public int Native_SendBugReport(Handle plugin, int numParams)
 	hook.SetUsername(sBotName);
 
 	MessageEmbed Embed = new MessageEmbed();
-
-	// Format Title
-	char sTitle[256];
-	Format(sTitle, sizeof(sTitle), "Bug Type: %s ║ Server: %s ║ Map: %s", sBugType, sServerName, sMap);
 	Embed.SetTitle(sTitle);
 
 	// Format Player
@@ -69,7 +63,35 @@ public int Native_SendBugReport(Handle plugin, int numParams)
 
 public int Native_SendCallAdmin(Handle plugin, int numParams)
 {
+	int client = GetNativeCell(1);
 
+	char sWebhook[1024], sBotName[64], sTitle[256], sTextMessage[256];
+	GetNativeString(2, sWebhook, sizeof(sWebhook));
+	GetNativeString(3, sBotName, sizeof(sBotName));
+	GetNativeString(4, sTitle, sizeof(sTitle));
+	GetNativeString(5, sTextMessage, sizeof(sTextMessage));
+
+	// Send Discord Announcement
+	DiscordWebHook hook = new DiscordWebHook(sWebhook);
+	hook.SlackMode = true;
+
+	hook.SetUsername(sBotName);
+
+	MessageEmbed Embed = new MessageEmbed();
+	Embed.SetTitle(sTitle);
+
+	char sName[MAX_NAME_LENGTH], sSteamID[32];
+	GetClientName(client, sName, sizeof(sName));
+	GetClientAuthId(client, AuthId_Steam2, sSteamID, sizeof(sSteamID));
+
+	// Format msg
+	char sMessage[512];
+	Format(sMessage, sizeof(sMessage), "%s (%s): @here %s", sName, sSteamID, sTextMessage);
+	Embed.AddField("", sMessage, true);
+
+	hook.Embed(Embed);
+	hook.Send();
+	delete hook;
 }
 
 public int Native_SendAnnouncement(Handle plugin, int numParams)

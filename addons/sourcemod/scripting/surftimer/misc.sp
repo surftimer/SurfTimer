@@ -4619,7 +4619,7 @@ public void totalTimeForHumans(int unix, char[] buffer, int size)
 	}
 }
 
-public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char szTime[32], char szRecordDiff[32])
+/* public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char szTime[32], char szRecordDiff[32])
 {
 	//Test which style to use
 	if (!GetConVarBool(g_dcKSFStyle))
@@ -4814,7 +4814,7 @@ public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], 
 		hook.Send();
 		delete hook;
 	}
-}
+} */
 
 bool IsPlayerVip(int client, bool admin = true, bool reply = false)
 {
@@ -4925,10 +4925,11 @@ public void SendBugReport(int client)
 	if (StrEqual(webhook, ""))
 		return;
 
-	char dcBugTrackerName[64];
+	char dcBugTrackerName[64], sTitle[256];
 	GetConVarString(g_dcBugTrackerName, dcBugTrackerName, sizeof(dcBugTrackerName));
+	Format(sTitle, sizeof(sTitle), "Bug Type: %s ║ Server: %s ║ Map: %s", g_sBugType[client], g_sServerName, g_szMapName);
 
-	SurfTimer_SendBugReport(client, webhook, dcBugTrackerName, g_sBugType[client], g_sServerName, g_szMapName, g_sBugMsg[client]);
+	SurfTimer_SendBugReport(client, webhook, dcBugTrackerName, sTitle, g_sBugMsg[client]);
 
 	CPrintToChat(client, "%t", "Misc44", g_szChatPrefix);
 }
@@ -4939,35 +4940,12 @@ public void CallAdmin(int client, char[] sText)
 	GetConVarString(g_hCalladminDiscord, webhook, 1024);
 	if (StrEqual(webhook, ""))
 		return;
-
-	// Send Discord Announcement
-	DiscordWebHook hook = new DiscordWebHook(webhook);
-	hook.SlackMode = true;
-
-	char dcCalladminName[64];
+	
+	char dcCalladminName[64], sTitle[256];
+	Format(sTitle, sizeof(sTitle), "Server: %s ║ Map: %s", g_sServerName, g_szMapName);
 	GetConVarString(g_dcCalladminName, dcCalladminName, sizeof(dcCalladminName));
 
-	hook.SetUsername(dcCalladminName);
-
-	MessageEmbed Embed = new MessageEmbed();
-
-	// Format title
-	char sTitle[256];
-	Format(sTitle, sizeof(sTitle), "Server: %s ║ Map: %s", g_sServerName, g_szMapName);
-	Embed.SetTitle(sTitle);
-
-	// Format player
-	char sName[MAX_NAME_LENGTH];
-	GetClientName(client, sName, sizeof(sName));
-
-	// Format msg
-	char sMessage[512];
-	Format(sMessage, sizeof(sMessage), "%s (%s): @here %s", sName, g_szSteamID[client], sText);
-	Embed.AddField("", sMessage, true);
-
-	hook.Embed(Embed);
-	hook.Send();
-	delete hook;
+	SurfTimer_SendCallAdmin(client, webhook, dcCalladminName, sTitle, sText);
 
 	CPrintToChat(client, "%t", "Misc45", g_szChatPrefix);
 }

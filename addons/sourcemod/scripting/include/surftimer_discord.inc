@@ -3,7 +3,8 @@
 #endif
 #define _surftimer_discord_included
 
-native void SurfTimer_SendBugReport(int client, char[] sWebhook, char[] sBotName, char[] sBugType, char[] sServerName, char[] sMapName, char[] sBugMessage);
+native void SurfTimer_SendBugReport(int client, char[] sWebhook, char[] sBotName, char[] sTitle, char[] sBugMessage);
+native void SurfTimer_SendCallAdmin(int client, char[] sWebhook, char[] sBotName, char[] sTitle, char[] sTextMessage);
 
 public SharedPlugin:__pl_surftimer_discord =
 {
