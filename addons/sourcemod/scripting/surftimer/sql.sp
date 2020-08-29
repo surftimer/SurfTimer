@@ -31,12 +31,7 @@ public void OnConnect(Database db, const char[] error, any data)
 	char szIdent[8];
 	g_dDb.Driver.GetIdentifier(szIdent, sizeof(szIdent));
 
-	if (strcmp(szIdent, "mysql", false) == 0)
-	{
-		// https://github.com/nikooo777/ckSurf/pull/58
-		g_dDb.Query(sqlSetSQLMode, "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));", _, DBPrio_Low);
-	}
-	else
+	if (!StrEqual(szIdent, "mysql", false))
 	{
 		SetFailState("[SurfTimer] Invalid database type");
 		return;
