@@ -33,7 +33,7 @@ public void OnConnect(Database db, const char[] error, any data)
 
 	if (!StrEqual(szIdent, "mysql", false))
 	{
-		SetFailState("[SurfTimer] Invalid database type");
+		SetFailState("[SurfTimer] Invalid database driver (%s), SurfTimer only support mysql.", szIdent);
 		return;
 	}
 }
