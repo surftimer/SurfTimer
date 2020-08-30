@@ -2861,11 +2861,13 @@ public void CheckRun(int client)
 
 	if (g_bTimerRunning[client])
 	{
-		if (g_fCurrentRunTime[client] > g_fPersonalRecord[client] && !g_bMissedMapBest[client] && !g_bPause[client] && g_iClientInZone[client][2] == 0)
+		if (g_fCurrentRunTime[client] > g_fPersonalStyleRecord[g_iCurrentStyle[client]][client] && !g_bMissedMapBest[client] && !g_bPause[client] && g_iClientInZone[client][2] == 0)
 		{
 			g_bMissedMapBest[client] = true;
-			if (g_fPersonalRecord[client] > 0.0) {
-				CPrintToChat(client, "%t", "MissedMapBest", g_szChatPrefix, g_szPersonalRecord[client]);
+			if (g_fPersonalStyleRecord[g_iCurrentStyle[client]][client] > 0.0) {
+				char szTime[32];
+				FormatTimeFloat(client, _fPersonalStyleRecord[g_iCurrentStyle[client]][client], 3, szTime, sizeof(szTime));
+				CPrintToChat(client, "%t", "MissedMapBest", g_szChatPrefix, szTime);
 				if (g_iAutoReset[client] && g_iCurrentStyle[client] == 0) {
 					Command_Restart(client, 1);
 					CPrintToChat(client, "%t", "AutoResetMessage1", g_szChatPrefix);
