@@ -2866,7 +2866,7 @@ public void CheckRun(int client)
 			g_bMissedMapBest[client] = true;
 			if (g_fPersonalStyleRecord[g_iCurrentStyle[client]][client] > 0.0) {
 				char szTime[32];
-				FormatTimeFloat(client, _fPersonalStyleRecord[g_iCurrentStyle[client]][client], 3, szTime, sizeof(szTime));
+				FormatTimeFloat(client, g_fPersonalStyleRecord[g_iCurrentStyle[client]][client], 3, szTime, sizeof(szTime));
 				CPrintToChat(client, "%t", "MissedMapBest", g_szChatPrefix, szTime);
 				if (g_iAutoReset[client] && g_iCurrentStyle[client] == 0) {
 					Command_Restart(client, 1);
@@ -2881,12 +2881,14 @@ public void CheckRun(int client)
 		}
 		else
 		{
-			if (g_fCurrentRunTime[client] > g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] > 0 && !g_bPause[client] && !g_bMissedBonusBest[client])
+			if (g_fCurrentRunTime[client] > g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] > 0 && !g_bPause[client] && !g_bMissedBonusBest[client])
 			{
-				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
+				if (g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client] > 0.0)
 				{
 					g_bMissedBonusBest[client] = true;
-					CPrintToChat(client, "%t", "Misc29", g_szChatPrefix, g_szPersonalRecordBonus[g_iClientInZone[client][2]][client]);
+					char szTime[32];
+					FormatTimeFloat(client, g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client], 3, szTime, sizeof(szTime));
+					CPrintToChat(client, "%t", "Misc29", g_szChatPrefix, szTime);
 					if (g_iAutoReset[client] && g_iCurrentStyle[client] == 0) {
 						Command_Teleport(client, 0);
 						CPrintToChat(client, "%t", "AutoResetMessage1", g_szChatPrefix);
