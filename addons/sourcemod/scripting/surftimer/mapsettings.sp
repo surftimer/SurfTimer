@@ -94,11 +94,11 @@ public int MapSettingsMenuHandler(Handle menu, MenuAction action, int param1, in
 			}
 			case 5:
 			{
-				db_unlimitAllStages(g_szMapName);
+				db_unlimitAllStages();
 			}
 			case 6:
 			{
-				db_removeOnejumplimit(g_szMapName);
+				db_removeOnejumplimit();
 			}
 		}
 	}
@@ -272,7 +272,7 @@ public void db_viewMapSettings()
 	{
 		LogToFile(g_szQueryFile, "db_viewMapSettings - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(sql_viewMapSettingsCallback, szQuery, DBPrio_High);
+	g_dDb.Query(sql_viewMapSettingsCallback, szQuery, _, DBPrio_High);
 }
 
 public void sql_viewMapSettingsCallback(Database db, DBResultSet results, const char[] error, any pack)
@@ -312,10 +312,10 @@ public void db_updateMapSettings()
 	{
 		LogToFile(g_szQueryFile, "db_updateMapSettings - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(sql_insertMapSettingsCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(sql_insertMapSettingsCallback, szQuery, _, DBPrio_Low);
 }
 
-public void db_unlimitAllStages(char[] szMapName)
+public void db_unlimitAllStages()
 {
 	char szQuery[256];
 	Format(szQuery, sizeof(szQuery), "UPDATE ck_zones SET prespeed = 0.0 WHERE mapname = '%s' AND zonetype = 3;", g_szMapName);
@@ -323,10 +323,10 @@ public void db_unlimitAllStages(char[] szMapName)
 	{
 		LogToFile(g_szQueryFile, "db_unlimitAllStages - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_UnlimitAllStagesCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(SQL_UnlimitAllStagesCallback, szQuery, _, DBPrio_Low);
 }
 
-public void db_removeOnejumplimit(char[] szMapName)
+public void db_removeOnejumplimit()
 {
 	char szQuery[256];
 	Format(szQuery, sizeof(szQuery), "UPDATE ck_zones SET onejumplimit = 0 WHERE mapname = '%s';", g_szMapName);
@@ -334,7 +334,7 @@ public void db_removeOnejumplimit(char[] szMapName)
 	{
 		LogToFile(g_szQueryFile, "db_removeOnejumplimit - szQuery: %s", szQuery);
 	}
-	g_dDb.Query(SQL_removeOnejumplimitCallback, szQuery, DBPrio_Low);
+	g_dDb.Query(SQL_removeOnejumplimitCallback, szQuery, _, DBPrio_Low);
 }
 
 public void SQL_UnlimitAllStagesCallback(Database db, DBResultSet results, const char[] error, any data)

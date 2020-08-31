@@ -91,6 +91,8 @@ public void LoadClientSetting(int client, int setting)
 				LogError("[SurfTimer] (LoadClientSetting) GetClientAuthId failed for client index %d.", client);
 				return;
 			}
+
+			strcopy(g_pr_szSteamID[client], sizeof(g_pr_szSteamID[]), g_szSteamID[client]);
 		}
 
 		switch (setting)
@@ -817,7 +819,7 @@ public void checkSpawnPoints()
 		{
 			LogToFile(g_szQueryFile, "checkSpawnPoints - szQuery: %s", szQuery);
 		}
-		g_dDb.Query(sqlSelectSpawnPoints, szQuery, pack);
+		g_dDb.Query(sqlSelectSpawnPoints, szQuery, pack, DBPrio_Low);
 	}
 }
 
@@ -1281,14 +1283,6 @@ public void LimitMaxSpeed(int client, float fMaxSpeed)
 		ScaleVector(CurVelVec, fMaxSpeed);
 		TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
 	}
-}
-
-public bool Base_TraceFilter(int entity, int contentsMask, any data)
-{
-	if (entity != data)
-		return (false);
-
-	return (true);
 }
 
 public void SetClientDefaults(int client)
@@ -2498,7 +2492,7 @@ public void SetPlayerRank(int client)
 
 	if (g_hSkillGroups == null)
 	{
-		CreateTimer(5.0, reloadRank, GetClientUserId(client));
+		CreateTimer(5.0, reloadRank, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 		return;
 	}
 
@@ -2816,25 +2810,6 @@ stock int BooltoInt(bool status)
 	return (status) ? 1:0;
 }
 
-public void PlayQuakeSound_Spec(int client, char[] buffer)
-{
-	int SpecMode;
-	for (int x = 1; x <= MaxClients; x++)
-	{
-		if (IsValidClient(x) && !IsPlayerAlive(x))
-		{
-			SpecMode = GetEntProp(x, Prop_Send, "m_iObserverMode");
-			if (SpecMode == 4 || SpecMode == 5)
-			{
-				int Target = GetEntPropEnt(x, Prop_Send, "m_hObserverTarget");
-				if (Target == client)
-					if (g_bEnableQuakeSounds[x])
-					ClientCommand(x, buffer);
-			}
-		}
-	}
-}
-
 public void AttackProtection(int client, int &buttons)
 {
 	if (GetConVarBool(g_hAttackSpamProtection))
@@ -2861,11 +2836,11 @@ public void CheckRun(int client)
 
 	if (g_bTimerRunning[client])
 	{
-		if (g_fCurrentRunTime[client] > g_fPersonalRecord[client] && !g_bMissedMapBest[client] && !g_bPause[client] && g_iClientInZone[client][2] == 0)
+		if (g_fCurrentRunTime[client] > g_fPersonalStyleRecord[g_iCurrentStyle[client]][client] && !g_bMissedMapBest[client] && !g_bPause[client] && g_iClientInZone[client][2] == 0)
 		{
 			g_bMissedMapBest[client] = true;
-			if (g_fPersonalRecord[client] > 0.0) {
-				CPrintToChat(client, "%t", "MissedMapBest", g_szChatPrefix, g_szPersonalRecord[client]);
+			if (g_fPersonalStyleRecord[g_iCurrentStyle[client]][client] > 0.0) {
+				CPrintToChat(client, "%t", "MissedMapBest", g_szChatPrefix, g_szPersonalStyleRecord[g_iCurrentStyle[client]][client]);
 				if (g_iAutoReset[client] && g_iCurrentStyle[client] == 0) {
 					Command_Restart(client, 1);
 					CPrintToChat(client, "%t", "AutoResetMessage1", g_szChatPrefix);
@@ -2879,12 +2854,12 @@ public void CheckRun(int client)
 		}
 		else
 		{
-			if (g_fCurrentRunTime[client] > g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] > 0 && !g_bPause[client] && !g_bMissedBonusBest[client])
+			if (g_fCurrentRunTime[client] > g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] > 0 && !g_bPause[client] && !g_bMissedBonusBest[client])
 			{
-				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
+				if (g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client] > 0.0)
 				{
 					g_bMissedBonusBest[client] = true;
-					CPrintToChat(client, "%t", "Misc29", g_szChatPrefix, g_szPersonalRecordBonus[g_iClientInZone[client][2]][client]);
+					CPrintToChat(client, "%t", "Misc29", g_szChatPrefix, g_szStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client]);
 					if (g_iAutoReset[client] && g_iCurrentStyle[client] == 0) {
 						Command_Teleport(client, 0);
 						CPrintToChat(client, "%t", "AutoResetMessage1", g_szChatPrefix);
@@ -4892,6 +4867,16 @@ public void LoadDefaultTitle(int client)
 						KvGetString(kv, "title", szBuffer, sizeof(szBuffer));
 						SetDefaultTitle(client, szBuffer);
 						g_iHasEnforcedTitle[client] = true;
+
+						g_iEnforceTitleType[client] = 2;
+						KvGetString(kv, "type", szBuffer, sizeof(szBuffer), "both");
+						if (StrEqual(szBuffer, "scoreboard"))
+							g_iEnforceTitleType[client] = 1;
+						else if (StrEqual(szBuffer, "chat"))
+							g_iEnforceTitleType[client] = 0;
+						else
+							g_iEnforceTitleType[client] = 2;
+
 						break;
 					} else {
 						g_iHasEnforcedTitle[client] = false;
