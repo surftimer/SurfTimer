@@ -159,7 +159,7 @@ public void db_selectVipStatusCallback(Database db, DBResultSet results, const c
 	}
 }
 
-public void db_removeVipCallback(Database db, DBResultSet results, const char[] error, any client)
+public void db_removeVipCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -167,8 +167,13 @@ public void db_removeVipCallback(Database db, DBResultSet results, const char[] 
 		return;
 	}
 
-	g_bCheckCustomTitle[client] = true;
-	db_CheckVIPAdmin(client, g_szSteamID[client]);
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
+	{
+		g_bCheckCustomTitle[client] = true;
+		db_CheckVIPAdmin(client, g_szSteamID[client]);
+	}
 }
 
 public void db_insertVip(char szSteamId[128], int iVip)

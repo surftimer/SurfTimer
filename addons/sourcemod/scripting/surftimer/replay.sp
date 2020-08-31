@@ -86,18 +86,6 @@ public Action RespawnBot(Handle timer, any userid)
 	return Plugin_Stop;
 }
 
-public Action Hook_WeaponCanSwitchTo(int client, int weapon)
-{
-	if (g_hBotMimicsRecord[client] == null)
-		return Plugin_Continue;
-
-	if (g_BotActiveWeapon[client] != weapon)
-	{
-		return Plugin_Stop;
-	}
-	return Plugin_Continue;
-}
-
 public void StartRecording(int client)
 {
 	if (!IsValidClient(client) || IsFakeClient(client))
@@ -113,9 +101,6 @@ public void StartRecording(int client)
 
 public void StopRecording(int client)
 {
-	if (!IsValidClient(client) || g_hRecording[client] == null)
-		return;
-
 	delete g_hRecording[client];
 	delete g_hRecordingAdditionalTeleport[client];
 	g_hRecording[client] = null;
@@ -859,21 +844,11 @@ public void LoadWrcpReplay()
 
 public void StopPlayerMimic(int client)
 {
-	if (!IsValidClient(client))
-		return;
-
 	g_BotMimicTick[client] = 0;
 	g_CurrentAdditionalTeleportIndex[client] = 0;
 	g_BotMimicRecordTickCount[client] = 0;
 	g_bValidTeleportCall[client] = false;
 	delete g_hBotMimicsRecord[client];
-}
-
-public bool IsPlayerMimicing(int client)
-{
-	if (!IsValidClient(client))
-		return false;
-	return g_hBotMimicsRecord[client] != null;
 }
 
 public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int &impulse, int &weapon, float angles[3], float vel[3])

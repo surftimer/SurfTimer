@@ -91,6 +91,8 @@ public void LoadClientSetting(int client, int setting)
 				LogError("[SurfTimer] (LoadClientSetting) GetClientAuthId failed for client index %d.", client);
 				return;
 			}
+
+			strcopy(g_pr_szSteamID[client], sizeof(g_pr_szSteamID[]), g_szSteamID[client]);
 		}
 
 		switch (setting)
@@ -817,7 +819,7 @@ public void checkSpawnPoints()
 		{
 			LogToFile(g_szQueryFile, "checkSpawnPoints - szQuery: %s", szQuery);
 		}
-		g_dDb.Query(sqlSelectSpawnPoints, szQuery, pack);
+		g_dDb.Query(sqlSelectSpawnPoints, szQuery, pack, DBPrio_Low);
 	}
 }
 
@@ -1281,14 +1283,6 @@ public void LimitMaxSpeed(int client, float fMaxSpeed)
 		ScaleVector(CurVelVec, fMaxSpeed);
 		TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
 	}
-}
-
-public bool Base_TraceFilter(int entity, int contentsMask, any data)
-{
-	if (entity != data)
-		return (false);
-
-	return (true);
 }
 
 public void SetClientDefaults(int client)
@@ -2498,7 +2492,7 @@ public void SetPlayerRank(int client)
 
 	if (g_hSkillGroups == null)
 	{
-		CreateTimer(5.0, reloadRank, GetClientUserId(client));
+		CreateTimer(5.0, reloadRank, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 		return;
 	}
 
@@ -2814,25 +2808,6 @@ public bool TraceRayDontHitSelf(int entity, int mask, any data)
 stock int BooltoInt(bool status)
 {
 	return (status) ? 1:0;
-}
-
-public void PlayQuakeSound_Spec(int client, char[] buffer)
-{
-	int SpecMode;
-	for (int x = 1; x <= MaxClients; x++)
-	{
-		if (IsValidClient(x) && !IsPlayerAlive(x))
-		{
-			SpecMode = GetEntProp(x, Prop_Send, "m_iObserverMode");
-			if (SpecMode == 4 || SpecMode == 5)
-			{
-				int Target = GetEntPropEnt(x, Prop_Send, "m_hObserverTarget");
-				if (Target == client)
-					if (g_bEnableQuakeSounds[x])
-					ClientCommand(x, buffer);
-			}
-		}
-	}
 }
 
 public void AttackProtection(int client, int &buttons)

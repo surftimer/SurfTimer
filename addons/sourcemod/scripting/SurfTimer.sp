@@ -36,7 +36,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "1.0.2"
+#define VERSION "1.1.0-dev"
 
 // Database Definitions
 #define MYSQL 0
@@ -203,10 +203,10 @@ enum struct SkillGroup
 public Plugin myinfo =
 {
 	name = "SurfTimer",
-	author = "Ace & olokos",
+	author = "All contributors",
 	description = "a fork from fluffys cksurf fork",
 	version = VERSION,
-	url = "https://github.com/olokos/Surftimer-olokos"
+	url = "https://github.com/surftimer/Surftimer-olokos"
 };
 
 /*===================================
@@ -368,9 +368,6 @@ bool g_bTierEntryFound;
 
 // Tier data found in ZGrp
 bool g_bTierFound;
-
-// Tier announce timer
-Handle AnnounceTimer[MAXPLAYERS + 1];
 
 /*----------  Zone Variables  ----------*/
 
@@ -910,7 +907,6 @@ bool g_bNewReplay[MAXPLAYERS + 1];
 bool g_bNewBonus[MAXPLAYERS + 1];
 bool g_createAdditionalTeleport[MAXPLAYERS + 1];
 int g_BotMimicRecordTickCount[MAXPLAYERS + 1] = { 0, ... };
-int g_BotActiveWeapon[MAXPLAYERS + 1] = { -1, ... };
 int g_CurrentAdditionalTeleportIndex[MAXPLAYERS + 1];
 int g_RecordedTicks[MAXPLAYERS + 1];
 int g_RecordPreviousWeapon[MAXPLAYERS + 1];
@@ -1708,7 +1704,8 @@ public void OnMapStart()
 	CreateTimer(1.0, CKTimer2, _, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 	CreateTimer(60.0, AttackTimer, _, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 	CreateTimer(600.0, PlayerRanksTimer, _, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
-	g_hZoneTimer = CreateTimer(GetConVarFloat(g_hChecker), BeamBoxAll, _, TIMER_REPEAT);
+	
+	CreateTimer(GetConVarFloat(g_hChecker), BeamBoxAll, _, TIMER_REPEAT);
 
 	// AutoBhop
 	if (GetConVarBool(g_hAutoBhopConVar))
@@ -1718,7 +1715,7 @@ public void OnMapStart()
 
 	// main.cfg & replays
 	CreateTimer(1.0, DelayedStuff, _, TIMER_FLAG_NO_MAPCHANGE);
-	CreateTimer(GetConVarFloat(g_replayBotDelay), LoadReplaysTimer, _, TIMER_FLAG_NO_MAPCHANGE); // replay bots
+	CreateTimer(GetConVarFloat(g_replayBotDelay), LoadReplaysTimer, _, TIMER_FLAG_NO_MAPCHANGE | TIMER_FLAG_NO_MAPCHANGE); // replay bots
 
 	g_Advert = 0;
 	CreateTimer(180.0, AdvertTimer, _, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
@@ -1866,7 +1863,7 @@ public void OnClientPutInServer(int client)
 
 public void OnClientPostAdminCheck(int client)
 {
-	if (!IsValidClient(client))
+	if (client < 1)
 	{
 		return;
 	}
@@ -1927,6 +1924,8 @@ public void OnClientPostAdminCheck(int client)
 		return;
 	}
 
+	strcopy(g_pr_szSteamID[client], sizeof(g_pr_szSteamID[]), g_szSteamID[client]);
+
 	// char fix
 	FixPlayerName(client);
 
@@ -1943,7 +1942,7 @@ public void OnClientPostAdminCheck(int client)
 
 	if (g_bTierFound)
 	{
-		AnnounceTimer[client] = CreateTimer(20.0, AnnounceMap, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(20.0, AnnounceMap, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 	}
 
 	if (g_bServerDataLoaded && !g_bSettingsLoaded[client] && !g_bLoadingSettings[client])
@@ -2006,10 +2005,7 @@ public void OnClientAuthorized(int client)
 
 public void OnClientDisconnect(int client)
 {
-	if (IsFakeClient(client))
-	{
-		delete g_hRecordingAdditionalTeleport[client];
-	}
+	delete g_hRecordingAdditionalTeleport[client];
 
 	db_savePlayTime(client);
 
@@ -2576,13 +2572,8 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 			Format(g_szRelativeSoundPathWRCP, sizeof(g_szRelativeSoundPathWRCP), "*physics/glass/glass_bottle_break2.wav");
 		}
 	}
-	if (g_hZoneTimer != INVALID_HANDLE)
-	{
-		KillTimer(g_hZoneTimer);
-		g_hZoneTimer = INVALID_HANDLE;
-	}
-
-	g_hZoneTimer = CreateTimer(GetConVarFloat(g_hChecker), BeamBoxAll, _, TIMER_REPEAT);
+	
+	CreateTimer(GetConVarFloat(g_hChecker), BeamBoxAll, _, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 }
 
 public void OnPluginStart()

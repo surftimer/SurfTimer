@@ -396,7 +396,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					{
 						LogToFile(g_szQueryFile, "Say_Hook - szQuery: %s", szQuery);
 					}
-					g_dDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client));
+					g_dDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client), DBPrio_Low);
 				}
 			}
 
@@ -629,7 +629,7 @@ public Action Event_OnPlayerDeath(Handle event, const char[] name, bool dontBroa
 		{
 			if (g_hRecording[client] != null)
 				StopRecording(client);
-			CreateTimer(2.0, RemoveRagdoll, GetClientUserId(client));
+			CreateTimer(2.0, RemoveRagdoll, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 		}
 		else
 			if (g_hBotMimicsRecord[client] != null)
@@ -707,20 +707,6 @@ public Action Event_OnRoundStart(Handle event, const char[] name, bool dontBroad
 	RefreshZones();
 
 	g_bRoundEnd = false;
-	return Plugin_Continue;
-}
-
-public Action OnTouchAllTriggers(int entity, int other)
-{
-	if (other >= 1 && other <= MaxClients && IsFakeClient(other))
-		return Plugin_Handled;
-	return Plugin_Continue;
-}
-
-public Action OnEndTouchAllTriggers(int entity, int other)
-{
-	if (other >= 1 && other <= MaxClients && IsFakeClient(other))
-		return Plugin_Handled;
 	return Plugin_Continue;
 }
 
@@ -1353,10 +1339,10 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 		{
 			if (!g_bJumpZoneTimer[client])
 			{
-				CreateTimer(1.0, StartJumpZonePrintTimer, GetClientUserId(client));
+				CreateTimer(1.0, StartJumpZonePrintTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 				CPrintToChat(client, "%t", "Hooks10", g_szChatPrefix);
 				Handle pack;
-				CreateDataTimer(0.05, DelayedVelocityCap, pack);
+				CreateDataTimer(0.05, DelayedVelocityCap, pack, TIMER_FLAG_NO_MAPCHANGE);
 				WritePackCell(pack, GetClientUserId(client));
 				WritePackFloat(pack, 0.0);
 				g_bJumpZoneTimer[client] = true;
@@ -1430,7 +1416,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 						{
 							CPrintToChat(client, "%t", "Hooks15", g_szChatPrefix);
 							Handle pack;
-							CreateDataTimer(0.05, DelayedVelocityCap, pack);
+							CreateDataTimer(0.05, DelayedVelocityCap, pack, TIMER_FLAG_NO_MAPCHANGE);
 							WritePackCell(pack, GetClientUserId(client));
 							WritePackFloat(pack, 0.0);
 						}
