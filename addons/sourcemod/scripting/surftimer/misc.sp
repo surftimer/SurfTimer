@@ -5022,6 +5022,16 @@ public void LoadDefaultTitle(int client)
 						KvGetString(kv, "title", szBuffer, sizeof(szBuffer));
 						SetDefaultTitle(client, szBuffer);
 						g_iHasEnforcedTitle[client] = true;
+
+						g_iEnforceTitleType[client] = 2;
+						KvGetString(kv, "type", szBuffer, sizeof(szBuffer), "both");
+						if (StrEqual(szBuffer, "scoreboard"))
+							g_iEnforceTitleType[client] = 1;
+						else if (StrEqual(szBuffer, "chat"))
+							g_iEnforceTitleType[client] = 0;
+						else
+							g_iEnforceTitleType[client] = 2;
+
 						break;
 					} else {
 						g_iHasEnforcedTitle[client] = false;
