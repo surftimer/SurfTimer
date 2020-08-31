@@ -36,15 +36,6 @@ public void OnConnect(Database db, const char[] error, any data)
 		SetFailState("[SurfTimer] Invalid database driver (%s), SurfTimer only support mysql.", szIdent);
 		return;
 	}
-}
-
-public void sqlSetSQLMode(Database db, DBResultSet results, const char[] error, any data)
-{
-	if (db == null || strlen(error))
-	{
-		LogError("[surftimer] SQL Error (sqlSetSQLMode): %s", error);
-		return;
-	}
 
 	// If updating from a previous version
 	if (!g_dDb.SetCharset("utf8mb4"))
