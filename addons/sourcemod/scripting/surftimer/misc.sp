@@ -2869,7 +2869,7 @@ public void CheckRun(int client)
 				EmitSoundToClient(client, "buttons/button18.wav", client);
 			}
 		}
-		else if (g_fCurrentRunTime[client] > g_fPersonalStyleRecord[g_iCurrentStyle[client]][client] && !g_bMissedMapBest[client] && !g_bPause[client] && g_iClientInZone[client][2] == 0)
+		else if (g_fCurrentRunTime[client] > g_fPersonalStyleRecord[g_iCurrentStyle[client]][client] && g_iCurrentStyle[client] != 0 && !g_bMissedMapBest[client] && !g_bPause[client] && g_iClientInZone[client][2] == 0)
 		{
 			g_bMissedMapBest[client] = true;
 			if (g_fPersonalStyleRecord[g_iCurrentStyle[client]][client] > 0.0) {
@@ -2887,7 +2887,7 @@ public void CheckRun(int client)
 		}
 		else
 		{
-			if (g_fCurrentRunTime[client] > g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] > 0 && !g_bPause[client] && !g_bMissedBonusBest[client])
+			if (g_fCurrentRunTime[client] > g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client] && g_iCurrentStyle[client] != 0 && g_iClientInZone[client][2] > 0 && !g_bPause[client] && !g_bMissedBonusBest[client])
 			{
 				if (g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client] > 0.0)
 				{
