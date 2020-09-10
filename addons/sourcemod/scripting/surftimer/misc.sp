@@ -2836,7 +2836,7 @@ public void CheckRun(int client)
 
 	if (g_bTimerRunning[client])
 	{
-		if (g_fCurrentRunTime[client] > g_fPersonalRecord[client] && !g_bMissedMapBest[client] && !g_bPause[client] && g_iClientInZone[client][2] == 0)
+		if (g_fCurrentRunTime[client] > g_fPersonalRecord[client] && g_iCurrentStyle[client] == 0 && !g_bMissedMapBest[client] && !g_bPause[client] && g_iClientInZone[client][2] == 0)
 		{
 			g_bMissedMapBest[client] = true;
 			if (g_fPersonalRecord[client] > 0.0) {
@@ -2852,7 +2852,7 @@ public void CheckRun(int client)
 			}
 			EmitSoundToClient(client, "buttons/button18.wav", client);
 		}
-		else if (g_fCurrentRunTime[client] > g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] > 0 && !g_bPause[client] && !g_bMissedBonusBest[client])
+		if (g_fCurrentRunTime[client] > g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] && g_iCurrentStyle[client] == 0 && g_iClientInZone[client][2] > 0 && !g_bPause[client] && !g_bMissedBonusBest[client])
 		{
 			if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
 			{
@@ -2869,7 +2869,7 @@ public void CheckRun(int client)
 				EmitSoundToClient(client, "buttons/button18.wav", client);
 			}
 		}
-		else if (g_fCurrentRunTime[client] > g_fPersonalStyleRecord[g_iCurrentStyle[client]][client] && g_iCurrentStyle[client] != 0 && !g_bMissedMapBest[client] && !g_bPause[client] && g_iClientInZone[client][2] == 0)
+		if (g_fCurrentRunTime[client] > g_fPersonalStyleRecord[g_iCurrentStyle[client]][client] && g_iCurrentStyle[client] > 0 && !g_bMissedMapBest[client] && !g_bPause[client] && g_iClientInZone[client][2] == 0)
 		{
 			g_bMissedMapBest[client] = true;
 			if (g_fPersonalStyleRecord[g_iCurrentStyle[client]][client] > 0.0) {
@@ -2885,24 +2885,21 @@ public void CheckRun(int client)
 			}
 			EmitSoundToClient(client, "buttons/button18.wav", client);
 		}
-		else
+		if (g_fCurrentRunTime[client] > g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client] && g_iCurrentStyle[client] > 0 && g_iClientInZone[client][2] > 0 && !g_bPause[client] && !g_bMissedBonusBest[client])
 		{
-			if (g_fCurrentRunTime[client] > g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client] && g_iCurrentStyle[client] != 0 && g_iClientInZone[client][2] > 0 && !g_bPause[client] && !g_bMissedBonusBest[client])
+			if (g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client] > 0.0)
 			{
-				if (g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client] > 0.0)
-				{
-					g_bMissedBonusBest[client] = true;
-					CPrintToChat(client, "%t", "Misc29", g_szChatPrefix, g_szStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client]);
-					if (g_iAutoReset[client] && g_iCurrentStyle[client] == 0) {
-						Command_Teleport(client, 0);
-						CPrintToChat(client, "%t", "AutoResetMessage1", g_szChatPrefix);
-						CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
-					} else if (g_iAutoReset[client] && g_iCurrentStyle[client] != 0) {
-						CPrintToChat(client, "%t", "AutoResetMessageStyle", g_szChatPrefix, g_szStyleMenuPrint[g_iCurrentStyle[client]]);
-						CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
-					}
-					EmitSoundToClient(client, "buttons/button18.wav", client);
+				g_bMissedBonusBest[client] = true;
+				CPrintToChat(client, "%t", "Misc29", g_szChatPrefix, g_szStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client]);
+				if (g_iAutoReset[client] && g_iCurrentStyle[client] == 0) {
+					Command_Teleport(client, 0);
+					CPrintToChat(client, "%t", "AutoResetMessage1", g_szChatPrefix);
+					CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
+				} else if (g_iAutoReset[client] && g_iCurrentStyle[client] != 0) {
+					CPrintToChat(client, "%t", "AutoResetMessageStyle", g_szChatPrefix, g_szStyleMenuPrint[g_iCurrentStyle[client]]);
+					CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
 				}
+				EmitSoundToClient(client, "buttons/button18.wav", client);
 			}
 		}
 	}
