@@ -1,6 +1,6 @@
-# Surftimer-olokos for CS:GO
+# Surftimer-Official for CS:GO
 
-_I have renamed the repository to Surftimer-olokos just to make it obvious, that we're entering a new chapter in CS:GO surf community, a milestone._
+_We're entering a new chapter in CS:GO surf community - a milestone - project that is meant to unite people._
 
 ## Project Goals
 
