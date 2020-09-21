@@ -455,7 +455,7 @@ public void db_selectSpawnLocationsCallback(Database db, DBResultSet results, co
 
 public void db_viewMapProRankCount()
 {
-	g_MapTimesCount = 0;
+	g_StyleMapTimesCount[0] = 0;
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), sql_selectPlayerProCount, g_szMapName);
 	if (g_cLogQueries.BoolValue)
@@ -486,14 +486,14 @@ public void sql_selectPlayerProCountCallback(Database db, DBResultSet results, c
 			style = results.FetchInt(0);
 			count = results.FetchInt(1);
 			if (style == 0)
-				g_MapTimesCount = count;
+				g_StyleMapTimesCount[0] = count;
 			else
 				g_StyleMapTimesCount[style] = count;
 		}
 	}
 	else
 	{
-		g_MapTimesCount = 0;
+		g_StyleMapTimesCount[0] = 0;
 		for (int i = 1; i < MAX_STYLES; i++)
 			g_StyleMapTimesCount[style] = 0;
 	}
@@ -533,7 +533,7 @@ public void db_viewMapRankProCallback(Database db, DBResultSet results, const ch
 		int client = GetClientOfUserId(userid);
 		if (IsValidClient(client))
 		{
-			g_MapRank[client] = results.FetchInt(0);
+			g_StyleMapRank[0][client] = results.FetchInt(0);
 		}
 	}
 }
@@ -2064,7 +2064,7 @@ public void ContinueRecalc(int client)
 
 public void db_GetMapRecord_Pro()
 {
-	g_fRecordMapTime = 9999999.0;
+	g_fRecordStyleMapTime[0] = 9999999.0;
 	for (int i = 1; i < MAX_STYLES; i++)
 		g_fRecordStyleMapTime[i] = 9999999.0;
 	
@@ -2114,11 +2114,11 @@ public void sql_selectMapRecordCallback(Database db, DBResultSet results, const 
 			style = results.FetchInt(9);
 			if (style == 0)
 			{
-				g_fRecordMapTime = results.FetchFloat(0);
+				g_fRecordStyleMapTime[0] = results.FetchFloat(0);
 
-				if (g_fRecordMapTime > -1.0 && !results.IsFieldNull(0))
+				if (g_fRecordStyleMapTime[0] > -1.0 && !results.IsFieldNull(0))
 				{
-					g_fRecordMapTime = results.FetchFloat(0);
+					g_fRecordStyleMapTime[0] = results.FetchFloat(0);
 
 					g_iStartVelsServerRecord[0][0] = results.FetchInt(3);
 					g_iStartVelsServerRecord[0][1] = results.FetchInt(4);
@@ -2127,14 +2127,14 @@ public void sql_selectMapRecordCallback(Database db, DBResultSet results, const 
 					g_iEndVelsServerRecord[0][1] = results.FetchInt(7);
 					g_iEndVelsServerRecord[0][2] = results.FetchInt(8);
 
-					FormatTimeFloat(0, g_fRecordMapTime, 3, g_szRecordMapTime, 64);
-					results.FetchString(1, g_szRecordPlayer, MAX_NAME_LENGTH);
-					results.FetchString(2, g_szRecordMapSteamID, MAX_NAME_LENGTH);
+					FormatTimeFloat(0, g_fRecordStyleMapTime[0], 3, g_szRecordStyleMapTime[0], 64);
+					results.FetchString(1, g_szRecordStylePlayer[0], MAX_NAME_LENGTH);
+					results.FetchString(2, g_szRecordStyleMapSteamID[0], MAX_NAME_LENGTH);
 				}
 				else
 				{
-					Format(g_szRecordMapTime, 64, "N/A");
-					g_fRecordMapTime = 9999999.0;
+					Format(g_szRecordStyleMapTime[0], 64, "N/A");
+					g_fRecordStyleMapTime[0] = 9999999.0;
 				}
 			}
 			else
@@ -2158,8 +2158,8 @@ public void sql_selectMapRecordCallback(Database db, DBResultSet results, const 
 	}
 	else
 	{
-		Format(g_szRecordMapTime, 64, "N/A");
-		g_fRecordMapTime = 9999999.0;
+		Format(g_szRecordStyleMapTime[0], 64, "N/A");
+		g_fRecordStyleMapTime[0] = 9999999.0;
 		for (int i = 1; i < MAX_STYLES; i++)
 		{
 			Format(g_szRecordStyleMapTime[i], 64, "N/A");
@@ -2688,7 +2688,7 @@ public void SQL_UpdateRecordProCallback2(Database db, DBResultSet results, const
 		{
 			rank = (results.FetchInt(0)+1);
 		}
-		g_MapRank[client] = rank;
+		g_StyleMapRank[0][client] = rank;
 		
 		for (int i = 0; i < 3; i ++)
 			g_iStartVelsRecord[client][0][i] = g_iStartVelsNew[client][0][i];
@@ -3239,8 +3239,8 @@ public void SQL_selectPersonalRecordsCallback(Database db, DBResultSet results, 
 			return;
 		}
 
-		g_fPersonalRecord[client] = 0.0;
-		Format(g_szPersonalRecord[client], 64, "NONE");
+		g_fPersonalStyleRecord[0][client] = 0.0;
+		Format(g_szPersonalStyleRecord[0][client], 64, "NONE");
 		for (int i = 1; i < MAX_STYLES; i++)
 		{
 			Format(g_szPersonalStyleRecord[i][client], 64, "NONE");
@@ -3258,15 +3258,15 @@ public void SQL_selectPersonalRecordsCallback(Database db, DBResultSet results, 
 				style = results.FetchInt(1);
 				if (style == 0)
 				{
-					g_fPersonalRecord[client] = results.FetchFloat(0);
+					g_fPersonalStyleRecord[0][client] = results.FetchFloat(0);
 
 					g_iStartVelsRecord[client][0][0] = results.FetchInt(2);
 					g_iStartVelsRecord[client][0][1] = results.FetchInt(3);
 					g_iStartVelsRecord[client][0][2] = results.FetchInt(4);
 
-					if (g_fPersonalRecord[client] > 0.0)
+					if (g_fPersonalStyleRecord[0][client] > 0.0)
 					{
-						FormatTimeFloat(client, g_fPersonalRecord[client], 3, g_szPersonalRecord[client], 64);
+						FormatTimeFloat(client, g_fPersonalStyleRecord[0][client], 3, g_szPersonalStyleRecord[0][client], 64);
 						// Time found, get rank in current map
 						db_viewMapRankPro(client);
 					}
@@ -3286,8 +3286,8 @@ public void SQL_selectPersonalRecordsCallback(Database db, DBResultSet results, 
 		}
 		else
 		{
-			Format(g_szPersonalRecord[client], 64, "NONE");
-			g_fPersonalRecord[client] = 0.0;
+			Format(g_szPersonalStyleRecord[0][client], 64, "NONE");
+			g_fPersonalStyleRecord[0][client] = 0.0;
 
 			for (int i = 1; i < MAX_STYLES; i++)
 			{
@@ -3427,7 +3427,7 @@ public void db_viewRecordCheckpointInMap()
 	
 	// SELECT steamid, mapname, cp, time, zonegroup FROM ck_checkpoints WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = 0;
 	char szQuery[1028];
-	Format(szQuery, sizeof(szQuery), sql_selectRecordCheckpoints, g_szRecordMapSteamID, g_szMapName, g_szMapName);
+	Format(szQuery, sizeof(szQuery), sql_selectRecordCheckpoints, g_szRecordStyleMapSteamID[0], g_szMapName, g_szMapName);
 	if (g_cLogQueries.BoolValue)
 	{
 		LogToFile(g_szQueryFile, "db_viewRecordCheckpointInMap - szQuery: %s", szQuery);
@@ -3889,17 +3889,17 @@ public void db_viewMapRankBonusCallback(Database db, DBResultSet results, const 
 	{
 		if (results.HasResults && results.FetchRow())
 		{
-			g_MapRankBonus[zgroup][client] = results.RowCount;
+			g_StyleMapRankBonus[0][zgroup][client] = results.RowCount;
 		}
 		else
 		{
-			g_MapRankBonus[zgroup][client] = 9999999;
+			g_StyleMapRankBonus[0][zgroup][client] = 9999999;
 		}
 
 		switch (type)
 		{
 			case 1: {
-				g_iBonusCount[zgroup]++;
+				g_iStyleBonusCount[0][zgroup]++;
 				PrintChatBonus(client, zgroup);
 			}
 			case 2: {
@@ -3949,8 +3949,8 @@ public void SQL_selectPersonalBonusRecordsCallback(Database db, DBResultSet resu
 
 		for (int i = 0; i < MAXZONEGROUPS; i++)
 		{
-			g_fPersonalRecordBonus[i][client] = 0.0;
-			Format(g_szPersonalRecordBonus[i][client], 64, "N/A");
+			g_fStylePersonalRecordBonus[0][i][client] = 0.0;
+			Format(g_szStylePersonalRecordBonus[0][i][client], 64, "N/A");
 
 			for (int j = 0; j < 3; j++)
 			{
@@ -3980,7 +3980,7 @@ public void SQL_selectPersonalBonusRecordsCallback(Database db, DBResultSet resu
 
 				if (style == 0)
 				{
-					g_fPersonalRecordBonus[zgroup][client] = results.FetchFloat(0);
+					g_fStylePersonalRecordBonus[0][zgroup][client] = results.FetchFloat(0);
 
 					g_iStartVelsRecord[client][zgroup][0] = results.FetchInt(3);
 					g_iStartVelsRecord[client][zgroup][1] = results.FetchInt(4);
@@ -3989,15 +3989,15 @@ public void SQL_selectPersonalBonusRecordsCallback(Database db, DBResultSet resu
 					g_iEndVelsRecord[client][zgroup][1] = results.FetchInt(7);
 					g_iEndVelsRecord[client][zgroup][2] = results.FetchInt(8);
 
-					if (g_fPersonalRecordBonus[zgroup][client] > 0.0)
+					if (g_fStylePersonalRecordBonus[0][zgroup][client] > 0.0)
 					{
-						FormatTimeFloat(client, g_fPersonalRecordBonus[zgroup][client], 3, g_szPersonalRecordBonus[zgroup][client], 64);
+						FormatTimeFloat(client, g_fStylePersonalRecordBonus[0][zgroup][client], 3, g_szStylePersonalRecordBonus[0][zgroup][client], 64);
 						db_viewMapRankBonus(client, zgroup, 0); // get rank
 					}
 					else
 					{
-						Format(g_szPersonalRecordBonus[zgroup][client], 64, "N/A");
-						g_fPersonalRecordBonus[zgroup][client] = 0.0;
+						Format(g_szStylePersonalRecordBonus[0][zgroup][client], 64, "N/A");
+						g_fStylePersonalRecordBonus[0][zgroup][client] = 0.0;
 					}
 				}
 				else
@@ -4011,8 +4011,8 @@ public void SQL_selectPersonalBonusRecordsCallback(Database db, DBResultSet resu
 					}
 					else
 					{
-						Format(g_szPersonalRecordBonus[zgroup][client], 64, "N/A");
-						g_fPersonalRecordBonus[zgroup][client] = 0.0;
+						Format(g_szStylePersonalRecordBonus[0][zgroup][client], 64, "N/A");
+						g_fStylePersonalRecordBonus[0][zgroup][client] = 0.0;
 					}
 				}
 			}
@@ -4065,8 +4065,8 @@ public void SQL_selectFastestBonusCallback(Database db, DBResultSet results, con
 
 	for (int i = 0; i < MAXZONEGROUPS; i++)
 	{
-		Format(g_szBonusFastestTime[i], 64, "N/A");
-		g_fBonusFastest[i] = 9999999.0;
+		Format(g_szStyleBonusFastestTime[0][i], 64, "N/A");
+		g_fStyleBonusFastest[0][i] = 9999999.0;
 
 		for (int j = 0; j < 3; j++)
 		{	
@@ -4098,9 +4098,9 @@ public void SQL_selectFastestBonusCallback(Database db, DBResultSet results, con
 
 			if (style == 0)
 			{
-				results.FetchString(0, g_szBonusFastest[zonegroup], MAX_NAME_LENGTH);
-				g_fBonusFastest[zonegroup] = results.FetchFloat(1);
-				FormatTimeFloat(1, g_fBonusFastest[zonegroup], 3, g_szBonusFastestTime[zonegroup], 64);
+				results.FetchString(0, g_szStyleBonusFastest[0][zonegroup], MAX_NAME_LENGTH);
+				g_fStyleBonusFastest[0][zonegroup] = results.FetchFloat(1);
+				FormatTimeFloat(1, g_fStyleBonusFastest[0][zonegroup], 3, g_szStyleBonusFastestTime[0][zonegroup], 64);
 
 				g_iStartVelsServerRecord[zonegroup][0] = results.FetchInt(4);
 				g_iStartVelsServerRecord[zonegroup][1] = results.FetchInt(5);
@@ -4120,8 +4120,8 @@ public void SQL_selectFastestBonusCallback(Database db, DBResultSet results, con
 
 	for (int i = 0; i < MAXZONEGROUPS; i++)
 	{
-		if (g_fBonusFastest[i] == 0.0)
-			g_fBonusFastest[i] = 9999999.0;
+		if (g_fStyleBonusFastest[0][i] == 0.0)
+			g_fStyleBonusFastest[0][i] = 9999999.0;
 
 		for (int s = 1; s < MAX_STYLES; s++)
 		{
@@ -4160,7 +4160,7 @@ public void SQL_selectBonusTotalCountCallback(Database db, DBResultSet results, 
 	}
 
 	for (int i = 1; i < MAXZONEGROUPS; i++)
-	g_iBonusCount[i] = 0;
+	g_iStyleBonusCount[0][i] = 0;
 
 	if (results.HasResults)
 	{
@@ -4171,7 +4171,7 @@ public void SQL_selectBonusTotalCountCallback(Database db, DBResultSet results, 
 			zonegroup = results.FetchInt(0);
 			style = results.FetchInt(1);
 			if (style == 0)
-				g_iBonusCount[zonegroup] = results.FetchInt(2);
+				g_iStyleBonusCount[0][zonegroup] = results.FetchInt(2);
 			else
 				g_iStyleBonusCount[style][zonegroup] = results.FetchInt(2);
 		}
@@ -9449,8 +9449,8 @@ public void SQL_ViewPlayerPrMaptimeCallback2(Database db, DBResultSet results, c
 	{
 		for (int i = 1; i < g_totalBonusesPr[client]; i++)
 		{
-			if (g_fPersonalRecordBonus[i][client] != 0.0)
-				Format(szBonusInfo[i], 256, "Bonus %i: %s\nRank: %i/%i\n \n", i, g_szPersonalRecordBonus[i][target], g_MapRankBonus[i][target], g_iBonusCount[i]);
+			if (g_fStylePersonalRecordBonus[0][i][client] != 0.0)
+				Format(szBonusInfo[i], 256, "Bonus %i: %s\nRank: %i/%i\n \n", i, g_szStylePersonalRecordBonus[0][i][target], g_StyleMapRankBonus[0][i][target], g_iStyleBonusCount[0][i]);
 			else
 				Format(szBonusInfo[i], 256, "Bonus %i: None\n \n", i);
 

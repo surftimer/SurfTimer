@@ -484,176 +484,173 @@ public void StartTouch(int client, int action[3])
 
 public void EndTouch(int client, int action[3])
 {
-	if (IsValidClient(client))
+	LimitSpeed(client);
+	// Set Client targetName
+	if (StrEqual(g_szMapName, "surf_forgotten"))
 	{
-		LimitSpeed(client);
-		// Set Client targetName
-		if (StrEqual(g_szMapName, "surf_forgotten"))
-		{
-			if (!StrEqual("player", g_mapZones[g_iClientInZone[client][3]].TargetName))
-				DispatchKeyValue(client, "targetname", g_mapZones[g_iClientInZone[client][3]].TargetName);
-		}
-
-		// float CurVelVec[3];
-		// GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
-		// float currentspeed = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0) + Pow(CurVelVec[2], 2.0));
-		// float xy = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0));
-		// float z = SquareRoot(Pow(CurVelVec[2], 2.0));
-		// CPrintToChat(client, "XY: %f Z: %f XYZ: %f", xy, z, currentspeed);
-		// CPrintToChat(client, "%f", CurVelVec);
-		// CPrintToChat(client, "%f %f %f", CurVelVec[0], CurVelVec[1], CurVelVec[2]);
-
-		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
-		if (action[0] == 1 || action[0] == 5)
-		{
-			if (g_bPracticeMode[client] && !g_bTimerRunning[client]) // If on practice mode, but timer isn't on - start timer
-			{
-				CL_OnStartTimerPress(client);
-			}
-			else
-			{
-				if (!g_bPracticeMode[client])
-				{
-					g_Stage[g_iClientInZone[client][2]][client] = 1;
-					lastCheckpoint[g_iClientInZone[client][2]][client] = 999;
-
-					// NoClip check
-					if (g_bNoClip[client] || (!g_bNoClip[client] && (GetGameTime() - g_fLastTimeNoClipUsed[client]) < 3.0))
-					{
-						CPrintToChat(client, "%t", "SurfZones1", g_szChatPrefix);
-						ClientCommand(client, "play buttons\\button10.wav");
-						// fluffys
-						// ClientCommand(client, "sm_stuck");
-					}
-					else
-					{
-						if (g_bhasStages && g_bTimerEnabled[client])
-							CL_OnStartWrcpTimerPress(client); // fluffys only start stage timer if not in prac mode
-
-						if (g_bTimerEnabled[client])
-							CL_OnStartTimerPress(client);
-					}
-
-					// fluffys
-					if (!g_bNoClip[client])
-						g_bInStartZone[client] = false;
-
-					g_bValidRun[client] = false;
-				}
-			}
-		}
-		// fluffys
-		else if (action[0] == 3) // fluffys stage
-		{
-			float fVelocity[3];
-			GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
-			int zoneGrp = action[2];
-			int zone = action[1];
-			// int mode = g_SpeedMode[client];
-			g_iCheckpointVelsStartNew[zoneGrp][client][zone][0] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0))); // XY
-			g_iCheckpointVelsStartNew[zoneGrp][client][zone][1] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0))); // XYZ
-			g_iCheckpointVelsStartNew[zoneGrp][client][zone][2] = RoundToNearest(fVelocity[2]); // Z
-			
-			// int idiff, speedMode = g_SpeedMode[client];
-			int idiff, speedMode;
-
-			if (g_mapZones[zone].PreSpeed > 250.0)
-				speedMode = 0;
-			else
-				speedMode = 1;
-				
-			if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
-				idiff = g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode];
-			else if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] > g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode])
-				idiff = (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] - g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode]);
-			else
-				idiff = (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] - g_iCheckpointVelsStartServerRecord[0][zone][speedMode]);
-			
-			if (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] > g_iCheckpointVelsStartServerRecord[0][zone][speedMode] || g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
-				Format(g_szLastSpeedDifference[client], 128, "(WR +%d)", idiff);
-			else
-				Format(g_szLastSpeedDifference[client], 128, "(WR -%d)", idiff);
-
-
-			g_fLastDifferenceSpeed[client] = GetGameTime();
-			
-			// targetname filters
-			if (StrEqual(g_szMapName, "surf_treespam") && g_Stage[g_iClientInZone[client][2]][client] == 4)
-			{
-				DispatchKeyValue(client, "targetname", "s4neutral");
-			}
-			else if (StrEqual(g_szMapName, "surf_looksmodern"))
-			{	
-				if (g_Stage[g_iClientInZone[client][2]][client] == 2)
-					DispatchKeyValue(client, "classname", "two_1");
-				else if (g_Stage[g_iClientInZone[client][2]][client] == 3)
-					DispatchKeyValue(client, "classname", "threer");
-				else if (g_Stage[g_iClientInZone[client][2]][client] == 4)
-					DispatchKeyValue(client, "classname", "four_1");
-				else if (g_Stage[g_iClientInZone[client][2]][client] == 5)
-					DispatchKeyValue(client, "classname", "five_1");
-			}
-
-			g_bInStageZone[client] = false;
-
-			if (!g_bPracticeMode[client] && g_bTimerEnabled[client])
-				CL_OnStartWrcpTimerPress(client);
-
-		}
-		else if (action[0] == 4) // stage & cp
-		{
-			// If velocity
-			float fVelocity[3];
-			GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
-			int zoneGrp = action[2];
-			int zone = g_iClientInZone[client][1];
-			// int mode = g_SpeedMode[client];
-			g_iCheckpointVelsStartNew[zoneGrp][client][zone][0] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0))); // XY
-			g_iCheckpointVelsStartNew[zoneGrp][client][zone][1] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0))); // XYZ
-			g_iCheckpointVelsStartNew[zoneGrp][client][zone][2] = RoundToNearest(fVelocity[2]); // Z
-
-			// int idiff, speedMode = g_SpeedMode[client];
-			int idiff, speedMode = 0;
-
-			if (g_mapZones[zone].PreSpeed > 250.0)
-				speedMode = 0;
-			else
-				speedMode = 1;
-				
-			if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
-				idiff = g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode];
-			else if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] > g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode])
-				idiff = (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] - g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode]);
-			else
-				idiff = (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] - g_iCheckpointVelsStartServerRecord[0][zone][speedMode]);
-			
-			if (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] > g_iCheckpointVelsStartServerRecord[0][zone][speedMode] || g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
-				Format(g_szLastSpeedDifference[client], 128, "(WR +%d)", idiff);
-			else
-				Format(g_szLastSpeedDifference[client], 128, "(WR -%d)", idiff);
-			
-			g_fLastDifferenceSpeed[client] = GetGameTime();
-		}
-		else if (action[0] == 9) // fluffys nojump
-		{
-			g_bInJump[client] = false;
-		}
-		else if (action[0] == 10) // fluffys noduck
-		{
-			g_bInDuck[client] = false;
-		}
-		else if (action[0] == 11) // MaxSpeed zone
-		{
-			g_bInMaxSpeed[client] = false;
-		// 	CPrintToChat(client, "Left MaxSpeed zone");
-		}
-
-		// Set client location
-		g_iClientInZone[client][0] = -1;
-		g_iClientInZone[client][1] = -1;
-		g_iClientInZone[client][2] = action[2];
-		g_iClientInZone[client][3] = -1;
+		if (!StrEqual("player", g_mapZones[g_iClientInZone[client][3]].TargetName))
+			DispatchKeyValue(client, "targetname", g_mapZones[g_iClientInZone[client][3]].TargetName);
 	}
+
+	// float CurVelVec[3];
+	// GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
+	// float currentspeed = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0) + Pow(CurVelVec[2], 2.0));
+	// float xy = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0));
+	// float z = SquareRoot(Pow(CurVelVec[2], 2.0));
+	// CPrintToChat(client, "XY: %f Z: %f XYZ: %f", xy, z, currentspeed);
+	// CPrintToChat(client, "%f", CurVelVec);
+	// CPrintToChat(client, "%f %f %f", CurVelVec[0], CurVelVec[1], CurVelVec[2]);
+
+	// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
+	if (action[0] == 1 || action[0] == 5)
+	{
+		if (g_bPracticeMode[client] && !g_bTimerRunning[client]) // If on practice mode, but timer isn't on - start timer
+		{
+			CL_OnStartTimerPress(client);
+		}
+		else
+		{
+			if (!g_bPracticeMode[client])
+			{
+				g_Stage[g_iClientInZone[client][2]][client] = 1;
+				lastCheckpoint[g_iClientInZone[client][2]][client] = 999;
+
+				// NoClip check
+				if (g_bNoClip[client] || (!g_bNoClip[client] && (GetGameTime() - g_fLastTimeNoClipUsed[client]) < 3.0))
+				{
+					CPrintToChat(client, "%t", "SurfZones1", g_szChatPrefix);
+					ClientCommand(client, "play buttons\\button10.wav");
+					// fluffys
+					// ClientCommand(client, "sm_stuck");
+				}
+				else
+				{
+					if (g_bhasStages && g_bTimerEnabled[client])
+						CL_OnStartWrcpTimerPress(client); // fluffys only start stage timer if not in prac mode
+
+					if (g_bTimerEnabled[client])
+						CL_OnStartTimerPress(client);
+				}
+
+				// fluffys
+				if (!g_bNoClip[client])
+					g_bInStartZone[client] = false;
+
+				g_bValidRun[client] = false;
+			}
+		}
+	}
+	// fluffys
+	else if (action[0] == 3) // fluffys stage
+	{
+		float fVelocity[3];
+		GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+		int zoneGrp = action[2];
+		int zone = action[1];
+		// int mode = g_SpeedMode[client];
+		g_iCheckpointVelsStartNew[zoneGrp][client][zone][0] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0))); // XY
+		g_iCheckpointVelsStartNew[zoneGrp][client][zone][1] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0))); // XYZ
+		g_iCheckpointVelsStartNew[zoneGrp][client][zone][2] = RoundToNearest(fVelocity[2]); // Z
+		
+		// int idiff, speedMode = g_SpeedMode[client];
+		int idiff, speedMode;
+
+		if (g_mapZones[zone].PreSpeed > 250.0)
+			speedMode = 0;
+		else
+			speedMode = 1;
+			
+		if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
+			idiff = g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode];
+		else if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] > g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode])
+			idiff = (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] - g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode]);
+		else
+			idiff = (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] - g_iCheckpointVelsStartServerRecord[0][zone][speedMode]);
+		
+		if (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] > g_iCheckpointVelsStartServerRecord[0][zone][speedMode] || g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
+			Format(g_szLastSpeedDifference[client], 128, "(WR +%d)", idiff);
+		else
+			Format(g_szLastSpeedDifference[client], 128, "(WR -%d)", idiff);
+
+
+		g_fLastDifferenceSpeed[client] = GetGameTime();
+		
+		// targetname filters
+		if (StrEqual(g_szMapName, "surf_treespam") && g_Stage[g_iClientInZone[client][2]][client] == 4)
+		{
+			DispatchKeyValue(client, "targetname", "s4neutral");
+		}
+		else if (StrEqual(g_szMapName, "surf_looksmodern"))
+		{	
+			if (g_Stage[g_iClientInZone[client][2]][client] == 2)
+				DispatchKeyValue(client, "classname", "two_1");
+			else if (g_Stage[g_iClientInZone[client][2]][client] == 3)
+				DispatchKeyValue(client, "classname", "threer");
+			else if (g_Stage[g_iClientInZone[client][2]][client] == 4)
+				DispatchKeyValue(client, "classname", "four_1");
+			else if (g_Stage[g_iClientInZone[client][2]][client] == 5)
+				DispatchKeyValue(client, "classname", "five_1");
+		}
+
+		g_bInStageZone[client] = false;
+
+		if (!g_bPracticeMode[client] && g_bTimerEnabled[client])
+			CL_OnStartWrcpTimerPress(client);
+
+	}
+	else if (action[0] == 4) // stage & cp
+	{
+		// If velocity
+		float fVelocity[3];
+		GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+		int zoneGrp = action[2];
+		int zone = g_iClientInZone[client][1];
+		// int mode = g_SpeedMode[client];
+		g_iCheckpointVelsStartNew[zoneGrp][client][zone][0] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0))); // XY
+		g_iCheckpointVelsStartNew[zoneGrp][client][zone][1] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0))); // XYZ
+		g_iCheckpointVelsStartNew[zoneGrp][client][zone][2] = RoundToNearest(fVelocity[2]); // Z
+
+		// int idiff, speedMode = g_SpeedMode[client];
+		int idiff, speedMode = 0;
+
+		if (g_mapZones[zone].PreSpeed > 250.0)
+			speedMode = 0;
+		else
+			speedMode = 1;
+			
+		if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
+			idiff = g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode];
+		else if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] > g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode])
+			idiff = (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] - g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode]);
+		else
+			idiff = (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] - g_iCheckpointVelsStartServerRecord[0][zone][speedMode]);
+		
+		if (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] > g_iCheckpointVelsStartServerRecord[0][zone][speedMode] || g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
+			Format(g_szLastSpeedDifference[client], 128, "(WR +%d)", idiff);
+		else
+			Format(g_szLastSpeedDifference[client], 128, "(WR -%d)", idiff);
+		
+		g_fLastDifferenceSpeed[client] = GetGameTime();
+	}
+	else if (action[0] == 9) // fluffys nojump
+	{
+		g_bInJump[client] = false;
+	}
+	else if (action[0] == 10) // fluffys noduck
+	{
+		g_bInDuck[client] = false;
+	}
+	else if (action[0] == 11) // MaxSpeed zone
+	{
+		g_bInMaxSpeed[client] = false;
+	// 	CPrintToChat(client, "Left MaxSpeed zone");
+	}
+
+	// Set client location
+	g_iClientInZone[client][0] = -1;
+	g_iClientInZone[client][1] = -1;
+	g_iClientInZone[client][2] = action[2];
+	g_iClientInZone[client][3] = -1;
 }
 
 public void getZoneTeamColor(int team, int color[4])
