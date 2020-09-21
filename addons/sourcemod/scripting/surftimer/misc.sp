@@ -3402,20 +3402,7 @@ public void CenterHudAlive(int client)
 				// server records (change from WR)
 				if (gametime - g_fLastDifferenceTime[client] > 5.0)
 				{
-					if (g_iClientInZone[client][2] == 0 && style == 0)
-					{
-						if (g_fRecordStyleMapTime[0] != 9999999.0)
-						{
-							// fluffys
-							if (g_bPracticeMode[client])
-								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordStyleMapTime[0]);
-							else
-								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordStyleMapTime[0]);
-						}
-						else
-							Format(g_szLastSRDifference[client], 64, "SR: N/A");
-					}
-					else if (g_iClientInZone[client][2] == 0 && g_iCurrentStyle[client] != 0) // Styles
+					if (g_iClientInZone[client][2] == 0) // Styles
 					{
 						if (g_fRecordStyleMapTime[style] != 9999999.0)
 						{
@@ -3443,19 +3430,7 @@ public void CenterHudAlive(int client)
 				// PB
 				if (gametime - g_fLastDifferenceTime[client] > 5.0)
 				{
-					if (g_iClientInZone[client][2] == 0 && style == 0)
-					{
-						if (g_fRecordStyleMapTime[0] != 9999999.0)
-						{
-							if (g_fPersonalStyleRecord[0][client] > 0.0)
-								Format(g_szLastPBDifference[client], 64, "PB: %s", g_szPersonalStyleRecord[0][client]);
-							else
-								Format(g_szLastPBDifference[client], 64, "PB: N/A");
-						}
-						else
-							Format(g_szLastPBDifference[client], 64, "PB: N/A");
-					}
-					else if (g_iClientInZone[client][2] == 0 && g_iCurrentStyle[client] != 0) // Styles
+					if (g_iClientInZone[client][2] == 0) // Styles
 					{
 						if (g_fRecordStyleMapTime[style] != 9999999.0)
 						{
@@ -3631,21 +3606,23 @@ public void SideHudAlive(int client)
 				else
 					Format(szWR, 128, "%s", g_szLastSRDifference[client]);
 				char szWRHolder[64];
-				if (style == 0)
-				{
-					if (g_iClientInZone[client][2] == 0)
-						Format(szWRHolder, 64, g_szRecordStylePlayer[0]);
-					else
-						Format(szWRHolder, 64, g_szStyleBonusFastest[0][g_iClientInZone[client][2]]);
-
-				}
+				
+				if (g_iClientInZone[client][2] == 0)
+					Format(szWRHolder, sizeof(szWRHolder), g_szRecordStylePlayer[0]);
+				else
+					Format(szWRHolder, sizeof(szWRHolder), g_szStyleBonusFastest[0][g_iClientInZone[client][2]]);
+				
+				/*
+												????
 				else
 				{
 					if (g_iClientInZone[client][2] == 0)
-						Format(szWRHolder, 64, g_szRecordStylePlayer[0]);
+						Format(szWRHolder, sizeof(szWRHolder), g_szRecordStylePlayer[0]);
 					else
-						Format(szWRHolder, 64, g_szStyleBonusFastest[0][g_iClientInZone[client][2]]);
+						Format(szWRHolder, sizeof(szWRHolder), g_szStyleBonusFastest[0][g_iClientInZone[client][2]]);
 				}
+				*/
+
 				Format(szModule[i], 256, "%s\nby %s", szWR, szWRHolder);
 
 				if ((i + 1) != moduleCount)
@@ -3750,9 +3727,9 @@ public void SideHudAlive(int client)
 					{
 						Format(szStage, 64, "Stage: %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
 						char szWrcpTime[64];
-						FormatTimeFloat(0, g_fStageRecord[stage], 3, szWrcpTime, 64);
+						FormatTimeFloat(0, g_fStyleStageRecord[0][stage], 3, szWrcpTime, 64);
 						char szName[64];
-						Format(szName, 64, "%s", g_szStageRecordPlayer[stage]);
+						Format(szName, 64, "%s", g_szStyleStageRecordPlayer[0][stage]);
 						Format(szModule[i], 256, "%s\nSRCP: %s\nby %s", szStage, szWrcpTime, szName);
 
 						if ((i + 1) != moduleCount)

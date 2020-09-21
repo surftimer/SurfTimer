@@ -427,18 +427,13 @@ float g_fFinalWrcpTime[MAXPLAYERS + 1];
 // Total time the run took in 00:00:00 format
 char g_szFinalWrcpTime[MAXPLAYERS + 1][32];
 float g_fCurrentWrcpRunTime[MAXPLAYERS + 1];
-int g_StageRank[MAXPLAYERS + 1][CPLIMIT];
-float g_fStageRecord[CPLIMIT];
-char g_szRecordStageTime[CPLIMIT];
 
-int g_TotalStageRecords[CPLIMIT];
 int g_TotalStages;
 float g_fWrcpMenuLastQuery[MAXPLAYERS + 1] = 1.0;
 bool g_bSelectWrcp[MAXPLAYERS + 1];
 int g_iWrcpMenuStyleSelect[MAXPLAYERS + 1];
 char g_szWrcpMapSelect[MAXPLAYERS + 1][128];
 bool g_bStageSRVRecord[MAXPLAYERS + 1][CPLIMIT];
-char g_szStageRecordPlayer[CPLIMIT][MAX_NAME_LENGTH];
 // bool g_bFirstStageRecord[CPLIMIT];
 
 /*----------  Map Settings Variables ----------*/

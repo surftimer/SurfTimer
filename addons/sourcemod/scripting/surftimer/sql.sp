@@ -485,10 +485,7 @@ public void sql_selectPlayerProCountCallback(Database db, DBResultSet results, c
 		{
 			style = results.FetchInt(0);
 			count = results.FetchInt(1);
-			if (style == 0)
-				g_StyleMapTimesCount[0] = count;
-			else
-				g_StyleMapTimesCount[style] = count;
+			g_StyleMapTimesCount[style] = count;
 		}
 	}
 	else
@@ -2112,47 +2109,33 @@ public void sql_selectMapRecordCallback(Database db, DBResultSet results, const 
 		while (results.FetchRow())
 		{
 			style = results.FetchInt(9);
-			if (style == 0)
-			{
-				g_fRecordStyleMapTime[0] = results.FetchFloat(0);
 
-				if (g_fRecordStyleMapTime[0] > -1.0 && !results.IsFieldNull(0))
-				{
-					g_fRecordStyleMapTime[0] = results.FetchFloat(0);
 
-					g_iStartVelsServerRecord[0][0] = results.FetchInt(3);
-					g_iStartVelsServerRecord[0][1] = results.FetchInt(4);
-					g_iStartVelsServerRecord[0][2] = results.FetchInt(5);
-					g_iEndVelsServerRecord[0][0] = results.FetchInt(6);
-					g_iEndVelsServerRecord[0][1] = results.FetchInt(7);
-					g_iEndVelsServerRecord[0][2] = results.FetchInt(8);
+			g_fRecordStyleMapTime[style] = results.FetchFloat(0);
 
-					FormatTimeFloat(0, g_fRecordStyleMapTime[0], 3, g_szRecordStyleMapTime[0], 64);
-					results.FetchString(1, g_szRecordStylePlayer[0], MAX_NAME_LENGTH);
-					results.FetchString(2, g_szRecordStyleMapSteamID[0], MAX_NAME_LENGTH);
-				}
-				else
-				{
-					Format(g_szRecordStyleMapTime[0], 64, "N/A");
-					g_fRecordStyleMapTime[0] = 9999999.0;
-				}
-			}
-			else
+			if (g_fRecordStyleMapTime[style] > -1.0 && !results.IsFieldNull(0))
 			{
 				g_fRecordStyleMapTime[style] = results.FetchFloat(0);
 
-				if (g_fRecordStyleMapTime[style] > -1.0 && !results.IsFieldNull(0))
+				if (style == 0)
 				{
-					g_fRecordStyleMapTime[style] = results.FetchFloat(0);
-					FormatTimeFloat(0, g_fRecordStyleMapTime[style], 3, g_szRecordStyleMapTime[style], 64);
-					results.FetchString(1, g_szRecordStylePlayer[style], MAX_NAME_LENGTH);
-					results.FetchString(2, g_szRecordStyleMapSteamID[style], MAX_NAME_LENGTH);
+					g_iStartVelsServerRecord[style][0] = results.FetchInt(3);
+					g_iStartVelsServerRecord[style][1] = results.FetchInt(4);
+					g_iStartVelsServerRecord[style][2] = results.FetchInt(5);
+					g_iEndVelsServerRecord[style][0] = results.FetchInt(6);
+					g_iEndVelsServerRecord[style][1] = results.FetchInt(7);
+					g_iEndVelsServerRecord[style][2] = results.FetchInt(8);
 				}
-				else
-				{
-					Format(g_szRecordStyleMapTime[style], 64, "N/A");
-					g_fRecordStyleMapTime[style] = 9999999.0;
-				}
+
+				FormatTimeFloat(0, g_fRecordStyleMapTime[style], 3, g_szRecordStyleMapTime[style], 64);
+
+				results.FetchString(1, g_szRecordStylePlayer[style], MAX_NAME_LENGTH);
+				results.FetchString(2, g_szRecordStyleMapSteamID[style], MAX_NAME_LENGTH);
+			}
+			else
+			{
+				Format(g_szRecordStyleMapTime[style], 64, "N/A");
+				g_fRecordStyleMapTime[style] = 9999999.0;
 			}
 		}
 	}
@@ -3256,29 +3239,26 @@ public void SQL_selectPersonalRecordsCallback(Database db, DBResultSet results, 
 			while (results.FetchRow())
 			{
 				style = results.FetchInt(1);
+
+				g_fPersonalStyleRecord[style][client] = results.FetchFloat(0);
+
 				if (style == 0)
 				{
-					g_fPersonalStyleRecord[0][client] = results.FetchFloat(0);
+					g_iStartVelsRecord[client][style][0] = results.FetchInt(2);
+					g_iStartVelsRecord[client][style][1] = results.FetchInt(3);
+					g_iStartVelsRecord[client][style][2] = results.FetchInt(4);
+				}
 
-					g_iStartVelsRecord[client][0][0] = results.FetchInt(2);
-					g_iStartVelsRecord[client][0][1] = results.FetchInt(3);
-					g_iStartVelsRecord[client][0][2] = results.FetchInt(4);
+				if (g_fPersonalStyleRecord[style][client] > 0.0)
+				{
+					FormatTimeFloat(client, g_fPersonalStyleRecord[style][client], 3, g_szPersonalStyleRecord[style][client], 64);
 
-					if (g_fPersonalStyleRecord[0][client] > 0.0)
+					if (style == 0)
 					{
-						FormatTimeFloat(client, g_fPersonalStyleRecord[0][client], 3, g_szPersonalStyleRecord[0][client], 64);
-						// Time found, get rank in current map
 						db_viewMapRankPro(client);
 					}
-				}
-				else
-				{
-					g_fPersonalStyleRecord[style][client] = results.FetchFloat(0);
-
-					if (g_fPersonalStyleRecord[style][client] > 0.0)
+					else
 					{
-						FormatTimeFloat(client, g_fPersonalStyleRecord[style][client], 3, g_szPersonalStyleRecord[style][client], 64);
-						// Time found, get rank in current map
 						db_viewStyleMapRank(client, style);
 					}
 				}
@@ -3978,42 +3958,34 @@ public void SQL_selectPersonalBonusRecordsCallback(Database db, DBResultSet resu
 				zgroup = results.FetchInt(1);
 				style = results.FetchInt(2);
 
+				g_fStylePersonalRecordBonus[style][zgroup][client] = results.FetchFloat(0);
+
 				if (style == 0)
 				{
-					g_fStylePersonalRecordBonus[0][zgroup][client] = results.FetchFloat(0);
-
 					g_iStartVelsRecord[client][zgroup][0] = results.FetchInt(3);
 					g_iStartVelsRecord[client][zgroup][1] = results.FetchInt(4);
 					g_iStartVelsRecord[client][zgroup][2] = results.FetchInt(5);
 					g_iEndVelsRecord[client][zgroup][0] = results.FetchInt(6);
 					g_iEndVelsRecord[client][zgroup][1] = results.FetchInt(7);
 					g_iEndVelsRecord[client][zgroup][2] = results.FetchInt(8);
+				}
 
-					if (g_fStylePersonalRecordBonus[0][zgroup][client] > 0.0)
+				if (g_fStylePersonalRecordBonus[style][zgroup][client] > 0.0)
+				{
+					FormatTimeFloat(client, g_fStylePersonalRecordBonus[style][zgroup][client], 3, g_szStylePersonalRecordBonus[style][zgroup][client], 64);
+					if (style == 0)
 					{
-						FormatTimeFloat(client, g_fStylePersonalRecordBonus[0][zgroup][client], 3, g_szStylePersonalRecordBonus[0][zgroup][client], 64);
-						db_viewMapRankBonus(client, zgroup, 0); // get rank
+						db_viewMapRankBonus(client, zgroup, 0);
 					}
 					else
 					{
-						Format(g_szStylePersonalRecordBonus[0][zgroup][client], 64, "N/A");
-						g_fStylePersonalRecordBonus[0][zgroup][client] = 0.0;
+						db_viewMapRankBonusStyle(client, zgroup, 0, style);
 					}
 				}
 				else
 				{
-					g_fStylePersonalRecordBonus[style][zgroup][client] = results.FetchFloat(0);
-
-					if (g_fStylePersonalRecordBonus[style][zgroup][client] > 0.0)
-					{
-						FormatTimeFloat(client, g_fStylePersonalRecordBonus[style][zgroup][client], 3, g_szStylePersonalRecordBonus[style][zgroup][client], 64);
-						db_viewMapRankBonusStyle(client, zgroup, 0, style);
-					}
-					else
-					{
-						Format(g_szStylePersonalRecordBonus[0][zgroup][client], 64, "N/A");
-						g_fStylePersonalRecordBonus[0][zgroup][client] = 0.0;
-					}
+					Format(g_szStylePersonalRecordBonus[0][zgroup][client], 64, "N/A");
+					g_fStylePersonalRecordBonus[0][zgroup][client] = 0.0;
 				}
 			}
 		}
@@ -4096,12 +4068,12 @@ public void SQL_selectFastestBonusCallback(Database db, DBResultSet results, con
 			zonegroup = results.FetchInt(2);
 			style = results.FetchInt(3);
 
+			results.FetchString(0, g_szStyleBonusFastest[style][zonegroup], MAX_NAME_LENGTH);
+			g_fStyleBonusFastest[style][zonegroup] = results.FetchFloat(1);
+			FormatTimeFloat(1, g_fStyleBonusFastest[style][zonegroup], 3, g_szStyleBonusFastestTime[style][zonegroup], 64);
+
 			if (style == 0)
 			{
-				results.FetchString(0, g_szStyleBonusFastest[0][zonegroup], MAX_NAME_LENGTH);
-				g_fStyleBonusFastest[0][zonegroup] = results.FetchFloat(1);
-				FormatTimeFloat(1, g_fStyleBonusFastest[0][zonegroup], 3, g_szStyleBonusFastestTime[0][zonegroup], 64);
-
 				g_iStartVelsServerRecord[zonegroup][0] = results.FetchInt(4);
 				g_iStartVelsServerRecord[zonegroup][1] = results.FetchInt(5);
 				g_iStartVelsServerRecord[zonegroup][2] = results.FetchInt(6);
@@ -4109,12 +4081,7 @@ public void SQL_selectFastestBonusCallback(Database db, DBResultSet results, con
 				g_iEndVelsServerRecord[zonegroup][1] = results.FetchInt(8);
 				g_iEndVelsServerRecord[zonegroup][2] = results.FetchInt(9);
 			}
-			else
-			{
-				results.FetchString(0, g_szStyleBonusFastest[style][zonegroup], MAX_NAME_LENGTH);
-				g_fStyleBonusFastest[style][zonegroup] = results.FetchFloat(1);
-				FormatTimeFloat(1, g_fStyleBonusFastest[style][zonegroup], 3, g_szStyleBonusFastestTime[style][zonegroup], 64);
-			}
+
 		}
 	}
 
@@ -4170,10 +4137,7 @@ public void SQL_selectBonusTotalCountCallback(Database db, DBResultSet results, 
 		{
 			zonegroup = results.FetchInt(0);
 			style = results.FetchInt(1);
-			if (style == 0)
-				g_iStyleBonusCount[0][zonegroup] = results.FetchInt(2);
-			else
-				g_iStyleBonusCount[style][zonegroup] = results.FetchInt(2);
+			g_iStyleBonusCount[style][zonegroup] = results.FetchInt(2);
 		}
 	}
 
@@ -6242,10 +6206,7 @@ public void sql_selectWrcpRecordCallback(Database db, DBResultSet results, const
 		Format(szDiff, 128, "%cPB: %c+%s%c", WHITE, RED, szDiff, WHITE);
 
 	// SR
-	if (style == 0)
-		f_srDiff = (g_fStageRecord[stage] - time);
-	else // styles
-		f_srDiff = (g_fStyleStageRecord[style][stage] - time);
+	f_srDiff = (g_fStyleStageRecord[style][stage] - time);
 
 	FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
 
@@ -6422,10 +6383,7 @@ public void SQL_UpdateWrcpRecordCallback2(Database db, DBResultSet results, cons
 	{
 		if (bInsert) // fluffys FIXME
 		{
-			if (style == 0)
-				g_TotalStageRecords[stage]++;
-			else
-				g_TotalStageStyleRecords[style][stage]++;
+			g_TotalStageStyleRecords[style][stage]++;
 		}
 
 		if (stage == 0)
@@ -6439,10 +6397,7 @@ public void SQL_UpdateWrcpRecordCallback2(Database db, DBResultSet results, cons
 		if (stage > g_TotalStages) // Hack Fix for multiple end zone issue
 			stage = g_TotalStages;
 
-		if (style == 0)
-			g_StageRank[client][stage] = stagerank;
-		else
-			g_StyleStageRank[style][client][stage] = stagerank;
+		g_StyleStageRank[style][client][stage] = stagerank;
 
 		// Get client name
 		char szName[MAX_NAME_LENGTH];
@@ -6470,11 +6425,7 @@ public void SQL_UpdateWrcpRecordCallback2(Database db, DBResultSet results, cons
 		}
 
 		// SR
-		float f_srDiff;
-		if (style == 0)
-			f_srDiff = (g_fStageRecord[stage] - time);
-		else if (style != 0)
-			f_srDiff = (g_fStyleStageRecord[style][stage] - time);
+		float f_srDiff = (g_fStyleStageRecord[style][stage] - time);
 
 		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
 
@@ -6487,29 +6438,29 @@ public void SQL_UpdateWrcpRecordCallback2(Database db, DBResultSet results, cons
 		bool newRecordHolder = false;
 		if (style == 0)
 		{
-			if (g_TotalStageRecords[stage] > 0)
+			if (g_TotalStageStyleRecords[0][stage] > 0)
 			{ // If the server already has a record
 
-				if (g_fFinalWrcpTime[client] < g_fStageRecord[stage] && g_fFinalWrcpTime[client] > 0.0)
+				if (g_fFinalWrcpTime[client] < g_fStyleStageRecord[0][stage] && g_fFinalWrcpTime[client] > 0.0)
 				{ 
 					// New fastest time in map
 					g_bStageSRVRecord[client][stage] = true;
-					if (g_fWrcpRecord[client][stage][0] != g_fStageRecord[stage])
+					if (g_fWrcpRecord[client][stage][0] != g_fStyleStageRecord[0][stage])
 						newRecordHolder = true;
-					g_fStageRecord[stage] = g_fFinalTime[client];
-					Format(g_szStageRecordPlayer[stage], MAX_NAME_LENGTH, "%s", szName);
-					FormatTimeFloat(1, g_fStageRecord[stage], 3, g_szRecordStageTime[stage], 64);
-					CPrintToChatAll("%t", "SQL15", g_szChatPrefix, szName, stage, g_szFinalWrcpTime[client], sz_srDiff, g_TotalStageRecords[stage]);
+					g_fStyleStageRecord[0][stage] = g_fFinalTime[client];
+					Format(g_szStyleStageRecordPlayer[0][stage], MAX_NAME_LENGTH, "%s", szName);
+					FormatTimeFloat(1, g_fStyleStageRecord[0][stage], 3, g_szStyleRecordStageTime[0][stage], 64);
+					CPrintToChatAll("%t", "SQL15", g_szChatPrefix, szName, stage, g_szFinalWrcpTime[client], sz_srDiff, g_TotalStageStyleRecords[0][stage]);
 					g_bSavingWrcpReplay[client] = true;
 					// Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 					PlayWRCPRecord(1);
 				}
 				else
 				{
-					CPrintToChat(client, "%t", "SQL16", g_szChatPrefix, stage, g_szFinalWrcpTime[client], szDiff, sz_srDiff, g_StageRank[client][stage], g_TotalStageRecords[stage]);
+					CPrintToChat(client, "%t", "SQL16", g_szChatPrefix, stage, g_szFinalWrcpTime[client], szDiff, sz_srDiff, g_StyleStageRank[0][client][stage], g_TotalStageStyleRecords[0][stage]);
 
 					char szSpecMessage[512];
-					Format(szSpecMessage, sizeof(szSpecMessage), "%t", "SQL17", g_szChatPrefix, szName, stage, g_szFinalWrcpTime[client], szDiff, sz_srDiff, g_StageRank[client][stage], g_TotalStageRecords[stage]);
+					Format(szSpecMessage, sizeof(szSpecMessage), "%t", "SQL17", g_szChatPrefix, szName, stage, g_szFinalWrcpTime[client], szDiff, sz_srDiff, g_StyleStageRank[0][client][stage], g_TotalStageStyleRecords[0][stage]);
 					CheckpointToSpec(client, szSpecMessage);
 				}
 			}
@@ -6518,9 +6469,9 @@ public void SQL_UpdateWrcpRecordCallback2(Database db, DBResultSet results, cons
 				// Has to be the new record, since it is the first completion
 				newRecordHolder = true;
 				g_bStageSRVRecord[client][stage] = true;
-				g_fStageRecord[stage] = g_fFinalTime[client];
-				Format(g_szStageRecordPlayer[stage], MAX_NAME_LENGTH, "%s", szName);
-				FormatTimeFloat(1, g_fStageRecord[stage], 3, g_szRecordStageTime[stage], 64);
+				g_fStyleStageRecord[0][stage] = g_fFinalTime[client];
+				Format(g_szStyleStageRecordPlayer[0][stage], MAX_NAME_LENGTH, "%s", szName);
+				FormatTimeFloat(1, g_fStyleStageRecord[0][stage], 3, g_szStyleRecordStageTime[0][stage], 64);
 
 				CPrintToChatAll("%t", "SQL18", g_szChatPrefix, szName, stage, g_szFinalWrcpTime[client]);
 				g_bSavingWrcpReplay[client] = true;
@@ -6746,7 +6697,7 @@ public void sql_viewStageRanksCallback(Database db, DBResultSet results, const c
 	{
 		if (results.HasResults && results.FetchRow())
 		{
-			g_StageRank[client][stage] = results.FetchInt(0);
+			g_StyleStageRank[0][client][stage] = results.FetchInt(0);
 		}
 	}
 }
@@ -6786,7 +6737,7 @@ public void db_GetTotalStagesCallback(Database db, DBResultSet results, const ch
 
 		for(int i = 1; i <= g_TotalStages; i++)
 		{
-			g_fStageRecord[i] = 0.0;
+			g_fStyleStageRecord[0][i] = 0.0;
 			g_iWrcpVelsStartServerRecord[i][0] = 0;
 			g_iWrcpVelsStartServerRecord[i][1] = 0;
 			g_iWrcpVelsStartServerRecord[i][2] = 0;
@@ -7070,42 +7021,36 @@ public void sql_viewStageRecordsCallback(Database db, DBResultSet results, const
 			stage = results.FetchInt(2);
 			style = results.FetchInt(3);
 
+			g_fStyleStageRecord[style][stage] = results.FetchFloat(1);
+
 			if (style == 0)
 			{
-				g_fStageRecord[stage] = results.FetchFloat(1);
-
 				g_iWrcpVelsStartServerRecord[stage][0] = results.FetchInt(4);
 				g_iWrcpVelsStartServerRecord[stage][1] = results.FetchInt(5);
 				g_iWrcpVelsStartServerRecord[stage][2] = results.FetchInt(6);
 				g_iWrcpVelsEndServerRecord[stage][0] = results.FetchInt(7);
 				g_iWrcpVelsEndServerRecord[stage][1] = results.FetchInt(8);
 				g_iWrcpVelsEndServerRecord[stage][2] = results.FetchInt(9);
+			}
 
-				if (g_fStageRecord[stage] > -1.0 && !results.IsFieldNull(1))
+			if (g_fStyleStageRecord[style][stage] > -1.0 && !results.IsFieldNull(1))
+			{
+				g_fStyleStageRecord[style][stage] = results.FetchFloat(1);
+				FormatTimeFloat(0, g_fStyleStageRecord[style][stage], 3, g_szStyleRecordStageTime[style][stage], 64);
+
+				if (style == 0)
 				{
-					g_fStageRecord[stage] = results.FetchFloat(1);
-					Format(g_szStageRecordPlayer[stage], sizeof(g_szStageRecordPlayer), szName);
-					FormatTimeFloat(0, g_fStageRecord[stage], 3, g_szRecordStageTime[stage], 64);
-				}
-				else
-				{
-					Format(g_szStageRecordPlayer[stage], sizeof(g_szStageRecordPlayer), "N/A");
-					Format(g_szRecordStageTime[stage], 64, "N/A");
-					g_fStageRecord[stage] = 9999999.0;
+					Format(g_szStyleStageRecordPlayer[0][stage], sizeof(g_szStyleStageRecordPlayer[]), szName);
 				}
 			}
 			else
 			{
-				g_fStyleStageRecord[style][stage] = results.FetchFloat(1);
-				if (g_fStyleStageRecord[style][stage] > -1.0 && !results.IsFieldNull(1))
+				Format(g_szStyleRecordStageTime[style][stage], 64, "N/A");
+				g_fStyleStageRecord[style][stage] = 9999999.0;
+
+				if (style == 0)
 				{
-					g_fStyleStageRecord[style][stage] = results.FetchFloat(1);
-					FormatTimeFloat(0, g_fStyleStageRecord[style][stage], 3, g_szStyleRecordStageTime[style][stage], 64);
-				}
-				else
-				{
-					Format(g_szStyleRecordStageTime[style][stage], 64, "N/A");
-					g_fStyleStageRecord[style][stage] = 9999999.0;
+					Format(g_szStyleStageRecordPlayer[0][stage], sizeof(g_szStyleStageRecordPlayer[]), "N/A");
 				}
 			}
 		}
@@ -7114,8 +7059,8 @@ public void sql_viewStageRecordsCallback(Database db, DBResultSet results, const
 	{
 		for (int i = 1; i <= g_TotalStages; i++)
 		{
-			Format(g_szRecordStageTime[i], 64, "N/A");
-			g_fStageRecord[i] = 9999999.0;
+			Format(g_szStyleRecordStageTime[0][i], 64, "N/A");
+			g_fStyleStageRecord[0][i] = 9999999.0;
 			g_iWrcpVelsStartServerRecord[i][0] = 0;
 			g_iWrcpVelsStartServerRecord[i][1] = 0;
 			g_iWrcpVelsStartServerRecord[i][2] = 0;
@@ -7163,7 +7108,7 @@ public void sql_viewTotalStageRecordsCallback(Database db, DBResultSet results, 
 
 		for (int i = 0; i < CPLIMIT; i++)
 		{
-			g_TotalStageRecords[i] = 0;
+			g_TotalStageStyleRecords[0][i] = 0;
 		}
 
 		while (results.FetchRow())
@@ -7171,29 +7116,15 @@ public void sql_viewTotalStageRecordsCallback(Database db, DBResultSet results, 
 			stage = results.FetchInt(0);
 			style = results.FetchInt(1);
 
-			if (style == 0)
+
+			g_TotalStageStyleRecords[style][stage] = results.FetchInt(2);
+			if (g_TotalStageStyleRecords[style][stage] > -1.0 && !results.IsFieldNull(2))
 			{
-				g_TotalStageRecords[stage] = results.FetchInt(2);
-				if (g_TotalStageRecords[stage] > -1.0 && !results.IsFieldNull(2))
-				{
-					g_TotalStageRecords[stage] = results.FetchInt(2);
-				}
-				else
-				{
-					g_TotalStageRecords[stage] = 0;
-				}
+				g_TotalStageStyleRecords[style][stage] = results.FetchInt(2);
 			}
 			else
 			{
-				g_TotalStageStyleRecords[style][stage] = results.FetchInt(2);
-				if (g_TotalStageStyleRecords[style][stage] > -1.0 && !results.IsFieldNull(2))
-				{
-					g_TotalStageStyleRecords[style][stage] = results.FetchInt(2);
-				}
-				else
-				{
-					g_TotalStageStyleRecords[style][stage] = 0;
-				}
+				g_TotalStageStyleRecords[style][stage] = 0;
 			}
 		}
 	}
@@ -7201,7 +7132,7 @@ public void sql_viewTotalStageRecordsCallback(Database db, DBResultSet results, 
 	{
 		for (int i = 1; i <= g_TotalStages; i++)
 		{
-			g_TotalStageRecords[i] = 0;
+			g_TotalStageStyleRecords[0][i] = 0;
 			for (int s = 1; i < MAX_STYLES; s++)
 			{
 				g_TotalStageStyleRecords[s][i] = 0;

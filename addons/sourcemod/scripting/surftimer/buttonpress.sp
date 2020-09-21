@@ -945,7 +945,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 
 		char sz_srDiff[128];
 		float time = g_fFinalWrcpTime[client];
-		float f_srDiff = (g_fStageRecord[stage] - time);
+		float f_srDiff = (g_fStyleStageRecord[0][stage] - time);
 		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
 		if (f_srDiff > 0)
 		{
@@ -969,9 +969,9 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		}
 		else
 		{
-			if (g_TotalStageRecords[stage] > 0)
+			if (g_TotalStageStyleRecords[0][stage] > 0)
 			{ // If the server already has a record
-				if (g_fFinalWrcpTime[client] < g_fStageRecord[stage] && g_fFinalWrcpTime[client] > 0.0)
+				if (g_fFinalWrcpTime[client] < g_fStyleStageRecord[0][stage] && g_fFinalWrcpTime[client] > 0.0)
 				{
 					Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 				}

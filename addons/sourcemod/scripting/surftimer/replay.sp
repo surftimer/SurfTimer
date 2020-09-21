@@ -39,8 +39,8 @@ void setReplayTime(int zGrp, int stage, int style)
 	else if (stage > 0)
 	{
 		// Stage
-		if ((g_fStageRecord[stage] - 0.01) < time < (g_fStageRecord[stage]) + 0.01)
-			g_fStageReplayTimes[stage] = g_fStageRecord[stage];
+		if ((g_fStyleStageRecord[0][stage] - 0.01) < time < (g_fStyleStageRecord[0][stage]) + 0.01)
+			g_fStageReplayTimes[stage] = g_fStyleStageRecord[0][stage];
 		else
 			g_fStageReplayTimes[stage] = time;
 		return;
