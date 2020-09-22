@@ -5507,18 +5507,17 @@ public void db_viewUnfinishedMapsCallback(Database db, DBResultSet results, cons
 
 					// Initialize the name
 					if (!tmpMap[0])
-					strcopy(tmpMap, 128, szMap);
+						strcopy(tmpMap, 128, szMap);
 
 					// Check if the map changed, if so announce to client's console
 					if (!StrEqual(szMap, tmpMap, false))
 					{
 						if (count < 10)
-						digits = 1;
+							digits = 1;
+						else if (count < 100)
+							digits = 2;
 						else
-						if (count < 100)
-						digits = 2;
-						else
-						digits = 3;
+							digits = 3;
 
 						if (strlen(tmpMap) < (13-digits)) // <- 11
 							Format(tmpMap, 128, "%s - Tier %i:\t\t\t\t", tmpMap, tier);
@@ -5531,18 +5530,18 @@ public void db_viewUnfinishedMapsCallback(Database db, DBResultSet results, cons
 
 						count++;
 						if (!mapUnfinished) // Only bonus is unfinished
-						Format(consoleString, 1024, "%i. %s\t\t|  %s", count, tmpMap, unfinishedBonusBuffer);
+							Format(consoleString, 1024, "%i. %s\t\t|  %s", count, tmpMap, unfinishedBonusBuffer);
 						else if (!bonusUnfinished) // Only map is unfinished
-						Format(consoleString, 1024, "%i. %sMap unfinished\t|", count, tmpMap);
+							Format(consoleString, 1024, "%i. %sMap unfinished\t|", count, tmpMap);
 						else // Both unfinished
-						Format(consoleString, 1024, "%i. %sMap unfinished\t|  %s", count, tmpMap, unfinishedBonusBuffer);
+							Format(consoleString, 1024, "%i. %sMap unfinished\t|  %s", count, tmpMap, unfinishedBonusBuffer);
 
 						// Throttle messages to not cause errors on huge mapcycles
 						time = time + 0.1;
-						Handle pack = CreateDataPack();
+						Handle pack;
+						CreateDataTimer(time, PrintUnfinishedLine, pack, TIMER_FLAG_NO_MAPCHANGE);
 						WritePackCell(pack, userid);
 						WritePackString(pack, consoleString);
-						CreateDataTimer(time, PrintUnfinishedLine, pack, TIMER_FLAG_NO_MAPCHANGE);
 
 						mapUnfinished = false;
 						bonusUnfinished = false;
@@ -5565,7 +5564,9 @@ public void db_viewUnfinishedMapsCallback(Database db, DBResultSet results, cons
 							Format(zName, 128, "bonus %i", zGrp);
 
 						if (bonusUnfinished)
-						Format(unfinishedBonusBuffer, 772, "%s, %s", unfinishedBonusBuffer, zName);
+						{
+							Format(unfinishedBonusBuffer, 772, "%s, %s", unfinishedBonusBuffer, zName);
+						}
 						else
 						{
 							bonusUnfinished = true;
@@ -5598,12 +5599,12 @@ public Action PrintUnfinishedLine(Handle timer, DataPack pack)
 {
 	ResetPack(pack);
 	int client = GetClientOfUserId(ReadPackCell(pack));
-	char teksti[1024];
-	ReadPackString(pack, teksti, 1024);
+	char sMessage[1024];
+	ReadPackString(pack, sMessage, 1024);
 	
 	if (IsClientInGame(client))
 	{
-		PrintToConsole(client, teksti);
+		PrintToConsole(client, sMessage);
 	}
 
 }
