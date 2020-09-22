@@ -5478,7 +5478,7 @@ public void db_viewUnfinishedMaps(int client, char szSteamId[32])
 	g_dDb.Query(db_viewUnfinishedMapsCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_viewUnfinishedMapsCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void db_viewUnfinishedMapsCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
