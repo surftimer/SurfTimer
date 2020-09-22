@@ -5598,12 +5598,13 @@ public Action PrintUnfinishedLine(Handle timer, DataPack pack)
 {
 	ResetPack(pack);
 	int client = GetClientOfUserId(ReadPackCell(pack));
-	char teksti[1024];
-	ReadPackString(pack, teksti, 1024);
+	char sMessage[1024];
+	ReadPackString(pack, sMessage, 1024);
+	delete pack;
 	
 	if (IsClientInGame(client))
 	{
-		PrintToConsole(client, teksti);
+		PrintToConsole(client, sMessage);
 	}
 
 }
