@@ -9342,6 +9342,7 @@ public void SQL_ViewPlayerPrMaptimeCallback(Database db, DBResultSet results, co
 			LogToFile(g_szQueryFile, "SQL_ViewPlayerPrMaptimeCallback - szQuery: %s", szQuery);
 		}
 		g_dDb.Query(SQL_ViewPlayerPrMaptimeCallback2, szQuery, pack, DBPrio_Low);
+		return;
 	}
 
 	delete pack;
