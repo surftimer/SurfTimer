@@ -1277,7 +1277,7 @@ char g_sBugMsg[MAXPLAYERS + 1][256];
 Handle g_hDestinations;
 
 // CPR command
-float g_fClientCPs[MAXPLAYERS + 1][36];
+float g_fClientCPs[MAXPLAYERS + 1][CPLIMIT];
 float g_fTargetTime[MAXPLAYERS + 1];
 char g_szTargetCPR[MAXPLAYERS + 1][MAX_NAME_LENGTH];
 char g_szCPRMapName[MAXPLAYERS + 1][128];
