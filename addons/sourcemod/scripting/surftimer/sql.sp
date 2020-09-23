@@ -10281,7 +10281,7 @@ public void db_selectCPR(int client, int rank, const char szMapName[128], const 
 	WritePackString(pack, szSteamId);
 
 	char szQuery[512];
-	Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro`, velStartXY, velStartXYZ, velStartZ, velEndXY, velEndXYZ, velEndZ FROM `ck_playertimes` WHERE `steamid` = '%s' AND `mapname` LIKE '%c%s%c' AND style = 0", g_szSteamID[client], PERCENT, szMapName, PERCENT);
+	Format(szQuery, sizeof(szQuery), "SELECT `mapname`, `runtimepro`, velStartXY, velStartXYZ, velStartZ, velEndXY, velEndXYZ, velEndZ FROM `ck_playertimes` WHERE `steamid` = '%s' AND `mapname` LIKE '%c%s%c' AND style = 0", g_szSteamID[client], PERCENT, szMapName, PERCENT);
 	if (g_cLogQueries.BoolValue)
 	{
 		LogToFile(g_szQueryFile, "db_selectCPR - szQuery: %s", szQuery);
@@ -10305,17 +10305,17 @@ public void SQL_SelectCPRTimeCallback(Database db, DBResultSet results, const ch
 	{
 		if (results.HasResults && results.FetchRow())
 		{
-			results.FetchString(2, g_szCPRMapName[client], 128);
-			g_fClientCPs[client][0] = results.FetchFloat(3);
-			g_fClientVelsStart[client][0][0] = results.FetchInt(4);
-			g_fClientVelsStart[client][0][1] = results.FetchInt(5);
-			g_fClientVelsStart[client][0][2] = results.FetchInt(6);
-			g_fClientVelsEnd[client][0][0] = results.FetchInt(7);
-			g_fClientVelsEnd[client][0][1] = results.FetchInt(8);
-			g_fClientVelsEnd[client][0][2] = results.FetchInt(9);
+			results.FetchString(0, g_szCPRMapName[client], 128);
+			g_fClientCPs[client][0] = results.FetchFloat(1);
+			g_fClientVelsStart[client][0][0] = results.FetchInt(2);
+			g_fClientVelsStart[client][0][1] = results.FetchInt(3);
+			g_fClientVelsStart[client][0][2] = results.FetchInt(4);
+			g_fClientVelsEnd[client][0][0] = results.FetchInt(5);
+			g_fClientVelsEnd[client][0][1] = results.FetchInt(6);
+			g_fClientVelsEnd[client][0][2] = results.FetchInt(7);
 
 			char szQuery[512];
-			Format(szQuery, sizeof(szQuery), "SELECT steamid, mapname, cp, time, velStartXY, velStartXYZ, velStartZ, velEndXY, velEndXYZ, velEndZ FROM ck_checkpoints WHERE steamid = '%s' AND mapname LIKE '%c%s%c' AND zonegroup = 0;", g_szSteamID[client], PERCENT, g_szCPRMapName[client], PERCENT);
+			Format(szQuery, sizeof(szQuery), "SELECT cp, time, velStartXY, velStartXYZ, velStartZ, velEndXY, velEndXYZ, velEndZ FROM ck_checkpoints WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = 0;", g_szSteamID[client], g_szCPRMapName[client]);
 			if (g_cLogQueries.BoolValue)
 			{
 				LogToFile(g_szQueryFile, "SQL_SelectCPRTimeCallback - szQuery: %s", szQuery);
@@ -10339,25 +10339,43 @@ public void SQL_SelectCPRCallback(Database db, DBResultSet results, const char[]
 		return;
 	}
 
-	if (results.HasResults && results.FetchRow())
+	ResetPack(pack);
+
+	if (results.HasResults)
 	{
-		ResetPack(pack);
-		int client = ReadPackCell(pack);
+		int client = GetClientOfUserId(ReadPackCell(pack));
 
-		for (int i = 0; i <= 35; i++)
+		if (IsValidClient(client))
 		{
-			float fBuffer = 0.0;
-
-			if (!results.IsFieldNull(i))
+			while (results.FetchRow())
 			{
-				fBuffer = results.FetchFloat(i);
+				int cp = results.FetchInt(0);
+
+				if (cp == 0)
+				{
+					continue;
+				}
+
+				float fBuffer = 0.0;
+
+				if (!results.IsFieldNull(1) && results.FetchFloat(1) > 0.0)
+				{
+					fBuffer = results.FetchFloat(1);
+				}
+
+				g_fClientCPs[client][cp] = fBuffer;
+				g_fClientVelsStart[client][cp][0] = results.FetchInt(2);
+				g_fClientVelsStart[client][cp][1] = results.FetchInt(3);
+				g_fClientVelsStart[client][cp][2] = results.FetchInt(4);
+				g_fClientVelsEnd[client][cp][0] = results.FetchInt(5);
+				g_fClientVelsEnd[client][cp][1] = results.FetchInt(6);
+				g_fClientVelsEnd[client][cp][2] = results.FetchInt(7);
 			}
 
-			g_fClientCPs[client][i] = fBuffer;
-		}
-		db_selectCPRTarget(pack);
+			db_selectCPRTarget(pack);
 
-		return;
+			return;
+		}
 	}
 
 	delete pack;
@@ -10366,24 +10384,29 @@ public void SQL_SelectCPRCallback(Database db, DBResultSet results, const char[]
 public void db_selectCPRTarget(DataPack pack)
 {
 	ResetPack(pack);
-	int client = ReadPackCell(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
 	int rank = ReadPackCell(pack);
 	rank = rank - 1;
 
-	char szQuery[512];
-	if (rank == -1)
+	if (IsValidClient(client))
 	{
-		char szSteamId[32];
-		ReadPackString(pack, szSteamId, 32);
-		Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `mapname` LIKE '%c%s%c' AND steamid = '%s' AND style = 0", PERCENT, g_szCPRMapName[client], PERCENT, szSteamId);
+		char szQuery[512];
+		if (rank == -1)
+		{
+			char szSteamId[32];
+			ReadPackString(pack, szSteamId, 32);
+			Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro`, `velStartXY`, `velStartXYZ`, `velStartZ`, `velEndXY`, `velEndXYZ`, `velEndZ` FROM `ck_playertimes` WHERE `mapname` = '%s' AND steamid = '%s' AND style = 0", g_szCPRMapName[client], szSteamId);
+		}
+		else
+			Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro`, `velStartXY`, `velStartXYZ`, `velStartZ`, `velEndXY`, `velEndXYZ`, `velEndZ` FROM `ck_playertimes` WHERE `mapname` = '%s' AND style = 0 ORDER BY `runtimepro` ASC LIMIT %i, 1;", g_szCPRMapName[client], rank);
+		if (g_cLogQueries.BoolValue)
+		{
+			LogToFile(g_szQueryFile, "db_selectCPRTarget - szQuery: %s", szQuery);
+		}
+		g_dDb.Query(SQL_SelectCPRTargetCallback, szQuery, pack, DBPrio_Low);
+		return;
 	}
-	else
-		Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `mapname` LIKE '%c%s%c' AND style = 0 ORDER BY `runtimepro` ASC LIMIT %i, 1;", PERCENT, g_szCPRMapName[client], PERCENT, rank);
-	if (g_cLogQueries.BoolValue)
-	{
-		LogToFile(g_szQueryFile, "db_selectCPRTarget - szQuery: %s", szQuery);
-	}
-	g_dDb.Query(SQL_SelectCPRTargetCallback, szQuery, pack, DBPrio_Low);
+	delete pack;
 }
 
 public void SQL_SelectCPRTargetCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
@@ -10395,24 +10418,27 @@ public void SQL_SelectCPRTargetCallback(Database db, DBResultSet results, const 
 		return;
 	}
 
-	if (results.HasResults && results.FetchRow())
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+
+	if (IsValidClient(client))
 	{
-		ResetPack(pack);
-		int client = ReadPackCell(pack);
+		if (results.HasResults && results.FetchRow())
+		{
+			char szSteamId[32];
+			results.FetchString(0, szSteamId, sizeof(szSteamId));
+			results.FetchString(1, g_szTargetCPR[client], sizeof(g_szTargetCPR));
+			g_fTargetTime[client] = results.FetchFloat(3);
+			g_fTargetVelsStart[client][0][0] = results.FetchInt(4);
+			g_fTargetVelsStart[client][0][1] = results.FetchInt(5);
+			g_fTargetVelsStart[client][0][2] = results.FetchInt(6);
+			g_fTargetVelsEnd[client][0][0] = results.FetchInt(7);
+			g_fTargetVelsEnd[client][0][1] = results.FetchInt(8);
+			g_fTargetVelsEnd[client][0][2] = results.FetchInt(9); 
+			db_selectCPRTargetCPs(szSteamId, pack);
 
-		char szSteamId[32];
-		results.FetchString(0, szSteamId, sizeof(szSteamId));
-		results.FetchString(1, g_szTargetCPR[client], sizeof(g_szTargetCPR));
-		g_fTargetTime[client] = results.FetchFloat(3);
-		g_fTargetVelsStart[client][0][0] = results.FetchInt(4);
-		g_fTargetVelsStart[client][0][1] = results.FetchInt(5);
-		g_fTargetVelsStart[client][0][2] = results.FetchInt(6);
-		g_fTargetVelsEnd[client][0][0] = results.FetchInt(7);
-		g_fTargetVelsEnd[client][0][1] = results.FetchInt(8);
-		g_fTargetVelsEnd[client][0][2] = results.FetchInt(9); 
-		db_selectCPRTargetCPs(szSteamId, pack);
-
-		return;
+			return;
+		}
 	}
 
 	delete pack;
@@ -10421,15 +10447,21 @@ public void SQL_SelectCPRTargetCallback(Database db, DBResultSet results, const 
 public void db_selectCPRTargetCPs(const char[] szSteamId, DataPack pack)
 {
 	ResetPack(pack);
-	int client = ReadPackCell(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
 
-	char szQuery[512];
-	Format(szQuery, sizeof(szQuery), "SELECT steamid, mapname, cp, time, velStartXY, velStartXYZ, velStartZ, velEndXY, velEndXYZ, velEndZ FROM ck_checkpoints WHERE steamid = '%s' AND mapname LIKE '%c%s%c' AND zonegroup = 0;", szSteamId, PERCENT, g_szCPRMapName[client], PERCENT);
-	if (g_cLogQueries.BoolValue)
+	if (IsValidClient(client))
 	{
-		LogToFile(g_szQueryFile, "db_selectCPRTargetCPs - szQuery: %s", szQuery);
+		char szQuery[512];
+		Format(szQuery, sizeof(szQuery), "SELECT steamid, mapname, cp, time, velStartXY, velStartXYZ, velStartZ, velEndXY, velEndXYZ, velEndZ FROM ck_checkpoints WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = 0;", szSteamId, g_szCPRMapName[client]);
+		if (g_cLogQueries.BoolValue)
+		{
+			LogToFile(g_szQueryFile, "db_selectCPRTargetCPs - szQuery: %s", szQuery);
+		}
+		g_dDb.Query(SQL_SelectCPRTargetCPsCallback, szQuery, pack, DBPrio_Low);
+		return;
 	}
-	g_dDb.Query(SQL_SelectCPRTargetCPsCallback, szQuery, pack, DBPrio_Low);
+
+	delete pack;
 }
 
 public void SQL_SelectCPRTargetCPsCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
@@ -10441,83 +10473,83 @@ public void SQL_SelectCPRTargetCPsCallback(Database db, DBResultSet results, con
 		return;
 	}
 
+	ResetPack(pack);
+	int client = GetClientOfUserId(ReadPackCell(pack));
+	int rank = ReadPackCell(pack);
+	delete pack;
+
 	if (results.HasResults)
 	{
-		ResetPack(pack);
-		int client = ReadPackCell(pack);
-		int rank = ReadPackCell(pack);
-
-		Menu menu = CreateMenu(CPRMenuHandler);
-		char szTitle[256], szName[MAX_NAME_LENGTH];
-		GetClientName(client, szName, sizeof(szName));
-		Format(szTitle, sizeof(szTitle), "%s VS %s on %s\n \n", szName, g_szTargetCPR[client], g_szCPRMapName[client], rank);
-		SetMenuTitle(menu, szTitle);
-
-		float targetCPs, comparedCPs;
-		char szCPR[32], szCompared[32], szItem[256], szCompare[16];
-		int i = 0;
-		// int mode = g_SpeedMode[client];
-		int mode = 1;
-		int compareVel;
-
-		while (results.FetchRow())
+		if (IsValidClient(client))
 		{
-			int cp = results.FetchInt(2);
-			// g_fClientCPs[client][cp] = results.FetchFloat(3);
-			g_fTargetVelsStart[client][cp][0] = results.FetchInt(4);
-			g_fTargetVelsStart[client][cp][1] = results.FetchInt(5);
-			g_fTargetVelsStart[client][cp][2] = results.FetchInt(6);
-			g_fTargetVelsEnd[client][cp][0] = results.FetchInt(7);
-			g_fTargetVelsEnd[client][cp][1] = results.FetchInt(8);
-			g_fTargetVelsEnd[client][cp][2] = results.FetchInt(9);
-			targetCPs = results.FetchFloat(3);
-			comparedCPs = (g_fClientCPs[client][cp] - targetCPs);
-			if (i == 0)
+			Menu menu = CreateMenu(CPRMenuHandler);
+			char szTitle[256], szName[MAX_NAME_LENGTH];
+			GetClientName(client, szName, sizeof(szName));
+			Format(szTitle, sizeof(szTitle), "%s VS %s on %s\n \n", g_szTargetCPR[client], szName, g_szCPRMapName[client], rank);
+			SetMenuTitle(menu, szTitle);
+
+			float targetCPs, comparedCPs;
+			char szCPR[32], szCompared[32], szItem[256], szCompare[16];
+			int i = 0;
+			int mode = g_SpeedMode[client];
+			int compareVel;
+
+			while (results.FetchRow())
 			{
-				
-				compareVel = g_fClientVelsStart[client][0][mode] - g_fTargetVelsStart[client][cp][mode];
-				if (g_fClientVelsStart[client][0][mode] > g_fTargetVelsStart[client][cp][mode])
+				int cp = results.FetchInt(2);
+				// g_fClientCPs[client][cp] = results.FetchFloat(3);
+				g_fTargetVelsStart[client][cp][0] = results.FetchInt(4);
+				g_fTargetVelsStart[client][cp][1] = results.FetchInt(5);
+				g_fTargetVelsStart[client][cp][2] = results.FetchInt(6);
+				g_fTargetVelsEnd[client][cp][0] = results.FetchInt(7);
+				g_fTargetVelsEnd[client][cp][1] = results.FetchInt(8);
+				g_fTargetVelsEnd[client][cp][2] = results.FetchInt(9);
+				targetCPs = results.FetchFloat(3);
+				comparedCPs = (g_fClientCPs[client][cp] - targetCPs);
+				if (i == 0)
+				{
+					compareVel = g_fClientVelsStart[client][0][mode] - g_fTargetVelsStart[client][0][mode];
+					if (g_fClientVelsStart[client][0][mode] > g_fTargetVelsStart[client][0][mode])
+						Format(szCompare, sizeof(szCompare), "+%d", compareVel);
+					else
+						Format(szCompare, sizeof(szCompare), "%d", compareVel);
+
+					Format(szItem, sizeof(szItem), "Map Start: 00:00:00 (00:00:00) | Start: %d u/s (%s u/s)", g_fTargetVelsStart[client][0][mode], szCompare);
+					AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+					i++;
+				}
+
+				if (targetCPs == 0.0 || g_fClientCPs[client][cp] == 0.0)
+					continue;
+
+				compareVel = g_fClientVelsEnd[client][cp][mode] - g_fTargetVelsEnd[client][cp][mode]; // ClientEnd -> Start
+				if (g_fClientVelsEnd[client][cp][mode] > g_fTargetVelsEnd[client][cp][mode]) // ClientEnd -> Start
 					Format(szCompare, sizeof(szCompare), "+%d", compareVel);
 				else
 					Format(szCompare, sizeof(szCompare), "%d", compareVel);
 
-				Format(szItem, sizeof(szItem), "Map Start: 00:00:00 (00:00:00) | Start: %d u/s (%s u/s)", g_fClientVelsStart[client][0][mode], szCompare);
+				FormatTimeFloat(client, targetCPs, 3, szCPR, sizeof(szCPR));
+				FormatTimeFloat(client, comparedCPs, 6, szCompared, sizeof(szCompared));
+				Format(szItem, sizeof(szItem), "CP %i: %s (%s) | Touch: %d u/s (%s u/s)", cp, szCPR, szCompared, g_fTargetVelsEnd[client][cp][mode], szCompare); // ClientEnd -> Start
 				AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
-				i++;
 			}
 
-			if (targetCPs == 0.0 || g_fClientCPs[client][cp] == 0.0)
-				continue;
-
-			compareVel = g_fClientVelsEnd[client][cp][mode] - g_fTargetVelsEnd[client][cp][mode];
-			if (g_fClientVelsEnd[client][cp][mode] > g_fTargetVelsEnd[client][cp][mode])
+			char szTime[32], szCompared2[32];
+			float compared = g_fClientCPs[client][0] - g_fTargetTime[client];
+			FormatTimeFloat(client, g_fClientCPs[client][0], 3, szTime, sizeof(szTime));
+			FormatTimeFloat(client, compared, 6, szCompared2, sizeof(szCompared2));
+			compareVel = g_fClientVelsEnd[client][0][mode] - g_fTargetVelsEnd[client][0][mode];
+			if (g_fClientVelsEnd[client][0][mode] > g_fTargetVelsEnd[client][0][mode])
 				Format(szCompare, sizeof(szCompare), "+%d", compareVel);
 			else
 				Format(szCompare, sizeof(szCompare), "%d", compareVel);
 
-			FormatTimeFloat(client, targetCPs, 3, szCPR, sizeof(szCPR));
-			FormatTimeFloat(client, comparedCPs, 6, szCompared, sizeof(szCompared));
-			Format(szItem, sizeof(szItem), "CP %i: %s (%s) | Touch: %d u/s (%s u/s)", cp, szCPR, szCompared, g_fClientVelsEnd[client][cp][mode], szCompare);
+			Format(szItem, sizeof(szItem), "Total Time: %s (%s) | End: %d u/s (%s u/s)", szTime, szCompared2, g_fClientVelsEnd[client][0][mode], szCompare);
 			AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+			SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
+			DisplayMenu(menu, client, MENU_TIME_FOREVER);
 		}
-
-		char szTime[32], szCompared2[32];
-		float compared = g_fClientCPs[client][0] - g_fTargetTime[client];
-		FormatTimeFloat(client, g_fClientCPs[client][0], 3, szTime, sizeof(szTime));
-		FormatTimeFloat(client, compared, 6, szCompared2, sizeof(szCompared2));
-		compareVel = g_fClientVelsEnd[client][0][mode] - g_fTargetVelsEnd[client][0][mode];
-		if (g_fClientVelsEnd[client][0][mode] > g_fTargetVelsEnd[client][0][mode])
-			Format(szCompare, sizeof(szCompare), "+%d", compareVel);
-		else
-			Format(szCompare, sizeof(szCompare), "%d", compareVel);
-
-		Format(szItem, sizeof(szItem), "Total Time: %s (%s) | End: %d u/s (%s u/s)", szTime, szCompared2, g_fClientVelsEnd[client][0][mode], szCompare);
-		AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
-		SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
-		DisplayMenu(menu, client, MENU_TIME_FOREVER);
 	}
-
-	delete pack;
 }
 
 public int CPRMenuHandler(Menu menu, MenuAction action, int param1, int param2)
