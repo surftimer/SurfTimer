@@ -521,7 +521,7 @@ public void db_viewMapRankPro(int client)
 	g_dDb.Query(db_viewMapRankProCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_viewMapRankProCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void db_viewMapRankProCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -1492,7 +1492,7 @@ public void db_viewPlayerPoints(int client)
 	g_dDb.Query(db_viewPlayerPointsCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_viewPlayerPointsCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void db_viewPlayerPointsCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	int client = GetClientOfUserId(userid);
 
@@ -2322,7 +2322,7 @@ public void db_selectBonusesInMap(int client, char mapname[128])
 	g_dDb.Query(db_selectBonusesInMapCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_selectBonusesInMapCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void db_selectBonusesInMapCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -2522,7 +2522,7 @@ public void db_currentRunRank(int client)
 	g_dDb.Query(SQL_CurrentRunRankCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_CurrentRunRankCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void SQL_CurrentRunRankCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -3217,7 +3217,7 @@ public void db_viewPersonalRecords(int client, char szSteamId[32], char szMapNam
 }
 
 
-public void SQL_selectPersonalRecordsCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void SQL_selectPersonalRecordsCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	int client = GetClientOfUserId(userid);
 
@@ -3490,7 +3490,7 @@ public void db_viewCheckpoints(int client, char szSteamID[32], char szMapName[12
 	g_dDb.Query(SQL_selectCheckpointsCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_selectCheckpointsCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void SQL_selectCheckpointsCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	// fluffys come back
 	if (!IsValidDatabase(db, error))
@@ -3922,7 +3922,7 @@ public void db_viewPersonalBonusRecords(int client, char szSteamId[32])
 	g_dDb.Query(SQL_selectPersonalBonusRecordsCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_selectPersonalBonusRecordsCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void SQL_selectPersonalBonusRecordsCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	int client = GetClientOfUserId(userid);
 	
@@ -5814,7 +5814,7 @@ public void db_viewPlayerOptions(int client, char szSteamId[32])
 	g_dDb.Query(db_viewPlayerOptionsCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_viewPlayerOptionsCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void db_viewPlayerOptionsCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	int client = GetClientOfUserId(userid);
 
@@ -6636,7 +6636,7 @@ public void db_viewPersonalStageRecords(int client, char szSteamId[32])
 	g_dDb.Query(SQL_selectPersonalStageRecordsCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_selectPersonalStageRecordsCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void SQL_selectPersonalStageRecordsCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	int client = GetClientOfUserId(userid);
 
@@ -6880,7 +6880,7 @@ public void db_viewWrcpMapRecord(int client)
 	g_dDb.Query(sql_viewWrcpMapRecordCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void sql_viewWrcpMapRecordCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void sql_viewWrcpMapRecordCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -7908,7 +7908,7 @@ public void db_selectMapRank(int client, char szSteamId[32], char szMapName[128]
 {
 	char szQuery[1024];
 	if (StrEqual(szMapName, "surf_me"))
-			Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `steamid` = '%s' AND `mapname` = '%s' AND style = 0 LIMIT 1;", szSteamId, szMapName);
+		Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `steamid` = '%s' AND `mapname` = '%s' AND style = 0 LIMIT 1;", szSteamId, szMapName);
 	else
 		Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `steamid` = '%s' AND `mapname` LIKE '%c%s%c' AND style = 0 LIMIT 1;", szSteamId, PERCENT, szMapName, PERCENT);
 	if (g_cLogQueries.BoolValue)
@@ -7918,7 +7918,7 @@ public void db_selectMapRank(int client, char szSteamId[32], char szMapName[128]
 	g_dDb.Query(db_selectMapRankCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_selectMapRankCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void db_selectMapRankCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -7935,20 +7935,21 @@ public void db_selectMapRankCallback(Database db, DBResultSet results, const cha
 			char szSteamId[32];
 			char playername[MAX_NAME_LENGTH];
 			char mapname[128];
+			char szRuntime[32];
 			float runtimepro;
 
-			results.FetchString(0, szSteamId, 32);
-			results.FetchString(1, playername, MAX_NAME_LENGTH);
+			results.FetchString(0, szSteamId, sizeof(szSteamId));
+			results.FetchString(1, playername, sizeof(playername));
 			results.FetchString(2, mapname, sizeof(mapname));
 			runtimepro = results.FetchFloat(3);
 
-			FormatTimeFloat(client, runtimepro, 3, g_szRuntimepro[client], sizeof(g_szRuntimepro));
+			FormatTimeFloat(client, runtimepro, 3, szRuntime, sizeof(szRuntime));
 
-			Handle pack = CreateDataPack();
-			WritePackCell(pack, GetClientUserId(client));
+			DataPack pack = new DataPack();
 			WritePackString(pack, szSteamId);
 			WritePackString(pack, playername);
 			WritePackString(pack, mapname);
+			WritePackString(pack, szRuntime);
 
 			char szQuery[1024];
 
@@ -7976,33 +7977,30 @@ public void db_SelectTotalMapCompletesCallback(Database db, DBResultSet results,
 	}
 
 	ResetPack(pack);
-	int client = GetClientOfUserId(ReadPackCell(pack));
+
 	char szSteamId[32];
 	char playername[MAX_NAME_LENGTH];
 	char mapname[128];
-	ReadPackString(pack, szSteamId, 32);
+	char szRuntime[32];
+
+	ReadPackString(pack, szSteamId, sizeof(szSteamId));
 	ReadPackString(pack, playername, sizeof(playername));
 	ReadPackString(pack, mapname, sizeof(mapname));
+	ReadPackString(pack, szRuntime, sizeof(szRuntime));
 
-	if (IsValidClient(client))
+	if (results.HasResults && results.FetchRow())
 	{
-		if (results.HasResults && results.FetchRow())
+		WritePackCell(pack, results.FetchInt(0));
+
+		char szQuery[1024];
+
+		Format(szQuery, sizeof(szQuery), "SELECT COUNT(name),mapname FROM ck_playertimes WHERE runtimepro <= (SELECT runtimepro FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > -1.0 AND style = 0) AND mapname = '%s' AND style = 0 AND runtimepro > -1.0;", szSteamId, mapname, mapname);
+		if (g_cLogQueries.BoolValue)
 		{
-			g_totalPlayerTimes[client] = results.FetchInt(0);
-
-			char szQuery[1024];
-
-			Format(szQuery, sizeof(szQuery), "SELECT COUNT(name),mapname FROM ck_playertimes WHERE runtimepro <= (SELECT runtimepro FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > -1.0 AND style = 0) AND mapname = '%s' AND style = 0 AND runtimepro > -1.0;", szSteamId, mapname, mapname);
-			if (g_cLogQueries.BoolValue)
-			{
-				LogToFile(g_szQueryFile, "db_SelectTotalMapCompletesCallback - szQuery: %s", szQuery);
-			}
-			g_dDb.Query(db_SelectPlayersMapRankCallback, szQuery, pack, DBPrio_Low);
-			return;
+			LogToFile(g_szQueryFile, "db_SelectTotalMapCompletesCallback - szQuery: %s", szQuery);
 		}
+		g_dDb.Query(db_SelectPlayersMapRankCallback, szQuery, pack, DBPrio_Low);
 	}
-
-	delete pack;
 }
 
 public void db_SelectPlayersMapRankCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
@@ -8015,13 +8013,17 @@ public void db_SelectPlayersMapRankCallback(Database db, DBResultSet results, co
 	}
 
 	ResetPack(pack);
-	int client = ReadPackCell(pack);
+
 	char szSteamId[32];
 	char playername[MAX_NAME_LENGTH];
 	char mapname[128];
-	ReadPackString(pack, szSteamId, 32);
+	char szRuntime[32];
+
+	ReadPackString(pack, szSteamId, sizeof(szSteamId));
 	ReadPackString(pack, playername, sizeof(playername));
 	ReadPackString(pack, mapname, sizeof(mapname));
+	ReadPackString(pack, szRuntime, sizeof(szRuntime));
+	int iTotal = ReadPackCell(pack);
 	delete pack;
 
 	if (results.HasResults && results.FetchRow())
@@ -8047,13 +8049,13 @@ public void db_SelectPlayersMapRankCallback(Database db, DBResultSet results, co
 				Format(szGroup, 128, "");
 
 			if (rank >= 11 && rank <= g_G5Top)
-				CPrintToChatAll("%t", "SQL29", g_szChatPrefix, playername, rank, g_totalPlayerTimes[client], szGroup, g_szRuntimepro[client], mapname);
+				CPrintToChatAll("%t", "SQL29", g_szChatPrefix, playername, rank, iTotal, szGroup, szRuntime, mapname);
 			else
-				CPrintToChatAll("%t", "SQL30", g_szChatPrefix, playername, rank, g_totalPlayerTimes[client], g_szRuntimepro[client], mapname);
+				CPrintToChatAll("%t", "SQL30", g_szChatPrefix, playername, rank, iTotal, szRuntime, mapname);
 		}
 		else
 		{
-			CPrintToChatAll("%t", "SQL31", g_szChatPrefix, playername, rank, g_totalPlayerTimes[client], g_szRuntimepro[client], mapname);
+			CPrintToChatAll("%t", "SQL31", g_szChatPrefix, playername, rank, iTotal, szRuntime, mapname);
 		}
 	}
 }
@@ -8096,6 +8098,7 @@ public void db_selectMapRankUnknownCallback(Database db, DBResultSet results, co
 			char szSteamId[32];
 			char playername[MAX_NAME_LENGTH];
 			char mapname[128];
+			char szRuntime[32];
 			float runtimepro;
 
 			results.FetchString(0, szSteamId, 32);
@@ -8103,7 +8106,7 @@ public void db_selectMapRankUnknownCallback(Database db, DBResultSet results, co
 			results.FetchString(2, mapname, sizeof(mapname));
 			runtimepro = results.FetchFloat(3);
 
-			FormatTimeFloat(client, runtimepro, 3, g_szRuntimepro[client], sizeof(g_szRuntimepro));
+			FormatTimeFloat(client, runtimepro, 3, szRuntime, sizeof(szRuntime));
 
 			pack = CreateDataPack();
 			WritePackCell(pack, GetClientUserId(client));
@@ -8111,6 +8114,7 @@ public void db_selectMapRankUnknownCallback(Database db, DBResultSet results, co
 			WritePackString(pack, szSteamId);
 			WritePackString(pack, playername);
 			WritePackString(pack, mapname);
+			WritePackString(pack, szRuntime);
 
 			char szQuery[1024];
 
@@ -8143,9 +8147,11 @@ public void db_SelectTotalMapCompletesUnknownCallback(Database db, DBResultSet r
 	char szSteamId[32];
 	char playername[MAX_NAME_LENGTH];
 	char mapname[128];
+	char szRuntime[32];
 	ReadPackString(pack, szSteamId, 32);
 	ReadPackString(pack, playername, sizeof(playername));
 	ReadPackString(pack, mapname, sizeof(mapname));
+	ReadPackString(pack, szRuntime, sizeof(szRuntime));
 	delete pack;
 
 	if (IsValidClient(client))
@@ -8171,13 +8177,13 @@ public void db_SelectTotalMapCompletesUnknownCallback(Database db, DBResultSet r
 					Format(szGroup, 128, "");
 
 				if (rank >= 11 && rank <= g_G5Top)
-					CPrintToChatAll("%t", "SQL33", g_szChatPrefix, playername, rank, totalplayers, szGroup, g_szRuntimepro[client], mapname);
+					CPrintToChatAll("%t", "SQL33", g_szChatPrefix, playername, rank, totalplayers, szGroup, szRuntime, mapname);
 				else
-					CPrintToChatAll("%t", "SQL34", g_szChatPrefix, playername, rank, totalplayers, g_szRuntimepro[client], mapname);
+					CPrintToChatAll("%t", "SQL34", g_szChatPrefix, playername, rank, totalplayers, szRuntime, mapname);
 			}
 			else
 			{
-				CPrintToChatAll("%t", "SQL35", g_szChatPrefix, playername, rank, totalplayers, g_szRuntimepro[client], mapname);
+				CPrintToChatAll("%t", "SQL35", g_szChatPrefix, playername, rank, totalplayers, szRuntime, mapname);
 			}
 		}
 		else
@@ -8198,7 +8204,7 @@ public void db_selectBonusRank(int client, char szSteamId[32], char szMapName[12
 	g_dDb.Query(db_selectBonusRankCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_selectBonusRankCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void db_selectBonusRankCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -8217,6 +8223,7 @@ public void db_selectBonusRankCallback(Database db, DBResultSet results, const c
 			char mapname[128];
 			float runtimepro;
 			int bonus;
+			char szRuntime[32];
 
 			results.FetchString(0, szSteamId, 32);
 			results.FetchString(1, playername, MAX_NAME_LENGTH);
@@ -8224,14 +8231,14 @@ public void db_selectBonusRankCallback(Database db, DBResultSet results, const c
 			runtimepro = results.FetchFloat(3);
 			bonus = results.FetchInt(4);
 
-			FormatTimeFloat(client, runtimepro, 3, g_szRuntimepro[client], sizeof(g_szRuntimepro));
+			FormatTimeFloat(client, runtimepro, 3, szRuntime, sizeof(szRuntime));
 
 			Handle pack = CreateDataPack();
-			WritePackCell(pack, GetClientUserId(client));
 			WritePackString(pack, szSteamId);
 			WritePackString(pack, playername);
 			WritePackString(pack, mapname);
 			WritePackCell(pack, bonus);
+			WritePackString(pack, szRuntime);
 
 			char szQuery[1024];
 
@@ -8259,34 +8266,29 @@ public void db_SelectTotalBonusCompletesCallback(Database db, DBResultSet result
 	}
 
 	ResetPack(pack);
-	int client = GetClientOfUserId(ReadPackCell(pack));
 	char szSteamId[32];
 	char playername[MAX_NAME_LENGTH];
 	char mapname[128];
+	char szRuntime[32];
 	ReadPackString(pack, szSteamId, 32);
 	ReadPackString(pack, playername, sizeof(playername));
 	ReadPackString(pack, mapname, sizeof(mapname));
 	int bonus = ReadPackCell(pack);
+	ReadPackString(pack, szRuntime, sizeof(szRuntime));
 
-	if (IsValidClient(client))
+	if (results.HasResults && results.FetchRow())
 	{
-		if (results.HasResults && results.FetchRow())
+		WritePackCell(pack, results.FetchInt(0));
+
+		char szQuery[1024];
+
+		Format(szQuery, sizeof(szQuery), "SELECT name,mapname FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = %i AND style = 0 AND runtime > -1.0) AND mapname = '%s' AND zonegroup = %i AND runtime > -1.0 ORDER BY runtime;", szSteamId, mapname, bonus, mapname, bonus);
+		if (g_cLogQueries.BoolValue)
 		{
-			g_totalPlayerTimes[client] = results.FetchInt(0);
-
-			char szQuery[1024];
-
-			Format(szQuery, sizeof(szQuery), "SELECT name,mapname FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = %i AND style = 0 AND runtime > -1.0) AND mapname = '%s' AND zonegroup = %i AND runtime > -1.0 ORDER BY runtime;", szSteamId, mapname, bonus, mapname, bonus);
-			if (g_cLogQueries.BoolValue)
-			{
-				LogToFile(g_szQueryFile, "db_SelectTotalBonusCompletesCallback - szQuery: %s", szQuery);
-			}
-			g_dDb.Query(db_SelectPlayersBonusRankCallback, szQuery, pack, DBPrio_Low);
-			return;
+			LogToFile(g_szQueryFile, "db_SelectTotalBonusCompletesCallback - szQuery: %s", szQuery);
 		}
+		g_dDb.Query(db_SelectPlayersBonusRankCallback, szQuery, pack, DBPrio_Low);
 	}
-
-	delete pack;
 }
 
 public void db_SelectPlayersBonusRankCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
@@ -8299,14 +8301,16 @@ public void db_SelectPlayersBonusRankCallback(Database db, DBResultSet results, 
 	}
 
 	ResetPack(pack);
-	int client = ReadPackCell(pack);
 	char szSteamId[32];
 	char playername[MAX_NAME_LENGTH];
 	char mapname[128];
+	char szRuntime[32];
 	ReadPackString(pack, szSteamId, 32);
 	ReadPackString(pack, playername, sizeof(playername));
 	ReadPackString(pack, mapname, sizeof(mapname));
 	int bonus = ReadPackCell(pack);
+	ReadPackString(pack, szRuntime, sizeof(szRuntime));
+	int iTotal = ReadPackCell(pack);
 	delete pack;
 
 	if (results.HasResults && results.FetchRow())
@@ -8314,7 +8318,7 @@ public void db_SelectPlayersBonusRankCallback(Database db, DBResultSet results, 
 		int rank;
 		rank = results.RowCount;
 
-		CPrintToChatAll("%t", "SQL36", g_szChatPrefix, playername, rank, g_totalPlayerTimes[client], g_szRuntimepro[client], bonus, mapname);
+		CPrintToChatAll("%t", "SQL36", g_szChatPrefix, playername, rank, iTotal, szRuntime, bonus, mapname);
 	}
 }
 
@@ -8402,7 +8406,7 @@ public void db_selectPlayerRank(int client, int rank, char szSteamId[32])
 	g_dDb.Query(db_selectPlayerRankCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_selectPlayerRankCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void db_selectPlayerRankCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -8452,7 +8456,7 @@ public void db_selectPlayerRankUnknown(int client, char szName[128])
 	g_dDb.Query(db_selectPlayerRankUnknownCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_selectPlayerRankUnknownCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void db_selectPlayerRankUnknownCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -8538,7 +8542,7 @@ public void db_selectMapImprovement(int client, char szMapName[128])
 	g_dDb.Query(db_selectMapImprovementCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_selectMapImprovementCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void db_selectMapImprovementCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -9488,7 +9492,7 @@ public void db_CheckVIPAdmin(int client, char[] szSteamID)
 	g_dDb.Query(SQL_CheckVIPAdminCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_CheckVIPAdminCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void SQL_CheckVIPAdminCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	int client = GetClientOfUserId(userid);
 
@@ -10069,7 +10073,7 @@ public void db_updateColours(int client, char szSteamId[32], int newColour, int 
 	g_dDb.Query(SQL_UpdatePlayerColoursCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_UpdatePlayerColoursCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void SQL_UpdatePlayerColoursCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
@@ -10254,7 +10258,7 @@ public void db_setJoinMsg(int client, char[] szArg)
 	g_dDb.Query(SQL_SetJoinMsgCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_SetJoinMsgCallback(Database db, DBResultSet results, const char[] error, any userid)
+public void SQL_SetJoinMsgCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
 	if (!IsValidDatabase(db, error))
 	{
