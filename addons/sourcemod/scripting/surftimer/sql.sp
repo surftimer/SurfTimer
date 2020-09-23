@@ -10491,8 +10491,7 @@ public void SQL_SelectCPRTargetCPsCallback(Database db, DBResultSet results, con
 			float targetCPs, comparedCPs;
 			char szCPR[32], szCompared[32], szItem[256], szCompare[16];
 			int i = 0;
-			// int mode = g_SpeedMode[client];
-			int mode = 0;
+			int mode = g_SpeedMode[client];
 			int compareVel;
 
 			while (results.FetchRow())
@@ -10509,13 +10508,13 @@ public void SQL_SelectCPRTargetCPsCallback(Database db, DBResultSet results, con
 				comparedCPs = (g_fClientCPs[client][cp] - targetCPs);
 				if (i == 0)
 				{
-					compareVel = g_fClientVelsStart[client][cp][mode] - g_fTargetVelsStart[client][cp][mode];
-					if (g_fClientVelsStart[client][cp][mode] > g_fTargetVelsStart[client][cp][mode])
+					compareVel = g_fClientVelsStart[client][0][mode] - g_fTargetVelsStart[client][0][mode];
+					if (g_fClientVelsStart[client][0][mode] > g_fTargetVelsStart[client][0][mode])
 						Format(szCompare, sizeof(szCompare), "+%d", compareVel);
 					else
 						Format(szCompare, sizeof(szCompare), "%d", compareVel);
 
-					Format(szItem, sizeof(szItem), "Map Start: 00:00:00 (00:00:00) | Start: %d u/s (%s u/s)", g_fTargetVelsStart[client][cp][mode], szCompare);
+					Format(szItem, sizeof(szItem), "Map Start: 00:00:00 (00:00:00) | Start: %d u/s (%s u/s)", g_fTargetVelsStart[client][0][mode], szCompare);
 					AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
 					i++;
 				}
