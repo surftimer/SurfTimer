@@ -543,10 +543,6 @@ bool g_bTop10Time[MAXPLAYERS + 1] = false;
 float g_fCommandLastUsed[MAXPLAYERS + 1];
 bool g_bRateLimit[MAXPLAYERS + 1];
 
-// MRank Command
-char g_szRuntimepro[MAXPLAYERS + 1][32];
-int g_totalPlayerTimes[MAXPLAYERS + 1];
-
 // Rank Command
 int g_rankArg[MAXPLAYERS + 1];
 
