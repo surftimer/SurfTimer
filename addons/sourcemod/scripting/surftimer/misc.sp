@@ -3406,21 +3406,14 @@ public void CenterHudAlive(int client)
 					{
 						if (g_fRecordStyleMapTime[style] != 9999999.0)
 						{
-							// fluffys
-							if (g_bPracticeMode[client])
-								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordStyleMapTime[style]);
-							else
-								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordStyleMapTime[style]);
+							Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordStyleMapTime[style]);
 						}
 						else
 							Format(g_szLastSRDifference[client], 64, "SR: N/A");
 					}
 					else
 					{
-						if (g_iCurrentStyle[client] == 0)
-							Format(g_szLastSRDifference[client], 64, "SR: %s", g_szStyleBonusFastestTime[0][g_iClientInZone[client][2]]);
-						else if (g_iCurrentStyle[client] != 0) // Styles
-							Format(g_szLastSRDifference[client], 64, "SR: %s", g_szStyleBonusFastestTime[style][g_iClientInZone[client][2]]);
+						Format(g_szLastSRDifference[client], 64, "SR: %s", g_szStyleBonusFastestTime[style][g_iClientInZone[client][2]]);
 					}
 				}
 				Format(module[i], 128, "%s", g_szLastSRDifference[client]);
@@ -3444,10 +3437,7 @@ public void CenterHudAlive(int client)
 					}
 					else
 					{
-						if (g_iCurrentStyle[client] == 0)
-							Format(g_szLastPBDifference[client], 64, "PB: %s", g_szStylePersonalRecordBonus[0][g_iClientInZone[client][2]][client]);
-						else if (g_iCurrentStyle[client] != 0) // Styles
-							Format(g_szLastPBDifference[client], 64, "PB: %s", g_szStylePersonalRecordBonus[style][g_iClientInZone[client][2]][client]);
+						Format(g_szLastPBDifference[client], 64, "PB: %s", g_szStylePersonalRecordBonus[style][g_iClientInZone[client][2]][client]);
 					}
 				}
 				Format(module[i], 128, "%s", g_szLastPBDifference[client]);
