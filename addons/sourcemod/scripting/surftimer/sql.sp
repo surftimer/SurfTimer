@@ -44,6 +44,17 @@ public void OnConnect(Database db, const char[] error, any data)
 		return;
 	}
 
+	g_dDb.Query(db_setSQLMode, "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));", _, DBPrio_Low);
+}
+
+public void db_setSQLMode(Database db, DBResultSet results, const char[] error, any data)
+{
+	if (!IsValidDatabase(db, error))
+	{
+		LogError("[SurfTimer] SQL Error (db_setSQLMode): %s ", error);
+		return;
+	}
+	
 	db_createTables();
 }
 
@@ -391,6 +402,7 @@ public void db_editSpawnLocationsCallback(Database db, DBResultSet results, cons
 		LogError("[SurfTimer] SQL Error (db_editSpawnLocationsCallback): %s ", error);
 		return;
 	}
+
 	db_selectSpawnLocations();
 }
 
