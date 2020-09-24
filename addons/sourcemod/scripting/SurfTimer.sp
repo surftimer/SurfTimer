@@ -508,10 +508,6 @@ bool g_bTop10Time[MAXPLAYERS + 1] = false;
 float g_fCommandLastUsed[MAXPLAYERS + 1];
 bool g_bRateLimit[MAXPLAYERS + 1];
 
-// MRank Command
-char g_szRuntimepro[MAXPLAYERS + 1][32];
-int g_totalPlayerTimes[MAXPLAYERS + 1];
-
 // Rank Command
 int g_rankArg[MAXPLAYERS + 1];
 
@@ -1205,7 +1201,7 @@ char g_sBugMsg[MAXPLAYERS + 1][256];
 Handle g_hDestinations;
 
 // CPR command
-float g_fClientCPs[MAXPLAYERS + 1][36];
+float g_fClientCPs[MAXPLAYERS + 1][CPLIMIT];
 float g_fTargetTime[MAXPLAYERS + 1];
 char g_szTargetCPR[MAXPLAYERS + 1][MAX_NAME_LENGTH];
 char g_szCPRMapName[MAXPLAYERS + 1][128];
