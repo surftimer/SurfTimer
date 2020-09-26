@@ -76,7 +76,7 @@ public void StartRecording(int client)
 		return;
 	
 	StopRecording(client);
-	if (!g_bRequiredPlayersRecording) // return if limited recording is disabled
+	if (g_cEnableRequiredPlayersRecording.BoolValue && !g_bRequiredPlayersRecording) // return if limited recording is disabled
 		return;
 
 	g_hRecording[client] = CreateArray(sizeof(FrameInfo));
@@ -1182,7 +1182,7 @@ public void Stage_StartRecording(int client)
 	if (!IsValidClient(client) || IsFakeClient(client) || !g_bhasStages || g_bSavingWrcpReplay[client])
 		return;
 
-	if (!g_bRequiredPlayersRecording) // return if player recording is disabled
+	if (g_cEnableRequiredPlayersRecording.BoolValue && !g_bRequiredPlayersRecording) // return if player recording is disabled
 		return;
 
 	GetClientAbsOrigin(client, g_fStageInitialPosition[client]);

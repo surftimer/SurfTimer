@@ -880,6 +880,9 @@ ConVar g_cEnableRequiredPlayersRecording = null;
 ConVar g_cRequiredPlayersRecordLimit = null;     // max players for player recording to be active
 bool g_bRequiredPlayersRecording = false; // enable/disable player recording -> 1 if current players >= g_szPlayerRecordLimit
 
+ConVar g_cStopRecordMissedPB = null;
+ConVar g_cStopRecordTime = null;
+
 /*----------  Misc  ----------*/
 
 // Used to load the mapcycle
