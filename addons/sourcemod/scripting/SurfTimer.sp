@@ -876,6 +876,10 @@ float g_fReplayTimes[MAXZONEGROUPS][MAX_STYLES];
 int g_iManualBonusToReplay;
 int g_iCurrentlyPlayingStage;
 
+ConVar g_cEnableRequiredPlayersRecording = null;
+ConVar g_cRequiredPlayersRecordLimit = null;     // max players for player recording to be active
+bool g_bRequiredPlayersRecording = false; // enable/disable player recording -> 1 if current players >= g_szPlayerRecordLimit
+
 /*----------  Misc  ----------*/
 
 // Used to load the mapcycle
