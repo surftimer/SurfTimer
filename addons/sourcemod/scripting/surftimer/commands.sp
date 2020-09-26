@@ -1266,7 +1266,7 @@ public int PrintWorldRecordStyleSelectHandler(Handle menu, MenuAction action, in
 			if (param2 == 0)
 			{
 				// Normal
-				if (g_fRecordMapTime == 9999999.0)
+				if (g_fRecordStyleMapTime[0] == 9999999.0)
 					CPrintToChat(param1, "%t", "NoRecordTop", g_szChatPrefix);
 				else
 					PrintMapRecords(param1, 0);
@@ -1286,7 +1286,7 @@ public int PrintWorldRecordStyleSelectHandler(Handle menu, MenuAction action, in
 			if (param2 == 0)
 			{
 				// Normal
-				if (g_fBonusFastest[1] == 9999999.0)
+				if (g_fStyleBonusFastest[0][1] == 9999999.0)
 					CPrintToChat(param1, "%t", "NoRecordTop", g_szChatPrefix);
 				else
 					PrintMapRecords(param1, 99);
@@ -1319,10 +1319,10 @@ public Action Client_Avg(int client, int args)
 	char szProTime[32];
 	FormatTimeFloat(client, g_favg_maptime, 3, szProTime, sizeof(szProTime));
 
-	if (g_MapTimesCount == 0)
+	if (g_StyleMapTimesCount[0] == 0)
 		Format(szProTime, 32, "N/A");
 
-	CPrintToChat(client, "%t", "AvgTime", g_szChatPrefix, szProTime, g_MapTimesCount);
+	CPrintToChat(client, "%t", "AvgTime", g_szChatPrefix, szProTime, g_StyleMapTimesCount[0]);
 
 	if (g_bhasBonus)
 	{
@@ -1332,9 +1332,9 @@ public Action Client_Avg(int client, int args)
 		{
 			FormatTimeFloat(client, g_fAvg_BonusTime[i], 3, szBonusTime, sizeof(szBonusTime));
 
-			if (g_iBonusCount[i] == 0)
+			if (g_iStyleBonusCount[0][i] == 0)
 				Format(szBonusTime, 32, "N/A");
-			CPrintToChat(client, "%t", "AvgTimeBonus", g_szChatPrefix, szBonusTime, g_iBonusCount[i]);
+			CPrintToChat(client, "%t", "AvgTimeBonus", g_szChatPrefix, szBonusTime, g_iStyleBonusCount[0][i]);
 		}
 	}
 
@@ -4703,7 +4703,7 @@ public Action Command_CPR(int client, int args)
 
 	if (args == 0)
 	{
-		if (g_fPersonalRecord[client] < 1.0)
+		if (g_fPersonalStyleRecord[0][client] < 1.0)
 		{
 			CReplyToCommand(client, "%t", "Commands84", g_szChatPrefix);
 			return Plugin_Handled;

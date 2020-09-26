@@ -247,38 +247,8 @@ bool g_bGotSpawnLocation[MAXZONEGROUPS][CPLIMIT][2];
 
 /*----------  Bonus Variables  ----------*/
 
-// Name of the #1 in the current maps bonus
-char g_szBonusFastest[MAXZONEGROUPS][MAX_NAME_LENGTH];
-
-// Fastest bonus time in 00:00:00:00 format
-char g_szBonusFastestTime[MAXZONEGROUPS][64];
-
-// Clients personal bonus record in the current map
-float g_fPersonalRecordBonus[MAXZONEGROUPS][MAXPLAYERS + 1];
-
-// Personal bonus record in 00:00:00 format
-char g_szPersonalRecordBonus[MAXZONEGROUPS][MAXPLAYERS + 1][64];
-
-// Fastest bonus time in the current map
-float g_fBonusFastest[MAXZONEGROUPS];
-
-// Old record time, for prints + counting
-float g_fOldBonusRecordTime[MAXZONEGROUPS];
-
-// Clients personal bonus rank in the current map
-int g_MapRankBonus[MAXZONEGROUPS][MAXPLAYERS + 1];
-
-// Old rank in bonus
-int g_OldMapRankBonus[MAXZONEGROUPS][MAXPLAYERS + 1];
-
 // Has the client missed his best bonus time
 int g_bMissedBonusBest[MAXPLAYERS + 1];
-
-// Used to make sure bonus finished prints are correct
-int g_tmpBonusCount[MAXZONEGROUPS];
-
-// Amount of players that have passed the bonus in current map
-int g_iBonusCount[MAXZONEGROUPS];
 
 // How many total bonuses there are
 int g_totalBonusCount;
@@ -457,18 +427,13 @@ float g_fFinalWrcpTime[MAXPLAYERS + 1];
 // Total time the run took in 00:00:00 format
 char g_szFinalWrcpTime[MAXPLAYERS + 1][32];
 float g_fCurrentWrcpRunTime[MAXPLAYERS + 1];
-int g_StageRank[MAXPLAYERS + 1][CPLIMIT];
-float g_fStageRecord[CPLIMIT];
-char g_szRecordStageTime[CPLIMIT];
 
-int g_TotalStageRecords[CPLIMIT];
 int g_TotalStages;
 float g_fWrcpMenuLastQuery[MAXPLAYERS + 1] = 1.0;
 bool g_bSelectWrcp[MAXPLAYERS + 1];
 int g_iWrcpMenuStyleSelect[MAXPLAYERS + 1];
 char g_szWrcpMapSelect[MAXPLAYERS + 1][128];
 bool g_bStageSRVRecord[MAXPLAYERS + 1][CPLIMIT];
-char g_szStageRecordPlayer[CPLIMIT][MAX_NAME_LENGTH];
 // bool g_bFirstStageRecord[CPLIMIT];
 
 /*----------  Map Settings Variables ----------*/
@@ -702,10 +667,6 @@ bool g_bLoadingSettings[MAXPLAYERS + 1];
 // Are the servers settings loaded
 bool g_bServerDataLoaded;
 
-// SteamdID of #1 player in map, used to fetch checkpoint times
-char g_szRecordMapSteamID[MAX_NAME_LENGTH];
-//int g_iServerHibernationValue;
-
 /*----------  User Commands  ----------*/
 
 // Throttle !usp command
@@ -778,9 +739,6 @@ bool g_iAutoReset[MAXPLAYERS + 1];
 
 /*----------  Run Variables  ----------*/
 
-// Clients personal record in map
-float g_fPersonalRecord[MAXPLAYERS + 1];
-
 // Is clients timer running
 bool g_bTimerRunning[MAXPLAYERS + 1];
 
@@ -820,29 +778,11 @@ float g_fCurrentRunTime[MAXPLAYERS + 1];
 // Missed personal record time?
 bool g_bMissedMapBest[MAXPLAYERS + 1];
 
-// Was players run his first time finishing the map?
-bool g_bMapFirstRecord[MAXPLAYERS + 1];
-
-// Was players run his personal best?
-bool g_bMapPBRecord[MAXPLAYERS + 1];
-
-// Was players run the new server record?
-bool g_bMapSRVRecord[MAXPLAYERS + 1];
-
 // Used to print the client's new times difference to record
 char g_szTimeDifference[MAXPLAYERS + 1][32];
 
-// Record map time in seconds
-float g_fRecordMapTime;
-
-// Record map time in 00:00:00 format
-char g_szRecordMapTime[64];
-
 // Old Map Record
 float g_fOldRecordMapTime;
-
-// Client's peronal record in 00:00:00 format
-char g_szPersonalRecord[MAXPLAYERS + 1][64];
 
 // Average map time
 float g_favg_maptime;
@@ -855,18 +795,6 @@ bool g_bFirstTimerStart[MAXPLAYERS + 1];
 
 // Client has timer paused
 bool g_bPause[MAXPLAYERS + 1];
-
-// How many times the map has been beaten
-int g_MapTimesCount;
-
-// Clients rank in current map
-int g_MapRank[MAXPLAYERS + 1];
-
-// Clients old rank
-int g_OldMapRank[MAXPLAYERS + 1];
-
-// Current map's record player's name
-char g_szRecordPlayer[MAX_NAME_LENGTH];
 
 /*----------  Replay Variables  ----------*/
 
@@ -1687,7 +1615,7 @@ public void OnMapStart()
 	g_bTierFound = false;
 	for (int i = 0; i < MAXZONEGROUPS; i++)
 	{
-		g_fBonusFastest[i] = 9999999.0;
+		g_fStyleBonusFastest[0][i] = 9999999.0;
 		g_bCheckpointRecordFound[i] = false;
 	}
 
@@ -2786,12 +2714,12 @@ public int Native_GetMapData(Handle plugin, int numParams)
 	GetNativeString(1, name, MAX_NAME_LENGTH);
 	GetNativeString(2, time, 64);
 
-	Format(name, sizeof(name), g_szRecordPlayer);
-	Format(time, sizeof(time), g_szRecordMapTime);
+	Format(name, sizeof(name), g_szRecordStylePlayer[0]);
+	Format(time, sizeof(time), g_szRecordStyleMapTime[0]);
 	SetNativeString(1, name, sizeof(name), true);
 	SetNativeString(2, time, sizeof(time), true);
 
-	return g_MapTimesCount;
+	return g_StyleMapTimesCount[0];
 }
 
 public int Native_GetPlayerData(Handle plugin, int numParams)
@@ -2806,14 +2734,14 @@ public int Native_GetPlayerData(Handle plugin, int numParams)
 		rank = GetNativeCell(2);
 		GetNativeString(3, szCountry, 16);
 
-		if (g_fPersonalRecord[client] > 0.0)
-			Format(szTime, 64, "%s", g_szPersonalRecord[client]);
+		if (g_fPersonalStyleRecord[0][client] > 0.0)
+			Format(szTime, 64, "%s", g_szPersonalStyleRecord[0][client]);
 		else
 			Format(szTime, 64, "N/A");
 
 		Format(szCountry, sizeof(szCountry), g_szCountryCode[client]);
 
-		rank = g_MapRank[client];
+		rank = g_StyleMapRank[0][client];
 
 		SetNativeString(2, szTime, sizeof(szTime), true);
 		SetNativeString(4, szCountry, sizeof(szCountry), true);
