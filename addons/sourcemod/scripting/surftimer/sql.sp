@@ -3413,7 +3413,7 @@ public void db_viewRecordCheckpointInMap()
 	{
 		g_bCheckpointRecordFound[k] = false;
 		for (int i = 0; i < CPLIMIT; i++)
-		g_fCheckpointServerRecord[k][i] = 0.0;
+			g_fCheckpointServerRecord[k][i] = 0.0;
 	}
 	// "SELECT c.zonegroup, c.cp1, c.cp2, c.cp3, c.cp4, c.cp5, c.cp6, c.cp7, c.cp8, c.cp9, c.cp10, c.cp11, c.cp12, c.cp13, c.cp14, c.cp15, c.cp16, c.cp17, c.cp18, c.cp19, c.cp20, c.cp21, c.cp22, c.cp23, c.cp24, c.cp25, c.cp26, c.cp27, c.cp28, c.cp29, c.cp30, c.cp31, c.cp32, c.cp33, c.cp34, c.cp35 FROM ck_checkpoints c WHERE steamid = '%s' AND mapname='%s' UNION SELECT a.zonegroup, b.cp1, b.cp2, b.cp3, b.cp4, b.cp5, b.cp6, b.cp7, b.cp8, b.cp9, b.cp10, b.cp11, b.cp12, b.cp13, b.cp14, b.cp15, b.cp16, b.cp17, b.cp18, b.cp19, b.cp20, b.cp21, b.cp22, b.cp23, b.cp24, b.cp25, b.cp26, b.cp27, b.cp28, b.cp29, b.cp30, b.cp31, b.cp32, b.cp33, b.cp34, b.cp35 FROM ck_bonus a LEFT JOIN ck_checkpoints b ON a.steamid = b.steamid AND a.zonegroup = b.zonegroup WHERE a.mapname = '%s' GROUP BY a.zonegroup";
 	
@@ -5093,7 +5093,7 @@ public void db_insertLastPositionCallback(Database db, DBResultSet results, cons
 	if (IsValidClient(client))
 	{
 		if (!g_bTimerRunning[client])
-		g_fPlayerLastTime[client] = -1.0;
+			g_fPlayerLastTime[client] = -1.0;
 		int tickrate = g_Server_Tickrate * 5 * 11;
 		if (results.HasResults && results.FetchRow())
 		{
