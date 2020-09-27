@@ -1716,6 +1716,13 @@ public void OnMapStart()
 	// Save Locs
 	ResetSaveLocs();
 
+	// Clear record arrays, tries, ...
+	Handle hAdditionalTeleport;
+	char sPath[PLATFORM_MAX_PATH];
+
+	if(GetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath, hAdditionalTeleport))
+		delete hAdditionalTeleport;
+	ClearTrie(g_hLoadedRecordsAdditionalTeleport);
 }
 
 public void OnMapEnd()
@@ -1930,6 +1937,8 @@ public void OnClientAuthorized(int client)
 public void OnClientDisconnect(int client)
 {
 	delete g_hRecordingAdditionalTeleport[client];
+	delete g_hBotMimicsRecord[client];
+	delete g_hRecording[client];
 
 	db_savePlayTime(client);
 
