@@ -101,8 +101,8 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 						StopRecording(i);
 					}
 				} 
-			// hysteresis (player record limit > player count + 5) to prevent cvar spam
-			} else if (g_cRequiredPlayersRecordLimit.IntValue >= iCount) {
+			// hysteresis (player record limit > player count + 5) to prevent cvar spam and should prevent "flickering"
+			} else if (g_cRequiredPlayersRecordLimit.IntValue >= iCount + 5) {
 				// reenable player recording if player count is 5 players lower then actual limit
 				g_bRequiredPlayersRecording = true;
 			}
