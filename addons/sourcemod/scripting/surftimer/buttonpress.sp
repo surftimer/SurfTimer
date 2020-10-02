@@ -319,7 +319,7 @@ public void CL_OnEndTimerPress(int client)
 				{
 					// New fastest time in map
 					g_bStyleMapSRVRecord[0][client] = true;
-					g_fOldRecordMapTime = g_fRecordStyleMapTime[0];
+					g_fOldRecordStyleMapTime[0] = g_fRecordStyleMapTime[0];
 					g_fRecordStyleMapTime[0] = g_fFinalTime[client];
 					Format(g_szRecordStylePlayer[0], MAX_NAME_LENGTH, "%s", szName);
 					FormatTimeFloat(1, g_fRecordStyleMapTime[0], 3, g_szRecordStyleMapTime[0], 64);
@@ -370,7 +370,7 @@ public void CL_OnEndTimerPress(int client)
 					CreateTimer(0.0, ReplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 				}
 
-				g_fOldRecordMapTime = g_fRecordStyleMapTime[0];
+				g_fOldRecordStyleMapTime[0] = g_fRecordStyleMapTime[0];
 				g_bStyleMapSRVRecord[0][client] = true;
 				g_fRecordStyleMapTime[0] = g_fFinalTime[client];
 				Format(g_szRecordStylePlayer[0], MAX_NAME_LENGTH, "%s", szName);
@@ -403,7 +403,7 @@ public void CL_OnEndTimerPress(int client)
 					g_bCheckpointRecordFound[zGroup] = true;
 				}
 
-				g_fOldRecordMapTime = g_fRecordStyleMapTime[0];
+				g_fOldRecordStyleMapTime[0] = g_fRecordStyleMapTime[0];
 				// wrCredits = fcTierCredits;
 			}
 

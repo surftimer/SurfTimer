@@ -1864,7 +1864,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		}
 		
 		// Player beat map SR, time difference formatting 
-		RecordDiff2 = g_fOldRecordMapTime - g_fFinalTime[client];
+		RecordDiff2 = g_fOldRecordStyleMapTime[0] - g_fFinalTime[client];
 		FormatTimeFloat(client, RecordDiff2, 3, szRecordDiff2, 32);
 		if (RecordDiff2 > 0.0)
 		{
@@ -1885,7 +1885,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 			{
 				if (IsValidClient(i) && !IsFakeClient(i))
 				{
-					if (g_bStyleMapSRVRecord[0][client] && g_fFinalTime[client] == g_fOldRecordMapTime) // Player sets 1st Server Record
+					if (g_bStyleMapSRVRecord[0][client] && g_fFinalTime[client] == g_fOldRecordStyleMapTime[0]) // Player sets 1st Server Record
 					{
 						PlayRecordSound(2);
 						
@@ -1946,7 +1946,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		{// Print to own chat only
 			if (IsValidClient(client) && !IsFakeClient(client))
 			{
-				if (g_bStyleMapSRVRecord[0][client] && g_fFinalTime[client] == g_fOldRecordMapTime) // Player sets 1st Server Record
+				if (g_bStyleMapSRVRecord[0][client] && g_fFinalTime[client] == g_fOldRecordStyleMapTime[0]) // Player sets 1st Server Record
 				{
 					PlayRecordSound(2);
 					

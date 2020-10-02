@@ -782,9 +782,6 @@ bool g_bMissedMapBest[MAXPLAYERS + 1];
 // Used to print the client's new times difference to record
 char g_szTimeDifference[MAXPLAYERS + 1][32];
 
-// Old Map Record
-float g_fOldRecordMapTime;
-
 // Average map time
 float g_favg_maptime;
 
