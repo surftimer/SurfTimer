@@ -567,11 +567,11 @@ public void CL_OnEndTimerPress(int client)
 				FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 32);
 				if (RecordDiff > 0.0)
 				{
-				Format(szRecordDiff, 32, "-%s", szRecordDiff);
+					Format(szRecordDiff, 32, "-%s", szRecordDiff);
 				}
 				else
 				{
-				Format(szRecordDiff, 32, "+%s", szRecordDiff);
+					Format(szRecordDiff, 32, "+%s", szRecordDiff);
 				}
 
 				for (int i = 1; i <= MaxClients; i++)
