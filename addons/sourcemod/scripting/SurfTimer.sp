@@ -460,6 +460,7 @@ int g_OldStyleMapRank[MAX_STYLES][MAXPLAYERS + 1];
 float g_fPersonalStyleRecord[MAX_STYLES][MAXPLAYERS + 1];
 char g_szPersonalStyleRecord[MAX_STYLES][MAXPLAYERS + 1][256];
 float g_fRecordStyleMapTime[MAX_STYLES];
+float g_fOldRecordStyleMapTime[MAX_STYLES];
 char g_szRecordStyleMapTime[MAX_STYLES][64];
 char g_szRecordStylePlayer[MAX_STYLES][MAX_NAME_LENGTH];
 char g_szRecordStyleMapSteamID[MAX_STYLES][MAX_NAME_LENGTH];
