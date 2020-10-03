@@ -608,12 +608,12 @@
 	"CannotRequestKnife"
 	{
 		"#format"	"{1:s}"
-		"en"	"{1} {darkred} You must be alive to request a knife!"
+		"en"	"{1} {darkred}You must be alive to request a knife!"
 	}
 	"AlreadyHasKnife"
 	{
 		"#format"	"{1:s}"
-		"en"	"{1} {darkred} You already have a knife!"
+		"en"	"{1} {darkred}You already have a knife!"
 	}
 	"Commands54"
 	{
