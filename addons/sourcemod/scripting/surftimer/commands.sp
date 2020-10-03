@@ -4153,9 +4153,9 @@ public Action Admin_FixBot(int client, int args)
 
 public Action Command_GiveKnife(int client, int args)
 {
-	if (IsClientObserver(client))
+	if (IsClientObserver(client) || !IsPlayerAlive(client))
 	{
-		CPrintToChat(client, "%t", "SpectatingKnife", g_szChatPrefix);
+		CPrintToChat(client, "%t", "CannotRequestKnife", g_szChatPrefix);
 	}	
 	else if (IsPlayerAlive(client) && (GetPlayerWeaponSlot(client, CS_SLOT_KNIFE) != -1))	
 	{
