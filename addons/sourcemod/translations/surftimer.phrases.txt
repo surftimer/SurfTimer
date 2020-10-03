@@ -608,7 +608,7 @@
 	"AlreadyHasKnife"
 	{
 		"#format"	"{1:s}"
-		"en"	"{1} {darkred} You already have a knife!"
+		"en"	"{1} {darkred}You already have a knife!"
 	}
 	"Commands54"
 	{
