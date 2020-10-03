@@ -605,6 +605,11 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Fixing replay bots"
 	}
+	"SpectatingKnife"
+	{
+		"#format"	"{1:s}"
+		"en"	"{1} {darkred}You can't request a knife whilst spectating!"
+	}
 	"AlreadyHasKnife"
 	{
 		"#format"	"{1:s}"
