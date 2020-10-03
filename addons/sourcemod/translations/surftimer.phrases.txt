@@ -605,6 +605,11 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Fixing replay bots"
 	}
+	"AlreadyHasKnife"
+	{
+		"#format"	"{1:s}"
+		"en"	"{1} {darkred} You already have a knife!"
+	}
 	"Commands54"
 	{
 		"#format"	"{1:s}"
