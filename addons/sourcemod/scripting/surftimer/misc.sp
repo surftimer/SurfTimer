@@ -1868,11 +1868,11 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		FormatTimeFloat(client, RecordDiff2, 3, szRecordDiff2, 32);
 		if (RecordDiff2 > 0.0)
 		{
-			Format(szRecordDiff2, 32, "+%s", szRecordDiff2);
+			Format(szRecordDiff2, 32, "-%s", szRecordDiff2);
 		}
 		else
 		{
-			Format(szRecordDiff2, 32, "-%s", szRecordDiff2);
+			Format(szRecordDiff2, 32, "+%s", szRecordDiff2);
 		}
 
 		// Check that ck_chat_record_type matches and ck_min_rank_announce matches
@@ -4321,11 +4321,11 @@ stock void StyleFinishedMsgs(int client, int style)
 		FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 32);
 		if (RecordDiff > 0.0)
 		{
-			Format(szRecordDiff, 32, "-%s", szRecordDiff);
+			Format(szRecordDiff, 32, "+%s", szRecordDiff);
 		}
 		else
 		{
-			Format(szRecordDiff, 32, "+%s", szRecordDiff);
+			Format(szRecordDiff, 32, "-%s", szRecordDiff);
 		}
 
 		// Player beat map style SR, time difference formatting
