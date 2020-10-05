@@ -1408,7 +1408,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 						g_bJumpedInZone[client] = true;
 						g_bResetOneJump[client] = true;
 						g_fJumpedInZoneTime[client] = GetGameTime();
-						CreateTimer(1.0, ResetOneJump, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+						CreateTimer(1.5, ResetOneJump, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 					}
 					else
 					{
