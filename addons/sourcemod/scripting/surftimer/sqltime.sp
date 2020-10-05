@@ -2,13 +2,17 @@ public void db_viewPlayerInfo(int client, char szSteamId[32])
 {
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), "SELECT steamid, steamid64, name, country, lastseen, joined, connections, timealive, timespec FROM ck_playerrank WHERE steamid = '%s';", szSteamId);
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_viewPlayerInfo - szQuery: %s", szQuery);
+	}
 	g_dDb.Query(SQL_ViewPlayerInfoCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
 
-public void SQL_ViewPlayerInfoCallback(Handle owner, Handle hndl, const char[] error, any userid)
+public void SQL_ViewPlayerInfoCallback(Database db, DBResultSet results, const char[] error, any userid)
 {
-	if (hndl == null)
+	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (SQL_ViewPlayerInfoCallback): %s", error);
 		return;
@@ -18,18 +22,18 @@ public void SQL_ViewPlayerInfoCallback(Handle owner, Handle hndl, const char[] e
 
 	if (IsValidClient(client))
 	{
-		if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+		if (results.HasResults && results.FetchRow())
 		{
 			char szSteamId[32], szName[MAX_NAME_LENGTH], szCountry[128], szSteamId64[64];
-			SQL_FetchString(hndl, 0, szSteamId, 32);
-			SQL_FetchString(hndl, 1, szSteamId64, 64);
-			SQL_FetchString(hndl, 2, szName, sizeof(szName));
-			SQL_FetchString(hndl, 3, szCountry, sizeof(szCountry));
-			int lastSeenUnix = SQL_FetchInt(hndl, 4);
-			int joinUnix = SQL_FetchInt(hndl, 5);
-			int connections = SQL_FetchInt(hndl, 6);
-			int timeAlive = SQL_FetchInt(hndl, 7);
-			int timeSpec = SQL_FetchInt(hndl, 8);
+			results.FetchString(0, szSteamId, 32);
+			results.FetchString(1, szSteamId64, 64);
+			results.FetchString(2, szName, sizeof(szName));
+			results.FetchString(3, szCountry, sizeof(szCountry));
+			int lastSeenUnix = results.FetchInt(4);
+			int joinUnix = results.FetchInt(5);
+			int connections = results.FetchInt(6);
+			int timeAlive = results.FetchInt(7);
+			int timeSpec = results.FetchInt(8);
 
 			// Format Joined Time
 			char szTime[128];
@@ -86,12 +90,16 @@ public void db_savePlayTime(int client)
 {
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), "UPDATE ck_playerrank SET timealive = timealive + %i, timespec = timespec + %i WHERE steamid = '%s';", g_iPlayTimeAliveSession[client], g_iPlayTimeSpecSession[client], g_szSteamID[client]);
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_savePlayTime- szQuery: %s", szQuery);
+	}
 	g_dDb.Query(SQL_SavePlayTimeCallback, szQuery, _, DBPrio_Low);
 }
 
-public void SQL_SavePlayTimeCallback(Handle owner, Handle hndl, const char[] error, any data)
+public void SQL_SavePlayTimeCallback(Database db, DBResultSet results, const char[] error, any data)
 {
-	if (hndl == null)
+	if (!IsValidDatabase(db, error))
 	{
 		LogError("[SurfTimer] SQL Error (SQL_SavePlayTimeCallback): %s", error);
 		return;

@@ -28,6 +28,10 @@ public int NewMapMenuHandler(Menu menu, MenuAction action, int param1, int param
 public void db_ViewNewestMaps(int client)
 {
 	char sql_selectNewestMaps[] = "SELECT mapname, date FROM ck_newmaps ORDER BY date DESC LIMIT 50";
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_ViewNewestMaps - szQuery: %s", sql_selectNewestMaps);
+	}
 	g_dDb.Query(sql_selectNewestMapsCallback, sql_selectNewestMaps, GetClientUserId(client), DBPrio_Low);
 }
 
@@ -63,7 +67,7 @@ public void sql_selectNewestMapsCallback(Database db, DBResultSet results, const
 		else
 		{
 			menu.OptionFlags = MENUFLAG_BUTTON_EXIT;
-			int client = GetClientUserId(userid);
+			int client = GetClientOfUserId(userid);
 
 			if (IsClientInGame(client))
 			{
@@ -81,14 +85,22 @@ public void db_InsertNewestMaps()
 {
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), "INSERT INTO ck_newmaps (mapname) VALUES('%s');", g_szMapName);
-	g_dDb.Query(SQL_CheckCallback, szQuery, DBPrio_Low);
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_InsertNewestMaps - szQuery: %s", szQuery);
+	}
+	g_dDb.Query(SQL_CheckCallback, szQuery, _, DBPrio_Low);
 }
 
 //update Database just incase
 public void db_present()
 {
 	// Check for db upgrades
-	g_dDb.Query(sqlCheckNewMaps, "SELECT mapname FROM ck_newmaps LIMIT 1");
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_present - szQuery: SELECT mapname FROM ck_newmaps LIMIT 1");
+	}
+	g_dDb.Query(sqlCheckNewMaps, "SELECT mapname FROM ck_newmaps LIMIT 1", _, DBPrio_Low);
 }
 
 public void sqlCheckNewMaps(Database db, DBResultSet results, const char[] error, any data)
@@ -108,7 +120,11 @@ public void sqlCheckNewMaps(Database db, DBResultSet results, const char[] error
 
 public void db_upgradeDbNewMap()
 {
-	g_dDb.Query(sqlCreateNewMaps, "CREATE TABLE IF NOT EXISTS ck_newmaps (mapname VARCHAR(32), date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(mapname)) DEFAULT CHARSET=utf8mb4;");
+	if (g_cLogQueries.BoolValue)
+	{
+		LogToFile(g_szQueryFile, "db_upgradeDbNewMap - szQuery: CREATE TABLE IF NOT EXISTS ck_newmaps (mapname VARCHAR(32), date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(mapname)) DEFAULT CHARSET=utf8mb4;");
+	}
+	g_dDb.Query(sqlCreateNewMaps, "CREATE TABLE IF NOT EXISTS ck_newmaps (mapname VARCHAR(32), date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(mapname)) DEFAULT CHARSET=utf8mb4;", _, DBPrio_Low);
 }
 
 public void sqlCreateNewMaps(Database db, DBResultSet results, const char[] error, any data)

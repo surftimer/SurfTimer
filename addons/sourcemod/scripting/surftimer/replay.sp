@@ -33,22 +33,14 @@ void setReplayTime(int zGrp, int stage, int style)
 	if (zGrp == 0 && stage == 0)
 	{
 		// Map
-		if (style == 0)
-		{
-			if ((g_fRecordMapTime - 0.01) < time < (g_fRecordMapTime) + 0.01)
-				time = g_fRecordMapTime;
-		}
-		else
-		{
-			if ((g_fRecordStyleMapTime[style] - 0.01) < time < (g_fRecordStyleMapTime[style]) + 0.01)
-				time = g_fRecordStyleMapTime[style];
-		}
+		if ((g_fRecordStyleMapTime[style] - 0.01) < time < (g_fRecordStyleMapTime[style]) + 0.01)
+			time = g_fRecordStyleMapTime[style];
 	}
 	else if (stage > 0)
 	{
 		// Stage
-		if ((g_fStageRecord[stage] - 0.01) < time < (g_fStageRecord[stage]) + 0.01)
-			g_fStageReplayTimes[stage] = g_fStageRecord[stage];
+		if ((g_fStyleStageRecord[0][stage] - 0.01) < time < (g_fStyleStageRecord[0][stage]) + 0.01)
+			g_fStageReplayTimes[stage] = g_fStyleStageRecord[0][stage];
 		else
 			g_fStageReplayTimes[stage] = time;
 		return;
@@ -56,16 +48,8 @@ void setReplayTime(int zGrp, int stage, int style)
 	else
 	{
 		// Bonus
-		if (style == 0)
-		{
-			if ((g_fBonusFastest[zGrp] - 0.01) < time < (g_fBonusFastest[zGrp]) + 0.01)
-				time = g_fBonusFastest[zGrp];
-		}
-		else
-		{
-			if ((g_fStyleBonusFastest[style][zGrp] - 0.01) < time < (g_fStyleBonusFastest[style][zGrp]) + 0.01)
-				time = g_fStyleBonusFastest[style][zGrp];
-		}
+		if ((g_fStyleBonusFastest[style][zGrp] - 0.01) < time < (g_fStyleBonusFastest[style][zGrp]) + 0.01)
+			time = g_fStyleBonusFastest[style][zGrp];
 	}
 
 	g_fReplayTimes[zGrp][style] = time;
@@ -86,18 +70,6 @@ public Action RespawnBot(Handle timer, any userid)
 	return Plugin_Stop;
 }
 
-public Action Hook_WeaponCanSwitchTo(int client, int weapon)
-{
-	if (g_hBotMimicsRecord[client] == null)
-		return Plugin_Continue;
-
-	if (g_BotActiveWeapon[client] != weapon)
-	{
-		return Plugin_Stop;
-	}
-	return Plugin_Continue;
-}
-
 public void StartRecording(int client)
 {
 	if (!IsValidClient(client) || IsFakeClient(client))
@@ -113,9 +85,6 @@ public void StartRecording(int client)
 
 public void StopRecording(int client)
 {
-	if (!IsValidClient(client) || g_hRecording[client] == null)
-		return;
-
 	delete g_hRecording[client];
 	delete g_hRecordingAdditionalTeleport[client];
 	g_hRecording[client] = null;
@@ -859,21 +828,11 @@ public void LoadWrcpReplay()
 
 public void StopPlayerMimic(int client)
 {
-	if (!IsValidClient(client))
-		return;
-
 	g_BotMimicTick[client] = 0;
 	g_CurrentAdditionalTeleportIndex[client] = 0;
 	g_BotMimicRecordTickCount[client] = 0;
 	g_bValidTeleportCall[client] = false;
 	delete g_hBotMimicsRecord[client];
-}
-
-public bool IsPlayerMimicing(int client)
-{
-	if (!IsValidClient(client))
-		return false;
-	return g_hBotMimicsRecord[client] != null;
 }
 
 public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int &impulse, int &weapon, float angles[3], float vel[3])

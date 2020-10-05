@@ -382,24 +382,18 @@ public void ckAdminMenu(int client)
 		SetMenuOptionFlags(adminmenu, MENUFLAG_BUTTON_EXIT);
 		if (g_AdminMenuLastPage[client] < 6)
 			DisplayMenuAtItem(adminmenu, client, 0, MENU_TIME_FOREVER);
-		else
-			if (g_AdminMenuLastPage[client] < 12)
+		else if (g_AdminMenuLastPage[client] < 12)
 				DisplayMenuAtItem(adminmenu, client, 6, MENU_TIME_FOREVER);
-			else
-				if (g_AdminMenuLastPage[client] < 18)
-					DisplayMenuAtItem(adminmenu, client, 12, MENU_TIME_FOREVER);
-				else
-					if (g_AdminMenuLastPage[client] < 24)
-						DisplayMenuAtItem(adminmenu, client, 18, MENU_TIME_FOREVER);
-					else
-						if (g_AdminMenuLastPage[client] < 30)
-							DisplayMenuAtItem(adminmenu, client, 24, MENU_TIME_FOREVER);
-						else
-							if (g_AdminMenuLastPage[client] < 36)
-								DisplayMenuAtItem(adminmenu, client, 30, MENU_TIME_FOREVER);
-							else
-								if (g_AdminMenuLastPage[client] < 42)
-									DisplayMenuAtItem(adminmenu, client, 36, MENU_TIME_FOREVER);
+		else if (g_AdminMenuLastPage[client] < 18)
+				DisplayMenuAtItem(adminmenu, client, 12, MENU_TIME_FOREVER);
+		else if (g_AdminMenuLastPage[client] < 24)
+				DisplayMenuAtItem(adminmenu, client, 18, MENU_TIME_FOREVER);
+		else if (g_AdminMenuLastPage[client] < 30)
+				DisplayMenuAtItem(adminmenu, client, 24, MENU_TIME_FOREVER);
+		else if (g_AdminMenuLastPage[client] < 36)
+				DisplayMenuAtItem(adminmenu, client, 30, MENU_TIME_FOREVER);
+		else if (g_AdminMenuLastPage[client] < 42)
+				DisplayMenuAtItem(adminmenu, client, 36, MENU_TIME_FOREVER);
 	}
 	else
 	{
@@ -627,14 +621,34 @@ public Action Admin_RefreshProfile(int client, int args)
 	{
 		char szSteamID[128];
 		char szArg[128];
-		Format(szSteamID, 128, "");
+		Format(szSteamID, sizeof(szArg), "");
 		for (int i = 1; i < 6; i++)
 		{
-			GetCmdArg(i, szArg, 128);
+			GetCmdArg(i, szArg, sizeof(szArg));
 			if (!StrEqual(szArg, "", false))
-				Format(szSteamID, 128, "%s%s", szSteamID, szArg);
+				Format(szSteamID, sizeof(szArg), "%s%s", szSteamID, szArg);
 		}
 		RecalcPlayerRank(client, szSteamID);
+	}
+	return Plugin_Handled;
+}
+
+public Action Admin_ResetRecords(int client, int args)
+{
+	if (args < 1)
+	{
+		ReplyToCommand(client, "%s Usage: sm_wipeplayer <steamid>", g_szChatPrefix);
+		return Plugin_Handled;
+	}
+	else
+	{
+		char szArg[32];
+		GetCmdArgString(szArg, sizeof(szArg));
+
+		StripQuotes(szArg);
+		TrimString(szArg);
+
+		db_WipePlayer(client, szArg);
 	}
 	return Plugin_Handled;
 }

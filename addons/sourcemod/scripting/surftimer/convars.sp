@@ -8,7 +8,6 @@ ConVar g_hZonerFlag = null;
 ConVar g_hZoneDisplayType = null;								// How zones are displayed (lower edge, full)
 ConVar g_hZonesToDisplay = null;								// Which zones are displayed
 ConVar g_hChecker;												// Zone refresh rate
-Handle g_hZoneTimer = INVALID_HANDLE;
 // Zone Colors
 int g_iZoneColors[ZONEAMOUNT+2][4];								// ZONE COLOR TYPES: Stop(0), Start(1), End(2), BonusStart(3), BonusEnd(4), Stage(5),
 char g_szZoneColors[ZONEAMOUNT+2][24];							// Checkpoint(6), Speed(7), TeleToStart(8), Validator(9), Chekcer(10)
@@ -129,10 +128,11 @@ ConVar g_iAdminCountryTags = null;
 ConVar g_iVIPCommands = null;
 ConVar g_replayBotDelay = null;
 ConVar g_AllowPause = null;
+ConVar g_cLogQueries = null;
 
 void CreateConVars()
 {
-	CreateConVar("timer_version", VERSION, "Timer Version.", FCVAR_DONTRECORD | FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY);
+	CreateConVar("surftimer_version", VERSION, "SurfTimer Version", FCVAR_DONTRECORD | FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY);
 
 	AutoExecConfig_SetCreateDirectory(true);
 	AutoExecConfig_SetCreateFile(true);
@@ -177,14 +177,14 @@ void CreateConVars()
 	g_dcBugTrackerName = AutoExecConfig_CreateConVar("ck_discord_bug_tracker_name", "Bugtracker", "Webhook name for !bug - Discord side", FCVAR_NOTIFY);
 	g_dcBonusRecordName = AutoExecConfig_CreateConVar("ck_discord_bonus_record_name", "Surf Records", "Webhook name for bonus record announcements - Discord side", FCVAR_NOTIFY);
 	g_dcMapRecordName = AutoExecConfig_CreateConVar("ck_discord_map_record_name", "Surf Records", "Webhook name for map record announcements - Discord side", FCVAR_NOTIFY);
-	g_dcColor = CreateConVar("ck_discord_embed_color", "#ff2222", "The color of the discord embed message - Discord side", FCVAR_NOTIFY);
-	g_dcTitle = CreateConVar("ck_discord_embed_title", "New Server Record on {Server_Name}!", "The title of the discord embed for a server record, {Server_Name} will be replaced with your server's name - Discord side", FCVAR_NOTIFY);
-	g_dcTitleBonus = CreateConVar("ck_discord_embed_title_bonus", "New Server Bonus Record on {Server_Name}!", "The title of the discord embed for a bonus record, {Server_Name} will be replaced with your server's name - Discord side", FCVAR_NOTIFY);
-	g_dcMention = CreateConVar("ck_discord_mention", "@here", "Group to mention when somebody sets a record. Leave blank to disable. For a group other than @here or @everyone, use backslash@groupname in the discord's chat.", FCVAR_NOTIFY);
-	g_dcKSFStyle = CreateConVar("ck_discord_ksf_style", "0", "Wether or not to use the KSF style for discord announcements. Set to 1 for KSF style.", FCVAR_NOTIFY);
-	g_dcTest = CreateConVar("ck_discord_test", "0", "Wether or not discord testing is enabled. If it is, type !ck_discord_test to test it.", FCVAR_NOTIFY);
-	g_dcUrl_main = CreateConVar("ck_discord_url_main", "", "The base url of where the Discord main images are stored. Leave blank to disable.");
-	g_dcUrl_thumb = CreateConVar("ck_discord_url_thumb", "https://image.gametracker.com/images/maps/160x120/csgo/", "The base url of where the Discord thumb images are stored. Leave blank to disable.");
+	g_dcColor = AutoExecConfig_CreateConVar("ck_discord_embed_color", "#ff2222", "The color of the discord embed message - Discord side", FCVAR_NOTIFY);
+	g_dcTitle = AutoExecConfig_CreateConVar("ck_discord_embed_title", "New Server Record on {Server_Name}!", "The title of the discord embed for a server record, {Server_Name} will be replaced with your server's name - Discord side", FCVAR_NOTIFY);
+	g_dcTitleBonus = AutoExecConfig_CreateConVar("ck_discord_embed_title_bonus", "New Server Bonus Record on {Server_Name}!", "The title of the discord embed for a bonus record, {Server_Name} will be replaced with your server's name - Discord side", FCVAR_NOTIFY);
+	g_dcMention = AutoExecConfig_CreateConVar("ck_discord_mention", "@here", "Group to mention when somebody sets a record. Leave blank to disable. For a group other than @here or @everyone, use backslash@groupname in the discord's chat.", FCVAR_NOTIFY);
+	g_dcKSFStyle = AutoExecConfig_CreateConVar("ck_discord_ksf_style", "0", "Wether or not to use the KSF style for discord announcements. Set to 1 for KSF style.", FCVAR_NOTIFY);
+	g_dcTest = AutoExecConfig_CreateConVar("ck_discord_test", "0", "Wether or not discord testing is enabled. If it is, type !ck_discord_test to test it.", FCVAR_NOTIFY);
+	g_dcUrl_main = AutoExecConfig_CreateConVar("ck_discord_url_main", "", "The base url of where the Discord main images are stored. Leave blank to disable.");
+	g_dcUrl_thumb = AutoExecConfig_CreateConVar("ck_discord_url_thumb", "https://image.gametracker.com/images/maps/160x120/csgo/", "The base url of where the Discord thumb images are stored. Leave blank to disable.");
 	g_drDeleteSecurity = AutoExecConfig_CreateConVar("ck_dr_delete_security", "1", "(1 / 0) Enable/Disable delete security for !dr command", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_iAdminCountryTags = AutoExecConfig_CreateConVar("ck_admin_country_tags", "0", "(1 / 0) Enable/Disable country tags for admins", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_replayBotDelay = AutoExecConfig_CreateConVar("ck_replay_bot_delay", "10", "Delay in seconds after initial mapstart after the bots join the server", FCVAR_NOTIFY, true, 10.0);
@@ -465,6 +465,8 @@ void CreateConVars()
 	//Allow pausing
 	g_AllowPause = AutoExecConfig_CreateConVar("ck_allow_pause", "1", "on/off - Allows players to pause their timer", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	HookConVarChange(g_AllowPause, OnSettingChanged);
+
+	g_cLogQueries = AutoExecConfig_CreateConVar("ck_enable_query_logging", "0", "Enable logging of all queries? This can impact the I/O Load and is only useful for debugging.", _, true, 0.0, true, 1.0);
 
 	AutoExecConfig_ExecuteFile();
 	AutoExecConfig_CleanFile();
