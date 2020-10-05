@@ -15,6 +15,7 @@ void db_startUpgrading()
 	tTransaction.AddQuery("SELECT teleside FROM ck_spawnlocations LIMIT 1", 4);
 	tTransaction.AddQuery("SELECT velEndXYZ FROM ck_checkpoints LIMIT 1", 5);
 	tTransaction.AddQuery("SELECT steamid FROM ck_announcements LIMIT 1", 6);
+
 	g_dDb.Execute(tTransaction, SQLTxn_CheckDatabaseUpgradesSuccess, SQLTxn_CheckDatabaseUpgradesFailed);
 }
 

@@ -33,22 +33,14 @@ void setReplayTime(int zGrp, int stage, int style)
 	if (zGrp == 0 && stage == 0)
 	{
 		// Map
-		if (style == 0)
-		{
-			if ((g_fRecordMapTime - 0.01) < time < (g_fRecordMapTime) + 0.01)
-				time = g_fRecordMapTime;
-		}
-		else
-		{
-			if ((g_fRecordStyleMapTime[style] - 0.01) < time < (g_fRecordStyleMapTime[style]) + 0.01)
-				time = g_fRecordStyleMapTime[style];
-		}
+		if ((g_fRecordStyleMapTime[style] - 0.01) < time < (g_fRecordStyleMapTime[style]) + 0.01)
+			time = g_fRecordStyleMapTime[style];
 	}
 	else if (stage > 0)
 	{
 		// Stage
-		if ((g_fStageRecord[stage] - 0.01) < time < (g_fStageRecord[stage]) + 0.01)
-			g_fStageReplayTimes[stage] = g_fStageRecord[stage];
+		if ((g_fStyleStageRecord[0][stage] - 0.01) < time < (g_fStyleStageRecord[0][stage]) + 0.01)
+			g_fStageReplayTimes[stage] = g_fStyleStageRecord[0][stage];
 		else
 			g_fStageReplayTimes[stage] = time;
 		return;
@@ -56,16 +48,8 @@ void setReplayTime(int zGrp, int stage, int style)
 	else
 	{
 		// Bonus
-		if (style == 0)
-		{
-			if ((g_fBonusFastest[zGrp] - 0.01) < time < (g_fBonusFastest[zGrp]) + 0.01)
-				time = g_fBonusFastest[zGrp];
-		}
-		else
-		{
-			if ((g_fStyleBonusFastest[style][zGrp] - 0.01) < time < (g_fStyleBonusFastest[style][zGrp]) + 0.01)
-				time = g_fStyleBonusFastest[style][zGrp];
-		}
+		if ((g_fStyleBonusFastest[style][zGrp] - 0.01) < time < (g_fStyleBonusFastest[style][zGrp]) + 0.01)
+			time = g_fStyleBonusFastest[style][zGrp];
 	}
 
 	g_fReplayTimes[zGrp][style] = time;
