@@ -319,7 +319,7 @@ public void CL_OnEndTimerPress(int client)
 				{
 					// New fastest time in map
 					g_bStyleMapSRVRecord[0][client] = true;
-					g_fOldRecordMapTime = g_fRecordStyleMapTime[0];
+					g_fOldRecordStyleMapTime[0] = g_fRecordStyleMapTime[0];
 					g_fRecordStyleMapTime[0] = g_fFinalTime[client];
 					Format(g_szRecordStylePlayer[0], MAX_NAME_LENGTH, "%s", szName);
 					FormatTimeFloat(1, g_fRecordStyleMapTime[0], 3, g_szRecordStyleMapTime[0], 64);
@@ -370,7 +370,7 @@ public void CL_OnEndTimerPress(int client)
 					CreateTimer(0.0, ReplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 				}
 
-				g_fOldRecordMapTime = g_fRecordStyleMapTime[0];
+				g_fOldRecordStyleMapTime[0] = g_fRecordStyleMapTime[0];
 				g_bStyleMapSRVRecord[0][client] = true;
 				g_fRecordStyleMapTime[0] = g_fFinalTime[client];
 				Format(g_szRecordStylePlayer[0], MAX_NAME_LENGTH, "%s", szName);
@@ -403,7 +403,7 @@ public void CL_OnEndTimerPress(int client)
 					g_bCheckpointRecordFound[zGroup] = true;
 				}
 
-				g_fOldRecordMapTime = g_fRecordStyleMapTime[0];
+				g_fOldRecordStyleMapTime[0] = g_fRecordStyleMapTime[0];
 				// wrCredits = fcTierCredits;
 			}
 
@@ -471,6 +471,7 @@ public void CL_OnEndTimerPress(int client)
 			g_bStyleMapSRVRecord[style][client] = false;
 
 			g_OldStyleMapRank[style][client] = g_StyleMapRank[style][client];
+			g_fOldRecordStyleMapTime[style] = g_fRecordStyleMapTime[style];
 
 			diff = g_fPersonalStyleRecord[style][client] - g_fFinalTime[client];
 			FormatTimeFloat(client, diff, 3, szDiff, sizeof(szDiff));
@@ -524,6 +525,8 @@ public void CL_OnEndTimerPress(int client)
 
 				// Insert latest record
 				// db_InsertLatestRecords(g_szSteamID[client], szName, g_fFinalTime[client]);
+
+				g_fOldRecordStyleMapTime[style] = g_fRecordStyleMapTime[style];
 			}
 
 
@@ -553,18 +556,34 @@ public void CL_OnEndTimerPress(int client)
 				db_selectStyleRecord(client, style);
 			}
 
-			if (!g_bStyleMapSRVRecord[style][client] && !g_bStyleMapFirstRecord[style][client] && !g_bStyleMapPBRecord[style][client])
+			if (!g_bStyleMapSRVRecord[style][client] && !g_bStyleMapFirstRecord[style][client] && !g_bStyleMapPBRecord[style][client]) // Player did not beat Server Record nor finish for 1st time nor beat Personal Record using style
 			{
+				float RecordDiff;
+				char szRecordDiff[32];
 				int count = g_StyleMapTimesCount[style];
+
+				// Map style SR, time difference formatting
+				RecordDiff = g_fRecordStyleMapTime[style] - g_fFinalTime[client];
+				FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 32);
+				if (RecordDiff > 0.0)
+				{
+					Format(szRecordDiff, 32, "-%s", szRecordDiff);
+				}
+				else
+				{
+					Format(szRecordDiff, 32, "+%s", szRecordDiff);
+				}
 
 				for (int i = 1; i <= MaxClients; i++)
 				{
 					if (IsValidClient(i) && !IsFakeClient(i))
 					{
-						CPrintToChat(i, "%t", "BPress6", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szFinalTime[client], g_szTimeDifference[client], g_StyleMapRank[style][client], count, g_szRecordStyleMapTime[style]);
+						CPrintToChat(i, "%t", "StyleMapFinished5", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[style][client], count);
+						PrintToConsole(client, "Surftimer | %s finished %s in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[style][client], count);
 					}
 				}
-			}
+			} 
+			
 			CS_SetClientAssists(client, 100);
 		}
 	}
