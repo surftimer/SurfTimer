@@ -1,8 +1,10 @@
 #pragma semicolon 1
 
 #include <sourcemod>
-#include <discord>
 #include <surftimer>
+
+#undef REQUIRE_PLUGIN
+#include <discord>
 
 #pragma newdecls required
 
