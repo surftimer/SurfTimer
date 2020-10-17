@@ -7,15 +7,15 @@ public Action reloadRank(Handle timer, any userid)
 	return Plugin_Handled;
 }
 
-public Action AnnounceMap(Handle timer, any userid)
+public Action AnnounceMap(Handle timer, int userid)
 {
 	int client = GetClientOfUserId(userid);
 	
 	if (IsValidClient(client))
 	{
 		CPrintToChat(client, "%t", "Timer1", g_szChatPrefix, g_sTierString);
-		AnnounceTimer[client] = null;
 	}
+	
 	return Plugin_Handled;
 }
 
@@ -45,22 +45,6 @@ public Action RefreshZonesTimer(Handle timer)
 	return Plugin_Handled;
 }
 
-public Action SetPlayerWeapons(Handle timer, any client)
-{
-	if ((GetClientTeam(client) > 1) && IsValidClient(client))
-	{
-		StripAllWeapons(client);
-		if (!IsFakeClient(client))
-			GivePlayerItem(client, "weapon_usp_silencer");
-		int weapon;
-		weapon = GetPlayerWeaponSlot(client, 2);
-		if (weapon != -1 && !IsFakeClient(client))
-			SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
-	}
-
-	return Plugin_Handled;
-}
-
 public Action PlayerRanksTimer(Handle timer)
 {
 	for (int i = 1; i <= MaxClients; i++)
@@ -81,14 +65,6 @@ public Action UpdatePlayerProfile(Handle timer, Handle pack)
 
 	if (IsValidClient(client) && !IsFakeClient(client))
 		db_updateStat(client, style);
-
-	return Plugin_Handled;
-}
-
-public Action StartTimer(Handle timer, any client)
-{
-	if (IsValidClient(client) && !IsFakeClient(client))
-		CL_OnStartTimerPress(client);
 
 	return Plugin_Handled;
 }
@@ -372,44 +348,56 @@ public Action SetClanTag(Handle timer, any userid)
 	}
 	SetPlayerRank(client);
 
-	if (GetConVarBool(g_hCountry))
+	// new rank
+	if (oldrank && GetConVarBool(g_hPointSystem))
 	{
-		char szTabRank[1024], szTabClanTag[1024];
-		Format(szTabRank, 1024, "%s", g_pr_chat_coloredrank[client]);
-		CRemoveTags(szTabRank, 1024);
-		Format(szTabClanTag, 1024, "%s | %s", g_szCountryCode[client], szTabRank);
-		
-		if ((GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) {
-			if (GetConVarBool(g_iAdminCountryTags))
-				CS_SetClientClanTag(client, szTabRank);
-			else 
-				CS_SetClientClanTag(client, szTabClanTag);
-		} 
-		else CS_SetClientClanTag(client, szTabClanTag);
-	}
-	else
-	{
-		if (GetConVarBool(g_hPointSystem))
+		if (!StrEqual(g_pr_rankname[client], old_pr_rankname, false) && IsValidClient(client))
 		{
-			char szTabRank[1024], szTabClanTag[1024];
-			Format(szTabRank, 1024, "%s", g_pr_chat_coloredrank[client]);
-			CRemoveTags(szTabRank, 1024);
-			Format(szTabClanTag, 1024, "%s", szTabRank);
-			
-			if ((GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) {
-				if (GetConVarBool(g_iAdminCountryTags))
-					CS_SetClientClanTag(client, szTabRank);
-				else 
-					CS_SetClientClanTag(client, szTabClanTag);
-			} 
-			else CS_SetClientClanTag(client, szTabClanTag);
+			CPrintToChat(client, "%t", "SkillGroup", g_szChatPrefix, g_pr_chat_coloredrank[client]);
 		}
 	}
 
-	// new rank
-	if (oldrank && GetConVarBool(g_hPointSystem))
-		if (!StrEqual(g_pr_rankname[client], old_pr_rankname, false) && IsValidClient(client))
-			CPrintToChat(client, "%t", "SkillGroup", g_szChatPrefix, g_pr_chat_coloredrank[client]);
+	if (GetConVarBool(g_hCountry))
+	{
+		char szTabRank[1024], szTabClanTag[1024];
+
+		if (g_iEnforceTitleType[client] == 1 || g_iEnforceTitleType[client] == 2) {
+			Format(szTabRank, sizeof(szTabRank), "%s", g_pr_rankname[client]);
+		}
+
+		if (strlen(szTabRank) > 1) {
+			Format(szTabClanTag, sizeof(szTabClanTag), "%s | %s", g_szCountryCode[client], szTabRank);
+		}
+		else {
+			strcopy(szTabClanTag, sizeof(szTabClanTag), g_szCountryCode[client]);
+		}
+		
+		if (GetConVarBool(g_iAdminCountryTags) && (GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) {
+			CS_SetClientClanTag(client, szTabRank);
+		} else
+		{
+			CS_SetClientClanTag(client, szTabClanTag);
+		}
+	}
+	else if (GetConVarBool(g_hPointSystem))
+	{
+		char szTabRank[1024], szTabClanTag[1024];
+
+		if (g_iEnforceTitleType[client] == 1 || g_iEnforceTitleType[client] == 2) {
+			Format(szTabRank, sizeof(szTabRank), "%s", g_pr_chat_coloredrank[client]);
+		}
+
+		CRemoveTags(szTabRank, sizeof(szTabRank));
+
+		Format(szTabClanTag, sizeof(szTabClanTag), "%s", szTabRank);
+		
+		if (GetConVarBool(g_iAdminCountryTags) && (GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) {
+			CS_SetClientClanTag(client, szTabRank);
+		}
+		else {
+			CS_SetClientClanTag(client, szTabClanTag);
+		}
+	}
 
 	return Plugin_Handled;
 }
@@ -566,17 +554,6 @@ public Action StartJumpZonePrintTimer(Handle timer, any userid)
 	}
 
 	return Plugin_Handled;
-}
-
-
-public Action Block2Unload(Handle timer, any client)
-{
-	ServerCommand("sm plugins unload block2");
-}
-
-public Action Block2Load(Handle timer, any client)
-{
-	ServerCommand("sm plugins load block2");
 }
 
 // Replay Bot Fixes

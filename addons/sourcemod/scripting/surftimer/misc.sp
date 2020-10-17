@@ -91,6 +91,8 @@ public void LoadClientSetting(int client, int setting)
 				LogError("[SurfTimer] (LoadClientSetting) GetClientAuthId failed for client index %d.", client);
 				return;
 			}
+
+			strcopy(g_pr_szSteamID[client], sizeof(g_pr_szSteamID[]), g_szSteamID[client]);
 		}
 
 		switch (setting)
@@ -817,7 +819,7 @@ public void checkSpawnPoints()
 		{
 			LogToFile(g_szQueryFile, "checkSpawnPoints - szQuery: %s", szQuery);
 		}
-		g_dDb.Query(sqlSelectSpawnPoints, szQuery, pack);
+		g_dDb.Query(sqlSelectSpawnPoints, szQuery, pack, DBPrio_Low);
 	}
 }
 
@@ -1283,14 +1285,6 @@ public void LimitMaxSpeed(int client, float fMaxSpeed)
 	}
 }
 
-public bool Base_TraceFilter(int entity, int contentsMask, any data)
-{
-	if (entity != data)
-		return (false);
-
-	return (true);
-}
-
 public void SetClientDefaults(int client)
 {
 	float GameTime = GetGameTime();
@@ -1352,8 +1346,8 @@ public void SetClientDefaults(int client)
 	g_fStartTime[client] = -1.0;
 	g_fPlayerLastTime[client] = -1.0;
 	g_fPauseTime[client] = 0.0;
-	g_MapRank[client] = 99999;
-	g_OldMapRank[client] = 99999;
+	g_StyleMapRank[0][client] = 99999;
+	g_OldStyleMapRank[0][client] = 99999;
 	g_fProfileMenuLastQuery[client] = GameTime;
 	Format(g_szPlayerPanelText[client], 512, "");
 	Format(g_pr_rankname[client], 128, "");
@@ -1364,13 +1358,13 @@ public void SetClientDefaults(int client)
 	Format(g_szLastSRDifference[client], 64, "");
 	Format(g_szLastPBDifference[client], 64, "");
 
-	Format(g_szPersonalRecord[client], 64, "");
+	Format(g_szPersonalStyleRecord[0][client], 64, "");
 
 	for (int x = 0; x < MAXZONEGROUPS; x++)
 	{
-		Format(g_szPersonalRecordBonus[x][client], 64, "-");
+		Format(g_szStylePersonalRecordBonus[0][x][client], 64, "-");
 		g_bCheckpointsFound[x][client] = false;
-		g_MapRankBonus[x][client] = 9999999;
+		g_StyleMapRankBonus[0][x][client] = 9999999;
 		g_Stage[x][client] = 0;
 		for (int i = 0; i < CPLIMIT; i++)
 		{
@@ -1568,7 +1562,10 @@ public void PlayUnstoppableSound(int client)
 	char buffer[255];
 	Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathPB);
 	if (!IsFakeClient(client) && g_bEnableQuakeSounds[client])
+	{
 		ClientCommand(client, buffer);
+	}
+	
 	// Spec Stop Sound
 	for (int i = 1; i <= MaxClients; i++)
 	{
@@ -1579,7 +1576,9 @@ public void PlayUnstoppableSound(int client)
 			{
 				int Target = GetEntPropEnt(i, Prop_Send, "m_hObserverTarget");
 				if (Target == client && g_bEnableQuakeSounds[i])
+				{
 					ClientCommand(i, buffer);
+				}
 			}
 		}
 	}
@@ -1682,18 +1681,18 @@ public void PrintMapRecords(int client, int type)
 {
 	if (type == 0)
 	{
-		if (g_fRecordMapTime != 9999999.0)
+		if (g_fRecordStyleMapTime[0] != 9999999.0)
 			{
-				CPrintToChat(client, "%t", "Misc5", g_szChatPrefix, g_szRecordPlayer, g_szRecordMapTime, g_szMapName);
+				CPrintToChat(client, "%t", "Misc5", g_szChatPrefix, g_szRecordStylePlayer[0], g_szRecordStyleMapTime[0], g_szMapName);
 			}
 	}
 	else if (type == 99)
 	{
 	for (int i = 1; i <= g_mapZoneGroupCount; i++)
 		{
-			if (g_fBonusFastest[i] != 9999999.0) // BONUS
+			if (g_fStyleBonusFastest[0][i] != 9999999.0) // BONUS
 			{
-				CPrintToChat(client, "%t", "Misc6", g_szChatPrefix, g_szBonusFastest[i], g_szBonusFastestTime[i], g_szZoneGroupName[i], g_szMapName);
+				CPrintToChat(client, "%t", "Misc6", g_szChatPrefix, g_szStyleBonusFastest[0][i], g_szStyleBonusFastestTime[0][i], g_szZoneGroupName[i], g_szMapName);
 			}
 		}
 	}
@@ -1829,122 +1828,187 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 {
 	if (IsValidClient(client))
 	{
-		float RecordDiff;
-		char szRecordDiff[32], szName[MAX_NAME_LENGTH];
+		float RecordDiff, RecordDiff2;
+		char szRecordDiff[32], szRecordDiff2[32], szName[MAX_NAME_LENGTH];
 		GetClientName(client, szName, 128);
-		int count = g_MapTimesCount;
+		int count = g_StyleMapTimesCount[0];
 
 		if (rankThisRun == 0)
-			rankThisRun = g_MapRank[client];
+			rankThisRun = g_StyleMapRank[0][client];
 
-		int rank = g_MapRank[client];
+		int rank = g_StyleMapRank[0][client];
 		char szGroup[128];
 		if (rank >= 11 && rank <= g_G1Top)
-			Format(szGroup, 128, "[%cGroup 1%c]", DARKRED, WHITE);
+			Format(szGroup, 128, "%cGroup 1%c", DARKRED, WHITE);
 		else if (rank >= g_G2Bot && rank <= g_G2Top)
-			Format(szGroup, 128, "[%cGroup 2%c]", GREEN, WHITE);
+			Format(szGroup, 128, "%cGroup 2%c", GREEN, WHITE);
 		else if (rank >= g_G3Bot && rank <= g_G3Top)
-			Format(szGroup, 128, "[%cGroup 3%c]", BLUE, WHITE);
+			Format(szGroup, 128, "%cGroup 3%c", BLUE, WHITE);
 		else if (rank >= g_G4Bot && rank <= g_G4Top)
-			Format(szGroup, 128, "[%cGroup 4%c]", YELLOW, WHITE);
+			Format(szGroup, 128, "%cGroup 4%c", YELLOW, WHITE);
 		else if (rank >= g_G5Bot && rank <= g_G5Top)
-			Format(szGroup, 128, "[%cGroup 5%c]", GRAY, WHITE);
+			Format(szGroup, 128, "%cGroup 5%c", GRAY, WHITE);
 		else
 			Format(szGroup, 128, "");
 
+		// Map SR, time difference formatting 
+		RecordDiff = g_fRecordStyleMapTime[0] - g_fFinalTime[client];
+		FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 32);
+		if (RecordDiff > 0.0)
+		{
+			Format(szRecordDiff, 32, "+%s", szRecordDiff);
+		}
+		else
+		{
+			Format(szRecordDiff, 32, "-%s", szRecordDiff);
+		}
+		
+		// Player beat map SR, time difference formatting 
+		RecordDiff2 = g_fOldRecordStyleMapTime[0] - g_fFinalTime[client];
+		FormatTimeFloat(client, RecordDiff2, 3, szRecordDiff2, 32);
+		if (RecordDiff2 > 0.0)
+		{
+			Format(szRecordDiff2, 32, "-%s", szRecordDiff2);
+		}
+		else
+		{
+			Format(szRecordDiff2, 32, "+%s", szRecordDiff2);
+		}
+
 		// Check that ck_chat_record_type matches and ck_min_rank_announce matches
 		if ((GetConVarInt(g_hAnnounceRecord) == 0 ||
-			(GetConVarInt(g_hAnnounceRecord) == 1 && g_bMapPBRecord[client] || g_bMapSRVRecord[client] || g_bMapFirstRecord[client]) ||
-			(GetConVarInt(g_hAnnounceRecord) == 2 && g_bMapSRVRecord[client])) &&
+			(GetConVarInt(g_hAnnounceRecord) == 1 && g_bStyleMapPBRecord[0][client] || g_bStyleMapSRVRecord[0][client] || g_bStyleMapFirstRecord[0][client]) ||
+			(GetConVarInt(g_hAnnounceRecord) == 2 && g_bStyleMapSRVRecord[0][client])) &&
 			(rankThisRun <= GetConVarInt(g_hAnnounceRank) || GetConVarInt(g_hAnnounceRank) == 0))
 		{
 			for (int i = 1; i <= MaxClients; i++)
 			{
 				if (IsValidClient(i) && !IsFakeClient(i))
 				{
-					if (g_bMapFirstRecord[client]) // 1st time finishing
+					if (g_bStyleMapSRVRecord[0][client] && g_fFinalTime[client] == g_fOldRecordStyleMapTime[0]) // Player sets 1st Server Record
 					{
-						CPrintToChat(i, "%t", "MapFinished1", g_szChatPrefix, szName, g_szFinalTime[client], g_MapRank[client], count, szGroup, g_szRecordMapTime);
-						PrintToConsole(i, "%s finished the map with a time of (%s). [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_MapRank[client], count, g_szRecordMapTime);
-					}
-					else
-						if (g_bMapPBRecord[client]) // Own record
-						{
-							PlayUnstoppableSound(client);
-							CPrintToChat(i, "%t", "MapFinished3", g_szChatPrefix, szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, szGroup, g_szRecordMapTime);
-							PrintToConsole(i, "%s finished the map with a time of (%s). Improving their best time by (%s).  [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
-						}
-						else
-							if (!g_bMapSRVRecord[client] && !g_bMapFirstRecord[client] && !g_bMapPBRecord[client])
-							{
-								CPrintToChat(i, "%t", "MapFinished5", g_szChatPrefix, szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, szGroup, g_szRecordMapTime);
-								PrintToConsole(i, "%s finished the map with a time of (%s). Missing their best time by (%s).  [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
-							}
-
-					if (g_bMapSRVRecord[client])
-					{
-						// int r = GetRandomInt(1, 2);
 						PlayRecordSound(2);
-						RecordDiff = g_fOldRecordMapTime - g_fFinalTime[client];
-						FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 32);
-						Format(szRecordDiff, 32, "-%s", szRecordDiff);
+						
+						CPrintToChat(i,"%t", "FirstMapRecord", g_szChatPrefix, szName);
+						PrintToConsole(client, "Surftimer | %s set the map record!", szName);
 
-						// CPrintToChat(i, "%t", "MapFinished3", g_szChatPrefix, szName, g_szFinalTime[client], szRecordDiff, g_MapRank[client], count, g_szRecordMapTime);
-						CPrintToChat(i, "%t", "NewMapRecord", g_szChatPrefix, szName);
-						PrintToConsole(i, "surftimer | %s scored a new MAP RECORD", szName);
+						CPrintToChat(i,"%t", "MapFinished1", g_szChatPrefix, szName, g_szFinalTime[client]);
+						PrintToConsole(client, "Surftimer | %s set a SR of %s", szName, g_szFinalTime[client]);
 					}
-				}
-			}
-		}
-		else
-		{ // Print to own chat only
-			if (IsValidClient(client) && !IsFakeClient(client))
-			{
-				if (g_bMapFirstRecord[client])
-				{
-					CPrintToChat(client, "%t", "MapFinished1", g_szChatPrefix, szName, g_szFinalTime[client], g_MapRank[client], count, szGroup, g_szRecordMapTime);
-					PrintToConsole(client, "%s finished the map with a time of (%s). [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_MapRank[client], count, g_szRecordMapTime);
-				}
-				else
-				{
-					if (g_bMapPBRecord[client])
+					else if (g_bStyleMapSRVRecord[0][client]) // Player beat the Server Record
+					{
+						PlayRecordSound(2);								
+
+						CPrintToChat(i,"%t", "NewMapRecord", g_szChatPrefix, szName);
+						PrintToConsole(client, "Surftimer | %s beat the map record!", szName);
+							
+						CPrintToChat(i,"%t", "MapFinished2", g_szChatPrefix, szName, g_szFinalTime[client], szRecordDiff2, g_szTimeDifference[client], g_StyleMapRank[0][client], count);
+						PrintToConsole(client, "Surftimer | %s finished in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szFinalTime[client], szRecordDiff2, g_szTimeDifference[client], g_StyleMapRank[0][client], count);					
+					}						 
+					else if (g_bStyleMapFirstRecord[0][client] && !g_bStyleMapSRVRecord[0][client]) // Player 1st time finishing map 	
+					{
+						if (szGroup[client] == 0) // No group available
+						{	
+							CPrintToChat(i,"%t", "MapFinished3", g_szChatPrefix, szName, g_szFinalTime[client], szRecordDiff, g_StyleMapRank[0][client], count);
+							PrintToConsole(client, "Surftimer | %s set a PB of %s [SR %s | Rank #%i/%i]", szName, g_szFinalTime[client], szRecordDiff, g_StyleMapRank[0][client], count);
+						}
+						if (szGroup[client] > 0) // Group available
+						{
+							CPrintToChat(i,"%t", "MapFinished4", g_szChatPrefix, szName, g_szFinalTime[client], szRecordDiff, g_StyleMapRank[0][client], count, szGroup);
+							PrintToConsole(client, "Surftimer | %s set a PB of %s [SR %s | Rank #%i/%i | %s]", szName, g_szFinalTime[client], szRecordDiff, g_StyleMapRank[0][client], count, szGroup);
+						}
+					}
+					else if (g_bStyleMapPBRecord[0][client] && !g_bStyleMapSRVRecord[0][client]) // Player beat Personal Record
 					{
 						PlayUnstoppableSound(client);
-						CPrintToChat(client, "%t", "MapFinished3", g_szChatPrefix, szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, szGroup, g_szRecordMapTime);
-						PrintToConsole(client, "%s finished the map with a time of (%s). Improving their best time by (%s).  [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
-					}
-					else
-					{
-						if (!g_bMapSRVRecord[client] && !g_bMapFirstRecord[client] && !g_bMapPBRecord[client])
+						
+						if (szGroup[client] == 0) // No group available
 						{
-							CPrintToChat(client, "%t", "MapFinished5", g_szChatPrefix, szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, szGroup, g_szRecordMapTime);
-							PrintToConsole(client, "%s finished the map with a time of (%s). Missing their best time by (%s).  [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
+							CPrintToChat(client, "%t", "MapFinished5",g_szChatPrefix, szName, g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[0][client], count);
+							PrintToConsole(client, "Surftimer | %s finished in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[0][client], count);
 						}
+						if (szGroup[client] > 0) // Group available
+						{
+							CPrintToChat(client, "%t", "MapFinished6",g_szChatPrefix, szName, g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[0][client], count, szGroup);
+							PrintToConsole(client, "Surftimer | %s finished in %s [SR %s | PB %s | Rank #%i/%i | %s]", szName, g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[0][client], count, szGroup);
+						}
+					}	
+					else if (!g_bStyleMapSRVRecord[0][client] && !g_bStyleMapFirstRecord[0][client] && !g_bStyleMapPBRecord[0][client]) // Player did not beat Server Record nor finish for 1st time nor beat Personal Record
+					{
+						CPrintToChat(client, "%t", "MapFinished7", g_szChatPrefix, szName, g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[0][client], count);
+						PrintToConsole(client, "Surftimer | %s finished in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[0][client], count);
+					}	
+					
+				}
+			}		
+		}				
+		else
+		{// Print to own chat only
+			if (IsValidClient(client) && !IsFakeClient(client))
+			{
+				if (g_bStyleMapSRVRecord[0][client] && g_fFinalTime[client] == g_fOldRecordStyleMapTime[0]) // Player sets 1st Server Record
+				{
+					PlayRecordSound(2);
+					
+					CPrintToChat(client,"%t", "FirstMapRecord", g_szChatPrefix, szName);
+					PrintToConsole(client, "Surftimer | %s set the map record!", szName);
+
+					CPrintToChat(client,"%t", "MapFinished1", g_szChatPrefix, szName, g_szFinalTime[client]);
+					PrintToConsole(client, "Surftimer | %s set a SR of %s", szName, g_szFinalTime[client]);
+				}
+				else if (g_bStyleMapFirstRecord[0][client] && !g_bStyleMapSRVRecord[0][client]) // Player 1st time finishing map 	
+				{
+					if (szGroup[client] == 0) // No group available
+					{	
+						CPrintToChat(client,"%t", "MapFinished3", g_szChatPrefix, szName, g_szFinalTime[client], szRecordDiff, g_StyleMapRank[0][client], count);
+						PrintToConsole(client, "Surftimer | %s set a PB of %s [SR %s | Rank #%i/%i]", szName, g_szFinalTime[client], szRecordDiff, g_StyleMapRank[0][client], count);
+					}
+					if (szGroup[client] > 0) // Group available
+					{
+						CPrintToChat(client,"%t", "MapFinished4", g_szChatPrefix, szName, g_szFinalTime[client], szRecordDiff, g_StyleMapRank[0][client], count, szGroup);
+						PrintToConsole(client, "Surftimer | %s set a PB of %s [SR %s | Rank #%i/%i | %s]", szName, g_szFinalTime[client], szRecordDiff, g_StyleMapRank[0][client], count, szGroup);
 					}
 				}
+				else if (g_bStyleMapPBRecord[0][client] && !g_bStyleMapSRVRecord[0][client]) // Player beat Personal Record
+				{
+					PlayUnstoppableSound(client);
+					
+					if (szGroup[client] == 0) // No group available
+					{
+						CPrintToChat(client, "%t", "MapFinished5",g_szChatPrefix, szName, g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[0][client], count);
+						PrintToConsole(client, "Surftimer | %s finished in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[0][client], count);
+					}
+					if (szGroup[client] > 0) // Group available
+					{
+						CPrintToChat(client, "%t", "MapFinished6",g_szChatPrefix, szName, g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[0][client], count, szGroup);
+						PrintToConsole(client, "Surftimer | %s finished in %s [SR %s | PB %s | Rank #%i/%i | %s]", szName, g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[0][client], count, szGroup);
+					}	
+				}
+				else if (!g_bStyleMapSRVRecord[0][client] && !g_bStyleMapFirstRecord[0][client] && !g_bStyleMapPBRecord[0][client]) // Player did not beat Server Record nor finish for 1st time nor beat Personal Record
+				{
+					CPrintToChat(client, "%t", "MapFinished7", g_szChatPrefix, szName, g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[0][client], count);
+					PrintToConsole(client, "Surftimer | %s finished in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[0][client], count);
+				}
+										
 			}
-		}
+		}					
 
 		// Send Announcements
-		if (g_bMapSRVRecord[client])
+		if (g_bStyleMapSRVRecord[0][client])
 		{
-			RecordDiff = g_fOldRecordMapTime - g_fFinalTime[client];
-			FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 32);
-			Format(szRecordDiff, 32, "-%s", szRecordDiff);
-
 			if (GetConVarBool(g_hRecordAnnounce))
 				db_insertAnnouncement(client, szName, g_szMapName, 0, g_szFinalTime[client], 0);
 			char buffer[1024];
 			GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
 			if (!StrEqual(buffer, ""))
-				sendDiscordAnnouncement(szName, g_szMapName, g_szFinalTime[client], szRecordDiff);
+				sendDiscordAnnouncement(szName, g_szMapName, g_szFinalTime[client], szRecordDiff2);
 		}
 
 		if (g_bTop10Time[client])
 			PlayRecordSound(3);
 
-		if (g_MapRank[client] == 99999 && IsValidClient(client))
-			CPrintToChat(client, "%t", "Misc19", g_szChatPrefix);
+		if (g_StyleMapRank[0][client] == 99999 && IsValidClient(client))
+			CPrintToChat(client, "%t", "FailedSaveData", g_szChatPrefix);
 
 		Handle pack;
 		int style = 0;
@@ -1952,7 +2016,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		WritePackCell(pack, GetClientUserId(client));
 		WritePackCell(pack, style);
 
-		if (g_bMapFirstRecord[client] || g_bMapPBRecord[client] || g_bMapSRVRecord[client])
+		if (g_bStyleMapFirstRecord[0][client] || g_bStyleMapPBRecord[0][client] || g_bStyleMapSRVRecord[0][client])
 			CheckMapRanks(client);
 
 		/* Start function call */
@@ -1962,7 +2026,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		Call_PushCell(client);
 		Call_PushFloat(g_fFinalTime[client]);
 		Call_PushString(g_szFinalTime[client]);
-		Call_PushCell(g_MapRank[client]);
+		Call_PushCell(g_StyleMapRank[0][client]);
 		Call_PushCell(count);
 
 		/* Finish the call, get the result */
@@ -1980,109 +2044,132 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 	if (!IsValidClient(client))
 		return;
 
-	float RecordDiff;
-	char szRecordDiff[54], szName[128];
+	float RecordDiff, RecordDiff2;
+	char szRecordDiff[54], szRecordDiff2[54], szName[128];
 
 	if (rank == 0)
-		rank = g_MapRankBonus[zGroup][client];
-
+		rank = g_StyleMapRankBonus[0][zGroup][client];
+	
+	// Bonus SR, time difference formatting 
+	RecordDiff = g_fStyleBonusFastest[0][zGroup] - g_fFinalTime[client];
+	FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
+	if (RecordDiff > 0.0)
+	{
+		Format(szRecordDiff, 54, "+%s", szRecordDiff);
+	}
+	else
+	{
+		Format(szRecordDiff, 54, "-%s", szRecordDiff);
+	}
+	
+	// Player beat bonus SR, time difference formatting 
+	RecordDiff2 = g_fStyleOldBonusRecordTime[0][zGroup] - g_fFinalTime[client];
+	FormatTimeFloat(client, RecordDiff2, 3, szRecordDiff2, 54);
+	if (RecordDiff2 > 0.0)
+	{
+		Format(szRecordDiff2, 54, "+%s", szRecordDiff2);
+	}
+	else
+	{
+		Format(szRecordDiff2, 54, "-%s", szRecordDiff2);
+	
+	}
+	
 	GetClientName(client, szName, 128);
 	if ((GetConVarInt(g_hAnnounceRecord) == 0 ||
 		(GetConVarInt(g_hAnnounceRecord) == 1 && g_bBonusSRVRecord[client] || g_bBonusPBRecord[client] || g_bBonusFirstRecord[client]) ||
 		(GetConVarInt(g_hAnnounceRecord) == 2 && g_bBonusSRVRecord[client])) &&
 		(rank <= GetConVarInt(g_hAnnounceRank) || GetConVarInt(g_hAnnounceRank) == 0))
 	{
-		if (g_bBonusSRVRecord[client])
+		if (g_bBonusSRVRecord[client] && g_fFinalTime[client] == g_fStyleOldBonusRecordTime[0][client]) // Player sets 1st bonus record
 		{
-			// int i = GetRandomInt(1, 2);
 			PlayRecordSound(2);
 
-			RecordDiff = g_fOldBonusRecordTime[zGroup] - g_fFinalTime[client];
-			FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
-			Format(szRecordDiff, 54, "-%s", szRecordDiff);
+			CPrintToChatAll("%t", "FirstBonusRecord", g_szChatPrefix, szName, g_szZoneGroupName[zGroup]);
+			PrintToConsole(client, "Surftimer | %s set the %s record!", szName, g_szZoneGroupName[zGroup]);
+
+			CPrintToChatAll("%t", "BonusFinished1", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client]);
+			PrintToConsole(client, "Surftimer | %s set a %s SR of %s", szName, g_szZoneGroupName[zGroup], g_szFinalTime[client]);
 		}
-		if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
+		else if (g_bBonusSRVRecord[client]) // Player beats bonus record
 		{
-			CPrintToChatAll("%t", "BonusFinished2", g_szChatPrefix, szName, g_szZoneGroupName[zGroup]);
-			if (g_tmpBonusCount[zGroup] == 0)
-				CPrintToChatAll("%t", "BonusFinished3", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], g_szFinalTime[client]);
-			else
-				CPrintToChatAll("%t", "BonusFinished4", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_MapRankBonus[zGroup][client], g_iBonusCount[zGroup], g_szFinalTime[client]);
+			PlayRecordSound(2);
+
+			CPrintToChatAll("%t", "NewBonusRecord", g_szChatPrefix, szName, g_szZoneGroupName[zGroup]);
+			PrintToConsole(client, "Surftimer | %s beat the %s record!", szName, g_szZoneGroupName[zGroup]);
+				
+			CPrintToChatAll("%t", "BonusFinished2", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff2, g_szBonusTimeDifference[client], g_StyleMapRankBonus[0][zGroup][client], g_iStyleBonusCount[0][zGroup]);
+			PrintToConsole(client, "Surftimer | %s finished %s in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff2, g_szBonusTimeDifference[client], g_StyleMapRankBonus[0][zGroup][client], g_iStyleBonusCount[0][zGroup]);
 		}
-		if (g_bBonusPBRecord[client] && g_bBonusSRVRecord[client])
+		else if (g_bBonusFirstRecord[client] && !g_bBonusSRVRecord[client]) // Player 1st time finishing bonus
 		{
-			CPrintToChatAll("%t", "BonusFinished2", g_szChatPrefix, szName, g_szZoneGroupName[zGroup]);
-			CPrintToChatAll("%t", "BonusFinished5", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_MapRankBonus[zGroup][client], g_iBonusCount[zGroup], g_szFinalTime[client]);
+			CPrintToChatAll("%t", "BonusFinished3", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_StyleMapRankBonus[0][zGroup][client], g_iStyleBonusCount[0][zGroup]);
+			PrintToConsole(client, "Surftimer | %s set a %s PB of %s [SR %s | Rank #%i/%i]", szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_StyleMapRankBonus[0][zGroup][client], g_iStyleBonusCount[0][zGroup]);
 		}
-		if (g_bBonusPBRecord[client] && !g_bBonusSRVRecord[client])
+		else if (g_bBonusPBRecord[client] && !g_bBonusSRVRecord[client]) // Player beats PB but not bonus record
 		{
 			PlayUnstoppableSound(client);
-			CPrintToChatAll("%t", "BonusFinished6", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], g_szBonusTimeDifference[client], g_MapRankBonus[zGroup][client], g_iBonusCount[zGroup], g_szBonusFastestTime[zGroup]);
+			
+			CPrintToChatAll("%t", "BonusFinished5", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_szBonusTimeDifference[client], g_StyleMapRankBonus[0][zGroup][client], g_iStyleBonusCount[0][zGroup]);
+			PrintToConsole(client, "Surftimer | %s finished %s in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_szBonusTimeDifference[client], g_StyleMapRankBonus[0][zGroup][client], g_iStyleBonusCount[0][zGroup]);
 		}
-		if (g_bBonusFirstRecord[client] && !g_bBonusSRVRecord[client])
+		else if (!g_bBonusSRVRecord[client] && !g_bBonusFirstRecord[client] && !g_bBonusPBRecord[client]) // Player did not beat bonus record nor set 1st bonus time nor beat bonus PB
 		{
-			CPrintToChatAll("%t", "BonusFinished7", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], g_MapRankBonus[zGroup][client], g_iBonusCount[zGroup], g_szBonusFastestTime[zGroup]);
-		}
-		if (!g_bBonusSRVRecord[client] && !g_bBonusFirstRecord[client] && !g_bBonusPBRecord[client])
-		{
- 			CPrintToChatAll("%t", "BonusFinished1", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], g_szBonusTimeDifference[client], g_MapRankBonus[zGroup][client], g_iBonusCount[zGroup], g_szBonusFastestTime[zGroup]);
+			CPrintToChatAll("%t", "BonusFinished6", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_szBonusTimeDifference[client], g_StyleMapRankBonus[0][zGroup][client], g_iStyleBonusCount[0][zGroup]);
+			PrintToConsole(client, "Surftimer | %s finished %s in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_szBonusTimeDifference[client], g_StyleMapRankBonus[0][zGroup][client], g_iStyleBonusCount[0][zGroup]);
 		}
 	}
 	else
 	{
-		if (g_bBonusSRVRecord[client])
+		if (g_bBonusSRVRecord[client] && g_fFinalTime[client] == g_fStyleOldBonusRecordTime[0][client]) // Player sets 1st bonus record
 		{
-			// int i = GetRandomInt(1, 2);
 			PlayRecordSound(2);
 
-			RecordDiff = g_fOldBonusRecordTime[zGroup] - g_fFinalTime[client];
-			FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
-			Format(szRecordDiff, 54, "-%s", szRecordDiff);
+			CPrintToChat(client, "%t", "FirstBonusRecord", g_szChatPrefix, szName, g_szZoneGroupName[zGroup]);
+			PrintToConsole(client, "Surftimer | %s set the %s record!", szName, g_szZoneGroupName[zGroup]);
+
+			CPrintToChat(client, "%t", "BonusFinished1", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client]);
+			PrintToConsole(client, "Surftimer | %s set a %s SR of %s", szName, g_szZoneGroupName[zGroup], g_szFinalTime[client]);
 		}
-		if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
+		else if (g_bBonusSRVRecord[client]) // Player beats bonus record
 		{
-			CPrintToChat(client, "%t", "BonusFinished2", g_szChatPrefix, szName, g_szZoneGroupName[zGroup]);
-			if (g_tmpBonusCount[zGroup] == 0)
-				CPrintToChat(client, "%t", "BonusFinished3", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], g_szFinalTime[client]);
-			else
-				CPrintToChat(client, "%t", "BonusFinished4", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_MapRankBonus[zGroup][client], g_iBonusCount[zGroup], g_szFinalTime[client]);
+			PlayRecordSound(2);
+
+			CPrintToChat(client, "%t", "NewBonusRecord", g_szChatPrefix, szName, g_szZoneGroupName[zGroup]);
+			PrintToConsole(client, "Surftimer | %s beat the %s record!", szName, g_szZoneGroupName[zGroup]);
+				
+			CPrintToChat(client, "%t", "BonusFinished2", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff2, g_szBonusTimeDifference[client], g_StyleMapRankBonus[0][zGroup][client], g_iStyleBonusCount[0][zGroup]);
+			PrintToConsole(client, "Surftimer | %s finished %s in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff2, g_szBonusTimeDifference[client], g_StyleMapRankBonus[0][zGroup][client], g_iStyleBonusCount[0][zGroup]);
 		}
-		if (g_bBonusPBRecord[client] && g_bBonusSRVRecord[client])
+		else if (g_bBonusFirstRecord[client] && !g_bBonusSRVRecord[client]) // Player 1st time finishing bonus
 		{
-			CPrintToChat(client, "%t", "BonusFinished2", g_szChatPrefix, szName, g_szZoneGroupName[zGroup]);
-			CPrintToChat(client, "%t", "BonusFinished5", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_MapRankBonus[zGroup][client], g_iBonusCount[zGroup], g_szFinalTime[client]);
+			CPrintToChat(client, "%t", "BonusFinished3", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_StyleMapRankBonus[0][zGroup][client], g_iStyleBonusCount[0][zGroup]);
+			PrintToConsole(client, "Surftimer | %s finished %s in %s [SR %s | Rank #%i/%i]", szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_StyleMapRankBonus[0][zGroup][client], g_iStyleBonusCount[0][zGroup]);
 		}
-		if (g_bBonusPBRecord[client] && !g_bBonusSRVRecord[client])
+		else if (g_bBonusPBRecord[client] && !g_bBonusSRVRecord[client]) // Player beats PB but not bonus record
 		{
 			PlayUnstoppableSound(client);
-			CPrintToChat(client, "%t", "BonusFinished6", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], g_szBonusTimeDifference[client], g_MapRankBonus[zGroup][client], g_iBonusCount[zGroup], g_szBonusFastestTime[zGroup]);
+			
+			CPrintToChat(client, "%t", "BonusFinished5", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_szBonusTimeDifference[client], g_StyleMapRankBonus[0][zGroup][client], g_iStyleBonusCount[0][zGroup]);
+			PrintToConsole(client, "Surftimer | %s finished %s in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_szBonusTimeDifference[client], g_StyleMapRankBonus[0][zGroup][client], g_iStyleBonusCount[0][zGroup]);
 		}
-		if (g_bBonusFirstRecord[client] && !g_bBonusSRVRecord[client])
+		else if (!g_bBonusSRVRecord[client] && !g_bBonusFirstRecord[client] && !g_bBonusPBRecord[client]) // Player did not beat bonus record nor set 1st bonus time nor beat bonus PB
 		{
-			CPrintToChat(client, "%t", "BonusFinished7", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], g_MapRankBonus[zGroup][client], g_iBonusCount[zGroup], g_szBonusFastestTime[zGroup]);
+			CPrintToChat(client, "%t", "BonusFinished6", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_szBonusTimeDifference[client], g_StyleMapRankBonus[0][zGroup][client], g_iStyleBonusCount[0][zGroup]);
+			PrintToConsole(client, "Surftimer | %s finished %s in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], szRecordDiff, g_szBonusTimeDifference[client], g_StyleMapRankBonus[0][zGroup][client], g_iStyleBonusCount[0][zGroup]);
 		}
-		if (!g_bBonusSRVRecord[client] && !g_bBonusFirstRecord[client] && !g_bBonusPBRecord[client])
-		{
-			if (IsValidClient(client))
-	 			CPrintToChat(client, "%t", "BonusFinished1", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szFinalTime[client], g_szBonusTimeDifference[client], g_MapRankBonus[zGroup][client], g_iBonusCount[zGroup], g_szBonusFastestTime[zGroup]);
-		}
-
 	}
 
 	// Send Announcements
 	if (g_bBonusSRVRecord[client])
 	{
-		RecordDiff = g_fOldBonusRecordTime[zGroup] - g_fFinalTime[client];
-		FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
-		Format(szRecordDiff, 54, "-%s", szRecordDiff);
-
 		if (GetConVarBool(g_hRecordAnnounce))
 			db_insertAnnouncement(client, szName, g_szMapName, 1, g_szFinalTime[client], zGroup);
 		char buffer[1024], buffer1[1024];
 		GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
 		GetConVarString(g_hRecordAnnounceDiscordBonus, buffer1, 1024);
 		if (!StrEqual(buffer, "") && !StrEqual(buffer1, ""))
-			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup, szRecordDiff);
+			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup, szRecordDiff2);
 	}
 
 	/* Start function call */
@@ -2093,7 +2180,7 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 	Call_PushFloat(g_fFinalTime[client]);
 	Call_PushString(g_szFinalTime[client]);
 	Call_PushCell(rank);
-	Call_PushCell(g_iBonusCount[zGroup]);
+	Call_PushCell(g_iStyleBonusCount[0][zGroup]);
 	Call_PushCell(zGroup);
 
 	/* Finish the call, get the result */
@@ -2103,7 +2190,7 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 	db_CalcAvgRunTimeBonus();
 
 	if (rank == 9999999 && IsValidClient(client))
-		CPrintToChat(client, "%t", "Misc19", g_szChatPrefix);
+		CPrintToChat(client, "%t", "FailedSaveData", g_szChatPrefix);
 
 	return;
 }
@@ -2111,14 +2198,14 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 public void CheckMapRanks(int client)
 {
 	// if client has risen in rank,
-	if (g_OldMapRank[client] > g_MapRank[client])
+	if (g_OldStyleMapRank[0][client] > g_StyleMapRank[0][client])
 	{
 		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && i != client)
 			{ // if clients rank used to be bigger than i's, 2nd: clients new rank is at least as big as i's
-				if (g_OldMapRank[client] > g_MapRank[i] && g_MapRank[client] <= g_MapRank[i])
-					g_MapRank[i]++;
+				if (g_OldStyleMapRank[0][client] > g_StyleMapRank[0][i] && g_StyleMapRank[0][client] <= g_StyleMapRank[0][i])
+					g_StyleMapRank[0][i]++;
 			}
 		}
 	}
@@ -2127,14 +2214,14 @@ public void CheckMapRanks(int client)
 public void CheckBonusRanks(int client, int zGroup)
 {
 	// if client has risen in rank,
-	if (g_OldMapRankBonus[zGroup][client] > g_MapRankBonus[zGroup][client])
+	if (g_StyleOldMapRankBonus[0][zGroup][client] > g_StyleMapRankBonus[0][zGroup][client])
 	{
 		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && i != client)
 			{ // if clients rank used to be bigger than i's, 2nd: clients new rank is at least as big as i's
-				if (g_OldMapRankBonus[zGroup][client] > g_MapRankBonus[zGroup][i] && g_MapRankBonus[zGroup][client] <= g_MapRankBonus[zGroup][i])
-					g_MapRankBonus[zGroup][i]++;
+				if (g_StyleOldMapRankBonus[0][zGroup][client] > g_StyleMapRankBonus[0][zGroup][i] && g_StyleMapRankBonus[0][zGroup][client] <= g_StyleMapRankBonus[0][zGroup][i])
+					g_StyleMapRankBonus[0][zGroup][i]++;
 			}
 		}
 	}
@@ -2498,7 +2585,7 @@ public void SetPlayerRank(int client)
 
 	if (g_hSkillGroups == null)
 	{
-		CreateTimer(5.0, reloadRank, GetClientUserId(client));
+		CreateTimer(5.0, reloadRank, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 		return;
 	}
 
@@ -2816,25 +2903,6 @@ stock int BooltoInt(bool status)
 	return (status) ? 1:0;
 }
 
-public void PlayQuakeSound_Spec(int client, char[] buffer)
-{
-	int SpecMode;
-	for (int x = 1; x <= MaxClients; x++)
-	{
-		if (IsValidClient(x) && !IsPlayerAlive(x))
-		{
-			SpecMode = GetEntProp(x, Prop_Send, "m_iObserverMode");
-			if (SpecMode == 4 || SpecMode == 5)
-			{
-				int Target = GetEntPropEnt(x, Prop_Send, "m_hObserverTarget");
-				if (Target == client)
-					if (g_bEnableQuakeSounds[x])
-					ClientCommand(x, buffer);
-			}
-		}
-	}
-}
-
 public void AttackProtection(int client, int &buttons)
 {
 	if (GetConVarBool(g_hAttackSpamProtection))
@@ -2861,11 +2929,11 @@ public void CheckRun(int client)
 
 	if (g_bTimerRunning[client])
 	{
-		if (g_fCurrentRunTime[client] > g_fPersonalRecord[client] && !g_bMissedMapBest[client] && !g_bPause[client] && g_iClientInZone[client][2] == 0)
+		if (g_fCurrentRunTime[client] > g_fPersonalStyleRecord[g_iCurrentStyle[client]][client] && !g_bMissedMapBest[client] && !g_bPause[client] && g_iClientInZone[client][2] == 0)
 		{
 			g_bMissedMapBest[client] = true;
-			if (g_fPersonalRecord[client] > 0.0) {
-				CPrintToChat(client, "%t", "MissedMapBest", g_szChatPrefix, g_szPersonalRecord[client]);
+			if (g_fPersonalStyleRecord[g_iCurrentStyle[client]][client] > 0.0) {
+				CPrintToChat(client, "%t", "MissedMapBest", g_szChatPrefix, g_szPersonalStyleRecord[g_iCurrentStyle[client]][client]);
 				if (g_iAutoReset[client] && g_iCurrentStyle[client] == 0) {
 					Command_Restart(client, 1);
 					CPrintToChat(client, "%t", "AutoResetMessage1", g_szChatPrefix);
@@ -2879,12 +2947,12 @@ public void CheckRun(int client)
 		}
 		else
 		{
-			if (g_fCurrentRunTime[client] > g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] > 0 && !g_bPause[client] && !g_bMissedBonusBest[client])
+			if (g_fCurrentRunTime[client] > g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] > 0 && !g_bPause[client] && !g_bMissedBonusBest[client])
 			{
-				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
+				if (g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client] > 0.0)
 				{
 					g_bMissedBonusBest[client] = true;
-					CPrintToChat(client, "%t", "Misc29", g_szChatPrefix, g_szPersonalRecordBonus[g_iClientInZone[client][2]][client]);
+					CPrintToChat(client, "%t", "Misc29", g_szChatPrefix, g_szStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client]);
 					if (g_iAutoReset[client] && g_iCurrentStyle[client] == 0) {
 						Command_Teleport(client, 0);
 						CPrintToChat(client, "%t", "AutoResetMessage1", g_szChatPrefix);
@@ -2996,10 +3064,10 @@ public void SpecListMenuDead(int client) // What Spectators see
 					Format(szPlayerRank, 32, "Rank: NA / %i", g_pr_RankedPlayers[0]);
 			}
 
-			if (g_fPersonalRecord[ObservedUser] > 0.0)
+			if (g_fPersonalStyleRecord[0][ObservedUser] > 0.0)
 			{
-				FormatTimeFloat(client, g_fPersonalRecord[ObservedUser], 3, szTime2, sizeof(szTime2));
-				Format(szProBest, 32, "%s (#%i/%i)", szTime2, g_MapRank[ObservedUser], g_MapTimesCount);
+				FormatTimeFloat(client, g_fPersonalStyleRecord[0][ObservedUser], 3, szTime2, sizeof(szTime2));
+				Format(szProBest, 32, "%s (#%i/%i)", szTime2, g_StyleMapRank[0][ObservedUser], g_StyleMapTimesCount[0]);
 			}
 			else
 				Format(szProBest, 32, "None");
@@ -3375,12 +3443,12 @@ public void CenterHudAlive(int client)
 						// In Bonus
 						Format(module[i], 128, "<font color='#d87'>%s       </font>", pAika);
 					}
-					else if (g_bMissedMapBest[client] && g_fPersonalRecord[client] > 0.0)
+					else if (g_bMissedMapBest[client] && g_fPersonalStyleRecord[0][client] > 0.0)
 					{
 						// Missed Personal Best time
 						Format(module[i], 128, "<font color='#f32'>%s       </font>", pAika);
 					}
-					else if (g_fPersonalRecord[client] < 0.1)
+					else if (g_fPersonalStyleRecord[0][client] < 0.1)
 					{
 						// No Personal Best on map
 						Format(module[i], 128, "<font color='#8cd'>%s       </font>", pAika);
@@ -3422,38 +3490,18 @@ public void CenterHudAlive(int client)
 				// server records (change from WR)
 				if (gametime - g_fLastDifferenceTime[client] > 5.0)
 				{
-					if (g_iClientInZone[client][2] == 0 && style == 0)
-					{
-						if (g_fRecordMapTime != 9999999.0)
-						{
-							// fluffys
-							if (g_bPracticeMode[client])
-								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordMapTime);
-							else
-								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordMapTime);
-						}
-						else
-							Format(g_szLastSRDifference[client], 64, "SR: N/A");
-					}
-					else if (g_iClientInZone[client][2] == 0 && g_iCurrentStyle[client] != 0) // Styles
+					if (g_iClientInZone[client][2] == 0) // Styles
 					{
 						if (g_fRecordStyleMapTime[style] != 9999999.0)
 						{
-							// fluffys
-							if (g_bPracticeMode[client])
-								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordStyleMapTime[style]);
-							else
-								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordStyleMapTime[style]);
+							Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordStyleMapTime[style]);
 						}
 						else
 							Format(g_szLastSRDifference[client], 64, "SR: N/A");
 					}
 					else
 					{
-						if (g_iCurrentStyle[client] == 0)
-							Format(g_szLastSRDifference[client], 64, "SR: %s", g_szBonusFastestTime[g_iClientInZone[client][2]]);
-						else if (g_iCurrentStyle[client] != 0) // Styles
-							Format(g_szLastSRDifference[client], 64, "SR: %s", g_szStyleBonusFastestTime[style][g_iClientInZone[client][2]]);
+						Format(g_szLastSRDifference[client], 64, "SR: %s", g_szStyleBonusFastestTime[style][g_iClientInZone[client][2]]);
 					}
 				}
 				Format(module[i], 128, "%s", g_szLastSRDifference[client]);
@@ -3463,19 +3511,7 @@ public void CenterHudAlive(int client)
 				// PB
 				if (gametime - g_fLastDifferenceTime[client] > 5.0)
 				{
-					if (g_iClientInZone[client][2] == 0 && style == 0)
-					{
-						if (g_fRecordMapTime != 9999999.0)
-						{
-							if (g_fPersonalRecord[client] > 0.0)
-								Format(g_szLastPBDifference[client], 64, "PB: %s", g_szPersonalRecord[client]);
-							else
-								Format(g_szLastPBDifference[client], 64, "PB: N/A");
-						}
-						else
-							Format(g_szLastPBDifference[client], 64, "PB: N/A");
-					}
-					else if (g_iClientInZone[client][2] == 0 && g_iCurrentStyle[client] != 0) // Styles
+					if (g_iClientInZone[client][2] == 0) // Styles
 					{
 						if (g_fRecordStyleMapTime[style] != 9999999.0)
 						{
@@ -3489,10 +3525,7 @@ public void CenterHudAlive(int client)
 					}
 					else
 					{
-						if (g_iCurrentStyle[client] == 0)
-							Format(g_szLastPBDifference[client], 64, "PB: %s", g_szPersonalRecordBonus[g_iClientInZone[client][2]][client]);
-						else if (g_iCurrentStyle[client] != 0) // Styles
-							Format(g_szLastPBDifference[client], 64, "PB: %s", g_szStylePersonalRecordBonus[style][g_iClientInZone[client][2]][client]);
+						Format(g_szLastPBDifference[client], 64, "PB: %s", g_szStylePersonalRecordBonus[style][g_iClientInZone[client][2]][client]);
 					}
 				}
 				Format(module[i], 128, "%s", g_szLastPBDifference[client]);
@@ -3505,11 +3538,11 @@ public void CenterHudAlive(int client)
 				{
 					if (g_iCurrentStyle[client] == 0) // Normal
 					{
-						if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
-							Format(szRank, 64, "Rank: %i / %i", g_MapRankBonus[g_iClientInZone[client][2]][client], g_iBonusCount[g_iClientInZone[client][2]]);
+						if (g_fStylePersonalRecordBonus[0][g_iClientInZone[client][2]][client] > 0.0)
+							Format(szRank, 64, "Rank: %i / %i", g_StyleMapRankBonus[0][g_iClientInZone[client][2]][client], g_iStyleBonusCount[0][g_iClientInZone[client][2]]);
 						else
-							if (g_iBonusCount[g_iClientInZone[client][2]] > 0)
-								Format(szRank, 64, "Rank: - / %i", g_iBonusCount[g_iClientInZone[client][2]]);
+							if (g_iStyleBonusCount[0][g_iClientInZone[client][2]] > 0)
+								Format(szRank, 64, "Rank: - / %i", g_iStyleBonusCount[0][g_iClientInZone[client][2]]);
 							else
 								Format(szRank, 64, "Rank: N/A");
 					}
@@ -3528,11 +3561,11 @@ public void CenterHudAlive(int client)
 				{
 					if (g_iCurrentStyle[client] == 0) // Normal
 					{
-						if (g_fPersonalRecord[client] > 0.0)
-							Format(szRank, 64, "Rank: %i / %i", g_MapRank[client], g_MapTimesCount);
+						if (g_fPersonalStyleRecord[0][client] > 0.0)
+							Format(szRank, 64, "Rank: %i / %i", g_StyleMapRank[0][client], g_StyleMapTimesCount[0]);
 						else
-							if (g_MapTimesCount > 0)
-								Format(szRank, 64, "Rank: - / %i", g_MapTimesCount);
+							if (g_StyleMapTimesCount[0] > 0)
+								Format(szRank, 64, "Rank: - / %i", g_StyleMapTimesCount[0]);
 							else
 								Format(szRank, 64, "Rank: N/A");
 					}
@@ -3651,21 +3684,23 @@ public void SideHudAlive(int client)
 				else
 					Format(szWR, 128, "%s", g_szLastSRDifference[client]);
 				char szWRHolder[64];
-				if (style == 0)
-				{
-					if (g_iClientInZone[client][2] == 0)
-						Format(szWRHolder, 64, g_szRecordPlayer);
-					else
-						Format(szWRHolder, 64, g_szBonusFastest[g_iClientInZone[client][2]]);
-
-				}
+				
+				if (g_iClientInZone[client][2] == 0)
+					Format(szWRHolder, sizeof(szWRHolder), g_szRecordStylePlayer[0]);
+				else
+					Format(szWRHolder, sizeof(szWRHolder), g_szStyleBonusFastest[0][g_iClientInZone[client][2]]);
+				
+				/*
+												????
 				else
 				{
 					if (g_iClientInZone[client][2] == 0)
-						Format(szWRHolder, 64, g_szRecordPlayer);
+						Format(szWRHolder, sizeof(szWRHolder), g_szRecordStylePlayer[0]);
 					else
-						Format(szWRHolder, 64, g_szBonusFastest[g_iClientInZone[client][2]]);
+						Format(szWRHolder, sizeof(szWRHolder), g_szStyleBonusFastest[0][g_iClientInZone[client][2]]);
 				}
+				*/
+
 				Format(szModule[i], 256, "%s\nby %s", szWR, szWRHolder);
 
 				if ((i + 1) != moduleCount)
@@ -3689,11 +3724,11 @@ public void SideHudAlive(int client)
 				{
 					if (g_iCurrentStyle[client] == 0) // Normal
 					{
-						if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
-							Format(szRank, 64, "Rank: %i / %i", g_MapRankBonus[g_iClientInZone[client][2]][client], g_iBonusCount[g_iClientInZone[client][2]]);
+						if (g_fStylePersonalRecordBonus[0][g_iClientInZone[client][2]][client] > 0.0)
+							Format(szRank, 64, "Rank: %i / %i", g_StyleMapRankBonus[0][g_iClientInZone[client][2]][client], g_iStyleBonusCount[0][g_iClientInZone[client][2]]);
 						else
-							if (g_iBonusCount[g_iClientInZone[client][2]] > 0)
-								Format(szRank, 64, "Rank: - / %i", g_iBonusCount[g_iClientInZone[client][2]]);
+							if (g_iStyleBonusCount[0][g_iClientInZone[client][2]] > 0)
+								Format(szRank, 64, "Rank: - / %i", g_iStyleBonusCount[0][g_iClientInZone[client][2]]);
 							else
 								Format(szRank, 64, "Rank: N/A");
 					}
@@ -3712,11 +3747,11 @@ public void SideHudAlive(int client)
 				{
 					if (g_iCurrentStyle[client] == 0) // Normal
 					{
-						if (g_fPersonalRecord[client] > 0.0)
-							Format(szRank, 64, "Rank: %i / %i", g_MapRank[client], g_MapTimesCount);
+						if (g_fPersonalStyleRecord[0][client] > 0.0)
+							Format(szRank, 64, "Rank: %i / %i", g_StyleMapRank[0][client], g_StyleMapTimesCount[0]);
 						else
-							if (g_MapTimesCount > 0)
-								Format(szRank, 64, "Rank: - / %i", g_MapTimesCount);
+							if (g_StyleMapTimesCount[0] > 0)
+								Format(szRank, 64, "Rank: - / %i", g_StyleMapTimesCount[0]);
 							else
 								Format(szRank, 64, "Rank: N/A");
 					}
@@ -3752,7 +3787,7 @@ public void SideHudAlive(int client)
 						char szCurrentCP[64];
 						if (g_iCurrentCheckpoint[client] == g_mapZonesTypeCount[g_iClientInZone[client][2]][4])
 						{
-							FormatTimeFloat(0, g_fRecordMapTime, 3, szCP, 64);
+							FormatTimeFloat(0, g_fRecordStyleMapTime[0], 3, szCP, 64);
 							Format(szCurrentCP, 64, "End Zone");
 						}
 						else
@@ -3770,9 +3805,9 @@ public void SideHudAlive(int client)
 					{
 						Format(szStage, 64, "Stage: %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
 						char szWrcpTime[64];
-						FormatTimeFloat(0, g_fStageRecord[stage], 3, szWrcpTime, 64);
+						FormatTimeFloat(0, g_fStyleStageRecord[0][stage], 3, szWrcpTime, 64);
 						char szName[64];
-						Format(szName, 64, "%s", g_szStageRecordPlayer[stage]);
+						Format(szName, 64, "%s", g_szStyleStageRecordPlayer[0][stage]);
 						Format(szModule[i], 256, "%s\nSRCP: %s\nby %s", szStage, szWrcpTime, szName);
 
 						if ((i + 1) != moduleCount)
@@ -3951,9 +3986,9 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, int spee
 
 			/*
 			if (zonegroup > 0)
-				Format(g_szLastPBDifference[client], 64, "%s <font color='#99ff99' size='16'>%s</font>", g_szPersonalRecordBonus[zonegroup][client], szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "%s <font color='#99ff99' size='16'>%s</font>", g_szStylePersonalRecordBonus[0][zonegroup][client], szDiff_colorless);
 			else
-				Format(g_szLastPBDifference[client], 64, "%s <font color='#99ff99' size='16'>%s</font>", g_szPersonalRecord[client], szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "%s <font color='#99ff99' size='16'>%s</font>", g_szPersonalStyleRecord[0][client], szDiff_colorless);
 				*/
 		}
 		else
@@ -3966,9 +4001,9 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, int spee
 				Format(g_szLastPBDifference[client], 64, "PB: <font color='#f32'>%s</font>", szDiff_colorless);
 			/*
 			if (zonegroup > 0)
-				Format(g_szLastPBDifference[client], 64, "%s <font color='#FF9999' size='16'>%s</font>", g_szPersonalRecordBonus[zonegroup][client], szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "%s <font color='#FF9999' size='16'>%s</font>", g_szStylePersonalRecordBonus[0][zonegroup][client], szDiff_colorless);
 			else
-				Format(g_szLastPBDifference[client], 64, "%s <font color='#FF9999' size='16'>%s</font>", g_szPersonalRecord[client], szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "%s <font color='#FF9999' size='16'>%s</font>", g_szPersonalStyleRecord[0][client], szDiff_colorless);
 			*/
 		}
 		g_fLastDifferenceTime[client] = GetGameTime();
@@ -4276,55 +4311,125 @@ stock void StyleFinishedMsgs(int client, int style)
 {
 	if (IsValidClient(client))
 	{
-		char szName[MAX_NAME_LENGTH];
+		float RecordDiff, RecordDiff2;
+		char szRecordDiff[32], szRecordDiff2[32], szName[MAX_NAME_LENGTH];
 		GetClientName(client, szName, MAX_NAME_LENGTH);
 		int count = g_StyleMapTimesCount[style];
 
+		// Map style SR, time difference formatting
+		RecordDiff = g_fRecordStyleMapTime[style] - g_fFinalTime[client];
+		FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 32);
+		if (RecordDiff > 0.0)
+		{
+			Format(szRecordDiff, 32, "+%s", szRecordDiff);
+		}
+		else
+		{
+			Format(szRecordDiff, 32, "-%s", szRecordDiff);
+		}
+
+		// Player beat map style SR, time difference formatting
+		RecordDiff2 = g_fOldRecordStyleMapTime[style] - g_fFinalTime[client];
+		FormatTimeFloat(client, RecordDiff2, 3, szRecordDiff2, 32);
+		if (RecordDiff2 > 0.0)
+		{
+			Format(szRecordDiff2, 32, "-%s", szRecordDiff2);
+		}
+		else
+		{
+			Format(szRecordDiff2, 32, "+%s", szRecordDiff2);
+		}
+		
 		if (GetConVarInt(g_hAnnounceRecord) == 0 || GetConVarInt(g_hAnnounceRecord) == 1)
 		{
 			for (int i = 1; i <= MaxClients; i++)
 			{
 				if (IsValidClient(i) && !IsFakeClient(i))
 				{
-					if (g_bStyleMapFirstRecord[style][client]) // 1st time finishing
+					if (g_bStyleMapSRVRecord[style][client] && g_fFinalTime[client] == g_fOldRecordStyleMapTime[style]) // Player sets 1st Server Style Record
 					{
-						CPrintToChat(i, "%t", "Misc34", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szFinalTime[client], g_StyleMapRank[style][client], count, g_szRecordStyleMapTime[style]);
+						PlayRecordSound(2);
+						
+						CPrintToChat(i, "%t", "StyleFirstMapRecord", g_szChatPrefix, szName, g_szStyleRecordPrint[style]);
+						PrintToConsole(client, "Surftimer | %s set the %s map record!", szName, g_szStyleRecordPrint[style]);
+
+						CPrintToChat(i, "%t", "StyleMapFinished1", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szFinalTime[client]);
+						PrintToConsole(client, "Surftimer | %s set a %s SR of %s", szName, g_szStyleRecordPrint[style], g_szFinalTime[client]);
 					}
-					else
-					if (g_bStyleMapPBRecord[style][client]) // Own record
+					else if (g_bStyleMapSRVRecord[style][client]) // Player beat the Server Style Record
+					{
+						PlayRecordSound(2);
+						
+						CPrintToChat(i, "%t", "StyleNewMapRecord", g_szChatPrefix, szName, g_szStyleRecordPrint[style]);
+						PrintToConsole(client, "Surftimer | %s beat the %s map record!", szName, g_szStyleRecordPrint[style]);
+								
+						CPrintToChat(i, "%t", "StyleMapFinished2", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff2, g_szTimeDifference[client], g_StyleMapRank[style][client], count);
+						PrintToConsole(client, "Surftimer | %s finished %s in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff2, g_szTimeDifference[client], g_StyleMapRank[style][client], count);                                  
+					}
+					else if (g_bStyleMapFirstRecord[style][client] && !g_bStyleMapSRVRecord[style][client]) // Player 1st time finishing map using style
+					{      
+						CPrintToChat(i, "%t", "StyleMapFinished3", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_StyleMapRank[style][client], count);
+						PrintToConsole(client, "Surftimer | %s set a %s PB of %s [SR %s | Rank #%i/%i]", szName, g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_StyleMapRank[style][client], count);
+							
+					}
+					else if (g_bStyleMapPBRecord[style][client] && !g_bStyleMapSRVRecord[style][client]) // Player beat Personal Record using style
 					{
 						PlayUnstoppableSound(client);
-						CPrintToChat(i, "%t", "Misc35", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szFinalTime[client], g_szTimeDifference[client], g_StyleMapRank[style][client], count, g_szRecordStyleMapTime[style]);
-					}
+						
+						CPrintToChat(i, "%t", "StyleMapFinished4",g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[style][client], count);
+						PrintToConsole(client, "Surftimer | %s finished %s in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[style][client], count);
 
-					if (g_bStyleMapSRVRecord[style][client])
-					{
-						// int r = GetRandomInt(1, 2);
-						PlayRecordSound(2);
-						CPrintToChat(i, "%t", "Misc36", g_szChatPrefix, szName, g_szStyleRecordPrint[style]);
-					}
+					}                                      
 				}
 			}
 		}
-		else if (GetConVarInt(g_hAnnounceRecord) == 2)
+		else if (GetConVarInt(g_hAnnounceRecord) == 2) // Print SR to all only. Still advise player of own times
 		{
 			for (int i = 1; i <= MaxClients; i++)
 			{
-				if (g_bStyleMapSRVRecord[style][client])
+				if (g_bStyleMapSRVRecord[style][client] && g_fFinalTime[client] == g_fOldRecordStyleMapTime[style]) // Player sets 1st Server Style Record
 				{
-					// int r = GetRandomInt(1, 2);
 					PlayRecordSound(2);
-					CPrintToChat(i, "%t", "Misc36", g_szChatPrefix, szName, g_szStyleRecordPrint[style]);
+					
+					CPrintToChat(i, "%t", "StyleFirstMapRecord", g_szChatPrefix, szName, g_szStyleRecordPrint[style]);
+					PrintToConsole(client, "Surftimer | %s set the %s map record!", szName, g_szStyleRecordPrint[style]);
+
+					CPrintToChat(i, "%t", "StyleMapFinished1", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szFinalTime[client]);
+					PrintToConsole(client, "Surftimer | %s set a %s SR of %s", szName, g_szStyleRecordPrint[style], g_szFinalTime[client]);
+				}
+				else if (g_bStyleMapSRVRecord[style][client]) // Player beat the Server Style Record
+				{
+					PlayRecordSound(2);
+					
+					CPrintToChat(i, "%t", "StyleNewMapRecord", g_szChatPrefix, szName, g_szStyleRecordPrint[style]);
+					PrintToConsole(client, "Surftimer | %s beat the %s map record!", szName, g_szStyleRecordPrint[style]);
+							
+					CPrintToChat(i, "%t", "StyleMapFinished2", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff2, g_szTimeDifference[client], g_StyleMapRank[style][client], count);
+					PrintToConsole(client, "Surftimer | %s finished %s in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff2, g_szTimeDifference[client], g_StyleMapRank[style][client], count);                                  
+				}
+				else if (g_bStyleMapFirstRecord[style][client] && !g_bStyleMapSRVRecord[style][client]) // Player 1st time finishing map using style
+				{      
+					CPrintToChat(client, "%t", "StyleMapFinished3", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_StyleMapRank[style][client], count);
+					PrintToConsole(client, "Surftimer | %s set a %s PB of %s [SR %s | Rank #%i/%i]", szName, g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_StyleMapRank[style][client], count);
+						
+				}
+				else if (g_bStyleMapPBRecord[style][client] && !g_bStyleMapSRVRecord[style][client]) // Player beat Personal Record using style
+				{
+					PlayUnstoppableSound(client);
+					
+					CPrintToChat(client, "%t", "StyleMapFinished4",g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[style][client], count);
+					PrintToConsole(client, "Surftimer | %s finished %s in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[style][client], count);
+
 				}
 			}
-		}
+		}		
+	}	             
 
-		if (g_StyleMapRank[style][client] == 99999 && IsValidClient(client))
-			CPrintToChat(client, "%t", "Misc19", g_szChatPrefix);
+	if (g_StyleMapRank[style][client] == 99999 && IsValidClient(client))
+		CPrintToChat(client, "%t", "FailedSaveData", g_szChatPrefix);
 
-		CalculatePlayerRank(client, style);
-		return;
-	}
+	CalculatePlayerRank(client, style);
+	return;
 }
 
 stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
@@ -4332,52 +4437,80 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 	if (!IsValidClient(client))
 	return;
 
-	float RecordDiff;
-	char szRecordDiff[54], szName[MAX_NAME_LENGTH];
+	float RecordDiff, RecordDiff2;
+	char szRecordDiff[54], szRecordDiff2[54], szName[MAX_NAME_LENGTH];
 
 	if (rank == 0)
 	rank = g_StyleMapRankBonus[style][zGroup][client];
 
 	GetClientName(client, szName, MAX_NAME_LENGTH);
-	if (g_bBonusSRVRecord[client])
+
+	// Bonus style SR, time difference formatting
+	RecordDiff = g_fStyleBonusFastest[style][zGroup] - g_fFinalTime[client];
+	FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
+	if (RecordDiff > 0.0)
+	{
+		Format(szRecordDiff, 54, "-%s", szRecordDiff);
+	}
+	else
+	{
+		Format(szRecordDiff, 54, "+%s", szRecordDiff);
+	}
+
+	// Player beat bonus style SR, time difference formatting
+	RecordDiff2 = g_fStyleOldBonusRecordTime[style][zGroup] - g_fFinalTime[client];
+	FormatTimeFloat(client, RecordDiff2, 3, szRecordDiff2, 54);
+	if (RecordDiff2 > 0.0)
+	{
+		Format(szRecordDiff2, 54, "-%s", szRecordDiff2);
+	}
+	else
+	{
+		Format(szRecordDiff2, 54, "+%s", szRecordDiff2);
+	}
+
+	if (g_bBonusSRVRecord[client] && g_fFinalTime[client] == g_fStyleOldBonusRecordTime[style][zGroup]) // Player sets 1st bonus style record
 	{
 		PlayRecordSound(2);
 
-		RecordDiff = g_fStyleOldBonusRecordTime[style][zGroup] - g_fFinalTime[client];
-		FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
-		Format(szRecordDiff, 54, "-%s", szRecordDiff);
+		CPrintToChatAll("%t", "StyleFirstBonusRecord", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style]);
+		PrintToConsole(client, "Surftimer | %s set the %s %s record!", szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style]);
+
+		CPrintToChatAll("%t", "StyleBonusFinished1", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client]);
+		PrintToConsole(client, "Surftimer | %s set a %s %s SR of %s", szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client]);
 	}
-	if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
+	else if (g_bBonusSRVRecord[client]) // Player beats bonus style record
 	{
-		CPrintToChatAll("%t", "Misc37", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style]);
-		if (g_tmpBonusCount[zGroup] == 0)
-			CPrintToChatAll("%t", "Misc38", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], g_szFinalTime[client]);
-		else
-			CPrintToChatAll("%t", "Misc39", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szFinalTime[client]);
+		PlayRecordSound(2);
+		
+		CPrintToChatAll("%t", "StyleNewBonusRecord", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style]);
+		PrintToConsole(client, "Surftimer | %s beat the %s %s record!", szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style]);
+			
+		CPrintToChatAll("%t", "StyleBonusFinished2", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff2, g_szBonusTimeDifference[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup]);
+		PrintToConsole(client, "Surftimer | %s finished %s %s in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff2, g_szBonusTimeDifference[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup]);
 	}
-	if (g_bBonusPBRecord[client] && g_bBonusSRVRecord[client])
+	else if (g_bBonusFirstRecord[client] && !g_bBonusSRVRecord[client]) // Player 1st time finishing bonus using style
 	{
-		CPrintToChatAll("%t", "Misc37", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style]);
-		CPrintToChatAll("%t", "Misc39", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szFinalTime[client]);
+		CPrintToChatAll("%t", "StyleBonusFinished3", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup]);
+		PrintToConsole(client, "Surftimer | %s set a %s %s PB of %s [SR %s | Rank #%i/%i]", szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup]);
 	}
-	if (g_bBonusPBRecord[client] && !g_bBonusSRVRecord[client])
+	else if (g_bBonusPBRecord[client] && !g_bBonusSRVRecord[client]) // Player beats PB but not bonus record using style
 	{
 		PlayUnstoppableSound(client);
-		CPrintToChatAll("%t", "Misc40", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], g_szBonusTimeDifference[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szStyleBonusFastestTime[style][zGroup]);
+		
+		CPrintToChatAll("%t", "StyleBonusFinished4", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_szBonusTimeDifference[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup]);
+		PrintToConsole(client, "Surftimer | %s finished %s %s in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_szBonusTimeDifference[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup]);
 	}
-	if (g_bBonusFirstRecord[client] && !g_bBonusSRVRecord[client])
+	else if (!g_bBonusSRVRecord[client] && !g_bBonusFirstRecord[client] && !g_bBonusPBRecord[client]) // Player did not beat bonus record nor set 1st bonus time nor beat bonus PB using style
 	{
-		CPrintToChatAll("%t", "Misc41", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szStyleBonusFastestTime[style][zGroup]);
-	}
-	if (!g_bBonusSRVRecord[client] && !g_bBonusFirstRecord[client] && !g_bBonusPBRecord[client])
-	{
-		CPrintToChatAll("%t", "Misc42", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], g_szBonusTimeDifference[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szStyleBonusFastestTime[style][zGroup]);
+		CPrintToChat(client, "%t", "StyleBonusFinished5", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_szBonusTimeDifference[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup]);
+		PrintToConsole(client, "Surftimer | %s finished %s %s in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_szBonusTimeDifference[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup]);
 	}
 
 	CheckBonusStyleRanks(client, zGroup, style);
 
 	if (rank == 9999999 && IsValidClient(client))
-		CPrintToChat(client, "%t", "Misc19", g_szChatPrefix);
+		CPrintToChat(client, "%t", "FailedSaveData", g_szChatPrefix);
 
 	CalculatePlayerRank(client, style);
 	return;
@@ -5047,6 +5180,16 @@ public void LoadDefaultTitle(int client)
 						KvGetString(kv, "title", szBuffer, sizeof(szBuffer));
 						SetDefaultTitle(client, szBuffer);
 						g_iHasEnforcedTitle[client] = true;
+
+						g_iEnforceTitleType[client] = 2;
+						KvGetString(kv, "type", szBuffer, sizeof(szBuffer), "both");
+						if (StrEqual(szBuffer, "scoreboard"))
+							g_iEnforceTitleType[client] = 1;
+						else if (StrEqual(szBuffer, "chat"))
+							g_iEnforceTitleType[client] = 0;
+						else
+							g_iEnforceTitleType[client] = 2;
+
 						break;
 					} else {
 						g_iHasEnforcedTitle[client] = false;

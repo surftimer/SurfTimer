@@ -149,6 +149,9 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 				SetEntityGravity(client, 0.0);
 			}
 
+			SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
+			SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
+
 			return Plugin_Continue;
 		}
 
@@ -247,10 +250,6 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		// Give Player Kevlar + Helmet
 		GivePlayerItem(client, "item_assaultsuit");
 		
-	}
-	else if (IsFakeClient(client)) 
-	{
-		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
 	}
 	return Plugin_Continue;
 }
@@ -397,7 +396,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					{
 						LogToFile(g_szQueryFile, "Say_Hook - szQuery: %s", szQuery);
 					}
-					g_dDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client));
+					g_dDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client), DBPrio_Low);
 				}
 			}
 
@@ -465,14 +464,18 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		else
 		{
 			char szChatRank[1024];
-			Format(szChatRank, sizeof(szChatRank), "%s", g_pr_chat_coloredrank[client]);
 
-			char szChatRankColor[1024];
-			Format(szChatRankColor, sizeof(szChatRankColor), "%s", g_pr_chat_coloredrank[client]);
-			CGetRankColor(szChatRankColor, sizeof(szChatRankColor));
+			if(g_iEnforceTitleType[client] == 2 || g_iEnforceTitleType[client] == 0)
+			{
+				Format(szChatRank, sizeof(szChatRank), "%s", g_pr_chat_coloredrank[client]);
 
-			if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
-				Format(szName, sizeof(szName), "{%s}%s", szChatRankColor, szName);
+				char szChatRankColor[1024];
+				Format(szChatRankColor, sizeof(szChatRankColor), "%s", g_pr_chat_coloredrank[client]);
+				CGetRankColor(szChatRankColor, sizeof(szChatRankColor));
+
+				if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
+					Format(szName, sizeof(szName), "{%s}%s", szChatRankColor, szName);
+			}
 
 			if (GetConVarBool(g_hCountry) && (GetConVarBool(g_hPointSystem)))
 			{
@@ -630,7 +633,7 @@ public Action Event_OnPlayerDeath(Handle event, const char[] name, bool dontBroa
 		{
 			if (g_hRecording[client] != null)
 				StopRecording(client);
-			CreateTimer(2.0, RemoveRagdoll, GetClientUserId(client));
+			CreateTimer(2.0, RemoveRagdoll, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 		}
 		else
 			if (g_hBotMimicsRecord[client] != null)
@@ -708,20 +711,6 @@ public Action Event_OnRoundStart(Handle event, const char[] name, bool dontBroad
 	RefreshZones();
 
 	g_bRoundEnd = false;
-	return Plugin_Continue;
-}
-
-public Action OnTouchAllTriggers(int entity, int other)
-{
-	if (other >= 1 && other <= MaxClients && IsFakeClient(other))
-		return Plugin_Handled;
-	return Plugin_Continue;
-}
-
-public Action OnEndTouchAllTriggers(int entity, int other)
-{
-	if (other >= 1 && other <= MaxClients && IsFakeClient(other))
-		return Plugin_Handled;
 	return Plugin_Continue;
 }
 
@@ -942,6 +931,13 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		}
 		else if (!g_bInStartZone[client] && !g_bInStageZone[client] && val < -0.75)
 		g_KeyCount[client] = 0;
+	}
+	else if (g_iCurrentStyle[client] == 4) // Low-gravity
+	{
+		if (g_bInStartZone[client] || g_bInStageZone[client])
+		{
+			ResetGravity(client);
+		}
 	}
 	else if (g_iCurrentStyle[client] == 5) // Slow Motion
 	{
@@ -1354,10 +1350,10 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 		{
 			if (!g_bJumpZoneTimer[client])
 			{
-				CreateTimer(1.0, StartJumpZonePrintTimer, GetClientUserId(client));
+				CreateTimer(1.0, StartJumpZonePrintTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 				CPrintToChat(client, "%t", "Hooks10", g_szChatPrefix);
 				Handle pack;
-				CreateDataTimer(0.05, DelayedVelocityCap, pack);
+				CreateDataTimer(0.05, DelayedVelocityCap, pack, TIMER_FLAG_NO_MAPCHANGE);
 				WritePackCell(pack, GetClientUserId(client));
 				WritePackFloat(pack, 0.0);
 				g_bJumpZoneTimer[client] = true;
@@ -1419,7 +1415,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 						g_bJumpedInZone[client] = true;
 						g_bResetOneJump[client] = true;
 						g_fJumpedInZoneTime[client] = GetGameTime();
-						CreateTimer(1.0, ResetOneJump, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+						CreateTimer(1.5, ResetOneJump, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 					}
 					else
 					{
@@ -1431,7 +1427,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 						{
 							CPrintToChat(client, "%t", "Hooks15", g_szChatPrefix);
 							Handle pack;
-							CreateDataTimer(0.05, DelayedVelocityCap, pack);
+							CreateDataTimer(0.05, DelayedVelocityCap, pack, TIMER_FLAG_NO_MAPCHANGE);
 							WritePackCell(pack, GetClientUserId(client));
 							WritePackFloat(pack, 0.0);
 						}

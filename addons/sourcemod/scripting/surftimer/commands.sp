@@ -441,7 +441,7 @@ public int ShowMainDeleteMenuHandler(Menu menu, MenuAction action, int client, i
 		{
 			LogToFile(g_szQueryFile, "ShowMainDeleteMenuHandler - szQuery: %s", szQuery);
 		}
-		g_dDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client));
+		g_dDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client), DBPrio_Low);
 	}
 	else if(action == MenuAction_End)
 		delete menu;
@@ -1266,7 +1266,7 @@ public int PrintWorldRecordStyleSelectHandler(Handle menu, MenuAction action, in
 			if (param2 == 0)
 			{
 				// Normal
-				if (g_fRecordMapTime == 9999999.0)
+				if (g_fRecordStyleMapTime[0] == 9999999.0)
 					CPrintToChat(param1, "%t", "NoRecordTop", g_szChatPrefix);
 				else
 					PrintMapRecords(param1, 0);
@@ -1286,7 +1286,7 @@ public int PrintWorldRecordStyleSelectHandler(Handle menu, MenuAction action, in
 			if (param2 == 0)
 			{
 				// Normal
-				if (g_fBonusFastest[1] == 9999999.0)
+				if (g_fStyleBonusFastest[0][1] == 9999999.0)
 					CPrintToChat(param1, "%t", "NoRecordTop", g_szChatPrefix);
 				else
 					PrintMapRecords(param1, 99);
@@ -1319,10 +1319,10 @@ public Action Client_Avg(int client, int args)
 	char szProTime[32];
 	FormatTimeFloat(client, g_favg_maptime, 3, szProTime, sizeof(szProTime));
 
-	if (g_MapTimesCount == 0)
+	if (g_StyleMapTimesCount[0] == 0)
 		Format(szProTime, 32, "N/A");
 
-	CPrintToChat(client, "%t", "AvgTime", g_szChatPrefix, szProTime, g_MapTimesCount);
+	CPrintToChat(client, "%t", "AvgTime", g_szChatPrefix, szProTime, g_StyleMapTimesCount[0]);
 
 	if (g_bhasBonus)
 	{
@@ -1332,9 +1332,9 @@ public Action Client_Avg(int client, int args)
 		{
 			FormatTimeFloat(client, g_fAvg_BonusTime[i], 3, szBonusTime, sizeof(szBonusTime));
 
-			if (g_iBonusCount[i] == 0)
+			if (g_iStyleBonusCount[0][i] == 0)
 				Format(szBonusTime, 32, "N/A");
-			CPrintToChat(client, "%t", "AvgTimeBonus", g_szChatPrefix, szBonusTime, g_iBonusCount[i]);
+			CPrintToChat(client, "%t", "AvgTimeBonus", g_szChatPrefix, szBonusTime, g_iStyleBonusCount[0][i]);
 		}
 	}
 
@@ -1597,83 +1597,6 @@ public int MapTopMenuSelectStyleHandler(Handle menu, MenuAction action, int para
 }
 
 public Action Client_BonusTop(int client, int args)
-{
-	char szArg[128], zGrp;
-
-	if (!IsValidClient(client))
-		return Plugin_Handled;
-
-	switch (args) {
-		case 0: { // !btop
-			if (g_mapZoneGroupCount == 1)
-			{
-				CPrintToChat(client, "%t", "NoBonusOnMap", g_szChatPrefix);
-				CPrintToChat(client, "%t", "BTopUsage", g_szChatPrefix);
-				return Plugin_Handled;
-			}
-			if (g_mapZoneGroupCount == 2)
-			{
-				zGrp = 1;
-				Format(szArg, 128, "%s", g_szMapName);
-			}
-			if (g_mapZoneGroupCount > 2)
-			{
-				ListBonuses(client, 2);
-				return Plugin_Handled;
-			}
-		}
-		case 1: { // !btop <mapname> / <bonus id>
-			// 1st check if bonus id or mapname
-			GetCmdArg(1, szArg, 128);
-			if (StringToInt(szArg) == 0 && szArg[0] != '0') // passes, if not a number (argument is mapname)
-			{
-				db_selectBonusesInMap(client, szArg);
-				return Plugin_Handled;
-			}
-			else // argument is a bonus id (Use current map)
-			{
-				zGrp = StringToInt(szArg);
-				if (0 < zGrp < MAXZONEGROUPS)
-				{
-					Format(szArg, 128, "%s", g_szMapName);
-				}
-				else
-				{
-					CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, zGrp);
-					return Plugin_Handled;
-				}
-			}
-		}
-		case 2: {
-			GetCmdArg(1, szArg, 128);
-			if (StringToInt(szArg) != 0 && szArg[0] != '0') // passes, if not a number (argument is mapname)
-			{
-				char szZGrp[128];
-				GetCmdArg(2, szZGrp, 128);
-				zGrp = StringToInt(szZGrp);
-			}
-			else // argument is a bonus id
-			{
-				zGrp = StringToInt(szArg);
-				GetCmdArg(2, szArg, 128);
-			}
-
-			if (0 > zGrp || zGrp > MAXZONEGROUPS)
-			{
-				CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, zGrp);
-				return Plugin_Handled;
-			}
-		}
-		default: {
-			CPrintToChat(client, "%t", "BTopUsage", g_szChatPrefix);
-			return Plugin_Handled;
-		}
-	}
-	db_selectBonusTopSurfers(client, szArg, zGrp);
-	return Plugin_Handled;
-}
-
-public Action Client_SWBonusTop(int client, int args)
 {
 	char szArg[128], zGrp;
 
@@ -4230,11 +4153,19 @@ public Action Admin_FixBot(int client, int args)
 
 public Action Command_GiveKnife(int client, int args)
 {
-	if (IsPlayerAlive(client))
+	if (IsClientObserver(client) || !IsPlayerAlive(client))
+	{
+		CPrintToChat(client, "%t", "CannotRequestKnife", g_szChatPrefix);
+	}	
+	else if (IsPlayerAlive(client) && (GetPlayerWeaponSlot(client, CS_SLOT_KNIFE) != -1))	
+	{
+		CPrintToChat(client, "%t", "AlreadyHasKnife", g_szChatPrefix);
+	}
+	else
 	{
 		GivePlayerItem(client, "weapon_knife");
 	}
-
+	
 	return Plugin_Handled;
 }
 
@@ -4780,7 +4711,7 @@ public Action Command_CPR(int client, int args)
 
 	if (args == 0)
 	{
-		if (g_fPersonalRecord[client] < 1.0)
+		if (g_fPersonalStyleRecord[0][client] < 1.0)
 		{
 			CReplyToCommand(client, "%t", "Commands84", g_szChatPrefix);
 			return Plugin_Handled;
@@ -5092,7 +5023,7 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 		{
 			// Delay the switch to spec so the client sees the new bot name
 			Handle pack;
-			CreateDataTimer(0.2, SpecBot, pack);
+			CreateDataTimer(0.2, SpecBot, pack, TIMER_FLAG_NO_MAPCHANGE);
 			WritePackCell(pack, GetClientUserId(param1));
 			WritePackCell(pack, bot);
 		}

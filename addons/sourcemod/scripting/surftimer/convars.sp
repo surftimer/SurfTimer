@@ -8,7 +8,6 @@ ConVar g_hZonerFlag = null;
 ConVar g_hZoneDisplayType = null;								// How zones are displayed (lower edge, full)
 ConVar g_hZonesToDisplay = null;								// Which zones are displayed
 ConVar g_hChecker;												// Zone refresh rate
-Handle g_hZoneTimer = INVALID_HANDLE;
 // Zone Colors
 int g_iZoneColors[ZONEAMOUNT+2][4];								// ZONE COLOR TYPES: Stop(0), Start(1), End(2), BonusStart(3), BonusEnd(4), Stage(5),
 char g_szZoneColors[ZONEAMOUNT+2][24];							// Checkpoint(6), Speed(7), TeleToStart(8), Validator(9), Chekcer(10)
@@ -133,7 +132,7 @@ ConVar g_cLogQueries = null;
 
 void CreateConVars()
 {
-	CreateConVar("timer_version", VERSION, "Timer Version.", FCVAR_DONTRECORD | FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY);
+	CreateConVar("surftimer_version", VERSION, "SurfTimer Version", FCVAR_DONTRECORD | FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY);
 
 	AutoExecConfig_SetCreateDirectory(true);
 	AutoExecConfig_SetCreateFile(true);
