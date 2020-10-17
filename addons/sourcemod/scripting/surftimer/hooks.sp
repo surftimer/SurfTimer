@@ -932,6 +932,13 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		else if (!g_bInStartZone[client] && !g_bInStageZone[client] && val < -0.75)
 		g_KeyCount[client] = 0;
 	}
+	else if (g_iCurrentStyle[client] == 4) // Low-gravity
+	{
+		if (g_bInStartZone[client] || g_bInStageZone[client])
+		{
+			ResetGravity(client);
+		}
+	}
 	else if (g_iCurrentStyle[client] == 5) // Slow Motion
 	{
 		// Maybe fix ramp glitches in slow motion, using https://forums.alliedmods.net/showthread.php?t=277523
