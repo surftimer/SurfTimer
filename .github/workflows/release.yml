@@ -42,19 +42,13 @@ jobs:
           wget https://raw.githubusercontent.com/JoinedSenses/SourceMod-IncludeLibrary/master/include/smjansson.inc -P $INCLUDE_PATH
           wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/addons/sourcemod/scripting/include/colorlib.inc -P $INCLUDE_PATH
           wget https://github.com/Impact123/AutoExecConfig/raw/development/autoexecconfig.inc -P $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/peace-maker/DHooks2/dynhooks/sourcemod/scripting/include/dhooks.inc -P $INCLUDE_PATH
           
           git clone -b transitional_syntax https://github.com/bcserv/smlib.git
           mv smlib/scripting/include/* $INCLUDE_PATH
 
           git clone https://github.com/Deathknife/sourcemod-discord.git
           mv sourcemod-discord/include/* $INCLUDE_PATH
-      
-      - name: Add dhooks include
-        run: | 
-          mkdir temp && cd temp
-          curl -s "https://forums.alliedmods.net/attachment.php?attachmentid=181953&d=1591738802" -o dhooks.zip
-          unzip dhooks.zip
-          cp addons/sourcemod/scripting/include/dhooks.inc $INCLUDE_PATH/dhooks.inc
 
       - name: Set up python
         uses: actions/setup-python@v1
@@ -106,7 +100,7 @@ jobs:
         run: |
           wget http://users.alliedmods.net/~kyles/builds/SteamWorks/SteamWorks-git132-linux.tar.gz -O steamworks_linux.tar.gz
           wget http://users.alliedmods.net/~kyles/builds/SteamWorks/SteamWorks-git132-windows.zip -O steamworks_windows.zip
-          curl -s "https://forums.alliedmods.net/attachment.php?attachmentid=180932&d=1587473886" -o dhooks.zip
+          curl -s "https://forums.alliedmods.net/attachment.php?attachmentid=184479&d=1602926778" -o dhooks.zip
           curl -s "https://forums.alliedmods.net/attachment.php?attachmentid=133799&d=1400973546" -o smjansson.zip
 
       - name: Unpacking SteamWorks, DHooks and SMJansson
