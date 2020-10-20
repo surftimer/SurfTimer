@@ -941,6 +941,7 @@ public int MenuHandler_SelectStage(Menu tMenu, MenuAction action, int client, in
 			GetMenuItem(tMenu, item, aID, sizeof(aID));
 			int id = StringToInt(aID);
 			teleportClient(client, g_iClientInZone[client][2], id, true);
+			g_Stage[g_iClientInZone[client][2]][client] = id;
 		}
 		case MenuAction_End:
 		{
