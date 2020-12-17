@@ -1,6 +1,11 @@
 // Start Timer
 public void CL_OnStartTimerPress(int client)
 {
+	g_fStartTime[client] = GetGameTime();
+	int zgrp = g_iClientInZone[client][2];
+	float fVelocity[3];
+	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+
 	if (!IsFakeClient(client))
 	{
 		if (IsValidClient(client))
@@ -52,7 +57,6 @@ public void CL_OnStartTimerPress(int client)
 		g_bPause[client] = false;
 		SetEntityMoveType(client, MOVETYPE_WALK);
 		SetEntityRenderMode(client, RENDER_NORMAL);
-		g_fStartTime[client] = GetGameTime();
 		g_fCurrentRunTime[client] = 0.0;
 		g_bPositionRestored[client] = false;
 		g_bMissedMapBest[client] = true;
@@ -65,6 +69,7 @@ public void CL_OnStartTimerPress(int client)
 		g_iCurrentCheckpoint[client] = 0;
 		g_iCheckpointsPassed[client] = 0;
 		g_bIsValidRun[client] = false;
+		g_bSavingMapTime[client] = false;
 
 		if (!IsFakeClient(client))
 		{
@@ -75,52 +80,71 @@ public void CL_OnStartTimerPress(int client)
 			// Set missed record time variables
 			if (g_iClientInZone[client][2] == 0)
 			{
-				if (g_fPersonalRecord[client] > 0.0)
+				if (g_fPersonalStyleRecord[0][client] > 0.0)
 				g_bMissedMapBest[client] = false;
 			}
 			else
 			{
-				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
+				if (g_fStylePersonalRecordBonus[0][g_iClientInZone[client][2]][client] > 0.0)
 				g_bMissedBonusBest[client] = false;
 
 			}
-		}
 
-		if (!g_bPracticeMode[client] && !IsFakeClient(client)) {
-			char szSpeed[128];
-			char preMessage[128];
-			Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
-			Format(preMessage, sizeof(preMessage), "%t", "StartPrestrafe", g_szChatPrefix, szSpeed);
-			if (g_iPrespeedText[client])
-				CPrintToChat(client, preMessage);
-		
-			for (int i = 1; i <= MaxClients; i++) {
-				if (!IsClientInGame(i))
-					continue;
+			// int startSpeed[3];
 
- 				if (GetClientTeam(i) != CS_TEAM_SPECTATOR)
-					continue;
+			g_iStartVelsNew[client][zgrp][0] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0))); // XY
+			g_iStartVelsNew[client][zgrp][1] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0))); // XYZ
+			g_iStartVelsNew[client][zgrp][2] = RoundToNearest(fVelocity[2]); // Z
 
- 				int ObserverMode = GetEntProp(i, Prop_Send, "m_iObserverMode");
-				if (ObserverMode != 4 && ObserverMode != 5)
-					continue;
+			int idiff;
+			if (g_iStartVelsServerRecord[zgrp][1] == 0)
+				idiff = g_iStartVelsNew[client][zgrp][1];
+			else
+				idiff = (g_iStartVelsNew[client][zgrp][1] - g_iStartVelsServerRecord[zgrp][1]);
 
- 				int ObserverTarget = GetEntPropEnt(i, Prop_Send, "m_hObserverTarget");
-				if (ObserverTarget != client)
-					continue;
-
-				if (g_iPrespeedText[i])
-					CPrintToChat(i, preMessage);
+			char szDiff[32], szDiff2[32];
+			if (g_iStartVelsNew[client][zgrp][1] > g_iStartVelsServerRecord[zgrp][1] || g_iStartVelsServerRecord[zgrp][1] == 0)
+			{
+				Format(g_szLastSpeedDifference[client], 128, "(WR +%d)", idiff);
+				Format(szDiff, sizeof(szDiff), "+%d", idiff);
 			}
-		}
+			else
+			{
+				Format(g_szLastSpeedDifference[client], 128, "(WR %d)", idiff);
+				Format(szDiff, sizeof(szDiff), "%d", idiff);
+			}
 
+			if (g_iStartVelsRecord[client][zgrp][1] == 0)
+				idiff = g_iStartVelsNew[client][zgrp][1];
+			else
+				idiff = (g_iStartVelsNew[client][zgrp][1] - g_iStartVelsRecord[client][zgrp][1]);
+			
+			
+			if (g_iStartVelsNew[client][zgrp][1] > g_iStartVelsRecord[client][zgrp][1] || g_iStartVelsRecord[client][zgrp][1] == 0)
+			{
+				Format(szDiff2, sizeof(szDiff2), "+%d", idiff);
+			}
+			else
+			{
+				Format(szDiff2, sizeof(szDiff2), "%d", idiff);
+			}
+				
+			// Print Speed if velocity setting
+			if (g_bShowSpeedDifferenceHud[client])
+				g_fLastDifferenceSpeed[client] = GetGameTime();
+
+			CPrintToChat(client, "%s {default}Speed: {yellow}%d u/s {default}[WR: %s {default}| PB: %s{default}]", g_szChatPrefix, g_iStartVelsNew[client][zgrp][1], szDiff ,szDiff2);
+		}
 	}
 
-	// Play Start Sound
-	PlayButtonSound(client);
+	// Play Start Sound if not in practicemode
+	if (!g_bPracticeMode[client])
+	{
+		PlayButtonSound(client);
+	}
 
 	// Start recording for record bot
-	if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) || (!IsFakeClient(client) && GetConVarBool(g_hBonusBot)))
+	if (((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) || (!IsFakeClient(client) && GetConVarBool(g_hBonusBot))) && !g_hRecording[client])
 	{
 		if (!IsPlayerAlive(client) || GetClientTeam(client) == 1)
 		{
@@ -141,8 +165,44 @@ public void CL_OnStartTimerPress(int client)
 // End Timer
 public void CL_OnEndTimerPress(int client)
 {
-	if (!IsValidClient(client))
+	if (!IsValidClient(client) || g_bSavingMapTime[client])
 		return;
+
+	int zGroup = g_iClientInZone[client][2];
+
+	g_fFinalTime[client] = GetGameTime() - g_fStartTime[client] - g_fPauseTime[client];
+	float fVelocity[3];
+	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+	
+	g_iEndVelsNew[client][zGroup][0] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0))); // XY
+	g_iEndVelsNew[client][zGroup][1] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0))); // XYZ
+	g_iEndVelsNew[client][zGroup][2] = RoundToNearest(fVelocity[2]); // Z
+
+	int idiff;
+	if (g_iEndVelsServerRecord[zGroup][1] == 0)
+		idiff = g_iEndVelsNew[client][zGroup][1];
+	else
+		idiff = (g_iEndVelsNew[client][zGroup][1] - g_iEndVelsServerRecord[zGroup][1]);
+
+	char szDiff[54], szDiff2[54];
+	if (g_iEndVelsNew[client][zGroup][1] > g_iEndVelsServerRecord[zGroup][1] || g_iEndVelsServerRecord[zGroup][1] == 0)
+		Format(szDiff, sizeof(szDiff), "{lightgreen}+%d", idiff);
+	else
+		Format(szDiff, sizeof(szDiff), "{red}%d", idiff);
+
+	if (g_iEndVelsRecord[client][zGroup][1] == 0)
+		idiff = g_iEndVelsNew[client][zGroup][1];
+	else
+		idiff = (g_iEndVelsNew[client][zGroup][1] - g_iEndVelsRecord[client][zGroup][1]);
+	
+	if (g_iEndVelsNew[client][zGroup][1] > g_iEndVelsRecord[client][zGroup][1] || g_iEndVelsRecord[client][zGroup][1] == 0)
+		Format(szDiff2, sizeof(szDiff2), "{lightgreen}+%d", idiff);
+	else
+		Format(szDiff2, sizeof(szDiff2), "{red}%d",idiff);
+				
+	// Print Speed if velocity setting
+
+	CPrintToChat(client, "%s {default}Speed: {yellow}%d {default}[WR: %s {default}| PB: %s{default}]", g_szChatPrefix, g_iEndVelsNew[client][zGroup][1], szDiff ,szDiff2);
 
 	// Print bot finishing message to spectators
 	if (IsFakeClient(client) && g_bTimerRunning[client])
@@ -181,12 +241,12 @@ public void CL_OnEndTimerPress(int client)
 	else
 		PlayButtonSound(client);
 
+	g_bSavingMapTime[client] = true;
 	// Get client name
-	char szName[128];
-	GetClientName(client, szName, 128);
+	char szName[MAX_NAME_LENGTH];
+	GetClientName(client, szName, MAX_NAME_LENGTH);
 
 	// Get runtime and format it to a string
-	g_fFinalTime[client] = GetGameTime() - g_fStartTime[client] - g_fPauseTime[client];
 	FormatTimeFloat(client, g_fFinalTime[client], 3, g_szFinalTime[client], 32);
 
 	/*====================================
@@ -214,8 +274,6 @@ public void CL_OnEndTimerPress(int client)
 		return;
 	}
 
-	// Get zonegroup and style
-	int zGroup = g_iClientInZone[client][2];
 	int style = g_iCurrentStyle[client];
 
 	/*====================================
@@ -233,40 +291,48 @@ public void CL_OnEndTimerPress(int client)
 				{
 					g_fReplayTimes[0][0] = g_fFinalTime[client];
 					g_bNewReplay[client] = true;
-					CreateTimer(3.0, ReplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+					CreateTimer(0.0, ReplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 				}
 			}
 
-			char szDiff[54];
+			// char szDiff[54];
 			float diff;
 
 			// Record bools init
-			g_bMapFirstRecord[client] = false;
-			g_bMapPBRecord[client] = false;
-			g_bMapSRVRecord[client] = false;
+			g_bStyleMapFirstRecord[0][client] = false;
+			g_bStyleMapPBRecord[0][client] = false;
+			g_bStyleMapSRVRecord[0][client] = false;
 
-			g_OldMapRank[client] = g_MapRank[client];
+			g_OldStyleMapRank[0][client] = g_StyleMapRank[0][client];
 
-			diff = g_fPersonalRecord[client] - g_fFinalTime[client];
+			diff = g_fPersonalStyleRecord[0][client] - g_fFinalTime[client];
 			FormatTimeFloat(client, diff, 3, szDiff, sizeof(szDiff));
 			if (diff > 0.0)
-			Format(g_szTimeDifference[client], sizeof(szDiff), "-%s", szDiff);
+				Format(g_szTimeDifference[client], sizeof(szDiff), "-%s", szDiff);
 			else
-			Format(g_szTimeDifference[client], sizeof(szDiff), "+%s", szDiff);
+				Format(g_szTimeDifference[client], sizeof(szDiff), "+%s", szDiff);
 
 			// If the server already has a record
-			if (g_MapTimesCount > 0)
+			if (g_StyleMapTimesCount[0] > 0)
 			{
-				if (g_fFinalTime[client] < g_fRecordMapTime)
+				if (g_fFinalTime[client] < g_fRecordStyleMapTime[0])
 				{
 					// New fastest time in map
-					g_bMapSRVRecord[client] = true;
-					g_fRecordMapTime = g_fFinalTime[client];
-					Format(g_szRecordPlayer, 128, "%s", szName);
-					FormatTimeFloat(1, g_fRecordMapTime, 3, g_szRecordMapTime, 128);
+					g_bStyleMapSRVRecord[0][client] = true;
+					g_fOldRecordStyleMapTime[0] = g_fRecordStyleMapTime[0];
+					g_fRecordStyleMapTime[0] = g_fFinalTime[client];
+					Format(g_szRecordStylePlayer[0], MAX_NAME_LENGTH, "%s", szName);
+					FormatTimeFloat(1, g_fRecordStyleMapTime[0], 3, g_szRecordStyleMapTime[0], 64);
 
 					// Insert latest record
 					db_InsertLatestRecords(g_szSteamID[client], szName, g_fFinalTime[client]);
+
+					// Update Velocitys
+					for (int i = 0; i < 3; i++)
+					{
+						g_iStartVelsServerRecord[zGroup][i] = g_iStartVelsNew[client][zGroup][i];
+						g_iEndVelsServerRecord[zGroup][i] = g_iEndVelsNew[client][zGroup][i];
+					}
 
 					// Update Checkpoints
 					if (!g_bPositionRestored[client])
@@ -274,6 +340,13 @@ public void CL_OnEndTimerPress(int client)
 						for (int i = 0; i < CPLIMIT; i++)
 						{
 							g_fCheckpointServerRecord[zGroup][i] = g_fCheckpointTimesNew[zGroup][client][i];
+							
+							// Update Velocitys
+							for (int j = 0; j < 3; j++)
+							{
+								g_iCheckpointVelsStartServerRecord[zGroup][i][j] = g_iCheckpointVelsStartNew[zGroup][client][i][j];
+								g_iCheckpointVelsEndServerRecord[zGroup][i][j] = g_iCheckpointVelsEndNew[zGroup][client][i][j];
+							}
 						}
 						g_bCheckpointRecordFound[zGroup] = true;
 					}
@@ -282,8 +355,9 @@ public void CL_OnEndTimerPress(int client)
 					{
 						g_bNewReplay[client] = true;
 						g_fReplayTimes[0][0] = g_fFinalTime[client];
-						CreateTimer(3.0, ReplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+						CreateTimer(0.0, ReplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 					}
+					// wrCredits = 500;
 				}
 			}
 			else
@@ -293,62 +367,82 @@ public void CL_OnEndTimerPress(int client)
 				{
 					g_fReplayTimes[0][0] = g_fFinalTime[client];
 					g_bNewReplay[client] = true;
-					CreateTimer(3.0, ReplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+					CreateTimer(0.0, ReplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 				}
 
-				g_bMapSRVRecord[client] = true;
-				g_fRecordMapTime = g_fFinalTime[client];
-				Format(g_szRecordPlayer, 128, "%s", szName);
-				FormatTimeFloat(1, g_fRecordMapTime, 3, g_szRecordMapTime, 128);
+				g_fOldRecordStyleMapTime[0] = g_fRecordStyleMapTime[0];
+				g_bStyleMapSRVRecord[0][client] = true;
+				g_fRecordStyleMapTime[0] = g_fFinalTime[client];
+				Format(g_szRecordStylePlayer[0], MAX_NAME_LENGTH, "%s", szName);
+				FormatTimeFloat(1, g_fRecordStyleMapTime[0], 3, g_szRecordStyleMapTime[0], 64);
 
 				// Insert latest record
 				db_InsertLatestRecords(g_szSteamID[client], szName, g_fFinalTime[client]);
 
+				// Update Velocitys
+				for (int i = 0; i < 3; i++)
+				{
+					g_iStartVelsServerRecord[zGroup][i] = g_iStartVelsNew[client][zGroup][i];
+					g_iEndVelsServerRecord[zGroup][i] = g_iEndVelsNew[client][zGroup][i];
+				}
+
 				// Update Checkpoints
-				if (g_bCheckpointsEnabled[client] && !g_bPositionRestored[client])
+				if (!g_bPositionRestored[client])
 				{
 					for (int i = 0; i < CPLIMIT; i++)
 					{
 						g_fCheckpointServerRecord[zGroup][i] = g_fCheckpointTimesNew[zGroup][client][i];
+						
+						// Update Velocitys
+						for (int j = 0; j < 3; j++)
+						{
+							g_iCheckpointVelsStartServerRecord[zGroup][i][j] = g_iCheckpointVelsStartNew[zGroup][client][i][j];
+							g_iCheckpointVelsEndServerRecord[zGroup][i][j] = g_iCheckpointVelsEndNew[zGroup][client][i][j];
+						}
 					}
 					g_bCheckpointRecordFound[zGroup] = true;
 				}
 
+				g_fOldRecordStyleMapTime[0] = g_fRecordStyleMapTime[0];
+				// wrCredits = fcTierCredits;
 			}
 
 
 			// Clients first record
-			if (g_fPersonalRecord[client] == 0.0)
+			if (g_fPersonalStyleRecord[0][client] == 0.0)
 			{
-				g_fPersonalRecord[client] = g_fFinalTime[client];
+				g_fPersonalStyleRecord[0][client] = g_fFinalTime[client];
 				g_pr_finishedmaps[client][0]++;
-				g_MapTimesCount++;
-				FormatTimeFloat(1, g_fPersonalRecord[client], 3, g_szPersonalRecord[client], 64);
+				g_StyleMapTimesCount[0]++;
+				FormatTimeFloat(1, g_fPersonalStyleRecord[0][client], 3, g_szPersonalStyleRecord[0][client], 64);
 
-				g_bMapFirstRecord[client] = true;
+				g_bStyleMapFirstRecord[0][client] = true;
 				g_pr_showmsg[client] = true;
 				db_UpdateCheckpoints(client, g_szSteamID[client], zGroup);
 
 				db_selectRecord(client);
 
+				// fcCredits = fcTierCredits;
 			}
 			else if (diff > 0.0)
 			{
 				// Client's new record
-				g_fPersonalRecord[client] = g_fFinalTime[client];
-				FormatTimeFloat(1, g_fPersonalRecord[client], 3, g_szPersonalRecord[client], 64);
+				g_fPersonalStyleRecord[0][client] = g_fFinalTime[client];
+				FormatTimeFloat(1, g_fPersonalStyleRecord[0][client], 3, g_szPersonalStyleRecord[0][client], 64);
 
-				g_bMapPBRecord[client] = true;
+				g_bStyleMapPBRecord[0][client] = true;
 				g_pr_showmsg[client] = true;
 				db_UpdateCheckpoints(client, g_szSteamID[client], zGroup);
 
 				db_selectRecord(client);
 
+				// pbCredits = tierCredits;
 			}
-			if (!g_bMapSRVRecord[client] && !g_bMapFirstRecord[client] && !g_bMapPBRecord[client])
+			if (!g_bStyleMapSRVRecord[0][client] && !g_bStyleMapFirstRecord[0][client] && !g_bStyleMapPBRecord[0][client])
 			{
 				// for ck_min_rank_announce
 				db_currentRunRank(client);
+				// slowCredits = 1 * g_iMapTier;
 			}
 		}
 		else if (style != 0)
@@ -361,14 +455,14 @@ public void CL_OnEndTimerPress(int client)
 					g_fReplayTimes[0][style] = g_fFinalTime[client];
 					g_bNewReplay[client] = true;
 					Handle pack;
-					CreateDataTimer(3.0, StyleReplayTimer, pack);
+					CreateDataTimer(3.0, StyleReplayTimer, pack, TIMER_FLAG_NO_MAPCHANGE);
 					WritePackCell(pack, GetClientUserId(client));
 					WritePackCell(pack, style);
 				}
 			}
 
 			// Styles
-			char szDiff[54];
+			// char szDiff[54];
 			float diff;
 
 			// Record bools init
@@ -377,6 +471,7 @@ public void CL_OnEndTimerPress(int client)
 			g_bStyleMapSRVRecord[style][client] = false;
 
 			g_OldStyleMapRank[style][client] = g_StyleMapRank[style][client];
+			g_fOldRecordStyleMapTime[style] = g_fRecordStyleMapTime[style];
 
 			diff = g_fPersonalStyleRecord[style][client] - g_fFinalTime[client];
 			FormatTimeFloat(client, diff, 3, szDiff, sizeof(szDiff));
@@ -393,7 +488,7 @@ public void CL_OnEndTimerPress(int client)
 					// New fastest time in map
 					g_bStyleMapSRVRecord[style][client] = true;
 					g_fRecordStyleMapTime[style] = g_fFinalTime[client];
-					Format(g_szRecordStylePlayer[style], 128, "%s", szName);
+					Format(g_szRecordStylePlayer[style], MAX_NAME_LENGTH, "%s", szName);
 					FormatTimeFloat(1, g_fRecordStyleMapTime[style], 3, g_szRecordStyleMapTime[style], 64);
 
 					if (GetConVarBool(g_hReplayBot) && !g_bPositionRestored[client] && !g_bNewReplay[client])
@@ -401,10 +496,13 @@ public void CL_OnEndTimerPress(int client)
 						g_bNewReplay[client] = true;
 						g_fReplayTimes[0][style] = g_fFinalTime[client];
 						Handle pack;
-						CreateDataTimer(3.0, StyleReplayTimer, pack);
+						CreateDataTimer(3.0, StyleReplayTimer, pack, TIMER_FLAG_NO_MAPCHANGE);
 						WritePackCell(pack, GetClientUserId(client));
 						WritePackCell(pack, style);
 					}
+					
+					// Insert latest record
+					// db_InsertLatestRecords(g_szSteamID[client], szName, g_fFinalTime[client]);
 				}
 			}
 			else
@@ -414,7 +512,7 @@ public void CL_OnEndTimerPress(int client)
 					g_bNewReplay[client] = true;
 					g_fReplayTimes[0][style] = g_fFinalTime[client];
 					Handle pack;
-					CreateDataTimer(3.0, StyleReplayTimer, pack);
+					CreateDataTimer(3.0, StyleReplayTimer, pack, TIMER_FLAG_NO_MAPCHANGE);
 					WritePackCell(pack, GetClientUserId(client));
 					WritePackCell(pack, style);
 				}
@@ -422,8 +520,13 @@ public void CL_OnEndTimerPress(int client)
 				// Has to be the new record, since it is the first completion
 				g_bStyleMapSRVRecord[style][client] = true;
 				g_fRecordStyleMapTime[style] = g_fFinalTime[client];
-				Format(g_szRecordStylePlayer[style], 128, "%s", szName);
-				FormatTimeFloat(1, g_fRecordStyleMapTime[style], 3, g_szRecordStyleMapTime[style], 128);
+				Format(g_szRecordStylePlayer[style], MAX_NAME_LENGTH, "%s", szName);
+				FormatTimeFloat(1, g_fRecordStyleMapTime[style], 3, g_szRecordStyleMapTime[style], 64);
+
+				// Insert latest record
+				// db_InsertLatestRecords(g_szSteamID[client], szName, g_fFinalTime[client]);
+
+				g_fOldRecordStyleMapTime[style] = g_fRecordStyleMapTime[style];
 			}
 
 
@@ -432,7 +535,9 @@ public void CL_OnEndTimerPress(int client)
 			{
 				// Clients first record
 				g_fPersonalStyleRecord[style][client] = g_fFinalTime[client];
-				FormatTimeFloat(1, g_fPersonalStyleRecord[style][client], 3, g_szPersonalStyleRecord[style][client], 128);
+				/*g_pr_finishedmaps[client]++;
+				g_StyleMapTimesCount[0]++;*/
+				FormatTimeFloat(1, g_fPersonalStyleRecord[style][client], 3, g_szPersonalStyleRecord[style][client], 64);
 				
 				g_bStyleMapFirstRecord[style][client] = true;
 				g_pr_showmsg[client] = true;
@@ -443,7 +548,7 @@ public void CL_OnEndTimerPress(int client)
 			{
 				// Client's new record
 				g_fPersonalStyleRecord[style][client] = g_fFinalTime[client];
-				FormatTimeFloat(1, g_fPersonalStyleRecord[style][client], 3, g_szPersonalStyleRecord[style][client], 128);
+				FormatTimeFloat(1, g_fPersonalStyleRecord[style][client], 3, g_szPersonalStyleRecord[style][client], 64);
 
 				g_bStyleMapPBRecord[style][client] = true;
 				g_pr_showmsg[client] = true;
@@ -451,18 +556,34 @@ public void CL_OnEndTimerPress(int client)
 				db_selectStyleRecord(client, style);
 			}
 
-			if (!g_bStyleMapSRVRecord[style][client] && !g_bStyleMapFirstRecord[style][client] && !g_bStyleMapPBRecord[style][client])
+			if (!g_bStyleMapSRVRecord[style][client] && !g_bStyleMapFirstRecord[style][client] && !g_bStyleMapPBRecord[style][client]) // Player did not beat Server Record nor finish for 1st time nor beat Personal Record using style
 			{
+				float RecordDiff;
+				char szRecordDiff[32];
 				int count = g_StyleMapTimesCount[style];
+
+				// Map style SR, time difference formatting
+				RecordDiff = g_fRecordStyleMapTime[style] - g_fFinalTime[client];
+				FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 32);
+				if (RecordDiff > 0.0)
+				{
+					Format(szRecordDiff, 32, "-%s", szRecordDiff);
+				}
+				else
+				{
+					Format(szRecordDiff, 32, "+%s", szRecordDiff);
+				}
 
 				for (int i = 1; i <= MaxClients; i++)
 				{
 					if (IsValidClient(i) && !IsFakeClient(i))
 					{
-						CPrintToChat(i, "%t", "BPress6", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szFinalTime[client], g_szTimeDifference[client], g_StyleMapRank[style][client], count, g_szRecordStyleMapTime[style]);
+						CPrintToChat(i, "%t", "StyleMapFinished5", g_szChatPrefix, szName, g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[style][client], count);
+						PrintToConsole(client, "Surftimer | %s finished %s in %s [SR %s | PB %s | Rank #%i/%i]", szName, g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_szTimeDifference[client], g_StyleMapRank[style][client], count);
 					}
 				}
-			}
+			} 
+			
 			CS_SetClientAssists(client, 100);
 		}
 	}
@@ -480,13 +601,12 @@ public void CL_OnEndTimerPress(int client)
 					g_fReplayTimes[zGroup][0] = g_fFinalTime[client];
 					g_bNewBonus[client] = true;
 					Handle pack;
-					CreateDataTimer(3.0, BonusReplayTimer, pack);
+					CreateDataTimer(3.0, BonusReplayTimer, pack, TIMER_FLAG_NO_MAPCHANGE);
 					WritePackCell(pack, GetClientUserId(client));
 					WritePackCell(pack, zGroup);
 				}
 			}
 
-			char szDiff[54];
 			float diff;
 
 			// Record bools init
@@ -494,9 +614,9 @@ public void CL_OnEndTimerPress(int client)
 			g_bBonusPBRecord[client] = false;
 			g_bBonusSRVRecord[client] = false;
 
-			g_OldMapRankBonus[zGroup][client] = g_MapRankBonus[zGroup][client];
+			g_StyleOldMapRankBonus[0][zGroup][client] = g_StyleMapRankBonus[0][zGroup][client];
 
-			diff = g_fPersonalRecordBonus[zGroup][client] - g_fFinalTime[client];
+			diff = g_fStylePersonalRecordBonus[0][zGroup][client] - g_fFinalTime[client];
 			FormatTimeFloat(client, diff, 3, szDiff, sizeof(szDiff));
 
 			if (diff > 0.0)
@@ -505,18 +625,18 @@ public void CL_OnEndTimerPress(int client)
 				Format(g_szBonusTimeDifference[client], sizeof(szDiff), "+%s", szDiff);
 
 
-			g_tmpBonusCount[zGroup] = g_iBonusCount[zGroup];
+			g_StyletmpBonusCount[0][zGroup] = g_iStyleBonusCount[0][zGroup];
 
 			// If the server already has a record
-			if (g_iBonusCount[zGroup] > 0)
+			if (g_iStyleBonusCount[0][zGroup] > 0)
 			{
 				// New fastest time in current bonus
-				if (g_fFinalTime[client] < g_fBonusFastest[zGroup])
+				if (g_fFinalTime[client] < g_fStyleBonusFastest[0][zGroup])
 				{
-					g_fOldBonusRecordTime[zGroup] = g_fBonusFastest[zGroup];
-					g_fBonusFastest[zGroup] = g_fFinalTime[client];
-					Format(g_szBonusFastest[zGroup], 128, "%s", szName);
-					FormatTimeFloat(1, g_fBonusFastest[zGroup], 3, g_szBonusFastestTime[zGroup], 128);
+					g_fStyleOldBonusRecordTime[0][zGroup] = g_fStyleBonusFastest[0][zGroup];
+					g_fStyleBonusFastest[0][zGroup] = g_fFinalTime[client];
+					Format(g_szStyleBonusFastest[0][zGroup], 128, "%s", szName);
+					FormatTimeFloat(1, g_fStyleBonusFastest[0][zGroup], 3, g_szStyleBonusFastestTime[0][zGroup], 128);
 
 					// Update Checkpoints
 					if (g_bCheckpointsEnabled[client] && !g_bPositionRestored[client])
@@ -534,7 +654,7 @@ public void CL_OnEndTimerPress(int client)
 						g_bNewBonus[client] = true;
 						g_fReplayTimes[zGroup][0] = g_fFinalTime[client];
 						Handle pack;
-						CreateDataTimer(3.0, BonusReplayTimer, pack);
+						CreateDataTimer(3.0, BonusReplayTimer, pack, TIMER_FLAG_NO_MAPCHANGE);
 						WritePackCell(pack, GetClientUserId(client));
 						WritePackCell(pack, zGroup);
 					}
@@ -548,15 +668,15 @@ public void CL_OnEndTimerPress(int client)
 					g_bNewBonus[client] = true;
 					g_fReplayTimes[zGroup][0] = g_fFinalTime[client];
 					Handle pack;
-					CreateDataTimer(3.0, BonusReplayTimer, pack);
+					CreateDataTimer(3.0, BonusReplayTimer, pack, TIMER_FLAG_NO_MAPCHANGE);
 					WritePackCell(pack, GetClientUserId(client));
 					WritePackCell(pack, zGroup);
 				}
 
-				g_fOldBonusRecordTime[zGroup] = g_fBonusFastest[zGroup];
-				g_fBonusFastest[zGroup] = g_fFinalTime[client];
-				Format(g_szBonusFastest[zGroup], 128, "%s", szName);
-				FormatTimeFloat(1, g_fBonusFastest[zGroup], 3, g_szBonusFastestTime[zGroup], 128);
+				g_fStyleOldBonusRecordTime[0][zGroup] = g_fStyleBonusFastest[0][zGroup];
+				g_fStyleBonusFastest[0][zGroup] = g_fFinalTime[client];
+				Format(g_szStyleBonusFastest[0][zGroup], 128, "%s", szName);
+				FormatTimeFloat(1, g_fStyleBonusFastest[0][zGroup], 3, g_szStyleBonusFastestTime[0][zGroup], 128);
 
 				// Update Checkpoints
 				if (g_bCheckpointsEnabled[client] && !g_bPositionRestored[client])
@@ -568,14 +688,14 @@ public void CL_OnEndTimerPress(int client)
 
 				g_bBonusSRVRecord[client] = true;
 
-				g_fOldBonusRecordTime[zGroup] = g_fBonusFastest[zGroup];
+				g_fStyleOldBonusRecordTime[0][zGroup] = g_fStyleBonusFastest[0][zGroup];
 			}
 
 			// Clients first record
-			if (g_fPersonalRecordBonus[zGroup][client] == 0.0)
+			if (g_fStylePersonalRecordBonus[0][zGroup][client] == 0.0)
 			{
-				g_fPersonalRecordBonus[zGroup][client] = g_fFinalTime[client];
-				FormatTimeFloat(1, g_fPersonalRecordBonus[zGroup][client], 3, g_szPersonalRecordBonus[zGroup][client], 128);
+				g_fStylePersonalRecordBonus[0][zGroup][client] = g_fFinalTime[client];
+				FormatTimeFloat(1, g_fStylePersonalRecordBonus[0][zGroup][client], 3, g_szStylePersonalRecordBonus[0][zGroup][client], 128);
 
 				g_bBonusFirstRecord[client] = true;
 				g_pr_showmsg[client] = true;
@@ -586,8 +706,8 @@ public void CL_OnEndTimerPress(int client)
 			else if (diff > 0.0)
 			{
 				// client's new record
-				g_fPersonalRecordBonus[zGroup][client] = g_fFinalTime[client];
-				FormatTimeFloat(1, g_fPersonalRecordBonus[zGroup][client], 3, g_szPersonalRecordBonus[zGroup][client], 128);
+				g_fStylePersonalRecordBonus[0][zGroup][client] = g_fFinalTime[client];
+				FormatTimeFloat(1, g_fStylePersonalRecordBonus[0][zGroup][client], 3, g_szStylePersonalRecordBonus[0][zGroup][client], 128);
 
 				g_bBonusPBRecord[client] = true;
 				g_pr_showmsg[client] = true;
@@ -610,7 +730,7 @@ public void CL_OnEndTimerPress(int client)
 					g_fReplayTimes[zGroup][style] = g_fFinalTime[client];
 					g_bNewBonus[client] = true;
 					Handle pack;
-					CreateDataTimer(3.0, StyleBonusReplayTimer, pack);
+					CreateDataTimer(3.0, StyleBonusReplayTimer, pack, TIMER_FLAG_NO_MAPCHANGE);
 					WritePackCell(pack, GetClientUserId(client));
 					WritePackCell(pack, zGroup);
 					WritePackCell(pack, style);
@@ -618,7 +738,6 @@ public void CL_OnEndTimerPress(int client)
 			}
 
 			// styles for bonus
-			char szDiff[54];
 			float diff;
 
 			// Record bools init
@@ -656,7 +775,7 @@ public void CL_OnEndTimerPress(int client)
 						g_bNewBonus[client] = true;
 						g_fReplayTimes[zGroup][style] = g_fFinalTime[client];
 						Handle pack;
-						CreateDataTimer(3.0, StyleBonusReplayTimer, pack);
+						CreateDataTimer(3.0, StyleBonusReplayTimer, pack, TIMER_FLAG_NO_MAPCHANGE);
 						WritePackCell(pack, GetClientUserId(client));
 						WritePackCell(pack, zGroup);
 						WritePackCell(pack, style);
@@ -670,7 +789,7 @@ public void CL_OnEndTimerPress(int client)
 					g_bNewBonus[client] = true;
 					g_fReplayTimes[zGroup][style] = g_fFinalTime[client];
 					Handle pack;
-					CreateDataTimer(3.0, StyleBonusReplayTimer, pack);
+					CreateDataTimer(3.0, StyleBonusReplayTimer, pack, TIMER_FLAG_NO_MAPCHANGE);
 					WritePackCell(pack, GetClientUserId(client));
 					WritePackCell(pack, zGroup);
 					WritePackCell(pack, style);
@@ -723,47 +842,69 @@ public void CL_OnEndTimerPress(int client)
 // Start Timer
 public void CL_OnStartWrcpTimerPress(int client)
 {
+	float fVelocity[3];
+	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+
 	if (!g_bSpectate[client] && !g_bNoClip[client] && ((GetGameTime() - g_fLastTimeNoClipUsed[client]) > 2.0))
 	{
 		int zGroup = g_iClientInZone[client][2];
-		if(zGroup != 0)
-		{
-			return;
-		}
 		if (zGroup == 0)
 		{
 			g_fStartWrcpTime[client] = GetGameTime();
+			// g_fStartWrcpTime[client] = 0.0;
 			g_fCurrentWrcpRunTime[client] = 0.0;
 			g_bWrcpTimeractivated[client] = true;
 			g_bNotTeleporting[client] = true;
 			g_WrcpStage[client] = g_Stage[0][client];
-			Stage_StartRecording(client);
-		}
-		if (g_Stage[0][client] > 1 && !g_bPracticeMode[client] && !IsFakeClient(client)) {
-			char szSpeed[128];
-			char preMessage[128];
-			Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
-			Format(preMessage, sizeof(preMessage), "%t", "StagePrestrafe", g_szChatPrefix, g_Stage[0][client], szSpeed);
-			if (g_iPrespeedText[client])
-				CPrintToChat(client, preMessage);
-		
-			for (int i = 1; i <= MaxClients; i++) {
-				if (!IsClientInGame(i)) 
-					continue;
+			int stage = g_WrcpStage[client];
+			// Stage_StartRecording(client);
 
-				if (GetClientTeam(i) != CS_TEAM_SPECTATOR)
-					continue;
+			g_iWrcpVelsStartNew[client][stage][0] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0))); // XY
+			g_iWrcpVelsStartNew[client][stage][1] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0))); // XYZ
+			g_iWrcpVelsStartNew[client][stage][2] = RoundToNearest(fVelocity[2]); // Z
 
-				int ObserverMode = GetEntProp(i, Prop_Send, "m_iObserverMode");
-				if(ObserverMode != 4 && ObserverMode != 5)
-					continue;
+			int idiff;
+			if (g_iWrcpVelsStartServerRecord[stage][1] == 0)
+				idiff = g_iWrcpVelsStartNew[client][stage][1];
+			else
+				idiff = (g_iWrcpVelsStartNew[client][stage][1] - g_iWrcpVelsStartServerRecord[stage][1]);
 
-				int ObserverTarget = GetEntPropEnt(i, Prop_Send, "m_hObserverTarget");
-				if (ObserverTarget != client)
-					continue;
+			char szDiff[32], szDiff2[32];
+			if (g_iWrcpVelsStartNew[client][stage][1] > g_iWrcpVelsStartServerRecord[stage][1] || g_iWrcpVelsStartServerRecord[stage][1] == 0)
+			{
+				if (!g_bTimerRunning[client])
+					Format(g_szLastSpeedDifference[client], 128, "(WR +%d)", idiff);
+				Format(szDiff, sizeof(szDiff), "+%d", idiff);
+			}
+			else
+			{
+				if (!g_bTimerRunning[client])
+					Format(g_szLastSpeedDifference[client], 128, "(WR %d)", idiff);
+				Format(szDiff, sizeof(szDiff), "%d", idiff);
+			}
 
-				if (g_iPrespeedText[i])
-					CPrintToChat(i, preMessage);
+			if (g_iWrcpVelsStartRecord[client][stage][1] == 0)
+				idiff = g_iWrcpVelsStartNew[client][stage][1];
+			else
+				idiff = (g_iWrcpVelsStartNew[client][stage][1] - g_iWrcpVelsStartRecord[client][stage][1]);
+			
+			
+			if (g_iWrcpVelsStartNew[client][stage][1] > g_iWrcpVelsStartRecord[client][stage][1] || g_iWrcpVelsStartRecord[client][stage][1] == 0)
+			{
+				Format(szDiff2, sizeof(szDiff2), "+%d", idiff);
+			}
+			else
+			{
+				Format(szDiff2, sizeof(szDiff2), "%d", idiff);
+			}
+				
+			// Print Speed if velocity setting
+			if (!g_bTimerRunning[client])
+			{
+				if (g_bShowSpeedDifferenceHud[client])
+					g_fLastDifferenceSpeed[client] = GetGameTime();
+				
+				CPrintToChat(client, "%s {default}Stage %d: {yellow}%d u/s {default}[WR: %s {default}| PB: %s{default}]", g_szChatPrefix, stage, g_iWrcpVelsStartNew[client][stage][1], szDiff ,szDiff2);
 			}
 		}
 	}
@@ -784,8 +925,8 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 
 	int stage = g_WrcpStage[client];
 	// Get Client Name
-	char szName[128];
-	GetClientName(client, szName, 128);
+	char szName[MAX_NAME_LENGTH];
+	GetClientName(client, szName, MAX_NAME_LENGTH);
 
 	if (g_bWrcpEndZone[client])
 	{
@@ -802,34 +943,42 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 	{
 		// int stage = g_CurrentStage[client];
 
+		// g_fFinalWrcpTime[client] = GetGameTime() - g_fStartWrcpTime[client];
 		g_fFinalWrcpTime[client] = g_fCurrentWrcpRunTime[client];
 
+		// g_fFinalWrcpTime[client] = g_fStartWrcpTime[client] - time2;
 		if (g_fFinalWrcpTime[client] <= 0.0)
 		{
 			CPrintToChat(client, "%t", "ErrorStageTime", g_szChatPrefix, stage);
 			return;
 		}
-		//Stage 1 to stage 2 glitch stopper.
-		if(g_wrcpStage2Fix[client] && stage == 2){
-			g_wrcpStage2Fix[client] = false;
+
+		if (stage == 2 && g_wrcpStage2Fix[client])
+		{
 			CPrintToChat(client, "%t", "StageNotRecorded", g_szChatPrefix);
+			g_wrcpStage2Fix[client] = false;
 			return;
 		}
-		
+
 		g_wrcpStage2Fix[client] = false;
 
 		char sz_srDiff[128];
 		float time = g_fFinalWrcpTime[client];
-		float f_srDiff = (g_fStageRecord[stage] - time);
+		float f_srDiff = (g_fStyleStageRecord[0][stage] - time);
 		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
 		if (f_srDiff > 0)
 		{
-			Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
+			// Format(sz_srDiff_colorless, 128, "-%s", sz_srDiff);
+			Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
 		}
 		else
 		{
-			Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
+			// Format(sz_srDiff_colorless, 128, "+%s", sz_srDiff);
+			Format(sz_srDiff, 128, "%cWR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
 		}
+		// g_fLastDifferenceTime[client] = GetGameTime();
+		/*else
+		Format(sz_srDiff, 128, "");*/
 
 		FormatTimeFloat(client, g_fFinalWrcpTime[client], 3, g_szFinalWrcpTime[client], 32);
 		// Make a new stage replay bot?
@@ -839,9 +988,9 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		}
 		else
 		{
-			if (g_TotalStageRecords[stage] > 0)
+			if (g_TotalStageStyleRecords[0][stage] > 0)
 			{ // If the server already has a record
-				if (g_fFinalWrcpTime[client] < g_fStageRecord[stage] && g_fFinalWrcpTime[client] > 0.0)
+				if (g_fFinalWrcpTime[client] < g_fStyleStageRecord[0][stage] && g_fFinalWrcpTime[client] > 0.0)
 				{
 					Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 				}
@@ -871,15 +1020,26 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
 		if (f_srDiff > 0)
 		{
-			Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
+			// Format(sz_srDiff_colorless, 128, "-%s", sz_srDiff);
+			Format(sz_srDiff, 128, "%cWR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
 		}
 		else
 		{
-			Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
+			// Format(sz_srDiff_colorless, 128, "+%s", sz_srDiff);
+			Format(sz_srDiff, 128, "%cWR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
 		}
+		// g_fLastDifferenceTime[client] = GetGameTime();
+		/*else
+		Format(sz_srDiff, 128, "");*/
 
 		FormatTimeFloat(client, g_fFinalWrcpTime[client], 3, g_szFinalWrcpTime[client], 32);
 		db_selectWrcpRecord(client, style, stage);
 		g_bWrcpTimeractivated[client] = false;
 	}
+	else if (!g_bWrcpTimeractivated[client])
+	{
+		g_StageRecStartFrame[client] = -1;
+	}
+
+	Client_StopWrcp(client, 1);
 }

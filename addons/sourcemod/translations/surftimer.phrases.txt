@@ -1,5 +1,10 @@
 "Phrases"
 {
+	"Discord_Test"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Discord test sent."
+	}
 	"PracticeNormal"
 	{
 		"#format"	"{1:s}"
@@ -8,7 +13,12 @@
 	"PracticeInStartZone"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} You can't make a checkpoint inside the start zone!"
+		"en"		"{1} You must stand still on startzone to make a checkpoint!"
+	}
+	"NoclipSaveloc"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} You can't create a checkpoint with noclip!"
 	}
 	"ToogleCheckpoints1"
 	{
@@ -75,6 +85,21 @@
 		"#format"	"{1:s},{2:s},{3:i}"
 		"en"		"{1} {blue}{2} {default}- {lightgreen}{3} seconds remaining"
 	}
+	"TimeleftThree"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {green}3!"
+	}
+	"TimeleftTwo"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {orange}2!"
+	}
+	"TimeleftOne"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {red}1!"
+	}
 	"TimeleftCounter"
 	{
 		"#format"	"{1:s},{2:s},{3:i}"
@@ -140,71 +165,174 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Recalculation stopped!"
 	}
+	/*===================================
+	=        	Map Time Messages     	=
+	====================================*/
 	"NewMapRecord"
 	{
 		"#format"	"{1:s},{2:s}"
 		"en"		"{1} {yellow}{2} {default}beat the map record!"
 	}
-	"ReplayFinishingMsg"
+	"FirstMapRecord"
 	{
-		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {yellow}{2}{default} has finished in [{lightgreen}{3}{default}]"
-	}
-	"ReplayFinishingMsgBonus"
-	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s}"
-		"en"		"{1} {yellow}{2}{default} has finished [{orange}{3}{default}] in [{lightgreen}{4}{default}]"
+		"#format"	"{1:s},{2:s}"
+		"en"		"{1} {yellow}{2} {default}set the map record!"
 	}
 	"MapFinished1"
 	{
-		"#format"	"{1:s},{2:s},{3:s},{4:i},{5:i},{6:s},{7:s}"
-		"en"		"{1} {yellow}{2}{default} finished in {lightgreen}{3}{default}. [Rank: {lightgreen}{4}/{5} {default}{6} | Record: {lightgreen}{7}{default}]"
+		"#format"	"{1:s},{2:s},{3:s}"
+		"en"		"{1} {yellow}{2}{default} set a SR of {lightgreen}{3}{default}"
+	}
+	"MapFinished2"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i}"
+		"en"		"{1} {yellow}{2}{default} finished in {lightgreen}{3}{default} [SR {lightgreen}{4}{default} | PB {blue}{5}{default} | Rank {lightgreen}{6}/{7}{default}]"
 	}
 	"MapFinished3"
 	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:i},{6:i},{7:s},{8:s}"
-		"en"		"{1} {yellow}{2}{default} finished in {lightgreen}{3}{default}. Improving their best time by [{lightgreen}{4}{default}]. [Rank: {lightgreen}{5}/{6} {default}{7} | Record: {lightgreen}{8}{default}]"
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:i},{6:i}"
+		"en"		"{1} {yellow}{2}{default} set a PB of {lightgreen}{3}{default} [SR {red}{4}{default} | Rank {lightgreen}{5}/{6}{default}]"
+	}
+	"MapFinished4"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:i},{6:i},{7:s}"
+		"en"		"{1} {yellow}{2}{default} set a PB of {lightgreen}{3}{default} [SR {red}{4}{default} | Rank {lightgreen}{5}/{6}{default} | {7}]"
 	}
 	"MapFinished5"
 	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:i},{6:i},{7:s},{8:s}"
-		"en"		"{1} {yellow}{2}{default} finished in {lightgreen}{3}{default}. Missing their best time by [{red}{4}{default}]. [Rank: {lightgreen}{5}/{6} {default}{7} | Record: {lightgreen}{8}{default}]"
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i}"
+		"en"		"{1} {yellow}{2}{default} finished in {lightgreen}{3}{default} [SR {red}{4}{default} | PB {blue}{5}{default} | Rank {lightgreen}{6}/{7}{default}]"
+	}
+	"MapFinished6"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
+		"en"		"{1} {yellow}{2}{default} finished in {lightgreen}{3}{default} [SR {red}{4}{default} | PB {blue}{5}{default} | Rank {lightgreen}{6}/{7}{default} | {8}]"
+	}
+	"MapFinished7"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i}"
+		"en"		"{1} {yellow}{2}{default} finished in {lightgreen}{3}{default} [SR {red}{4}{default} | PB {yellow}{5}{default} | Rank {lightgreen}{6}/{7}{default}]"
+	}
+	/*===================================
+	=      Style Map Time Messages     	=
+	====================================*/
+	"StyleFirstMapRecord"
+	{
+		"#format"	"{1:s},{2:s},{3:s}"
+		"en"		"{1} {yellow}{2}{default} set the {red}{3} {default}map record!"
+	}
+	"StyleNewMapRecord"
+	{
+		"#format"	"{1:s},{2:s},{3:s}"
+		"en"		"{1} {yellow}{2}{default} beat the {red}{3} {default}map record!"
+	}
+	"StyleMapFinished1"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s}"
+		"en"		"{1} {yellow}{2}{default} set a {red}{3} {default}SR of {lightgreen}{4}{default}"
+	}
+	"StyleMapFinished2"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:i},{8:i}"
+		"en"		"{1} {yellow}{2}{default} finished {red}{3} {default}in {lightgreen}{4}{default} [SR {lightgreen}{5} {default}| PB {blue}{6} {default}| Rank {lightgreen}{7}/{8}{default}]"
+	}
+	"StyleMapFinished3"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i}"
+		"en"		"{1} {yellow}{2}{default} set a {red}{3} {default}PB of {lightgreen}{4}{default} [SR {red}{5} {default}| Rank {lightgreen}{6}/{7}{default}]"
+	}
+	"StyleMapFinished4"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:i},{8:i}"
+		"en"		"{1} {yellow}{2}{default} finished {red}{3} {default}in {lightgreen}{4}{default} [SR {red}{5} {default}| PB {blue}{6} {default}| Rank {lightgreen}{7}/{8}{default}]"
+	}
+	"StyleMapFinished5"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:i},{8:i}"
+		"en"		"{1} {yellow}{2}{default} finished {red}{3} {default}in {lightgreen}{4}{default} [SR {red}{5} {default}| PB {yellow}{6} {default}| Rank {lightgreen}{7}/{8}{default}]"
+	}
+	/*===================================
+	=        Bonus Time Messages     	=
+	====================================*/
+	"FirstBonusRecord"
+	{
+		"#format"	"{1:s},{2:s},{3:s}"
+		"en"		"{1} {yellow}{2} {default}set the {orange}{3} {default}record!"
+	}
+	"NewBonusRecord"
+	{
+		"#format"	"{1:s},{2:s},{3:s}"
+		"en"		"{1} {yellow}{2} {default}beat the {orange}{3} {default}record!"
 	}
 	"BonusFinished1"
 	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
-		"en"		"{1} {yellow}{2}{default} finished [{orange}{3}{default}] in {red}{4}{default}. Missing their best time by [{red}{5}{default}]. [Rank: {lightgreen}{6}/{7} {default}| Record: {lightgreen}{8}{default}]"
+		"#format"	"{1:s},{2:s},{3:s},{4:s}"
+		"en"		"{1} {yellow}{2}{default} set a {orange}{3}{default} SR of {lightgreen}{4}{default}"
 	}
 	"BonusFinished2"
 	{
-		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {yellow}{2} {default}beat the [{orange}{3}{default}] record!"
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:i},{8:i}"
+		"en"		"{1} {yellow}{2}{default} finished {orange}{3}{default} in {lightgreen}{4}{default} [SR {lightgreen}{5}{default} | PB {blue}{6} {default}| Rank {lightgreen}{7}/{8}{default}]"
 	}
 	"BonusFinished3"
 	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
-		"en"		"{1} {yellow}{2}{default} finished [{orange}{3}{default}] in {lightgreen}{4}{default}. [Rank: {lightgreen}1/1 {default}| Record: {lightgreen}{5}{default}]"
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i}"
+		"en"		"{1} {yellow}{2}{default} set a {orange}{3}{default} PB of {lightgreen}{4}{default} [SR {red}{5}{default} | Rank {lightgreen}{6}/{7}{default}]"
 	}
 	"BonusFinished4"
 	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
-		"en"		"{1} {yellow}{2}{default} finished [{orange}{3}{default}] in {lightgreen}{4}{default}. Improving the best time by {lightgreen}{5}{default}. [Rank: {lightgreen}{6}/{7} {default}| Record: {lightgreen}{8}{default}]"
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:i},{8:i}"
+		"en"		"{1} {yellow}{2}{default} finished {orange}{3}{default} in {lightgreen}{4}{default} [SR {lightgreen}{5}{default} | PB {blue}{6} {default}| Rank {lightgreen}{7}/{8}{default}]"
 	}
 	"BonusFinished5"
 	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
-		"en"		"{1} {yellow}{2}{default} finished [{orange}{3}{default}] in {lightgreen}{4}{default}. Improving the best time by {lightgreen}{5}{default}. [Rank: {lightgreen}{6}/{7} {default}| Record: {lightgreen}{8}{default}]"
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:i},{8:i}"
+		"en"		"{1} {yellow}{2}{default} finished {orange}{3}{default} in {lightgreen}{4}{default} [SR {red}{5}{default} | PB {blue}{6} {default}| Rank {lightgreen}{7}/{8}{default}]"
 	}
 	"BonusFinished6"
 	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
-		"en"		"{1} {yellow}{2}{default} finished [{orange}{3}{default}] in {lightgreen}{4}{default}. Improving their best time by {lightgreen}{5}{default}. [Rank: {lightgreen}{6}/{7} {default}| Record: {lightgreen}{8}{default}]"
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:i},{8:i}"
+		"en"		"{1} {yellow}{2}{default} finished {orange}{3}{default} in {lightgreen}{4}{default} [SR {red}{5}{default} | PB {yellow}{6} {default}| Rank {lightgreen}{7}/{8}{default}]"
 	}
-	"BonusFinished7"
+	/*===================================
+	=    Style Bonus Time Messages     	=
+	====================================*/
+	"StyleFirstBonusRecord"
 	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:i},{6:i},{7:s}"
-		"en"		"{1} {yellow}{2}{default} finished [{orange}{3}{default}] in {lightgreen}{4}{default}. [Rank: {lightgreen}{5}/{6} {default}| Record: {lightgreen}{7}{default}]"
+		"#format"	"{1:s},{2:s},{3:s},{4:s}"
+		"en"		"{1} {yellow}{2}{default} set the {orange}{3} {red}{4} {default}record!"
 	}
+	"StyleNewBonusRecord"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s}"
+		"en"		"{1} {yellow}{2}{default} beat the {orange}{3} {red}{4} {default}record!"
+	}
+	"StyleBonusFinished1"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
+		"en"		"{1} {yellow}{2} {default}set a {orange}{3} {red}{4} {default}SR of {lightgreen}{5}"
+	}
+	"StyleBonusFinished2"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:s},{8:i},{9:i}"
+		"en"		"{1} {yellow}{2} {default}finished {orange}{3} {red}{4} {default}in {lightgreen}{5} {default}[SR {lightgreen}{6} {default}| PB {blue}{7} {default}| Rank {lightgreen}{8}/{9}{default}]"
+	}
+	"StyleBonusFinished3"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:i},{8:i}"
+		"en"		"{1} {yellow}{2} {default}set a {orange}{3} {red}{4} {default}PB of {lightgreen}{5} {default}[SR {red}{6} {default}| Rank {lightgreen}{7}/{8}{default}]"
+	}
+	"StyleBonusFinished4"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:s},{8:i},{9:i}"
+		"en"		"{1} {yellow}{2} {default}finished {orange}{3} {red}{4} {default}in {lightgreen}{5} {default}[SR {red}{6} {default}| PB {blue}{7} {default}| Rank {lightgreen}{8}/{9}{default}]"
+	}
+	"StyleBonusFinished5"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:s},{8:i},{9:i}"
+		"en"		"{1} {yellow}{2} {default}finished {orange}{3} {red}{4} {default}in {lightgreen}{5} {default}[SR {red}{6} {default}| PB {yellow}{7} {default}| Rank {lightgreen}{8}/{9}{default}]"
+	}
+	/*================END================*/
 	"PlayerNotFound"
 	{
 		"#format"	"{1:s},{2:s}"
@@ -284,6 +412,11 @@
 	{
 		"#format"	"{1:s}"
 		"en"		"{1} Pause enabled"
+	}
+	"Pause Disabled"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} This server currently has !pause disabled."
 	}
 	"QuakeSounds1"
 	{
@@ -574,6 +707,16 @@
 	{
 		"#format"	"{1:s}"
 		"en"		"{1} Fixing replay bots"
+	}
+	"CannotRequestKnife"
+	{
+		"#format"	"{1:s}"
+		"en"	"{1} {darkred}You must be alive to request a knife!"
+	}
+	"AlreadyHasKnife"
+	{
+		"#format"	"{1:s}"
+		"en"	"{1} {darkred}You already have a knife!"
 	}
 	"Commands54"
 	{
@@ -1148,7 +1291,7 @@
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
 		"en"		"{1} {yellow}{2} {default}holds the {red}freestyle{gold}{3} {default}record with time: {lightgreen}{4} {default}on {blue}{5}"
 	}
-	"Misc19"
+	"FailedSaveData"
 	{
 		"#format"	"{1:s}"
 		"en"		"{1} {darkred}Failed to save your data correctly! Please contact an admin"
@@ -1223,51 +1366,6 @@
 		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s}"
 		"en"		"{1} {yellow}{2} {default}| CP [{lightgreen}{3}{default}]: {lightgreen}{4} {default}[PB: {lightgreen}N/A{default} | {5}{default}]"
 	}
-	"Misc34"
-	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:i},{6:i},{7:s}"
-		"en"		"{1} {yellow}{2}{default} finished {red}{3} {default}in [{lightgreen}{4}{default}]. [Rank: {lightgreen}{5}/{6} {default}| Record: {lightgreen}{7}{default}"
-	}
-	"Misc35"
-	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
-		"en"		"{1} {yellow}{2}{default} finished {red}{3} {default}in [{lightgreen}{4}{default}]. Improving their best time by [{lightgreen}{5}{default}]. [Rank: {lightgreen}{6}/{7} {default}| Record: {lightgreen}{8}{default}]"
-	}
-	"Misc36"
-	{
-		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {yellow}{2}{default} beat the {red}{3} {default}map record!"
-	}
-	"Misc37"
-	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s}"
-		"en"		"{1} {yellow}{2}{default} beat the [{orange}{3}{default}] {red}{4} {default}record!"
-	}
-	"Misc38"
-	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s}"
-		"en"		"{1} {yellow}{2} {default}finished [{orange}{3}{default}] {red}{4} {default}in {lightgreen}{5}{default}. [Rank: {lightgreen}1/1 {default}| Record: {lightgreen}{6}{default}]"
-	}
-	"Misc39"
-	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:i},{8:i},{9:s}"
-		"en"		"{1} {yellow}{2} {default}finished [{orange}{3}{default}] {red}{4} {default}in {lightgreen}{5}{default}. Improving the best time by {lightgreen}{6}{default}. [Rank: {lightgreen}{7}/{8} {default}| Record: {lightgreen}{9}{default}]"
-	}
-	"Misc40"
-	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:i},{8:i},{9:s}"
-		"en"		"{1} {yellow}{2} {default}finished [{orange}{3}{default}] {red}{4} {default}in {lightgreen}{5}{default}. Improving their best time by {lightgreen}{6}{default}. [Rank: {lightgreen}{7}/{8} {default}| Record: {lightgreen}{9}{default}]"
-	}
-	"Misc41"
-	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
-		"en"		"{1} {yellow}{2} {default}finished [{orange}{3}{default}] {red}{4} {default}in {lightgreen}{5}{default}. [Rank: {lightgreen}{6}/{7} {default}| Record: {lightgreen}{8}{default}]"
-	}
-	"Misc42"
-	{
-		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:i},{8:i},{9:s}"
-		"en"		"{1} {yellow}{2} {default}finished [{orange}{3}{default}] {red}{4} {default}in {lightgreen}{5}{default}. Missing their best time by {red}{6}{default}. [Rank: {lightgreen}{7}/{8} {default}| Record: {lightgreen}{9}{default}]"
-	}
 	"Misc43"
 	{
 		"#format"	"{1:s}"
@@ -1282,6 +1380,16 @@
 	{
 		"#format"	"{1:s}"
 		"en"		"{1} Report sent - thanks"
+	}
+	"ReplayFinishingMsg"
+	{
+		"#format"	"{1:s},{2:s},{3:s}"
+		"en"		"{1} {yellow}{2}{default} has finished in [{lightgreen}{3}{default}]"
+	}
+	"ReplayFinishingMsgBonus"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s}"
+		"en"		"{1} {yellow}{2}{default} has finished [{orange}{3}{default}] in [{lightgreen}{4}{default}]"
 	}
 	"SQL1"
 	{
@@ -1511,8 +1619,8 @@
 	"StageNotRecorded"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Potential S1 to S2 glitch stopped. Stage time was not recorded"
-	}
+		"en"		"{1} {darkred}There was an error saving your stage 2 record, please restart."
+	} 
 	"StartPrestrafe"
 	{
 		"#format"	"{1:s},{2:s}"
@@ -1652,5 +1760,15 @@
 	{
 		"#format"	"{1:s},{2:s}"
 		"en"		"{1} Auto-reset is enabled, but you weren't teleported because you're surfing in {gold}{2}"
+	}
+	"StageNotRecorded"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {darkred}There was an error saving your stage 2 record, please restart."
+	}
+	"ShowVelocityCP"
+	{
+		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s},{6:i},{7:s},{8:s}"
+		"en"		"{1} Start: {yellow}{2} u/s {default}[WR {3} {default}| PB {4}{default}] | {5}: {yellow}{6} u/s {default}[WR {7} {default}| PB {8}{default}]"
 	}
 }
