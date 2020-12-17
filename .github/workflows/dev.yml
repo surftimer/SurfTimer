@@ -23,11 +23,11 @@ jobs:
       - name: Set environment variables
         run: |
           TOOLS_PATH=$GITHUB_WORKSPACE/tools
-          echo ::set-env name=TOOLS_PATH::$TOOLS_PATH
+          echo "TOOLS_PATH=$TOOLS_PATH" >> $GITHUB_ENV
           SOURCEMOD_PATH=$GITHUB_WORKSPACE/addons/sourcemod
-          echo ::set-env name=SOURCEMOD_PATH::$SOURCEMOD_PATH
-          echo ::set-env name=SCRIPTS_PATH::$SOURCEMOD_PATH/scripting
-          echo ::set-env name=INCLUDE_PATH::$SOURCEMOD_PATH/scripting/include
+          echo "SOURCEMOD_PATH=$SOURCEMOD_PATH" >> $GITHUB_ENV
+          echo "SCRIPTS_PATH=$SOURCEMOD_PATH/scripting" >> $GITHUB_ENV
+          echo "INCLUDE_PATH=$SOURCEMOD_PATH/scripting/include" >> $GITHUB_ENV
 
       - name: Setup SourcePawn Compiler ${{ matrix.SM_VERSION }}
         uses: rumblefrog/setup-sp@master
@@ -44,7 +44,7 @@ jobs:
           wget https://raw.githubusercontent.com/JoinedSenses/SourceMod-IncludeLibrary/master/include/smjansson.inc -P $INCLUDE_PATH
           wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/addons/sourcemod/scripting/include/colorlib.inc -P $INCLUDE_PATH
           wget https://github.com/Impact123/AutoExecConfig/raw/development/autoexecconfig.inc -P $INCLUDE_PATH
-          wget https://raw.githubusercontent.com/peace-maker/DHooks2/dynhooks/sourcemod/scripting/include/dhooks.inc -P $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/peace-maker/DHooks2/dynhooks/sourcemod_files/scripting/include/dhooks.inc -P $INCLUDE_PATH
           
           git clone -b transitional_syntax https://github.com/bcserv/smlib.git
           mv smlib/scripting/include/* $INCLUDE_PATH
@@ -61,16 +61,19 @@ jobs:
         run: python3 -m pip install --upgrade pip setuptools wheel
         
       - name: Download colorlib-gen
-        run: git clone https://github.com/c0rp3n/colorlib-gen.git $TOOLS_PATH/gen
+        run: |
+          cd tools
+          git clone https://github.com/c0rp3n/colorlib-gen.git
         
       - name: Install colorlib-gen
         run: |
-          cd $TOOLS_PATH/gen/
+          cd tools/colorlib-gen
           pip install -r ./requirements.txt
           python3 ./setup.py install
 
       - name: Generate colorlib_map.inc
-        run: colorlib_gen -re --config "$TOOLS_PATH/colors.yaml" "$INCLUDE_PATH/colorlib_map.inc"
+        run: colorlib_gen -r --config "./colors.yaml" "../addons/sourcemod/scripting/include/colorlib_map.inc"
+        working-directory: ./tools
 
       - name: Compile plugin
         run: |

@@ -1,3 +1,6 @@
+enum_name: CL_Color
+function_name: _CL_ColorMap
+terminator: '}'
 colors:
   default:      engine 1
   prefix:       green
