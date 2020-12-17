@@ -23,7 +23,6 @@ Yes, but not any more than other projects currently and for past years.
 <sup>(We only support the latest stable version of Sourcemod.)</sup>
 
 **Extensions:**
-* [Surftimer-Web-Stats](https://github.com/KristianP26/Surftimer-Web-Stats) - Web Statistics
 * [DHooks](https://forums.alliedmods.net/showthread.php?t=180114) - **Recommended:** [Detours Build](https://forums.alliedmods.net/showpost.php?p=2588686&postcount=589) for SourceMod 1.10 Stable
 * [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604)
 * [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
@@ -37,6 +36,7 @@ Yes, but not any more than other projects currently and for past years.
 * [colorvariables](https://github.com/olokos/Chat-Processor/blob/master/scripting/include/colorvariables.inc)
 
 **Recommended:**
+* [Surftimer-Web-Stats](https://github.com/KristianP26/Surftimer-Web-Stats) - Web Statistics
 * [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (Suppresses console warnings)
 * [Stripper:Source](https://forums.alliedmods.net/showthread.php?t=39439) (Allows you to add/modify/removes entities from maps, recommended filter file included)
 
