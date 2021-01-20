@@ -52,6 +52,7 @@
 
 #### Optional
 
+* [Surftimer-Web-Stats](https://github.com/KristianP26/Surftimer-Web-Stats) - Web Statistics
 * [SMLib](https://github.com/bcserv/smlib/tree/transitional_syntax)
 * [ColorLib](https://github.com/c0rp3n/colorlib-sm/blob/master/addons/sourcemod/scripting/include/colorlib.inc) (colorlib.inc only)
 * [AutoExecConfig](https://github.com/Impact123/AutoExecConfig/)
