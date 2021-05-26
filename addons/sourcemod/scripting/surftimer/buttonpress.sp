@@ -1,37 +1,39 @@
 // Start Timer
 public void CL_OnStartTimerPress(int client)
 {
+	float fGetGameTime = GetGameTime();
+
 	if (!IsFakeClient(client))
 	{
 		if (IsValidClient(client))
 		{
 			if (!g_bServerDataLoaded)
 			{
-				if (GetGameTime() - g_fErrorMessage[client] > 1.0)
+				if (fGetGameTime - g_fErrorMessage[client] > 1.0)
 				{
 					CPrintToChat(client, "%t", "BPress1", g_szChatPrefix);
 					ClientCommand(client, "play buttons\\button10.wav");
-					g_fErrorMessage[client] = GetGameTime();
+					g_fErrorMessage[client] = fGetGameTime;
 				}
 				return;
 			}
 			else if (g_bLoadingSettings[client])
 			{
-				if (GetGameTime() - g_fErrorMessage[client] > 1.0)
+				if (fGetGameTime - g_fErrorMessage[client] > 1.0)
 				{
 					CPrintToChat(client, "%t", "BPress2", g_szChatPrefix);
 					ClientCommand(client, "play buttons\\button10.wav");
-					g_fErrorMessage[client] = GetGameTime();
+					g_fErrorMessage[client] = fGetGameTime;
 				}
 				return;
 			}
 			else if (!g_bSettingsLoaded[client])
 			{
-				if (GetGameTime() - g_fErrorMessage[client] > 1.0)
+				if (fGetGameTime - g_fErrorMessage[client] > 1.0)
 				{
 					CPrintToChat(client, "%t", "BPress3", g_szChatPrefix);
 					ClientCommand(client, "play buttons\\button10.wav");
-					g_fErrorMessage[client] = GetGameTime();
+					g_fErrorMessage[client] = fGetGameTime;
 				}
 				return;
 			}
@@ -40,7 +42,7 @@ public void CL_OnStartTimerPress(int client)
 		return;
 	}
 
-	if (!g_bSpectate[client] && !g_bNoClip[client] && ((GetGameTime() - g_fLastTimeNoClipUsed[client]) > 2.0))
+	if (!g_bSpectate[client] && !g_bNoClip[client] && ((fGetGameTime - g_fLastTimeNoClipUsed[client]) > 2.0))
 	{
 		if (g_bActivateCheckpointsOnStart[client])
 		g_bCheckpointsEnabled[client] = true;
@@ -48,17 +50,20 @@ public void CL_OnStartTimerPress(int client)
 		// Reset Run Variables
 		tmpDiff[client] = 9999.0;
 		g_fPauseTime[client] = 0.0;
+		g_fSrcpPauseTime[client] = 0.0;
 		g_fStartPauseTime[client] = 0.0;
 		g_bPause[client] = false;
 		SetEntityMoveType(client, MOVETYPE_WALK);
 		SetEntityRenderMode(client, RENDER_NORMAL);
-		g_fStartTime[client] = GetGameTime();
+		g_fStartTime[client] = fGetGameTime;
 		g_fCurrentRunTime[client] = 0.0;
+		g_fPracModeStartTime[client] = fGetGameTime;
 		g_bPositionRestored[client] = false;
 		g_bMissedMapBest[client] = true;
 		g_bMissedBonusBest[client] = true;
 		g_bTimerRunning[client] = true;
 		g_bTop10Time[client] = false;
+		
 		// Strafe Sync
 		g_iGoodGains[client] = 0;
 		g_iTotalMeasures[client] = 0;
@@ -196,10 +201,13 @@ public void CL_OnEndTimerPress(int client)
 
 	if (g_bPracticeMode[client])
 	{
+		// Get CurrentRunTime and format it to a string
+		FormatTimeFloat(client, g_fCurrentRunTime[client], 3, g_szPracticeTime[client], 32);
+
 		if (g_iClientInZone[client][2] > 0)
-			CPrintToChat(client, "%t", "BPress4", g_szChatPrefix, szName, g_szFinalTime[client]);
+			CPrintToChat(client, "%t", "BPress4", g_szChatPrefix, szName, g_szPracticeTime[client]);
 		else
-			CPrintToChat(client, "%t", "BPress5", g_szChatPrefix, szName, g_szFinalTime[client]);
+			CPrintToChat(client, "%t", "BPress5", g_szChatPrefix, szName, g_szPracticeTime[client]);
 		
 		/* Start function call */
 		Call_StartForward(g_PracticeFinishForward);
@@ -211,6 +219,9 @@ public void CL_OnEndTimerPress(int client)
 
 		/* Finish the call, get the result */
 		Call_Finish();
+
+		// Stop Timer
+		Client_Stop(client, 1);
 
 		return;
 	}
@@ -854,6 +865,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		}
 
 		db_selectWrcpRecord(client, 0, stage);
+		
 		g_bWrcpTimeractivated[client] = false;
 	}
 	else if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] != 0) // styles
@@ -880,7 +892,82 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		}
 
 		FormatTimeFloat(client, g_fFinalWrcpTime[client], 3, g_szFinalWrcpTime[client], 32);
+		
 		db_selectWrcpRecord(client, style, stage);
+		
 		g_bWrcpTimeractivated[client] = false;
 	}
+}
+
+public void CL_OnStartPracSrcpTimerPress(int client)
+{
+	float fGetGameTime = GetGameTime();
+
+	if (!g_bSpectate[client] && !g_bNoClip[client] && ((fGetGameTime - g_fLastTimeNoClipUsed[client]) > 2.0))
+	{
+		int zGroup = g_iClientInZone[client][2];
+		
+		
+		if(zGroup != 0)
+		{
+			return;
+		}
+		if (zGroup == 0)
+		{
+			g_bPracSrcpTimerActivated[client] = true;
+			g_fSrcpPauseTime[client] = 0.0;
+			g_fStartPracSrcpTime[client] = fGetGameTime;
+			
+			if (g_bSaveLocTele[client]) // Has the player teleported to saveloc?
+			{
+				g_iPracSrcpStage[client] = g_iPlayerPracLocationSnap[client][g_iLastSaveLocIdClient[client]];
+			}
+			else
+			{
+				g_iPracSrcpStage[client] = g_Stage[g_iClientInZone[client][2]][client];
+			}
+		}
+	}
+}
+
+public void CL_OnEndPracSrcpTimerPress(int client, float currentPracSrcpRunTime)
+{
+	if (!IsValidClient(client))
+	{
+		return;
+	}
+	
+	int stage = g_iPracSrcpStage[client];
+
+	if (g_bPracSrcpEndZone[client])
+	{
+		stage += 1;
+		g_bPracSrcpEndZone[client] = false;
+	}
+
+	if (stage > g_TotalStages) // Hack Fix for multiple end zone issue
+	{
+		stage = g_TotalStages;
+	}
+	else if (stage < 1)
+	{
+		stage = 1;
+	}
+
+	if (g_bPracSrcpTimerActivated[client])
+	{
+		g_fFinalPracSrcpTime[client] = currentPracSrcpRunTime;
+		g_bPracSrcpTimerActivated[client] = false;
+	}
+
+	if (g_fFinalPracSrcpTime[client] <= 0.0)
+	{
+		CPrintToChat(client, "%t", "ErrorPracWrcpTime", g_szChatPrefix, stage);
+		return;
+	}
+
+	FormatTimeFloat(client, g_fFinalPracSrcpTime[client], 3, g_szFinalPracSrcpTime[client], 32);
+	
+	int style = g_iCurrentStyle[client];
+	db_selectPracWrcpRecord(client, style, stage);
 }
