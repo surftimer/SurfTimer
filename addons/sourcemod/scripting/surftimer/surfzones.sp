@@ -181,8 +181,7 @@ public Action StartTouchTrigger(int caller, int activator)
 	action[2] = g_mapZones[id].ZoneGroup;
 
 	// Set Client targetName
-	if (!StrEqual("player", g_mapZones[id].TargetName))
-		DispatchKeyValue(activator, "targetname", g_mapZones[id].TargetName);
+	DispatchKeyValue(activator, "targetname", g_mapZones[id].TargetName);
 
 	// Hack fix to allow bonus zones to sit on top of start zones, e.g surf_aircontrol_ksf bonus 1
 	if (g_bTimerRunning[activator])
