@@ -24,7 +24,7 @@
 #undef REQUIRE_PLUGIN
 #include <dhooks>
 #include <mapchooser>
-#include <discord>
+
 #include <surftimer>
 
 /*===================================
@@ -670,10 +670,11 @@ bool g_bFixingRamp[MAXPLAYERS + 1];
 ConVar g_hSlopeFixEnable;
 
 /*----------  Forwards  ----------*/
-Handle g_MapFinishForward;
-Handle g_MapCheckpointForward;
-Handle g_BonusFinishForward;
-Handle g_PracticeFinishForward;
+GlobalForward g_MapFinishForward;
+GlobalForward g_NewRecordForward;
+GlobalForward g_MapCheckpointForward;
+GlobalForward g_BonusFinishForward;
+GlobalForward g_PracticeFinishForward;
 
 /*----------  SQL Variables  ----------*/
 
@@ -1285,10 +1286,6 @@ int g_iAllowCheckpointRecreation; // Int for allowCheckpointRecreation convar
 
 char g_sServerName[256];
 ConVar g_hHostName = null;
-
-// discord bugtracker
-char g_sBugType[MAXPLAYERS + 1][32];
-char g_sBugMsg[MAXPLAYERS + 1][256];
 
 // Teleport Destinations
 Handle g_hDestinations;
@@ -2710,8 +2707,8 @@ public void OnPluginStart()
 
 	// Forwards
 	g_MapFinishForward = CreateGlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell);
+	g_NewRecordForward = CreateGlobalForward("surftimer_OnNewRecord", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
 	g_MapCheckpointForward = CreateGlobalForward("surftimer_OnCheckpoint", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String);
-	g_BonusFinishForward = CreateGlobalForward("surftimer_OnBonusFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell, Param_Cell);
 	g_PracticeFinishForward = CreateGlobalForward("surftimer_OnPracticeFinished", ET_Event, Param_Cell, Param_Float, Param_String);
 
 	if (g_bLateLoaded)

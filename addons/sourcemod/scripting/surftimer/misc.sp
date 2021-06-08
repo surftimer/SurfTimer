@@ -1915,12 +1915,15 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		// Send Announcements
 		if (g_bMapSRVRecord[client])
 		{
-			if (GetConVarBool(g_hRecordAnnounce))
-				db_insertAnnouncement(szName, g_szMapName, 0, g_szFinalTime[client], 0);
-			char buffer[1024];
-			GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
-			if (!StrEqual(buffer, ""))
-				sendDiscordAnnouncement(szName, g_szMapName, g_szFinalTime[client]);
+			char szSteamId64[64];
+			GetClientAuthId(client, AuthId_SteamID64, szSteamId64, sizeof(szSteamId64), true);
+
+			if (GetConVarBool(g_hRecordAnnounce)) // Check if cross server announcements are enabled
+			{
+				db_insertAnnouncement(szName, g_szMapName, 0, g_szFinalTime[client], 0, 0);
+			}
+			
+			SendNewRecordForward(client, 0, szRecordDiff, false);
 		}
 
 		if (g_bTop10Time[client])
@@ -1950,7 +1953,6 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 
 		/* Finish the call, get the result */
 		Call_Finish();
-
 	}
 	// recalc avg
 	db_CalcAvgRunTime();
@@ -2055,13 +2057,15 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 	// Send Announcements
 	if (g_bBonusSRVRecord[client])
 	{
-		if (GetConVarBool(g_hRecordAnnounce))
-			db_insertAnnouncement(szName, g_szMapName, 1, g_szFinalTime[client], zGroup);
-		char buffer[1024], buffer1[1024];
-		GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
-		GetConVarString(g_hRecordAnnounceDiscordBonus, buffer1, 1024);
-		if (!StrEqual(buffer, "") && !StrEqual(buffer1, ""))
-			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup);
+		char szSteamId64[64];
+		GetClientAuthId(client, AuthId_SteamID64, szSteamId64, sizeof(szSteamId64), true);
+
+		if (GetConVarBool(g_hRecordAnnounce)) // Check if cross server announcements are enabled
+		{
+			db_insertAnnouncement(szName, g_szMapName, 1, g_szFinalTime[client], zGroup, 0);
+		}
+
+		SendNewRecordForward(client, 0, szRecordDiff, zGroup);
 	}
 
 	/* Start function call */
@@ -4153,8 +4157,21 @@ stock void StyleFinishedMsgs(int client, int style)
 		}
 
 		if (g_StyleMapRank[style][client] == 99999 && IsValidClient(client))
-			CPrintToChat(client, "%t", "Misc19", g_szChatPrefix);
+			CPrintToChat(client, "%t", "FailedSaveData", g_szChatPrefix);
 
+		// Send Announcements
+		if (g_bStyleMapSRVRecord[style][client])
+		{
+			char szSteamId64[64];
+			GetClientAuthId(client, AuthId_SteamID64, szSteamId64, sizeof(szSteamId64), true);
+			
+			if (GetConVarBool(g_hRecordAnnounceStyle)) //Check if cross server announcement for style is enabled
+			{	
+				db_insertAnnouncement(szName, g_szMapName, 2, g_szFinalTime[client], 0, style);
+			}
+
+			SendNewRecordForward(client, style, szRecordDiff2);
+		}
 		CalculatePlayerRank(client, style);
 		return;
 	}
@@ -4210,8 +4227,21 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 	CheckBonusStyleRanks(client, zGroup, style);
 
 	if (rank == 9999999 && IsValidClient(client))
-		CPrintToChat(client, "%t", "Misc19", g_szChatPrefix);
+		CPrintToChat(client, "%t", "FailedSaveData", g_szChatPrefix);
 
+	// Send Announcements
+	if (g_bBonusSRVRecord[client])
+	{
+		char szSteamId64[64];
+		GetClientAuthId(client, AuthId_SteamID64, szSteamId64, sizeof(szSteamId64), true);
+
+		if (GetConVarBool(g_hRecordAnnounceStyle)) //Check if cross server announcement for style is enabled
+		{
+			db_insertAnnouncement(szName, g_szMapName, 3, g_szFinalTime[client], zGroup, style);
+		}
+
+		SendNewRecordForward(client, style, szRecordDiff2, zGroup);
+	}
 	CalculatePlayerRank(client, style);
 	return;
 }
@@ -4452,59 +4482,6 @@ public void totalTimeForHumans(int unix, char[] buffer, int size)
 	}
 }
 
-public void sendDiscordAnnouncement(char szName[128], char szMapName[128], char szTime[32])
-{
-	char webhook[1024], webhookName[1024];
-	GetConVarString(g_hRecordAnnounceDiscord, webhook, 1024);
-	GetConVarString(g_dcMapRecordName, webhookName, 1024);
-	if (StrEqual(webhook, ""))
-		return;
-
-	// Send Discord Announcement
-	DiscordWebHook hook = new DiscordWebHook(webhook);
-	hook.SlackMode = true;
-
-	hook.SetUsername(webhookName);
-
-	// Format The Message
-	char szMessage[256];
-
-	Format(szMessage, sizeof(szMessage), "```md\n# New Server Record on %s #\n\n[%s] beat the server record on < %s > with a time of < %s > ]:```", g_sServerName, szName, szMapName, szTime);
-
-	hook.SetContent(szMessage);
-	hook.Send();
-	delete hook;
-}
-
-public void sendDiscordAnnouncementBonus(char szName[128], char szMapName[128], char szTime[32], int zGroup)
-{
-	char webhook[1024], webhookN[1024], webhookName[1024];
-	GetConVarString(g_hRecordAnnounceDiscord, webhookN, 1024);
-	GetConVarString(g_hRecordAnnounceDiscordBonus, webhook, 1024);
-	GetConVarString(g_dcBonusRecordName, webhookName, 1024);
-	if (StrEqual(webhook, ""))
-		if (StrEqual(webhookN, ""))
-			return;
-		else
-			webhook = webhookN;
-
-
- 	// Send Discord Announcement
-	DiscordWebHook hook = new DiscordWebHook(webhook);
-	hook.SlackMode = true;
-
-	hook.SetUsername(webhookName);
-
-	// Format The Message
-	char szMessage[256];
-
-	Format(szMessage, sizeof(szMessage), "```md\n# New Bonus Server Record on %s #\n\n[%s] beat the bonus %i server record on < %s > with a time of < %s > ]:```", g_sServerName, szName, zGroup, szMapName, szTime);
-
-	hook.SetContent(szMessage);
-	hook.Send();
-	delete hook;
-}
-
 bool IsPlayerVip(int client, bool admin = true, bool reply = false)
 {
 	if (admin)
@@ -4584,84 +4561,6 @@ public void TeleportToSaveloc(int client, int id)
 	DispatchKeyValue(client, "targetname", g_szSaveLocTargetname[id]);
 	SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, 0.0 } ));
 	TeleportEntity(client, g_fSaveLocCoords[client][id], g_fSaveLocAngle[client][id], g_fSaveLocVel[client][id]);
-}
-
-public void SendBugReport(int client)
-{
-	char webhook[1024];
-	GetConVarString(g_hReportBugsDiscord, webhook, 1024);
-	if (StrEqual(webhook, ""))
-		return;
-
-	// Send Discord Announcement
-	DiscordWebHook hook = new DiscordWebHook(webhook);
-	hook.SlackMode = true;
-
-	char dcBugTrackerName[64];
-	GetConVarString(g_dcBugTrackerName, dcBugTrackerName, sizeof(dcBugTrackerName));
-
-	hook.SetUsername(dcBugTrackerName);
-
-	MessageEmbed Embed = new MessageEmbed();
-
-	// Format Title
-	char sTitle[256];
-	Format(sTitle, sizeof(sTitle), "Bug Type: %s ║ Server: %s ║ Map: %s", g_sBugType[client], g_sServerName, g_szMapName);
-	Embed.SetTitle(sTitle);
-
-	// Format Player
-	char sName[MAX_NAME_LENGTH];
-	GetClientName(client, sName, sizeof(sName));
-
-	// Format Message
-	char sMessage[512];
-	Format(sMessage, sizeof(sMessage), "%s (%s): %s", sName, g_szSteamID[client], g_sBugMsg[client]);
-	Embed.AddField("", sMessage, true);
-
-	hook.Embed(Embed);
-	hook.Send();
-	delete hook;
-
-	CPrintToChat(client, "%t", "Misc44", g_szChatPrefix);
-}
-
-public void CallAdmin(int client, char[] sText)
-{
-	char webhook[1024];
-	GetConVarString(g_hCalladminDiscord, webhook, 1024);
-	if (StrEqual(webhook, ""))
-		return;
-
-	// Send Discord Announcement
-	DiscordWebHook hook = new DiscordWebHook(webhook);
-	hook.SlackMode = true;
-
-	char dcCalladminName[64];
-	GetConVarString(g_dcCalladminName, dcCalladminName, sizeof(dcCalladminName));
-
-	hook.SetUsername(dcCalladminName);
-
-	MessageEmbed Embed = new MessageEmbed();
-
-	// Format title
-	char sTitle[256];
-	Format(sTitle, sizeof(sTitle), "Server: %s ║ Map: %s", g_sServerName, g_szMapName);
-	Embed.SetTitle(sTitle);
-
-	// Format player
-	char sName[MAX_NAME_LENGTH];
-	GetClientName(client, sName, sizeof(sName));
-
-	// Format msg
-	char sMessage[512];
-	Format(sMessage, sizeof(sMessage), "%s (%s): @here %s", sName, g_szSteamID[client], sText);
-	Embed.AddField("", sMessage, true);
-
-	hook.Embed(Embed);
-	hook.Send();
-	delete hook;
-
-	CPrintToChat(client, "%t", "Misc45", g_szChatPrefix);
 }
 
 public void ReadDefaultTitlesWhitelist()
@@ -4889,4 +4788,20 @@ public void PrintPracSrcp(int client, int style, int stage, float fClientPbStage
 	}
 
 	CheckpointToSpec(client, szSpecMessage);
+}
+
+stock void SendNewRecordForward(int client, int style, char[] szRecordDiff, int bonusGroup = -1)
+{
+	/* Start New record function call */
+	Call_StartForward(g_NewRecordForward);
+
+	/* Push parameters one at a time */
+	Call_PushCell(client);
+	Call_PushCell(style);
+	Call_PushString(g_szFinalTime[client]);
+	Call_PushString(szRecordDiff);
+	Call_PushCell(bonusGroup);
+
+	/* Finish the call, get the result */
+	Call_Finish();
 }
