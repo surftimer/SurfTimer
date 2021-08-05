@@ -243,9 +243,11 @@ public Action StartTouchTrigger(int caller, int activator)
 			g_iClientInZone[activator][3] = id;
 			StartTouch(activator, action);
 		}
-		else
-			if (action[0] == 6 || action[0] == 7 || action[0] == 8 || action[0] == 0 || action[0] == 9 || action[0] == 10 || action[0] == 11) // Allow MISC zones regardless of zonegroup // fluffys add nojump, noduck
-				StartTouch(activator, action);
+		else if (action[0] == 6 || action[0] == 7 || action[0] == 8 || action[0] == 0 || action[0] == 9 || action[0] == 10 || action[0] == 11) // Allow MISC zones regardless of zonegroup // fluffys add nojump, noduck
+		{
+			g_iClientInZone[activator][3] = id;
+			StartTouch(activator, action);
+		}
 	}
 
 	return Plugin_Continue;
@@ -451,7 +453,7 @@ public void StartTouch(int client, int action[3])
 				
 				if (g_iCurrentStyle[client] == 0)
 				{
-					Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime);
+					Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime, GetAllSpeedTypes(client));
 				}
 				
 				if (!g_bSaveLocTele[client])
@@ -512,7 +514,7 @@ public void StartTouch(int client, int action[3])
 				// Announcing checkpoint in linear maps
 				if (g_iCurrentStyle[client] == 0)
 				{
-					Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime);
+					Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime, GetAllSpeedTypes(client));
 					
 					if (!g_bSaveLocTele[client])
 					{
@@ -549,8 +551,8 @@ public void StartTouch(int client, int action[3])
 		}
 		else if (action[0] == 11) // MaxSpeed
 		{
-			g_bInMaxSpeed[client] = true;
-			// CPrintToChat(client, "Inside MaxSpeed zone");
+			// g_bInMaxSpeed[client] = true;
+			MaxSpeedZoneLimiter(client);
 		}
 	}
 }
@@ -622,6 +624,28 @@ public void EndTouch(int client, int action[3])
 		// fluffys
 		else if (action[0] == 3) // fluffys stage
 		{
+			int AllSpeed[3], idiff;
+			AllSpeed = GetAllSpeedTypes(client);
+			int zoneGrp = action[2];
+			int zone = action[1];
+			int speedMode = g_SpeedMode[client];
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][0] = AllSpeed[0];
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][1] = AllSpeed[1];
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][2] = AllSpeed[2];
+
+			if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
+				idiff = g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode];
+			else if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] > g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode])
+				idiff = (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] - g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode]);
+			else
+				idiff = (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] - g_iCheckpointVelsStartServerRecord[0][zone][speedMode]);
+
+			if (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] > g_iCheckpointVelsStartServerRecord[0][zone][speedMode] || g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
+				Format(g_szLastSpeedDifference[client], 128, "(WR +%d)", idiff);
+			else
+				Format(g_szLastSpeedDifference[client], 128, "(WR -%d)", idiff);
+
+
 			// targetname filters
 			if (StrEqual(g_szMapName, "surf_treespam") && g_Stage[g_iClientInZone[client][2]][client] == 4)
 			{
@@ -648,6 +672,30 @@ public void EndTouch(int client, int action[3])
 			
 			CL_OnStartPracSrcpTimerPress(client);
 		}
+		else if (action[0] == 4) // stage & cp
+		{
+			int AllSpeed[3], idiff;
+			AllSpeed = GetAllSpeedTypes(client);
+			int zoneGrp = action[2];
+			int zone = action[1];
+			int speedMode = g_SpeedMode[client];
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][0] = AllSpeed[0];
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][1] = AllSpeed[1];
+			g_iCheckpointVelsStartNew[zoneGrp][client][zone][2] = AllSpeed[2];
+
+			if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
+				idiff = g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode];
+			else if (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] > g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode])
+				idiff = (g_iCheckpointVelsStartServerRecord[0][zone][speedMode] - g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode]);
+			else
+				idiff = (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] - g_iCheckpointVelsStartServerRecord[0][zone][speedMode]);
+
+			if (g_iCheckpointVelsStartNew[zoneGrp][client][zone][speedMode] > g_iCheckpointVelsStartServerRecord[0][zone][speedMode] || g_iCheckpointVelsStartServerRecord[0][zone][speedMode] == 0)
+				Format(g_szLastSpeedDifference[client], 128, "(WR +%d)", idiff);
+			else
+				Format(g_szLastSpeedDifference[client], 128, "(WR -%d)", idiff);
+
+		}
 		else if (action[0] == 9) // fluffys nojump
 		{
 			g_bInJump[client] = false;
@@ -658,8 +706,7 @@ public void EndTouch(int client, int action[3])
 		}
 		else if (action[0] == 11) // MaxSpeed zone
 		{
-			g_bInMaxSpeed[client] = false;
-		// 	CPrintToChat(client, "Left MaxSpeed zone");
+			// g_bInMaxSpeed[client] = false;
 		}
 
 		// Set client location

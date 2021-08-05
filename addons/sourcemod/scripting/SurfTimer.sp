@@ -86,7 +86,7 @@
 
 // Checkpoint Definitions
 // Maximum amount of checkpoints in a map
-#define CPLIMIT 37
+#define CPLIMIT 128
 
 // Zone Definitions
 #define ZONE_MODEL "models/props/de_train/barrel.mdl"
@@ -125,7 +125,7 @@
 #define MAX_LOCS 128
 
 //CSGO HUD Hint Fix
-#define MAX_HINT_SIZE 225
+#define MAX_HINT_SIZE 512
 
 /*====================================
 =            Enumerations            =
@@ -378,8 +378,8 @@ bool g_bJumpZoneTimer[MAXPLAYERS + 1] = false;
 bool g_bInStartZone[MAXPLAYERS + 1] = false;
 bool g_bInStageZone[MAXPLAYERS + 1];
 
-/*----------  MaxSpeed Variables  ----------*/
-bool g_bInMaxSpeed[MAXPLAYERS + 1];
+// /*----------  MaxSpeed Variables  ----------*/
+// bool g_bInMaxSpeed[MAXPLAYERS + 1];
 
 /*----------  VIP Variables  ----------*/
 ConVar g_hAutoVipFlag = null;
@@ -778,6 +778,9 @@ bool g_iDisableTriggers[MAXPLAYERS + 1];
 // auto reset
 bool g_iAutoReset[MAXPLAYERS + 1];
 
+// small hud
+bool g_bSmallHud[MAXPLAYERS + 1];
+
 /*----------  Run Variables  ----------*/
 
 // Clients personal record in map
@@ -877,6 +880,9 @@ char g_szRecordPlayer[MAX_NAME_LENGTH];
 
 // Checks if the bot is new, if so, set weapon
 bool g_bNewRecordBot;
+
+// Old Map Record
+float g_fOldRecordMapTime;
 
 // Checks if the bot is new, if so, set weapon
 bool g_bNewBonusBot;
@@ -1294,7 +1300,7 @@ char g_sBugMsg[MAXPLAYERS + 1][256];
 Handle g_hDestinations;
 
 // CPR command
-float g_fClientCPs[MAXPLAYERS + 1][36];
+float g_fClientCPs[MAXPLAYERS + 1][CPLIMIT];
 float g_fTargetTime[MAXPLAYERS + 1];
 char g_szTargetCPR[MAXPLAYERS + 1][MAX_NAME_LENGTH];
 char g_szCPRMapName[MAXPLAYERS + 1][128];
@@ -1369,6 +1375,39 @@ float g_iLastJump[MAXPLAYERS + 1];
 int g_iTicksOnGround[MAXPLAYERS + 1];
 bool g_bNewStage[MAXPLAYERS + 1];
 bool g_bLeftZone[MAXPLAYERS + 1];
+
+/*=====================
+=	New Vel Compare	=
+=====================*/
+
+// Velocity 0 = XY, 1 = XYZ, 2 = Z
+int g_iCheckpointVelsStartRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT][3];
+int g_iCheckpointVelsStartNew[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT][3];
+int g_iCheckpointVelsStartServerRecord[MAXZONEGROUPS][CPLIMIT][3];
+
+// Start Velocitys
+int g_iStartVelsServerRecord[MAXZONEGROUPS][3];
+int g_iStartVelsRecord[MAXPLAYERS + 1][MAXZONEGROUPS][3];
+int g_iStartVelsNew[MAXPLAYERS + 1][MAXZONEGROUPS][3];
+
+// End Velocitys
+int g_iEndVelsServerRecord[MAXZONEGROUPS][3];
+int g_iEndVelsRecord[MAXPLAYERS + 1][MAXZONEGROUPS][3];
+int g_iEndVelsNew[MAXPLAYERS + 1][MAXZONEGROUPS][3];
+
+// WRCP Velocitys
+int g_iWrcpVelsStartNew[MAXPLAYERS + 1][CPLIMIT][3];
+int g_iWrcpVelsStartRecord[MAXPLAYERS + 1][CPLIMIT][3];
+int g_iWrcpVelsStartServerRecord[CPLIMIT][3];
+
+// Speed Comparsion (hud) not even working on lubjams servers lul
+float g_fLastDifferenceSpeed[MAXPLAYERS + 1];
+char g_szLastSpeedDifference[MAXPLAYERS + 1][64];
+bool g_bShowSpeedDifferenceHud[MAXPLAYERS + 1];
+
+// do those really need to be global???
+int g_iClientVelsStart[MAXPLAYERS + 1][CPLIMIT][3];
+int g_iTargetVelsStart[MAXPLAYERS + 1][CPLIMIT][3];
 
 /*===================================
 =         Predefined Arrays         =

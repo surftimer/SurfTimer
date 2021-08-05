@@ -29,7 +29,6 @@ public int NewMapMenuHandler(Menu menu, MenuAction action, int param1, int param
 
 public void db_ViewNewestMaps(int client)
 {
-	char sql_selectNewestMaps[] = "SELECT mapname, date FROM ck_newmaps ORDER BY date DESC LIMIT 50";
 	SQL_TQuery(g_hDb, sql_selectNewestMapsCallback, sql_selectNewestMaps, client, DBPrio_Low);
 }
 
@@ -72,7 +71,6 @@ public void sql_selectNewestMapsCallback(Handle owner, Handle hndl, const char[]
 
 public void db_InsertNewestMaps()
 {
-	char sql_insertNewestMaps[] = "INSERT INTO ck_newmaps (mapname) VALUES('%s');";
 	char szQuery[512];
 	Format(szQuery, 512, sql_insertNewestMaps, g_szMapName);
 	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
@@ -92,8 +90,6 @@ public void db_present()
 
 public void db_upgradeDbNewMap()
 {
-	char sql_createNewestMaps[] = "CREATE TABLE IF NOT EXISTS ck_newmaps (mapname VARCHAR(32), date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(mapname)) DEFAULT CHARSET=utf8mb4;";
-
 	Transaction createTableTnx = SQL_CreateTransaction();
 
 	SQL_AddQuery(createTableTnx, sql_createNewestMaps);

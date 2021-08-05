@@ -418,15 +418,15 @@
 		"en"		"{1} The server hasn't finished loading your settings, please wait"
 	}
 	"BPress4"
-	{
-		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {yellow}{2}{default} finished the bonus in [{blue}{3}{default}] in practice mode!"
-	}
-	"BPress5"
-	{
-		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {yellow}{2}{default} finished the map in [{blue}{3}{default}] in practice mode!"
-	}
+    {
+        "#format"    "{1:s},{2:s},{3:s},{4:s},{5:s},{6:i}"
+        "en"        "{1} [{blue}Practice{default}] {yellow}{2}{default} finished bonus {6} in {lightblue}{3}{default} [{blue}PR{default}: {5} | {yellow}SR{default}: {4}]"
+    }
+    "BPress5"
+    {
+        "#format"    "{1:s},{2:s},{3:s},{4:s},{5:s}"
+        "en"        "{1} [{blue}Practice{default}] {yellow}{2}{default} finished the map in [{lightblue}{3}{default}] [{blue}PR{default}: {5} | {yellow}SR{default}: {4}]"
+    }
 	"BPress6"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
@@ -1323,22 +1323,22 @@
 	"Misc30"
 	{
 		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s}"
-		"en"		"{1} CP [{lightgreen}{2}{default}]: {lightgreen}{3} {default}[PB: {4}{default} | {5}{default}]"
+		"en"		"{1} {yellow}Checkpoint {2}{default}: {lightgreen}{3} {default}[PB: {4}{default} | {5}{default}]"
 	}
 	"Misc31"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:s}"
-		"en"		"{1} {yellow}{2} {default}| CP [{lightgreen}{3}{default}]: {lightgreen}{4} {default}[PB: {5}{default} | {6}{default}]"
+		"en"		"{1} {yellow}{2} {default}| {yellow}Checkpoint {3}{default}: {lightgreen}{4} {default}[PB: {5}{default} | {6}{default}]"
 	}
 	"Misc32"
 	{
 		"#format"	"{1:s},{2:i},{3:s},{4:s}"
-		"en"		"{1} CP [{lightgreen}{2}{default}]: {lightgreen}{3} {default}[PB: {lightgreen}N/A{default} | {4}{default}]"
+		"en"		"{1} {yellow}Checkpoint {2}{default}: {lightgreen}{3} {default}[PB: {lightgreen}N/A{default} | {4}{default}]"
 	}
 	"Misc33"
 	{
 		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s}"
-		"en"		"{1} {yellow}{2} {default}| CP [{lightgreen}{3}{default}]: {lightgreen}{4} {default}[PB: {lightgreen}N/A{default} | {5}{default}]"
+		"en"		"{1} {yellow}{2} {default}| {yellow}Checkpoint {3}{default}: {lightgreen}{4} {default}[PB: {lightgreen}N/A{default} | {5}{default}]"
 	}
 	"Misc34"
 	{
@@ -1632,13 +1632,23 @@
 	}
 	"StartPrestrafe"
 	{
-		"#format"	"{1:s},{2:s}"
-		"en"		"{1} Start Prestrafe: {2} u/s"
+		"#format"	"{1:s},{2:i},{3:s},{4:s}"
+		"en"		"{1} {green}Start{default}: {2} u/s [{blue}PB{default}: {3} | {yellow}SR{default}: {4}]"
 	}
 	"StagePrestrafe"
 	{
-		"#format"	"{1:s},{2:i},{3:s}"
-		"en"		"{1} Stage {2} Prestrafe: {3} u/s"
+		"#format"	"{1:s},{2:i},{3:i},{4:s},{5:s}"
+		"en"		"{1} {lime}Stage {2}{default}: {3} u/s [{blue}PB{default}: {4} | {yellow}SR{default}: {5}]"
+	}
+	"EndSpeed"
+	{
+		"#format"	"{1:s},{2:i},{3:s},{4:s}"
+		"en"		"{1} {red}End{default}: {2} u/s [{blue}PB{default}: {3} | {yellow}SR{default}: {4}]"
+	}
+	"CheckpointSpeed"
+	{
+		"#format"	"{1:s},{2:i},{3:i},{4:s},{5:s}"
+		"en"		"{1} {yellow}Checkpoint {2}{default}: {3} u/s {default}[{blue}PB{default}: {4} | {yellow}SR{default}: {5}]"
 	}
 	"SilentSpecMessageToggleOn"
 	{
@@ -1663,12 +1673,12 @@
 	"ToggleCpsMessageToggleOn"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} CP messages are now {green}enabled"
+		"en"		"{1} Checkpoint messages are now {green}enabled"
 	}
 	"ToggleCpsMessageToggleOff"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} CP messages are now {red}disabled"
+		"en"		"{1} Checkpoint messages are now {red}disabled"
 	}
 	"QuakeToggleOn"
 	{
