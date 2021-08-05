@@ -162,7 +162,7 @@ public Action StartTouchTrigger(int caller, int activator)
 
 	// Ignore dead players
 	if (!IsValidClient(client)) {
-		return Plugin_Handled;
+		return Plugin_Continue;
     }
 
 	char sTargetName[256];
@@ -187,14 +187,14 @@ public Action StartTouchTrigger(int caller, int activator)
 		{
 			if (action[2] != g_iInBonus[activator])
 			{
-				return Plugin_Handled;
+				return Plugin_Continue;
 			}
 		}
 		else
 		{
 			if (!g_bInBonus[activator] && action[2] > 0)
 			{
-				return Plugin_Handled;
+				return Plugin_Continue;
 			}
 
 			else if (StrEqual(g_szMapName, "surf_christmas2") && !g_bUsingStageTeleport[activator])
@@ -202,7 +202,7 @@ public Action StartTouchTrigger(int caller, int activator)
 				if (action[0] == 3)
 				{
 					if (action[1] > (g_Stage[g_iClientInZone[activator][2]][activator] + 1) || action[1] < (g_Stage[g_iClientInZone[activator][2]][activator] - 1))
-						return Plugin_Handled;
+						return Plugin_Continue;
 				}
 			}
 		}
@@ -212,7 +212,7 @@ public Action StartTouchTrigger(int caller, int activator)
 		if (!g_bInBonus[activator] && action[2] > 0)
 		{
 			g_bInBonus[activator] = false;
-			return Plugin_Handled;
+			return Plugin_Continue;
 		}
 		else if (action[2] > 0)
 			g_bInBonus[activator] = true;
@@ -220,10 +220,6 @@ public Action StartTouchTrigger(int caller, int activator)
 
 	if (g_bUsingStageTeleport[activator])
 		g_bUsingStageTeleport[activator] = false;
-
-	// Set Client targetName
-	if (!StrEqual("player", g_mapZones[id].TargetName))
-		DispatchKeyValue(activator, "targetname", g_mapZones[id].TargetName);
 
 	if (action[2] == g_iClientInZone[activator][2]) // Is touching zone in right zonegroup
 	{
@@ -252,7 +248,7 @@ public Action StartTouchTrigger(int caller, int activator)
 				StartTouch(activator, action);
 	}
 
-	return Plugin_Handled;
+	return Plugin_Continue;
 }
 
 public Action EndTouchTrigger(int caller, int activator)
@@ -261,7 +257,7 @@ public Action EndTouchTrigger(int caller, int activator)
 
 	// Ignore dead players
 	if (!IsValidClient(client)) {
-		return Plugin_Handled;
+		return Plugin_Continue;
     }
 
 	// For new speed limiter
@@ -271,7 +267,7 @@ public Action EndTouchTrigger(int caller, int activator)
 	if (g_bIgnoreZone[activator])
 	{
 		g_bIgnoreZone[activator] = false;
-		return Plugin_Handled;
+		return Plugin_Continue;
 	}
 
 	// Reset Prehop Limit
@@ -293,12 +289,12 @@ public Action EndTouchTrigger(int caller, int activator)
 	action[2] = g_mapZones[id].ZoneGroup;
 
 	if (action[2] != g_iClientInZone[activator][2] || action[0] == 6 || action[0] == 8 || action[0] != g_iClientInZone[activator][0]) // Ignore end touches in other zonegroups, zones that teleports away or multiple zones on top of each other // fluffys
-		return Plugin_Handled;
+		return Plugin_Continue;
 
 	// End touch
 	EndTouch(activator, action);
 
-	return Plugin_Handled;
+	return Plugin_Continue;
 }
 
 public void StartTouch(int client, int action[3])
