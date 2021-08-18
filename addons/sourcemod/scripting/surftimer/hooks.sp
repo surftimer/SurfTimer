@@ -1317,11 +1317,18 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 			{
 				if (g_bFirstJump[client])
 				{
-					if (cTime > 0.8)
+					if (cTime > 0.8 && g_iCurrentStyle[client] != 4 && g_iCurrentStyle[client] != 5) // cTime Normal Threshold + Exclude LG/SM
 					{
 						g_bFirstJump[client] = true;
 						g_iLastJump[client] = GetGameTime();
 					}
+
+					else if (cTime > 1.6 && (g_iCurrentStyle[client] == 4 || g_iCurrentStyle[client] == 5)) // LG/SM jump time threshold
+					{
+						g_bFirstJump[client] = true;
+						g_iLastJump[client] = GetGameTime();
+					}
+					
 					else
 					{
 						g_iLastJump[client] = GetGameTime();
@@ -1336,11 +1343,19 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 			}
 			else
 			{
-				if (cTime > 1)
+				// 0.2s no-jump buffer (cTime + 0.2) to register as no longer in bhop.
+				if (cTime > 1 && g_iCurrentStyle[client] != 4 && g_iCurrentStyle[client] != 5) // Not LG/SM
 				{
 					g_bInBhop[client] = false;
 					g_iLastJump[client] = GetGameTime();
 				}
+
+				else if (cTime > 1.8 && (g_iCurrentStyle[client] == 4 || g_iCurrentStyle[client] == 5)) // LG/SM
+				{
+					g_bInBhop[client] = false;
+					g_iLastJump[client] = GetGameTime();
+				}
+
 				else
 				{
 					g_iLastJump[client] = GetGameTime();
