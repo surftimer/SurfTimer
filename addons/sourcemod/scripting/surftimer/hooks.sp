@@ -1374,7 +1374,10 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 						g_bJumpedInZone[client] = true;
 						g_bResetOneJump[client] = true;
 						g_fJumpedInZoneTime[client] = GetGameTime();
-						CreateTimer(1.0, ResetOneJump, client, TIMER_FLAG_NO_MAPCHANGE);
+						if (g_iCurrentStyle[client] == 5 || g_iCurrentStyle[client] == 4)
+							CreateTimer(1.7, ResetOneJump, client, TIMER_FLAG_NO_MAPCHANGE);
+						else
+							CreateTimer(1.0, ResetOneJump, client, TIMER_FLAG_NO_MAPCHANGE);
 					}
 					else
 					{
@@ -1382,7 +1385,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 						float time = GetGameTime();
 						float time2 = time - g_fJumpedInZoneTime[client];
 						g_bJumpedInZone[client] = false;
-						if (time2 <= 0.9)
+						if ((time2 <= 0.9 && g_iCurrentStyle[client] != 4 && g_iCurrentStyle[client] != 5) || (time2 <= 1.6 && (g_iCurrentStyle[client] == 4 || g_iCurrentStyle[client] == 5)))
 						{
 							CPrintToChat(client, "%t", "Hooks15", g_szChatPrefix);
 							Handle pack;
