@@ -3142,7 +3142,7 @@ public Action Command_SetDbTitle(int client, int args)
 		{
 			if (StrContains(UnallowedTitles[i], upperArg)!=-1)
 			{
-				arg = "{pink}Fag";
+				arg = "{red}DISALLOWED";
 				break;
 			}
 		}
