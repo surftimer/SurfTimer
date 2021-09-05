@@ -93,16 +93,15 @@ public int Handle_VoteMenuExtend(Menu menu, MenuAction action, int param1, int p
 		menu.GetItem(param1, item, sizeof(item), _, display, sizeof(display));
 		GetMenuVoteInfo(param2, iWinVotes, iTotalVotes);
 
-		float winVotes = float(iWinVotes);
 		float totalVotes = float(iTotalVotes);
-		float votes = 0.0;
+		float votes = float(iWinVotes);
 
 		if (strcmp(item, VOTE_NO) == 0 && param1 == 1)
 		{
 			votes = totalVotes - votes;
 		}
 
-		percent = float(votes / totalVotes);
+		percent = votes / totalVotes;
 
 		GetCurrentMaptime();
 		int iTimeLimit = GetConVarInt(mapTime);
