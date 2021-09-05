@@ -7789,12 +7789,12 @@ public void db_selectPlayerRank(int client, int rank, char szSteamId[32])
 	{
 		g_rankArg[client] = rank;
 		rank -= 1;
-		Format(szQuery, 1024, "SELECT `name`, `points` FROM `ck_playerrank` ORDER BY `points` DESC LIMIT %i, 1;", rank);
+		Format(szQuery, 1024, "SELECT `name`, `points` FROM `ck_playerrank` WHERE `style` = 0 ORDER BY `points` DESC LIMIT %i, 1;", rank);
 	}
 	else if (rank == 0) // Self Rank Cmd
 	{
 		g_rankArg[client] = -1;
-		Format(szQuery, 1024, "SELECT `name`, `points` FROM `ck_playerrank` WHERE `steamid` = '%s';", szSteamId);
+		Format(szQuery, 1024, "SELECT `name`, `points` FROM `ck_playerrank` WHERE `steamid` = '%s' AND `style` = 0;", szSteamId);
 	}
 
 	SQL_TQuery(g_hDb, db_selectPlayerRankCallback, szQuery, client, DBPrio_Low);
