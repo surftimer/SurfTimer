@@ -2050,7 +2050,7 @@ public void sql_selectMapRecordCallback(Handle owner, Handle hndl, const char[] 
 public void db_selectTopSurfers(int client, char mapname[128])
 {
 	char szQuery[1024];
-	Format(szQuery, 1024, sql_selectTopSurfers, mapname);
+	Format(szQuery, 1024, sql_selectTopSurfers, mapname, 0, 0);
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackString(pack, mapname);
@@ -2063,7 +2063,7 @@ public void db_selectMapTopSurfers(int client, char mapname[128])
 	char szQuery[1024];
 	char type[128];
 	type = "normal";
-	Format(szQuery, 1024, sql_selectTopSurfers, mapname);
+	Format(szQuery, 1024, sql_selectTopSurfers, mapname, 0, 0);
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackString(pack, mapname);
@@ -2091,21 +2091,17 @@ public void sql_selectTopSurfersCallback(Handle owner, Handle hndl, const char[]
 	char szName[64];
 	float time;
 	char szSteamID[32];
-	char lineBuf[256];
-	Handle stringArray = CreateArray(100);
 
 	Handle menu;
 	menu = CreateMenu(MapMenuHandler1);
 	SetMenuPagination(menu, 5);
 
-	bool bduplicat = false;
 	char title[256];
 	if (SQL_HasResultSet(hndl))
 	{
 		int i = 1;
 		while (SQL_FetchRow(hndl))
 		{
-			bduplicat = false;
 			SQL_FetchString(hndl, 0, szSteamID, 32);
 			SQL_FetchString(hndl, 1, szName, 64);
 			time = SQL_FetchFloat(hndl, 2);
@@ -2113,14 +2109,7 @@ public void sql_selectTopSurfersCallback(Handle owner, Handle hndl, const char[]
 
 			if (i == 1 || (i > 1 && StrEqual(szFirstMap, szMap)))
 			{
-				int stringArraySize = GetArraySize(stringArray);
-				for (int x = 0; x < stringArraySize; x++)
-				{
-					GetArrayString(stringArray, x, lineBuf, sizeof(lineBuf));
-					if (StrEqual(lineBuf, szName, false))
-						bduplicat = true;
-				}
-				if (bduplicat == false && i < 51)
+				if (i < 51)
 				{
 					char szTime[32];
 					FormatTimeFloat(client, time, 3, szTime, sizeof(szTime));
@@ -2135,7 +2124,6 @@ public void sql_selectTopSurfersCallback(Handle owner, Handle hndl, const char[]
 						Format(szValue, 128, "[0%i.] %s |    » %s", i, szTime, szName);
 
 					AddMenuItem(menu, szSteamID, szValue, ITEMDRAW_DEFAULT);
-					PushArrayString(stringArray, szName);
 
 					if (i == 1)
 						Format(szFirstMap, 128, "%s", szMap);
@@ -2163,7 +2151,6 @@ public void sql_selectTopSurfersCallback(Handle owner, Handle hndl, const char[]
 		default: Format(title, 256, "Top 50 Times on %s \n    Rank    Time               Player", szFirstMap);
 	}
 
-	CloseHandle(stringArray);
 	SetMenuTitle(menu, title);
 	SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
@@ -2284,10 +2271,8 @@ public void sql_selectTopBonusSurfersCallback(Handle owner, Handle hndl, const c
 	int zGrp = ReadPackCell(data);
 	CloseHandle(data);
 
-	char szFirstMap[128], szValue[128], szName[64], szSteamID[32], lineBuf[256], title[256];
+	char szFirstMap[128], szValue[128], szName[64], szSteamID[32], title[256];
 	float time;
-	bool bduplicat = false;
-	Handle stringArray = CreateArray(100);
 	Menu topMenu;
 
 	topMenu = new Menu(MapMenuHandler1);
@@ -2299,36 +2284,27 @@ public void sql_selectTopBonusSurfersCallback(Handle owner, Handle hndl, const c
 		int i = 1;
 		while (SQL_FetchRow(hndl))
 		{
-			bduplicat = false;
 			SQL_FetchString(hndl, 0, szSteamID, 32);
 			SQL_FetchString(hndl, 1, szName, 64);
 			time = SQL_FetchFloat(hndl, 2);
 			SQL_FetchString(hndl, 4, szMap, 128);
 			if (i == 1 || (i > 1 && StrEqual(szFirstMap, szMap)))
 			{
-				int stringArraySize = GetArraySize(stringArray);
-				for (int x = 0; x < stringArraySize; x++)
-				{
-					GetArrayString(stringArray, x, lineBuf, sizeof(lineBuf));
-					if (StrEqual(lineBuf, szName, false))
-					bduplicat = true;
-				}
-				if (bduplicat == false && i < 51)
+				if (i < 51)
 				{
 					char szTime[32];
 					FormatTimeFloat(client, time, 3, szTime, sizeof(szTime));
 					if (time < 3600.0)
-					Format(szTime, 32, "   %s", szTime);
+						Format(szTime, 32, "   %s", szTime);
 					if (i == 100)
-					Format(szValue, 128, "[%i.] %s |    » %s", i, szTime, szName);
+						Format(szValue, 128, "[%i.] %s |    » %s", i, szTime, szName);
 					if (i >= 10)
-					Format(szValue, 128, "[%i.] %s |    » %s", i, szTime, szName);
+						Format(szValue, 128, "[%i.] %s |    » %s", i, szTime, szName);
 					else
-					Format(szValue, 128, "[0%i.] %s |    » %s", i, szTime, szName);
+						Format(szValue, 128, "[0%i.] %s |    » %s", i, szTime, szName);
 					topMenu.AddItem(szSteamID, szValue, ITEMDRAW_DEFAULT);
-					PushArrayString(stringArray, szName);
 					if (i == 1)
-					Format(szFirstMap, 128, "%s", szMap);
+						Format(szFirstMap, 128, "%s", szMap);
 					i++;
 				}
 			}
@@ -2344,7 +2320,6 @@ public void sql_selectTopBonusSurfersCallback(Handle owner, Handle hndl, const c
 	topMenu.SetTitle(title);
 	topMenu.OptionFlags = MENUFLAG_BUTTON_EXIT;
 	topMenu.Display(client, MENU_TIME_FOREVER);
-	CloseHandle(stringArray);
 }
 
 public void db_currentRunRank(int client)
@@ -6474,33 +6449,22 @@ public void sql_selectStageTopSurfersCallback(Handle owner, Handle hndl, const c
 	float time;
 	char szMap[128];
 	char szValue[128];
-	char lineBuf[256];
-	Handle stringArray = CreateArray(100);
 	Handle menu;
 	menu = CreateMenu(StageTopMenuHandler);
 	SetMenuPagination(menu, 5);
-	bool bduplicat = false;
 	char title[256];
 	if (SQL_HasResultSet(hndl))
 	{
 		int i = 1;
 		while (SQL_FetchRow(hndl))
 		{
-			bduplicat = false;
 			SQL_FetchString(hndl, 0, szSteamID, 32);
 			SQL_FetchString(hndl, 1, szName, 64);
 			time = SQL_FetchFloat(hndl, 2);
 			SQL_FetchString(hndl, 4, szMap, 128);
 			if (i == 1 || (i > 1))
 			{
-				int stringArraySize = GetArraySize(stringArray);
-				for (int x = 0; x < stringArraySize; x++)
-				{
-					GetArrayString(stringArray, x, lineBuf, sizeof(lineBuf));
-					if (StrEqual(lineBuf, szName, false))
-					bduplicat = true;
-				}
-				if (bduplicat == false && i < 51)
+				if (i < 51)
 				{
 					char szTime[32];
 					FormatTimeFloat(client, time, 3, szTime, sizeof(szTime));
@@ -6513,7 +6477,6 @@ public void sql_selectStageTopSurfersCallback(Handle owner, Handle hndl, const c
 					else
 					Format(szValue, 128, "[0%i.] %s |    » %s", i, szTime, szName);
 					AddMenuItem(menu, szSteamID, szValue, ITEMDRAW_DEFAULT);
-					PushArrayString(stringArray, szName);
 					i++;
 				}
 			}
@@ -6530,7 +6493,6 @@ public void sql_selectStageTopSurfersCallback(Handle owner, Handle hndl, const c
 	SetMenuTitle(menu, title);
 	SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
-	CloseHandle(stringArray);
 }
 
 public int StageTopMenuHandler(Menu menu, MenuAction action, int client, int item)
@@ -6945,7 +6907,7 @@ public void db_viewStyleMapRankCallback(Handle owner, Handle hndl, const char[] 
 public void db_selectStyleMapTopSurfers(int client, char mapname[128], int style)
 {
 	char szQuery[1024];
-	Format(szQuery, 1024, "SELECT db2.steamid, db1.name, db2.runtimepro as overall, db1.steamid, db2.mapname FROM ck_playertimes as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname LIKE '%c%s%c' AND db2.style = %i AND db2.runtimepro > -1.0 ORDER BY overall ASC LIMIT 100;", PERCENT, mapname, PERCENT, style);
+	Format(szQuery, 1024, sql_selectTopSurfers, mapname, style, style);
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackString(pack, mapname);
@@ -7318,7 +7280,7 @@ public void sql_viewStyleWrcpMapCallback(Handle owner, Handle hndl, const char[]
 public void db_selectStageStyleTopSurfers(int client, char info[32], char mapname[128], int style)
 {
 	char szQuery[1024];
-	Format(szQuery, 1024, "SELECT db2.steamid, db1.name, db2.runtimepro as overall, db1.steamid, db2.mapname FROM ck_wrcps as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname = '%s' AND db2.style = %i AND db2.stage = %i AND db2.runtimepro > -1.0 ORDER BY overall ASC LIMIT 50;", mapname, style, info);
+	Format(szQuery, 1024, "SELECT db2.steamid, db1.name, db2.runtimepro as overall, db1.steamid, db2.mapname FROM ck_wrcps as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname = '%s' AND db1.style = %i AND db2.style = %i AND db2.stage = %i AND db2.runtimepro > -1.0 ORDER BY overall ASC LIMIT 50;", mapname, style, style, info);
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackCell(pack, style);
@@ -7349,46 +7311,34 @@ public void sql_selectStageStyleTopSurfersCallback(Handle owner, Handle hndl, co
 	float time;
 	char szMap[128];
 	char szValue[128];
-	char lineBuf[256];
-	Handle stringArray = CreateArray(100);
 	Handle menu;
 	menu = CreateMenu(StageStyleTopMenuHandler);
 	SetMenuPagination(menu, 5);
-	bool bduplicat = false;
 	char title[256];
 	if (SQL_HasResultSet(hndl))
 	{
 		int i = 1;
 		while (SQL_FetchRow(hndl))
 		{
-			bduplicat = false;
 			SQL_FetchString(hndl, 0, szSteamID, 32);
 			SQL_FetchString(hndl, 1, szName, 64);
 			time = SQL_FetchFloat(hndl, 2);
 			SQL_FetchString(hndl, 4, szMap, 128);
 			if (i == 1 || (i > 1))
 			{
-				int stringArraySize = GetArraySize(stringArray);
-				for (int x = 0; x < stringArraySize; x++)
-				{
-					GetArrayString(stringArray, x, lineBuf, sizeof(lineBuf));
-					if (StrEqual(lineBuf, szName, false))
-						bduplicat = true;
-				}
-				if (bduplicat == false && i < 51)
+				if (i < 51)
 				{
 					char szTime[32];
 					FormatTimeFloat(client, time, 3, szTime, sizeof(szTime));
 					if (time < 3600.0)
-					Format(szTime, 32, "   %s", szTime);
+						Format(szTime, 32, "   %s", szTime);
 					if (i == 100)
-					Format(szValue, 128, "[%i.] %s |    » %s", i, szTime, szName);
+						Format(szValue, 128, "[%i.] %s |    » %s", i, szTime, szName);
 					if (i >= 10)
-					Format(szValue, 128, "[%i.] %s |    » %s", i, szTime, szName);
+						Format(szValue, 128, "[%i.] %s |    » %s", i, szTime, szName);
 					else
-					Format(szValue, 128, "[0%i.] %s |    » %s", i, szTime, szName);
+						Format(szValue, 128, "[0%i.] %s |    » %s", i, szTime, szName);
 					AddMenuItem(menu, szSteamID, szValue, ITEMDRAW_DEFAULT);
-					PushArrayString(stringArray, szName);
 					i++;
 				}
 			}
@@ -7405,7 +7355,6 @@ public void sql_selectStageStyleTopSurfersCallback(Handle owner, Handle hndl, co
 	SetMenuTitle(menu, title);
 	SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
-	CloseHandle(stringArray);
 }
 
 public int StageStyleTopMenuHandler(Menu menu, MenuAction action, int client, int item)
