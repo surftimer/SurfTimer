@@ -88,27 +88,15 @@ public int Handle_VoteMenuExtend(Menu menu, MenuAction action, int param1, int p
 	{
 		char item[64], display[64];
 		float percent, limit;
-		int iWinVotes, iTotalVotes;
+		int votes, totalVotes;
 
 		menu.GetItem(param1, item, sizeof(item), _, display, sizeof(display));
-		GetMenuVoteInfo(param2, iWinVotes, iTotalVotes);
-
-		float winVotes = float(iWinVotes);
-		float totalVotes = float(iTotalVotes);
-		float votes = 0.0;
+		GetMenuVoteInfo(param2, votes, totalVotes);
 
 		if (strcmp(item, VOTE_NO) == 0 && param1 == 1)
-<<<<<<< HEAD
 		votes = totalVotes - votes;
 
 		percent = view_as<float>(votes) / view_as<float>(totalVotes);
-=======
-		{
-			votes = totalVotes - winVotes;
-		}
-
-		percent = votes / totalVotes;
->>>>>>> 62286a2 (Fix incorrect percentage value)
 
 		GetCurrentMaptime();
 		int iTimeLimit = GetConVarInt(mapTime);
@@ -121,11 +109,11 @@ public int Handle_VoteMenuExtend(Menu menu, MenuAction action, int param1, int p
 		/* 0=yes, 1=no */
 		if ((strcmp(item, VOTE_YES) == 0 && FloatCompare(percent,limit) < 0 && param1 == 0) || (strcmp(item, VOTE_NO) == 0 && param1 == 1))
 		{
-			CPrintToChatAll("%t", "CVote8", g_szChatPrefix, RoundToNearest(100.0*limit), RoundToNearest(100.0*percent), iTotalVotes);
+			CPrintToChatAll("%t", "CVote8", g_szChatPrefix, RoundToNearest(100.0*limit), RoundToNearest(100.0*percent), totalVotes);
 		}
 		else
 		{
-			CPrintToChatAll("%t", "CVote9", g_szChatPrefix, RoundToNearest(100.0*percent), iTotalVotes);
+			CPrintToChatAll("%t", "CVote9", g_szChatPrefix, RoundToNearest(100.0*percent), totalVotes);
 			CPrintToChatAll("%t", "CVote10", g_szChatPrefix);
 			extendMap(600);
 		}
