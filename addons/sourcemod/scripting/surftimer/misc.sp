@@ -2657,7 +2657,7 @@ public bool CheatFlag(const char[] voice_inputfromfile, bool isCommand, bool rem
 	}
 }
 
-public void StringRGBtoInt(char color[24], intColor[4])
+public void StringRGBtoInt(char color[24], int intColor[4])
 {
 	char sPart[4][24];
 	ExplodeString(color, " ", sPart, sizeof(sPart), sizeof(sPart[]));
