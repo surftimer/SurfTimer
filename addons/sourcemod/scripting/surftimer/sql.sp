@@ -6814,7 +6814,7 @@ public void db_GetStyleMapRecord_Pro(int style)
 	SQL_TQuery(g_hDb, sql_selectStyleMapRecordCallback, szQuery, style, DBPrio_Low);
 }
 
-public void sql_selectStyleMapRecordCallback(Handle owner, Handle hndl, const char[] error, any style)
+public void sql_selectStyleMapRecordCallback(Handle owner, Handle hndl, const char[] error, int style)
 {
 	if (hndl == null)
 	{
@@ -6854,7 +6854,7 @@ public void db_viewStyleMapRankCount(int style)
 	SQL_TQuery(g_hDb, sql_selectStylePlayerCountCallback, szQuery, style, DBPrio_Low);
 }
 
-public void sql_selectStylePlayerCountCallback(Handle owner, Handle hndl, const char[] error, any style)
+public void sql_selectStylePlayerCountCallback(Handle owner, Handle hndl, const char[] error, int style)
 {
 	if (hndl == null)
 	{
