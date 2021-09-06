@@ -2897,7 +2897,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 /*======  End of Natives  ======*/
 
-public Action ItemFoundMsg(UserMsg msg_id, Handle pb, const players[], any playersNum, any reliable, any init)
+public Action ItemFoundMsg(UserMsg msg_id, BfRead msg, const int[] players, int playersNum, bool reliable, bool init)
 {
 	return Plugin_Handled;
 }
