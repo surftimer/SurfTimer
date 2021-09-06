@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sm_version: [ "1.10", "1.11" ]
+        sm_version: [ "1.10", "1.11.6735" ]
 
 
     steps:
