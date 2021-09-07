@@ -1051,6 +1051,9 @@ float g_fLastOverlay[MAXPLAYERS + 1];
 // Stage 2 Bug Fixer
 bool g_wrcpStage2Fix[MAXPLAYERS + 1];
 
+// Is client trying to teleport inside a trigger_multiple
+bool g_TeleInTriggerMultiple[MAXPLAYERS + 1];
+
 /*----------  Player location restoring  ----------*/
 
 // Clients location was restored this run
