@@ -1724,6 +1724,8 @@ public void OnMapStart()
 	{
 		SDKHook(iEnt, SDKHook_EndTouch, OnMultipleTrigger1);
 		SDKHook(iEnt, SDKHook_StartTouch, OnMultipleTrigger1);
+		SDKHook(iEnt, SDKHook_StartTouch, OnMultipleTrigger2);
+		SDKHook(iEnt, SDKHook_EndTouch, OnMultipleTrigger3);
 		PushArrayCell(g_hTriggerMultiple, iEnt);
 	}
 
