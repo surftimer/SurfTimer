@@ -130,7 +130,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	
 	// dpexx stop teleporting if in trigger_multiple
 	if (g_TeleInTriggerMultiple[client]){
-	PrintToChat(client, "Teleport blocked");
+		PrintToChat(client, "Teleport blocked");
 	return;
 	}
 
