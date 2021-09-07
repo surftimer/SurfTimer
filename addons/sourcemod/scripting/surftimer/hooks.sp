@@ -696,6 +696,27 @@ public Action Event_OnRoundStart(Handle event, const char[] name, bool dontBroad
 	return Plugin_Continue;
 }
 
+public Action ApplyStyles(Handle timer, int client)
+{
+	if(IsValidClient(client)){
+	if (g_iCurrentStyle[client] == 5)// 5 slowmo
+		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 0.5);
+	else if (g_iCurrentStyle[client] == 6)// 6 fastforward
+		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.5);
+	else if (g_iCurrentStyle[client] == 8)// 8 goldknife
+		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.25);
+	}
+}
+
+public Action OnMultipleTrigger1(int entity, int client)
+{
+	if (IsValidClient(client)){
+		CreateTimer(0.1, ApplyStyles, client);
+	}
+
+	return Plugin_Continue;
+}
+
 public Action OnTouchAllTriggers(int entity, int other)
 {
 	if (other >= 1 && other <= MaxClients && IsFakeClient(other))

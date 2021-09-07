@@ -1722,6 +1722,8 @@ public void OnMapStart()
 	g_hTriggerMultiple = CreateArray(256);
 	while ((iEnt = FindEntityByClassname(iEnt, "trigger_multiple")) != -1)
 	{
+		SDKHook(iEnt, SDKHook_EndTouch, OnMultipleTrigger1);
+		SDKHook(iEnt, SDKHook_StartTouch, OnMultipleTrigger1);
 		PushArrayCell(g_hTriggerMultiple, iEnt);
 	}
 
