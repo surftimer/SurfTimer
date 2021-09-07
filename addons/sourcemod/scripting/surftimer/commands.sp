@@ -1459,6 +1459,7 @@ public void TopMenuStyleSelect(int client)
 	AddMenuItem(menu, "", "Low-Gravity");
 	AddMenuItem(menu, "", "Slow Motion");
 	AddMenuItem(menu, "", "Fast Forwards");
+	AddMenuItem(menu, "", "Freestyle");
 	SetMenuExitButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
 }
@@ -2638,6 +2639,10 @@ public int BonusTopMenuHandler(Menu menu, MenuAction action, int param1, int par
 	{
 		db_selectBonusTopSurfers(param1, g_szMapName, param2 + 1);
 	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
 }
 
 public void OptionMenu(int client)
@@ -3142,7 +3147,7 @@ public Action Command_SetDbTitle(int client, int args)
 		{
 			if (StrContains(UnallowedTitles[i], upperArg)!=-1)
 			{
-				arg = "{pink}Fag";
+				arg = "{red}DISALLOWED";
 				break;
 			}
 		}
@@ -4007,12 +4012,9 @@ public Action Command_Repeat(int client, int args)
 
 public Action Admin_FixBot(int client, int args)
 {
-	if (!g_bZoner[client] && !CheckCommandAccess(client, "", ADMFLAG_ROOT))
-		return Plugin_Handled;
-
-	CPrintToChat(client, "%t", "Commands52", g_szChatPrefix);
-	CreateTimer(5.0, FixBot_Off, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
-	CreateTimer(10.0, FixBot_On, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
+	CReplyToCommand(client, "%t", "Commands52", g_szChatPrefix);
+	CreateTimer(5.0, FixBot_Off, _, TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer(10.0, FixBot_On, _, TIMER_FLAG_NO_MAPCHANGE);
 
 	return Plugin_Handled;
 }
@@ -4284,6 +4286,10 @@ public int HookZonesMenuHandler(Menu menu, MenuAction action, int param1, int pa
 		{
 			if (IsValidClient(param1))
 				g_iSelectedTrigger[param1] = -1;
+		}
+		case MenuAction_End:
+		{
+			delete menu;
 		}
 	}
 }

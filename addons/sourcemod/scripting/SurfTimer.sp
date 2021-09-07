@@ -1136,7 +1136,7 @@ int g_pr_AllPlayers[MAX_STYLES];
 int g_pr_RankedPlayers[MAX_STYLES];
 
 // Total map count in mapcycle
-int g_pr_MapCount[7];
+int g_pr_MapCount[9];
 
 // The amount of clients that get recalculated in a full recalculation
 int g_pr_TableRowCount;
@@ -1883,6 +1883,13 @@ public void OnClientPutInServer(int client)
 	// Defaults
 	SetClientDefaults(client);
 	Command_Restart(client, 1);
+
+	//display center speed so doesnt have to be re-enabled in options
+	if (g_bCenterSpeedDisplay[client])
+	{
+		SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
+		CreateTimer(0.1, CenterSpeedDisplayTimer, client, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
+	}
 
 	// SDKHooks
 	SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
@@ -2890,7 +2897,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 /*======  End of Natives  ======*/
 
-public Action ItemFoundMsg(UserMsg msg_id, Handle pb, const players[], any playersNum, any reliable, any init)
+public Action ItemFoundMsg(UserMsg msg_id, Protobuf msg, const int[] players, int playersNum, bool reliable, bool init)
 {
 	return Plugin_Handled;
 }
