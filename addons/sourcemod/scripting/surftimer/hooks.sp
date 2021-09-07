@@ -703,8 +703,6 @@ public Action ApplyStyles(Handle timer, int client)
 		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 0.5);
 	else if (g_iCurrentStyle[client] == 6)// 6 fastforward
 		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.5);
-	else if (g_iCurrentStyle[client] == 8)// 8 goldknife
-		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.25);
 	}
 }
 
