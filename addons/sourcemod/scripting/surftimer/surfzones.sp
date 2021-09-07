@@ -300,7 +300,7 @@ public Action EndTouchTrigger(int caller, int activator)
 public void StartTouch(int client, int action[3])
 {
 	if (g_iClientInZone[client][0] > 0){
-	g_TeleInTriggerMultiple[client] = false;
+		g_TeleInTriggerMultiple[client] = false;
 	}
 
 	if (IsValidClient(client))
