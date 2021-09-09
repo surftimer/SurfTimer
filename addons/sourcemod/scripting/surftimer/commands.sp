@@ -714,25 +714,36 @@ public Action Command_Teleport(int client, int args)
 
 	// Throttle using !back to fix errors with replays
 	if ((GetGameTime() - g_fLastCommandBack[client]) < 1.0)
+	{
 		return Plugin_Handled;
+	}
 	else
+	{
 		g_fLastCommandBack[client] = GetGameTime();
+		g_bTeleByCommand[client] = true;
+	}
 
 	if (g_Stage[g_iClientInZone[client][2]][client] == 1)
 	{
 		// fluffys
 		if (g_bPause[client] == true)
+		{
 			PauseMethod(client);
+		}
 
 		teleportClient(client, g_iClientInZone[client][2], 1, false);
+
 		return Plugin_Handled;
 	}
 
 	// fluffys
 	if (g_bPause[client] == true)
+	{
 		PauseMethod(client);
+	}
 
 	teleportClient(client, g_iClientInZone[client][2], g_Stage[g_iClientInZone[client][2]][client], false);
+
 	return Plugin_Handled;
 }
 
@@ -821,8 +832,11 @@ public int MenuHandler_SelectBonus(Menu sMenu, MenuAction action, int client, in
 		{
 			char aID[3];
 			GetMenuItem(sMenu, item, aID, sizeof(aID));
-			int zoneGrp = StringToInt(aID);
+			
 			g_bInBonus[client] = true;
+			g_bTeleByCommand[client] = true;
+			
+			int zoneGrp = StringToInt(aID);
 			g_iInBonus[client] = zoneGrp;
 			teleportClient(client, zoneGrp, 1, true);
 		}
@@ -836,7 +850,9 @@ public int MenuHandler_SelectBonus(Menu sMenu, MenuAction action, int client, in
 public Action Command_ToBonus(int client, int args)
 {
 	if (!IsValidClient(client))
+	{
 		return Plugin_Handled;
+	}
 
 	if (g_mapZoneGroupCount < 2)
 	{
@@ -858,21 +874,32 @@ public Action Command_ToBonus(int client, int args)
 		GetCmdArg(1, arg1, sizeof(arg1));
 
 		if (!arg1[0])
+		{
 			zoneGrp = args;
+		}
 		else
+		{
 			zoneGrp = StringToInt(arg1);
+		}
 
-		if (zoneGrp == 0) {
+		if (zoneGrp == 0) 
+		{
 			Command_Restart(client, 1);
+
 			return Plugin_Handled;
 		}
 	}
 	else
+	{
 		zoneGrp = 1;
+	}
 
 	g_bInBonus[client] = true;
+	g_bTeleByCommand[client] = true;
 	g_iInBonus[client] = zoneGrp;
+
 	teleportClient(client, zoneGrp, 1, true);
+
 	return Plugin_Handled;
 }
 
@@ -939,6 +966,9 @@ public int MenuHandler_SelectStage(Menu tMenu, MenuAction action, int client, in
 		{
 			char aID[64];
 			GetMenuItem(tMenu, item, aID, sizeof(aID));
+
+			g_bTeleByCommand[client] = true;
+
 			int id = StringToInt(aID);
 			teleportClient(client, g_iClientInZone[client][2], id, true);
 			g_Stage[g_iClientInZone[client][2]][client] = id;
@@ -953,7 +983,11 @@ public int MenuHandler_SelectStage(Menu tMenu, MenuAction action, int client, in
 public Action Command_ToStage(int client, int args)
 {
 	if (!IsValidClient(client))
+	{
 		return Plugin_Handled;
+	}
+
+	g_bTeleByCommand[client] = true;
 
 	if (args < 1)
 	{
@@ -993,7 +1027,9 @@ public Action Command_ToEnd(int client, int args)
 		CReplyToCommand(client, "%t", "Commands71", g_szChatPrefix);
 		return Plugin_Handled;
 	}
+
 	teleportClient(client, g_iClientInZone[client][2], -1, true);
+
 	return Plugin_Handled;
 }
 
@@ -1018,16 +1054,21 @@ public Action Command_Restart(int client, int args)
 	g_bClientRestarting[client] = false;
 	// fluffys
 	if (g_bPause[client] == true)
+	{
 		PauseMethod(client);
+	}
 
 	if (!g_bTimerEnabled[client])
+	{
 		g_bTimerEnabled[client] = true;
+	}
 
 	g_bWrcpTimeractivated[client] = false;
 	g_bInStageZone[client] = false;
 	g_bInStartZone[client] = true;
 	g_bLeftZone[client] = false;
 	g_bInBhop[client] = false;
+	g_bTeleByCommand[client] = true;
 
 	teleportClient(client, 0, 1, true);
 	return Plugin_Handled;
@@ -3533,9 +3574,14 @@ public int StageStyleSelectMenuHandler(Menu menu, MenuAction action, int param1,
 public Action Command_GoBack(int client, int args)
 {
 	if (g_Stage[0][client] <= 1)
+	{
 		Command_Restart(client, 1);
+	}
 	else
+	{
+		g_bTeleByCommand[client] = true;
 		teleportClient(client, 0, g_Stage[0][client] - 1, false);
+	}
 
 	return Plugin_Handled;
 }

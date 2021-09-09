@@ -1052,7 +1052,8 @@ float g_fLastOverlay[MAXPLAYERS + 1];
 bool g_wrcpStage2Fix[MAXPLAYERS + 1];
 
 // Is client trying to teleport inside a trigger_multiple
-bool g_TeleInTriggerMultiple[MAXPLAYERS + 1];
+//bool g_TeleInTriggerMultiple[MAXPLAYERS + 1];
+bool g_bTeleByCommand[MAXPLAYERS + 1];
 
 /*----------  Player location restoring  ----------*/
 
@@ -1727,8 +1728,9 @@ public void OnMapStart()
 	{
 		SDKHook(iEnt, SDKHook_EndTouch, OnMultipleTrigger1);
 		SDKHook(iEnt, SDKHook_StartTouch, OnMultipleTrigger1);
-		SDKHook(iEnt, SDKHook_StartTouch, OnMultipleTrigger2);
-		SDKHook(iEnt, SDKHook_EndTouch, OnMultipleTrigger3);
+		/* SDKHook(iEnt, SDKHook_StartTouch, OnMultipleTrigger2);
+		SDKHook(iEnt, SDKHook_EndTouch, OnMultipleTrigger3); */
+		HookSingleEntityOutput(iEnt, "OnEndTouch", OnTriggerOutput);
 		PushArrayCell(g_hTriggerMultiple, iEnt);
 	}
 
@@ -1913,6 +1915,7 @@ public void OnClientPutInServer(int client)
 		SendConVarValue(client, g_hFootsteps, "0");
 
 	g_bReportSuccess[client] = false;
+	g_bTeleByCommand[client] = false;
 	g_fCommandLastUsed[client] = 0.0;
 
 	// fluffys set bools
