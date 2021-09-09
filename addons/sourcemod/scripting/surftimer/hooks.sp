@@ -696,6 +696,44 @@ public Action Event_OnRoundStart(Handle event, const char[] name, bool dontBroad
 	return Plugin_Continue;
 }
 
+public Action ApplyStyles(Handle timer, int client)
+{
+	if (IsValidClient(client)) {
+		if (g_iCurrentStyle[client] == 5)// 5 slowmo
+			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 0.5);
+		else if (g_iCurrentStyle[client] == 6)// 6 fastforward
+			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.5);
+	}
+}
+
+public Action OnMultipleTrigger1(int entity, int client)
+{
+	if (IsValidClient(client)) {
+		CreateTimer(0.1, ApplyStyles, client);
+	}
+
+	return Plugin_Continue;
+}
+
+public Action OnMultipleTrigger2(int entity, int client)
+{
+	if (g_iClientInZone[client][0] > 0) {
+		g_TeleInTriggerMultiple[client] = false;
+	}
+	else {
+		g_TeleInTriggerMultiple[client] = true;
+	}
+	
+	return Plugin_Continue;
+}
+
+public Action OnMultipleTrigger3(int entity, int client)
+{
+	g_TeleInTriggerMultiple[client] = false;
+
+	return Plugin_Continue;
+}
+
 public Action OnTouchAllTriggers(int entity, int other)
 {
 	if (other >= 1 && other <= MaxClients && IsFakeClient(other))
