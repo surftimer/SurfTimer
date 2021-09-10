@@ -162,7 +162,16 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	g_bInBhop[client] = false;
 	g_iTicksOnGround[client] = 0;
 	g_bNewStage[client] = false;
-	g_bTeleByCommand[client] = true;
+
+	// dpexx's hack fix for those startzone inside a trigger
+	if (g_iClientInZone[client][0] > 0)
+	{
+		g_bTeleByCommand[client] = false;
+	}
+	else
+	{
+		g_bTeleByCommand[client] = true;
+	}
 
 	// Check for spawn locations
 	int realZone;
