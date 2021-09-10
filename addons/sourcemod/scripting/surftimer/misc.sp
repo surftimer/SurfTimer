@@ -162,6 +162,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	g_bInBhop[client] = false;
 	g_iTicksOnGround[client] = 0;
 	g_bNewStage[client] = false;
+	g_bTeleByCommand[client] = true;
 
 	// Check for spawn locations
 	int realZone;
