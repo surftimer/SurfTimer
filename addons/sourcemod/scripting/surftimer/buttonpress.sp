@@ -65,6 +65,8 @@ public void CL_OnStartTimerPress(int client)
 		g_iCurrentCheckpoint[client] = 0;
 		g_iCheckpointsPassed[client] = 0;
 		g_bIsValidRun[client] = false;
+		// Enable Trigger Output on Timer Restart
+		g_bTeleByCommand[client] = false;
 
 		if (!IsFakeClient(client))
 		{
@@ -113,7 +115,6 @@ public void CL_OnStartTimerPress(int client)
 					CPrintToChat(i, preMessage);
 			}
 		}
-
 	}
 
 	// Play Start Sound

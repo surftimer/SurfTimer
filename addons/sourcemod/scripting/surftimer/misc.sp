@@ -129,10 +129,10 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 		return;
 	
 	// dpexx stop teleporting if in trigger_multiple
-	if (g_TeleInTriggerMultiple[client]){
+	/* if (g_TeleInTriggerMultiple[client]){
 		PrintToChat(client, "Teleport blocked");
 		return;
-	}
+	} */
 
 	if (!IsValidZonegroup(zonegroup))
 	{
@@ -162,6 +162,16 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	g_bInBhop[client] = false;
 	g_iTicksOnGround[client] = 0;
 	g_bNewStage[client] = false;
+
+	// dpexx's hack fix for those startzone inside a trigger
+	if (g_iClientInZone[client][0] > 0)
+	{
+		g_bTeleByCommand[client] = false;
+	}
+	else
+	{
+		g_bTeleByCommand[client] = true;
+	}
 
 	// Check for spawn locations
 	int realZone;
