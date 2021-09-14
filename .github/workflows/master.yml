@@ -1,8 +1,6 @@
 name: Compile with SourceMod
 
-on:
-  push:
-    branches: ["master", "githubActions", "dev"]
+on: [push, pull_request]
 
 jobs:
   build:
