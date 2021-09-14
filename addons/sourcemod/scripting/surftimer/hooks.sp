@@ -736,6 +736,8 @@ public Action OnMultipleTrigger3(int entity, int client)
 
 public Action OnTriggerOutput(const char[] output, int caller, int activator, float delay)
 {
+	if (!IsValidClient(client)) return Plugin_Continue;
+	
 	// Block Output when player use a teleport command
 	if(g_bTeleByCommand[activator])
 	{

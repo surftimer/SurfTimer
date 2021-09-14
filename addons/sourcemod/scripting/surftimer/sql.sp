@@ -7785,7 +7785,7 @@ public void db_selectPlayerRank(int client, int rank, char szSteamId[32])
 {
 	char szQuery[1024];
 
-	if (StrContains(szSteamId, "none", false)!= -1) // Select Rank Number
+	if (StrContains(szSteamId, "none", false)!= -1 && rank > 0) // Select Rank Number
 	{
 		g_rankArg[client] = rank;
 		rank -= 1;
