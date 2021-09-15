@@ -18,6 +18,7 @@
 #include <geoip>
 #include <basecomm>
 #include <colorvariables>
+#include <autoexecconfig>
 #undef REQUIRE_EXTENSIONS
 #include <clientprefs>
 #undef REQUIRE_PLUGIN
@@ -2628,9 +2629,6 @@ public void OnPluginStart()
 
 	db_setupDatabase();
 	CreateCommandsNewMap();
-
-	// exec surftimer.cfg
-	AutoExecConfig(true, "surftimer");
 
 	// mic
 	g_ownerOffset = FindSendPropInfo("CBaseCombatWeapon", "m_hOwnerEntity");

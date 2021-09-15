@@ -44,6 +44,7 @@ jobs:
           wget https://raw.githubusercontent.com/KyleSanderson/SteamWorks/master/Pawn/includes/SteamWorks.inc -P $INCLUDE_PATH
           wget https://raw.githubusercontent.com/JoinedSenses/SourceMod-IncludeLibrary/master/include/smjansson.inc -P $INCLUDE_PATH
           wget https://raw.githubusercontent.com/peace-maker/DHooks2/dynhooks/sourcemod_files/scripting/include/dhooks.inc -P $INCLUDE_PATH
+          wget https://github.com/Impact123/AutoExecConfig/raw/development/autoexecconfig.inc -P $INCLUDE_PATH
           
           git clone -b transitional_syntax https://github.com/bcserv/smlib.git
           mv smlib/scripting/include/* $INCLUDE_PATH
