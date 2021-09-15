@@ -122,7 +122,7 @@
 #define EF_NODRAW 32
 
 // New Save Locs
-#define MAX_LOCS 1024
+#define MAX_LOCS 128
 
 //CSGO HUD Hint Fix
 #define MAX_HINT_SIZE 225
@@ -425,6 +425,7 @@ bool g_bWrcpEndZone[MAXPLAYERS + 1] = false;
 int g_CurrentStage[MAXPLAYERS + 1];
 float g_fStartWrcpTime[MAXPLAYERS + 1];
 float g_fFinalWrcpTime[MAXPLAYERS + 1];
+float g_fOldFinalWrcpTime[MAXPLAYERS + 1];
 
 // Total time the run took in 00:00:00 format
 char g_szFinalWrcpTime[MAXPLAYERS + 1][32];
@@ -442,6 +443,16 @@ char g_szWrcpMapSelect[MAXPLAYERS + 1][128];
 bool g_bStageSRVRecord[MAXPLAYERS + 1][CPLIMIT];
 char g_szStageRecordPlayer[CPLIMIT][MAX_NAME_LENGTH];
 // bool g_bFirstStageRecord[CPLIMIT];
+
+// PracMode SRCP
+float g_fStartPracSrcpTime[MAXPLAYERS + 1];
+float g_fCurrentPracSrcpRunTime[MAXPLAYERS + 1];
+bool g_bPracSrcpTimerActivated[MAXPLAYERS + 1] = false;
+int g_iPracSrcpStage[MAXPLAYERS + 1];
+bool g_bPracSrcpEndZone[MAXPLAYERS + 1] = false;
+float g_fFinalPracSrcpTime[MAXPLAYERS + 1];
+char g_szFinalPracSrcpTime[MAXPLAYERS + 1][32];
+float g_fSrcpPauseTime[MAXPLAYERS + 1];
 
 /*----------  Map Settings Variables ----------*/
 float g_fMaxVelocity;
@@ -793,6 +804,9 @@ char g_szBonusTimeDifference[MAXPLAYERS + 1];
 // Time when run was started
 float g_fStartTime[MAXPLAYERS + 1];
 
+// Time when PracMode run was started
+float g_fPracModeStartTime[MAXPLAYERS + 1];
+
 // Total time the run took
 float g_fFinalTime[MAXPLAYERS + 1];
 
@@ -807,6 +821,9 @@ float g_fStartPauseTime[MAXPLAYERS + 1];
 
 // Current runtime
 float g_fCurrentRunTime[MAXPLAYERS + 1];
+
+// PracticeMode total time the run took in 00:00:00 format
+char g_szPracticeTime[MAXPLAYERS + 1][32];
 
 // Missed personal record time?
 bool g_bMissedMapBest[MAXPLAYERS + 1];
@@ -1247,16 +1264,24 @@ int g_iTotalMeasures[MAXPLAYERS + 1];
 float g_fAngleCache[MAXPLAYERS + 1];
 
 // Save locs
-int g_iSaveLocCount;
-float g_fSaveLocCoords[MAX_LOCS][3]; // [loc id][coords]
-float g_fSaveLocAngle[MAX_LOCS][3]; // [loc id][angle]
-float g_fSaveLocVel[MAX_LOCS][3]; // [loc id][velocity]
+int g_iSaveLocCount[MAXPLAYERS + 1];
+float g_fSaveLocCoords[MAXPLAYERS + 1][MAX_LOCS][3]; // [loc id][coords]
+float g_fSaveLocAngle[MAXPLAYERS + 1][MAX_LOCS][3]; // [loc id][angle]
+float g_fSaveLocVel[MAXPLAYERS + 1][MAX_LOCS][3]; // [loc id][velocity]
 char g_szSaveLocTargetname[MAX_LOCS][128]; // [loc id]
-char g_szSaveLocClientName[MAX_LOCS][MAX_NAME_LENGTH];
+char g_szSaveLocClientName[MAXPLAYERS + 1][MAX_LOCS][MAX_NAME_LENGTH];
 int g_iLastSaveLocIdClient[MAXPLAYERS + 1];
 float g_fLastCheckpointMade[MAXPLAYERS + 1];
-int g_iSaveLocUnix[MAX_LOCS]; // [loc id]
+int g_iSaveLocUnix[MAX_LOCS][MAXPLAYERS + 1]; // [loc id]
 int g_iMenuPosition[MAXPLAYERS + 1];
+int g_iPreviousSaveLocIdClient[MAXPLAYERS + 1]; // The previous saveloc the client used
+float g_fPlayerPracTimeSnap[MAXPLAYERS + 1][MAX_LOCS]; // PracticeMode saveloc runtime
+int g_iPlayerPracLocationSnap[MAXPLAYERS + 1][MAX_LOCS]; // Stage the player was in when creating saveloc
+int g_iPlayerPracLocationSnapIdClient[MAXPLAYERS + 1]; // Stage Index to use when tele to saveloc
+bool g_bSaveLocTele[MAXPLAYERS + 1]; // Has the player teleported to saveloc?
+int g_iSaveLocInBonus[MAXPLAYERS + 1][MAX_LOCS]; // Bonus number if player created saveloc in bonus
+float g_fPlayerPracSrcpTimeSnap[MAXPLAYERS + 1][MAX_LOCS]; // PracticeMode Wrcp saveloc runtime
+int g_iAllowCheckpointRecreation; // Int for allowCheckpointRecreation convar
 
 char g_sServerName[256];
 ConVar g_hHostName = null;
@@ -1331,6 +1356,11 @@ bool g_bPrestigeAvoid[MAXPLAYERS + 1];
 
 // Menus mapname
 char g_szMapNameFromDatabase[MAXPLAYERS + 1][128];
+
+// New noclipspeed vars
+ConVar sv_noclipspeed;
+float g_iDefaultNoclipSpeed;
+float g_iNoclipSpeed[MAXPLAYERS + 1];
 
 // New speed limit variables
 bool g_bInBhop[MAXPLAYERS + 1];
@@ -1779,7 +1809,6 @@ public void OnMapStart()
 
 	// Save Locs
 	ResetSaveLocs();
-
 }
 
 public void OnMapEnd()
@@ -2032,7 +2061,9 @@ public void OnClientDisconnect(int client)
 			g_fPlayerLastTime[client] = GetGameTime() - g_fStartTime[client] - g_fPauseTime[client];
 		}
 		else
+		{
 			g_fPlayerLastTime[client] = g_fCurrentRunTime[client];
+		}
 	}
 
 	SDKUnhook(client, SDKHook_SetTransmit, Hook_SetTransmit);
@@ -2083,6 +2114,9 @@ public void OnClientDisconnect(int client)
 		--g_iTriggerTransmitCount;
 		TransmitTriggers(g_iTriggerTransmitCount > 0);
 	}
+
+	// New noclipspeed
+	sv_noclipspeed.FloatValue = g_iDefaultNoclipSpeed;
 }
 
 public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] newValue)

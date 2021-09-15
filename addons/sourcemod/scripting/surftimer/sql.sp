@@ -4408,8 +4408,13 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 			g_mapZones[g_mapZonesCount].ZoneGroup = SQL_FetchInt(hndl, 11);
 
 			// Total amount of checkpoints
-			if (g_mapZones[g_mapZonesCount].ZoneType == 4)
-				g_iTotalCheckpoints++;
+			if (g_mapZones[g_mapZonesCount].ZoneGroup == 0)
+			{
+				if (g_mapZones[g_mapZonesCount].ZoneType == 4)
+				{
+					g_iTotalCheckpoints++;
+				}
+			}
 
 			/**
 			* Initialize error checking
@@ -4461,8 +4466,11 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 						Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "End-%i", g_mapZones[g_mapZonesCount].ZoneTypeId);
 					}
 					case 3: {
-						g_bhasStages = true;
-						Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "Stage-%i", (g_mapZones[g_mapZonesCount].ZoneTypeId + 2));
+						if (g_mapZones[g_mapZonesCount].ZoneGroup == 0)
+						{
+							g_bhasStages = true;
+							Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "Stage-%i", (g_mapZones[g_mapZonesCount].ZoneTypeId + 2));
+						}
 					}
 					case 4: {
 						Format(g_mapZones[g_mapZonesCount].ZoneName, sizeof(MapZone::ZoneName), "Checkpoint-%i", g_mapZones[g_mapZonesCount].ZoneTypeId);
@@ -4500,7 +4508,13 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 							g_bhasBonus = true;
 						Format(g_szZoneGroupName[g_mapZones[g_mapZonesCount].ZoneGroup], 128, "%s", g_mapZones[g_mapZonesCount].ZoneName);
 					}
-					case 3: g_bhasStages = true;
+					case 3: 
+					{
+						if (g_mapZones[g_mapZonesCount].ZoneGroup == 0)
+						{
+							g_bhasStages = true;
+						}
+					}
 				}
 			}
 
@@ -5796,7 +5810,7 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 	int stage = ReadPackCell(packx);
 	CloseHandle(packx);
 
-	if (!IsValidClient(data) || IsFakeClient(data))
+	if (!IsValidClient(data) || IsFakeClient(data) || g_bPracticeMode[data])
 		return;
 
 	char szName[32];
@@ -9658,4 +9672,73 @@ public void db_updateMapRankedStatus()
 	}
 
 	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
+}
+
+public void db_selectPracWrcpRecord(int client, int style, int stage)
+{
+	if (!IsValidClient(client) || IsFakeClient(client) || g_bUsingStageTeleport[client])
+	{
+		return;
+	}
+
+	if (stage > g_TotalStages) // Hack fix for multiple end zones
+	{
+		stage = g_TotalStages;
+	}
+
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackCell(pack, style);
+	WritePackCell(pack, stage);
+
+	char szQuery[255];
+	if (style == 0)
+	{
+		Format(szQuery, 255, "SELECT runtimepro FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = 0", g_szSteamID[client], g_szMapName, stage);
+	}
+	else if (style != 0)
+	{
+		Format(szQuery, 255, "SELECT runtimepro FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = %i", g_szSteamID[client], g_szMapName, stage, style);
+	}
+
+	SQL_TQuery(g_hDb, sql_selectPracWrcpRecordCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void sql_selectPracWrcpRecordCallback(Handle owner, Handle hndl, const char[] error, DataPack packx)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (sql_selectPracWrcpRecordCallback): %s", error);
+		delete packx;
+		return;
+	}
+
+	ResetPack(packx);
+	int data = ReadPackCell(packx);
+	int style = ReadPackCell(packx);
+	int stage = ReadPackCell(packx);
+	delete packx;
+
+	if (!IsValidClient(data) || IsFakeClient(data))
+	{
+		return;
+	}
+
+	if (stage > g_TotalStages) // Hack fix for multiple end zones
+	{
+		stage = g_TotalStages;
+	}
+	
+	float fClientPbStageTime;
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	{
+		fClientPbStageTime = SQL_FetchFloat(hndl, 0);
+	}
+	else
+	{
+		fClientPbStageTime = 0.0;
+	}
+
+	PrintPracSrcp(data, style, stage, fClientPbStageTime);
 }

@@ -117,6 +117,7 @@ ConVar g_dcBugTrackerName = null;
 ConVar g_drDeleteSecurity = null;
 ConVar g_iAdminCountryTags = null;
 ConVar g_replayBotDelay = null;
+ConVar g_hAllowCheckpointRecreation = null;								// Allows players to recreate checkpoints along with where to display info.
 
 void CreateConVars()
 {
@@ -338,6 +339,10 @@ void CreateConVars()
 	g_hEnforceDefaultTitles = AutoExecConfig_CreateConVar("ck_enforce_default_titles", "0", "Sets whether default titles will be enforced on clients, Enable / Disable");
 	HookConVarChange(g_hEnforceDefaultTitles, OnSettingChanged);
 
+	// SaveLoc
+	g_hAllowCheckpointRecreation = AutoExecConfig_CreateConVar("ck_allow_checkpoint_recreation", "0", "Allow player checkpoint recreation (saveloc). 0 - Disabled | 1 - Print info to player chat | 2 - Print info to player console | 3 - Print info to both chat and console");
+	g_iAllowCheckpointRecreation = GetConVarInt(g_hAllowCheckpointRecreation);
+
 	// WRCP Points
 	g_hWrcpPoints = AutoExecConfig_CreateConVar("ck_wrcp_points", "0", "Sets the amount of points a player should get for a WRCP, 0 to disable");
 
@@ -440,4 +445,15 @@ void CreateConVars()
 
 	// Footsteps
 	g_hFootsteps = FindConVar("sv_footsteps");
+
+	// New noclip
+	sv_noclipspeed = FindConVar("sv_noclipspeed");
+	sv_noclipspeed.Flags &= ~FCVAR_NOTIFY;
+	g_iDefaultNoclipSpeed = sv_noclipspeed.FloatValue;
+	for( int i = 1; i <= MaxClients; i++ )
+    {
+        g_iNoclipSpeed[i] = g_iDefaultNoclipSpeed;
+    }
+	
+
 }
