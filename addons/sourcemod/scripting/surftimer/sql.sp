@@ -650,6 +650,8 @@ public void sql_CalcuatePlayerRankCallback(Handle owner, Handle hndl, const char
 	}
 	else
 	{
+		CloseHandle(pack);
+		
 		// Players first time on server
 		if (client <= MaxClients)
 		{
