@@ -682,6 +682,8 @@ public void sql_CalcuatePlayerRankCallback(Handle owner, Handle hndl, const char
 
 			CalculatePlayerRank(client, style);
 		}
+
+		CloseHandle(pack);
 	}
 }
 
