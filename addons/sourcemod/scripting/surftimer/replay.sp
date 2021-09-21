@@ -718,7 +718,7 @@ public bool LoadRecordFromFile(const char[] path, FileHeader header, bool header
 
 public Action RefreshBot(Handle timer)
 {
-	setBotQuota();
+	SetBotQuota();
 	LoadRecordReplay();
 	return Plugin_Handled;
 }
@@ -781,7 +781,7 @@ public void LoadRecordReplay()
 
 public Action RefreshBonusBot(Handle timer)
 {
-	setBotQuota();
+	SetBotQuota();
 	LoadBonusReplay();
 	return Plugin_Handled;
 }
@@ -845,7 +845,7 @@ public void LoadBonusReplay()
 
 public Action RefreshWrcpBot(Handle timer)
 {
-	setBotQuota();
+	SetBotQuota();
 	LoadWrcpReplay();
 	return Plugin_Handled;
 }
@@ -1373,7 +1373,7 @@ public void Stage_SaveRecording(int client, int stage, char[] time)
 	strcopy(header.Playername, sizeof(FileHeader::Playername), szName);
 	header.Checkpoints = 0;
 
-	ArrayList frames = new ArrayList(sizeof(FrameInfo));
+	ArrayList frames = new ArrayList(sizeof(frame_t));
 	any aFrameData[sizeof(frame_t)];
 
 	for (int i = startFrame; i < endFrame; i++)

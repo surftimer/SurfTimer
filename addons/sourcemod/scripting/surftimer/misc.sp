@@ -1,4 +1,4 @@
-void setBotQuota()
+public void SetBotQuota()
 {
 	// Get bot_quota value
 	ConVar hBotQuota = FindConVar("bot_quota");
@@ -3156,7 +3156,7 @@ public void LoadInfoBot()
 	}
 	else
 	{
-		setBotQuota();
+		SetBotQuota();
 		CreateTimer(0.5, RefreshInfoBot, TIMER_FLAG_NO_MAPCHANGE);
 	}
 }
