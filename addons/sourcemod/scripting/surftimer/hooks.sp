@@ -126,10 +126,10 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		else
 			SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 5, 4, true);
 
-		// Botmimic3
-		if (g_hBotMimicsRecord[client] != null && IsFakeClient(client))
+		// Replay bot frame init
+		if (g_aReplayFrame[client] != null && IsFakeClient(client))
 		{
-			g_BotMimicTick[client] = 0;
+			g_iReplayTick[client] = 0;
 			g_CurrentAdditionalTeleportIndex[client] = 0;
 		}
 
@@ -609,22 +609,40 @@ public Action Event_OnPlayerDeath(Handle event, const char[] name, bool dontBroa
 	int client = GetEventInt(event, "userid");
 	if (IsValidClient(client))
 	{
+		RemoveRagdoll(client);
+
 		if (!IsFakeClient(client))
 		{
-			if (g_hRecording[client] != null)
+			if (g_aRecording[client] != null)// should detect player if is onTimer
+			{
 				StopRecording(client);
-			CreateTimer(2.0, RemoveRagdoll, client);
+			}
 		}
 		else
-			if (g_hBotMimicsRecord[client] != null)
+		{
+			if (g_aReplayFrame[client] != null)
 			{
-				g_BotMimicTick[client] = 0;
+				g_iReplayTick[client] = 0;
 				g_CurrentAdditionalTeleportIndex[client] = 0;
 				if (GetClientTeam(client) >= CS_TEAM_T)
+				{
 					CreateTimer(1.0, RespawnBot, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+				}
 			}
+		}
 	}
+
 	return Plugin_Continue;
+}
+
+static void RemoveRagdoll(int client)
+{
+	int iEntity = GetEntPropEnt(client, Prop_Send, "m_hRagdoll");
+
+	if(iEntity != INVALID_ENT_REFERENCE)
+	{
+		AcceptEntityInput(iEntity, "Kill");
+	}
 }
 
 public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)
@@ -771,12 +789,6 @@ public Action OnTouchPushTrigger(int entity, int other)
 	{
 		if (IsFakeClient(other))
 			return Plugin_Handled;
-
-		// Takes a new additional teleport to increase acuraccy for bot recordings.
-		if (g_hRecording[other] != null && !IsFakeClient(other))
-		{
-			g_createAdditionalTeleport[other] = true;
-		}
 
 		// fluffys
 		g_bInPushTrigger[other] = true;
@@ -1028,7 +1040,9 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	// Backwards
 
 	if (g_bRoundEnd || !IsValidClient(client))
+	{
 		return Plugin_Continue;
+	}
 
 	if (IsPlayerAlive(client))
 	{
@@ -1132,15 +1146,25 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 
 		if (newVelocity[0] == 0.0 && newVelocity[1] == 0.0 && newVelocity[2] == 0.0)
 		{
-			RecordReplay(client, buttons, subtype, seed, impulse, weapon, angles, vel);
 			if (IsFakeClient(client))
+			{
 				PlayReplay(client, buttons, subtype, seed, impulse, weapon, angles, vel);
+			}
+			else
+			{
+				RecordReplay(client, buttons, subtype, seed, impulse, weapon, angles, vel);
+			}
 		}
 		else
 		{
-			RecordReplay(client, buttons, subtype, seed, impulse, weapon, angles, newVelocity);
 			if (IsFakeClient(client))
+			{
 				PlayReplay(client, buttons, subtype, seed, impulse, weapon, angles, newVelocity);
+			}
+			else
+			{
+				RecordReplay(client, buttons, subtype, seed, impulse, weapon, angles, vel);
+			}
 		}
 
 		// Strafe Sync taken from shavit's bhoptimer
@@ -1272,7 +1296,7 @@ public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 	}
 
 	// This one is currently mimicing something.
-	if (g_hBotMimicsRecord[client] != null)
+	if (g_aReplayFrame[client] != null)
 	{
 		// We didn't allow that teleporting. STOP THAT.
 		if (!g_bValidTeleportCall[client])
@@ -1282,7 +1306,7 @@ public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 	}
 
 	// Don't care if he's not recording.
-	if (g_hRecording[client] == null)
+	if (g_aRecording[client] == null)
 		return MRES_Ignored;
 
 	bool bOriginNull = DHookIsNullParam(hParams, 1);
@@ -1305,22 +1329,6 @@ public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 
 	if (bOriginNull && bAnglesNull && bVelocityNull)
 		return MRES_Ignored;
-
-	AdditionalTeleport iAT;
-	Array_Copy(origin, iAT.AtOrigin, 3);
-	Array_Copy(angles, iAT.AtAngles, 3);
-	Array_Copy(velocity, iAT.AtVelocity, 3);
-
-	// Remember,
-	if (!bOriginNull)
-		iAT.AtFlags |= ADDITIONAL_FIELD_TELEPORTED_ORIGIN;
-	if (!bAnglesNull)
-		iAT.AtFlags |= ADDITIONAL_FIELD_TELEPORTED_ANGLES;
-	if (!bVelocityNull)
-		iAT.AtFlags |= ADDITIONAL_FIELD_TELEPORTED_VELOCITY;
-
-	if (g_hRecordingAdditionalTeleport[client] != null)
-		PushArrayArray(g_hRecordingAdditionalTeleport[client], iAT, sizeof(AdditionalTeleport));
 
 	return MRES_Ignored;
 }

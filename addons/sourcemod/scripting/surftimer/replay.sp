@@ -1,25 +1,33 @@
 
-// Botmimic3 - modified by 1NutWunDeR
-// http://forums.alliedmods.net/showthread.php?t=164148
-
-void setReplayTime(int zGrp, int stage, int style)
+static void SetReplayTime(int zGrp, int stage, int style)
 {
 	char sPath[256], sTime[54], sBuffer[4][54];
+
 	if (zGrp > 0)
 	{
 		if (style == 0)
+		{
 			BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s_bonus_%d.rec", CK_REPLAY_PATH, g_szMapName, zGrp);
+		}
 		else
+		{
 			BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s_bonus_%d_style_%d.rec", CK_REPLAY_PATH, g_szMapName, zGrp, style);
+		}
 	}
 	else if (stage > 0)
+	{
 		BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s_stage_%d.rec", CK_REPLAY_PATH, g_szMapName, stage);
+	}
 	else
 	{
 		if (style == 0)
+		{
 			BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s.rec", CK_REPLAY_PATH, g_szMapName);
+		}
 		else
+		{
 			BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s_style_%d.rec", CK_REPLAY_PATH, g_szMapName, style);
+		}
 	}
 
 	FileHeader header;
@@ -36,21 +44,30 @@ void setReplayTime(int zGrp, int stage, int style)
 		if (style == 0)
 		{
 			if ((g_fRecordMapTime - 0.01) < time < (g_fRecordMapTime) + 0.01)
+			{
 				time = g_fRecordMapTime;
+			}
 		}
 		else
 		{
 			if ((g_fRecordStyleMapTime[style] - 0.01) < time < (g_fRecordStyleMapTime[style]) + 0.01)
+			{
 				time = g_fRecordStyleMapTime[style];
+			}
 		}
 	}
 	else if (stage > 0)
 	{
 		// Stage
 		if ((g_fStageRecord[stage] - 0.01) < time < (g_fStageRecord[stage]) + 0.01)
+		{
 			g_fStageReplayTimes[stage] = g_fStageRecord[stage];
+		}
 		else
+		{
 			g_fStageReplayTimes[stage] = time;
+		}
+
 		return;
 	}
 	else
@@ -59,12 +76,16 @@ void setReplayTime(int zGrp, int stage, int style)
 		if (style == 0)
 		{
 			if ((g_fBonusFastest[zGrp] - 0.01) < time < (g_fBonusFastest[zGrp]) + 0.01)
+			{
 				time = g_fBonusFastest[zGrp];
+			}
 		}
 		else
 		{
 			if ((g_fStyleBonusFastest[style][zGrp] - 0.01) < time < (g_fStyleBonusFastest[style][zGrp]) + 0.01)
+			{
 				time = g_fStyleBonusFastest[style][zGrp];
+			}
 		}
 	}
 
@@ -75,9 +96,11 @@ public Action RespawnBot(Handle timer, any userid)
 {
 	int client = GetClientOfUserId(userid);
 	if (!client)
+	{
 		return Plugin_Stop;
+	}
 
-	if (g_hBotMimicsRecord[client] != null && IsValidClient(client) && !IsPlayerAlive(client) && IsFakeClient(client) && GetClientTeam(client) >= CS_TEAM_T)
+	if (g_aReplayFrame[client] != null && IsValidClient(client) && !IsPlayerAlive(client) && IsFakeClient(client) && GetClientTeam(client) >= CS_TEAM_T)
 	{
 		TeamChangeActual(client, 2);
 		CS_RespawnPlayer(client);
@@ -86,62 +109,44 @@ public Action RespawnBot(Handle timer, any userid)
 	return Plugin_Stop;
 }
 
-public Action Hook_WeaponCanSwitchTo(int client, int weapon)
-{
-	if (g_hBotMimicsRecord[client] == null)
-		return Plugin_Continue;
-
-	if (g_BotActiveWeapon[client] != weapon)
-	{
-		return Plugin_Stop;
-	}
-	return Plugin_Continue;
-}
-
+// Start zone EndTouch(should be starttouch if add preframe)
 public void StartRecording(int client)
 {
 	if (!IsValidClient(client) || IsFakeClient(client))
+	{
 		return;
+	}
 
-	g_hRecording[client] = CreateArray(sizeof(FrameInfo));
-	g_hRecordingAdditionalTeleport[client] = CreateArray(sizeof(AdditionalTeleport));
-	GetClientAbsOrigin(client, g_fInitialPosition[client]);
-	GetClientEyeAngles(client, g_fInitialAngles[client]);
-	g_RecordedTicks[client] = 0;
-	g_OriginSnapshotInterval[client] = 0;
+	g_iRecordedTicks[client] = 0;
 }
 
 public void StopRecording(int client)
 {
-	if (!IsValidClient(client) || g_hRecording[client] == null)
+	if (!IsValidClient(client))
+	{
 		return;
+	}
 
-	CloseHandle(g_hRecording[client]);
-	CloseHandle(g_hRecordingAdditionalTeleport[client]);
-	g_hRecording[client] = null;
-	g_hRecordingAdditionalTeleport[client] = null;
-
-	g_RecordedTicks[client] = 0;
-	g_RecordPreviousWeapon[client] = 0;
-	g_CurrentAdditionalTeleportIndex[client] = 0;
-	g_OriginSnapshotInterval[client] = 0;
+	ClearFrame(client);
 }
 
 public void SaveRecording(int client, int zgroup, int style)
 {
-	if (!IsValidClient(client) || g_hRecording[client] == null)
-		return;
-	else
+	if (!IsValidClient(client) || g_aRecording[client] == null)
 	{
-		g_bNewReplay[client] = false;
-		g_bNewBonus[client] = false;
+		return;
 	}
 
-	char sPath2[256];
+	g_bNewReplay[client] = false;
+	g_bNewBonus[client] = false;
+
 	// Check if the default record folder exists
+	char sPath2[256];
 	BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s", CK_REPLAY_PATH);
 	if (!DirExists(sPath2))
+	{
 		CreateDirectory(sPath2, 511);
+	}
 
 	// Build path
 	char sPath3[256];
@@ -149,11 +154,15 @@ public void SaveRecording(int client, int zgroup, int style)
 
 	// Bonus replay path
 	if (zgroup > 0)
+	{
 		Format(sPath3, sizeof(sPath3), "%s_bonus_%d", sPath3, zgroup);
+	}
 	
 	// Style replay path
 	if (style > 0)
+	{
 		Format(sPath3, sizeof(sPath3), "%s_style_%d", sPath3, style);
+	}
 	
 	// Finish the path
 	Format(sPath3, sizeof(sPath3), "%s.rec", sPath3);
@@ -172,38 +181,42 @@ public void SaveRecording(int client, int zgroup, int style)
 	FileHeader header;
 	header.BinaryFormatVersion = BINARY_FORMAT_VERSION;
 	strcopy(header.Time, sizeof(FileHeader::Time), g_szFinalTime[client]);
-	header.TickCount = GetArraySize(g_hRecording[client]);
+	header.TickCount = g_iRecordedTicks[client];
 	strcopy(header.Playername, sizeof(FileHeader::Playername), szName);
-	header.Checkpoints = 0; // So that KZTimers replays work
-	Array_Copy(g_fInitialPosition[client], header.InitialPosition, 3);
-	Array_Copy(g_fInitialAngles[client], header.InitialAngles, 3);
-	header.Frames = g_hRecording[client];
-
-	if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > 0)
-		SetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath2, g_hRecordingAdditionalTeleport[client]);
-	else
-		CloseHandle(g_hRecordingAdditionalTeleport[client]);
-
-	g_hRecordingAdditionalTeleport[client] = null;
+	header.Checkpoints = 0;
+	header.Frames = g_aRecording[client];
 
 	WriteRecordToDisk(sPath2, header);
 
 	g_bNewReplay[client] = false;
 	g_bNewBonus[client] = false;
 
-	if (g_hRecording[client] != null)
+	if (g_aRecording[client] != null)
+	{
 		StopRecording(client);
+	}
 }
 
+static void ClearFrame(int client)
+{
+	delete g_aRecording[client];
+	g_aRecording[client] = new ArrayList(sizeof(frame_t));
+	g_iRecordedTicks[client] = 0;
+}
 
 public void LoadReplays()
 {
 	if (!GetConVarBool(g_hReplayBot) && !GetConVarBool(g_hBonusBot) && !GetConVarBool(g_hWrcpBot))
+	{
 		return;
+	}
 
 	// Init Variables:
 	for (int i = 0; i < MAX_STYLES; i++)
+	{
 		g_bMapReplay[i] = false;
+	}
+
 	for (int i = 0; i < MAXZONEGROUPS; i++)
 	{
 		for (int j = 0; j < MAX_STYLES; j++)
@@ -223,21 +236,8 @@ public void LoadReplays()
 	g_BonusBot = -1;
 	g_WrcpBot = -1;
 	g_iCurrentBonusReplayIndex = 0;
-
-	Handle hSnapshot = CreateTrieSnapshot(g_hLoadedRecordsAdditionalTeleport);
-	int iSnapshotLength = TrieSnapshotLength(hSnapshot);
-	char sKey[PLATFORM_MAX_PATH];
-	Handle hAT;
-	for (int i = 0; i < iSnapshotLength; i++)
-	{
-		GetTrieSnapshotKey(hSnapshot, i, sKey, sizeof(sKey));
-		GetTrieValue(g_hLoadedRecordsAdditionalTeleport, sKey, hAT);
-		delete hAT;
-	}
-	CloseHandle(hSnapshot);
-	ClearTrie(g_hLoadedRecordsAdditionalTeleport);
-
 	g_bFirstStageReplay = false;
+
 	if (g_bhasStages)
 	{
 		char sPath2[256];
@@ -251,22 +251,21 @@ public void LoadReplays()
 					g_StageReplayCurrentStage = i;
 					g_bFirstStageReplay = true;
 				}
+
 				g_bStageReplay[i] = true;
-				setReplayTime(0, i, 0);
+				SetReplayTime(0, i, 0);
 			}
 		}
+
 		g_StageReplaysLoop = 1;
 	}
-
-
-	ClearTrie(g_hLoadedRecordsAdditionalTeleport);
 
 	// Check that map replay exists
 	char sPath[256];
 	BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s.rec", CK_REPLAY_PATH, g_szMapName);
 	if (FileExists(sPath))
 	{
-		setReplayTime(0, 0, 0);
+		SetReplayTime(0, 0, 0);
 		g_bMapReplay[0] = true;
 	}
 	else// Check if backup exists
@@ -276,16 +275,16 @@ public void LoadReplays()
 		if (FileExists(sPathBack))
 		{
 			RenameFile(sPath, sPathBack);
-			setReplayTime(0, 0, 0);
+			SetReplayTime(0, 0, 0);
 			g_bMapReplay[0] = true;
 		}
 	}
 
 	// Try to fix old bonus replays
 	BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s_Bonus.rec", CK_REPLAY_PATH, g_szMapName);
-	Handle hFilex = OpenFile(sPath, "r");
+	File fFile = OpenFile(sPath, "r");
 
-	if (hFilex != null)
+	if (fFile != null)
 	{
 		FileHeader header;
 		float initPos[3];
@@ -297,12 +296,13 @@ public void LoadReplays()
 		{
 			BuildPath(Path_SM, newPath, sizeof(newPath), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, g_szMapName, g_mapZones[zId].ZoneGroup);
 			if (RenameFile(newPath, sPath))
+			{
 				PrintToServer("SurfTimer | Succesfully renamed bonus record file to: %s", newPath);
+			}
 		}
-		CloseHandle(hFilex);
 	}
-	hFilex = null;
-	delete hFilex;
+
+	delete fFile;
 
 	// Check if bonus replays exists
 	for (int i = 1; i < g_mapZoneGroupCount; i++)
@@ -310,7 +310,7 @@ public void LoadReplays()
 		BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, g_szMapName, i);
 		if (FileExists(sPath))
 		{
-			setReplayTime(i, 0, 0);
+			SetReplayTime(i, 0, 0);
 			g_iBonusToReplay[g_BonusBotCount] = i;
 			g_BonusBotCount++;
 			g_bMapBonusReplay[i][0] = true;
@@ -322,7 +322,7 @@ public void LoadReplays()
 			BuildPath(Path_SM, sPathBack, sizeof(sPathBack), "%s%s_bonus_%i.rec.bak", CK_REPLAY_PATH, g_szMapName, i);
 			if (FileExists(sPathBack))
 			{
-				setReplayTime(i, 0, 0);
+				SetReplayTime(i, 0, 0);
 				RenameFile(sPath, sPathBack);
 				g_iBonusToReplay[g_BonusBotCount] = i;
 				g_BonusBotCount++;
@@ -338,7 +338,7 @@ public void LoadReplays()
 		if (FileExists(sPath))
 		{
 			g_bMapReplay[i] = true;
-			setReplayTime(0, 0, i);
+			SetReplayTime(0, 0, i);
 		}
 		else
 		{
@@ -348,7 +348,7 @@ public void LoadReplays()
 			if (FileExists(sPathBack))
 			{
 				g_bMapReplay[i] = true;
-				setReplayTime(0, 0, i);
+				SetReplayTime(0, 0, i);
 				RenameFile(sPath, sPathBack);
 			}
 		}
@@ -363,7 +363,7 @@ public void LoadReplays()
 			if (FileExists(sPath))
 			{
 				g_bMapBonusReplay[i][j] = true;
-				setReplayTime(i, 0, j);
+				SetReplayTime(i, 0, j);
 			}
 			else
 			{
@@ -373,7 +373,7 @@ public void LoadReplays()
 				if (FileExists(sPathBack))
 				{
 					g_bMapBonusReplay[i][j] = true;
-					setReplayTime(i, 0, j);
+					SetReplayTime(i, 0, j);
 					RenameFile(sPath, sPathBack);
 				}
 			}
@@ -381,20 +381,27 @@ public void LoadReplays()
 	}
 
 	if (g_bMapReplay[0])
+	{
 		CreateTimer(1.0, RefreshBot, TIMER_FLAG_NO_MAPCHANGE);
+	}
 
 	if (g_BonusBotCount > 0)
+	{
 		CreateTimer(1.0, RefreshBonusBot, TIMER_FLAG_NO_MAPCHANGE);
+	}
 
 	if (g_bhasStages)
+	{
 		CreateTimer(1.0, RefreshWrcpBot, TIMER_FLAG_NO_MAPCHANGE);
+	}
 }
 
 public void PlayRecord(int client, int type, int style)
 {
-	// He's currently recording. Don't start to play some record on him at the same time.
-	if (!IsValidClient(client) || g_hRecording[client] != null || !IsFakeClient(client))
+	if (!IsValidClient(client))
+	{
 		return;
+	}
 
 	char buffer[256];
 	char sPath[256];
@@ -403,28 +410,44 @@ public void PlayRecord(int client, int type, int style)
 	if (type > 0)
 	{
 		if (g_iCurrentBonusReplayIndex == 99)
+		{
 			bonus = type;
+		}
 		else
+		{
 			bonus = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
+		}
 	}
 
 	if (style == 0)
 	{
 		if (type == 0)
+		{
 			Format(sPath, sizeof(sPath), "%s%s.rec", CK_REPLAY_PATH, g_szMapName);
+		}
 		else if (type > 0)
+		{
 			Format(sPath, sizeof(sPath), "%s%s_bonus_%d.rec", CK_REPLAY_PATH, g_szMapName, bonus);
+		}
 		else if (type < 0)
+		{
 			Format(sPath, sizeof(sPath), "%s%s_stage_%d.rec", CK_REPLAY_PATH, g_szMapName, (type * -1));
+		}
 	}
 	else
 	{
 		if (type == 0)
+		{
 			Format(sPath, sizeof(sPath), "%s%s_style_%d.rec", CK_REPLAY_PATH, g_szMapName, style);
+		}
 		else if (type > 0)
+		{
 			Format(sPath, sizeof(sPath), "%s%s_bonus_%d_style_%d.rec", CK_REPLAY_PATH, g_szMapName, bonus, style);
+		}
 		else if (type < 0)
+		{
 			Format(sPath, sizeof(sPath), "%s%s_stage_%d_style_%d.rec", CK_REPLAY_PATH, g_szMapName, (type * -1), style);
+		}
 	}
 
 	FileHeader header;
@@ -435,6 +458,7 @@ public void PlayRecord(int client, int type, int style)
 	{
 		Format(g_szReplayTime, sizeof(g_szReplayTime), "%s", header.Time);
 		Format(g_szReplayName, sizeof(g_szReplayName), "%s", header.Playername);
+
 		if (style == 0)
 		{
 			Format(buffer, sizeof(buffer), "%s (%s)", g_szReplayName, g_szReplayTime);
@@ -490,9 +514,10 @@ public void PlayRecord(int client, int type, int style)
 		}
 	}
 
-	g_hBotMimicsRecord[client] = header.Frames;
-	g_BotMimicTick[client] = 0;
-	g_BotMimicRecordTickCount[client] = header.TickCount;
+	g_aReplayFrame[client] = header.Frames;
+	g_iReplayVersion[client] = header.BinaryFormatVersion;
+	g_iReplayTick[client] = 0;
+	g_iRecordedTicksCount[client] = header.TickCount;
 	g_CurrentAdditionalTeleportIndex[client] = 0;
 
 	Array_Copy(header.InitialPosition, g_fInitialPosition[client], 3);
@@ -506,175 +531,189 @@ public void PlayRecord(int client, int type, int style)
 	{
 		CS_RespawnPlayer(client);
 		if (GetConVarBool(g_hForceCT))
+		{
 			TeamChangeActual(client, 2);
+		}
 	}
 }
 
-public void WriteRecordToDisk(const char[] sPath, FileHeader header)
+public bool WriteRecordToDisk(const char[] sPath, FileHeader header)
 {
-	Handle hFile = OpenFile(sPath, "wb");
-	if (hFile == null)
+	File fFile = OpenFile(sPath, "wb");
+	if (fFile == null)
 	{
 		LogError("Can't open the record file for writing! (%s)", sPath);
-		return;
+
+		delete fFile;
+
+		return false;
 	}
 
-	WriteFileCell(hFile, BM_MAGIC, 4);
-	WriteFileCell(hFile, header.BinaryFormatVersion, 1);
-	WriteFileCell(hFile, strlen(header.Time), 1);
-	WriteFileString(hFile, header.Time, false);
-	WriteFileCell(hFile, strlen(header.Playername), 1);
-	WriteFileString(hFile, header.Playername, false);
-	WriteFileCell(hFile, header.Checkpoints, 4);
-	WriteFile(hFile, view_as<int>(header.InitialPosition), 3, 4);
-	WriteFile(hFile, view_as<int>(header.InitialAngles), 2, 4);
+	fFile.WriteInt32(BM_MAGIC);
+	fFile.WriteInt8(header.BinaryFormatVersion);
+	fFile.WriteInt8(strlen(header.Time));
+	fFile.WriteString(header.Time, false);
+	fFile.WriteInt8(strlen(header.Playername));
+	fFile.WriteString(header.Playername, false);
+	fFile.WriteInt32(header.Checkpoints);
+	fFile.Write(view_as<int>(header.InitialPosition), 3, 4);
+	fFile.Write(view_as<int>(header.InitialAngles), 2, 4);
+	fFile.WriteInt32(header.TickCount);
 
-	Handle hAdditionalTeleport;
-	int iATIndex;
-	GetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath, hAdditionalTeleport);
+	// use 'any' type to store origin[3], angles[2], buttons, flags, movetype
+	any aFrameData[sizeof(frame_t)];
+	// optimized replay writing to do less system calls
+	any aWriteData[sizeof(frame_t) * 100];
+	int iFramesWritten = 0;
 
-	int iTickCount = header.TickCount;
-	WriteFileCell(hFile, iTickCount, 4);
-
-	FrameInfo iFrame;
-	for (int i = 0; i < iTickCount; i++)
+	for(int i = 0; i < header.Frames.Length; i++)
 	{
-		GetArrayArray(header.Frames, i, iFrame, sizeof(FrameInfo));
-		WriteFile(hFile, iFrame.PlayerButtons, sizeof(FrameInfo::PlayerButtons), 4);
-		WriteFile(hFile, iFrame.PlayerImpulse, sizeof(FrameInfo::PlayerImpulse), 4);
-		WriteFile(hFile, view_as<int>(iFrame.ActualVelocity), sizeof(FrameInfo::ActualVelocity), 4);
-		WriteFile(hFile, view_as<int>(iFrame.PredictedVelocity), sizeof(FrameInfo::PredictedVelocity), 4);
-		WriteFile(hFile, view_as<int>(iFrame.PredictedAngles), sizeof(FrameInfo::PredictedAngles), 4);
-		WriteFile(hFile, view_as<int>(iFrame.NewWeapon), sizeof(FrameInfo::NewWeapon), 4);
-		WriteFile(hFile, iFrame.PlayerSubtype, sizeof(FrameInfo::PlayerSubtype), 4);
-		WriteFile(hFile, iFrame.PlayerSeed, sizeof(FrameInfo::PlayerSeed), 4);
-		WriteFile(hFile, iFrame.AdditionalFields, sizeof(FrameInfo::AdditionalFields), 4);
-		WriteFile(hFile, iFrame.Pause, sizeof(FrameInfo::Pause), 4);
+		header.Frames.GetArray(i, aFrameData, sizeof(frame_t));
 
-		// Handle the optional Teleport call
-		if (hAdditionalTeleport != null && iFrame.AdditionalFields & (ADDITIONAL_FIELD_TELEPORTED_ORIGIN | ADDITIONAL_FIELD_TELEPORTED_ANGLES | ADDITIONAL_FIELD_TELEPORTED_VELOCITY))
+		for(int j = 0; j < sizeof(frame_t); j++)
 		{
-			AdditionalTeleport iAT;
-			GetArrayArray(hAdditionalTeleport, iATIndex, iAT, sizeof(AdditionalTeleport));
-			if (iFrame.AdditionalFields & ADDITIONAL_FIELD_TELEPORTED_ORIGIN)
-				WriteFile(hFile, view_as<int>(iAT.AtOrigin), 3, 4);
-			if (iFrame.AdditionalFields & ADDITIONAL_FIELD_TELEPORTED_ANGLES)
-				WriteFile(hFile, view_as<int>(iAT.AtAngles), 3, 4);
-			if (iFrame.AdditionalFields & ADDITIONAL_FIELD_TELEPORTED_VELOCITY)
-				WriteFile(hFile, view_as<int>(iAT.AtVelocity), 3, 4);
-			iATIndex++;
+			aWriteData[(sizeof(frame_t) * iFramesWritten) + j] = aFrameData[j];
+		}
+
+		if(++iFramesWritten == 100 || i == header.Frames.Length - 1)
+		{
+			fFile.Write(aWriteData, sizeof(frame_t) * iFramesWritten, 4);
+
+			iFramesWritten = 0;
 		}
 	}
 
-	CloseHandle(hFile);
+	delete fFile;
+
 	LoadReplays();
+
+	return true;
 }
 
-public void LoadRecordFromFile(const char[] path, FileHeader header, bool headerOnly)
+public bool LoadRecordFromFile(const char[] path, FileHeader header, bool headerOnly)
 {
-	Handle hFile = OpenFile(path, "rb");
-	if (hFile == null)
-		return;
+	File fFile = OpenFile(path, "rb");
+	if (fFile == null)
+	{
+		delete fFile;
+		return false;
+	}
+
 	int iMagic;
-	ReadFileCell(hFile, iMagic, 4);
+	fFile.ReadInt32(iMagic);
 	if (iMagic != BM_MAGIC)
 	{
-		CloseHandle(hFile);
-		return;
+		delete fFile;
+		return false;
 	}
-	int iBinaryFormatVersion;
-	ReadFileCell(hFile, iBinaryFormatVersion, 1);
-	header.BinaryFormatVersion = iBinaryFormatVersion;
 
-	if (iBinaryFormatVersion > BINARY_FORMAT_VERSION)
-	{
-		CloseHandle(hFile);
-		return;
-	}
+	fFile.ReadInt8(header.BinaryFormatVersion);
 
 	int iNameLength;
-	ReadFileCell(hFile, iNameLength, 1);
+	fFile.ReadInt8(iNameLength);
 	char szTime[MAX_NAME_LENGTH];
-	ReadFileString(hFile, szTime, iNameLength + 1, iNameLength);
+	fFile.ReadString(szTime, iNameLength + 1, iNameLength);
 	szTime[iNameLength] = '\0';
+	strcopy(header.Time, sizeof(FileHeader::Time), szTime);
 
 	int iNameLength2;
-	ReadFileCell(hFile, iNameLength2, 1);
+	fFile.ReadInt8(iNameLength2);
 	char szName[MAX_NAME_LENGTH];
-	ReadFileString(hFile, szName, iNameLength2 + 1, iNameLength2);
+	fFile.ReadString(szName, iNameLength2 + 1, iNameLength2);
 	szName[iNameLength2] = '\0';
-
-	int iCp;
-	ReadFileCell(hFile, iCp, 4);
-
-	ReadFile(hFile, view_as<int>(header.InitialPosition), 3, 4);
-	ReadFile(hFile, view_as<int>(header.InitialAngles), 2, 4);
-
-	int iTickCount;
-	ReadFileCell(hFile, iTickCount, 4);
-
-	strcopy(header.Time, sizeof(FileHeader::Time), szTime);
 	strcopy(header.Playername, sizeof(FileHeader::Playername), szName);
-	header.Checkpoints = iCp;
-	header.TickCount = iTickCount;
-	header.Frames = null;
 
-	if (headerOnly)
+	fFile.ReadInt32(header.Checkpoints);
+	fFile.Read(view_as<int>(header.InitialPosition), 3, 4);
+	fFile.Read(view_as<int>(header.InitialAngles), 2, 4);
+	fFile.ReadInt32(header.TickCount);
+
+	if (header.BinaryFormatVersion >= BINARY_FORMAT_VERSION)
 	{
-		CloseHandle(hFile);
-		return;
-	}
+		header.Frames = new ArrayList(sizeof(frame_t), header.TickCount);
 
-	Handle hRecordFrames = CreateArray(sizeof(FrameInfo));
-	Handle hAdditionalTeleport = CreateArray(sizeof(AdditionalTeleport));
+		any aReplayData[sizeof(frame_t)];
 
-	FrameInfo iFrame;
-	for (int i = 0; i < iTickCount; i++)
-	{
-		ReadFile(hFile, iFrame.PlayerButtons, sizeof(FrameInfo::PlayerButtons), 4);
-		ReadFile(hFile, iFrame.PlayerImpulse, sizeof(FrameInfo::PlayerImpulse), 4);
-		ReadFile(hFile, view_as<int>(iFrame.ActualVelocity), sizeof(FrameInfo::ActualVelocity), 4);
-		ReadFile(hFile, view_as<int>(iFrame.PredictedVelocity), sizeof(FrameInfo::PredictedVelocity), 4);
-		ReadFile(hFile, view_as<int>(iFrame.PredictedAngles), sizeof(FrameInfo::PredictedAngles), 4);
-		ReadFile(hFile, view_as<int>(iFrame.NewWeapon), sizeof(FrameInfo::NewWeapon), 4);
-		ReadFile(hFile, iFrame.PlayerSubtype, sizeof(FrameInfo::PlayerSubtype), 4);
-		ReadFile(hFile, iFrame.PlayerSeed, sizeof(FrameInfo::PlayerSeed), 4);
-		ReadFile(hFile, iFrame.AdditionalFields, sizeof(FrameInfo::AdditionalFields), 4);
-		ReadFile(hFile, iFrame.Pause, sizeof(FrameInfo::Pause), 4);
-		PushArrayArray(hRecordFrames, iFrame, sizeof(FrameInfo));
-
-		if (iFrame.AdditionalFields & (ADDITIONAL_FIELD_TELEPORTED_ORIGIN | ADDITIONAL_FIELD_TELEPORTED_ANGLES | ADDITIONAL_FIELD_TELEPORTED_VELOCITY))
+		for(int i = 0; i < header.TickCount; i++)
 		{
-			AdditionalTeleport iAT;
-			if (iFrame.AdditionalFields & ADDITIONAL_FIELD_TELEPORTED_ORIGIN)
-				ReadFile(hFile, view_as<int>(iAT.AtOrigin), 3, 4);
-			if (iFrame.AdditionalFields & ADDITIONAL_FIELD_TELEPORTED_ANGLES)
-				ReadFile(hFile, view_as<int>(iAT.AtAngles), 3, 4);
-			if (iFrame.AdditionalFields & ADDITIONAL_FIELD_TELEPORTED_VELOCITY)
-				ReadFile(hFile, view_as<int>(iAT.AtVelocity), 3, 4);
-			view_as<int>(iAT.AtFlags) = iFrame.AdditionalFields & (ADDITIONAL_FIELD_TELEPORTED_ORIGIN | ADDITIONAL_FIELD_TELEPORTED_ANGLES | ADDITIONAL_FIELD_TELEPORTED_VELOCITY);
-			PushArrayArray(hAdditionalTeleport, iAT, sizeof(AdditionalTeleport));
+			if(fFile.Read(aReplayData, sizeof(frame_t), 4) >= 0)
+			{
+				header.Frames.SetArray(i, aReplayData, sizeof(frame_t));
+			}
+		}
+	}
+	else // old replay
+	{
+		header.Frames = null;
+
+		if (headerOnly)
+		{
+			delete fFile;
+			return true;
+		}
+
+		ArrayList aRecordFrames = new ArrayList(sizeof(FrameInfo));
+		ArrayList aAdditionalTeleport = new ArrayList(sizeof(AdditionalTeleport));
+
+		FrameInfo iFrame;
+		for (int i = 0; i < header.TickCount; i++)
+		{
+			fFile.Read(iFrame.PlayerButtons, sizeof(FrameInfo::PlayerButtons), 4);
+			fFile.Read(iFrame.PlayerImpulse, sizeof(FrameInfo::PlayerImpulse), 4);
+			fFile.Read(view_as<int>(iFrame.ActualVelocity), sizeof(FrameInfo::ActualVelocity), 4);
+			fFile.Read(view_as<int>(iFrame.PredictedVelocity), sizeof(FrameInfo::PredictedVelocity), 4);
+			fFile.Read(view_as<int>(iFrame.PredictedAngles), sizeof(FrameInfo::PredictedAngles), 4);
+			fFile.Read(view_as<int>(iFrame.NewWeapon), sizeof(FrameInfo::NewWeapon), 4);
+			fFile.Read(iFrame.PlayerSubtype, sizeof(FrameInfo::PlayerSubtype), 4);
+			fFile.Read(iFrame.PlayerSeed, sizeof(FrameInfo::PlayerSeed), 4);
+			fFile.Read(iFrame.AdditionalFields, sizeof(FrameInfo::AdditionalFields), 4);
+			fFile.Read(iFrame.Pause, sizeof(FrameInfo::Pause), 4);
+			aRecordFrames.PushArray(iFrame, sizeof(FrameInfo));
+
+			if (iFrame.AdditionalFields & (ADDITIONAL_FIELD_TELEPORTED_ORIGIN | ADDITIONAL_FIELD_TELEPORTED_ANGLES | ADDITIONAL_FIELD_TELEPORTED_VELOCITY))
+			{
+				AdditionalTeleport iAT;
+				if (iFrame.AdditionalFields & ADDITIONAL_FIELD_TELEPORTED_ORIGIN)
+				{
+					fFile.Read(view_as<int>(iAT.AtOrigin), 3, 4);
+				}
+				if (iFrame.AdditionalFields & ADDITIONAL_FIELD_TELEPORTED_ANGLES)
+				{
+					fFile.Read(view_as<int>(iAT.AtAngles), 3, 4);
+				}
+				if (iFrame.AdditionalFields & ADDITIONAL_FIELD_TELEPORTED_VELOCITY)
+				{
+					fFile.Read(view_as<int>(iAT.AtVelocity), 3, 4);
+				}
+
+				view_as<int>(iAT.AtFlags) = iFrame.AdditionalFields & (ADDITIONAL_FIELD_TELEPORTED_ORIGIN | ADDITIONAL_FIELD_TELEPORTED_ANGLES | ADDITIONAL_FIELD_TELEPORTED_VELOCITY);
+				aAdditionalTeleport.PushArray(iAT, sizeof(AdditionalTeleport));
+			}
+		}
+
+		header.Frames = aRecordFrames;
+
+		// Free any old handles if we already loaded this one once before.
+		StringMap smOldAT;
+		if (g_smLoadedRecordsAdditionalTeleport.GetValue(path, smOldAT))
+		{
+			delete smOldAT;
+			g_smLoadedRecordsAdditionalTeleport.Remove(path);
+		}
+
+		if (aAdditionalTeleport.Length > 0)
+		{
+			g_smLoadedRecordsAdditionalTeleport.SetValue(path, aAdditionalTeleport);
+		}
+		else
+		{
+			delete aAdditionalTeleport;
 		}
 	}
 
-	header.Frames = hRecordFrames;
+	delete fFile;
 
-	// Free any old handles if we already loaded this one once before.
-	Handle hOldAT;
-	if (GetTrieValue(g_hLoadedRecordsAdditionalTeleport, path, hOldAT))
-	{
-		delete hOldAT;
-		RemoveFromTrie(g_hLoadedRecordsAdditionalTeleport, path);
-	}
-
-	if (GetArraySize(hAdditionalTeleport) > 0)
-		SetTrieValue(g_hLoadedRecordsAdditionalTeleport, path, hAdditionalTeleport);
-	else
-		CloseHandle(hAdditionalTeleport);
-
-	CloseHandle(hFile);
-
-	return;
+	return true;
 }
 
 public Action RefreshBot(Handle timer)
@@ -690,12 +729,17 @@ public void LoadRecordReplay()
 	for (int i = 1; i <= MaxClients; i++)
 	{
 		if (!IsValidClient(i) || !IsFakeClient(i) || IsClientSourceTV(i) || i == g_InfoBot || i == g_BonusBot || i == g_WrcpBot)
+		{
 			continue;
+		}
+
 		if (!IsPlayerAlive(i))
 		{
 			CS_RespawnPlayer(i);
 			if (GetConVarBool(g_hForceCT))
+			{
 				TeamChangeActual(i, 2);
+			}
 		}
 
 		g_RecordBot = i;
@@ -708,14 +752,12 @@ public void LoadRecordReplay()
 		char clantag[100];
 		CS_GetClientClanTag(g_RecordBot, clantag, sizeof(clantag));
 		if (StrContains(clantag, "REPLAY") == -1)
+		{
 			g_bNewRecordBot = true;
+		}
 
 		g_iClientInZone[g_RecordBot][2] = 0;
 
-		// "Having a bot in noclip and zero gravity ensures it's smooth" - Crashfort
-		// https://github.com/crashfort/SourceToolAssist/blob/be9218583ee0a8086c817a5bd29101b2a260e5a7/Source/surf_segmentplay.sp#L113
-		// Disabling noclip, makes the bot bug, look into later
-		// SetEntityMoveType(g_RecordBot, MOVETYPE_NOCLIP);
 		SetEntityGravity(g_RecordBot, 0.0);
 
 		PlayRecord(g_RecordBot, 0, 0);
@@ -736,6 +778,7 @@ public void LoadRecordReplay()
 		CreateTimer(1.0, RefreshBot, TIMER_FLAG_NO_MAPCHANGE);
 	}
 }
+
 public Action RefreshBonusBot(Handle timer)
 {
 	setBotQuota();
@@ -749,14 +792,18 @@ public void LoadBonusReplay()
 	for (int i = 1; i <= MaxClients; i++)
 	{
 		if (!IsValidClient(i) || !IsFakeClient(i) || IsClientSourceTV(i) || i == g_InfoBot || i == g_RecordBot || i == g_WrcpBot)
+		{
 			continue;
+		}
 
 		if (!IsPlayerAlive(i))
 		{
 			CS_RespawnPlayer(i);
 
 			if (GetConVarBool(g_hForceCT))
+			{
 				TeamChangeActual(i, 2);
+			}
 		}
 
 		g_BonusBot = i;
@@ -769,13 +816,12 @@ public void LoadBonusReplay()
 		char clantag[100];
 		CS_GetClientClanTag(g_BonusBot, clantag, sizeof(clantag));
 		if (StrContains(clantag, "REPLAY") == -1)
+		{
 			g_bNewBonusBot = true;
+		}
+
 		g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[0];
 
-		// "Having a bot in noclip and zero gravity ensures it's smooth" - Crashfort
-		// https://github.com/crashfort/SourceToolAssist/blob/be9218583ee0a8086c817a5bd29101b2a260e5a7/Source/surf_segmentplay.sp#L113
-		// Disabling noclip, makes the bot bug, look into later
-		// SetEntityMoveType(g_BonusBot, MOVETYPE_NOCLIP);
 		SetEntityGravity(g_BonusBot, 0.0);
 
 		PlayRecord(g_BonusBot, 1, 0);
@@ -810,14 +856,18 @@ public void LoadWrcpReplay()
 	for (int i = 1; i <= MaxClients; i++)
 	{
 		if (!IsValidClient(i) || !IsFakeClient(i) || IsClientSourceTV(i) || i == g_InfoBot || i == g_RecordBot || i == g_BonusBot)
+		{
 			continue;
+		}
 
 		if (!IsPlayerAlive(i))
 		{
 			CS_RespawnPlayer(i);
 
 			if (GetConVarBool(g_hForceCT))
+			{
 				TeamChangeActual(i, 2);
+			}
 		}
 
 		g_WrcpBot = i;
@@ -832,10 +882,6 @@ public void LoadWrcpReplay()
 
 		g_iClientInZone[g_WrcpBot][2] = 0;
 
-		// "Having a bot in noclip and zero gravity ensures it's smooth" - Crashfort
-		// https://github.com/crashfort/SourceToolAssist/blob/be9218583ee0a8086c817a5bd29101b2a260e5a7/Source/surf_segmentplay.sp#L113
-		// Disabling noclip, makes the bot bug, look into later
-		// SetEntityMoveType(g_WrcpBot, MOVETYPE_NOCLIP);
 		SetEntityGravity(g_WrcpBot, 0.0);
 
 		PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0);
@@ -860,205 +906,120 @@ public void LoadWrcpReplay()
 public void StopPlayerMimic(int client)
 {
 	if (!IsValidClient(client))
-		return;
-
-	g_BotMimicTick[client] = 0;
-	g_CurrentAdditionalTeleportIndex[client] = 0;
-	g_BotMimicRecordTickCount[client] = 0;
-	g_bValidTeleportCall[client] = false;
-	delete g_hBotMimicsRecord[client];
-}
-
-public bool IsPlayerMimicing(int client)
-{
-	if (!IsValidClient(client))
-		return false;
-	return g_hBotMimicsRecord[client] != null;
-}
-
-public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int &impulse, int &weapon, float angles[3], float vel[3])
-{
-	if (g_hRecording[client] != null && !IsFakeClient(client))
 	{
-		// Dont record pause frames
-		if (g_bPause[client])
-			return;
-
-		FrameInfo iFrame;
-		iFrame.PlayerButtons = buttons;
-		iFrame.PlayerImpulse = impulse;
-
-		float vVel[3];
-		Entity_GetAbsVelocity(client, vVel);
-		iFrame.ActualVelocity = vVel;
-		iFrame.PredictedVelocity = vel;
-
-		Array_Copy(angles, iFrame.PredictedAngles, 2);
-		iFrame.NewWeapon = CSWeapon_NONE;
-		iFrame.PlayerSubtype = subtype;
-		iFrame.PlayerSeed = seed;
-
-		// Save the current position
-		if (g_OriginSnapshotInterval[client] > ORIGIN_SNAPSHOT_INTERVAL || g_createAdditionalTeleport[client])
-		{
-			AdditionalTeleport iAT;
-			float fBuffer[3];
-			GetClientAbsOrigin(client, fBuffer);
-			Array_Copy(fBuffer, iAT.AtOrigin, 3);
-
-			iAT.AtFlags = ADDITIONAL_FIELD_TELEPORTED_ORIGIN;
-			PushArrayArray(g_hRecordingAdditionalTeleport[client], iAT, sizeof(AdditionalTeleport));
-			g_OriginSnapshotInterval[client] = 0;
-			g_createAdditionalTeleport[client] = false;
-		}
-		g_OriginSnapshotInterval[client]++;
-
-		// Check for additional Teleports
-		if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > g_CurrentAdditionalTeleportIndex[client])
-		{
-			AdditionalTeleport iAT;
-			GetArrayArray(g_hRecordingAdditionalTeleport[client], g_CurrentAdditionalTeleportIndex[client], iAT, sizeof(AdditionalTeleport));
-			// Remember, we were teleported this frame!
-			iFrame.AdditionalFields |= iAT.AtFlags;
-			g_CurrentAdditionalTeleportIndex[client]++;
-		}
-
-		PushArrayArray(g_hRecording[client], iFrame, sizeof(FrameInfo));
-		g_RecordedTicks[client]++;
+		return;
 	}
+
+	g_iReplayTick[client] = 0;
+	g_CurrentAdditionalTeleportIndex[client] = 0;
+	g_iRecordedTicksCount[client] = 0;
+	g_bValidTeleportCall[client] = false;
+	delete g_aReplayFrame[client];
+}
+
+public void RecordReplay(int client, int &buttons, int &subtype, int &seed, int &impulse, int &weapon, float angles[3], float vel[3])
+{
+	if (g_aRecording[client] == null || g_bPause[client])
+	{
+		return;
+	}
+
+	if (g_aRecording[client].Length <= g_iRecordedTicks[client])
+	{
+		// Add about two seconds worth of frames so we don't have to resize so often
+		g_aRecording[client].Resize(g_iRecordedTicks[client] + (RoundToCeil(g_fTickrate) * 2));
+	}
+
+	//origin[3], angles[2], buttons, flags, movetype
+	frame_t aFrame;
+
+	GetClientAbsOrigin(client, aFrame.pos);
+	float vecEyes[3];
+	GetClientEyeAngles(client, vecEyes);
+	aFrame.ang[0] = vecEyes[0];
+	aFrame.ang[1] = vecEyes[1];
+	aFrame.buttons = buttons;
+	aFrame.flags = GetEntityFlags(client);
+	aFrame.mt = GetEntityMoveType(client);
+
+	g_aRecording[client].SetArray(g_iRecordedTicks[client]++, aFrame, sizeof(aFrame));
 }
 
 public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &impulse, int &weapon, float angles[3], float vel[3])
 {
-	if (g_hBotMimicsRecord[client] != null)
+	if (GetClientTeam(client) < CS_TEAM_T || 
+		g_aReplayFrame[client] == null)
 	{
-		if (!IsPlayerAlive(client) || GetClientTeam(client) < CS_TEAM_T)
-			return;
+		return;
+	}
 
-		if (g_BotMimicTick[client] >= g_BotMimicRecordTickCount[client] || g_bReplayAtEnd[client])
+	LoopReplay(client);
+
+	if(g_iReplayVersion[client] >= BINARY_FORMAT_VERSION)
+	{
+		// origin[3], angles[2], buttons, flags, movetype
+		frame_t aFrame;
+		g_aReplayFrame[client].GetArray(g_iReplayTick[client], aFrame, sizeof(aFrame));
+
+		buttons = aFrame.buttons;
+
+		float vecCurrentPosition[3];
+		GetEntPropVector(client, Prop_Send, "m_vecOrigin", vecCurrentPosition);
+
+		float vecVelocity[3];
+		MakeVectorFromPoints(vecCurrentPosition, aFrame.pos, vecVelocity);
+		ScaleVector(vecVelocity, g_fTickrate);
+
+		float ang[3];
+		ang[0] = aFrame.ang[0];
+		ang[1] = aFrame.ang[1];
+
+		SetEntityFlags(client, aFrame.flags);
+
+		bool bWalk = true;
+
+		if(aFrame.flags & FL_ONGROUND)
 		{
-			if (client == g_BonusBot)
+			MoveType mt = MOVETYPE_WALK;
+			if(GetVectorLength(vecVelocity) > 300.0)
 			{
-				if (g_bManualBonusReplayPlayback)
+				TR_TraceRay(aFrame.pos, vecCurrentPosition, MASK_PLAYERSOLID, RayType_EndPoint);
+				if(TR_DidHit())
 				{
-					if (g_iManualBonusReplayCount < 1)
-						g_iManualBonusReplayCount++;
-					else
-					{
-						g_iManualBonusReplayCount = 0;
-						g_bManualBonusReplayPlayback = false;
-						g_iCurrentBonusReplayIndex = 0;
-						PlayRecord(g_BonusBot, 1, 0);
-						g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
-					}
-				}
-				else
-				{
-					// Call to load another replay
-					if (g_iCurrentBonusReplayIndex < (g_BonusBotCount-1))
-						g_iCurrentBonusReplayIndex++;
-					else
-						g_iCurrentBonusReplayIndex = 0;
-
-					PlayRecord(g_BonusBot, 1, 0);
-					g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
-				}
-			}
-			else if (client == g_RecordBot)
-			{
-				if (g_bManualReplayPlayback)
-				{
-					if (g_iManualReplayCount < 1)
-						g_iManualReplayCount++;
-					else
-					{
-						g_iManualReplayCount = 0;
-						g_bManualReplayPlayback = false;
-						PlayRecord(g_RecordBot, 0, 0);
-					}
-				}
-			}
-			else if (client == g_WrcpBot)
-			{
-				if (g_bManualStageReplayPlayback)
-				{
-					if (g_iManualStageReplayCount < 2)
-						g_iManualStageReplayCount++;
-					else
-					{
-						g_iManualStageReplayCount = 0;
-						g_bManualStageReplayPlayback = false;
-						g_StageReplaysLoop = 3;
-						PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0);
-					}
-				}
-				else
-				{
-					bool found = false;
-					if (g_StageReplaysLoop == 3)
-					{
-						char sPath2[256];
-						for (int i = 1; i <= g_TotalStages; i++)
-						{
-							if (i <= g_StageReplayCurrentStage)
-								continue;
-
-							BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s%s_stage_%d.rec", CK_REPLAY_PATH, g_szMapName, i);
-
-							if (FileExists(sPath2))
-							{
-								g_StageReplayCurrentStage = i;
-								g_StageReplaysLoop = 0;
-								found = true;
-								break;
-							}
-						}
-
-						if (!found)
-						{
-							for (int i = 1; i <= g_TotalStages; i++)
-							{
-								BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s%s_stage_%d.rec", CK_REPLAY_PATH, g_szMapName, i);
-								if (FileExists(sPath2))
-								{
-									g_StageReplayCurrentStage = i;
-									g_StageReplaysLoop = 0;
-									break;
-								}
-							}
-						}
-					}
-
-					g_StageReplaysLoop++;
-					PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0);
+					bWalk = false;
+					mt = MOVETYPE_NOCLIP;
 				}
 			}
 
-			if (!g_bReplayAtEnd[client])
-			{
-				g_fReplayRestarted[client] = GetEngineTime();
-				SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 0.0);
-				g_bReplayAtEnd[client] = true;
-			}
-
-			if (client != g_BonusBot)
-			{
-				g_BotMimicTick[client] = 0;
-				g_CurrentAdditionalTeleportIndex[client] = 0;
-			}
-
-			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
-			g_bReplayAtEnd[client] = false;
-			g_BotMimicTick[client] = 0;
-			g_CurrentAdditionalTeleportIndex[client] = 0;
+			SetEntityMoveType(client, mt);
+		}
+		else
+		{
+			bWalk = false;
+			SetEntityMoveType(client, MOVETYPE_NOCLIP);
 		}
 
+		// shavit idea
+		// replay is going above 15k speed, just teleport at this point
+		// bot is on ground.. 
+		// if the distance between the previous position is much bigger (1.5x) than the expected according to the bot's velocity, 
+		// teleport to avoid sync issues
+		if((GetVectorLength(vecVelocity) > 15000.0 ||
+			(bWalk && GetVectorDistance(vecCurrentPosition, aFrame.pos) > GetVectorLength(vecVelocity) / g_fTickrate * 1.5)))
+		{
+			TeleportEntity(client, aFrame.pos, ang, NULL_VECTOR);
+		}
+
+		else
+		{
+			TeleportEntity(client, NULL_VECTOR, ang, vecVelocity);
+		}
+	}
+
+	else // load old replays
+	{
 		FrameInfo iFrame;
-		GetArrayArray(g_hBotMimicsRecord[client],
-						g_BotMimicTick[client],
-						iFrame,
-						sizeof(FrameInfo)
-					);
+		g_aReplayFrame[client].GetArray(g_iReplayTick[client], iFrame, sizeof(FrameInfo));
 
 		buttons = iFrame.PlayerButtons;
 		impulse = iFrame.PlayerImpulse;
@@ -1075,14 +1036,18 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 		if (iFrame.AdditionalFields & (ADDITIONAL_FIELD_TELEPORTED_ORIGIN | ADDITIONAL_FIELD_TELEPORTED_ANGLES | ADDITIONAL_FIELD_TELEPORTED_VELOCITY))
 		{
 			AdditionalTeleport iAT;
-			Handle hAdditionalTeleport;
+			ArrayList hAdditionalTeleport;
 			char sPath[PLATFORM_MAX_PATH];
 			if (client == g_RecordBot)
 			{
 				if (g_iSelectedReplayType == 0 && g_iSelectedReplayStyle == 0)
+				{
 					Format(sPath, sizeof(sPath), "%s%s.rec", CK_REPLAY_PATH, g_szMapName);
+				}
 				else if (g_iSelectedReplayType == 0 && g_iSelectedReplayStyle > 0)
+				{
 					Format(sPath, sizeof(sPath), "%s%s_style_%d.rec", CK_REPLAY_PATH, g_szMapName, g_iSelectedReplayStyle);
+				}
 			}
 			else if (client == g_BonusBot)
 			{
@@ -1090,20 +1055,28 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 				if (g_iSelectedReplayType == 1 && g_iSelectedBonusReplayStyle == 0)
 				{
 					if (g_iCurrentBonusReplayIndex != 99)
+					{
 						Format(sPath, sizeof(sPath), "%s%s_bonus_%d.rec", CK_REPLAY_PATH, g_szMapName, g_iBonusToReplay[g_iCurrentBonusReplayIndex]);
+					}
 					else
+					{
 						Format(sPath, sizeof(sPath), "%s%s_bonus_%d.rec", CK_REPLAY_PATH, g_szMapName, g_iManualBonusToReplay);
+					}
 				}
 				else if (g_iSelectedReplayType == 1 && g_iSelectedBonusReplayStyle > 0)
+				{
 					Format(sPath, sizeof(sPath), "%s%s_bonus_%d_style_%d.rec", CK_REPLAY_PATH, g_szMapName, bonus, g_iSelectedBonusReplayStyle);
+				}
 			}
 
 			BuildPath(Path_SM, sPath, sizeof(sPath), "%s", sPath);
-			if (g_hLoadedRecordsAdditionalTeleport != null)
+			if (g_smLoadedRecordsAdditionalTeleport != null)
 			{
-				GetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath, hAdditionalTeleport);
+				g_smLoadedRecordsAdditionalTeleport.GetValue(sPath, hAdditionalTeleport);
 				if (hAdditionalTeleport != null)
-					GetArrayArray(hAdditionalTeleport, g_CurrentAdditionalTeleportIndex[client], iAT, 10);
+				{
+					hAdditionalTeleport.GetArray(g_CurrentAdditionalTeleportIndex[client], iAT, 10);
+				}
 
 				float fOrigin[3], fAngles[3], fVelocity[3];
 				Array_Copy(iAT.AtOrigin, fOrigin, 3);
@@ -1118,16 +1091,24 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 					if (iAT.AtFlags & ADDITIONAL_FIELD_TELEPORTED_ANGLES)
 					{
 						if (iAT.AtFlags & ADDITIONAL_FIELD_TELEPORTED_VELOCITY)
+						{
 							TeleportEntity(client, fOrigin, fAngles, fVelocity);
+						}
 						else
+						{
 							TeleportEntity(client, fOrigin, fAngles, NULL_VECTOR);
+						}
 					}
 					else
 					{
 						if (iAT.AtFlags & ADDITIONAL_FIELD_TELEPORTED_VELOCITY)
+						{
 							TeleportEntity(client, fOrigin, NULL_VECTOR, fVelocity);
+						}
 						else
+						{
 							TeleportEntity(client, fOrigin, NULL_VECTOR, NULL_VECTOR);
+						}
 					}
 				}
 				else
@@ -1135,27 +1116,33 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 					if (iAT.AtFlags & ADDITIONAL_FIELD_TELEPORTED_ANGLES)
 					{
 						if (iAT.AtFlags & ADDITIONAL_FIELD_TELEPORTED_VELOCITY)
+						{
 							TeleportEntity(client, NULL_VECTOR, fAngles, fVelocity);
+						}
 						else
+						{
 							TeleportEntity(client, NULL_VECTOR, fAngles, NULL_VECTOR);
+						}
 					}
 					else
 					{
 						if (iAT.AtFlags & ADDITIONAL_FIELD_TELEPORTED_VELOCITY)
+						{
 							TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fVelocity);
+						}
 					}
 				}
+
 				g_CurrentAdditionalTeleportIndex[client]++;
 			}
 		}
 
 		// This is the first tick. Teleport him to the initial position
-		if (g_BotMimicTick[client] == 0)
+		if (g_iReplayTick[client] == 0)
 		{
 			CL_OnStartTimerPress(client);
 			g_bValidTeleportCall[client] = true;
 			TeleportEntity(client, g_fInitialPosition[client], g_fInitialAngles[client], fActualVelocity);
-
 		}
 		else
 		{
@@ -1165,56 +1152,195 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 
 		if (iFrame.NewWeapon != CSWeapon_NONE)
 		{
-			if (g_BotMimicTick[client] > 0)
+			if (g_iReplayTick[client] > 0)
+			{
 				Client_RemoveAllWeapons(client);
+			}
 			else
 			{
 				if ((client == g_RecordBot && g_bNewRecordBot) || (client == g_BonusBot && g_bNewBonusBot))
 				{
 					if (client == g_RecordBot)
+					{
 						g_bNewRecordBot = false;
+					}
 					else
+					{
 						if (client == g_BonusBot)
+						{
 							g_bNewBonusBot = false;
+						}
+					}
 				}
 				else
+				{
 					Client_RemoveAllWeapons(client);
+				}
 			}
 		}
-		g_BotMimicTick[client]++;
+	}
+
+	g_iReplayTick[client]++;
+}
+
+static void LoopReplay(int client)
+{
+	if (g_iReplayTick[client] >= g_iRecordedTicksCount[client] || g_bReplayAtEnd[client])
+	{
+		if (client == g_BonusBot)
+		{
+			if (g_bManualBonusReplayPlayback)
+			{
+				if (g_iManualBonusReplayCount < 1)
+				{
+					g_iManualBonusReplayCount++;
+				}
+				else
+				{
+					g_iManualBonusReplayCount = 0;
+					g_bManualBonusReplayPlayback = false;
+					g_iCurrentBonusReplayIndex = 0;
+					PlayRecord(g_BonusBot, 1, 0);
+					g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
+				}
+			}
+			else
+			{
+				// Call to load another replay
+				if (g_iCurrentBonusReplayIndex < (g_BonusBotCount-1))
+				{
+					g_iCurrentBonusReplayIndex++;
+				}
+				else
+				{
+					g_iCurrentBonusReplayIndex = 0;
+				}
+
+				PlayRecord(g_BonusBot, 1, 0);
+				g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
+			}
+		}
+		else if (client == g_RecordBot)
+		{
+			if (g_bManualReplayPlayback)
+			{
+				if (g_iManualReplayCount < 1)
+				{
+					g_iManualReplayCount++;
+				}
+				else
+				{
+					g_iManualReplayCount = 0;
+					g_bManualReplayPlayback = false;
+					PlayRecord(g_RecordBot, 0, 0);
+				}
+			}
+		}
+		else if (client == g_WrcpBot)
+		{
+			if (g_bManualStageReplayPlayback)
+			{
+				if (g_iManualStageReplayCount < 2)
+				{
+					g_iManualStageReplayCount++;
+				}
+				else
+				{
+					g_iManualStageReplayCount = 0;
+					g_bManualStageReplayPlayback = false;
+					g_StageReplaysLoop = 3;
+					PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0);
+				}
+			}
+			else
+			{
+				bool found = false;
+				if (g_StageReplaysLoop == 3)
+				{
+					char sPath2[256];
+					for (int i = 1; i <= g_TotalStages; i++)
+					{
+						if (i <= g_StageReplayCurrentStage)
+						{
+							continue;
+						}
+
+						BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s%s_stage_%d.rec", CK_REPLAY_PATH, g_szMapName, i);
+
+						if (FileExists(sPath2))
+						{
+							g_StageReplayCurrentStage = i;
+							g_StageReplaysLoop = 0;
+							found = true;
+							break;
+						}
+					}
+
+					if (!found)
+					{
+						for (int i = 1; i <= g_TotalStages; i++)
+						{
+							BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s%s_stage_%d.rec", CK_REPLAY_PATH, g_szMapName, i);
+							if (FileExists(sPath2))
+							{
+								g_StageReplayCurrentStage = i;
+								g_StageReplaysLoop = 0;
+								break;
+							}
+						}
+					}
+				}
+
+				g_StageReplaysLoop++;
+				PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0);
+			}
+		}
+
+		if (!g_bReplayAtEnd[client])
+		{
+			g_fReplayRestarted[client] = GetEngineTime();
+			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 0.0);
+			g_bReplayAtEnd[client] = true;
+		}
+
+		if (client != g_BonusBot)
+		{
+			g_iReplayTick[client] = 0;
+			g_CurrentAdditionalTeleportIndex[client] = 0;
+		}
+
+		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
+		g_bReplayAtEnd[client] = false;
+		g_iReplayTick[client] = 0;
+		g_CurrentAdditionalTeleportIndex[client] = 0;
 	}
 }
 
+// Stage zone EndTouch(should be starttouch if add preframe)
 public void Stage_StartRecording(int client)
 {
 	if (!IsValidClient(client) || IsFakeClient(client))
-		return;
-
-	GetClientAbsOrigin(client, g_fStageInitialPosition[client]);
-	GetClientEyeAngles(client, g_fStageInitialAngles[client]);
-
-	// Client is being recorded, save the ticks where the recording started
-	if (g_hRecording[client] != null) 
 	{
-		g_StageRecStartFrame[client] = g_RecordedTicks[client];
-		g_StageRecStartAT[client] = g_CurrentAdditionalTeleportIndex[client];
 		return;
 	}
+
+	g_iStageStartFrame[client] = g_iRecordedTicks[client];
 
 	char szName[MAX_NAME_LENGTH];
 	GetClientName(client, szName, MAX_NAME_LENGTH);
 
-	if (g_hRecording[client] == null)
+	if (g_aRecording[client] == null)
+	{
 		StartRecording(client);
-
-	g_StageRecStartFrame[client] = 0;
-	g_StageRecStartAT[client] = 0;
+	}
 }
 
 public void Stage_SaveRecording(int client, int stage, char[] time)
 {
-	if (!IsValidClient(client) || g_hRecording[client] == null) 
+	if (!IsValidClient(client) || g_aRecording[client] == null)
+	{
 		return;
+	}
 
 	char szName[MAX_NAME_LENGTH];
 	GetClientName(client, szName, MAX_NAME_LENGTH);
@@ -1224,10 +1350,11 @@ public void Stage_SaveRecording(int client, int stage, char[] time)
 	// Check if the default record folder exists?
 	BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s", CK_REPLAY_PATH);
 	if (!DirExists(sPath2))
+	{
 		CreateDirectory(sPath2, 511);
+	}
 
 	BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s%s_stage_%d.rec", CK_REPLAY_PATH, g_szMapName, stage);
-
 
 	if (FileExists(sPath2) && GetConVarBool(g_hBackupReplays))
 	{
@@ -1236,47 +1363,31 @@ public void Stage_SaveRecording(int client, int stage, char[] time)
 		RenameFile(newPath, sPath2);
 	}
 
-	// char szName[MAX_NAME_LENGTH];
-	// GetClientName(client, szName, MAX_NAME_LENGTH);
-
-	int startframe = g_StageRecStartFrame[client];
-	int framesRecorded = GetArraySize(g_hRecording[client]) - startframe;
+	int startFrame = g_iStageStartFrame[client];
+	int endFrame = g_iRecordedTicks[client];
 
 	FileHeader header;
 	header.BinaryFormatVersion = BINARY_FORMAT_VERSION;
 	strcopy(header.Time, sizeof(FileHeader::Time), time);
-	header.TickCount = framesRecorded;
+	header.TickCount = endFrame - startFrame;
 	strcopy(header.Playername, sizeof(FileHeader::Playername), szName);
-	header.Checkpoints = 0; // So that KZTimers replays work
-	Array_Copy(g_fStageInitialPosition[client], header.InitialPosition, 3);
-	Array_Copy(g_fStageInitialAngles[client], header.InitialAngles, 3);
+	header.Checkpoints = 0;
 
-	Handle frames = CreateArray(sizeof(FrameInfo));
+	ArrayList frames = new ArrayList(sizeof(FrameInfo));
+	any aFrameData[sizeof(frame_t)];
 
-	for (int i = startframe; i < GetArraySize(g_hRecording[client]); i++)
+	for (int i = startFrame; i < endFrame; i++)
 	{
-		FrameInfo iFrame;
-		GetArrayArray(g_hRecording[client], i, iFrame, sizeof(FrameInfo));
-		PushArrayArray(frames, iFrame, sizeof(FrameInfo));
+		g_aRecording[client].GetArray(i, aFrameData, sizeof(frame_t));
+		frames.PushArray(aFrameData, sizeof(frame_t));
 	}
 
 	header.Frames = frames;
 
-	if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > 0)
-	{
-		Handle additionalteleports = CreateArray(sizeof(AdditionalTeleport));
-
-		for (int i = g_StageRecStartAT[client]; i < GetArraySize(g_hRecordingAdditionalTeleport[client]); i++)
-		{
-			AdditionalTeleport iAT;
-			GetArrayArray(g_hRecordingAdditionalTeleport[client], i, iAT, sizeof(AdditionalTeleport));
-			PushArrayArray(additionalteleports, iAT, sizeof(AdditionalTeleport));
-		}
-
-		SetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath2, additionalteleports);
-	}
-
 	WriteRecordToDisk(sPath2, header);
+
 	if (g_bSavingWrcpReplay[client])
+	{
 		g_bSavingWrcpReplay[client] = false;
+	}
 }

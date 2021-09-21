@@ -128,18 +128,13 @@ public void CL_OnStartTimerPress(int client)
 	// Start recording for record bot
 	if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) || (!IsFakeClient(client) && GetConVarBool(g_hBonusBot)))
 	{
-		if (!IsPlayerAlive(client) || GetClientTeam(client) == 1)
+		if (IsPlayerAlive(client))
 		{
-			if (g_hRecording[client] != null)
-				StopRecording(client);
-		}
-		else
-		{
-			if (g_hRecording[client] != null)
-				StopRecording(client);
 			StartRecording(client);
 			if (g_bhasStages)
+			{
 				Stage_StartRecording(client);
+			}
 		}
 	}
 }

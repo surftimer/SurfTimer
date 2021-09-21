@@ -3106,7 +3106,7 @@ public void SQL_LastRunCallback(Handle owner, Handle hndl, const char[] error, a
 		// Set new start time
 		float fl_time = SQL_FetchFloat(hndl, 6);
 		int tickrate = RoundFloat(float(SQL_FetchInt(hndl, 7)) / 5.0 / 11.0);
-		if (tickrate == g_Server_Tickrate)
+		if (tickrate == g_iTickrate)
 		{
 			if (fl_time > 0.0)
 			{
@@ -4734,7 +4734,7 @@ public void db_insertLastPositionCallback(Handle owner, Handle hndl, const char[
 	{
 		if (!g_bTimerRunning[client])
 		g_fPlayerLastTime[client] = -1.0;
-		int tickrate = g_Server_Tickrate * 5 * 11;
+		int tickrate = g_iTickrate * 5 * 11;
 		if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 		{
 			Format(szQuery, 1024, sql_updatePlayerTmp, g_fPlayerCordsLastPosition[client][0], g_fPlayerCordsLastPosition[client][1], g_fPlayerCordsLastPosition[client][2], g_fPlayerAnglesLastPosition[client][0], g_fPlayerAnglesLastPosition[client][1], g_fPlayerAnglesLastPosition[client][2], g_fPlayerLastTime[client], szMapName, tickrate, stage, zgroup, szSteamID);

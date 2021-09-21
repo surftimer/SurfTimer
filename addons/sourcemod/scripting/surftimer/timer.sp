@@ -216,7 +216,7 @@ public Action CKTimer2(Handle timer)
 			g_bOverlay[i] = false;
 
 		// stop replay to prevent server crashes because of a massive recording array (max. 2h)
-		if (g_hRecording[i] != null && g_fCurrentRunTime[i] > 6720.0)
+		if (g_aRecording[i] != null && g_fCurrentRunTime[i] > 6720.0)
 		{
 			StopRecording(i);
 		}
@@ -491,18 +491,6 @@ public Action CenterMsgTimer(Handle timer, any client)
 		g_bRestorePositionMsg[client] = false;
 	}
 
-	return Plugin_Handled;
-}
-
-public Action RemoveRagdoll(Handle timer, any victim)
-{
-	if (IsValidEntity(victim) && !IsPlayerAlive(victim))
-	{
-		int player_ragdoll;
-		player_ragdoll = GetEntDataEnt2(victim, g_ragdolls);
-		if (player_ragdoll != -1)
-			RemoveEdict(player_ragdoll);
-	}
 	return Plugin_Handled;
 }
 

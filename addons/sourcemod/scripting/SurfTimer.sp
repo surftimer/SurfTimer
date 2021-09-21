@@ -112,7 +112,7 @@
 
 // Replay Definitions
 #define BM_MAGIC 0xBAADF00D
-#define BINARY_FORMAT_VERSION 0x01
+#define BINARY_FORMAT_VERSION 0x02
 #define ADDITIONAL_FIELD_TELEPORTED_ORIGIN (1<<0)
 #define ADDITIONAL_FIELD_TELEPORTED_ANGLES (1<<1)
 #define ADDITIONAL_FIELD_TELEPORTED_VELOCITY (1<<2)
@@ -131,6 +131,18 @@
 =            Enumerations            =
 ====================================*/
 
+// new frame info
+enum struct frame_t
+{
+	float pos[3];
+	float ang[2];
+	int buttons;
+	int flags;
+	MoveType mt;
+}
+
+
+// old frame info
 enum struct FrameInfo
 {
 	int PlayerButtons;
@@ -162,7 +174,7 @@ enum struct FileHeader
 	int TickCount;
 	float InitialPosition[3];
 	float InitialAngles[3];
-	Handle Frames;
+	ArrayList Frames;
 }
 
 enum struct MapZone
@@ -885,14 +897,16 @@ bool g_bNewBonusBot;
 Handle g_hTeleport = null;
 
 // Client is being recorded
-Handle g_hRecording[MAXPLAYERS + 1];
+ArrayList g_aRecording[MAXPLAYERS + 1];
 
 // Fix for trigger_push affecting bots
-Handle g_hLoadedRecordsAdditionalTeleport = null;
-Handle g_hRecordingAdditionalTeleport[MAXPLAYERS + 1];
+StringMap g_smLoadedRecordsAdditionalTeleport = null;
 
-// Is mimicing a record
-Handle g_hBotMimicsRecord[MAXPLAYERS + 1] = { null, ... };
+// Bot replay frame
+ArrayList g_aReplayFrame[MAXPLAYERS + 1] = { null, ... };
+
+// Bot replay version
+int g_iReplayVersion[MAXPLAYERS + 1] = { 0x01, ...};
 
 // Timer to refresh bot trails
 Handle g_hBotTrail[2] = { null, null };
@@ -909,14 +923,12 @@ bool g_bValidTeleportCall[MAXPLAYERS + 1];
 // Don't allow starting a new run if saving a record run
 bool g_bNewReplay[MAXPLAYERS + 1];
 bool g_bNewBonus[MAXPLAYERS + 1];
-bool g_createAdditionalTeleport[MAXPLAYERS + 1];
-int g_BotMimicRecordTickCount[MAXPLAYERS + 1] = { 0, ... };
-int g_BotActiveWeapon[MAXPLAYERS + 1] = { -1, ... };
+
+// Replay stuff
 int g_CurrentAdditionalTeleportIndex[MAXPLAYERS + 1];
-int g_RecordedTicks[MAXPLAYERS + 1];
-int g_RecordPreviousWeapon[MAXPLAYERS + 1];
-int g_OriginSnapshotInterval[MAXPLAYERS + 1];
-int g_BotMimicTick[MAXPLAYERS + 1] = { 0, ... };
+int g_iRecordedTicks[MAXPLAYERS + 1];
+int g_iRecordedTicksCount[MAXPLAYERS + 1];
+int g_iReplayTick[MAXPLAYERS + 1];
 
 // Record bot client ID
 int g_RecordBot = -1;
@@ -1017,11 +1029,9 @@ bool g_specToStage[MAXPLAYERS + 1];
 // Location where client is spawned from spectate
 float g_fTeleLocation[MAXPLAYERS + 1][3];
 
-// Used to clear ragdolls from ground
-int g_ragdolls = -1;
-
 // Server tickrate
-int g_Server_Tickrate;
+int g_iTickrate;
+float g_fTickrate;
 
 // Who the client is spectating?
 int g_SpecTarget[MAXPLAYERS + 1];
@@ -1225,16 +1235,7 @@ bool g_bResetOneJump[MAXPLAYERS + 1];
 // Stage replays
 
 // Number of frames where the replay started being recorded
-int g_StageRecStartFrame[MAXPLAYERS+1];
-
-// Ammount of additional teleport when the replay started being recorded
-int g_StageRecStartAT[MAXPLAYERS+1];
-
-// Replay start position
-float g_fStageInitialPosition[MAXPLAYERS + 1][3];
-
-// Replay start angle
-float g_fStageInitialAngles[MAXPLAYERS + 1][3];
+int g_iStageStartFrame[MAXPLAYERS+1];
 
 bool g_bSavingWrcpReplay[MAXPLAYERS + 1];
 int g_StageReplayCurrentStage;
@@ -1603,7 +1604,9 @@ public void OnLibraryAdded(const char[] name)
 		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (IsClientInGame(i))
+			{
 				OnClientPutInServer(i);
+			}
 		}
 	}
 }
@@ -1917,7 +1920,9 @@ public void OnClientConnected(int client)
 public void OnClientPutInServer(int client)
 {
 	if (!IsValidClient(client))
-	return;
+	{
+		return;
+	}
 
 	// Defaults
 	SetClientDefaults(client);
@@ -1940,9 +1945,11 @@ public void OnClientPutInServer(int client)
 	SDKHook(client, SDKHook_PostThink, OnPlayerThink);
 	SDKHook(client, SDKHook_PostThinkPost, OnPlayerThink);
 
-	// Footsteps
 	if (!IsFakeClient(client))
+	{
 		SendConVarValue(client, g_hFootsteps, "0");
+		StopRecording(client); // clear client replay frames
+	}
 
 	g_bReportSuccess[client] = false;
 	g_bTeleByCommand[client] = false;
@@ -1955,7 +1962,6 @@ public void OnClientPutInServer(int client)
 
 	if (IsFakeClient(client))
 	{
-		g_hRecordingAdditionalTeleport[client] = CreateArray(sizeof(AdditionalTeleport));
 		CS_SetMVPCount(client, 1);
 		return;
 	}
@@ -2044,12 +2050,6 @@ public void OnClientAuthorized(int client)
 
 public void OnClientDisconnect(int client)
 {
-	if (IsFakeClient(client) && g_hRecordingAdditionalTeleport[client] != null)
-	{
-		CloseHandle(g_hRecordingAdditionalTeleport[client]);
-		g_hRecordingAdditionalTeleport[client] = null;
-	}
-
 	db_savePlayTime(client);
 
 	g_fPlayerLastTime[client] = -1.0;
@@ -2104,7 +2104,7 @@ public void OnClientDisconnect(int client)
 	}
 
 	// Stop recording
-	if (g_hRecording[client] != null)
+	if (g_aRecording[client] != null)
 		StopRecording(client);
 
 	// Stop Showing Triggers
@@ -2145,7 +2145,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 					else
 					{
 						if (!GetConVarBool(g_hBonusBot) && !GetConVarBool(g_hWrcpBot)) // if both bots are off, no need to record
-							if (g_hRecording[i] != null)
+							if (g_aRecording[i] != null)
 								StopRecording(i);
 					}
 				}
@@ -2181,7 +2181,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 					else
 					{
 						if (!GetConVarBool(g_hReplayBot) && !GetConVarBool(g_hWrcpBot)) // if both bots are off
-							if (g_hRecording[i] != null)
+							if (g_aRecording[i] != null)
 								StopRecording(i);
 					}
 				}
@@ -2219,7 +2219,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 					else
 					{
 						if (!GetConVarBool(g_hReplayBot) && !GetConVarBool(g_hBonusBot)) // if both bots are off
-							if (g_hRecording[i] != null)
+							if (g_aRecording[i] != null)
 								StopRecording(i);
 					}
 				}
@@ -2666,7 +2666,6 @@ public void OnPluginStart()
 
 	// mic
 	g_ownerOffset = FindSendPropInfo("CBaseCombatWeapon", "m_hOwnerEntity");
-	g_ragdolls = FindSendPropInfo("CCSPlayer", "m_hRagdoll");
 
 	// add to admin menu
 	Handle tpMenu;
@@ -2685,7 +2684,7 @@ public void OnPluginStart()
 
 	CheatFlag("bot_zombie", false, true);
 	CheatFlag("bot_mimic", false, true);
-	g_hLoadedRecordsAdditionalTeleport = CreateTrie();
+	g_smLoadedRecordsAdditionalTeleport = new StringMap();
 	Handle hGameData = LoadGameConfigFile("sdktools.games");
 	if (hGameData == null)
 	{
