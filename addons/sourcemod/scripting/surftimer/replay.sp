@@ -1035,8 +1035,6 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 		// We're supposed to teleport stuff?
 		if (iFrame.AdditionalFields & (ADDITIONAL_FIELD_TELEPORTED_ORIGIN | ADDITIONAL_FIELD_TELEPORTED_ANGLES | ADDITIONAL_FIELD_TELEPORTED_VELOCITY))
 		{
-			AdditionalTeleport iAT;
-			ArrayList hAdditionalTeleport;
 			char sPath[PLATFORM_MAX_PATH];
 			if (client == g_RecordBot)
 			{
@@ -1072,10 +1070,13 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			BuildPath(Path_SM, sPath, sizeof(sPath), "%s", sPath);
 			if (g_smLoadedRecordsAdditionalTeleport != null)
 			{
+				AdditionalTeleport iAT;
+				ArrayList hAdditionalTeleport = null;
 				g_smLoadedRecordsAdditionalTeleport.GetValue(sPath, hAdditionalTeleport);
 				if (hAdditionalTeleport != null)
 				{
 					hAdditionalTeleport.GetArray(g_CurrentAdditionalTeleportIndex[client], iAT, 10);
+					delete hAdditionalTeleport;
 				}
 
 				float fOrigin[3], fAngles[3], fVelocity[3];
