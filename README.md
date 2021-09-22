@@ -56,6 +56,9 @@ Yes, but not any more than other projects currently and for past years.
 * [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (Suppresses console warnings)
 * [Stripper:Source](https://forums.alliedmods.net/showthread.php?t=39439) (Allows you to add/modify/removes entities from maps, recommended filter file included)
 
+**Optional:**
+* [Surftimer-Web-Stats](https://github.com/KristianP26/Surftimer-Web-Stats) - Web Statistics
+
 ## Issue Rules
 
 **If any of the rules listed below are not followed, you must expect the issue to be closed immediately.**
