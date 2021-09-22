@@ -14,6 +14,23 @@ Yes, but not any more than other projects currently and for past years.
 
 **Pull requests and any contributions are welcome and encouraged!**
 
+## Issue Rules
+
+**We are only helping with timer related bugs, any host related issue will be closed immediately.**
+
+**If any of the rules listed below are not followed, you must expect the issue to be closed immediately.**
+
+- Prerequisites:
+	- Ensure your timer version is up to date with the [latest release](https://github.com/surftimer/Surftimer-Official/releases/latest)
+	- [SourceMod](https://www.sourcemod.net/downloads.php?branch=stable) and [Metamod](https://www.sourcemm.net/downloads.php/?branch=stable) are up to date (support only for latest stable)
+	- Stock timer without any additional changes
+- Follow the template
+	- That means you won't delete any pre-entered questions!
+- Give clear and as precise information as you can
+	- If applicable include related logs / configs (posted to [pastebin](https://pastebin.com/))
+- Don't edit issues 
+	- Always write a new comment below!
+
 ## Installation and Requirements
 * [SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable)
 * [Metamod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable)
@@ -23,17 +40,17 @@ Yes, but not any more than other projects currently and for past years.
 <sup>(We only support the latest stable version of Sourcemod.)</sup>
 
 **Extensions:**
-* [DHooks](https://forums.alliedmods.net/showthread.php?t=180114) - **Recommended:** [Detours Build](https://forums.alliedmods.net/showpost.php?p=2588686&postcount=589) for SourceMod 1.10 Stable
+* [DHooks](https://github.com/peace-maker/DHooks2/releases/latest)
 * [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604)
 * [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
 
 **Compilation Requirements (Includes):**
-* [SMJansson](https://github.com/JoinedSenses/SourceMod-IncludeLibrary/blob/master/include/smjansson.inc)
-* [SMLib (Transitional Syntax Branch)](https://github.com/bcserv/smlib/tree/transitional_syntax)
 * [SourceMod Includes](https://www.sourcemod.net/downloads.php?branch=stable)
-* [Sourcemod-Discord API](https://github.com/Deathknife/sourcemod-discord)
+* [SMJansson](https://github.com/JoinedSenses/SourceMod-IncludeLibrary/blob/master/include/smjansson.inc)
+* [SMLib](https://github.com/bcserv/smlib/tree/transitional_syntax)
+* [DiscordAPI](https://github.com/Deathknife/sourcemod-discord)
 * [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
-* [colorvariables](https://github.com/olokos/Chat-Processor/blob/master/scripting/include/colorvariables.inc)
+* [ColorVariables](https://github.com/olokos/Chat-Processor/blob/master/scripting/include/colorvariables.inc)
 
 **Recommended:**
 * [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (Suppresses console warnings)
