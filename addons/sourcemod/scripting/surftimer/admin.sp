@@ -644,3 +644,23 @@ public Action Admin_RefreshProfile(int client, int args)
 	}
 	return Plugin_Handled;
 }
+
+public Action Admin_ResetRecords(int client, int args)
+{
+	if (args < 1)
+	{
+		ReplyToCommand(client, "%s Usage: sm_wipeplayer <steamid>", g_szChatPrefix);
+		return Plugin_Handled;
+	}
+	else
+	{
+		char szArg[32];
+		GetCmdArgString(szArg, sizeof(szArg));
+
+		StripQuotes(szArg);
+		TrimString(szArg);
+		PrintToChat(client, "Output test: %s", szArg);
+		db_WipePlayer(client, szArg);
+	}
+	return Plugin_Handled;
+}
