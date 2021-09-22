@@ -193,6 +193,7 @@ void CreateCommands()
 	// Delete records
 	RegAdminCmd("sm_deleterecords", Command_DeleteRecords, g_ZonerFlag, "[surftimer] [zoner] Delete records");
 	RegAdminCmd("sm_dr", Command_DeleteRecords, g_ZonerFlag, "[surftimer] [zoner] Delete records");
+	RegAdminCmd("sm_wipeplayer", Admin_ResetRecords, ADMFLAG_ROOT, "[surfTimer] Removes all database entries of the specific steamid - requires z flag");
 
 	// Setting Commands
 	RegConsoleCmd("sm_pre", Command_Prestrafe, "[surftimer] [settings] Toggles prestrafe messages for player");
