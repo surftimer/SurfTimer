@@ -1,4 +1,4 @@
-void setBotQuota()
+public void SetBotQuota()
 {
 	// Get bot_quota value
 	ConVar hBotQuota = FindConVar("bot_quota");
@@ -2912,7 +2912,7 @@ public void AutoBhopFunction(int client, int &buttons)
 public void SpecListMenuDead(int client) // What Spectators see
 {
 	char szTick[32];
-	Format(szTick, 32, "%i", g_Server_Tickrate);
+	Format(szTick, 32, "%i", g_iTickrate);
 	int ObservedUser;
 	ObservedUser = -1;
 	char sSpecs[512];
@@ -3156,7 +3156,7 @@ public void LoadInfoBot()
 	}
 	else
 	{
-		setBotQuota();
+		SetBotQuota();
 		CreateTimer(0.5, RefreshInfoBot, TIMER_FLAG_NO_MAPCHANGE);
 	}
 }
@@ -3226,7 +3226,7 @@ public void CenterHudDead(int client)
 	char szTick[32];
 	char obsAika[128];
 	float obsTimer;
-	Format(szTick, 32, "%i", g_Server_Tickrate);
+	Format(szTick, 32, "%i", g_iTickrate);
 	int ObservedUser;
 	ObservedUser = -1;
 	int SpecMode;

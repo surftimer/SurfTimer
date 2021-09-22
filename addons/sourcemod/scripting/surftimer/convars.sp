@@ -441,7 +441,8 @@ void CreateConVars()
 	g_Offset_m_fEffects = FindSendPropInfo("CBaseEntity", "m_fEffects");
 
 	// Server Tickate
-	g_Server_Tickrate = RoundFloat(1 / GetTickInterval());
+	g_iTickrate = RoundFloat(1 / GetTickInterval());
+	g_fTickrate = (1 / GetTickInterval());
 
 	// Footsteps
 	g_hFootsteps = FindConVar("sv_footsteps");
