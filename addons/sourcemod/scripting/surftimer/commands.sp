@@ -3180,7 +3180,7 @@ public void SideHudOptions(int client, int item)
 
 	AddMenuItem(menu, "Module 1", "Module 1");
 	AddMenuItem(menu, "Module 2", "Module 2");
-	AddMenuItem(menu, "Module 3", "Moudle 3");
+	AddMenuItem(menu, "Module 3", "Module 3");
 	AddMenuItem(menu, "Module 4", "Module 4");
 	AddMenuItem(menu, "Module 5", "Module 5\n \n");
 
