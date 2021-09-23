@@ -1,4 +1,33 @@
 # Changelog
+[2021-09-22 - Version 1.0.0]
+---
+- Moved to [semantic versioning](https://semver.org/lang/de/)
+- Updated README.md
+- Added/Fixed support for SM1.11 compiler
+- [Added Telefinder](https://github.com/surftimer/Surftimer-Official/pull/235)
+- [Added stripper files](https://github.com/surftimer/Surftimer-Official/pull/291)
+- [Added AutoExecConfig support](https://github.com/surftimer/Surftimer-Official/pull/302)
+- [Added prehop prevention support for LG/SM](https://github.com/surftimer/Surftimer-Official/pull/285)
+- [Added freestyle style to sm_top](https://github.com/surftimer/Surftimer-Official/pull/293)
+- [Allow sm_fixbot as server console](https://github.com/surftimer/Surftimer-Official/pull/293)
+- [Load only normal (style) ranks](https://github.com/surftimer/Surftimer-Official/pull/292)
+- [Reworked practice mode](https://github.com/qawery-just-sad/Surftimer-Official/pull/43)
+- [Several replay fixes](https://github.com/surftimer/Surftimer-Official/pull/310)
+- [Fixed](https://github.com/surftimer/Surftimer-Official/pull/293) [several](https://github.com/surftimer/Surftimer-Official/pull/309) [memory leaks](https://github.com/surftimer/Surftimer-Official/commit/62d19c41aee41cb08a137a777d9c975c213b6076)
+- [Fixed bug with stage 3](https://github.com/surftimer/Surftimer-Official/pull/265)
+- [Fixed Hook Zone](https://github.com/surftimer/Surftimer-Official/pull/283) Issue: [#108](https://github.com/surftimer/Surftimer-Official/issues/108)
+- [Fixed bug with overwritten bonus style times](https://github.com/surftimer/Surftimer-Official/pull/287)
+- [Fixed duplicate rows for map-top sql queries](https://github.com/surftimer/Surftimer-Official/pull/284)
+- [Fixed silent spec](https://github.com/surftimer/Surftimer-Official/pull/293)
+- [Fixed tier error](https://github.com/surftimer/Surftimer-Official/pull/293)
+- [Fixed issue with center speed](https://github.com/surftimer/Surftimer-Official/pull/293)
+- [Fixed incorrect percent value in chat](https://github.com/surftimer/Surftimer-Official/pull/293)
+- [Fixed scoreboard ordering with unranked players](https://github.com/surftimer/Surftimer-Official/pull/293)
+- [Fixed issue with OnEndTouch and keeping velocity](https://github.com/surftimer/Surftimer-Official/pull/298)
+- [Fixed prespeed exploit](https://github.com/surftimer/Surftimer-Official/pull/43)
+- [Fixed sql query error with rank 0 or lower](https://github.com/surftimer/Surftimer-Official/pull/299)
+- [Remove duplicate check](https://github.com/surftimer/Surftimer-Official/pull/293)
+
 [2020-04-24 - Version 285]
 ---
 - Created and updated the changelog to version 285. @olokos

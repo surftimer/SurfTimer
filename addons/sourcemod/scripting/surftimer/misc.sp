@@ -1,4 +1,4 @@
-void setBotQuota()
+public void SetBotQuota()
 {
 	// Get bot_quota value
 	ConVar hBotQuota = FindConVar("bot_quota");
@@ -127,6 +127,12 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 {
 	if (!IsValidClient(client))
 		return;
+	
+	// dpexx stop teleporting if in trigger_multiple
+	/* if (g_TeleInTriggerMultiple[client]){
+		PrintToChat(client, "Teleport blocked");
+		return;
+	} */
 
 	if (!IsValidZonegroup(zonegroup))
 	{
@@ -156,6 +162,16 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	g_bInBhop[client] = false;
 	g_iTicksOnGround[client] = 0;
 	g_bNewStage[client] = false;
+
+	// dpexx's hack fix for those startzone inside a trigger
+	if (g_iClientInZone[client][0] > 0)
+	{
+		g_bTeleByCommand[client] = false;
+	}
+	else
+	{
+		g_bTeleByCommand[client] = true;
+	}
 
 	// Check for spawn locations
 	int realZone;
@@ -399,8 +415,17 @@ int setClientLocation(int client, float fDestination[3])
 	if (zId != g_iClientInZone[client][3]) // Ignore location changes, if teleporting to the same zone they are already in
 	{
 		if (g_iClientInZone[client][0] != -1) // Ignore end touch if teleporting from within a zone
-			g_bIgnoreZone[client] = true;
-
+		{	
+			if (!g_bPracticeMode)
+			{
+				g_bIgnoreZone[client] = true;
+			}
+			else
+			{
+				g_bIgnoreZone[client] = false;
+			}
+		}
+		
 		if (zId > -1)
 		{
 			g_iClientInZone[client][0] = g_mapZones[zId].ZoneType;
@@ -564,7 +589,19 @@ void TeamChangeActual(int client, int toteam)
 	if (g_bSpectate[client])
 	{
 		if (g_fStartTime[client] != -1.0 && g_bTimerRunning[client] == true)
+		{
 			g_fPauseTime[client] = GetGameTime() - g_fStartPauseTime[client];
+			
+			if (g_iClientInZone[client][0] == 3)
+			{
+				g_fSrcpPauseTime[client] = 0.0;
+			}
+			else
+			{
+				g_fSrcpPauseTime[client] = g_fPauseTime[client];
+			}
+		}
+
 		g_bSpectate[client] = false;
 	}
 
@@ -1379,6 +1416,12 @@ public void SetClientDefaults(int client)
 	// Save loc
 	g_iLastSaveLocIdClient[client] = 0;
 	g_fLastCheckpointMade[client] = 0.0;
+	g_bSaveLocTele[client] = false;
+	
+	for (int i = 0; i < MAX_LOCS; i++)
+	{
+		g_iSaveLocInBonus[client][i] = 0;
+	}
 
 	// surf_christmas2
 	g_bUsingStageTeleport[client] = false;
@@ -1395,16 +1438,45 @@ public void SetClientDefaults(int client)
 		g_Stage[i][client] = 1;
 
 	g_bInBhop[client] = false;
+
+	// New noclipspeed
+	g_iNoclipSpeed[client] = g_iDefaultNoclipSpeed;
 }
 
 // Get Runtime
 public void GetcurrentRunTime(int client)
 {
 	float fGetGameTime = GetGameTime();
-	g_fCurrentRunTime[client] = fGetGameTime - g_fStartTime[client] - g_fPauseTime[client];
+	float fPauseTime = g_fPauseTime[client];
+	float fSrcpPauseTime = g_fSrcpPauseTime[client];
 
+	if (g_bPracticeMode[client]) // If in PracMode then use normal CurrentRunTime + time from saveloc
+	{
+		g_fCurrentRunTime[client] = (fGetGameTime - g_fPracModeStartTime[client] - fPauseTime) + g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]];
+	}
+	else // If not in PracMode then use normal CurrentRunTime
+	{
+		g_fCurrentRunTime[client] = fGetGameTime - g_fStartTime[client] - fPauseTime;
+	}
+	
 	if (g_bWrcpTimeractivated[client])
-		g_fCurrentWrcpRunTime[client] = fGetGameTime - g_fStartWrcpTime[client];
+	{
+		g_fCurrentWrcpRunTime[client] = fGetGameTime - g_fStartWrcpTime[client] - fSrcpPauseTime;
+	}
+
+	if (g_bPracSrcpTimerActivated[client])
+	{
+		float fStartPracSrcpTime = g_fStartPracSrcpTime[client];
+		
+		if (!g_bSaveLocTele[client])
+		{
+			g_fCurrentPracSrcpRunTime[client] = fGetGameTime - fStartPracSrcpTime - fSrcpPauseTime;
+		}
+		else
+		{
+			g_fCurrentPracSrcpRunTime[client] = (fGetGameTime - fStartPracSrcpTime - fSrcpPauseTime) + g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]];
+		}
+	}
 }
 
 public float GetSpeed(int client)
@@ -2840,7 +2912,7 @@ public void AutoBhopFunction(int client, int &buttons)
 public void SpecListMenuDead(int client) // What Spectators see
 {
 	char szTick[32];
-	Format(szTick, 32, "%i", g_Server_Tickrate);
+	Format(szTick, 32, "%i", g_iTickrate);
 	int ObservedUser;
 	ObservedUser = -1;
 	char sSpecs[512];
@@ -3084,7 +3156,7 @@ public void LoadInfoBot()
 	}
 	else
 	{
-		setBotQuota();
+		SetBotQuota();
 		CreateTimer(0.5, RefreshInfoBot, TIMER_FLAG_NO_MAPCHANGE);
 	}
 }
@@ -3154,7 +3226,7 @@ public void CenterHudDead(int client)
 	char szTick[32];
 	char obsAika[128];
 	float obsTimer;
-	Format(szTick, 32, "%i", g_Server_Tickrate);
+	Format(szTick, 32, "%i", g_iTickrate);
 	int ObservedUser;
 	ObservedUser = -1;
 	int SpecMode;
@@ -3216,7 +3288,15 @@ public void CenterHudDead(int client)
 			}
 			else if (g_bTimerRunning[ObservedUser])
 			{
-				obsTimer = GetGameTime() - g_fStartTime[ObservedUser] - g_fPauseTime[ObservedUser];
+				if (g_bPracticeMode[ObservedUser])
+				{
+					obsTimer = g_fCurrentRunTime[ObservedUser];
+				}
+				else
+				{
+					obsTimer = GetGameTime() - g_fStartTime[ObservedUser] - g_fPauseTime[ObservedUser];
+				}
+
 				FormatTimeFloat(client, obsTimer, 3, obsAika, sizeof(obsAika));
 			}
 			else if (g_bWrcpTimeractivated[ObservedUser] && !g_bTimerRunning[ObservedUser])
@@ -3225,10 +3305,14 @@ public void CenterHudDead(int client)
 				FormatTimeFloat(client, obsTimer, 3, obsAika, sizeof(obsAika));
 			}
 			else if (!g_bTimerEnabled[ObservedUser])
+			{
 				obsAika = "<font color='#f32'>Disabled</font>";
-			else {
+			}
+			else 
+			{
 				obsAika = "<font color='#f32'>00:00:00</font>";
 			}
+			
 			char timerText[32] = "";
 			if (g_iClientInZone[ObservedUser][2] > 0)
 				Format(timerText, 32, "[%s] ", g_szZoneGroupName[g_iClientInZone[ObservedUser][2]]);
@@ -3269,6 +3353,7 @@ public void CenterHudAlive(int client)
 				if (g_bTimerRunning[client])
 				{
 					FormatTimeFloat(client, g_fCurrentRunTime[client], 3, pAika, 128);
+					
 					if (g_bPause[client])
 					{
 						// Paused
@@ -3277,12 +3362,12 @@ public void CenterHudAlive(int client)
 					else if (g_bPracticeMode[client])
 					{
 						// Prac mode
-						Format(module[i], 128, "<font color='#eee'>[P]: %s       </font>", pAika);
+						Format(module[i], 128, "<font color='#8cd'>[P]: %s       </font>", pAika);
 					}
 					else if (g_bInBonus[client])
 					{
 						// In Bonus
-						Format(module[i], 128, "<font color='#d87'>%s       </font>", pAika);
+						Format(module[i], 128, "<font color='#5e5'>%s       </font>", pAika);
 					}
 					else if (g_bMissedMapBest[client] && g_fPersonalRecord[client] > 0.0)
 					{
@@ -3292,7 +3377,7 @@ public void CenterHudAlive(int client)
 					else if (g_fPersonalRecord[client] < 0.1)
 					{
 						// No Personal Best on map
-						Format(module[i], 128, "<font color='#8cd'>%s       </font>", pAika);
+						Format(module[i], 128, "<font color='#5e5'>%s       </font>", pAika);
 					}
 					else
 					{
@@ -3303,10 +3388,10 @@ public void CenterHudAlive(int client)
 				else if (g_bWrcpTimeractivated[client] && !g_bPracticeMode[client])
 				{
 					FormatTimeFloat(client, g_fCurrentWrcpRunTime[client], 3, pAika, 128);
-					Format(module[i], 128, "<font color='#b8b'>%s       </font>", pAika);
+					Format(module[i], 128, "<font color='#8cd'>%s       </font>", pAika);
 				}
 				else if (!g_bTimerEnabled[client])
-					Format(module[i], 128, "<font color='#ec8'>Disabled       </font>");
+					Format(module[i], 128, "<font color='#f32'>Disabled       </font>");
 				else
 				{
 					Format(module[i], 128, "<font color='#f32'>00:00:00       </font>");
@@ -3336,9 +3421,9 @@ public void CenterHudAlive(int client)
 						{
 							// fluffys
 							if (g_bPracticeMode[client])
-								Format(g_szLastSRDifference[client], 64, "SR: <font color='#b8b'>%s</font>", g_szRecordMapTime);
+								Format(g_szLastSRDifference[client], 64, "SR: <font color='#fc0'>%s</font>", g_szRecordMapTime);
 							else
-								Format(g_szLastSRDifference[client], 64, "SR: <font color='#b8b'>%s</font>", g_szRecordMapTime);
+								Format(g_szLastSRDifference[client], 64, "SR: <font color='#fc0'>%s</font>", g_szRecordMapTime);
 						}
 						else
 							Format(g_szLastSRDifference[client], 64, "SR: N/A");
@@ -3349,9 +3434,9 @@ public void CenterHudAlive(int client)
 						{
 							// fluffys
 							if (g_bPracticeMode[client])
-								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordStyleMapTime[style]);
+								Format(g_szLastSRDifference[client], 64, "SR: <font color='#fc0'>%s</font>", g_szRecordStyleMapTime[style]);
 							else
-								Format(g_szLastSRDifference[client], 64, "SR: %s", g_szRecordStyleMapTime[style]);
+								Format(g_szLastSRDifference[client], 64, "SR: <font color='#fc0'>%s</font>", g_szRecordStyleMapTime[style]);
 						}
 						else
 							Format(g_szLastSRDifference[client], 64, "SR: N/A");
@@ -3359,9 +3444,27 @@ public void CenterHudAlive(int client)
 					else
 					{
 						if (g_iCurrentStyle[client] == 0)
-							Format(g_szLastSRDifference[client], 64, "SR: %s", g_szBonusFastestTime[g_iClientInZone[client][2]]);
+						{
+							if (StrEqual(g_szBonusFastestTime[g_iClientInZone[client][2]], "N/A"))
+							{
+								Format(g_szLastSRDifference[client], 64, "SR: <font color='#fff'>%s</font>", g_szBonusFastestTime[g_iClientInZone[client][2]]);
+							}
+							else
+							{	
+								Format(g_szLastSRDifference[client], 64, "SR: <font color='#fc0'>%s</font>", g_szBonusFastestTime[g_iClientInZone[client][2]]);
+							}
+						}
 						else if (g_iCurrentStyle[client] != 0) // Styles
-							Format(g_szLastSRDifference[client], 64, "SR: %s", g_szStyleBonusFastestTime[style][g_iClientInZone[client][2]]);
+						{
+							if (StrEqual(g_szStyleBonusFastestTime[style][g_iClientInZone[client][2]], "N/A"))
+							{
+								Format(g_szLastSRDifference[client], 64, "SR: <font color='#fff'>%s</font>", g_szStyleBonusFastestTime[style][g_iClientInZone[client][2]]);
+							}
+							else
+							{
+								Format(g_szLastSRDifference[client], 64, "SR: <font color='#fc0'>%s</font>", g_szStyleBonusFastestTime[style][g_iClientInZone[client][2]]);
+							}
+						}
 					}
 				}
 				Format(module[i], 128, "%s", g_szLastSRDifference[client]);
@@ -3469,11 +3572,27 @@ public void CenterHudAlive(int client)
 					}
 					else // map has stages
 					{
-						Format(module[i], 128, "Stage: %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1)); // less \t's to make lines align
+						if (g_bPracticeMode[client])
+						{
+							if (g_bSaveLocTele[client]) // Has the player teleported to saveloc?
+							{
+								Format(module[i], 128, "Stage: %i / %i", g_iPlayerPracLocationSnap[client][g_iPlayerPracLocationSnapIdClient[client]], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+							}
+							else
+							{
+								Format(module[i], 128, "Stage: %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+							}
+						}
+						else
+						{
+							Format(module[i], 128, "Stage: %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1)); // less \t's to make lines align
+						}
 					}
 				}
 				else
+				{
 					Format(module[i], 128, "Bonus %i", g_iClientInZone[client][2]);
+				}
 			}
 			else if (g_iCentreHudModule[client][i] == 6)
 			{
@@ -3665,7 +3784,22 @@ public void SideHudAlive(int client)
 						}
 						else
 						{
-							Format(szCurrentCP, 64, "Checkpoint [%i]", g_iCurrentCheckpoint[client] + 1);
+							if (g_bPracticeMode[client])
+							{
+								if (g_bSaveLocTele[client]) // Has the player teleported to saveloc?
+								{
+									Format(szCurrentCP, 64, "Checkpoint [%i]", g_iPlayerPracLocationSnap[client][g_iLastSaveLocIdClient[client]]);
+								}
+								else
+								{
+									Format(szCurrentCP, 64, "Checkpoint [%i]", g_iCurrentCheckpoint[client] + 1);
+								}
+							}
+							else
+							{
+								Format(szCurrentCP, 64, "Checkpoint [%i]", g_iCurrentCheckpoint[client] + 1);
+							}
+							
 							FormatTimeFloat(0, g_fCheckpointServerRecord[g_iClientInZone[client][2]][g_iCurrentCheckpoint[client]], 3, szCP, 64);
 						}
 
@@ -3676,7 +3810,22 @@ public void SideHudAlive(int client)
 					}
 					else // map has stages
 					{
-						Format(szStage, 64, "Stage: %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+						if (g_bPracticeMode[client])
+						{
+							if (g_bSaveLocTele[client]) // Has the player teleported to saveloc?
+							{
+								Format(szStage, 64, "Stage: %i / %i", g_iPlayerPracLocationSnap[client][g_iLastSaveLocIdClient[client]], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+							}
+							else
+							{
+								Format(szStage, 64, "Stage: %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+							}
+						}
+						else
+						{
+							Format(szStage, 64, "Stage: %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+						}
+						
 						char szWrcpTime[64];
 						FormatTimeFloat(0, g_fStageRecord[stage], 3, szWrcpTime, 64);
 						char szName[64];
@@ -3764,7 +3913,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 	percent = percent * 100.0;
 	Format(szPercnt, 24, "%1.f%%", percent);
 
-	if (g_bTimerRunning[client] && !g_bPracticeMode[client]) {
+	if (g_bTimerRunning[client]) {
 		if (g_fMaxPercCompleted[client] < 1.0) // First time a checkpoint is reached
 			g_fMaxPercCompleted[client] = percent;
 		else
@@ -3816,7 +3965,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 	GetClientName(client, szName, MAX_NAME_LENGTH);
 
 	// Has completed the map before
-	if (g_bCheckpointsFound[zonegroup][client] && g_bTimerRunning[client] && !g_bPracticeMode[client] && g_fCheckpointTimesRecord[zonegroup][client][zone] > 0.1)
+	if (g_bCheckpointsFound[zonegroup][client] && g_bTimerRunning[client] && g_fCheckpointTimesRecord[zonegroup][client][zone] > 0.1)
 	{
 		// Set percent of completion to assist
 		if (CS_GetMVPCount(client) < 1)
@@ -3876,7 +4025,9 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		Call_Finish();
 
 		if (g_bCheckpointsEnabled[client] && g_iCpMessages[client])
+		{
 			CPrintToChat(client, "%t", "Misc30", g_szChatPrefix, g_iClientInZone[client][1] + 1, szTime, szDiff, sz_srDiff);
+		}
 
 		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "Misc31", g_szChatPrefix, szName, g_iClientInZone[client][1] + 1, szTime, szDiff, sz_srDiff);
 		CheckpointToSpec(client, szSpecMessage);
@@ -3885,7 +4036,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		tmpDiff[client] = diff;
 	}
 	else // if first run
-		if (g_bTimerRunning[client] && !g_bPracticeMode[client])
+		if (g_bTimerRunning[client])
 		{
 			// Set percent of completion to assist
 			if (CS_GetMVPCount(client) < 1)
@@ -4384,16 +4535,24 @@ public float GetStrafeSync(int client, bool sync)
 
 public void ResetSaveLocs()
 {
-	g_iSaveLocCount = 0;
+	for (int client = 1; client <= MAXPLAYERS; client++)
+	{
+		g_iSaveLocCount[client] = 0;
+	}
+	
 	for (int i = 0; i < MAX_LOCS; i++)
 	{
-		for (int j = 0; j < 3; j++)
+		for (int client = 1; client <= MAXPLAYERS; client++)
 		{
-			g_fSaveLocCoords[i][j] = 0.0;
-			g_fSaveLocAngle[i][j] = 0.0;
-			g_fSaveLocVel[i][j] = 0.0;
+			for (int j = 0; j < 3; j++)
+			{
+				g_fSaveLocCoords[client][i][j] = 0.0;
+				g_fSaveLocAngle[client][i][j] = 0.0;
+				g_fSaveLocVel[client][i][j] = 0.0;
+			}
+		
+			g_iSaveLocUnix[i][client] = 0;
 		}
-		g_iSaveLocUnix[i] = 0;
 		g_szSaveLocTargetname[i][0] = '\0';
 	}
 }
@@ -4404,10 +4563,27 @@ public void TeleportToSaveloc(int client, int id)
 	ResetGravity(client);
 	g_bPracticeMode[client] = true;
 	g_bWrcpTimeractivated[client] = false;
+	g_bPracSrcpTimerActivated[client] = true;
+	
+	// Allows you to go from saveloc in map to bonus and visa-versa and use correct times/hud
+	if(g_iSaveLocInBonus[client][id] > 0)
+	{
+		g_bInBonus[client] = true;
+		g_iInBonus[client] = g_iSaveLocInBonus[client][id];
+		g_iClientInZone[client][2] = g_iInBonus[client];
+	}
+	else
+	{
+		g_bInBonus[client] = false;
+		g_iClientInZone[client][2] = 0;
+	}
+
 	CL_OnStartTimerPress(client);
+	CL_OnStartPracSrcpTimerPress(client);
+	GetcurrentRunTime(client);
 	DispatchKeyValue(client, "targetname", g_szSaveLocTargetname[id]);
 	SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, 0.0 } ));
-	TeleportEntity(client, g_fSaveLocCoords[id], g_fSaveLocAngle[id], g_fSaveLocVel[id]);
+	TeleportEntity(client, g_fSaveLocCoords[client][id], g_fSaveLocAngle[client][id], g_fSaveLocVel[client][id]);
 }
 
 public void SendBugReport(int client)
@@ -4647,4 +4823,70 @@ void PrintCSGOHUDText(int client, const char[] format, any ...)
 	pb.AddString("params", NULL_STRING);
 
 	EndMessage();
+}
+
+public void PrintPracSrcp(int client, int style, int stage, float fClientPbStageTime)
+{
+	char szName[MAX_NAME_LENGTH];
+	GetClientName(client, szName, MAX_NAME_LENGTH);
+
+	char sz_srDiff[128];
+	char szDiff[128];
+	float fFinalPracSrcpTime = g_fFinalPracSrcpTime[client];
+	float f_srDiff;
+	float fDiff;
+
+	// PB
+	fDiff = (fClientPbStageTime - fFinalPracSrcpTime);
+	FormatTimeFloat(client, fDiff, 3, szDiff, 128);
+
+	if (fDiff > 0.0)
+	{
+		Format(szDiff, 128, "%cPB: %c-%s%c", WHITE, LIGHTGREEN, szDiff, WHITE);
+	}
+	else
+	{
+		Format(szDiff, 128, "%cPB: %c+%s%c", WHITE, RED, szDiff, WHITE);
+	}
+
+	// SR
+	if (style == 0)
+	{
+		f_srDiff = (g_fStageRecord[stage] - fFinalPracSrcpTime);
+	}
+	else // styles
+	{
+		f_srDiff = (g_fStyleStageRecord[style][stage] - fFinalPracSrcpTime);
+	}
+	FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
+
+	if (f_srDiff > 0.0)
+	{
+		Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
+	}
+	else
+	{
+		Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
+	}
+
+	char szSpecMessage[512];
+	
+	if (style == 0)
+	{
+		if (g_iWrcpMessages[client])
+		{
+			CPrintToChat(client, "%t", "PracWrcp1", g_szChatPrefix, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff);
+		}
+		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp2", g_szChatPrefix, szName, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff);
+	}
+	else if (style != 0) // styles
+	{
+		if (g_iWrcpMessages[client])
+		{
+			CPrintToChat(client, "%t", "PracWrcp3", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
+		}
+		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp4", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
+	}
+
+	CheckpointToSpec(client, szSpecMessage);
 }

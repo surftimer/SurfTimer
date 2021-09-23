@@ -18,6 +18,7 @@
 #include <geoip>
 #include <basecomm>
 #include <colorvariables>
+#include <autoexecconfig>
 #undef REQUIRE_EXTENSIONS
 #include <clientprefs>
 #undef REQUIRE_PLUGIN
@@ -35,7 +36,7 @@
 #pragma semicolon 1
 
 // Plugin Info
-#define VERSION "285"
+#define VERSION "1.0.0"
 
 // Database Definitions
 #define MYSQL 0
@@ -111,7 +112,7 @@
 
 // Replay Definitions
 #define BM_MAGIC 0xBAADF00D
-#define BINARY_FORMAT_VERSION 0x01
+#define BINARY_FORMAT_VERSION 0x02
 #define ADDITIONAL_FIELD_TELEPORTED_ORIGIN (1<<0)
 #define ADDITIONAL_FIELD_TELEPORTED_ANGLES (1<<1)
 #define ADDITIONAL_FIELD_TELEPORTED_VELOCITY (1<<2)
@@ -121,7 +122,7 @@
 #define EF_NODRAW 32
 
 // New Save Locs
-#define MAX_LOCS 1024
+#define MAX_LOCS 128
 
 //CSGO HUD Hint Fix
 #define MAX_HINT_SIZE 225
@@ -130,6 +131,18 @@
 =            Enumerations            =
 ====================================*/
 
+// new frame info
+enum struct frame_t
+{
+	float pos[3];
+	float ang[2];
+	int buttons;
+	int flags;
+	MoveType mt;
+}
+
+
+// old frame info
 enum struct FrameInfo
 {
 	int PlayerButtons;
@@ -161,7 +174,7 @@ enum struct FileHeader
 	int TickCount;
 	float InitialPosition[3];
 	float InitialAngles[3];
-	Handle Frames;
+	ArrayList Frames;
 }
 
 enum struct MapZone
@@ -424,6 +437,7 @@ bool g_bWrcpEndZone[MAXPLAYERS + 1] = false;
 int g_CurrentStage[MAXPLAYERS + 1];
 float g_fStartWrcpTime[MAXPLAYERS + 1];
 float g_fFinalWrcpTime[MAXPLAYERS + 1];
+float g_fOldFinalWrcpTime[MAXPLAYERS + 1];
 
 // Total time the run took in 00:00:00 format
 char g_szFinalWrcpTime[MAXPLAYERS + 1][32];
@@ -441,6 +455,16 @@ char g_szWrcpMapSelect[MAXPLAYERS + 1][128];
 bool g_bStageSRVRecord[MAXPLAYERS + 1][CPLIMIT];
 char g_szStageRecordPlayer[CPLIMIT][MAX_NAME_LENGTH];
 // bool g_bFirstStageRecord[CPLIMIT];
+
+// PracMode SRCP
+float g_fStartPracSrcpTime[MAXPLAYERS + 1];
+float g_fCurrentPracSrcpRunTime[MAXPLAYERS + 1];
+bool g_bPracSrcpTimerActivated[MAXPLAYERS + 1] = false;
+int g_iPracSrcpStage[MAXPLAYERS + 1];
+bool g_bPracSrcpEndZone[MAXPLAYERS + 1] = false;
+float g_fFinalPracSrcpTime[MAXPLAYERS + 1];
+char g_szFinalPracSrcpTime[MAXPLAYERS + 1][32];
+float g_fSrcpPauseTime[MAXPLAYERS + 1];
 
 /*----------  Map Settings Variables ----------*/
 float g_fMaxVelocity;
@@ -792,6 +816,9 @@ char g_szBonusTimeDifference[MAXPLAYERS + 1];
 // Time when run was started
 float g_fStartTime[MAXPLAYERS + 1];
 
+// Time when PracMode run was started
+float g_fPracModeStartTime[MAXPLAYERS + 1];
+
 // Total time the run took
 float g_fFinalTime[MAXPLAYERS + 1];
 
@@ -806,6 +833,9 @@ float g_fStartPauseTime[MAXPLAYERS + 1];
 
 // Current runtime
 float g_fCurrentRunTime[MAXPLAYERS + 1];
+
+// PracticeMode total time the run took in 00:00:00 format
+char g_szPracticeTime[MAXPLAYERS + 1][32];
 
 // Missed personal record time?
 bool g_bMissedMapBest[MAXPLAYERS + 1];
@@ -867,14 +897,16 @@ bool g_bNewBonusBot;
 Handle g_hTeleport = null;
 
 // Client is being recorded
-Handle g_hRecording[MAXPLAYERS + 1];
+ArrayList g_aRecording[MAXPLAYERS + 1];
 
 // Fix for trigger_push affecting bots
-Handle g_hLoadedRecordsAdditionalTeleport = null;
-Handle g_hRecordingAdditionalTeleport[MAXPLAYERS + 1];
+StringMap g_smLoadedRecordsAdditionalTeleport = null;
 
-// Is mimicing a record
-Handle g_hBotMimicsRecord[MAXPLAYERS + 1] = { null, ... };
+// Bot replay frame
+ArrayList g_aReplayFrame[MAXPLAYERS + 1] = { null, ... };
+
+// Bot replay version
+int g_iReplayVersion[MAXPLAYERS + 1] = { 0x01, ...};
 
 // Timer to refresh bot trails
 Handle g_hBotTrail[2] = { null, null };
@@ -891,14 +923,12 @@ bool g_bValidTeleportCall[MAXPLAYERS + 1];
 // Don't allow starting a new run if saving a record run
 bool g_bNewReplay[MAXPLAYERS + 1];
 bool g_bNewBonus[MAXPLAYERS + 1];
-bool g_createAdditionalTeleport[MAXPLAYERS + 1];
-int g_BotMimicRecordTickCount[MAXPLAYERS + 1] = { 0, ... };
-int g_BotActiveWeapon[MAXPLAYERS + 1] = { -1, ... };
+
+// Replay stuff
 int g_CurrentAdditionalTeleportIndex[MAXPLAYERS + 1];
-int g_RecordedTicks[MAXPLAYERS + 1];
-int g_RecordPreviousWeapon[MAXPLAYERS + 1];
-int g_OriginSnapshotInterval[MAXPLAYERS + 1];
-int g_BotMimicTick[MAXPLAYERS + 1] = { 0, ... };
+int g_iRecordedTicks[MAXPLAYERS + 1];
+int g_iRecordedTicksCount[MAXPLAYERS + 1];
+int g_iReplayTick[MAXPLAYERS + 1];
 
 // Record bot client ID
 int g_RecordBot = -1;
@@ -999,11 +1029,9 @@ bool g_specToStage[MAXPLAYERS + 1];
 // Location where client is spawned from spectate
 float g_fTeleLocation[MAXPLAYERS + 1][3];
 
-// Used to clear ragdolls from ground
-int g_ragdolls = -1;
-
 // Server tickrate
-int g_Server_Tickrate;
+int g_iTickrate;
+float g_fTickrate;
 
 // Who the client is spectating?
 int g_SpecTarget[MAXPLAYERS + 1];
@@ -1050,6 +1078,10 @@ float g_fLastOverlay[MAXPLAYERS + 1];
 
 // Stage 2 Bug Fixer
 bool g_wrcpStage2Fix[MAXPLAYERS + 1];
+
+// Is client trying to teleport inside a trigger_multiple
+//bool g_TeleInTriggerMultiple[MAXPLAYERS + 1];
+bool g_bTeleByCommand[MAXPLAYERS + 1];
 
 /*----------  Player location restoring  ----------*/
 
@@ -1203,16 +1235,7 @@ bool g_bResetOneJump[MAXPLAYERS + 1];
 // Stage replays
 
 // Number of frames where the replay started being recorded
-int g_StageRecStartFrame[MAXPLAYERS+1];
-
-// Ammount of additional teleport when the replay started being recorded
-int g_StageRecStartAT[MAXPLAYERS+1];
-
-// Replay start position
-float g_fStageInitialPosition[MAXPLAYERS + 1][3];
-
-// Replay start angle
-float g_fStageInitialAngles[MAXPLAYERS + 1][3];
+int g_iStageStartFrame[MAXPLAYERS+1];
 
 bool g_bSavingWrcpReplay[MAXPLAYERS + 1];
 int g_StageReplayCurrentStage;
@@ -1242,16 +1265,24 @@ int g_iTotalMeasures[MAXPLAYERS + 1];
 float g_fAngleCache[MAXPLAYERS + 1];
 
 // Save locs
-int g_iSaveLocCount;
-float g_fSaveLocCoords[MAX_LOCS][3]; // [loc id][coords]
-float g_fSaveLocAngle[MAX_LOCS][3]; // [loc id][angle]
-float g_fSaveLocVel[MAX_LOCS][3]; // [loc id][velocity]
+int g_iSaveLocCount[MAXPLAYERS + 1];
+float g_fSaveLocCoords[MAXPLAYERS + 1][MAX_LOCS][3]; // [loc id][coords]
+float g_fSaveLocAngle[MAXPLAYERS + 1][MAX_LOCS][3]; // [loc id][angle]
+float g_fSaveLocVel[MAXPLAYERS + 1][MAX_LOCS][3]; // [loc id][velocity]
 char g_szSaveLocTargetname[MAX_LOCS][128]; // [loc id]
-char g_szSaveLocClientName[MAX_LOCS][MAX_NAME_LENGTH];
+char g_szSaveLocClientName[MAXPLAYERS + 1][MAX_LOCS][MAX_NAME_LENGTH];
 int g_iLastSaveLocIdClient[MAXPLAYERS + 1];
 float g_fLastCheckpointMade[MAXPLAYERS + 1];
-int g_iSaveLocUnix[MAX_LOCS]; // [loc id]
+int g_iSaveLocUnix[MAX_LOCS][MAXPLAYERS + 1]; // [loc id]
 int g_iMenuPosition[MAXPLAYERS + 1];
+int g_iPreviousSaveLocIdClient[MAXPLAYERS + 1]; // The previous saveloc the client used
+float g_fPlayerPracTimeSnap[MAXPLAYERS + 1][MAX_LOCS]; // PracticeMode saveloc runtime
+int g_iPlayerPracLocationSnap[MAXPLAYERS + 1][MAX_LOCS]; // Stage the player was in when creating saveloc
+int g_iPlayerPracLocationSnapIdClient[MAXPLAYERS + 1]; // Stage Index to use when tele to saveloc
+bool g_bSaveLocTele[MAXPLAYERS + 1]; // Has the player teleported to saveloc?
+int g_iSaveLocInBonus[MAXPLAYERS + 1][MAX_LOCS]; // Bonus number if player created saveloc in bonus
+float g_fPlayerPracSrcpTimeSnap[MAXPLAYERS + 1][MAX_LOCS]; // PracticeMode Wrcp saveloc runtime
+int g_iAllowCheckpointRecreation; // Int for allowCheckpointRecreation convar
 
 char g_sServerName[256];
 ConVar g_hHostName = null;
@@ -1326,6 +1357,11 @@ bool g_bPrestigeAvoid[MAXPLAYERS + 1];
 
 // Menus mapname
 char g_szMapNameFromDatabase[MAXPLAYERS + 1][128];
+
+// New noclipspeed vars
+ConVar sv_noclipspeed;
+float g_iDefaultNoclipSpeed;
+float g_iNoclipSpeed[MAXPLAYERS + 1];
 
 // New speed limit variables
 bool g_bInBhop[MAXPLAYERS + 1];
@@ -1568,7 +1604,9 @@ public void OnLibraryAdded(const char[] name)
 		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (IsClientInGame(i))
+			{
 				OnClientPutInServer(i);
+			}
 		}
 	}
 }
@@ -1722,6 +1760,11 @@ public void OnMapStart()
 	g_hTriggerMultiple = CreateArray(256);
 	while ((iEnt = FindEntityByClassname(iEnt, "trigger_multiple")) != -1)
 	{
+		SDKHook(iEnt, SDKHook_EndTouch, OnMultipleTrigger1);
+		SDKHook(iEnt, SDKHook_StartTouch, OnMultipleTrigger1);
+		/* SDKHook(iEnt, SDKHook_StartTouch, OnMultipleTrigger2);
+		SDKHook(iEnt, SDKHook_EndTouch, OnMultipleTrigger3); */
+		HookSingleEntityOutput(iEnt, "OnEndTouch", OnTriggerOutput);
 		PushArrayCell(g_hTriggerMultiple, iEnt);
 	}
 
@@ -1769,7 +1812,6 @@ public void OnMapStart()
 
 	// Save Locs
 	ResetSaveLocs();
-
 }
 
 public void OnMapEnd()
@@ -1878,7 +1920,9 @@ public void OnClientConnected(int client)
 public void OnClientPutInServer(int client)
 {
 	if (!IsValidClient(client))
-	return;
+	{
+		return;
+	}
 
 	// Defaults
 	SetClientDefaults(client);
@@ -1901,11 +1945,14 @@ public void OnClientPutInServer(int client)
 	SDKHook(client, SDKHook_PostThink, OnPlayerThink);
 	SDKHook(client, SDKHook_PostThinkPost, OnPlayerThink);
 
-	// Footsteps
 	if (!IsFakeClient(client))
+	{
 		SendConVarValue(client, g_hFootsteps, "0");
+		StopRecording(client); // clear client replay frames
+	}
 
 	g_bReportSuccess[client] = false;
+	g_bTeleByCommand[client] = false;
 	g_fCommandLastUsed[client] = 0.0;
 
 	// fluffys set bools
@@ -1915,7 +1962,6 @@ public void OnClientPutInServer(int client)
 
 	if (IsFakeClient(client))
 	{
-		g_hRecordingAdditionalTeleport[client] = CreateArray(sizeof(AdditionalTeleport));
 		CS_SetMVPCount(client, 1);
 		return;
 	}
@@ -2004,12 +2050,6 @@ public void OnClientAuthorized(int client)
 
 public void OnClientDisconnect(int client)
 {
-	if (IsFakeClient(client) && g_hRecordingAdditionalTeleport[client] != null)
-	{
-		CloseHandle(g_hRecordingAdditionalTeleport[client]);
-		g_hRecordingAdditionalTeleport[client] = null;
-	}
-
 	db_savePlayTime(client);
 
 	g_fPlayerLastTime[client] = -1.0;
@@ -2021,7 +2061,9 @@ public void OnClientDisconnect(int client)
 			g_fPlayerLastTime[client] = GetGameTime() - g_fStartTime[client] - g_fPauseTime[client];
 		}
 		else
+		{
 			g_fPlayerLastTime[client] = g_fCurrentRunTime[client];
+		}
 	}
 
 	SDKUnhook(client, SDKHook_SetTransmit, Hook_SetTransmit);
@@ -2062,7 +2104,7 @@ public void OnClientDisconnect(int client)
 	}
 
 	// Stop recording
-	if (g_hRecording[client] != null)
+	if (g_aRecording[client] != null)
 		StopRecording(client);
 
 	// Stop Showing Triggers
@@ -2072,6 +2114,9 @@ public void OnClientDisconnect(int client)
 		--g_iTriggerTransmitCount;
 		TransmitTriggers(g_iTriggerTransmitCount > 0);
 	}
+
+	// New noclipspeed
+	sv_noclipspeed.FloatValue = g_iDefaultNoclipSpeed;
 }
 
 public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] newValue)
@@ -2100,7 +2145,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 					else
 					{
 						if (!GetConVarBool(g_hBonusBot) && !GetConVarBool(g_hWrcpBot)) // if both bots are off, no need to record
-							if (g_hRecording[i] != null)
+							if (g_aRecording[i] != null)
 								StopRecording(i);
 					}
 				}
@@ -2136,7 +2181,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 					else
 					{
 						if (!GetConVarBool(g_hReplayBot) && !GetConVarBool(g_hWrcpBot)) // if both bots are off
-							if (g_hRecording[i] != null)
+							if (g_aRecording[i] != null)
 								StopRecording(i);
 					}
 				}
@@ -2174,7 +2219,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 					else
 					{
 						if (!GetConVarBool(g_hReplayBot) && !GetConVarBool(g_hBonusBot)) // if both bots are off
-							if (g_hRecording[i] != null)
+							if (g_aRecording[i] != null)
 								StopRecording(i);
 					}
 				}
@@ -2619,12 +2664,8 @@ public void OnPluginStart()
 	db_setupDatabase();
 	CreateCommandsNewMap();
 
-	// exec surftimer.cfg
-	AutoExecConfig(true, "surftimer");
-
 	// mic
 	g_ownerOffset = FindSendPropInfo("CBaseCombatWeapon", "m_hOwnerEntity");
-	g_ragdolls = FindSendPropInfo("CCSPlayer", "m_hRagdoll");
 
 	// add to admin menu
 	Handle tpMenu;
@@ -2643,7 +2684,7 @@ public void OnPluginStart()
 
 	CheatFlag("bot_zombie", false, true);
 	CheatFlag("bot_mimic", false, true);
-	g_hLoadedRecordsAdditionalTeleport = CreateTrie();
+	g_smLoadedRecordsAdditionalTeleport = new StringMap();
 	Handle hGameData = LoadGameConfigFile("sdktools.games");
 	if (hGameData == null)
 	{

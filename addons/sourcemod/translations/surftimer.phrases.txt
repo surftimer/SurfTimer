@@ -10,6 +10,11 @@
 		"#format"	"{1:s}"
 		"en"		"{1} You can't make a checkpoint inside the start zone!"
 	}
+	"PracticeInSpectate"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} You can't go to a checkpoint whilst spectating!"
+	}
 	"ToogleCheckpoints1"
 	{
 		"#format"	"{1:s}"
@@ -200,6 +205,73 @@
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:i},{7:i},{8:s}"
 		"en"		"{1} {yellow}{2}{default} finished [{orange}{3}{default}] in {lightgreen}{4}{default}. Improving their best time by {lightgreen}{5}{default}. [Rank: {lightgreen}{6}/{7} {default}| Record: {lightgreen}{8}{default}]"
 	}
+	/*===================================
+	=    Style Bonus Time Messages     	=
+	====================================*/
+	"StyleFirstBonusRecord"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s}"
+		"en"		"{1} {yellow}{2}{default} set the {orange}{3} {red}{4} {default}record!"
+	}
+	"StyleNewBonusRecord"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s}"
+		"en"		"{1} {yellow}{2}{default} beat the {orange}{3} {red}{4} {default}record!"
+	}
+	"StyleBonusFinished1"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s}"
+		"en"		"{1} {yellow}{2} {default}set a {orange}{3} {red}{4} {default}SR of {lightgreen}{5}"
+	}
+	"StyleBonusFinished2"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:s},{8:i},{9:i}"
+		"en"		"{1} {yellow}{2} {default}finished {orange}{3} {red}{4} {default}in {lightgreen}{5} {default}[SR {lightgreen}{6} {default}| PB {blue}{7} {default}| Rank {lightgreen}{8}/{9}{default}]"
+	}
+	"StyleBonusFinished3"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:i},{8:i}"
+		"en"		"{1} {yellow}{2} {default}set a {orange}{3} {red}{4} {default}PB of {lightgreen}{5} {default}[SR {red}{6} {default}| Rank {lightgreen}{7}/{8}{default}]"
+	}
+	"StyleBonusFinished4"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:s},{8:i},{9:i}"
+		"en"		"{1} {yellow}{2} {default}finished {orange}{3} {red}{4} {default}in {lightgreen}{5} {default}[SR {red}{6} {default}| PB {blue}{7} {default}| Rank {lightgreen}{8}/{9}{default}]"
+	}
+	"StyleBonusFinished5"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:s},{6:s},{7:s},{8:i},{9:i}"
+		"en"		"{1} {yellow}{2} {default}finished {orange}{3} {red}{4} {default}in {lightgreen}{5} {default}[SR {red}{6} {default}| PB {yellow}{7} {default}| Rank {lightgreen}{8}/{9}{default}]"
+	}
+	/*===================================
+	=    Prac WRCP Time Messages     	=
+	====================================*/
+	"PracWrcp1"
+	{
+		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s}"
+		"en"		"{1} Stage {2}:{default} {lightgreen}{3} {default}[{4}{default} | {5}{default}]"
+	}
+	"PracWrcp2"
+	{
+		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:s}"
+		"en"		"{1} {yellow}{2} {default}| {purple}Stage {3}:{default} {lightgreen}{4} {default}[{5}{default} | {6}{default}]"
+	}
+	"PracWrcp3"
+	{
+		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s},{6:i},{7:i}"
+		"en"		"{1} Completed {default}Stage {2} {red}{3} {default}in {lightgreen}{4} {5} {default}[Rank: {lightgreen}{6}/{7}{default}]"
+	}
+	"PracWrcp4"
+	{
+		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s},{6:i},{7:i}"
+		"en"		"{1} Completed {default}Stage {2} {red}{3} {default}in {lightgreen}{4} {5} {default}[Rank: {lightgreen}{6}/{7}{default}]"
+	}
+	/*============END============*/
+	"ReplayFinishingMsg"
+	{
+		"#format"	"{1:s},{2:s},{3:s}"
+		"en"		"{1} {yellow}{2}{default} has finished in [{lightgreen}{3}{default}]"
+	}
 	"BonusFinished7"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:i},{6:i},{7:s}"
@@ -365,6 +437,11 @@
 		"#format"	"{1:s},{2:i}"
 		"en"		"{1} Error saving your {purple}stage {2} {default}time"
 	}
+	"ErrorPracWrcpTime"
+	{
+		"#format"	"{1:s},{2:i}"
+		"en"		"{1} {darkred}Error {default}saving your {purple}stage {2} {default}practice time"
+	}
 	"MSettings1"
 	{
 		"#format"	"{1:s}"
@@ -425,10 +502,40 @@
 		"#format"	"{1:s},{2:s}"
 		"en"		"{1} Vote to extend started by {yellow}{2}"
 	}
-	"Commands7"
+	"Commands7Chat"
 	{
 		"#format"	"{1:s},{2:d}"
 		"en"		"{1} sm_tele #{2}"
+	}
+	"Commands7Console"
+	{
+		"#format"	"{1:d}"
+		"en"		"SurfTimer | sm_tele #{1}"
+	}
+	"CheckpointRecreationNotAllowed"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {darkred}Checkpoint recreation not allowed on this server"
+	}
+	"Commands7Added"
+	{
+		"#format"	"{1:s},{2:i}"
+		"en"		"{1} {lime}Added saveloc {default}to sm_tele #{2}"
+	}
+	"CheckpointRecreationToChat"
+	{
+		"#format"	"{1:i},{2:i},{3:i},{4:i},{5:i},{6:i},{7:i},{8:i},{9:i},{10:i},{11:.3f},{12:.3f},{13:.3f},{14:.3f},{15:i}"
+		"en"		"To Recreate use: !addsaveloc {1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}|{13}|{14}|{15}"
+	}
+	"CheckpointRecreationToConsole"
+	{
+		"#format"	"{1:i}{2:i},{3:i},{4:i},{5:i},{6:i},{7:i},{8:i},{9:i},{10:i},{11:i},{12:.3f},{13:.3f},{14:.3f},{15:.3f},{16:i}"
+		"en"		"SurfTimer | To Recreate sm_tele #{1} use: sm_addsaveloc {2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}|{13}|{14}|{15}|{16}"
+	}
+	"CheckpointRecreationUnable"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Unable to recreate saveloc: {darkred}Invalid number of inputs"
 	}
 	"Commands8"
 	{
@@ -450,10 +557,20 @@
 		"#format"	"{1:s}"
 		"en"		"{1} There are no saved locations, use sm_saveloc to make one"
 	}
+	"Commands12"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {red}There are no saved locations to remove"
+	}
 	"Commands13"
 	{
 		"#format"	"{1:s},{2:d}"
 		"en"		"{1} Set saveloc id to #{2}"
+	}
+	"Commands14"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {green}Saved locations cleared"
 	}
 	"NoBonusOnMap"
 	{
