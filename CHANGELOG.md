@@ -1,7 +1,7 @@
 # Changelog
 [2021-09-22 - Version 1.0.0]
 ---
-- Moved to [semantic versioning](https://semver.org/lang/de/)
+- Moved to [semantic versioning](https://semver.org/)
 - Updated README.md
 - Added/Fixed support for SM1.11 compiler
 - [Added Telefinder](https://github.com/surftimer/Surftimer-Official/pull/235)
