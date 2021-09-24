@@ -1,4 +1,3 @@
-
 static void SetReplayTime(int zGrp, int stage, int style)
 {
 	char sPath[256], sTime[54], sBuffer[4][54];
@@ -628,6 +627,14 @@ public bool LoadRecordFromFile(const char[] path, FileHeader header, bool header
 	fFile.Read(view_as<int>(header.InitialAngles), 2, 4);
 	fFile.ReadInt32(header.TickCount);
 
+	header.Frames = null;
+
+	if (headerOnly)
+	{
+		delete fFile;
+		return true;
+	}
+
 	if (header.BinaryFormatVersion >= BINARY_FORMAT_VERSION)
 	{
 		header.Frames = new ArrayList(sizeof(frame_t), header.TickCount);
@@ -644,14 +651,6 @@ public bool LoadRecordFromFile(const char[] path, FileHeader header, bool header
 	}
 	else // old replay
 	{
-		header.Frames = null;
-
-		if (headerOnly)
-		{
-			delete fFile;
-			return true;
-		}
-
 		ArrayList aRecordFrames = new ArrayList(sizeof(FrameInfo));
 		ArrayList aAdditionalTeleport = new ArrayList(sizeof(AdditionalTeleport));
 
@@ -1373,18 +1372,18 @@ public void Stage_SaveRecording(int client, int stage, char[] time)
 	strcopy(header.Playername, sizeof(FileHeader::Playername), szName);
 	header.Checkpoints = 0;
 
-	ArrayList frames = new ArrayList(sizeof(frame_t));
+	header.Frames = new ArrayList(sizeof(frame_t));
 	any aFrameData[sizeof(frame_t)];
 
 	for (int i = startFrame; i < endFrame; i++)
 	{
 		g_aRecording[client].GetArray(i, aFrameData, sizeof(frame_t));
-		frames.PushArray(aFrameData, sizeof(frame_t));
+		header.Frames.PushArray(aFrameData, sizeof(frame_t));
 	}
 
-	header.Frames = frames;
-
 	WriteRecordToDisk(sPath2, header);
+
+	delete header.Frames;
 
 	if (g_bSavingWrcpReplay[client])
 	{

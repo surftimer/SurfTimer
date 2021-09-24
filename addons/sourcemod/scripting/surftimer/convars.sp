@@ -126,6 +126,7 @@ void CreateConVars()
 	AutoExecConfig_SetCreateDirectory(true);
 	AutoExecConfig_SetCreateFile(true);
 	AutoExecConfig_SetFile("surftimer");
+
 	g_hChatPrefix = AutoExecConfig_CreateConVar("ck_chat_prefix", "{lime}SurfTimer {default}|", "Determines the prefix used for chat messages", FCVAR_NOTIFY);
 	g_hConnectMsg = AutoExecConfig_CreateConVar("ck_connect_msg", "1", "on/off - Enables a player connect message with country tag", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hAllowRoundEndCvar = AutoExecConfig_CreateConVar("ck_round_end", "0", "on/off - Allows to end the current round", FCVAR_NOTIFY, true, 0.0, true, 1.0);
@@ -280,7 +281,9 @@ void CreateConVars()
 		g_AdminMenuFlag = ADMFLAG_ROOT;
 	}
 	else
+	{
 		g_AdminMenuFlag = FlagToBit(bufferFlag);
+	}
 	HookConVarChange(g_hAdminMenuFlag, OnSettingChanged);
 
 	g_hZonerFlag = AutoExecConfig_CreateConVar("ck_zoner_flag", "z", "Zoner status will automatically be granted to players with this flag. If the convar is invalid or not set, z (root) will be used by default.", FCVAR_NOTIFY);
@@ -292,7 +295,9 @@ void CreateConVars()
 		g_ZonerFlag = ADMFLAG_ROOT;
 	}
 	else
+	{
 		g_ZonerFlag = FlagToBit(bufferFlag);
+	}
 	HookConVarChange(g_hZonerFlag, OnSettingChanged);
 
 	// Map Setting ConVars
@@ -308,7 +313,9 @@ void CreateConVars()
 		g_VipFlag = ADMFLAG_RESERVATION;
 	}
 	else
-	g_VipFlag = FlagToBit(bufferFlag);
+	{
+		g_VipFlag = FlagToBit(bufferFlag);
+	}
 	HookConVarChange(g_hAutoVipFlag, OnSettingChanged);
 
 	// Prestige Server
@@ -435,7 +442,9 @@ void CreateConVars()
 	g_cvar_sv_hibernate_when_empty = FindConVar("sv_hibernate_when_empty");
 
 	if (GetConVarInt(g_cvar_sv_hibernate_when_empty) == 1)
+	{
 		SetConVarInt(g_cvar_sv_hibernate_when_empty, 0);
+	}
 
 	// Show Triggers
 	g_Offset_m_fEffects = FindSendPropInfo("CBaseEntity", "m_fEffects");
@@ -451,10 +460,11 @@ void CreateConVars()
 	sv_noclipspeed = FindConVar("sv_noclipspeed");
 	sv_noclipspeed.Flags &= ~FCVAR_NOTIFY;
 	g_iDefaultNoclipSpeed = sv_noclipspeed.FloatValue;
-	for( int i = 1; i <= MaxClients; i++ )
-    {
-        g_iNoclipSpeed[i] = g_iDefaultNoclipSpeed;
-    }
-	
+	for(int i = 1; i <= MaxClients; i++)
+	{
+		g_iNoclipSpeed[i] = g_iDefaultNoclipSpeed;
+	}
 
+	AutoExecConfig_ExecuteFile();
+	AutoExecConfig_CleanFile();
 }
