@@ -35,6 +35,9 @@
 #pragma newdecls required
 #pragma semicolon 1
 
+// More dynamic array size
+#pragma dynamic 2621440
+
 // Plugin Info
 #define VERSION "1.0.0"
 
@@ -924,11 +927,26 @@ bool g_bValidTeleportCall[MAXPLAYERS + 1];
 bool g_bNewReplay[MAXPLAYERS + 1];
 bool g_bNewBonus[MAXPLAYERS + 1];
 
-// Replay stuff
+// Old replay teleport destination
 int g_CurrentAdditionalTeleportIndex[MAXPLAYERS + 1];
+
+// Player's frame
 int g_iRecordedTicks[MAXPLAYERS + 1];
+
+// Amount of Player's frame
 int g_iRecordedTicksCount[MAXPLAYERS + 1];
+
+// Replay bot's frame
 int g_iReplayTick[MAXPLAYERS + 1];
+
+// Stage replays stuff
+int g_iStageStartFrame[MAXPLAYERS+1];
+bool g_bSavingWrcpReplay[MAXPLAYERS + 1];
+int g_StageReplayCurrentStage;
+int g_StageReplaysLoop;
+bool g_bStageReplay[CPLIMIT];
+bool g_bFirstStageReplay;
+float g_fStageReplayTimes[CPLIMIT];
 
 // Record bot client ID
 int g_RecordBot = -1;
@@ -1231,18 +1249,6 @@ Handle g_cvar_sv_hibernate_when_empty = INVALID_HANDLE;
 bool g_bJumpedInZone[MAXPLAYERS + 1];
 float g_fJumpedInZoneTime[MAXPLAYERS + 1];
 bool g_bResetOneJump[MAXPLAYERS + 1];
-
-// Stage replays
-
-// Number of frames where the replay started being recorded
-int g_iStageStartFrame[MAXPLAYERS+1];
-
-bool g_bSavingWrcpReplay[MAXPLAYERS + 1];
-int g_StageReplayCurrentStage;
-int g_StageReplaysLoop;
-bool g_bStageReplay[CPLIMIT];
-bool g_bFirstStageReplay;
-float g_fStageReplayTimes[CPLIMIT];
 
 // Server Announcements
 int g_iServerID;
