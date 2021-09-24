@@ -461,9 +461,9 @@ void CreateConVars()
 	sv_noclipspeed.Flags &= ~FCVAR_NOTIFY;
 	g_iDefaultNoclipSpeed = sv_noclipspeed.FloatValue;
 	for(int i = 1; i <= MaxClients; i++)
-    {
-        g_iNoclipSpeed[i] = g_iDefaultNoclipSpeed;
-    }
+	{
+		g_iNoclipSpeed[i] = g_iDefaultNoclipSpeed;
+	}
 
 	AutoExecConfig_ExecuteFile();
 	AutoExecConfig_CleanFile();
