@@ -39,7 +39,7 @@
 #pragma dynamic 2621440
 
 // Plugin Info
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 
 // Database Definitions
 #define MYSQL 0
