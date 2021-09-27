@@ -1597,22 +1597,8 @@ public Action Client_Usp(int client, int args)
 
 	g_flastClientUsp[client] = GetGameTime();
 
-	if (Client_HasWeapon(client, "weapon_hkp2000"))
-	{
-		int weapon = Client_GetWeapon(client, "weapon_hkp2000");
-		FakeClientCommand(client, "use %s", weapon);
-		InstantSwitch(client, weapon);
-	}
-	else if (Client_HasWeapon(client, "weapon_glock"))
-	{
-		int weapon = Client_GetWeapon(client, "weapon_glock");
-		FakeClientCommand(client, "use %s", weapon);
-		InstantSwitch(client, weapon);
-		FakeClientCommand(client, "drop");
-		GivePlayerItem(client, "weapon_usp_silencer");
-	}
-	else
-		GivePlayerItem(client, "weapon_usp_silencer");
+	SafeDropWeapon(client, CS_SLOT_SECONDARY);
+	GivePlayerWeaponAndSkin(client, "weapon_usp_silencer", CS_TEAM_CT);
 	return Plugin_Handled;
 }
 
@@ -1626,41 +1612,9 @@ public Action Client_Glock(int client, int args)
 
 	g_flastClientUsp[client] = GetGameTime();
 
-	if (Client_HasWeapon(client, "weapon_glock"))
-	{
-		int weapon = Client_GetWeapon(client, "weapon_glock");
-		FakeClientCommand(client, "use %s", weapon);
-		InstantSwitch(client, weapon);
-	}
-	else if (Client_HasWeapon(client, "weapon_hkp2000"))
-	{
-		int weapon = Client_GetWeapon(client, "weapon_hkp2000");
-		FakeClientCommand(client, "use %s", weapon);
-		InstantSwitch(client, weapon);
-		FakeClientCommand(client, "drop");
-		GivePlayerItem(client, "weapon_glock");
-	}
-	else
-		GivePlayerItem(client, "weapon_glock");
+	SafeDropWeapon(client, CS_SLOT_SECONDARY);
+	GivePlayerWeaponAndSkin(client, "weapon_glock", CS_TEAM_T);
 	return Plugin_Handled;
-}
-
-void InstantSwitch(int client, int weapon, int timer = 0)
-{
-	if (weapon == -1)
-		return;
-
-	float GameTime = GetGameTime();
-
-	if (!timer)
-	{
-		SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
-		SetEntPropFloat(weapon, Prop_Send, "m_flNextPrimaryAttack", GameTime);
-	}
-
-	SetEntPropFloat(client, Prop_Send, "m_flNextAttack", GameTime);
-	int ViewModel = GetEntPropEnt(client, Prop_Send, "m_hViewModel");
-	SetEntProp(ViewModel, Prop_Send, "m_nSequence", 0);
 }
 
 public Action Command_ext_Menu(int client, const char[] command, int argc)
