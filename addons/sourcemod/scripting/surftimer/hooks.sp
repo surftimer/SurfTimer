@@ -114,10 +114,11 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		{
 			StripAllWeapons(client);
 			if (!IsFakeClient(client))
-				GivePlayerItem(client, "weapon_usp_silencer");
-			int weapon = GetPlayerWeaponSlot(client, 2);
-			if (weapon != -1 && !IsFakeClient(client))
-				SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
+			{
+				int weapon = GivePlayerWeaponAndSkin(client, "weapon_usp_silencer", CS_TEAM_CT);
+				if (weapon > MaxClients)
+					SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
+			}
 		}
 
 		// NoBlock

@@ -4890,3 +4890,30 @@ public void PrintPracSrcp(int client, int style, int stage, float fClientPbStage
 
 	CheckpointToSpec(client, szSpecMessage);
 }
+
+int GivePlayerWeaponAndSkin(int client, const char[] name, int team)
+{
+	int currentTeam = GetEntProp(client, Prop_Data, "m_iTeamNum");
+	if (currentTeam != team)
+	{
+		SetEntProp(client, Prop_Data, "m_iTeamNum", team);
+	}
+
+	int weapon = GivePlayerItem(client, name);
+
+	if (currentTeam != team)
+	{
+		SetEntProp(client, Prop_Data, "m_iTeamNum", currentTeam);
+	}
+
+	return weapon;
+}
+
+void SafeDropWeapon(int client, int slot)
+{
+	int weapon = GetPlayerWeaponSlot(client, slot);
+	if (weapon != -1)
+	{
+		RemoveEntity(weapon);
+	}
+}
