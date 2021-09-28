@@ -334,6 +334,12 @@ public void StartTouch(int client, int action[3])
 			lastCheckpoint[g_iClientInZone[client][2]][client] = 1;
 			g_bSaveLocTele[client] = false;
 
+			if (g_bPracticeMode[client])
+			{
+				g_bPracticeMode[client] = false;
+				CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
+			}
+
 			if (g_bhasStages)
 			{
 				g_bWrcpTimeractivated[client] = false;
@@ -579,12 +585,6 @@ public void EndTouch(int client, int action[3])
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 		if (action[0] == 1 || action[0] == 5)
 		{	
-			if (g_bPracticeMode[client] && !g_bTimerRunning[client]) // If on practice mode, but timer isn't on - kick you out of practice mode and then start timer 
-			{
-				g_bPracticeMode[client] = false;
-				CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
-			}
-			
 			if (!g_bPracticeMode[client])
 			{
 				g_Stage[g_iClientInZone[client][2]][client] = 1;
