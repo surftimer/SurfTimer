@@ -458,7 +458,7 @@ void CreateConVars()
 
 	// New noclip
 	sv_noclipspeed = FindConVar("sv_noclipspeed");
-	sv_noclipspeed.Flags &= ~FCVAR_NOTIFY;
+	sv_noclipspeed.Flags &= ~(FCVAR_NOTIFY | FCVAR_REPLICATED);
 	g_iDefaultNoclipSpeed = sv_noclipspeed.FloatValue;
 	for(int i = 1; i <= MaxClients; i++)
 	{
