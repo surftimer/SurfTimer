@@ -2911,6 +2911,11 @@ public void AutoBhopFunction(int client, int &buttons)
 
 public void SpecListMenuDead(int client) // What Spectators see
 {
+	if(!g_bSideHud[client])
+	{
+		return;
+	}
+
 	char szTick[32];
 	Format(szTick, 32, "%i", g_iTickrate);
 	int ObservedUser;
@@ -3223,6 +3228,11 @@ public void SetInfoBotName(int ent)
 
 public void CenterHudDead(int client)
 {
+	if(!g_bCentreHud[client])
+	{
+		return;
+	}
+
 	char szTick[32];
 	char obsAika[128];
 	float obsTimer;
