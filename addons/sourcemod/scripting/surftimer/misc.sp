@@ -1300,8 +1300,8 @@ public void SetClientDefaults(int client)
 
 	g_ClientRenamingZone[client] = false;
 
-	g_bNewReplay[client] = false;
-	g_bNewBonus[client] = false;
+	g_bSavingReplay[client] = false;
+	g_bHijackFrame[client] = false;
 
 	g_bFirstTimerStart[client] = true;
 	g_pr_Calculating[client] = false;
@@ -1394,9 +1394,6 @@ public void SetClientDefaults(int client)
 	// VIP
 	g_bCheckCustomTitle[client] = false;
 	g_bZoner[client] = false;
-
-	// WRCP Replays
-	g_bSavingWrcpReplay[client] = false;
 
 	// Reset Bonus Bool
 	g_bInBonus[client] = false;
@@ -3276,17 +3273,41 @@ public void CenterHudDead(int client)
 
 			if (IsFakeClient(ObservedUser))
 			{
-				if (ObservedUser == g_RecordBot)
-					Format(obsAika, sizeof(obsAika), "<font color='#ec8'>%s</font>", g_szReplayTime);
-				else if (ObservedUser == g_BonusBot)
-					Format(obsAika, sizeof(obsAika), "<font color='#ec8'>%s</font>", g_szBonusTime);
-				else if (ObservedUser == g_WrcpBot)
-					Format(obsAika, sizeof(obsAika), "<font color='#ec8'>%s</font>", g_szWrcpReplayTime[g_iCurrentlyPlayingStage]);
-
 				float fSpeed[3];
 				GetEntPropVector(ObservedUser, Prop_Data, "m_vecVelocity", fSpeed);
 
 				float fSpeedHUD = SquareRoot(Pow(fSpeed[0], 2.0) + Pow(fSpeed[1], 2.0));
+
+				if (ObservedUser == g_RecordBot)
+				{
+					Format(obsAika, sizeof(obsAika), "<font color='#ec8'>%s</font>", g_szReplayTime);
+
+					if(g_iSelectedReplayStyle == 5)
+					{
+						fSpeedHUD /= 0.5;
+					}
+					else if(g_iSelectedReplayStyle == 6)
+					{
+						fSpeedHUD /= 1.5;
+					}
+				}
+				else if (ObservedUser == g_BonusBot)
+				{
+					Format(obsAika, sizeof(obsAika), "<font color='#ec8'>%s</font>", g_szBonusTime);
+
+					if(g_iSelectedBonusReplayStyle == 5)
+					{
+						fSpeedHUD /= 0.5;
+					}
+					else if(g_iSelectedBonusReplayStyle == 6)
+					{
+						fSpeedHUD /= 1.5;
+					}
+				}
+				else if (ObservedUser == g_WrcpBot)
+				{
+					Format(obsAika, sizeof(obsAika), "<font color='#ec8'>%s</font>", g_szWrcpReplayTime[g_iCurrentlyPlayingStage]);
+				}
 
 				PrintCSGOHUDText(client, "<pre>%s\nSpeed: <font color='#5e5'>%i u/s\n%s</pre>", obsAika, RoundToNearest(fSpeedHUD), sResult);
 				return;
@@ -4894,31 +4915,4 @@ public void PrintPracSrcp(int client, int style, int stage, float fClientPbStage
 	}
 
 	CheckpointToSpec(client, szSpecMessage);
-}
-
-int GivePlayerWeaponAndSkin(int client, const char[] name, int team)
-{
-	int currentTeam = GetEntProp(client, Prop_Data, "m_iTeamNum");
-	if (currentTeam != team)
-	{
-		SetEntProp(client, Prop_Data, "m_iTeamNum", team);
-	}
-
-	int weapon = GivePlayerItem(client, name);
-
-	if (currentTeam != team)
-	{
-		SetEntProp(client, Prop_Data, "m_iTeamNum", currentTeam);
-	}
-
-	return weapon;
-}
-
-void SafeDropWeapon(int client, int slot)
-{
-	int weapon = GetPlayerWeaponSlot(client, slot);
-	if (weapon != -1)
-	{
-		RemoveEntity(weapon);
-	}
 }
