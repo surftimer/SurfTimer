@@ -1199,6 +1199,7 @@ static void LoopReplay(int client)
 					g_iManualBonusReplayCount = 0;
 					g_bManualBonusReplayPlayback = false;
 					g_iCurrentBonusReplayIndex = 0;
+					g_iSelectedBonusReplayStyle = 0;
 					PlayRecord(g_BonusBot, 1, 0);
 					g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
 				}
@@ -1215,6 +1216,7 @@ static void LoopReplay(int client)
 					g_iCurrentBonusReplayIndex = 0;
 				}
 
+				g_iSelectedBonusReplayStyle = 0;
 				PlayRecord(g_BonusBot, 1, 0);
 				g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
 			}
@@ -1231,6 +1233,7 @@ static void LoopReplay(int client)
 				{
 					g_iManualReplayCount = 0;
 					g_bManualReplayPlayback = false;
+					g_iSelectedReplayStyle = 0;
 					PlayRecord(g_RecordBot, 0, 0);
 				}
 			}
