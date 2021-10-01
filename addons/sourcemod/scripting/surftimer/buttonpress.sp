@@ -743,6 +743,8 @@ public void CL_OnStartWrcpTimerPress(int client)
 			g_fCurrentWrcpRunTime[client] = 0.0;
 			g_bWrcpTimeractivated[client] = true;
 			g_bNotTeleporting[client] = true;
+			// Enable Trigger Output on Timer Restart
+			g_bTeleByCommand[client] = false;
 			g_WrcpStage[client] = g_Stage[0][client];
 			Stage_StartRecording(client);
 		}
