@@ -1,9 +1,11 @@
-# Surftimer-olokos for CS:GO
+<h1 align="center">!!! Don't use this Version/Branch of SurfTimer !!!</h1>
+
+## Surftimer-olokos for CS:GO
 
 <sup>I have renamed the repository to Surftimer-olokos just to make it obvious, that we're entering a new chapter in CS:GO surf community, a milestone.</sup>
 
 
-## Project Goals
+### Project Goals
 
 *As you probably all know there are quite some bugs in all open-source versions of cksurf or surftimer.*
 
@@ -18,7 +20,7 @@
 **Pull requests and any contributions are welcome and encouraged!**
 **Our [discord](https://discord.gg/5dsFHeR) is a good place for dev talk and help!**
 
-## Issue Rules
+### Issue Rules
 
 **We are only helping with timer related bugs, any host related issue will be closed immediately.**
 
@@ -89,7 +91,7 @@ If you choose to use the various discord features, please make sure of the follo
 *   If you want to use custom thumbnails/images, make sure they have the exact same name as the map in question, and that they are in the .jpg format. Furthermore, don't forget to add "/" at the end of the url, without the "".
 *   To edit the color of the embeds, use the hexadecimal color format, you can generate it at [this adress](https://www.color-hex.com/color-palette/25362).
 	
-## Upgrading
+### Upgrading
 
 #### Upgrade from pre v.285 checkpoints
 
@@ -113,7 +115,7 @@ If you choose to use the various discord features, please make sure of the follo
 *   Run `CSGOFOLDER/scripts/mysql-files/checkpoints-upgrade.sql` in your surftimer database
 
 
-## Point System
+### Point System
 <details>
   <summary>Explanation</summary> 
   
@@ -163,7 +165,7 @@ Take surf_aircontrol_nbv for example: (You can use sm_mi to see this menu)
 </details>
 
 
-## Credits
+### Credits
 
 *   [Jonitaikaponi](https://github.com/jonitaikaponi) - Original ckSurf creator
 *   [sneaK](https://github.com/sneak-it)
