@@ -188,6 +188,8 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	// Check clients tele side
 	int teleside = g_iTeleSide[client];
 
+	int zoneID = getZoneID(zonegroup, zone);
+
 	// Check if requested zone teleport is valid (non-linear map)
 	if(zoneID == -1) {
 		CPrintToChat(client, "Invalid stage or map has no stages!");
