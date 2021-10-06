@@ -1280,6 +1280,10 @@ public Action Command_ToStage(int client, int args)
 		int StageId = StringToInt(arg1);
 		if (StageId == 3)
 		{
+			if(getZoneID(0, StageId) == -1){
+			CPrintToChat(client, "Invalid stage or map has no stages!");
+			return Plugin_Handled;
+			}
 			g_bWrcpTimeractivated[client] = false;
 			teleportClient(client, 0, 3, true);
 			g_Stage[0][client] = 3;
