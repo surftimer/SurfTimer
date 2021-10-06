@@ -1281,7 +1281,7 @@ public Action Command_ToStage(int client, int args)
 		if (StageId == 3)
 		{
 			if(getZoneID(0, StageId) == -1){
-			CPrintToChat(client, "Invalid stage or map has no stages!");
+			CPrintToChat(client, "%t", "InvalidMapNoStages", g_szChatPrefix);
 			return Plugin_Handled;
 			}
 			g_bWrcpTimeractivated[client] = false;
