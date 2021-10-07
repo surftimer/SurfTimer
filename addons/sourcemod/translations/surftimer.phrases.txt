@@ -537,6 +537,11 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Unable to recreate saveloc: {darkred}Invalid number of inputs"
 	}
+	"InvalidMapNoStages"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Invalid stage or map has no stages!"
+	}
 	"Commands8"
 	{
 		"#format"	"{1:s}"
