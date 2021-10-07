@@ -192,7 +192,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 
 	// Check if requested zone teleport is valid (non-linear map)
 	if(zoneID == -1) {
-		CPrintToChat(client, "%t", "InvalidMapNoStages", g_szChatPrefix);
+		CPrintToChat(client, "%T", "InvalidMapNoStages", client, g_szChatPrefix);
 		return;
 	}
 
