@@ -424,7 +424,7 @@ int setClientLocation(int client, float fDestination[3])
 	{
 		if (g_iClientInZone[client][0] != -1) // Ignore end touch if teleporting from within a zone
 		{	
-			if (!g_bPracticeMode)
+			if (!g_bPracticeMode[client])
 			{
 				g_bIgnoreZone[client] = true;
 			}
