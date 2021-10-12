@@ -645,6 +645,26 @@ public Action Admin_RefreshProfile(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action Admin_RefreshPlayerRankTable(int client, int args)
+{
+	if (!IsPlayerTimerAdmin(client))
+		return Plugin_Handled;
+
+	if (args > 0)
+	{
+		char sArg[12];
+		GetCmdArg(1, sArg, sizeof(sArg));
+		if (IsStringNumeric(sArg))
+		{
+			RefreshPlayerRankTable(StringToInt(sArg));
+			return Plugin_Handled;
+		}
+	}
+	
+	RefreshPlayerRankTable(MAX_PR_PLAYERS);
+	return Plugin_Handled;
+}
+
 public Action Admin_ResetRecords(int client, int args)
 {
 	if (args < 1)
