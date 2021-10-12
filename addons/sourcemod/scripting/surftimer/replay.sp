@@ -1380,6 +1380,11 @@ public void Stage_SaveRecording(int client, int stage, char[] time)
 
 	for (int i = startFrame; i < endFrame; i++)
 	{
+		if (i == -1)
+		{
+			break;
+		}
+		
 		g_aRecording[client].GetArray(i, aFrameData, sizeof(frame_t));
 		header.Frames.PushArray(aFrameData, sizeof(frame_t));
 	}
