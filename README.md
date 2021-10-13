@@ -175,3 +175,15 @@ Extensions used in this version:
 *	[olokos](https://github.com/olokos) [Steam](https://steamcommunity.com/id/olokos/) [My server](https://kiepownica.pl/)
 *	and many, many more people who contributed to the project!
 
+
+
+
+
+
+
+
+
+
+
+## Nubbe
+thanks to DaLLuZZ for helping me and actually having a fix for spam 
