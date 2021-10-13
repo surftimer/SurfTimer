@@ -2148,13 +2148,12 @@ public void db_selectTopSurfers(int client, char mapname[128])
 public void db_selectMapTopSurfers(int client, char mapname[128])
 {
 	char szQuery[1024];
-	char type[128];
-	type = "normal";
-	Format(szQuery, 1024, sql_selectTopSurfers, mapname, 0, 0);
+	int type = 0;
+	Format(szQuery, 1024, sql_selectTopSurfers3, mapname);
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackString(pack, mapname);
-	WritePackString(pack, type);
+	WritePackCell(pack, type);
 	SQL_TQuery(g_hDb, sql_selectTopSurfersCallback, szQuery, pack, DBPrio_Low);
 }
 
