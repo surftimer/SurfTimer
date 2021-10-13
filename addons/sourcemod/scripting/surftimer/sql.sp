@@ -2148,13 +2148,12 @@ public void db_selectTopSurfers(int client, char mapname[128])
 public void db_selectMapTopSurfers(int client, char mapname[128])
 {
 	char szQuery[1024];
-	char type[128];
-	type = "normal";
-	Format(szQuery, 1024, sql_selectTopSurfers, mapname, 0, 0);
+	int type = 0;
+	Format(szQuery, 1024, sql_selectTopSurfers2, mapname);
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackString(pack, mapname);
-	WritePackString(pack, type);
+	WritePackCell(pack, type);
 	SQL_TQuery(g_hDb, sql_selectTopSurfersCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -7609,7 +7608,7 @@ public void db_SelectPlayersMapRankCallback(Handle owner, Handle hndl, const cha
 	}
 }
 
-// sm_mrank @x command
+// sm_mrank @x command with map parameter
 public void db_selectMapRankUnknown(int client, char szMapName[128], int rank)
 {
 	char szQuery[1024];
@@ -7620,6 +7619,19 @@ public void db_selectMapRankUnknown(int client, char szMapName[128], int rank)
 	rank = rank - 1;
 	Format(szQuery, 1024, "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `mapname` LIKE '%c%s%c' AND style = 0 ORDER BY `runtimepro` ASC LIMIT %i, 1;", PERCENT, szMapName, PERCENT, rank);
 	SQL_TQuery(g_hDb, db_selectMapRankUnknownCallback, szQuery, pack, DBPrio_Low);
+}
+
+// sm_mrank @x command without map parameter (current mapname being used)
+public void db_selectMapRankUnknownWithMap(int client, char szMapName[128], int rank)
+{
+    char szQuery[1024];
+    Handle pack = CreateDataPack();
+    WritePackCell(pack, client);
+    WritePackCell(pack, rank);
+
+    rank = Math_Min(rank - 1, 0);
+    Format(szQuery, 1024, sql_selectMapRankUnknownWithMap, szMapName, rank);
+    SQL_TQuery(g_hDb, db_selectMapRankUnknownCallback, szQuery, pack, DBPrio_Low);
 }
 
 public void db_selectMapRankUnknownCallback(Handle owner, Handle hndl, const char[] error, any data)
