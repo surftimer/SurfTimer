@@ -90,7 +90,8 @@ void CreateCommands()
 	// Admin Commands
 	RegConsoleCmd("sm_ckadmin", Admin_ckPanel, "[surftimer] Displays the SurfTimer admin menu panel");
 	RegConsoleCmd("sm_refreshprofile", Admin_RefreshProfile, "[surftimer] Recalculates player profile for given steam id");
-	RegConsoleCmd("sm_clearassists", Admin_ClearAssists, "[surftimer] Clears assist points (map progress) from all players");
+	RegConsoleCmd("sm_clearassists", Admin_ClearAssists, "[surftimer] Clears assist points (map progress) from all players");// reload map
+	RegConsoleCmd("sm_refreshranks", Admin_RefreshPlayerRankTable, "[surftimer] Refresh player rank table");
 
 	// Zoning/Mapsetting Commands
 	RegConsoleCmd("sm_zones", Command_Zones, "[surftimer] [zoner] Opens up the zone creation menu.");
@@ -4563,10 +4564,6 @@ public int HookZonesMenuHandler(Menu menu, MenuAction action, int param1, int pa
 		{
 			if (IsValidClient(param1))
 				g_iSelectedTrigger[param1] = -1;
-		}
-		case MenuAction_End:
-		{
-			delete menu;
 		}
 	}
 }

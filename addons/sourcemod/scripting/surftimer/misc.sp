@@ -4964,3 +4964,48 @@ void SafeDropWeapon(int client, int slot)
 		RemoveEntity(weapon);
 	}
 }
+
+/**
+ * Checks if the string is numeric.
+ * This correctly handles + - . in the String.
+ *
+ * @param str				String to check.
+ * @return					True if the String is numeric, false otherwise..
+ *
+ * Credits: https://github.com/bcserv/smlib/blob/7adc8d0c0811f9dd62d941b4f023c2785a4f5300/scripting/include/smlib/strings.inc#L9-L50
+ */
+stock bool IsStringNumeric(const char[] str)
+{
+	int x=0;
+	int dotsFound=0;
+	int numbersFound=0;
+
+	if (str[x] == '+' || str[x] == '-') {
+		x++;
+	}
+
+	while (str[x] != '\0') {
+
+		if (IsCharNumeric(str[x])) {
+			numbersFound++;
+		}
+		else if (str[x] == '.') {
+			dotsFound++;
+
+			if (dotsFound > 1) {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+
+		x++;
+	}
+
+	if (!numbersFound) {
+		return false;
+	}
+
+	return true;
+}
