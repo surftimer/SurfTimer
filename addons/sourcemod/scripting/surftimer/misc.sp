@@ -1,4 +1,4 @@
-public void setBotQuota()
+public void SetBotQuota()
 {
 	// Get bot_quota value
 	ConVar hBotQuota = FindConVar("bot_quota");
