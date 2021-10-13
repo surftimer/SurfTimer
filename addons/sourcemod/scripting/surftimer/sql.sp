@@ -2149,7 +2149,7 @@ public void db_selectMapTopSurfers(int client, char mapname[128])
 {
 	char szQuery[1024];
 	int type = 0;
-	Format(szQuery, 1024, sql_selectTopSurfers3, mapname);
+	Format(szQuery, 1024, sql_selectTopSurfers2, mapname);
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackString(pack, mapname);
