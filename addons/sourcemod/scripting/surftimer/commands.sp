@@ -4033,7 +4033,7 @@ public Action Command_SelectMapTime(int client, int args)
 					rank = StringToInt(arg1);
 
 				if (!arg2[0])
-					db_selectMapRankUnknown(client, g_szMapName, rank);
+					db_selectMapRankUnknownWithMap(client, g_szMapName, rank);
 				else
 					db_selectMapRankUnknown(client, arg2, rank);
 
