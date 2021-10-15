@@ -414,6 +414,13 @@ public void StartTouch(int client, int action[3])
 			g_bInDuck[client] = false;
 			g_KeyCount[client] = 0;
 
+			if (g_bPracticeMode[client])
+			{
+				g_bPracticeMode[client] = false;
+				Command_Teleport(client, 1);
+				CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
+			}
+
 			// stop bot wrcp timer
 			if (client == g_WrcpBot)
 			{
