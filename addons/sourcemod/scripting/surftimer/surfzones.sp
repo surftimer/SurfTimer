@@ -337,6 +337,7 @@ public void StartTouch(int client, int action[3])
 			if (g_bPracticeMode[client])
 			{
 				g_bPracticeMode[client] = false;
+				Command_Restart(client, 1);
 				CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
 			}
 
