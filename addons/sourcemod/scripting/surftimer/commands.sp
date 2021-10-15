@@ -926,16 +926,7 @@ public Action Command_clearPlayerCheckpoints(int client, int args)
 		g_iSaveLocCount[client] = 0;
 
 		CPrintToChat(client, "%t", "Commands14", g_szChatPrefix);
-
-		if (GetConVarInt(g_hDoubleRestartCommand) == 1)
-		{ 
-			Command_Restart(client, 1);
-			Command_Restart(client, 1);
-		}
-		else
-		{
-			Command_Restart(client, 1);
-		}
+		Command_Restart(client, 1);
 		
 		return Plugin_Handled;
 	}
