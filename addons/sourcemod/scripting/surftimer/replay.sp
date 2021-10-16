@@ -1380,6 +1380,12 @@ public void Stage_SaveRecording(int client, int stage, char[] time)
 
 	for (int i = startFrame; i < endFrame; i++)
 	{
+		if (i == -1)
+		{
+			LogError("Stage record cannot be saved. Client: \"%L\", startFrame: %d (g_iStageStartFrame: %d), endFrame: %d (g_iRecordedTicks: %d), i: %d, Path/File: %s", client, startFrame, g_iStageStartFrame[client], endFrame, g_iRecordedTicks[client], i, sPath2);
+			continue;
+		}
+		
 		g_aRecording[client].GetArray(i, aFrameData, sizeof(frame_t));
 		header.Frames.PushArray(aFrameData, sizeof(frame_t));
 	}
