@@ -1464,7 +1464,10 @@ public void GetcurrentRunTime(int client)
 	}
 	else // If not in PracMode then use normal CurrentRunTime
 	{
-		g_fCurrentRunTime[client] = fGetGameTime - g_fStartTime[client] - fPauseTime;
+		if (g_bTimerRunning[client])
+			g_fCurrentRunTime[client] = fGetGameTime - g_fStartTime[client] - fPauseTime;
+		else
+			g_fCurrentRunTime[client] = -1.0;
 	}
 	
 	if (g_bWrcpTimeractivated[client])
