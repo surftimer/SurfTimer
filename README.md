@@ -51,6 +51,7 @@ Yes, but not any more than other projects currently and for past years.
 * [DiscordAPI](https://github.com/Deathknife/sourcemod-discord)
 * [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
 * [ColorVariables](https://github.com/olokos/Chat-Processor/blob/master/scripting/include/colorvariables.inc)
+* [AutoExecConfig](https://github.com/Impact123/AutoExecConfig/blob/development/autoexecconfig.inc)
 
 **Recommended:**
 * [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (Suppresses console warnings)
