@@ -299,20 +299,20 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		}
 
 		// Functions that require the client to input something via the chat box
-		if (g_iWaitingForResponse[client] > -1)
+		if (g_iWaitingForResponse[client] > None)
 		{
 			// Check if client is cancelling
 			if (StrEqual(sText, "cancel"))
 			{
 				CPrintToChat(client, "%t", "Hooks1", g_szChatPrefix);
-				g_iWaitingForResponse[client] = -1;
+				g_iWaitingForResponse[client] = None;
 				return Plugin_Handled;
 			}
 
 			// Check which function we're waiting for
 			switch (g_iWaitingForResponse[client])
 			{
-				case 0: 
+				case PreSpeed: 
 				{
 					// Set zone Prespeed
 					float prespeed = StringToFloat(sText);
@@ -321,7 +321,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					g_mapZones[g_ClientSelectedZone[client]].PreSpeed = prespeed;
 					PrespeedMenu(client);
 				}
-				case 3:
+				case ZoneGroup:
 				{
 					// Hook zone zonegroup
 					int zgrp = StringToInt(sText);
@@ -333,7 +333,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					g_iZonegroupHook[client] = zgrp;
 					CPrintToChat(client, "%t", "Hooks3", g_szChatPrefix, zgrp);
 				}
-				case 4:
+				case MaxVelocity:
 				{
 					// Maxvelocity for map
 					float maxvelocity = StringToFloat(sText);
@@ -344,7 +344,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					MaxVelocityMenu(client);
 					CPrintToChat(client, "%t", "Hooks4", g_szChatPrefix, g_szMapName, maxvelocity);
 				}
-				case 5:
+				case TargetName:
 				{
 					// Zone set clients Target Name
 					if (StrEqual(sText, "reset"))
@@ -356,7 +356,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 
 					EditorMenu(client);
 				}
-				case 6:
+				case ClientEdit:
 				{
 					g_SelectedType[client] = StringToInt(sText);
 					char szQuery[512];
@@ -385,7 +385,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 				}
 			}
 
-			g_iWaitingForResponse[client] = -1;
+			g_iWaitingForResponse[client] = None;
 			return Plugin_Handled;
 		}
 

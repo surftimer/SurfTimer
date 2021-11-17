@@ -210,6 +210,16 @@ enum struct SkillGroup
 	char NameColour[32];
 }
 
+enum ResponseType
+{
+  None,
+  PreSpeed,
+  ZoneGroup,
+  MaxVelocity,
+  TargetName,
+  ClientEdit,
+}
+
 /*===================================
 =            Plugin Info            =
 ===================================*/
@@ -1315,7 +1325,7 @@ char g_szEnforcedTitle[MAXPLAYERS + 1][256];
 Handle g_DefaultTitlesWhitelist = null;
 
 // Prespeed in zones
-int g_iWaitingForResponse[MAXPLAYERS + 1];
+ResponseType g_iWaitingForResponse[MAXPLAYERS + 1];
 
 // Trigger List so we can store the names of the triggers before we rename them
 Handle g_TriggerMultipleList;

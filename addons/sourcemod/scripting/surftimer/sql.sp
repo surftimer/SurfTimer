@@ -253,7 +253,7 @@ public int callback_DeleteRecord(Menu menu, MenuAction action, int client, int k
 	
 		if(g_SelectedEditOption[client] > 0 && key == 1)
 		{
-			g_iWaitingForResponse[client] = 6;
+			g_iWaitingForResponse[client] = ClientEdit;
 			CPrintToChat(client, "%t", "DeleteRecordsNewValue", g_szChatPrefix);
 			return 0;
 		}

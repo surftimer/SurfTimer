@@ -4626,7 +4626,7 @@ public int HookZoneGroupHandler(Menu menu, MenuAction action, int param1, int pa
 			{
 				case 0:
 				{
-					g_iWaitingForResponse[param1] = -1;
+					g_iWaitingForResponse[param1] = None;
 					g_iZonegroupHook[param1] = 0;
 					int iEnt = GetArrayCell(g_hTriggerMultiple, index);
 
@@ -4647,7 +4647,7 @@ public int HookZoneGroupHandler(Menu menu, MenuAction action, int param1, int pa
 				}
 				case 1:
 				{
-					g_iWaitingForResponse[param1] = 3;
+					g_iWaitingForResponse[param1] = ZoneGroup;
 					CPrintToChat(param1, "%t", "Commands60", g_szChatPrefix);
 
 					int iEnt = GetArrayCell(g_hTriggerMultiple, index);
@@ -4693,7 +4693,7 @@ public int HookZoneTypeHandler(Menu menu, MenuAction action, int param1, int par
 			GetEntPropString(iEnt, Prop_Send, "m_iName", szTriggerName, 128, 0);
 
 
-			if (g_iWaitingForResponse[param1] == 3)
+			if (g_iWaitingForResponse[param1] == ZoneGroup)
 			{
 				CPrintToChat(param1, "%t", "Commands61", g_szChatPrefix);
 

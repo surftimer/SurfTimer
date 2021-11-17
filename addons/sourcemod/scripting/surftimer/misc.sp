@@ -1437,7 +1437,7 @@ public void SetClientDefaults(int client)
 	// Enforce Titles
 	g_bEnforceTitle[client] = false;
 
-	g_iWaitingForResponse[client] = -1;
+	g_iWaitingForResponse[client] = None;
 
 	g_iMenuPosition[client] = 0;
 
