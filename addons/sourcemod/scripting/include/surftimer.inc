@@ -167,8 +167,18 @@ forward Action:surftimer_OnBonusFinished(client, Float:fRunTime, String:sRunTime
  * @param client     Player index.
  * @return           Plugin_Handled; to stop the player from searching.
  */
- forward Action:surftimer_OnPracticeFinished(client, Float:fRunTime, String:sRunTime[54]);
+forward Action:surftimer_OnPracticeFinished(client, Float:fRunTime, String:sRunTime[54]);
 
+/**
+ * Called when a client sets a new record
+ *
+ * @param client			Player index
+ * @param style				Style index
+ * @param time				Time set by the player
+ * @param timeDif			Time difference with the former record
+ * @param bonusGroup	Group of the bonus. -1 if the record isn't a bonus
+ */
+forward void surftimer_OnNewRecord(int client, int style, char[] time, char[] timeDif, int bonusGroup);
 
 public SharedPlugin:__pl_surftimer =
 {
@@ -191,4 +201,5 @@ public __pl_surftimer_SetNTVOptional()
 	MarkNativeAsOptional("surftimer_ClientIsVIP");
 	MarkNativeAsOptional("surftimer_GetServerRank");
 	MarkNativeAsOptional("surftimer_SafeTeleport");
+	MarkNativeAsOptional("surftimer_OnNewRecord");
 }
