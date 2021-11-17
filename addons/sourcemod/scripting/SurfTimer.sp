@@ -24,7 +24,6 @@
 #undef REQUIRE_PLUGIN
 #include <dhooks>
 #include <mapchooser>
-#include <discord>
 #include <surftimer>
 
 /*===================================
@@ -1292,10 +1291,6 @@ int g_iAllowCheckpointRecreation; // Int for allowCheckpointRecreation convar
 
 char g_sServerName[256];
 ConVar g_hHostName = null;
-
-// discord bugtracker
-char g_sBugType[MAXPLAYERS + 1][32];
-char g_sBugMsg[MAXPLAYERS + 1][256];
 
 // Teleport Destinations
 Handle g_hDestinations;
