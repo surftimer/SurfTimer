@@ -1890,6 +1890,8 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 						PlayRecordSound(2);
 						CPrintToChat(i, "%t", "NewMapRecord", g_szChatPrefix, szName);
 						PrintToConsole(i, "surftimer | %s scored a new MAP RECORD", szName);
+						
+						SendNewRecordForward(client);
 					}
 				}
 			}
@@ -1928,10 +1930,6 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		{
 			if (GetConVarBool(g_hRecordAnnounce))
 				db_insertAnnouncement(szName, g_szMapName, 0, g_szFinalTime[client], 0);
-			char buffer[1024];
-			GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
-			if (!StrEqual(buffer, ""))
-				sendDiscordAnnouncement(szName, g_szMapName, g_szFinalTime[client]);
 		}
 
 		if (g_bTop10Time[client])
@@ -1969,7 +1967,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 	return;
 }
 
-stock void PrintChatBonus (int client, int zGroup, int rank = 0)
+stock void PrintChatBonus(int client, int zGroup, int rank = 0)
 {
 	if (!IsValidClient(client))
 		return;
@@ -2032,6 +2030,8 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 			RecordDiff = g_fOldBonusRecordTime[zGroup] - g_fFinalTime[client];
 			FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
 			Format(szRecordDiff, 54, "-%s", szRecordDiff);
+
+			SendNewRecordForward(client, zGroup);
 		}
 		if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 		{
@@ -2068,11 +2068,6 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 	{
 		if (GetConVarBool(g_hRecordAnnounce))
 			db_insertAnnouncement(szName, g_szMapName, 1, g_szFinalTime[client], zGroup);
-		char buffer[1024], buffer1[1024];
-		GetConVarString(g_hRecordAnnounceDiscord, buffer, 1024);
-		GetConVarString(g_hRecordAnnounceDiscordBonus, buffer1, 1024);
-		if (!StrEqual(buffer, "") && !StrEqual(buffer1, ""))
-			sendDiscordAnnouncementBonus(szName, g_szMapName, g_szFinalTime[client], zGroup);
 	}
 
 	/* Start function call */
@@ -4880,4 +4875,27 @@ stock bool IsStringNumeric(const char[] str)
 	}
 
 	return true;
+}
+
+
+/**
+ * Sends a new record forward on surftimer_OnNewRecord.
+ * 
+ * @param client           Index of the client.
+ * @param bonusGroup       Number of the bonus. Default = -1.
+ */
+stock void SendNewRecordForward(int client, int bonusGroup = -1)
+{
+	/* Start New record function call */
+	Call_StartForward(g_NewRecordForward);
+
+	/* Push parameters one at a time */
+	Call_PushCell(client);
+	Call_PushCell(g_iCurrentStyle[client]);
+	Call_PushString(g_szFinalTime[client]);
+	Call_PushString(g_szTimeDifference[client]);
+	Call_PushCell(bonusGroup);
+
+	/* Finish the call, get the result */
+	Call_Finish();
 }

@@ -684,10 +684,11 @@ bool g_bFixingRamp[MAXPLAYERS + 1];
 ConVar g_hSlopeFixEnable;
 
 /*----------  Forwards  ----------*/
-Handle g_MapFinishForward;
-Handle g_MapCheckpointForward;
-Handle g_BonusFinishForward;
-Handle g_PracticeFinishForward;
+GlobalForward g_MapFinishForward;
+GlobalForward g_MapCheckpointForward;
+GlobalForward g_BonusFinishForward;
+GlobalForward g_PracticeFinishForward;
+GlobalForward g_NewRecordForward;
 
 /*----------  SQL Variables  ----------*/
 

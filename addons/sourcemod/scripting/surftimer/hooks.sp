@@ -321,17 +321,6 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					g_mapZones[g_ClientSelectedZone[client]].PreSpeed = prespeed;
 					PrespeedMenu(client);
 				}
-				case 1:
-				{
-					// BugMsg
-					Format(g_sBugMsg[client], sizeof(g_sBugMsg), sText);
-					SendBugReport(client);
-				}
-				case 2:
-				{
-					// Calladmin
-					CallAdmin(client, sText);
-				}
 				case 3:
 				{
 					// Hook zone zonegroup
