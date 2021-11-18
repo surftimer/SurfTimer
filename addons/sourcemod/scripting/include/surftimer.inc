@@ -3,176 +3,172 @@
 #endif
 #define _surftimer_included
 
-/* Natives */
+/*  Natives  */
 
 /**
- * Checks clients timer status
+ * Checks if a client's timer is active.
  *
- * @param client    Client's id
- * @return          True / False
+ * @param client		The client's ID.
+ * @return					true if the client's timer is active. False otherwise.
  */
-native bool:surftimer_GetTimerStatus(client);
+native bool surftimer_GetTimerStatus(int client);
 
 /**
- * Stops client's timer.
+ * Stops a client's timer.
  *
- * @param client    Client's id
- * @return          No return
+ * @param client		The client's ID.
  */
-native surftimer_StopTimer(client);
+native void surftimer_StopTimer(int client);
 
 /**
- * Starts client's timer
+ * Starts a client's timer.
  *
- * @param client    Client's id
- * @return          No return
+ * @param client		The client's ID.
  */
-native surftimer_EmulateStartButtonPress(client);
+native void surftimer_EmulateStartButtonPress(int client);
 
 /**
  * Finishes a client's run.
  *
- * @param client    Client's id
- * @return          No return
+ * @param client		The client's ID.
  */
-native surftimer_EmulateStopButtonPress(client);
+native void surftimer_EmulateStopButtonPress(int client);
 
 /**
- * Get client's current runtime.
+ * Retrives a client's current runtime.
  *
- * @param client     Client's id
- * @return           Client's curren runtime as a float.
+ * @param client			The client's ID.
+ * @return						The current runtime of the client.
  */
-native Float:surftimer_GetCurrentTime(client);
+native float surftimer_GetCurrentTime(int client);
 
 /**
- * Checks if the client has VIP status
+ * Checks if a client has the VIP status.
  *
- * @param client     Clients id
- * @return           True / False
+ * @param client			The client's ID.
+ * @return						true if the client's has the VIP status. False otherwise.
  */
-native bool:surftimer_IsClientVip(client);
+native bool surftimer_IsClientVip(int client);
 
 /**
- * Gets the rank of a client
+ * Retrieves the rank of a client.
  *
- * @param client     Client's id
- * @return           Rank as an int / -1 on failure
+ * @param client			The client's ID.
+ * @return						The rank of the client. -1 on failure.
  */
-native surftimer_GetPlayerRank(client);
+native int surftimer_GetPlayerRank(int client);
 
 /**
- * Gets the clients points
+ * Retrieves a client's rank.
  *
- * @param client     Client's id
- * @return           points as an int / -1 on failure
+ * @param client			The client's ID.
+ * @return						The points of the client. -1 on failure.
  */
-native surftimer_GetPlayerPoints(client);
+native int surftimer_GetPlayerPoints(int client);
 
 /**
- * Gets the skillgroup of a client
+ * Retrieves the skillgroup of a client
  *
- * @param client     Client's id
- * @param str		 String to convert
- * @return           Skillgroup as a string / Unranked on failure
+ * @param client			The client's ID.
+ * @param str					The string to convert.
+ * @return						Skillgroup as a string. Unranked on failure.
  */
-native surftimer_GetPlayerSkillgroup(client, String:str[]);
+native void surftimer_GetPlayerSkillgroup(int client, char[] str);
 
 /**
- * Gets current map tier
- * @return          Current map tier
- */
-native surftimer_GetMapTier();
-
-/**
- * Gets amount of stages on current map
- * @return          amount of stages on current map / 0 if linear
- */
-native surftimer_GetMapStages();
-
-/**
- * Gets a clients name with colour in string
+ * Retrieves the current map tier.
  *
- * @param client     Client's id
- * @param str		 String to convert
- * @return           Players name with color as a string / invalid on failure
+ * @return						Current map tier.
  */
-native surftimer_GetPlayerNameColored(client, String:str[]);
+native int surftimer_GetMapTier();
 
 /**
- * Gets current map wr holder and time
+ * Retrieves the number of stages on the current map.
  *
- * @param name		 String to convert for wr holder name
- * @param time		 String to convert for wr holder time
- * @return           total players finished on current map
+ * @return						Number of stages on the current map. 0 if the map is linear.
  */
-native surftimer_GetMapData(String:name[], String:time[]);
+native int surftimer_GetMapStages();
 
 /**
- * Gets client data
+ * Retrieves a client's name with colors.
  *
- * @param client	 Client's id
- * @param time		 String to convert for players map time
- * @param rank		 int to convert to players map rank
- * @param country	 String to convert for players country
- * @return           Two strings with wr holder name and time
+ * @param client			The client's ID.
+ * @param str					The string to convert.
+ * @return						The client's name with colors. Invalid on failure.
  */
-native surftimer_GetPlayerData(client, String:time[], rank, String:country[]);
+native void surftimer_GetPlayerNameColored(int client, char[] str);
 
 /**
- * Safely teleports the client. Does not trigger end touches
- * and sets client location correctly.
+ * Retrieves the current map's WR holder and the associated time.
  *
- * @param client    		Client's id
- * @param fDestination 		Teleport location
- * @param fAngle 			Teleport angle
- * @param fVelocity 		Teleport velocity
- * @param bStopTimer 		Stop the client's timer, default false
- * @return           true on success / false on failure
+ * @param name				String to store the WR holder's name.
+ * @param time				String to store the WR holder's time.
+ * @return						The number of players who have finished the current map.
  */
-native bool:surftimer_SafeTeleport(client, Float:fDestination[3], Float:fAngle[3], Float:fVelocity[3], bool:bStopTimer = false);
-
-/*
-		FORWARDS
-						*/
+native int surftimer_GetMapData(char[] name, char[] time);
 
 /**
- * Called when a player finishes a map
+ * Retrieves the client's data.
  *
- * @param client     Player index.
- * @return           Plugin_Handled; to stop the player from searching.
+ * @param client			The client's ID.
+ * @param time				String to store the client's map time.
+ * @param rank				int to store the client's map rank.
+ * @param country			String to store the client's country.
  */
-forward Action:surftimer_OnMapFinished(client, Float:fRunTime, String:sRunTime[54], rank, total);
+native void surftimer_GetPlayerData(int& client, char[] time, int& rank, char[] country);
 
 /**
- * Called when a player recieves a checkpoint either via a stage or checkpoint zone
+ * Teleport a client safely, without triggering end touches
+ * and sets the client's location correctly.
  *
- * @param client     Player index.
- * @return           Plugin_Handled; to stop the player from searching.
+ * @param client					The client's ID.
+ * @param fDestination		The teleport location.
+ * @param fAngle					The teleport angle.
+ * @param fVelocity				The teleport velocity.
+ * @param bStopTimer			Whether or not to stop the client's timer. Defaults to false.
+ * @return								true on success, false otherwise.
  */
-forward Action:surftimer_OnCheckpoint(client, Float:fRunTime, String:sRunTime[54], Float:fPbCp, String:sPbDiff[16], Float:fSrCp, String:sSrDiff[16]);
+native bool surftimer_SafeTeleport(int client, float fDestination[3], float fAngle[3], float fVelocity[3], bool bStopTimer = false);
+
+/*  FORWARDS  */
+
+/**
+ * Called when a client finishes a map.
+ *
+ * @param client			The client's ID.
+ * @return						Plugin_Handled, to stop the client from searching.
+ */
+forward Action surftimer_OnMapFinished(int client, float fRunTime, char sRunTime[54], int rank, int total);
+
+/**
+ * Called when a player reaches a checkpoint zone or a stage.
+ *
+ * @param client			The client's ID.
+ * @return						Plugin_Handled, to stop the client from searching.
+ */
+forward Action surftimer_OnCheckpoint(int client, float fRunTime, char sRunTime[54], float fPbCp, char sPbDiff[16], char fSrCp, char sSrDiff[16]);
 
 
 /**
- * Called when a player finishes a bonus
+ * Called when a client finishes a bonus.
  *
- * @param client     Player index.
- * @return           Plugin_Handled; to stop the player from searching.
+ * @param client			The client's ID.
+ * @return						Plugin_Handled, to stop the player from searching.
  */
-forward Action:surftimer_OnBonusFinished(client, Float:fRunTime, String:sRunTime[54], rank, total, bonusid);
+forward Action surftimer_OnBonusFinished(int client, float fRunTime, char sRunTime[54], int rank, int total, int bonusid);
 
 /**
- * Called when a player finishes a map in practice mode
+ * Called when a client finishes a map in practice mode
  *
- * @param client     Player index.
- * @return           Plugin_Handled; to stop the player from searching.
+ * @param client			The client's ID.
+ * @return						Plugin_Handled, to stop the player from searching.
  */
-forward Action:surftimer_OnPracticeFinished(client, Float:fRunTime, String:sRunTime[54]);
+forward Action surftimer_OnPracticeFinished(int client, float fRunTime, char sRunTime[54]);
 
 /**
  * Called when a client sets a new record
  *
- * @param client			Player index
+ * @param client			The client's ID.
  * @param style				Style index
  * @param time				Time set by the player
  * @param timeDif			Time difference with the former record
