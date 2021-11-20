@@ -2424,7 +2424,7 @@ public void ProfileMenu2(int client, int style, char szName[MAX_NAME_LENGTH], ch
 		SetMenuTitle(menu, "Profile Menu - Choose a player\n------------------------------\n");
 		GetClientName(client, szPlayerName, sizeof(szPlayerName));
 		AddMenuItem(menu, szPlayerName, szPlayerName);
-		for (int i = i; i <= MaxClients; i++)
+		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && i != client)
 			{
