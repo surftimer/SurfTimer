@@ -1,4 +1,8 @@
-#include "surftimer/db/queries.sp"
+#if SOURCEMOD_V_MINOR > 10
+	#include "db/queries.sp"
+#else
+	#include "surftimer/db/queries.sp"
+#endif
 
 /*==================================
 =          DATABASE SETUP          =
