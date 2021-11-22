@@ -1891,7 +1891,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 						CPrintToChat(i, "%t", "NewMapRecord", g_szChatPrefix, szName);
 						PrintToConsole(i, "surftimer | %s scored a new MAP RECORD", szName);
 						
-						SendNewRecordForward(client);
+						SendNewRecordForward(client, g_szTimeDifference[client]);
 					}
 				}
 			}
@@ -1992,6 +1992,8 @@ stock void PrintChatBonus(int client, int zGroup, int rank = 0)
 			RecordDiff = g_fOldBonusRecordTime[zGroup] - g_fFinalTime[client];
 			FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
 			Format(szRecordDiff, 54, "-%s", szRecordDiff);
+			
+			SendNewRecordForward(client, szRecordDiff, zGroup);
 		}
 		if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 		{
@@ -2031,7 +2033,7 @@ stock void PrintChatBonus(int client, int zGroup, int rank = 0)
 			FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
 			Format(szRecordDiff, 54, "-%s", szRecordDiff);
 
-			SendNewRecordForward(client, zGroup);
+			SendNewRecordForward(client, szRecordDiff, zGroup);
 		}
 		if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 		{
@@ -4882,9 +4884,10 @@ stock bool IsStringNumeric(const char[] str)
  * Sends a new record forward on surftimer_OnNewRecord.
  * 
  * @param client           Index of the client.
+ * @param szRecordDiff     String containing the formatted difference with the previous record.
  * @param bonusGroup       Number of the bonus. Default = -1.
  */
-stock void SendNewRecordForward(int client, int bonusGroup = -1)
+stock void SendNewRecordForward(int client, const char[] szRecordDiff, int bonusGroup = -1)
 {
 	/* Start New record function call */
 	Call_StartForward(g_NewRecordForward);
@@ -4893,7 +4896,7 @@ stock void SendNewRecordForward(int client, int bonusGroup = -1)
 	Call_PushCell(client);
 	Call_PushCell(g_iCurrentStyle[client]);
 	Call_PushString(g_szFinalTime[client]);
-	Call_PushString(g_szTimeDifference[client]);
+	Call_PushString(szRecordDiff);
 	Call_PushCell(bonusGroup);
 
 	/* Finish the call, get the result */
