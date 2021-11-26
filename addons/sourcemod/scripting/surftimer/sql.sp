@@ -2943,7 +2943,7 @@ public void SQL_ViewTop10RecordsCallback2(Handle owner, Handle hndl, const char[
 		char szSteamId[32];
 		char szMapName[128];
 
-		int rank = SQL_GetRowCount(hndl);
+		int rank = SQL_FetchInt(hndl, 0);
 		WritePackCell(data, rank);
 		ResetPack(data);
 		ReadPackString(data, szName, MAX_NAME_LENGTH);

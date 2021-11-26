@@ -3,8 +3,13 @@ public void SetBotQuota()
 	// Get bot_quota value
 	ConVar hBotQuota = FindConVar("bot_quota");
 
+	int flags = GetConVarFlags(hBotQuota);
+	flags &= ~FCVAR_REPLICATED;
+	SetConVarFlags(hBotQuota, flags);
+
 	// Initialize
 	SetConVarInt(hBotQuota, 0, false, false);
+
 
 	// Check how many bots are needed
 	int count = 0;
@@ -1464,7 +1469,10 @@ public void GetcurrentRunTime(int client)
 	}
 	else // If not in PracMode then use normal CurrentRunTime
 	{
-		g_fCurrentRunTime[client] = fGetGameTime - g_fStartTime[client] - fPauseTime;
+		if (g_bTimerRunning[client])
+			g_fCurrentRunTime[client] = fGetGameTime - g_fStartTime[client] - fPauseTime;
+		else
+			g_fCurrentRunTime[client] = -1.0;
 	}
 	
 	if (g_bWrcpTimeractivated[client])
