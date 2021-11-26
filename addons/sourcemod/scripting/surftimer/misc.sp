@@ -245,6 +245,45 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 			g_bInBonus[client] = false;
 		}
 
+		bool destinationFound = false;
+		int entity;
+		float origin[3];
+		float ang[3];
+		for (int i = 0; i < GetArraySize(g_hDestinations); i++)
+		{
+			entity = GetArrayCell(g_hDestinations, i);
+			GetEntPropVector(entity, Prop_Send, "m_vecOrigin", origin);
+			/**
+			*	Checks if coordinates are inside a zone
+			*	Return: zone id where location is in, or -1 if not inside a zone
+			**/
+			if (zonegroup > 0 && StrEqual(g_szMapName, "surf_mudkip_fix"))
+			{
+				char szBuffer[128];
+				char szTargetName[128];
+				GetEntPropString(entity, Prop_Send, "m_iName", szBuffer, sizeof(szBuffer));
+				Format(szTargetName, 128, "bonus%i", zonegroup);
+				if (zonegroup == 5)
+					Format(szTargetName, 128, "%s_1", szTargetName);
+		
+				if (StrEqual(szBuffer, szTargetName))
+				{
+					destinationFound = true;
+					GetEntPropVector(entity, Prop_Send, "m_angRotation", ang);
+					break;
+				}
+			}
+			else
+			{
+				if (IsInsideZone(origin) == destinationZoneId)
+				{
+					destinationFound = true;
+					GetEntPropVector(entity, Prop_Send, "m_angRotation", ang);
+					break;
+				}
+			}
+		}
+
 		if (GetClientTeam(client) == 1 || GetClientTeam(client) == 0) // Spectating
 		{
 			if (stopTime)
@@ -309,7 +348,10 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 						Client_Stop(client, 0);
 
 					// Set spawn location to the destination zone:
-					Array_Copy(g_mapZones[destinationZoneId].CenterPoint, g_fTeleLocation[client], 3);
+					if (destinationFound)
+						Array_Copy(origin, g_fTeleLocation[client], 3);
+					else
+						Array_Copy(g_mapZones[destinationZoneId].CenterPoint, g_fTeleLocation[client], 3);
 
 					// Set specToStage flag
 					g_bRespawnPosition[client] = false;
@@ -326,45 +368,6 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 				}
 				else // Teleport normally
 				{
-					bool destinationFound = false;
-					int entity;
-					float origin[3];
-					float ang[3];
-					for (int i = 0; i < GetArraySize(g_hDestinations); i++)
-					{
-						entity = GetArrayCell(g_hDestinations, i);
-						GetEntPropVector(entity, Prop_Send, "m_vecOrigin", origin);
-						/**
-						*	Checks if coordinates are inside a zone
-						*	Return: zone id where location is in, or -1 if not inside a zone
-						**/
-						if (zonegroup > 0 && StrEqual(g_szMapName, "surf_mudkip_fix"))
-						{
-							char szBuffer[128];
-							char szTargetName[128];
-							GetEntPropString(entity, Prop_Send, "m_iName", szBuffer, sizeof(szBuffer));
-							Format(szTargetName, 128, "bonus%i", zonegroup);
-							if (zonegroup == 5)
-								Format(szTargetName, 128, "%s_1", szTargetName);
-
-							if (StrEqual(szBuffer, szTargetName))
-							{
-								destinationFound = true;
-								GetEntPropVector(entity, Prop_Send, "m_angRotation", ang);
-								break;
-							}
-						}
-						else
-						{
-							if (IsInsideZone(origin) == destinationZoneId)
-							{
-								destinationFound = true;
-								GetEntPropVector(entity, Prop_Send, "m_angRotation", ang);
-								break;
-							}
-						}
-					}
-
 					// Set client speed to 0
 					SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, -100.0 } ));
 
