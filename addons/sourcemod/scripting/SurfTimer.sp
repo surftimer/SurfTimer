@@ -1568,6 +1568,7 @@ char RadioCMDS[][] =  // Disable radio commands
 
 #include "surftimer/convars.sp"
 #include "surftimer/misc.sp"
+#include "surftimer/db/queries.sp"
 #include "surftimer/sql.sp"
 #include "surftimer/admin.sp"
 #include "surftimer/newmaps.sp"
