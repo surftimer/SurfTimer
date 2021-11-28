@@ -4969,3 +4969,336 @@ bool CGetColor(const char[] sName, char[] sColor, int iColorSize)
 
 	return false;
 }
+
+/* Credits to SMLib for the following stocks */
+
+/**
+ * Copies a 1 dimensional static array.
+ *
+ * @param array			Static Array to copy from.
+ * @param newArray		New Array to copy to.
+ * @param size			Size of the array (or number of cells to copy)
+ * @noreturn
+ */
+stock void Array_Copy(const any[] array, any[] newArray, int size)
+{
+	for (int i=0; i < size; i++) {
+		newArray[i] = array[i];
+	}
+}
+
+/**
+ * Removes all weapons of a client.
+ * You can specify a weapon it shouldn't remove and if to
+ * clear the player's ammo for a weapon when it gets removed.
+ *
+ * @param client 		Client Index.
+ * @param exclude		If not empty, this weapon won't be removed from the client.
+ * @param clearAmmo		If true, the ammo the player carries for all removed weapons are set to 0 (primary and secondary).
+ * @return				Number of removed weapons.
+ */
+stock int Client_RemoveAllWeapons(int client, const char[] exclude="", bool clearAmmo=false)
+{
+	int offset = Client_GetWeaponsOffset(client) - 4;
+
+	int numWeaponsRemoved = 0;
+	for (int i=0; i < MAX_WEAPONS; i++) {
+		offset += 4;
+
+		int weapon = GetEntDataEnt2(client, offset);
+
+		if (!Weapon_IsValid(weapon)) {
+			continue;
+		}
+
+		if (exclude[0] != '\0' && Entity_ClassNameMatches(weapon, exclude)) {
+			Client_SetActiveWeapon(client, weapon);
+			continue;
+		}
+
+		if (clearAmmo) {
+			Client_SetWeaponPlayerAmmoEx(client, weapon, 0, 0);
+		}
+
+		if (RemovePlayerItem(client, weapon)) {
+			Entity_Kill(weapon);
+		}
+
+		numWeaponsRemoved++;
+	}
+
+	return numWeaponsRemoved;
+}
+
+/**
+ * Sets the client's Score.
+ *
+ * @param client			Client's index.
+ * @param value				Score.
+ * @noreturn
+ */
+stock int Client_SetScore(int client, int value)
+{
+	SetEntProp(client, Prop_Data, "m_iFrags", value);
+
+	return 0;
+}
+
+/**
+ * Gets the offset for a client's weapon list (m_hMyWeapons).
+ * The offset will saved globally for optimization.
+ *
+ * @param client		Client Index.
+ * @return				Weapon list offset or -1 on failure.
+ */
+stock int Client_GetWeaponsOffset(int client)
+{
+	static int offset = -1;
+
+	if (offset == -1) {
+		offset = FindDataMapInfo(client, "m_hMyWeapons");
+	}
+
+	return offset;
+}
+
+/**
+ * Changes the active/current weapon of a player by Index.
+ * Note: No changing animation will be played !
+ *
+ * @param client		Client Index.
+ * @param weapon		Index of a valid weapon.
+ */
+stock void Client_SetActiveWeapon(int client, int weapon)
+{
+	SetEntPropEnt(client, Prop_Data, "m_hActiveWeapon", weapon);
+	ChangeEdictState(client, FindDataMapInfo(client, "m_hActiveWeapon"));
+}
+
+/**
+ * Sets the primary and secondary ammo the player carries for a specific weapon index.
+ *
+ * @param client		Client Index.
+ * @param weapon		Weapon Entity Index.
+ * @param primaryAmmo	Primary ammo stock value from the client, if -1 the value is untouched.
+ * @param secondaryAmmo	Secondary ammo stock value from the client, if -1 the value is untouched.
+ */
+stock void Client_SetWeaponPlayerAmmoEx(int client, int weapon, int primaryAmmo=-1, int secondaryAmmo=-1)
+{
+	int offset_ammo = FindDataMapInfo(client, "m_iAmmo");
+
+	if (primaryAmmo != -1) {
+		int offset = offset_ammo + (Weapon_GetPrimaryAmmoType(weapon) * 4);
+		SetEntData(client, offset, primaryAmmo, 4, true);
+	}
+
+	if (secondaryAmmo != -1) {
+		int offset = offset_ammo + (Weapon_GetSecondaryAmmoType(weapon) * 4);
+		SetEntData(client, offset, secondaryAmmo, 4, true);
+	}
+}
+
+/**
+ * Sets if to draw the client's view model for the client.
+ *
+ * @param client		Client Index.
+ * @param drawViewModel	Set to true if to draw, false otherwise.
+ */
+stock void Client_SetDrawViewModel(int client, bool drawViewModel)
+{
+	SetEntProp(client, Prop_Send, "m_bDrawViewmodel", drawViewModel);
+}
+
+/**
+ * Converts the whole String to lower case.
+ * Only works with alphabetical characters (not ÖÄÜ) because Sourcemod suxx !
+ * The Output String can be the same as the Input String.
+ *
+ * @param input				Input String.
+ * @param output			Output String.
+ * @param size				Max Size of the Output string
+ */
+stock void String_ToLower(const char[] input, char[] output, int size)
+{
+	size--;
+
+	int x=0;
+	while (input[x] != '\0' && x < size) {
+
+		output[x] = CharToLower(input[x]);
+
+		x++;
+	}
+
+	output[x] = '\0';
+}
+
+/**
+ * Sets the given value to min
+ * if the value is smaller than the given.
+ * Don't use this with float values.
+ *
+ * @param value			Value
+ * @param min			Min Value used as lower border
+ * @return				Correct value not lower than min
+ */
+stock any Math_Min(any value, any min)
+{
+	if (value < min) {
+		value = min;
+	}
+
+	return value;
+}
+
+/*
+ * Copies file source to destination
+ * Based on code of javalia:
+ * http://forums.alliedmods.net/showthread.php?t=159895
+ *
+ * @param source		Input file
+ * @param destination	Output file
+ * @return				True on success, false otherwise
+ */
+stock bool File_Copy(const char[] source, const char[] destination)
+{
+	File file_source = OpenFile(source, "rb");
+
+	if (file_source == INVALID_HANDLE) {
+		return false;
+	}
+
+	File file_destination = OpenFile(destination, "wb");
+
+	if (file_destination == INVALID_HANDLE) {
+		delete file_source;
+		return false;
+	}
+
+	int buffer[32];
+	int cache;
+
+	while (!IsEndOfFile(file_source)) {
+		cache = ReadFile(file_source, buffer, sizeof(buffer), 1);
+		WriteFile(file_destination, buffer, cache, 1);
+	}
+
+	delete file_source;
+	delete file_destination;
+
+	return true;
+}
+
+/*
+ * Checks whether the entity is a valid weapon or not.
+ *
+ * @param weapon		Weapon Entity.
+ * @return				True if the entity is a valid weapon, false otherwise.
+ */
+stock bool Weapon_IsValid(int weapon)
+{
+	if (!IsValidEdict(weapon)) {
+		return false;
+	}
+
+	return Entity_ClassNameMatches(weapon, "weapon_", true);
+}
+
+/**
+ * Checks if an entity (partially) matches a specific entity class.
+ *
+ * @param entity		Entity Index.
+ * @param className		Classname String.
+ * @partialMatch		If to do a partial classname check.
+ * @return				True if the classname matches, false otherwise.
+ */
+stock bool Entity_ClassNameMatches(int entity, const char[] className, bool partialMatch=false)
+{
+	char entity_className[64];
+	Entity_GetClassName(entity, entity_className, sizeof(entity_className));
+
+	if (partialMatch) {
+		return (StrContains(entity_className, className) != -1);
+	}
+
+	return StrEqual(entity_className, className);
+}
+
+/**
+ * Kills an entity on the next frame (delayed).
+ * It is safe to use with entity loops.
+ * If the entity is is player ForcePlayerSuicide() is called.
+ *
+ * @param kenny			Entity index.
+ * @param killChildren	When true, kennys children are killed too.
+ * @return 				True on success, false otherwise.
+ */
+stock bool Entity_Kill(int kenny, bool killChildren=false)
+{
+	if (Entity_IsPlayer(kenny)) {
+		// Oh My God! They Killed Kenny!!
+		ForcePlayerSuicide(kenny);
+		return true;
+	}
+
+	if(killChildren){
+		return AcceptEntityInput(kenny, "KillHierarchy");
+	}
+	else {
+		return AcceptEntityInput(kenny, "Kill");
+	}
+}
+
+/*
+ * Gets the primary ammo Type (int offset)
+ *
+ * @param weapon		Weapon Entity.
+ * @return				Primary ammo type value.
+ */
+stock int Weapon_GetPrimaryAmmoType(int weapon)
+{
+	return GetEntProp(weapon, Prop_Data, "m_iPrimaryAmmoType");
+}
+
+/*
+ * Gets the secondary ammo Type (int offset)
+ *
+ * @param weapon		Weapon Entity.
+ * @return				Secondary ammo type value.
+ */
+stock int Weapon_GetSecondaryAmmoType(int weapon)
+{
+	return GetEntProp(weapon, Prop_Data, "m_iSecondaryAmmoType");
+}
+
+/**
+ * Gets the Classname of an entity.
+ * This is like GetEdictClassname(), except it works for ALL
+ * entities, not just edicts.
+ *
+ * @param entity			Entity index.
+ * @param buffer			Return/Output buffer.
+ * @param size				Max size of buffer.
+ * @return					Number of non-null bytes written.
+ */
+stock int Entity_GetClassName(int entity, char[] buffer, int size)
+{
+	return GetEntPropString(entity, Prop_Data, "m_iClassname", buffer, size);
+}
+
+/**
+ * Checks if an entity is a player or not.
+ * No checks are done if the entity is actually valid,
+ * the player is connected or ingame.
+ *
+ * @param entity			Entity index.
+ * @return 				True if the entity is a player, false otherwise.
+ */
+stock bool Entity_IsPlayer(int entity)
+{
+	if (entity < 1 || entity > MaxClients) {
+		return false;
+	}
+
+	return true;
+}

@@ -14,7 +14,6 @@
 #include <sdktools>
 #include <adminmenu>
 #include <cstrike>
-#include <smlib>
 #include <geoip>
 #include <basecomm>
 #include <colorlib>
@@ -102,6 +101,9 @@
 #define MAXZONEGROUPS 12
 // Maximum amount of zones in a map
 #define MAXZONES 128
+
+// Part of SMLib
+#define MAX_WEAPONS				48	// Max number of weapons availabl
 
 // Ranking Definitions
 #define MAX_PR_PLAYERS 1066
