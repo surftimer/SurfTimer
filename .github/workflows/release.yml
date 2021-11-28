@@ -24,13 +24,10 @@ jobs:
         with:
           version: "1.10"
 
-      - name: Create dependency directories
-        run: mkdir $INCLUDE_PATH/smlib
-
       - name: Fetch plugin dependencies
         run: |
           wget https://raw.githubusercontent.com/peace-maker/DHooks2/dynhooks/sourcemod_files/scripting/include/dhooks.inc -P $INCLUDE_PATH
-          wget https://github.com/Impact123/AutoExecConfig/raw/development/autoexecconfig.inc -P $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/Impact123/AutoExecConfig/development/autoexecconfig.inc -P $INCLUDE_PATH
           wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/addons/sourcemod/scripting/include/colorlib.inc -P $INCLUDE_PATH
 
       - name: Compile surftimer.sp
