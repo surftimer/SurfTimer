@@ -2790,12 +2790,14 @@ public void SpecList(int client)
 		Handle panel = CreatePanel();
 		DrawPanelText(panel, g_szPlayerPanelText[client]);
 		SendPanelToClient(panel, client, PanelHandler, 1);
-		CloseHandle(panel);
+		delete panel;
 	}
 }
 
 public int PanelHandler(Handle menu, MenuAction action, int param1, int param2)
 {
+
+	return 0;
 }
 
 public bool TraceRayDontHitSelf(int entity, int mask, any data)
@@ -3203,6 +3205,8 @@ public void CreateNavFile()
 public Action RefreshInfoBot(Handle timer)
 {
 	LoadInfoBot();
+
+	return Plugin_Continue;
 }
 
 public void SetInfoBotName(int ent)
@@ -3940,7 +3944,7 @@ public void SideHudAlive(int client)
 		DrawPanelText(panel, szPanel);
 
 		SendPanelToClient(panel, client, PanelHandler, 1);
-		CloseHandle(panel);
+		delete panel;
 	}
 }
 

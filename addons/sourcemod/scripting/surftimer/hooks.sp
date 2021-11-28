@@ -69,6 +69,8 @@ public Action Event_OnFire(Handle event, const char[] name, bool dontBroadcast)
 			}
 		}
 	}
+
+	return Plugin_Continue;
 }
 
 // Player Spawns
@@ -716,6 +718,8 @@ public Action ApplyStyles(Handle timer, int client)
 		else if (g_iCurrentStyle[client] == 6)// 6 fastforward
 			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.5);
 	}
+
+	return Plugin_Continue;
 }
 
 public Action OnMultipleTrigger1(int entity, int client)
@@ -1462,6 +1466,8 @@ public Action ResetOneJump(Handle timer, any client)
 		g_bJumpedInZone[client] = false;
 		g_bResetOneJump[client] = false;
 	}
+
+	return Plugin_Continue;
 }
 
 public Action DelayedVelocityCap(Handle timer, Handle pack)
@@ -1483,6 +1489,8 @@ public Action DelayedVelocityCap(Handle timer, Handle pack)
 	NormalizeVector(CurVelVec, CurVelVec);
 	ScaleVector(CurVelVec, speedCap);
 	TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
+
+	return Plugin_Continue;
 }
 
 public Action Hook_SetTriggerTransmit(int entity, int client)

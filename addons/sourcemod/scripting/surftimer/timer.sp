@@ -546,11 +546,15 @@ public Action StartJumpZonePrintTimer(Handle timer, any client)
 public Action Block2Unload(Handle timer, any client)
 {
 	ServerCommand("sm plugins unload block2");
+
+	return Plugin_Handled;
 }
 
 public Action Block2Load(Handle timer, any client)
 {
 	ServerCommand("sm plugins load block2");
+
+	return Plugin_Handled;
 }
 
 // Replay Bot Fixes
@@ -589,6 +593,8 @@ public Action PlayTimeTimer(Handle timer)
 			}
 		}
 	}
+
+	return Plugin_Continue;
 }
 
 public Action AnnouncementTimer(Handle timer)
@@ -632,6 +638,8 @@ public Action SetArmsModel(Handle timer, any client)
 		GetConVarString(g_hArmModel, szBuffer, 256);
 		SetEntPropString(client, Prop_Send, "m_szArmsModel", szBuffer);
 	}
+
+	return Plugin_Continue;
 }
 
 public Action SpecBot(Handle timer, Handle pack)
@@ -652,4 +660,6 @@ public Action RestartPlayer(Handle timer, any client)
 {
 	if (IsValidClient(client))
 		Command_Restart(client, 1);
+	
+	return Plugin_Continue;
 }
