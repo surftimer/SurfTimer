@@ -46,10 +46,7 @@ Yes, but not any more than other projects currently and for past years.
 
 **Compilation Requirements (Includes):**
 * [SourceMod Includes](https://www.sourcemod.net/downloads.php?branch=stable)
-* [SMJansson](https://github.com/JoinedSenses/SourceMod-IncludeLibrary/blob/master/include/smjansson.inc)
 * [SMLib](https://github.com/bcserv/smlib/tree/transitional_syntax)
-* [DiscordAPI](https://github.com/Deathknife/sourcemod-discord)
-* [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
 * [ColorLib](https://github.com/c0rp3n/colorlib-sm/blob/master/addons/sourcemod/scripting/include/colorlib.inc)
 * [AutoExecConfig](https://github.com/Impact123/AutoExecConfig/blob/development/autoexecconfig.inc)
 
@@ -59,6 +56,7 @@ Yes, but not any more than other projects currently and for past years.
 
 **Optional:**
 * [Surftimer-Web-Stats](https://github.com/KristianP26/Surftimer-Web-Stats) - Web Statistics
+* [Surftimer-Discord](https://github.com/Sarrus1/SurfTimer-discord/releases/latest) - Discord Record Notifications
 
 ## Issue Rules
 
@@ -155,8 +153,6 @@ Take surf_aircontrol_nbv for example: (You can use sm_mi to see this menu)
 ## Credits
 
 Extensions used in this version:
-*   [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556) (KyleS)
-*   [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604) (Thrawn2)
 *   [DHooks](https://forums.alliedmods.net/showthread.php?t=180114) (Dr!fter)
 *   [Discord API](https://github.com/Deathknife/sourcemod-discord) (Deathknife)
 *   [Trails Chroma](https://github.com/Nickelony/Trails-Chroma) (Nickelony)

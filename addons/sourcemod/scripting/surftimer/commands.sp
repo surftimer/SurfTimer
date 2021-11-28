@@ -177,10 +177,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_startpos", Command_Startpos, "[surftimer] Saves current location as new !r spawn.");
 	RegConsoleCmd("sm_resetstartpos", Command_ResetStartpos, "[surftimer] Removes custom !r spawn.");
 
-	// Discord
-	RegConsoleCmd("sm_bug", Command_Bug, "[surftimer] report a bug to our discord");
-	RegConsoleCmd("sm_calladmin", Command_Calladmin, "[surftimer] sends a message to the staff");
-
 	// CPR
 	RegConsoleCmd("sm_cpr", Command_CPR, "[surftimer] Compare clients time to another clients time");
 
@@ -4630,7 +4626,7 @@ public int HookZoneGroupHandler(Menu menu, MenuAction action, int param1, int pa
 			{
 				case 0:
 				{
-					g_iWaitingForResponse[param1] = -1;
+					g_iWaitingForResponse[param1] = None;
 					g_iZonegroupHook[param1] = 0;
 					int iEnt = GetArrayCell(g_hTriggerMultiple, index);
 
@@ -4651,7 +4647,7 @@ public int HookZoneGroupHandler(Menu menu, MenuAction action, int param1, int pa
 				}
 				case 1:
 				{
-					g_iWaitingForResponse[param1] = 3;
+					g_iWaitingForResponse[param1] = ZoneGroup;
 					CPrintToChat(param1, "%t", "Commands60", g_szChatPrefix);
 
 					int iEnt = GetArrayCell(g_hTriggerMultiple, index);
@@ -4697,7 +4693,7 @@ public int HookZoneTypeHandler(Menu menu, MenuAction action, int param1, int par
 			GetEntPropString(iEnt, Prop_Send, "m_iName", szTriggerName, 128, 0);
 
 
-			if (g_iWaitingForResponse[param1] == 3)
+			if (g_iWaitingForResponse[param1] == ZoneGroup)
 			{
 				CPrintToChat(param1, "%t", "Commands61", g_szChatPrefix);
 
@@ -4797,42 +4793,6 @@ public void Startpos(int client)
 	{
 		CPrintToChat(client, "%t", "Commands69", g_szChatPrefix);
 	}
-}
-
-public Action Command_Bug(int client, int args)
-{
-	ReportBugMenu(client);
-	return Plugin_Handled;
-}
-
-public void ReportBugMenu(int client)
-{
-	Menu menu = CreateMenu(ReportBugHandler);
-	SetMenuTitle(menu, "Choose a bug type");
-	AddMenuItem(menu, "Map Bug", "Map Bug");
-	AddMenuItem(menu, "SurfTimer Bug", "SurfTimer Bug");
-	AddMenuItem(menu, "Server Bug", "Server Bug");
-	SetMenuExitButton(menu, true);
-	DisplayMenu(menu, client, MENU_TIME_FOREVER);
-}
-
-public int ReportBugHandler(Menu menu, MenuAction action, int param1, int param2)
-{
-	if (action == MenuAction_Select)
-	{
-		GetMenuItem(menu, param2, g_sBugType[param1], 32);
-		g_iWaitingForResponse[param1] = 1;
-		CPrintToChat(param1, "%t", "Commands70", g_szChatPrefix);
-	}
-	else if (action == MenuAction_End)
-		CloseHandle(menu);
-}
-
-public Action Command_Calladmin(int client, int args)
-{
-	g_iWaitingForResponse[client] = 2;
-	CPrintToChat(client, "%t", "Commands70", g_szChatPrefix);
-	return Plugin_Handled;
 }
 
 public Action Command_CPR(int client, int args)

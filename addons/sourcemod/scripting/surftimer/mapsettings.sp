@@ -171,7 +171,7 @@ public int MaxVelocityMenuHandler(Handle tMenu, MenuAction action, int client, i
 			if (maxvelocity == -1.0)
 			{
 				CPrintToChat(client, "%t", "MSettings1", g_szChatPrefix);
-				g_iWaitingForResponse[client] = 4;
+				g_iWaitingForResponse[client] = MaxVelocity;
 				return;
 			}
 			else

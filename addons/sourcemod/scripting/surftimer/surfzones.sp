@@ -2044,7 +2044,7 @@ public int MenuHandler_Editor(Handle tMenu, MenuAction action, int client, int i
 				case 9:
 				{
 					// Set Target Name
-					g_iWaitingForResponse[client] = 5;
+					g_iWaitingForResponse[client] = TargetName;
 					CPrintToChat(client, "%t", "SurfZones9", g_szChatPrefix);
 				}
 				case 10:
@@ -2214,7 +2214,7 @@ public int MenuHandler_Prespeed(Handle tMenu, MenuAction action, int client, int
 			if (prespeed == -1.0)
 			{
 				CPrintToChat(client, "%t", "SurfZones10", g_szChatPrefix, g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]].ZoneTypeId);
-				g_iWaitingForResponse[client] = 0;
+				g_iWaitingForResponse[client] = PreSpeed;
 				return;
 			}
 			else if (prespeed == -2.0)

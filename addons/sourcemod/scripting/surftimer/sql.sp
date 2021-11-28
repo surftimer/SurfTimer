@@ -257,7 +257,7 @@ public int callback_DeleteRecord(Menu menu, MenuAction action, int client, int k
 	
 		if(g_SelectedEditOption[client] > 0 && key == 1)
 		{
-			g_iWaitingForResponse[client] = 6;
+			g_iWaitingForResponse[client] = ClientEdit;
 			CPrintToChat(client, "%t", "DeleteRecordsNewValue", g_szChatPrefix);
 			return 0;
 		}
@@ -2947,7 +2947,7 @@ public void SQL_ViewTop10RecordsCallback2(Handle owner, Handle hndl, const char[
 		char szSteamId[32];
 		char szMapName[128];
 
-		int rank = SQL_GetRowCount(hndl);
+		int rank = SQL_FetchInt(hndl, 0);
 		WritePackCell(data, rank);
 		ResetPack(data);
 		ReadPackString(data, szName, MAX_NAME_LENGTH);

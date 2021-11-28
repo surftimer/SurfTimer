@@ -24,7 +24,6 @@
 #undef REQUIRE_PLUGIN
 #include <dhooks>
 #include <mapchooser>
-#include <discord>
 #include <surftimer>
 
 /*===================================
@@ -209,6 +208,16 @@ enum struct SkillGroup
 	char RankName[128];
 	char RankNameColored[128];
 	char NameColour[32];
+}
+
+enum ResponseType
+{
+  None,
+  PreSpeed,
+  ZoneGroup,
+  MaxVelocity,
+  TargetName,
+  ClientEdit,
 }
 
 /*===================================
@@ -685,10 +694,11 @@ bool g_bFixingRamp[MAXPLAYERS + 1];
 ConVar g_hSlopeFixEnable;
 
 /*----------  Forwards  ----------*/
-Handle g_MapFinishForward;
-Handle g_MapCheckpointForward;
-Handle g_BonusFinishForward;
-Handle g_PracticeFinishForward;
+GlobalForward g_MapFinishForward;
+GlobalForward g_MapCheckpointForward;
+GlobalForward g_BonusFinishForward;
+GlobalForward g_PracticeFinishForward;
+GlobalForward g_NewRecordForward;
 
 /*----------  SQL Variables  ----------*/
 
@@ -1293,10 +1303,6 @@ int g_iAllowCheckpointRecreation; // Int for allowCheckpointRecreation convar
 char g_sServerName[256];
 ConVar g_hHostName = null;
 
-// discord bugtracker
-char g_sBugType[MAXPLAYERS + 1][32];
-char g_sBugMsg[MAXPLAYERS + 1][256];
-
 // Teleport Destinations
 Handle g_hDestinations;
 
@@ -1319,7 +1325,7 @@ char g_szEnforcedTitle[MAXPLAYERS + 1][256];
 Handle g_DefaultTitlesWhitelist = null;
 
 // Prespeed in zones
-int g_iWaitingForResponse[MAXPLAYERS + 1];
+ResponseType g_iWaitingForResponse[MAXPLAYERS + 1];
 
 // Trigger List so we can store the names of the triggers before we rename them
 Handle g_TriggerMultipleList;
@@ -2714,10 +2720,11 @@ public void OnPluginStart()
 	}
 
 	// Forwards
-	g_MapFinishForward = CreateGlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell);
-	g_MapCheckpointForward = CreateGlobalForward("surftimer_OnCheckpoint", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String);
-	g_BonusFinishForward = CreateGlobalForward("surftimer_OnBonusFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell, Param_Cell);
-	g_PracticeFinishForward = CreateGlobalForward("surftimer_OnPracticeFinished", ET_Event, Param_Cell, Param_Float, Param_String);
+	g_MapFinishForward = new GlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell);
+	g_MapCheckpointForward = new GlobalForward("surftimer_OnCheckpoint", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String);
+	g_BonusFinishForward = new GlobalForward("surftimer_OnBonusFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell, Param_Cell);
+	g_PracticeFinishForward = new GlobalForward("surftimer_OnPracticeFinished", ET_Event, Param_Cell, Param_Float, Param_String);
+	g_NewRecordForward = new GlobalForward("surftimer_OnNewRecord", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
 
 	if (g_bLateLoaded)
 	{
