@@ -1895,8 +1895,6 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 						PlayRecordSound(2);
 						CPrintToChat(i, "%t", "NewMapRecord", g_szChatPrefix, szName);
 						PrintToConsole(i, "surftimer | %s scored a new MAP RECORD", szName);
-						
-						SendNewRecordForward(client, g_szTimeDifference[client]);
 					}
 				}
 			}
@@ -1933,6 +1931,8 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		// Send Announcements
 		if (g_bMapSRVRecord[client])
 		{
+			SendNewRecordForward(client, g_szTimeDifference[client]);
+			
 			if (GetConVarBool(g_hRecordAnnounce))
 				db_insertAnnouncement(szName, g_szMapName, 0, g_szFinalTime[client], 0);
 		}
