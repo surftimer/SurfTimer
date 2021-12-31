@@ -52,8 +52,14 @@ jobs:
           git clone https://github.com/Deathknife/sourcemod-discord.git
           mv sourcemod-discord/include/* $INCLUDE_PATH
 
-      - name: Compile plugin
+      - name: Compile SurfTimer
         run: |
           echo -e "\nCompiling SurfTimer.sp..."
-          spcomp -w234 -O2 -v2 -i $INCLUDE_PATH SurfTimer.sp
+          spcomp -w234 -O2 -v2 -i$includePath -i$INCLUDE_PATH SurfTimer.sp
+        working-directory: ${{ env.SCRIPTING_PATH }}/
+
+      - name: Compile SurfTimer Telefinder
+        run: |
+          echo -e "\nCompiling SurfTimer-telefinder.sp..."
+          spcomp -w234 -O2 -v2 -i$includePath -i$INCLUDE_PATH SurfTimer-telefinder.sp
         working-directory: ${{ env.SCRIPTING_PATH }}/
