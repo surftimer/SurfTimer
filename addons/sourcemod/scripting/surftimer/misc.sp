@@ -2696,6 +2696,7 @@ stock Action PrintSpecMessageAll(int client)
 // http:// pastebin.com/YdUWS93H
 public bool CheatFlag(const char[] voice_inputfromfile, bool isCommand, bool remove)
 {
+	int flags;
 	if (remove)
 	{
 		if (!isCommand)
@@ -2703,7 +2704,7 @@ public bool CheatFlag(const char[] voice_inputfromfile, bool isCommand, bool rem
 			Handle hConVar = FindConVar(voice_inputfromfile);
 			if (hConVar != null)
 			{
-				int flags = GetConVarFlags(hConVar);
+				flags = GetConVarFlags(hConVar);
 				SetConVarFlags(hConVar, flags &= ~FCVAR_CHEAT);
 				return true;
 			}
@@ -2712,7 +2713,7 @@ public bool CheatFlag(const char[] voice_inputfromfile, bool isCommand, bool rem
 		}
 		else
 		{
-			int flags = GetCommandFlags(voice_inputfromfile);
+			flags = GetCommandFlags(voice_inputfromfile);
 			if (SetCommandFlags(voice_inputfromfile, flags &= ~FCVAR_CHEAT))
 				return true;
 			else
@@ -2726,7 +2727,7 @@ public bool CheatFlag(const char[] voice_inputfromfile, bool isCommand, bool rem
 			Handle hConVar = FindConVar(voice_inputfromfile);
 			if (hConVar != null)
 			{
-				int flags = GetConVarFlags(hConVar);
+				flags = GetConVarFlags(hConVar);
 				SetConVarFlags(hConVar, flags & FCVAR_CHEAT);
 				return true;
 			}
@@ -2735,7 +2736,7 @@ public bool CheatFlag(const char[] voice_inputfromfile, bool isCommand, bool rem
 
 		} else
 		{
-			int flags = GetCommandFlags(voice_inputfromfile);
+			flags = GetCommandFlags(voice_inputfromfile);
 			if (SetCommandFlags(voice_inputfromfile, flags & FCVAR_CHEAT))
 				return true;
 			else
