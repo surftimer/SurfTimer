@@ -894,7 +894,8 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	}
 	else if (g_bInMaxSpeed[client])
 	{
-		LimitMaxSpeed(client, g_mapZones[g_iClientInZone[client][3]].PreSpeed);
+		if (g_iClientInZone[client][3] >= 0)
+			LimitMaxSpeed(client, g_mapZones[g_iClientInZone[client][3]].PreSpeed);
 	}
 
 	/*------ Styles ------*/
