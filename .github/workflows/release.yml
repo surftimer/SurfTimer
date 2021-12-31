@@ -35,12 +35,16 @@ jobs:
           wget https://raw.githubusercontent.com/JoinedSenses/SourceMod-IncludeLibrary/master/include/smjansson.inc -P $INCLUDE_PATH
           wget https://raw.githubusercontent.com/peace-maker/DHooks2/dynhooks/sourcemod_files/scripting/include/dhooks.inc -P $INCLUDE_PATH
           wget https://github.com/Impact123/AutoExecConfig/raw/development/autoexecconfig.inc -P $INCLUDE_PATH
-          
+
           git clone -b transitional_syntax https://github.com/bcserv/smlib.git
           mv smlib/scripting/include/* $INCLUDE_PATH
 
           git clone https://github.com/Deathknife/sourcemod-discord.git
           mv sourcemod-discord/include/* $INCLUDE_PATH
+
+      - name: Replace version with tag name
+        run: |
+          sed -i "s/1.0.dev/${{ github.ref }}/g" $SCRIPTING_PATH/SurfTimer.sp
 
       - name: Compile surftimer.sp
         run: |
