@@ -18,6 +18,11 @@ jobs:
           echo "SOURCEMOD_PATH=$SOURCEMOD_PATH" >> $GITHUB_ENV
           echo "SCRIPTING_PATH=$SOURCEMOD_PATH/scripting" >> $GITHUB_ENV
           echo "INCLUDE_PATH=$SOURCEMOD_PATH/scripting/include" >> $GITHUB_ENV
+          if [[ ${{ github.ref }} == *"beta"* ]]; then
+            echo "PRE_RELEASE=true" >> $GITHUB_ENV
+          else
+            echo "PRE_RELEASE=false" >> $GITHUB_ENV
+          fi
 
       - name: Setup SourcePawn Compiler 1.10
         uses: rumblefrog/setup-sp@master
@@ -55,7 +60,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
           draft: false
-          prerelease: false
+          prerelease: ${{ env.PRE_RELEASE }}
 
       - name: Upload SurfTimer
         id: upload-surftimer
