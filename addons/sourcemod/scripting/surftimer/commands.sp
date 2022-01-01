@@ -86,6 +86,8 @@ void CreateCommands()
 	RegConsoleCmd("sm_clearlocs", Command_clearPlayerCheckpoints, "[surftimer] Clears the players savelocs");
 	RegConsoleCmd("sm_addsaveloc", Command_recreatePlayerCheckpoint, "[surftimer] Recreates a saveloc with supplied information, where the player can teleport back to");
 	RegConsoleCmd("sm_addloc", Command_recreatePlayerCheckpoint, "[surftimer] Recreates a saveloc with supplied information, where the player can teleport back to");
+	RegConsoleCmd("sm_teleprev", Command_previousSaveloc, "[surftimer] Cycles backwards through created savelocs.");
+	RegConsoleCmd("sm_telenext", Command_nextSaveloc, "[surftimer] Cycles forwards through created savelocs.");
 
 	// Admin Commands
 	RegConsoleCmd("sm_ckadmin", Admin_ckPanel, "[surftimer] Displays the SurfTimer admin menu panel");
@@ -5182,4 +5184,46 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 		delete menu;
 
 	return 0;
+}
+
+public Action Command_previousSaveloc(int client, int args)
+{
+	if (g_iSaveLocCount[client] < 1)
+	{
+		CPrintToChat(client, "%t", "Commands11", g_szChatPrefix);
+		return Plugin_Handled;
+	}
+
+	int desiredSavelocID = g_iLastSaveLocIdClient[client] - 1;
+	if (desiredSavelocID <= 0)
+	{
+		CPrintToChat(client, "%t", "Commands16", g_szChatPrefix);
+		return Plugin_Handled;
+	}
+	
+	CPrintToChat(client, "%t", "Commands13", g_szChatPrefix, desiredSavelocID);
+	TeleportToSaveloc(client, desiredSavelocID);
+
+	return Plugin_Handled;
+}
+
+public Action Command_nextSaveloc(int client, int args)
+{
+	if (g_iSaveLocCount[client] < 1)
+	{
+		CPrintToChat(client, "%t", "Commands11", g_szChatPrefix);
+		return Plugin_Handled;
+	}
+
+	int desiredSavelocID = g_iLastSaveLocIdClient[client] + 1;
+	if (desiredSavelocID > g_iSaveLocCount[client])
+	{
+		CPrintToChat(client, "%t", "Commands15", g_szChatPrefix);
+		return Plugin_Handled;
+	}
+	
+	CPrintToChat(client, "%t", "Commands13", g_szChatPrefix, desiredSavelocID);
+	TeleportToSaveloc(client, desiredSavelocID);
+
+	return Plugin_Handled;
 }
