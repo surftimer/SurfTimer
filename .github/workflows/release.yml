@@ -18,7 +18,7 @@ jobs:
           echo "SOURCEMOD_PATH=$SOURCEMOD_PATH" >> $GITHUB_ENV
           echo "SCRIPTING_PATH=$SOURCEMOD_PATH/scripting" >> $GITHUB_ENV
           echo "INCLUDE_PATH=$SOURCEMOD_PATH/scripting/include" >> $GITHUB_ENV
-          if [[ ${{ github.ref }} == *"beta"* ]]; then
+          if [[ ${{ github.ref }} == *"pre"* || ${{ github.ref }} == *"beta"* ]]; then
             echo "PRE_RELEASE=true" >> $GITHUB_ENV
           else
             echo "PRE_RELEASE=false" >> $GITHUB_ENV
