@@ -37,7 +37,7 @@ jobs:
 
       - name: Replace version with tag name
         run: |
-          sed -i "s/1.0.dev/${{ github.ref }}/g" $SCRIPTING_PATH/SurfTimer.sp
+          sed -i "s/1.0.dev/${{ github.ref_name }}/g" $SCRIPTING_PATH/SurfTimer.sp
 
       - name: Compile surftimer.sp
         run: |
