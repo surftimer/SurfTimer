@@ -5188,6 +5188,9 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 
 public Action Command_previousSaveloc(int client, int args)
 {
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+		
 	if (g_iSaveLocCount[client] < 1)
 	{
 		CPrintToChat(client, "%t", "Commands11", g_szChatPrefix);
@@ -5209,6 +5212,9 @@ public Action Command_previousSaveloc(int client, int args)
 
 public Action Command_nextSaveloc(int client, int args)
 {
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+
 	if (g_iSaveLocCount[client] < 1)
 	{
 		CPrintToChat(client, "%t", "Commands11", g_szChatPrefix);
