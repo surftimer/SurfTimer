@@ -370,7 +370,7 @@ public Action SetClanTag(Handle timer, any client)
 	{
 		char szTabRank[1024], szTabClanTag[1024];
 		Format(szTabRank, 1024, "%s", g_pr_chat_coloredrank[client]);
-		CRemoveColors(szTabRank, 1024);
+		RemoveColors(szTabRank, 1024);
 		Format(szTabClanTag, 1024, "%s | %s", g_szCountryCode[client], szTabRank);
 		
 		if ((GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) {
@@ -387,7 +387,7 @@ public Action SetClanTag(Handle timer, any client)
 		{
 			char szTabRank[1024], szTabClanTag[1024];
 			Format(szTabRank, 1024, "%s", g_pr_chat_coloredrank[client]);
-			CRemoveColors(szTabRank, 1024);
+			RemoveColors(szTabRank, 1024);
 			Format(szTabClanTag, 1024, "%s", szTabRank);
 			
 			if ((GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) {
