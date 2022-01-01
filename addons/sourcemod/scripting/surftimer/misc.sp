@@ -2469,7 +2469,7 @@ public void SetSkillGroups()
 				RankValue.RankReq = rank;
 
 				// Remove colors from rank name
-				CRemoveColors(sRankName, 128);
+				RemoveColors(sRankName, 128);
 
 				Format(RankValue.RankName, sizeof(SkillGroup::RankName), "%s", sRankName);
 				Format(RankValue.RankNameColored, sizeof(SkillGroup::RankNameColored), "%s", sRankNameColored);
@@ -2523,7 +2523,7 @@ public void SetPlayerRank(int client)
 		{
 			char szTitle[256];
 			Format(szTitle, 256, g_szEnforcedTitle[client]);
-			CRemoveColors(szTitle, 256);
+			RemoveColors(szTitle, 256);
 			Format(g_pr_rankname[client], 256, szTitle);
 		}
 	}
@@ -2534,7 +2534,7 @@ public void SetPlayerRank(int client)
 		{
 			char szName[MAX_NAME_LENGTH];
 			GetClientName(client, szName, sizeof(szName));
-			CRemoveColors(szName, sizeof(szName));
+			RemoveColors(szName, sizeof(szName));
 
 			Format(g_pr_chat_coloredrank[client], sizeof(SkillGroup::RankNameColored), RankValue.RankNameColored);
 			Format(g_pr_chat_coloredrank_style[client], sizeof(SkillGroup::RankNameColored), RankValue.RankNameColored);
@@ -5305,4 +5305,10 @@ stock bool Entity_IsPlayer(int entity)
 	}
 
 	return true;
+}
+
+void RemoveColors(char[] message, int maxlength)
+{
+	CRemoveTags(message, maxlength);
+	CRemoveColors(message, maxlength);
 }

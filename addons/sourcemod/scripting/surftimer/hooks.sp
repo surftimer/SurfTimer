@@ -431,7 +431,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 
 		char szName[64];
 		GetClientName(client, szName, 64);
-		CRemoveColors(szName, 64);
+		RemoveColors(szName, 64);
 
 		// log the chat of the player to the server so that tools such as HLSW/HLSTATX see it and also it remains logged in the log file
 		WriteChatLog(client, "say", sText);
