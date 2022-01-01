@@ -1117,6 +1117,8 @@ public int Handle_ZoneMenu(Handle tMenu, MenuAction action, int client, int item
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 public void EditZoneGroup(int client)
@@ -1164,6 +1166,8 @@ public int h_editZoneGroupMenu(Handle tMenu, MenuAction action, int client, int 
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 public void ListBonusGroups(int client)
@@ -1211,6 +1215,8 @@ public int Handler_bonusGroupListing(Handle tMenu, MenuAction action, int client
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 public void ListBonusSettings(int client)
@@ -1251,6 +1257,8 @@ public int Handler_ListBonusSettings(Handle tMenu, MenuAction action, int client
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 public void checkForMissclick(int client)
@@ -1290,6 +1298,8 @@ public int Handle_checkForMissclick(Handle tMenu, MenuAction action, int client,
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 public void listZonesInGroup(int client)
@@ -1344,6 +1354,8 @@ public int Handler_listBonusZones(Handle tMenu, MenuAction action, int client, i
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 public void renameBonusGroup(int client)
@@ -1395,6 +1407,8 @@ public int Handler_selectBonusZoneType(Handle tMenu, MenuAction action, int clie
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 // Create zone 2nd
@@ -1446,6 +1460,8 @@ public int h_newZoneGroupMenu(Handle tMenu, MenuAction action, int client, int i
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 public void StartBonusZoneCreation(int client)
@@ -1486,7 +1502,7 @@ public int H_CreateBonusFirst(Handle tMenu, MenuAction action, int client, int i
 				case 1:
 				{
 					if (!IsValidClient(client))
-						return;
+						return 0;
 
 					g_Editing[client] = 2;
 					CPrintToChat(client, "%t", "SurfZones5", g_szChatPrefix);
@@ -1504,6 +1520,8 @@ public int H_CreateBonusFirst(Handle tMenu, MenuAction action, int client, int i
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 public void EndBonusZoneCreation(int client)
@@ -1558,6 +1576,8 @@ public int H_CreateBonusSecond(Handle tMenu, MenuAction action, int client, int 
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 public void SaveBonusZones(int client)
@@ -1630,6 +1650,8 @@ public int Handle_SelectNormalZoneType(Handle tMenu, MenuAction action, int clie
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 public void ZoneSettings(int client)
@@ -1699,6 +1721,8 @@ public int Handle_ZoneSettingMenu(Handle tMenu, MenuAction action, int client, i
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 public void SelectMiscZoneType(int client)
@@ -1744,6 +1768,8 @@ public int Handle_SelectMiscZoneType(Handle tMenu, MenuAction action, int client
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 // Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 public int Handle_EditZoneTypeId(Handle tMenu, MenuAction action, int client, int item)
@@ -1766,6 +1792,8 @@ public int Handle_EditZoneTypeId(Handle tMenu, MenuAction action, int client, in
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 public void ListZones(int client, bool mapzones)
@@ -1843,6 +1871,8 @@ public int MenuHandler_ZoneModify(Handle tMenu, MenuAction action, int client, i
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 /*
@@ -2074,6 +2104,8 @@ public int MenuHandler_Editor(Handle tMenu, MenuAction action, int client, int i
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 public void resetSelection(int client)
@@ -2179,6 +2211,8 @@ public int MenuHandler_Scale(Handle tMenu, MenuAction action, int client, int it
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 public void PrespeedMenu(int client)
@@ -2215,7 +2249,7 @@ public int MenuHandler_Prespeed(Handle tMenu, MenuAction action, int client, int
 			{
 				CPrintToChat(client, "%t", "SurfZones10", g_szChatPrefix, g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]].ZoneTypeId);
 				g_iWaitingForResponse[client] = PreSpeed;
-				return;
+				return 0;
 			}
 			else if (prespeed == -2.0)
 				g_mapZones[g_ClientSelectedZone[client]].PreSpeed = 0.0;
@@ -2232,6 +2266,8 @@ public int MenuHandler_Prespeed(Handle tMenu, MenuAction action, int client, int
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 public void ChangeZonesHook(int client)
@@ -2257,6 +2293,8 @@ public int ChangeZonesHookMenuHandler(Handle menu, MenuAction action, int param1
 		g_iSelectedTrigger[param1] = -1;
 	else if (action == MenuAction_End)
 		delete menu;
+
+	return 0;
 }
 
 public void SelectTrigger(int client, int index)
@@ -2367,6 +2405,8 @@ public int ZoneHookHandler(Handle menu, MenuAction action, int param1, int param
 	{
 		delete menu;
 	}
+
+	return 0;
 }
 
 public void GetClientSelectedZone(int client, int &team, int &vis)
@@ -2426,6 +2466,8 @@ public int MenuHandler_ClearZones(Handle tMenu, MenuAction action, int client, i
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 stock void GetMiddleOfABox(const float vec1[3], const float vec2[3], float buffer[3])

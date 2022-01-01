@@ -14,10 +14,9 @@
 #include <sdktools>
 #include <adminmenu>
 #include <cstrike>
-#include <smlib>
 #include <geoip>
 #include <basecomm>
-#include <colorvariables>
+#include <colorlib>
 #include <autoexecconfig>
 #undef REQUIRE_EXTENSIONS
 #include <clientprefs>
@@ -102,6 +101,9 @@
 #define MAXZONEGROUPS 12
 // Maximum amount of zones in a map
 #define MAXZONES 128
+
+// Part of SMLib
+#define MAX_WEAPONS				48	// Max number of weapons availabl
 
 // Ranking Definitions
 #define MAX_PR_PLAYERS 1066
@@ -395,11 +397,11 @@ int g_mapZoneGroupCount;
 float g_fZoneCorners[MAXZONES][8][3];
 
 /*----------  AntiJump & AntiDuck Variables  ----------*/
-bool g_bInDuck[MAXPLAYERS + 1] = false;
-bool g_bInJump[MAXPLAYERS + 1] = false;
-bool g_bInPushTrigger[MAXPLAYERS + 1] = false;
-bool g_bJumpZoneTimer[MAXPLAYERS + 1] = false;
-bool g_bInStartZone[MAXPLAYERS + 1] = false;
+bool g_bInDuck[MAXPLAYERS + 1] = {false, ...};
+bool g_bInJump[MAXPLAYERS + 1] = {false, ...};
+bool g_bInPushTrigger[MAXPLAYERS + 1] = {false, ...};
+bool g_bJumpZoneTimer[MAXPLAYERS + 1] = {false, ...};
+bool g_bInStartZone[MAXPLAYERS + 1] = {false, ...};
 bool g_bInStageZone[MAXPLAYERS + 1];
 
 /*----------  MaxSpeed Variables  ----------*/
@@ -419,15 +421,15 @@ char g_szCustomJoinMsg[MAXPLAYERS + 1][256];
 /*----------  Custom Titles  ----------*/
 char g_szCustomTitleColoured[MAXPLAYERS + 1][1024];
 char g_szCustomTitle[MAXPLAYERS + 1][1024];
-bool g_bDbCustomTitleInUse[MAXPLAYERS + 1] = false;
-bool g_bdbHasCustomTitle[MAXPLAYERS + 1] = false;
+bool g_bDbCustomTitleInUse[MAXPLAYERS + 1] = {false, ...};
+bool g_bdbHasCustomTitle[MAXPLAYERS + 1] = {false, ...};
 
 // 0 = name, 1 = text;
 int g_iCustomColours[MAXPLAYERS + 1][2];
 
-// int g_idbCustomTextColour[MAXPLAYERS + 1] = 0;
-bool g_bHasCustomTextColour[MAXPLAYERS + 1] = false;
-bool g_bCustomTitleAccess[MAXPLAYERS + 1] = false;
+// int g_idbCustomTextColour[MAXPLAYERS + 1] = {0, ...};
+bool g_bHasCustomTextColour[MAXPLAYERS + 1] = {false, ...};
+bool g_bCustomTitleAccess[MAXPLAYERS + 1] = {false, ...};
 bool g_bUpdatingColours[MAXPLAYERS + 1];
 // char g_szsText[MAXPLAYERS + 1];
 
@@ -444,8 +446,8 @@ int g_pr_StageCount;
 // Clients best WRCP times
 float g_fWrcpRecord[MAXPLAYERS + 1][CPLIMIT][MAX_STYLES];
 
-bool g_bWrcpTimeractivated[MAXPLAYERS + 1] = false;
-bool g_bWrcpEndZone[MAXPLAYERS + 1] = false;
+bool g_bWrcpTimeractivated[MAXPLAYERS + 1] = {false, ...};
+bool g_bWrcpEndZone[MAXPLAYERS + 1] = {false, ...};
 int g_CurrentStage[MAXPLAYERS + 1];
 float g_fStartWrcpTime[MAXPLAYERS + 1];
 float g_fFinalWrcpTime[MAXPLAYERS + 1];
@@ -460,7 +462,7 @@ char g_szRecordStageTime[CPLIMIT];
 
 int g_TotalStageRecords[CPLIMIT];
 int g_TotalStages;
-float g_fWrcpMenuLastQuery[MAXPLAYERS + 1] = 1.0;
+float g_fWrcpMenuLastQuery[MAXPLAYERS + 1] = {1.0, ...};
 bool g_bSelectWrcp[MAXPLAYERS + 1];
 int g_iWrcpMenuStyleSelect[MAXPLAYERS + 1];
 char g_szWrcpMapSelect[MAXPLAYERS + 1][128];
@@ -471,9 +473,9 @@ char g_szStageRecordPlayer[CPLIMIT][MAX_NAME_LENGTH];
 // PracMode SRCP
 float g_fStartPracSrcpTime[MAXPLAYERS + 1];
 float g_fCurrentPracSrcpRunTime[MAXPLAYERS + 1];
-bool g_bPracSrcpTimerActivated[MAXPLAYERS + 1] = false;
+bool g_bPracSrcpTimerActivated[MAXPLAYERS + 1] = {false, ...};
 int g_iPracSrcpStage[MAXPLAYERS + 1];
-bool g_bPracSrcpEndZone[MAXPLAYERS + 1] = false;
+bool g_bPracSrcpEndZone[MAXPLAYERS + 1] = {false, ...};
 float g_fFinalPracSrcpTime[MAXPLAYERS + 1];
 char g_szFinalPracSrcpTime[MAXPLAYERS + 1][32];
 float g_fSrcpPauseTime[MAXPLAYERS + 1];
@@ -494,7 +496,7 @@ char g_szInitalStyle[MAXPLAYERS + 1][256];
 char g_szStyleHud[MAXPLAYERS + 1][32];
 bool g_bRankedStyle[MAXPLAYERS + 1];
 bool g_bFunStyle[MAXPLAYERS + 1];
-int g_KeyCount[MAXPLAYERS + 1] = 0;
+int g_KeyCount[MAXPLAYERS + 1] = {0, ...};
 
 // Map Styles
 int g_StyleMapRank[MAX_STYLES][MAXPLAYERS + 1];
@@ -544,7 +546,7 @@ int g_iSettingToLoad[MAXPLAYERS + 1];
 int g_iPreviousSpeed[MAXPLAYERS + 1];
 
 /*----------  Sounds  ----------*/
-bool g_bTop10Time[MAXPLAYERS + 1] = false;
+bool g_bTop10Time[MAXPLAYERS + 1] = {false, ...};
 
 // Rate Limiting Commands
 float g_fCommandLastUsed[MAXPLAYERS + 1];
@@ -594,9 +596,9 @@ int g_G5Top;
 bool g_bInsertNewTime = false;
 
 /*----------  fluffys tmf & repeat  ----------*/
-bool g_bToggleMapFinish[MAXPLAYERS + 1] = true;
-bool g_bRepeat[MAXPLAYERS + 1] = false;
-bool g_bNotTeleporting[MAXPLAYERS + 1] = true;
+bool g_bToggleMapFinish[MAXPLAYERS + 1] = {true, ...};
+bool g_bRepeat[MAXPLAYERS + 1] = {false, ...};
+bool g_bNotTeleporting[MAXPLAYERS + 1] = {true, ...};
 
 // Client Side Autobhop
 Handle g_hAutoBhop = INVALID_HANDLE;
@@ -1566,6 +1568,7 @@ char RadioCMDS[][] =  // Disable radio commands
 
 #include "surftimer/convars.sp"
 #include "surftimer/misc.sp"
+#include "surftimer/db/queries.sp"
 #include "surftimer/sql.sp"
 #include "surftimer/admin.sp"
 #include "surftimer/newmaps.sp"
@@ -2773,6 +2776,8 @@ public int Native_GetTimerStatus(Handle plugin, int numParams)
 public int Native_StopTimer(Handle plugin, int numParams)
 {
 	Client_Stop(GetNativeCell(1), 0);
+
+	return 0;
 }
 
 public int Native_GetCurrentTime(Handle plugin, int numParams)
@@ -2783,11 +2788,15 @@ public int Native_GetCurrentTime(Handle plugin, int numParams)
 public int Native_EmulateStartButtonPress(Handle plugin, int numParams)
 {
 	CL_OnStartTimerPress(GetNativeCell(1));
+
+	return 0;
 }
 
 public int Native_EmulateStopButtonPress(Handle plugin, int numParams)
 {
 	CL_OnEndTimerPress(GetNativeCell(1));
+
+	return 0;
 }
 
 public int Native_SafeTeleport(Handle plugin, int numParams)
@@ -2850,6 +2859,8 @@ public int Native_GetPlayerSkillgroup(Handle plugin, int numParams)
 		Format(str, sizeof(str), "Unranked");
 		SetNativeString(2, str, 256, true);
 	}
+
+	return 0;
 }
 
 public int Native_GetPlayerNameColored(Handle plugin, int numParams)
@@ -2868,6 +2879,8 @@ public int Native_GetPlayerNameColored(Handle plugin, int numParams)
 		Format(str, sizeof(str), "invalid");
 		SetNativeString(2, str, 256, true);
 	}
+
+	return 0;
 }
 
 public int Native_GetMapData(Handle plugin, int numParams)

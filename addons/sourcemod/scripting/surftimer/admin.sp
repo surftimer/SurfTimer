@@ -45,9 +45,10 @@ public int TopMenuHandler2(Handle topmenu, TopMenuAction action, TopMenuObject o
 	if (action == TopMenuAction_DisplayOption)
 		Format(buffer, maxlength, "SurfTimer");
 
-	else
-		if (action == TopMenuAction_SelectOption)
+	else if (action == TopMenuAction_SelectOption)
 		Admin_ckPanel(param, 0);
+
+	return 0;
 }
 
 public Action Admin_insertMapTier(int client, int args)
@@ -101,6 +102,8 @@ public int ChooseTeleSideHandler(Handle menu, MenuAction action, int param1, int
 		InsertSpawnLocation(param1, param2);
 	else if (action == MenuAction_End)
 		delete menu;
+
+	return 0;
 }
 
 public void InsertSpawnLocation(int client, int teleside)
@@ -164,6 +167,8 @@ public int DelSpawnLocationHandler(Handle menu, MenuAction action, int param1, i
 		DelSpawnLocation(param1, param2);
 	else if (action == MenuAction_End)
 		delete menu;
+
+	return 0;
 }
 
 public void DelSpawnLocation(int client, int teleside)
@@ -617,6 +622,8 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 				CloseHandle(menu);
 		}
 	}
+
+	return 0;
 }
 
 public Action Admin_RefreshProfile(int client, int args)

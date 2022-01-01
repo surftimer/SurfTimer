@@ -67,13 +67,15 @@ public int ProfileInfoMenuHandler(Menu menu, MenuAction action, int param1, int 
 		GetMenuItem(menu, param2, info, sizeof(info));
 		CPrintToChat(param1, "%t", "SQLTime1", g_szChatPrefix, info);
 	}
-	else
-		if (action == MenuAction_End)
+	else if (action == MenuAction_End)
 	{
 		if (IsValidClient(param1))
 			g_bSelectProfile[param1] = false;
-		CloseHandle(menu);
+
+		delete menu;
 	}
+
+	return 0;
 }
 
 public void db_savePlayTime(int client)

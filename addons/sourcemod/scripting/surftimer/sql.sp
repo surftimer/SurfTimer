@@ -1,5 +1,3 @@
-#include "surftimer/db/queries.sp"
-
 /*==================================
 =          DATABASE SETUP          =
 ==================================*/
@@ -350,6 +348,8 @@ public int callback_Confirm(Menu menu, MenuAction action, int client, int key)
 	}
 	else if(action == MenuAction_End)
 		delete menu;
+
+	return 0;
 }
 
 public void db_WipePlayer(int client, char szSteamID[32])
@@ -1981,8 +1981,10 @@ public int ProfileMenuHandler(Handle menu, MenuAction action, int client, int it
 	}
 	else if (action == MenuAction_End)
 	{
-		CloseHandle(menu);
+		delete menu;
 	}
+
+	return 0;
 }
 
 public void completionMenu(int client)
@@ -2019,7 +2021,9 @@ public int CompletionMenuHandler(Handle menu, MenuAction action, int client, int
 	else if (action == MenuAction_Cancel)
 		db_viewPlayerProfile(client, g_ProfileStyleSelect[client], g_szProfileSteamId[client], true, "");
 	else if (action == MenuAction_End)
-		CloseHandle(menu);
+		delete menu;
+
+	return 0;
 }
 
 public void ContinueRecalc(int client)
@@ -2329,6 +2333,8 @@ public int MenuHandler_SelectBonusinMap(Handle sMenu, MenuAction action, int cli
 			delete sMenu;
 		}
 	}
+
+	return 0;
 }
 
 public void db_selectBonusTopSurfers(int client, char mapname[128], int zGrp)
@@ -4182,14 +4188,14 @@ public void SQL_updateZoneCallback(Handle owner, Handle hndl, const char[] error
 	db_selectMapZones();
 }
 
-public int db_deleteZonesInGroup(int client)
+void db_deleteZonesInGroup(int client)
 {
 	char szQuery[258];
 
 	if (g_CurrentSelectedZoneGroup[client] < 1)
 	{
 		if (IsValidClient(client))
-		CPrintToChat(client, "%t", "SQL6", g_szChatPrefix, g_CurrentSelectedZoneGroup[client]);
+			CPrintToChat(client, "%t", "SQL6", g_szChatPrefix, g_CurrentSelectedZoneGroup[client]);
 
 		PrintToServer("surftimer | Invalid zonegroup index selected, aborting. (%i)", g_CurrentSelectedZoneGroup[client]);
 	}
@@ -4881,7 +4887,7 @@ public void sql_selectLatestRecordsCallback(Handle owner, Handle hndl, const cha
 		if (i == 1)
 		{
 			PrintToConsole(data, "No records found.");
-			CloseHandle(menu);
+			delete menu;
 		}
 		else
 		{
@@ -4898,7 +4904,9 @@ public void sql_selectLatestRecordsCallback(Handle owner, Handle hndl, const cha
 public int LatestRecordsMenuHandler(Handle menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_End)
-		CloseHandle(menu);
+		delete menu;
+
+	return 0;
 }
 
 public void db_InsertLatestRecords(char szSteamID[32], char szName[128], float FinalTime)
@@ -5288,6 +5296,7 @@ public Action PrintUnfinishedLine(Handle timer, any pack)
 	CloseHandle(pack);
 	PrintToConsole(client, teksti);
 
+	return Plugin_Continue;
 }
 
 /*
@@ -5767,8 +5776,10 @@ public int TopPlayersMenuHandler1(Handle menu, MenuAction action, int client, in
 	}
 	else if (action == MenuAction_End)
 	{
-		CloseHandle(menu);
+		delete menu;
 	}
+
+	return 0;
 }
 
 public int MapMenuHandler1(Handle menu, MenuAction action, int client, int item)
@@ -5786,8 +5797,10 @@ public int MapMenuHandler1(Handle menu, MenuAction action, int client, int item)
 	}
 	else if (action == MenuAction_End)
 	{
-		CloseHandle(menu);
+		delete menu;
 	}
+
+	return 0;
 }
 
 public int FinishedMapsMenuHandler(Handle menu, MenuAction action, int client, int item)
@@ -5798,8 +5811,10 @@ public int FinishedMapsMenuHandler(Handle menu, MenuAction action, int client, i
 	}
 	else if (action == MenuAction_End)
 	{
-		CloseHandle(menu);
+		delete menu;
 	}
+
+	return 0;
 }
 
 // fluffys sql select total bonus
@@ -6609,7 +6624,9 @@ public int StageTopMenuHandler(Menu menu, MenuAction action, int client, int ite
 		db_viewWrcpMap(client, g_szWrcpMapSelect[client]);
 	}
 	else if (action == MenuAction_End)
-		CloseHandle(menu);
+		delete menu;
+
+	return 0;
 }
 
 public void db_viewStageRecords()
@@ -7471,7 +7488,9 @@ public int StageStyleTopMenuHandler(Menu menu, MenuAction action, int client, in
 			db_viewStyleWrcpMap(client, g_szWrcpMapSelect[client], g_iWrcpMenuStyleSelect[client]);
 	}
 	else if (action == MenuAction_End)
-		CloseHandle(menu);
+		delete menu;
+
+	return 0;
 }
 
 public void db_selectMapRank(int client, char szSteamId[32], char szMapName[128])
@@ -8290,7 +8309,9 @@ public int MapImprovementMenuHandler(Menu mi, MenuAction action, int param1, int
 		db_selectMapImprovement(param1, szMapName);
 	}
 	if (action == MenuAction_End)
-		CloseHandle(mi);
+		delete mi;
+
+	return 0;
 }
 
 public int MapImprovementTop10MenuHandler(Menu mi, MenuAction action, int param1, int param2)
@@ -8302,8 +8323,10 @@ public int MapImprovementTop10MenuHandler(Menu mi, MenuAction action, int param1
 	}
 	if (action == MenuAction_End)
 	{
-		CloseHandle(mi);
+		delete mi;
 	}
+
+	return 0;
 }
 
 public void db_selectCurrentMapImprovement()
@@ -8543,6 +8566,8 @@ public int ChooseMapMenuHandler(Menu menu, MenuAction action, int param1, int pa
 	}
 	else if (action == MenuAction_End)
 		delete menu;
+
+	return 0;
 }
 
 // sm_pr command
@@ -8811,14 +8836,12 @@ public void SQL_ViewPlayerPrMaptimeCallback2(Handle owner, Handle hndl, const ch
 
 public int PrMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 {
-	if (action == MenuAction_Select)
+	if (action == MenuAction_End)
 	{
+		delete menu;
+	}
 
-	}
-	else if (action == MenuAction_End)
-	{
-		CloseHandle(menu);
-	}
+	return 0;
 }
 
 // VIP
@@ -9345,15 +9368,16 @@ public int changeColoursMenuHandler(Handle menu, MenuAction action, int client, 
 			case 15:db_updateColours(client, g_szSteamID[client], 15, type);
 		}
 	}
-	else
-	if (action == MenuAction_Cancel)
+	else if (action == MenuAction_Cancel)
 	{
 		CustomTitleMenu(client);
 	}
 	else if (action == MenuAction_End)
 	{
-		CloseHandle(menu);
+		delete menu;
 	}
+
+	return 0;
 }
 
 public void db_updateColours(int client, char szSteamId[32], int newColour, int type)
@@ -9753,7 +9777,9 @@ public void SQL_SelectCPRTargetCPsCallback(Handle owner, Handle hndl, const char
 public int CPRMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_End)
-		CloseHandle(menu);
+		delete menu;
+
+	return 0;
 }
 
 public void db_updateMapRankedStatus()

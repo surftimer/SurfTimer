@@ -82,7 +82,7 @@ public int Handle_VoteMenuExtend(Menu menu, MenuAction action, int param1, int p
 	if (action == MenuAction_End)
 	{
 		/* This is called after VoteEnd */
-		CloseHandle(menu);
+		delete menu;
 	}
 	else if (action == MenuAction_VoteEnd)
 	{
@@ -123,13 +123,15 @@ public int Handle_VoteMenuExtend(Menu menu, MenuAction action, int param1, int p
 			extendMap(600);
 		}
 	}
+
+	return 0;
 }
 
 public int Handle_VoteMenuChangeMap(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_End)
 	{
-		CloseHandle(menu);
+		delete menu;
 	}
 	else if (action == MenuAction_VoteEnd)
 	{
@@ -144,12 +146,16 @@ public int Handle_VoteMenuChangeMap(Menu menu, MenuAction action, int param1, in
 			CPrintToChatAll("%t", "CVote12", g_szChatPrefix);
 		}
 	}
+
+	return 0;
 }
 
 // Change Map
 public Action Change_Map(Handle timer)
 {
 	ServerCommand("sm_rcon changelevel %s", mapnameforvote);
+
+	return Plugin_Continue;
 }
 
 // sm_cvote setnextmap
@@ -158,7 +164,7 @@ public int Handle_VoteMenuSetNextMap(Menu menu, MenuAction action, int param1, i
 	if (action == MenuAction_End)
 	{
 		/* This is called after VoteEnd */
-		CloseHandle(menu);
+		delete menu;
 	}
 	else if (action == MenuAction_VoteEnd)
 	{
@@ -173,4 +179,6 @@ public int Handle_VoteMenuSetNextMap(Menu menu, MenuAction action, int param1, i
 			CPrintToChatAll("%t", "CVote12", g_szChatPrefix);
 		}
 	}
+
+	return 0;
 }
