@@ -169,12 +169,22 @@ forward Action surftimer_OnPracticeFinished(int client, float fRunTime, char sRu
  * Called when a client sets a new record
  *
  * @param client			The client's ID.
- * @param style				Style index
- * @param time				Time set by the player
- * @param timeDif			Time difference with the former record
- * @param bonusGroup	Group of the bonus. -1 if the record isn't a bonus
+ * @param style				Style index.
+ * @param time				Time set by the player.
+ * @param timeDif			Time difference with the former record.
+ * @param bonusGroup	Group of the bonus. -1 if the record isn't a bonus.
  */
 forward void surftimer_OnNewRecord(int client, int style, char[] time, char[] timeDif, int bonusGroup);
+
+/**
+ * Called when a client sets a new WRCP
+ *
+ * @param client			The client's ID.
+ * @param style				Style index.
+ * @param time				Time set by the player.
+ * @param timeDif			Time difference with the former record
+ */
+forward void surftimer_OnNewWRCP(int client, int style, char[] time, char[] timeDif);
 
 public SharedPlugin:__pl_surftimer =
 {
