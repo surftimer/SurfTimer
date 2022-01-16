@@ -4910,15 +4910,16 @@ stock void SendNewRecordForward(int client, const char[] szRecordDiff, int bonus
  */
  stock void SendNewWRCPForward(int client, int stage, const char[] szRecordDiff)
  {
-	 /* Start New record function call */
-	 Call_StartForward(g_NewWRCPForward);
- 
-	 /* Push parameters one at a time */
-	 Call_PushCell(client);
-	 Call_PushCell(g_iCurrentStyle[client]);
-	 Call_PushString(g_szFinalWrcpTime[client]);
-	 Call_PushString(szRecordDiff);
- 
-	 /* Finish the call, get the result */
-	 Call_Finish();
+	/* Start New record function call */
+	Call_StartForward(g_NewWRCPForward);
+
+	/* Push parameters one at a time */
+	Call_PushCell(client);
+	Call_PushCell(g_iCurrentStyle[client]);
+	Call_PushString(g_szFinalWrcpTime[client]);
+	Call_PushString(szRecordDiff);
+	Call_PushCell(stage);
+
+	/* Finish the call, get the result */
+	Call_Finish();
  }
