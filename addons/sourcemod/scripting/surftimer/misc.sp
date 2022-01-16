@@ -1597,18 +1597,15 @@ public void PlayUnstoppableSound(int client)
 	}
 }
 
-public void PlayWRCPRecord(int iRecordtype)
+public void PlayWRCPRecord()
 {
 	char buffer[255];
-	if (iRecordtype == 1)
+	for (int i = 1; i <= MaxClients; i++)
 	{
-		for (int i = 1; i <= MaxClients; i++)
+		if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 		{
-			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
-			{
-				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathWRCP);
-				ClientCommand(i, buffer);
-			}
+			Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathWRCP);
+			ClientCommand(i, buffer);
 		}
 	}
 }
@@ -1898,6 +1895,8 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 						PlayRecordSound(2);
 						CPrintToChat(i, "%t", "NewMapRecord", g_szChatPrefix, szName);
 						PrintToConsole(i, "surftimer | %s scored a new MAP RECORD", szName);
+						
+						SendNewRecordForward(client, g_szTimeDifference[client]);
 					}
 				}
 			}
@@ -4892,6 +4891,7 @@ stock bool IsStringNumeric(const char[] str)
 	return true;
 }
 
+
 /**
  * Sends a new record forward on surftimer_OnNewRecord.
  * 
@@ -4915,6 +4915,29 @@ stock void SendNewRecordForward(int client, const char[] szRecordDiff, int bonus
 	Call_Finish();
 }
 
+
+/**
+ * Sends a new WRCP forward on surftimer_OnNewWRCP.
+ * 
+ * @param client           Index of the client.
+ * @param client           ID of the stage.
+ * @param szRecordDiff     String containing the formatted difference with the previous record.
+ */
+ stock void SendNewWRCPForward(int client, int stage, const char[] szRecordDiff)
+ {
+	/* Start New record function call */
+	Call_StartForward(g_NewWRCPForward);
+
+	/* Push parameters one at a time */
+	Call_PushCell(client);
+	Call_PushCell(g_iCurrentStyle[client]);
+	Call_PushString(g_szFinalWrcpTime[client]);
+	Call_PushString(szRecordDiff);
+	Call_PushCell(stage);
+
+	/* Finish the call, get the result */
+	Call_Finish();
+ }
 bool CGetColor(const char[] sName, char[] sColor, int iColorSize)
 {
 	if (sName[0] == '\0')
