@@ -577,6 +577,16 @@
 		"#format"	"{1:s}"
 		"en"		"{1} {green}Saved locations cleared"
 	}
+	"Commands15"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {red}You are already at your most recent saved location."
+	}
+	"Commands16"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {red}You are already at your first saved location."
+	}
 	"NoBonusOnMap"
 	{
 		"#format"	"{1:s}"

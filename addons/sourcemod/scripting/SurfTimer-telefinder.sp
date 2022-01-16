@@ -81,6 +81,8 @@ public Action ShowTeleportDestinations(int client, int args)
 	} 
 
 	menu.Display(client, 30);
+
+	return Plugin_Handled;
 }
 
 
@@ -97,6 +99,8 @@ public int TD_MenuHandler(Menu menu, MenuAction action, int param1, int param2)
 	} else if (action == MenuAction_End) {
 		delete menu;
 	}
+
+	return 0;
 }
 
 
@@ -119,6 +123,8 @@ public Action ShowTriggersLocations(int client, int args)
 	}
 
 	menu.Display(client, 30);
+
+	return Plugin_Handled;
 }
 
 
@@ -135,4 +141,6 @@ public int TM_MenuHandler(Menu menu, MenuAction action, int param1, int param2)
 	} else if (action == MenuAction_End) {
 		delete menu;
 	}
+
+	return 0;
 }
