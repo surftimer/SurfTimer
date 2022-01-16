@@ -19,7 +19,7 @@ addons/sourcemod/scripting/include/basecomm.inc
 addons/sourcemod/scripting/include/bitbuffer.inc
 addons/sourcemod/scripting/include/clientprefs.inc
 addons/sourcemod/scripting/include/clients.inc
-addons/sourcemod/scripting/include/colorvariables.inc
+addons/sourcemod/scripting/include/colorlib.inc
 addons/sourcemod/scripting/include/commandfilters.inc
 addons/sourcemod/scripting/include/commandline.inc
 addons/sourcemod/scripting/include/console.inc
