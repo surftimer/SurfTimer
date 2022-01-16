@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sm_version: [ "1.10", "1.11" ]
+        SM_VERSION: [ "1.10", "1.11" ]
 
 
     steps:
@@ -34,26 +34,20 @@ jobs:
         with:
           version: ${{ matrix.SM_VERSION }}
 
-      - name: Create dependency directories
-        run: mkdir $INCLUDE_PATH/smlib
-
       - name: Fetch plugin dependencies
         run: |
-          wget https://raw.githubusercontent.com/bcserv/smlib/transitional_syntax/scripting/include/smlib.inc -P $INCLUDE_PATH
-          wget https://raw.githubusercontent.com/olokos/Chat-Processor/master/scripting/include/colorvariables.inc -P $INCLUDE_PATH
-          wget https://raw.githubusercontent.com/KyleSanderson/SteamWorks/master/Pawn/includes/SteamWorks.inc -P $INCLUDE_PATH
-          wget https://raw.githubusercontent.com/JoinedSenses/SourceMod-IncludeLibrary/master/include/smjansson.inc -P $INCLUDE_PATH
           wget https://raw.githubusercontent.com/peace-maker/DHooks2/dynhooks/sourcemod_files/scripting/include/dhooks.inc -P $INCLUDE_PATH
-          wget https://github.com/Impact123/AutoExecConfig/raw/development/autoexecconfig.inc -P $INCLUDE_PATH
-          
-          git clone -b transitional_syntax https://github.com/bcserv/smlib.git
-          mv smlib/scripting/include/* $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/Impact123/AutoExecConfig/development/autoexecconfig.inc -P $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/addons/sourcemod/scripting/include/colorlib.inc -P $INCLUDE_PATH
 
-          git clone https://github.com/Deathknife/sourcemod-discord.git
-          mv sourcemod-discord/include/* $INCLUDE_PATH
-
-      - name: Compile plugin
+      - name: Compile SurfTimer
         run: |
           echo -e "\nCompiling SurfTimer.sp..."
-          spcomp -w234 -O2 -v2 -i $INCLUDE_PATH SurfTimer.sp
+          spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH SurfTimer.sp
+        working-directory: ${{ env.SCRIPTING_PATH }}/
+
+      - name: Compile SurfTimer Telefinder
+        run: |
+          echo -e "\nCompiling SurfTimer-telefinder.sp..."
+          spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH SurfTimer-telefinder.sp
         working-directory: ${{ env.SCRIPTING_PATH }}/

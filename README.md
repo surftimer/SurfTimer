@@ -47,7 +47,7 @@ Yes, but not any more than other projects currently and for past years.
 **Compilation Requirements (Includes):**
 * [SourceMod Includes](https://www.sourcemod.net/downloads.php?branch=stable)
 * [SMLib](https://github.com/bcserv/smlib/tree/transitional_syntax)
-* [ColorVariables](https://github.com/olokos/Chat-Processor/blob/master/scripting/include/colorvariables.inc)
+* [ColorLib](https://github.com/c0rp3n/colorlib-sm/blob/master/addons/sourcemod/scripting/include/colorlib.inc)
 * [AutoExecConfig](https://github.com/Impact123/AutoExecConfig/blob/development/autoexecconfig.inc)
 
 **Recommended:**

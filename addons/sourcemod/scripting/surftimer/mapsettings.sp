@@ -104,6 +104,8 @@ public int MapSettingsMenuHandler(Handle menu, MenuAction action, int param1, in
 	}
 	else if (action == MenuAction_End)
 		delete menu;
+
+	return 0;
 }
 
 public void ChangeMapTier(int client)
@@ -140,6 +142,8 @@ public int ChangeMapTierHandler(Handle menu, MenuAction action, int client, int 
 		MapSettingsMenu(client);
 	else if (action == MenuAction_End)
 		delete menu;
+
+	return 0;
 }
 
 public void MaxVelocityMenu(int client)
@@ -172,7 +176,7 @@ public int MaxVelocityMenuHandler(Handle tMenu, MenuAction action, int client, i
 			{
 				CPrintToChat(client, "%t", "MSettings1", g_szChatPrefix);
 				g_iWaitingForResponse[client] = MaxVelocity;
-				return;
+				return 0;
 			}
 			else
 				g_fMaxVelocity = maxvelocity;
@@ -188,6 +192,8 @@ public int MaxVelocityMenuHandler(Handle tMenu, MenuAction action, int client, i
 			delete tMenu;
 		}
 	}
+
+	return 0;
 }
 
 public Action Command_SetMaxVelocity(int client, int args)
