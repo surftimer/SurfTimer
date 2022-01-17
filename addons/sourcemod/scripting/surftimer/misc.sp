@@ -4920,11 +4920,11 @@ stock void SendNewRecordForward(int client, const char[] szRecordDiff, int bonus
  * Sends a new WRCP forward on surftimer_OnNewWRCP.
  * 
  * @param client           Index of the client.
- * @param client           ID of the stage.
+ * @param stage            ID of the stage.
  * @param szRecordDiff     String containing the formatted difference with the previous record.
  */
- stock void SendNewWRCPForward(int client, int stage, const char[] szRecordDiff)
- {
+stock void SendNewWRCPForward(int client, int stage, const char[] szRecordDiff)
+{
 	/* Start New record function call */
 	Call_StartForward(g_NewWRCPForward);
 
@@ -4937,7 +4937,9 @@ stock void SendNewRecordForward(int client, const char[] szRecordDiff, int bonus
 
 	/* Finish the call, get the result */
 	Call_Finish();
- }
+}
+
+
 bool CGetColor(const char[] sName, char[] sColor, int iColorSize)
 {
 	if (sName[0] == '\0')
