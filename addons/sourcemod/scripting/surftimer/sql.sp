@@ -6119,6 +6119,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 	GetClientName(client, szName, MAX_NAME_LENGTH);
 
 	char sz_srDiff[128];
+	char sz_srRawDiff[128];
 
 	// PB
 	char szDiff[128];
@@ -6146,12 +6147,18 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 	else if (style != 0)
 		f_srDiff = (g_fStyleStageRecord[style][stage] - time);
 
-	FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
+	FormatTimeFloat(client, f_srDiff, 3, sz_srRawDiff, 128);
 
 	if (f_srDiff > 0)
-		Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
+	{
+		Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srRawDiff, WHITE);
+		Format(sz_srRawDiff, sizeof sz_srRawDiff, "-%s", sz_srRawDiff);
+	}
 	else
-		Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
+	{
+		Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srRawDiff, WHITE);
+		Format(sz_srRawDiff, sizeof sz_srRawDiff, "+%s", sz_srRawDiff);
+	}
 
 	// Check for SR
 	bool newRecordHolder = false;
@@ -6173,7 +6180,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 				g_bSavingWrcpReplay[client] = true;
 				// Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 				PlayWRCPRecord();
-				SendNewWRCPForward(client, stage, sz_srDiff);
+				SendNewWRCPForward(client, stage, sz_srRawDiff);
 			}
 			else
 			{
@@ -6197,7 +6204,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			g_bSavingWrcpReplay[client] = true;
 			// Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 			PlayWRCPRecord();
-			SendNewWRCPForward(client, stage, sz_srDiff);
+			SendNewWRCPForward(client, stage, sz_srRawDiff);
 		}
 	}
 	else if (style != 0) // styles
@@ -6218,7 +6225,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 
 				CPrintToChatAll("%t", "SQL19", g_szChatPrefix, szName, g_szStyleRecordPrint[style], stage, g_szFinalWrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
 				PlayWRCPRecord();
-				SendNewWRCPForward(client, stage, sz_srDiff);
+				SendNewWRCPForward(client, stage, sz_srRawDiff);
 			}
 			else
 			{
@@ -6240,7 +6247,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 
 			CPrintToChatAll("%t", "SQL22", g_szChatPrefix, szName, g_szStyleRecordPrint[style], stage, g_szFinalWrcpTime[client]);
 			PlayWRCPRecord();
-			SendNewWRCPForward(client, stage, sz_srDiff);
+			SendNewWRCPForward(client, stage, sz_srRawDiff);
 		}
 	}
 
