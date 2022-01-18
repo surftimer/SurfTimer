@@ -1326,7 +1326,7 @@ public Action Command_Restart(int client, int args)
 			g_fClientRestarting[client] = GetGameTime();
 			g_bClientRestarting[client] = true;
 			CPrintToChat(client, "%t", "Commands34", g_szChatPrefix);
-			ClientCommand(client, "play ambient/misc/clank4");
+			EmitSoundToClientNoPreCache(client, "play ambient/misc/clank4", false);
 			return Plugin_Handled;
 		}
 	}

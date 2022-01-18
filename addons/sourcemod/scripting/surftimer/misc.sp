@@ -1124,8 +1124,7 @@ public void PlayButtonSound(int client)
 	{
 		char buffer[255];
 		GetConVarString(g_hSoundPath, buffer, 255);
-		Format(buffer, sizeof(buffer), "play %s", buffer);
-		ClientCommand(client, buffer);
+		EmitSoundToClientNoPreCache(client, buffer);
 	}
 
 	// Spectators button sound
@@ -1141,8 +1140,7 @@ public void PlayButtonSound(int client)
 				{
 					char szsound[255];
 					GetConVarString(g_hSoundPath, szsound, 256);
-					Format(szsound, sizeof(szsound), "play %s", szsound);
-					ClientCommand(i, szsound);
+					EmitSoundToClientNoPreCache(client, szsound);
 				}
 			}
 		}
@@ -1535,8 +1533,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathWR);
-				ClientCommand(i, buffer);
+				EmitSoundToClientNoPreCache(i, buffer);
 			}
 		}
 	}
@@ -1546,8 +1543,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathWR);
-				ClientCommand(i, buffer);
+				EmitSoundToClientNoPreCache(i, buffer);
 			}
 		}
 	}
@@ -1557,8 +1553,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathTop);
-				ClientCommand(i, buffer);
+				EmitSoundToClientNoPreCache(i, buffer);
 			}
 		}
 	}
@@ -1568,8 +1563,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathTop);
-				ClientCommand(i, buffer);
+				EmitSoundToClientNoPreCache(i, buffer);
 			}
 		}
 	}
@@ -1577,10 +1571,10 @@ public void PlayRecordSound(int iRecordtype)
 
 public void PlayUnstoppableSound(int client)
 {
-	char buffer[255];
-	Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathPB);
 	if (!IsFakeClient(client) && g_bEnableQuakeSounds[client])
-		ClientCommand(client, buffer);
+	{
+		EmitSoundToClientNoPreCache(client, g_szRelativeSoundPathPB);
+	}
 	// Spec Stop Sound
 	for (int i = 1; i <= MaxClients; i++)
 	{
@@ -1591,7 +1585,9 @@ public void PlayUnstoppableSound(int client)
 			{
 				int Target = GetEntPropEnt(i, Prop_Send, "m_hObserverTarget");
 				if (Target == client && g_bEnableQuakeSounds[i])
-					ClientCommand(i, buffer);
+				{
+					EmitSoundToClientNoPreCache(i, g_szRelativeSoundPathPB);
+				}
 			}
 		}
 	}
@@ -1604,8 +1600,7 @@ public void PlayWRCPRecord()
 	{
 		if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 		{
-			Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathWRCP);
-			ClientCommand(i, buffer);
+			EmitSoundToClientNoPreCache(i, buffer);
 		}
 	}
 }
@@ -2811,25 +2806,6 @@ public bool TraceRayDontHitSelf(int entity, int mask, any data)
 stock int BooltoInt(bool status)
 {
 	return (status) ? 1:0;
-}
-
-public void PlayQuakeSound_Spec(int client, char[] buffer)
-{
-	int SpecMode;
-	for (int x = 1; x <= MaxClients; x++)
-	{
-		if (IsValidClient(x) && !IsPlayerAlive(x))
-		{
-			SpecMode = GetEntProp(x, Prop_Send, "m_iObserverMode");
-			if (SpecMode == 4 || SpecMode == 5)
-			{
-				int Target = GetEntPropEnt(x, Prop_Send, "m_hObserverTarget");
-				if (Target == client)
-					if (g_bEnableQuakeSounds[x])
-					ClientCommand(x, buffer);
-			}
-		}
-	}
 }
 
 public void AttackProtection(int client, int &buttons)
@@ -5336,4 +5312,27 @@ void RemoveColors(char[] message, int maxlength)
 {
 	CRemoveTags(message, maxlength);
 	CRemoveColors(message, maxlength);
+}
+
+
+/**
+ * Emit a sound to a client without having to precache the sound.
+ * See https://wiki.alliedmods.net/Csgo_quirks#The_.22play.22_client_command for more details.
+ * 
+ * @param client      The client's id.
+ * @param szPath      The path of the sound with or without "play " as a suffix.
+ * @param addPlay     Whether or not "play " should be append to the begining of szPath (default = true).
+ */
+stock void EmitSoundToClientNoPreCache(int client, const char[] szPath, bool addPlay = true)
+{
+	char szBuffer[256];
+	if(addPlay)
+	{
+		Format(szBuffer, sizeof szBuffer, "play %s", szPath);
+	}
+	else
+	{
+		strcopy(szBuffer, sizeof szBuffer, szPath);
+	}
+	ClientCommand(client, szBuffer);
 }

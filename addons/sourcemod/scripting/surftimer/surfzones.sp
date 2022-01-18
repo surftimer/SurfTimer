@@ -594,7 +594,7 @@ public void EndTouch(int client, int action[3])
 				if (g_bNoClip[client] || (!g_bNoClip[client] && (GetGameTime() - g_fLastTimeNoClipUsed[client]) < 3.0))
 				{
 					CPrintToChat(client, "%t", "SurfZones1", g_szChatPrefix);
-					ClientCommand(client, "play buttons\\button10.wav");
+					EmitSoundToClientNoPreCache(client, "play buttons\\button10.wav", false);
 					// fluffys
 					// ClientCommand(client, "sm_stuck");
 				}
