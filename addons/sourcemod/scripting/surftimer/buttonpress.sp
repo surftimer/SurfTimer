@@ -12,7 +12,7 @@ public void CL_OnStartTimerPress(int client)
 				if (fGetGameTime - g_fErrorMessage[client] > 1.0)
 				{
 					CPrintToChat(client, "%t", "BPress1", g_szChatPrefix);
-					ClientCommand(client, "play buttons\\button10.wav");
+					EmitSoundToClientNoPreCache(client, "play buttons\\button10.wav", false);
 					g_fErrorMessage[client] = fGetGameTime;
 				}
 				return;
@@ -22,7 +22,7 @@ public void CL_OnStartTimerPress(int client)
 				if (fGetGameTime - g_fErrorMessage[client] > 1.0)
 				{
 					CPrintToChat(client, "%t", "BPress2", g_szChatPrefix);
-					ClientCommand(client, "play buttons\\button10.wav");
+					EmitSoundToClientNoPreCache(client, "play buttons\\button10.wav", false);
 					g_fErrorMessage[client] = fGetGameTime;
 				}
 				return;
@@ -32,7 +32,7 @@ public void CL_OnStartTimerPress(int client)
 				if (fGetGameTime - g_fErrorMessage[client] > 1.0)
 				{
 					CPrintToChat(client, "%t", "BPress3", g_szChatPrefix);
-					ClientCommand(client, "play buttons\\button10.wav");
+					EmitSoundToClientNoPreCache(client, "play buttons\\button10.wav", false);
 					g_fErrorMessage[client] = fGetGameTime;
 				}
 				return;
@@ -176,7 +176,7 @@ public void CL_OnEndTimerPress(int client)
 	// If timer is not on, play error sound and return
 	if (!g_bTimerRunning[client])
 	{
-		ClientCommand(client, "play buttons\\button10.wav");
+		EmitSoundToClientNoPreCache(client, "play buttons\\button10.wav", false);
 		return;
 	}
 	else
