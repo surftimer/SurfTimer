@@ -1514,6 +1514,24 @@ public float GetSpeed(int client)
 	return speed;
 }
 
+public void SetPrestrafe(int client, int stage, int style, bool bonus) {
+	float fVelocity[3];
+	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+
+	if (bonus)
+	{
+		g_iPreStrafeBonus[0][stage][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
+		g_iPreStrafeBonus[1][stage][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
+		g_iPreStrafeBonus[2][stage][style][client] = RoundToNearest(fVelocity[2]);
+	} 
+	else 
+	{
+		g_iPreStrafe[0][stage][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
+		g_iPreStrafe[1][stage][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
+		g_iPreStrafe[2][stage][style][client] = RoundToNearest(fVelocity[2]);
+	}
+}
+
 public void SetCashState()
 {
 	ServerCommand("mp_startmoney 0; mp_playercashawards 0; mp_teamcashawards 0");
