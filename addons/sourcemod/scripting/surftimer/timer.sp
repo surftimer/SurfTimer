@@ -479,6 +479,31 @@ public Action AdvertTimer(Handle timer)
 	return Plugin_Continue;
 }
 
+public Action ShowTips(Handle timer)
+{
+	char szTip[MAX_TIP_SIZE];
+	if (GetConVarBool(g_bTipsRandomOrder))
+	{
+		int iNumber;
+		iNumber = GetRandomInt(0, g_Tips.Length);
+
+		g_Tips.GetString(iNumber, szTip, sizeof(szTip));
+	}
+	else
+	{
+		g_Tips.GetString(g_iTipNumber, szTip, sizeof(szTip));
+		g_iTipNumber++;
+	}
+
+	for (int i = 0; i <= MaxClients; i++)
+	{
+		if (g_bAllowTips[i])
+			CPrintToChat(i, szTip);
+	}
+
+	return Plugin_Continue;
+}
+
 public Action CenterMsgTimer(Handle timer, any client)
 {
 	if (IsValidClient(client) && !IsFakeClient(client))

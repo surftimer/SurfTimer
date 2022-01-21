@@ -1640,6 +1640,16 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Prestrafe messages are now {red}disabled"
 	}
+	"TipsToggleOn"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Tips are now {green}enabled"
+	}
+	"TipsToggleOff"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Tips are now {red}disabled"
+	}
 	"StageNotRecorded"
 	{
 		"#format"	"{1:s}"

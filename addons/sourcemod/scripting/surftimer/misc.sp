@@ -664,6 +664,33 @@ public int getZoneID(int zoneGrp, int stage)
 	return -1;
 }
 
+public void readTips()
+{
+	char sPath[PLATFORM_MAX_PATH];
+	char line[128];
+
+	BuildPath(Path_SM, sPath, sizeof(sPath), "%s", TIPS_PATH);
+	Handle fileHandle = OpenFile(sPath, "r");
+
+	if (fileHandle != null)
+	{
+		while (!IsEndOfFile(fileHandle) && ReadFileLine(fileHandle, line, sizeof(line)))
+		{
+			if (strlen(line) > MAX_TIP_SIZE)
+				LogError("[surftimer] '%s' is too big. Maximum size of a tip is %i", line, MAX_TIP_SIZE);
+			else
+				PushArrayString(g_Tips, line);
+		}
+	}
+	else
+		SetFailState("[surftimer] %s is empty or does not exist.", TIPS_PATH);
+
+	if (fileHandle != null)
+		CloseHandle(fileHandle);
+
+	return;
+}
+
 public void readMultiServerMapcycle()
 {
 	char sPath[PLATFORM_MAX_PATH];

@@ -71,6 +71,7 @@
 #define SKILLGROUP_PATH "configs/surftimer/skillgroups.cfg"
 #define DEFAULT_TITLES_WHITELIST_PATH "configs/surftimer/default_titles_whitelist.txt"
 #define DEFAULT_TITLES_PATH "configs/surftimer/default_titles.txt"
+#define TIPS_PATH "configs/surftimer/tips.txt"
 
 // Paths for sounds
 #define WR2_FULL_SOUND_PATH "sound/surftimer/wr.mp3"
@@ -130,6 +131,9 @@
 
 //CSGO HUD Hint Fix
 #define MAX_HINT_SIZE 225
+
+// Maximum size of tips
+#define MAX_TIP_SIZE 265
 
 /*====================================
 =            Enumerations            =
@@ -1002,6 +1006,15 @@ int g_iCurrentlyPlayingStage;
 
 /*----------  Misc  ----------*/
 
+// Used to load all the tips
+ArrayList g_Tips;
+
+// Tip number
+int g_iTipNumber = 0;
+
+// Allow tips
+bool g_bAllowTips[MAXPLAYERS + 1];
+
 // Used to load the mapcycle
 Handle g_MapList = null;
 
@@ -1749,6 +1762,10 @@ public void OnMapStart()
 
 	g_Advert = 0;
 	CreateTimer(180.0, AdvertTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+
+	// Timer for tips
+	if (GetConVarFloat(g_iTipsInterval) != 0)
+		CreateTimer(GetConVarFloat(g_iTipsInterval), ShowTips, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 
 	int iEnt;
 
@@ -2687,6 +2704,9 @@ public void OnPluginStart()
 	Handle tpMenu;
 	if (LibraryExists("adminmenu") && ((tpMenu = GetAdminTopMenu()) != null))
 		OnAdminMenuReady(tpMenu);
+
+	// Tips arrar
+	g_Tips = new ArrayList(MAX_TIP_SIZE);
 
 	// mapcycle array
 	int arraySize = ByteCountToCells(PLATFORM_MAX_PATH);

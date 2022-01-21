@@ -197,6 +197,8 @@ void CreateCommands()
 	// Setting Commands
 	RegConsoleCmd("sm_pre", Command_Prestrafe, "[surftimer] [settings] Toggles prestrafe messages for player");
 	RegConsoleCmd("sm_prestrafe", Command_Prestrafe, "[surftimer] [settings] Toggles prestrafe messages for player");
+	RegConsoleCmd("sm_toggletips", Command_ToggleTips, "[surftimer] [settings] Toggles the tip messages");
+	RegConsoleCmd("sm_tips", Command_ToggleTips, "[surftimer] [settings] Toggles the tip messages");
 	RegConsoleCmd("sm_silentspec", Command_SilentSpec, "[surftimer] [settings] Toggles silent spectate for player");
 	RegConsoleCmd("sm_sspec", Command_SilentSpec, "[surftimer] [settings] Toggles silent spectate for player");
 	RegConsoleCmd("sm_togglewrcps", Command_ToggleWrcps, "[surftimer] [settings] on/off - Enable player checkpoints");
@@ -341,6 +343,18 @@ public Action Command_Prestrafe(int client, int args) {
 	} else {
 		g_iPrespeedText[client] = true;
 		CPrintToChat(client, "%t", "PrestrafeMessageToggleOn", g_szChatPrefix);
+	}
+	return Plugin_Handled;
+}
+
+public Action Command_ToggleTips(int client, int args)
+{
+	if (g_bAllowTips[client]) {
+		g_bAllowTips[client] = false;
+		CPrintToChat(client, "%t", "TipsToggleOff", g_szChatPrefix);
+	} else {
+		g_bAllowTips[client] = true;
+		CPrintToChat(client, "%t", "TipsToggleOn", g_szChatPrefix);
 	}
 	return Plugin_Handled;
 }
@@ -2251,6 +2265,17 @@ void PrespeedText(int client, bool menu = false)
 		MiscellaneousOptions(client);
 }
 
+void TipsText(int client, bool menu = false)
+{
+	if (g_bAllowTips[client])
+		g_bAllowTips[client] = false;
+	else
+		g_bAllowTips[client] = true;
+	
+	if (menu)
+		MiscellaneousOptions(client);
+}
+
 public Action Client_Hide(int client, int args)
 {
 	HideMethod(client);
@@ -3369,6 +3394,12 @@ public void MiscellaneousOptions(int client)
 		AddMenuItem(menu, "", "[ON] Prestrafe Message");
 	else
 		AddMenuItem(menu, "", "[OFF] Prestrafe Message");
+
+	// Show tips
+	if (g_bAllowTips[client])
+		AddMenuItem(menu, "", "[ON] Tips");
+	else
+		AddMenuItem(menu, "", "[OFF] Tips");
 	
 	SetMenuExitBackButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
@@ -3389,6 +3420,7 @@ public int MiscellaneousOptionsHandler(Menu menu, MenuAction action, int param1,
 			case 6: HideChat(param1, true);
 			case 7: HideViewModel(param1, true);
 			case 8: PrespeedText(param1, true);
+			case 9: TipsText(param1, true);
 		}
 	}
 	else if (action == MenuAction_Cancel)
