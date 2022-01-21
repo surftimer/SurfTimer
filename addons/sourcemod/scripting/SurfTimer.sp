@@ -480,6 +480,10 @@ float g_fFinalPracSrcpTime[MAXPLAYERS + 1];
 char g_szFinalPracSrcpTime[MAXPLAYERS + 1][32];
 float g_fSrcpPauseTime[MAXPLAYERS + 1];
 
+// Prestrafe records
+int g_iRecordPreStrafe[3][CPLIMIT][MAX_STYLES];
+int g_iRecordPreStrafeBonus[3][MAXZONEGROUPS][MAX_STYLES];
+
 /*----------  Map Settings Variables ----------*/
 float g_fMaxVelocity;
 ConVar g_hMaxVelocity;
@@ -900,6 +904,12 @@ int g_OldMapRank[MAXPLAYERS + 1];
 
 // Current map's record player's name
 char g_szRecordPlayer[MAX_NAME_LENGTH];
+
+// Latest prestrafe speed for linear and stage map
+int g_iPreStrafe[3][CPLIMIT][MAX_STYLES][MAXPLAYERS + 1];
+
+// Latest prestrafe speed for bonuses
+int g_iPreStrafeBonus[3][MAXZONEGROUPS][MAX_STYLES][MAXPLAYERS + 1];
 
 /*----------  Replay Variables  ----------*/
 

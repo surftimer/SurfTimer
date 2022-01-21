@@ -2077,6 +2077,13 @@ public void sql_selectMapRecordCallback(Handle owner, Handle hndl, const char[] 
 		return;
 	}
 
+	for (int i=1; i < MAX_STYLES; i++)
+	{
+		g_iRecordPreStrafe[0][0][i] = 0;
+		g_iRecordPreStrafe[1][0][i] = 0;
+		g_iRecordPreStrafe[2][0][i] = 0;
+	}
+
 	int style;
 
 	if (SQL_HasResultSet(hndl))
@@ -2118,6 +2125,10 @@ public void sql_selectMapRecordCallback(Handle owner, Handle hndl, const char[] 
 					g_fRecordStyleMapTime[style] = 9999999.0;
 				}
 			}
+
+			g_iRecordPreStrafe[0][0][style] = SQL_FetchInt(hndl, 4);
+			g_iRecordPreStrafe[1][0][style] = SQL_FetchInt(hndl, 5);
+			g_iRecordPreStrafe[2][0][style] = SQL_FetchInt(hndl, 6);
 		}
 	}
 	else
@@ -3744,10 +3755,18 @@ public void SQL_selectFastestBonusCallback(Handle owner, Handle hndl, const char
 		Format(g_szBonusFastestTime[i], 64, "N/A");
 		g_fBonusFastest[i] = 9999999.0;
 
+		g_iRecordPreStrafeBonus[0][i][0] = 0;
+		g_iRecordPreStrafeBonus[1][i][0] = 0;
+		g_iRecordPreStrafeBonus[2][i][0] = 0;
+
 		for (int s = 1; s < MAX_STYLES; s++)
 		{
 			Format(g_szStyleBonusFastestTime[s][i], 64, "N/A");
 			g_fStyleBonusFastest[s][i] = 9999999.0;
+
+			g_iRecordPreStrafeBonus[0][i][s] = 0;
+			g_iRecordPreStrafeBonus[1][i][s] = 0;
+			g_iRecordPreStrafeBonus[2][i][s] = 0;
 		}
 	}
 
@@ -3772,6 +3791,10 @@ public void SQL_selectFastestBonusCallback(Handle owner, Handle hndl, const char
 				g_fStyleBonusFastest[style][zonegroup] = SQL_FetchFloat(hndl, 1);
 				FormatTimeFloat(1, g_fStyleBonusFastest[style][zonegroup], 3, g_szStyleBonusFastestTime[style][zonegroup], 64);
 			}
+
+			g_iRecordPreStrafeBonus[0][zonegroup][style] = SQL_FetchInt(hndl, 4);
+			g_iRecordPreStrafeBonus[1][zonegroup][style] = SQL_FetchInt(hndl, 5);
+			g_iRecordPreStrafeBonus[2][zonegroup][style] = SQL_FetchInt(hndl, 6);
 		}
 	}
 
@@ -6643,7 +6666,7 @@ public int StageTopMenuHandler(Menu menu, MenuAction action, int client, int ite
 public void db_viewStageRecords()
 {
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT name, MIN(runtimepro), stage, style FROM ck_wrcps WHERE mapname = '%s' GROUP BY stage, style;", g_szMapName);
+	Format(szQuery, 512, "SELECT cp1.name, cp1.runtimepro, cp1.stage, cp1.style, cp1.velStartXY, cp1.velStartXYZ, cp1.velstartZ from ck_wrcps cp1 where cp1.mapname = '%s' and cp1.runtimepro = (select min(runtimepro) from ck_wrcps cp2 where cp2.mapname = cp1.mapname and cp1.stage = cp2.stage and cp2.style = cp1.style);", g_szMapName);
 	SQL_TQuery(g_hDb, sql_viewStageRecordsCallback, szQuery, 0, DBPrio_Low);
 }
 
@@ -6656,6 +6679,16 @@ public void sql_viewStageRecordsCallback(Handle owner, Handle hndl, const char[]
 		{
 			db_selectTotalBonusCount();
 			return;
+		}
+	}
+
+	for (int i=1; i<CPLIMIT; i++)
+	{
+		for (int s=0; s<MAX_STYLES; s++)
+		{
+			g_iRecordPreStrafe[0][i][s] = 0;
+			g_iRecordPreStrafe[1][i][s] = 0;
+			g_iRecordPreStrafe[2][i][s] = 0;
 		}
 	}
 
@@ -6701,6 +6734,9 @@ public void sql_viewStageRecordsCallback(Handle owner, Handle hndl, const char[]
 					g_fStyleStageRecord[style][stage] = 9999999.0;
 				}
 			}
+			g_iRecordPreStrafeBonus[0][stage][style] = SQL_FetchInt(hdnl, 4);
+			g_iRecordPreStrafeBonus[1][stage][style] = SQL_FetchInt(hdnl, 5);
+			g_iRecordPreStrafeBonus[2][stage][style] = SQL_FetchInt(hdnl, 6);
 		}
 	}
 	else
