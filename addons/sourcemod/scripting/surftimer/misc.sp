@@ -1890,8 +1890,6 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 						PlayRecordSound(2);
 						CPrintToChat(i, "%t", "NewMapRecord", g_szChatPrefix, szName);
 						PrintToConsole(i, "surftimer | %s scored a new MAP RECORD", szName);
-						
-						SendNewRecordForward(client, g_szTimeDifference[client]);
 					}
 				}
 			}
