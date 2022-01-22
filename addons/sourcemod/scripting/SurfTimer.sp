@@ -1917,6 +1917,9 @@ public void OnConfigsExecuted()
 	else
 		readMultiServerMapcycle();
 
+	if (GetConVarFloat(g_iHintsInterval) != 0)
+		readHints();
+
 	if (GetConVarBool(g_hEnforceDefaultTitles))
 		ReadDefaultTitlesWhitelist();
 
