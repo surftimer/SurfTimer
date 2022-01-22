@@ -2531,7 +2531,7 @@ public void db_updateRecordPro(int client)
 
 	char szQuery[1024];
 	// "UPDATE ck_playertimes SET name = '%s', runtimepro = '%f' WHERE steamid = '%s' AND mapname = '%s' AND style = %i;";
-	Format(szQuery, 1024, sql_updateRecordPro, szName, g_fFinalTime[client], g_iPreStrafe[0][0][data], g_iPreStrafe[1][0][data], g_iPreStrafe[2][0][data], g_szSteamID[client], g_szMapName, 0);
+	Format(szQuery, 1024, sql_updateRecordPro, szName, g_fFinalTime[client], g_iPreStrafe[0][0][client], g_iPreStrafe[1][0][client], g_iPreStrafe[2][0][client], g_szSteamID[client], g_szMapName, 0);
 	SQL_TQuery(g_hDb, SQL_UpdateRecordProCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -6030,9 +6030,9 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 		WritePackCell(pack, data);
 
 		if (style == 0)
-			Format(szQuery, 512, "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage, velStartXY, velStartXYZ, velStartZ) VALUES ('%s', '%s', '%s', '%f', %i, %i, %i, %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage, g_iPreStrafe[0][stage][0][client], g_iPreStrafe[1][stage][0][client], g_iPreStrafe[2][stage][0][client]);
+			Format(szQuery, 512, "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage, velStartXY, velStartXYZ, velStartZ) VALUES ('%s', '%s', '%s', '%f', %i, %i, %i, %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage, g_iPreStrafe[0][stage][0][data], g_iPreStrafe[1][stage][0][data], g_iPreStrafe[2][stage][0][data]);
 		else if (style != 0)
-			Format(szQuery, 512, "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage, style, velStartXY, velStartXYZ, velStartZ) VALUES ('%s', '%s', '%s', '%f', %i, %i, %i, %i, %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage, style, g_iPreStrafe[0][stage][style][client], g_iPreStrafe[1][stage][style][client], g_iPreStrafe[2][stage][style][client]);
+			Format(szQuery, 512, "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage, style, velStartXY, velStartXYZ, velStartZ) VALUES ('%s', '%s', '%s', '%f', %i, %i, %i, %i, %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage, style, g_iPreStrafe[0][stage][style][data], g_iPreStrafe[1][stage][style][data], g_iPreStrafe[2][stage][style][data]);
 
 		SQL_TQuery(g_hDb, SQL_UpdateWrcpRecordCallback, szQuery, pack, DBPrio_Low);
 
@@ -6734,9 +6734,9 @@ public void sql_viewStageRecordsCallback(Handle owner, Handle hndl, const char[]
 					g_fStyleStageRecord[style][stage] = 9999999.0;
 				}
 			}
-			g_iRecordPreStrafeBonus[0][stage][style] = SQL_FetchInt(hdnl, 4);
-			g_iRecordPreStrafeBonus[1][stage][style] = SQL_FetchInt(hdnl, 5);
-			g_iRecordPreStrafeBonus[2][stage][style] = SQL_FetchInt(hdnl, 6);
+			g_iRecordPreStrafeBonus[0][stage][style] = SQL_FetchInt(hndl, 4);
+			g_iRecordPreStrafeBonus[1][stage][style] = SQL_FetchInt(hndl, 5);
+			g_iRecordPreStrafeBonus[2][stage][style] = SQL_FetchInt(hndl, 6);
 		}
 	}
 	else
@@ -7172,7 +7172,7 @@ public void db_updateBonusStyle(int client, char szSteamId[32], char szUName[128
 	WritePackCell(datapack, zoneGrp);
 	WritePackCell(datapack, style);
 	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH * 2 + 1);
-	Format(szQuery, 1024, "UPDATE ck_bonus SET runtime = '%f', name = '%s', velStartXY = %i, velStartXYZ = %i, velStartZ = %i WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = %i AND style = %i", FinalTime, szName, g_iPreStrafeBonus[0][zoneGrp][style][client], , g_iPreStrafeBonus[1][zoneGrp][style][client], g_iPreStrafeBonus[2][zoneGrp][style][client], szSteamId, g_szMapName, zoneGrp, style);
+	Format(szQuery, 1024, "UPDATE ck_bonus SET runtime = '%f', name = '%s', velStartXY = %i, velStartXYZ = %i, velStartZ = %i WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = %i AND style = %i;", FinalTime, szName, g_iPreStrafeBonus[0][zoneGrp][style][client], g_iPreStrafeBonus[1][zoneGrp][style][client], g_iPreStrafeBonus[2][zoneGrp][style][client], szSteamId, g_szMapName, zoneGrp, style);
 	SQL_TQuery(g_hDb, SQL_updateBonusStyleCallback, szQuery, datapack, DBPrio_Low);
 }
 
