@@ -451,54 +451,31 @@ public Action HelpMsgTimer(Handle timer, any client)
 	return Plugin_Handled;
 }
 
-public Action AdvertTimer(Handle timer)
+public Action ShowHintsTimer(Handle timer)
 {
-	g_Advert++;
-	if ((g_Advert % 2) == 0)
-	{
-		if (g_bhasBonus)
-		{
-			CPrintToChatAll("%t", "AdvertBonus", g_szChatPrefix);
-		}
-		else if (g_bhasStages)
-		{
-			CPrintToChatAll("%t", "AdvertWRCP", g_szChatPrefix);
-		}
-	}
-	else
-	{
-		if (g_bhasStages)
-		{
-			CPrintToChatAll("%t", "AdvertWRCP", g_szChatPrefix);
-		}
-		else if (g_bhasBonus)
-		{
-			CPrintToChatAll("%t", "AdvertBonus", g_szChatPrefix);
-		}
-	}
-	return Plugin_Continue;
-}
+	if (g_Hints.Length == 0)
+		return Plugin_Stop;
 
-public Action ShowTips(Handle timer)
-{
-	char szTip[MAX_TIP_SIZE];
-	if (GetConVarBool(g_bTipsRandomOrder))
+	char szHint[MAX_HINT_MESSAGES_SIZE];
+	char szMessage[512];
+	if (GetConVarBool(g_bHintsRandomOrder))
 	{
 		int iNumber;
-		iNumber = GetRandomInt(0, g_Tips.Length);
+		iNumber = GetRandomInt(0, g_Hints.Length);
 
-		g_Tips.GetString(iNumber, szTip, sizeof(szTip));
+		g_Hints.GetString(iNumber, szHint, sizeof(szHint));
 	}
 	else
 	{
-		g_Tips.GetString(g_iTipNumber, szTip, sizeof(szTip));
-		g_iTipNumber++;
+		g_Hints.GetString(g_iHintNumber, szHint, sizeof(szHint));
+		g_iHintNumber++;
 	}
 
+	Format(szMessage, sizeof(szMessage), "%s %s", g_szChatPrefix, szHint);
 	for (int i = 0; i <= MaxClients; i++)
 	{
-		if (g_bAllowTips[i])
-			CPrintToChat(i, szTip);
+		if (g_bAllowHints[i])
+			CPrintToChat(i, szMessage);
 	}
 
 	return Plugin_Continue;

@@ -71,7 +71,7 @@
 #define SKILLGROUP_PATH "configs/surftimer/skillgroups.cfg"
 #define DEFAULT_TITLES_WHITELIST_PATH "configs/surftimer/default_titles_whitelist.txt"
 #define DEFAULT_TITLES_PATH "configs/surftimer/default_titles.txt"
-#define TIPS_PATH "configs/surftimer/tips.txt"
+#define HINTS_PATH "configs/surftimer/hints.txt"
 
 // Paths for sounds
 #define WR2_FULL_SOUND_PATH "sound/surftimer/wr.mp3"
@@ -132,8 +132,8 @@
 //CSGO HUD Hint Fix
 #define MAX_HINT_SIZE 225
 
-// Maximum size of tips
-#define MAX_TIP_SIZE 265
+// Maximum size of hints
+#define MAX_HINT_MESSAGES_SIZE 256
 
 /*====================================
 =            Enumerations            =
@@ -351,11 +351,6 @@ bool g_bCheckpointRecordFound[MAXZONEGROUPS];
 float g_fMaxPercCompleted[MAXPLAYERS + 1];
 
 int g_iCurrentCheckpoint[MAXPLAYERS + 1];
-
-/*----------  Advert Variables  ----------*/
-
-// Defines which advert to play
-int g_Advert;
 
 /*----------  Maptier Variables  ----------*/
 
@@ -1006,14 +1001,14 @@ int g_iCurrentlyPlayingStage;
 
 /*----------  Misc  ----------*/
 
-// Used to load all the tips
-ArrayList g_Tips;
+// Used to load all the hints
+ArrayList g_Hints;
 
-// Tip number
-int g_iTipNumber = 0;
+// Hint number
+int g_iHintNumber = 0;
 
-// Allow tips
-bool g_bAllowTips[MAXPLAYERS + 1];
+// Allow hints
+bool g_bAllowHints[MAXPLAYERS + 1];
 
 // Used to load the mapcycle
 Handle g_MapList = null;
@@ -1760,12 +1755,9 @@ public void OnMapStart()
 	CreateTimer(1.0, DelayedStuff, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 	CreateTimer(GetConVarFloat(g_replayBotDelay), LoadReplaysTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE); // replay bots
 
-	g_Advert = 0;
-	CreateTimer(180.0, AdvertTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
-
-	// Timer for tips
-	if (GetConVarFloat(g_iTipsInterval) != 0)
-		CreateTimer(GetConVarFloat(g_iTipsInterval), ShowTips, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+	// Timer for hints
+	if (GetConVarFloat(g_iHintsInterval) != 0)
+		CreateTimer(GetConVarFloat(g_iHintsInterval), ShowHintsTimer, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 
 	int iEnt;
 
@@ -2705,8 +2697,8 @@ public void OnPluginStart()
 	if (LibraryExists("adminmenu") && ((tpMenu = GetAdminTopMenu()) != null))
 		OnAdminMenuReady(tpMenu);
 
-	// Tips arrar
-	g_Tips = new ArrayList(MAX_TIP_SIZE);
+	// Tips array
+	g_Hints = new ArrayList(MAX_HINT_SIZE);
 
 	// mapcycle array
 	int arraySize = ByteCountToCells(PLATFORM_MAX_PATH);

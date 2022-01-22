@@ -1,0 +1,12 @@
+// Write down all the tips you want to show in game here
+//
+// Each tip is automatically preceded by your chat prefix
+// Each line is a new tip
+
+Type {lightgreen}!bonus {default}to teleport to the bonus stage
+Type {lightgreen}!stages {default}to teleport to a stage
+Type {lightgreen}!r {default}or {lightgreen}!r {default}to go back to the beginning of the map
+Type {lightgreen}!rs {default}to go back to the beginning of your stage
+Type {lightgreen}!maptop {default}to see the map times
+Type {lightgreen}!replay {default}to see a replay of the fastest map run
+Tired of seeing these tips? Type {lightgreen}!toggletips {default}to toggle them on or off
