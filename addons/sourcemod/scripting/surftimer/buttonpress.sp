@@ -88,6 +88,7 @@ public void CL_OnStartTimerPress(int client)
 					g_bMissedMapBest[client] = false;
 				iPrestrafeRecord = g_iRecordPreStrafe[g_SpeedMode[client]][0][g_iCurrentStyle[client]];
 				SetPrestrafe(client, 0, g_iCurrentStyle[client], false);
+				SetPrestrafe(client, 1, g_iCurrentStyle[client], false);
 			}
 			else
 			{
