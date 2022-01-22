@@ -94,14 +94,14 @@ public void CL_OnStartTimerPress(int client)
 				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
 					g_bMissedBonusBest[client] = false;
 				iPrestrafeRecord = g_iRecordPreStrafeBonus[g_SpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
-				SetPrestrafe(client, 0, g_iCurrentStyle[client], false);
+				SetPrestrafe(client, g_iClientInZone[client][2], g_iCurrentStyle[client], true);
 			}
 		}
 
 		if (!g_bPracticeMode[client] && !IsFakeClient(client)) {
 			char szDifference[128], szSpeed[128], preMessage[128];
 			int iDifference;
-			int prestrafe = RoundToNearest(g_fLastSpeed[client]);
+			int prestrafe = RoundToNearest(GetSpeed(client));
 			if (iPrestrafeRecord == 0)
 			{
 				szDifference = "";
@@ -117,7 +117,7 @@ public void CL_OnStartTimerPress(int client)
 				Format(szDifference, sizeof(szDifference), "[%c-%i%c]", RED, iDifference, WHITE);
 			}
 
-			Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
+			Format(szSpeed, sizeof(szSpeed), "%i", prestrafe);
 
 			if (g_iClientInZone[client][2] == 0)
 				Format(preMessage, sizeof(preMessage), "%t", "StartPrestrafe", g_szChatPrefix, szSpeed, szDifference);
@@ -778,7 +778,9 @@ public void CL_OnStartWrcpTimerPress(int client)
 			char szDifference[128], szSpeed[128], preMessage[128];
 			int iDifference;
 			int iPrestrafeRecord = g_iRecordPreStrafe[g_SpeedMode[client]][g_Stage[0][client]][g_iCurrentStyle[client]];
-			int prestrafe = RoundToNearest(g_fLastSpeed[client]);
+			int prestrafe = RoundToNearest(GetSpeed(client));
+
+			SetPrestrafe(client, g_Stage[0][client], g_iCurrentStyle[client], false);
 
 			if (iPrestrafeRecord == 0)
 			{
@@ -795,7 +797,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 				Format(szDifference, sizeof(szDifference), " [%c-%i%c]", RED, iDifference, WHITE);
 			}
 
-			Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
+			Format(szSpeed, sizeof(szSpeed), "%i", prestrafe);
 			Format(preMessage, sizeof(preMessage), "%t", "StagePrestrafe", g_szChatPrefix, g_Stage[0][client], szSpeed, szDifference);
 
 			if (g_iPrespeedText[client])

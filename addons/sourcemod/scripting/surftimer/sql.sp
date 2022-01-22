@@ -2077,7 +2077,7 @@ public void sql_selectMapRecordCallback(Handle owner, Handle hndl, const char[] 
 		return;
 	}
 
-	for (int i=1; i < MAX_STYLES; i++)
+	for (int i=0; i < MAX_STYLES; i++)
 	{
 		g_iRecordPreStrafe[0][0][i] = 0;
 		g_iRecordPreStrafe[1][0][i] = 0;
@@ -2503,7 +2503,7 @@ public void sql_selectRecordCallback(Handle owner, Handle hndl, const char[] err
 		WritePackCell(pack, data);
 
 		// "INSERT INTO ck_playertimes (steamid, mapname, name, runtimepro, style) VALUES('%s', '%s', '%s', '%f', %i);";
-		Format(szQuery, 512, sql_insertPlayerTime, g_szSteamID[data], g_szMapName, szName, g_fFinalTime[data], 0, g_iPreStrafe[0][0][data], g_iPreStrafe[1][0][data], g_iPreStrafe[2][0][data]);
+		Format(szQuery, 512, sql_insertPlayerTime, g_szSteamID[data], g_szMapName, szName, g_fFinalTime[data], 0, g_iPreStrafe[0][0][0][data], g_iPreStrafe[1][0][0][data], g_iPreStrafe[2][0][0][data]);
 		SQL_TQuery(g_hDb, SQL_UpdateRecordProCallback, szQuery, pack, DBPrio_Low);
 
 		g_bInsertNewTime = true;
@@ -2531,7 +2531,7 @@ public void db_updateRecordPro(int client)
 
 	char szQuery[1024];
 	// "UPDATE ck_playertimes SET name = '%s', runtimepro = '%f' WHERE steamid = '%s' AND mapname = '%s' AND style = %i;";
-	Format(szQuery, 1024, sql_updateRecordPro, szName, g_fFinalTime[client], g_iPreStrafe[0][0][client], g_iPreStrafe[1][0][client], g_iPreStrafe[2][0][client], g_szSteamID[client], g_szMapName, 0);
+	Format(szQuery, 1024, sql_updateRecordPro, szName, g_fFinalTime[client], g_iPreStrafe[0][0][0][client], g_iPreStrafe[1][0][0][client], g_iPreStrafe[2][0][0][client], g_szSteamID[client], g_szMapName, 0);
 	SQL_TQuery(g_hDb, SQL_UpdateRecordProCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -3755,14 +3755,13 @@ public void SQL_selectFastestBonusCallback(Handle owner, Handle hndl, const char
 		Format(g_szBonusFastestTime[i], 64, "N/A");
 		g_fBonusFastest[i] = 9999999.0;
 
-		g_iRecordPreStrafeBonus[0][i][0] = 0;
-		g_iRecordPreStrafeBonus[1][i][0] = 0;
-		g_iRecordPreStrafeBonus[2][i][0] = 0;
-
-		for (int s = 1; s < MAX_STYLES; s++)
+		for (int s = 0; s < MAX_STYLES; s++)
 		{
+			if (s != 0)
+			{
 			Format(g_szStyleBonusFastestTime[s][i], 64, "N/A");
 			g_fStyleBonusFastest[s][i] = 9999999.0;
+			}
 
 			g_iRecordPreStrafeBonus[0][i][s] = 0;
 			g_iRecordPreStrafeBonus[1][i][s] = 0;
@@ -6067,7 +6066,7 @@ public void db_updateWrcpRecord(int client, int style, int stage)
 	if (style == 0)
 		Format(szQuery, 1024, "UPDATE ck_wrcps SET name = '%s', runtimepro = '%f', velStartXY = %i, velStartXYZ = %i, velStartZ = %i WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = 0;", szName, g_fFinalWrcpTime[client], g_iPreStrafe[0][stage][0][client], g_iPreStrafe[1][stage][0][client], g_iPreStrafe[2][stage][0][client], g_szSteamID[client], g_szMapName, stage);
 	if (style > 0)
-		Format(szQuery, 1024, "UPDATE ck_wrcps SET name = '%s', runtimepro = '%f', velStartXY = %i, velStartXYZ = %i, velStartZ = %i WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = %i;", szName, g_fFinalWrcpTime[client], g_iPreStrafe[0][stage][style][client], g_iPreStrafe[1][stage][style][client], g_iPreStrafe[2][stage][style][client], g_szSteamID[client], g_szSteamID[client], g_szMapName, stage, style);
+		Format(szQuery, 1024, "UPDATE ck_wrcps SET name = '%s', runtimepro = '%f', velStartXY = %i, velStartXYZ = %i, velStartZ = %i WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = %i;", szName, g_fFinalWrcpTime[client], g_iPreStrafe[0][stage][style][client], g_iPreStrafe[1][stage][style][client], g_iPreStrafe[2][stage][style][client], g_szSteamID[client], g_szMapName, stage, style);
 	SQL_TQuery(g_hDb, SQL_UpdateWrcpRecordCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -6204,6 +6203,10 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 				// Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 				PlayWRCPRecord();
 				SendNewWRCPForward(client, stage, sz_srRawDiff);
+
+				g_iRecordPreStrafe[0][stage][0] = g_iPreStrafe[0][stage][0][client];
+				g_iRecordPreStrafe[1][stage][0] = g_iPreStrafe[1][stage][0][client];
+				g_iRecordPreStrafe[2][stage][0] = g_iPreStrafe[2][stage][0][client];
 			}
 			else
 			{
@@ -6228,6 +6231,10 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			// Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 			PlayWRCPRecord();
 			SendNewWRCPForward(client, stage, sz_srRawDiff);
+
+			g_iRecordPreStrafe[0][stage][0] = g_iPreStrafe[0][stage][0][client];
+			g_iRecordPreStrafe[1][stage][0] = g_iPreStrafe[1][stage][0][client];
+			g_iRecordPreStrafe[2][stage][0] = g_iPreStrafe[2][stage][0][client];
 		}
 	}
 	else if (style != 0) // styles
@@ -6249,6 +6256,10 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 				CPrintToChatAll("%t", "SQL19", g_szChatPrefix, szName, g_szStyleRecordPrint[style], stage, g_szFinalWrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
 				PlayWRCPRecord();
 				SendNewWRCPForward(client, stage, sz_srRawDiff);
+
+				g_iRecordPreStrafe[0][stage][style] = g_iPreStrafe[0][stage][style][client];
+				g_iRecordPreStrafe[1][stage][style] = g_iPreStrafe[1][stage][style][client];
+				g_iRecordPreStrafe[2][stage][style] = g_iPreStrafe[2][stage][style][client];
 			}
 			else
 			{
@@ -6271,6 +6282,10 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			CPrintToChatAll("%t", "SQL22", g_szChatPrefix, szName, g_szStyleRecordPrint[style], stage, g_szFinalWrcpTime[client]);
 			PlayWRCPRecord();
 			SendNewWRCPForward(client, stage, sz_srRawDiff);
+
+			g_iRecordPreStrafe[0][stage][style] = g_iPreStrafe[0][stage][style][client];
+			g_iRecordPreStrafe[1][stage][style] = g_iPreStrafe[1][stage][style][client];
+			g_iRecordPreStrafe[2][stage][style] = g_iPreStrafe[2][stage][style][client];
 		}
 	}
 
@@ -6682,9 +6697,9 @@ public void sql_viewStageRecordsCallback(Handle owner, Handle hndl, const char[]
 		}
 	}
 
-	for (int i=1; i<CPLIMIT; i++)
+	for (int i = 1; i < CPLIMIT; i++)
 	{
-		for (int s=0; s<MAX_STYLES; s++)
+		for (int s = 0; s < MAX_STYLES; s++)
 		{
 			g_iRecordPreStrafe[0][i][s] = 0;
 			g_iRecordPreStrafe[1][i][s] = 0;
@@ -6734,9 +6749,9 @@ public void sql_viewStageRecordsCallback(Handle owner, Handle hndl, const char[]
 					g_fStyleStageRecord[style][stage] = 9999999.0;
 				}
 			}
-			g_iRecordPreStrafeBonus[0][stage][style] = SQL_FetchInt(hndl, 4);
-			g_iRecordPreStrafeBonus[1][stage][style] = SQL_FetchInt(hndl, 5);
-			g_iRecordPreStrafeBonus[2][stage][style] = SQL_FetchInt(hndl, 6);
+			g_iRecordPreStrafe[0][stage][style] = SQL_FetchInt(hndl, 4);
+			g_iRecordPreStrafe[1][stage][style] = SQL_FetchInt(hndl, 5);
+			g_iRecordPreStrafe[2][stage][style] = SQL_FetchInt(hndl, 6);
 		}
 	}
 	else

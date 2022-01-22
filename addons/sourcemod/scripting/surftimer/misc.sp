@@ -1514,21 +1514,21 @@ public float GetSpeed(int client)
 	return speed;
 }
 
-public void SetPrestrafe(int client, int stage, int style, bool bonus) {
+public void SetPrestrafe(int client, int zone, int style, bool bonus) {
 	float fVelocity[3];
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
 
 	if (bonus)
 	{
-		g_iPreStrafeBonus[0][stage][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
-		g_iPreStrafeBonus[1][stage][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
-		g_iPreStrafeBonus[2][stage][style][client] = RoundToNearest(fVelocity[2]);
+		g_iPreStrafeBonus[0][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
+		g_iPreStrafeBonus[1][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
+		g_iPreStrafeBonus[2][zone][style][client] = RoundToNearest(fVelocity[2]);
 	} 
 	else 
 	{
-		g_iPreStrafe[0][stage][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
-		g_iPreStrafe[1][stage][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
-		g_iPreStrafe[2][stage][style][client] = RoundToNearest(fVelocity[2]);
+		g_iPreStrafe[0][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
+		g_iPreStrafe[1][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
+		g_iPreStrafe[2][zone][style][client] = RoundToNearest(fVelocity[2]);
 	}
 }
 
@@ -1945,6 +1945,10 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		if (g_bMapSRVRecord[client])
 		{
 			SendNewRecordForward(client, g_szTimeDifference[client]);
+
+			g_iRecordPreStrafe[0][0][0] = g_iPreStrafe[0][0][0][client];
+			g_iRecordPreStrafe[1][0][0] = g_iPreStrafe[1][0][0][client];
+			g_iRecordPreStrafe[2][0][0] = g_iPreStrafe[2][0][0][client];
 			
 			if (GetConVarBool(g_hRecordAnnounce))
 				db_insertAnnouncement(szName, g_szMapName, 0, g_szFinalTime[client], 0);
@@ -2012,6 +2016,10 @@ stock void PrintChatBonus(int client, int zGroup, int rank = 0)
 			Format(szRecordDiff, 54, "-%s", szRecordDiff);
 			
 			SendNewRecordForward(client, szRecordDiff, zGroup);
+
+			g_iRecordPreStrafeBonus[0][zGroup][0] = g_iPreStrafeBonus[0][zGroup][0][client];
+			g_iRecordPreStrafeBonus[1][zGroup][0] = g_iPreStrafeBonus[1][zGroup][0][client];
+			g_iRecordPreStrafeBonus[2][zGroup][0] = g_iPreStrafeBonus[2][zGroup][0][client];
 		}
 		if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 		{
@@ -2052,6 +2060,10 @@ stock void PrintChatBonus(int client, int zGroup, int rank = 0)
 			Format(szRecordDiff, 54, "-%s", szRecordDiff);
 
 			SendNewRecordForward(client, szRecordDiff, zGroup);
+
+			g_iRecordPreStrafeBonus[0][zGroup][0] = g_iPreStrafeBonus[0][zGroup][0][client];
+			g_iRecordPreStrafeBonus[1][zGroup][0] = g_iPreStrafeBonus[1][zGroup][0][client];
+			g_iRecordPreStrafeBonus[2][zGroup][0] = g_iPreStrafeBonus[2][zGroup][0][client];
 		}
 		if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 		{
@@ -4203,6 +4215,13 @@ stock void StyleFinishedMsgs(int client, int style)
 			}
 		}
 
+		if (g_bStyleMapSRVRecord[style][client])
+		{
+			g_iRecordPreStrafe[0][0][style] = g_iPreStrafe[0][0][style][client];
+			g_iRecordPreStrafe[1][0][style] = g_iPreStrafe[1][0][style][client];
+			g_iRecordPreStrafe[2][0][style] = g_iPreStrafe[2][0][style][client];
+		}
+
 		if (g_StyleMapRank[style][client] == 99999 && IsValidClient(client))
 			CPrintToChat(client, "%t", "Misc19", g_szChatPrefix);
 
@@ -4230,6 +4249,10 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 		RecordDiff = g_fStyleOldBonusRecordTime[style][zGroup] - g_fFinalTime[client];
 		FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
 		Format(szRecordDiff, 54, "-%s", szRecordDiff);
+
+		g_iRecordPreStrafeBonus[0][zGroup][style] = g_iPreStrafeBonus[0][zGroup][style][client];
+		g_iRecordPreStrafeBonus[1][zGroup][style] = g_iPreStrafeBonus[1][zGroup][style][client];
+		g_iRecordPreStrafeBonus[2][zGroup][style] = g_iPreStrafeBonus[2][zGroup][style][client];
 	}
 	if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 	{

@@ -1657,7 +1657,7 @@
 	}
 	"StagePrestrafe"
 	{
-		"#format"	"{1:s},{2:i},{3:s}"
+		"#format"	"{1:s},{2:i},{3:s},{4:s}"
 		"en"		"{1} Stage {2} Prestrafe: {3} u/s {4}"
 	}
 	"SilentSpecMessageToggleOn"
