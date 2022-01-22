@@ -1514,41 +1514,6 @@ public float GetSpeed(int client)
 	return speed;
 }
 
-public void SetPrestrafe(int client, int zone, int style, bool bonus) 
-{
-	float fVelocity[3];
-	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
-
-	if (bonus)
-	{
-		g_iPreStrafeBonus[0][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
-		g_iPreStrafeBonus[1][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
-		g_iPreStrafeBonus[2][zone][style][client] = RoundToNearest(fVelocity[2]);
-	} 
-	else 
-	{
-		g_iPreStrafe[0][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
-		g_iPreStrafe[1][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
-		g_iPreStrafe[2][zone][style][client] = RoundToNearest(fVelocity[2]);
-	}
-}
-
-public void SetNewRecordPrestrafe(int client, int zone, int style, bool bonus)
-{
-	if (bonus)
-	{
-		g_iRecordPreStrafeBonus[0][zone][style] = g_iPreStrafeBonus[0][zone][style][client];
-		g_iRecordPreStrafeBonus[1][zone][style] = g_iPreStrafeBonus[1][zone][style][client];
-		g_iRecordPreStrafeBonus[2][zone][style] = g_iPreStrafeBonus[2][zone][style][client];
-	}
-	else
-	{
-		g_iRecordPreStrafe[0][zone][style] = g_iPreStrafe[0][zone][style][client];
-		g_iRecordPreStrafe[1][zone][style] = g_iPreStrafe[1][zone][style][client];
-		g_iRecordPreStrafe[2][zone][style] = g_iPreStrafe[2][zone][style][client];
-	}
-}
-
 public void SetCashState()
 {
 	ServerCommand("mp_startmoney 0; mp_playercashawards 0; mp_teamcashawards 0");
@@ -1962,8 +1927,6 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		if (g_bMapSRVRecord[client])
 		{
 			SendNewRecordForward(client, g_szTimeDifference[client]);
-
-			SetNewRecordPrestrafe(client, 0, 0, false);
 			
 			if (GetConVarBool(g_hRecordAnnounce))
 				db_insertAnnouncement(szName, g_szMapName, 0, g_szFinalTime[client], 0);
@@ -2031,8 +1994,6 @@ stock void PrintChatBonus(int client, int zGroup, int rank = 0)
 			Format(szRecordDiff, 54, "-%s", szRecordDiff);
 			
 			SendNewRecordForward(client, szRecordDiff, zGroup);
-
-			SetNewRecordPrestrafe(client, zGroup, 0, true);
 		}
 		if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 		{
@@ -2073,8 +2034,6 @@ stock void PrintChatBonus(int client, int zGroup, int rank = 0)
 			Format(szRecordDiff, 54, "-%s", szRecordDiff);
 
 			SendNewRecordForward(client, szRecordDiff, zGroup);
-
-			SetNewRecordPrestrafe(client, zGroup, 0, true);
 		}
 		if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 		{
@@ -4226,11 +4185,6 @@ stock void StyleFinishedMsgs(int client, int style)
 			}
 		}
 
-		if (g_bStyleMapSRVRecord[style][client])
-		{
-			SetNewRecordPrestrafe(client, 0, style, false);
-		}
-
 		if (g_StyleMapRank[style][client] == 99999 && IsValidClient(client))
 			CPrintToChat(client, "%t", "Misc19", g_szChatPrefix);
 
@@ -4258,8 +4212,6 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 		RecordDiff = g_fStyleOldBonusRecordTime[style][zGroup] - g_fFinalTime[client];
 		FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
 		Format(szRecordDiff, 54, "-%s", szRecordDiff);
-
-		SetNewRecordPrestrafe(client, zGroup, style, true);
 	}
 	if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 	{
