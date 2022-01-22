@@ -2077,6 +2077,13 @@ public void sql_selectMapRecordCallback(Handle owner, Handle hndl, const char[] 
 		return;
 	}
 
+	for (int i=0; i < MAX_STYLES; i++)
+	{
+		g_iRecordPreStrafe[0][0][i] = 0;
+		g_iRecordPreStrafe[1][0][i] = 0;
+		g_iRecordPreStrafe[2][0][i] = 0;
+	}
+
 	int style;
 
 	if (SQL_HasResultSet(hndl))
@@ -2118,6 +2125,10 @@ public void sql_selectMapRecordCallback(Handle owner, Handle hndl, const char[] 
 					g_fRecordStyleMapTime[style] = 9999999.0;
 				}
 			}
+
+			g_iRecordPreStrafe[0][0][style] = SQL_FetchInt(hndl, 4);
+			g_iRecordPreStrafe[1][0][style] = SQL_FetchInt(hndl, 5);
+			g_iRecordPreStrafe[2][0][style] = SQL_FetchInt(hndl, 6);
 		}
 	}
 	else
@@ -2492,7 +2503,7 @@ public void sql_selectRecordCallback(Handle owner, Handle hndl, const char[] err
 		WritePackCell(pack, data);
 
 		// "INSERT INTO ck_playertimes (steamid, mapname, name, runtimepro, style) VALUES('%s', '%s', '%s', '%f', %i);";
-		Format(szQuery, 512, sql_insertPlayerTime, g_szSteamID[data], g_szMapName, szName, g_fFinalTime[data], 0);
+		Format(szQuery, 512, sql_insertPlayerTime, g_szSteamID[data], g_szMapName, szName, g_fFinalTime[data], 0, g_iPreStrafe[0][0][0][data], g_iPreStrafe[1][0][0][data], g_iPreStrafe[2][0][0][data]);
 		SQL_TQuery(g_hDb, SQL_UpdateRecordProCallback, szQuery, pack, DBPrio_Low);
 
 		g_bInsertNewTime = true;
@@ -2520,7 +2531,7 @@ public void db_updateRecordPro(int client)
 
 	char szQuery[1024];
 	// "UPDATE ck_playertimes SET name = '%s', runtimepro = '%f' WHERE steamid = '%s' AND mapname = '%s' AND style = %i;";
-	Format(szQuery, 1024, sql_updateRecordPro, szName, g_fFinalTime[client], g_szSteamID[client], g_szMapName, 0);
+	Format(szQuery, 1024, sql_updateRecordPro, szName, g_fFinalTime[client], g_iPreStrafe[0][0][0][client], g_iPreStrafe[1][0][0][client], g_iPreStrafe[2][0][0][client], g_szSteamID[client], g_szMapName, 0);
 	SQL_TQuery(g_hDb, SQL_UpdateRecordProCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -3744,10 +3755,17 @@ public void SQL_selectFastestBonusCallback(Handle owner, Handle hndl, const char
 		Format(g_szBonusFastestTime[i], 64, "N/A");
 		g_fBonusFastest[i] = 9999999.0;
 
-		for (int s = 1; s < MAX_STYLES; s++)
+		for (int s = 0; s < MAX_STYLES; s++)
 		{
+			if (s != 0)
+			{
 			Format(g_szStyleBonusFastestTime[s][i], 64, "N/A");
 			g_fStyleBonusFastest[s][i] = 9999999.0;
+			}
+
+			g_iRecordPreStrafeBonus[0][i][s] = 0;
+			g_iRecordPreStrafeBonus[1][i][s] = 0;
+			g_iRecordPreStrafeBonus[2][i][s] = 0;
 		}
 	}
 
@@ -3772,6 +3790,10 @@ public void SQL_selectFastestBonusCallback(Handle owner, Handle hndl, const char
 				g_fStyleBonusFastest[style][zonegroup] = SQL_FetchFloat(hndl, 1);
 				FormatTimeFloat(1, g_fStyleBonusFastest[style][zonegroup], 3, g_szStyleBonusFastestTime[style][zonegroup], 64);
 			}
+
+			g_iRecordPreStrafeBonus[0][zonegroup][style] = SQL_FetchInt(hndl, 4);
+			g_iRecordPreStrafeBonus[1][zonegroup][style] = SQL_FetchInt(hndl, 5);
+			g_iRecordPreStrafeBonus[2][zonegroup][style] = SQL_FetchInt(hndl, 6);
 		}
 	}
 
@@ -3850,7 +3872,7 @@ public void db_insertBonus(int client, char szSteamId[32], char szUName[128], fl
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackCell(pack, zoneGrp);
-	Format(szQuery, 1024, sql_insertBonus, szSteamId, szName, g_szMapName, FinalTime, zoneGrp);
+	Format(szQuery, 1024, sql_insertBonus, szSteamId, szName, g_szMapName, FinalTime, zoneGrp, g_iPreStrafeBonus[0][zoneGrp][0][client], g_iPreStrafeBonus[1][zoneGrp][0][client], g_iPreStrafeBonus[2][zoneGrp][0][client]);
 	SQL_TQuery(g_hDb, SQL_insertBonusCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -3880,7 +3902,7 @@ public void db_updateBonus(int client, char szSteamId[32], char szUName[128], fl
 	WritePackCell(datapack, client);
 	WritePackCell(datapack, zoneGrp);
 	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH * 2 + 1);
-	Format(szQuery, 1024, sql_updateBonus, FinalTime, szName, szSteamId, g_szMapName, zoneGrp);
+	Format(szQuery, 1024, sql_updateBonus, FinalTime, szName, g_iPreStrafeBonus[1][zoneGrp][0][client], g_iPreStrafeBonus[2][zoneGrp][0][client], szSteamId, g_szMapName, zoneGrp, g_iPreStrafeBonus[0][zoneGrp][0][client]);
 	SQL_TQuery(g_hDb, SQL_updateBonusCallback, szQuery, datapack, DBPrio_Low);
 }
 
@@ -6007,9 +6029,9 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 		WritePackCell(pack, data);
 
 		if (style == 0)
-			Format(szQuery, 512, "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage) VALUES ('%s', '%s', '%s', '%f', %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage);
+			Format(szQuery, 512, "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage, velStartXY, velStartXYZ, velStartZ) VALUES ('%s', '%s', '%s', '%f', %i, %i, %i, %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage, g_iPreStrafe[0][stage][0][data], g_iPreStrafe[1][stage][0][data], g_iPreStrafe[2][stage][0][data]);
 		else if (style != 0)
-			Format(szQuery, 512, "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage, style) VALUES ('%s', '%s', '%s', '%f', %i, %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage, style);
+			Format(szQuery, 512, "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage, style, velStartXY, velStartXYZ, velStartZ) VALUES ('%s', '%s', '%s', '%f', %i, %i, %i, %i, %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage, style, g_iPreStrafe[0][stage][style][data], g_iPreStrafe[1][stage][style][data], g_iPreStrafe[2][stage][style][data]);
 
 		SQL_TQuery(g_hDb, SQL_UpdateWrcpRecordCallback, szQuery, pack, DBPrio_Low);
 
@@ -6042,9 +6064,9 @@ public void db_updateWrcpRecord(int client, int style, int stage)
 	char szQuery[1024];
 	// "UPDATE ck_playertimes SET name = '%s', runtimepro = '%f' WHERE steamid = '%s' AND mapname = '%s';";
 	if (style == 0)
-		Format(szQuery, 1024, "UPDATE ck_wrcps SET name = '%s', runtimepro = '%f' WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = 0;", szName, g_fFinalWrcpTime[client], g_szSteamID[client], g_szMapName, stage);
+		Format(szQuery, 1024, "UPDATE ck_wrcps SET name = '%s', runtimepro = '%f', velStartXY = %i, velStartXYZ = %i, velStartZ = %i WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = 0;", szName, g_fFinalWrcpTime[client], g_iPreStrafe[0][stage][0][client], g_iPreStrafe[1][stage][0][client], g_iPreStrafe[2][stage][0][client], g_szSteamID[client], g_szMapName, stage);
 	if (style > 0)
-		Format(szQuery, 1024, "UPDATE ck_wrcps SET name = '%s', runtimepro = '%f' WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = %i;", szName, g_fFinalWrcpTime[client], g_szSteamID[client], g_szMapName, stage, style);
+		Format(szQuery, 1024, "UPDATE ck_wrcps SET name = '%s', runtimepro = '%f', velStartXY = %i, velStartXYZ = %i, velStartZ = %i WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = %i;", szName, g_fFinalWrcpTime[client], g_iPreStrafe[0][stage][style][client], g_iPreStrafe[1][stage][style][client], g_iPreStrafe[2][stage][style][client], g_szSteamID[client], g_szMapName, stage, style);
 	SQL_TQuery(g_hDb, SQL_UpdateWrcpRecordCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -6181,6 +6203,8 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 				// Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 				PlayWRCPRecord();
 				SendNewWRCPForward(client, stage, sz_srRawDiff);
+
+				SetNewRecordPrestrafe(client, stage, 0, false);
 			}
 			else
 			{
@@ -6205,6 +6229,8 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			// Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 			PlayWRCPRecord();
 			SendNewWRCPForward(client, stage, sz_srRawDiff);
+
+			SetNewRecordPrestrafe(client, stage, 0, false);
 		}
 	}
 	else if (style != 0) // styles
@@ -6226,6 +6252,8 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 				CPrintToChatAll("%t", "SQL19", g_szChatPrefix, szName, g_szStyleRecordPrint[style], stage, g_szFinalWrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
 				PlayWRCPRecord();
 				SendNewWRCPForward(client, stage, sz_srRawDiff);
+
+				SetNewRecordPrestrafe(client, stage, style, false);
 			}
 			else
 			{
@@ -6248,6 +6276,8 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			CPrintToChatAll("%t", "SQL22", g_szChatPrefix, szName, g_szStyleRecordPrint[style], stage, g_szFinalWrcpTime[client]);
 			PlayWRCPRecord();
 			SendNewWRCPForward(client, stage, sz_srRawDiff);
+
+			SetNewRecordPrestrafe(client, stage, style, false);
 		}
 	}
 
@@ -6643,7 +6673,7 @@ public int StageTopMenuHandler(Menu menu, MenuAction action, int client, int ite
 public void db_viewStageRecords()
 {
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT name, MIN(runtimepro), stage, style FROM ck_wrcps WHERE mapname = '%s' GROUP BY stage, style;", g_szMapName);
+	Format(szQuery, 512, "SELECT cp1.name, cp1.runtimepro, cp1.stage, cp1.style, cp1.velStartXY, cp1.velStartXYZ, cp1.velstartZ from ck_wrcps cp1 where cp1.mapname = '%s' and cp1.runtimepro = (select min(runtimepro) from ck_wrcps cp2 where cp2.mapname = cp1.mapname and cp1.stage = cp2.stage and cp2.style = cp1.style);", g_szMapName);
 	SQL_TQuery(g_hDb, sql_viewStageRecordsCallback, szQuery, 0, DBPrio_Low);
 }
 
@@ -6656,6 +6686,16 @@ public void sql_viewStageRecordsCallback(Handle owner, Handle hndl, const char[]
 		{
 			db_selectTotalBonusCount();
 			return;
+		}
+	}
+
+	for (int i = 1; i < CPLIMIT; i++)
+	{
+		for (int s = 0; s < MAX_STYLES; s++)
+		{
+			g_iRecordPreStrafe[0][i][s] = 0;
+			g_iRecordPreStrafe[1][i][s] = 0;
+			g_iRecordPreStrafe[2][i][s] = 0;
 		}
 	}
 
@@ -6701,6 +6741,9 @@ public void sql_viewStageRecordsCallback(Handle owner, Handle hndl, const char[]
 					g_fStyleStageRecord[style][stage] = 9999999.0;
 				}
 			}
+			g_iRecordPreStrafe[0][stage][style] = SQL_FetchInt(hndl, 4);
+			g_iRecordPreStrafe[1][stage][style] = SQL_FetchInt(hndl, 5);
+			g_iRecordPreStrafe[2][stage][style] = SQL_FetchInt(hndl, 6);
 		}
 	}
 	else
@@ -6856,7 +6899,7 @@ public void sql_selectStyleRecordCallback(Handle owner, Handle hndl, const char[
 
 	g_StyleMapTimesCount[style]++;
 
-	Format(szQuery, 512, "INSERT INTO ck_playertimes (steamid, mapname, name, runtimepro, style) VALUES ('%s', '%s', '%s', '%f', %i)", g_szSteamID[data], g_szMapName, szName, g_fFinalTime[data], style);
+	Format(szQuery, 512, "INSERT INTO ck_playertimes (steamid, mapname, name, runtimepro, style, velStartXY, velStartXYZ, velStartZ) VALUES ('%s', '%s', '%s', '%f', %i, %i, %i, %i)", g_szSteamID[data], g_szMapName, szName, g_fFinalTime[data], style, g_iPreStrafe[0][0][style], g_iPreStrafe[1][0][style], g_iPreStrafe[2][0][style]);
 	SQL_TQuery(g_hDb, SQL_UpdateStyleRecordCallback, szQuery, pack, DBPrio_Low);
 }
 }
@@ -6883,7 +6926,7 @@ public void db_updateStyleRecord(int client, int style)
 
 	char szQuery[1024];
 	// "UPDATE ck_playertimes SET name = '%s', runtimepro = '%f' WHERE steamid = '%s' AND mapname = '%s';";
-	Format(szQuery, 1024, "UPDATE `ck_playertimes` SET `name` = '%s', runtimepro = '%f' WHERE `steamid` = '%s' AND `mapname` = '%s' AND `style` = %i;", szName, g_fFinalTime[client], g_szSteamID[client], g_szMapName, style);
+	Format(szQuery, 1024, "UPDATE `ck_playertimes` SET `name` = '%s', runtimepro = '%f', `velStartXY` = %i, `velStartXYZ` = %i, `velStartZ` = %i WHERE `steamid` = '%s' AND `mapname` = '%s' AND `style` = %i;", szName, g_fFinalTime[client], g_iPreStrafe[0][0][style], g_iPreStrafe[1][0][style], g_iPreStrafe[2][0][style], g_szSteamID[client], g_szMapName, style);
 	SQL_TQuery(g_hDb, SQL_UpdateStyleRecordCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -7053,7 +7096,7 @@ public void db_insertBonusStyle(int client, char szSteamId[32], char szUName[128
 	WritePackCell(pack, client);
 	WritePackCell(pack, zoneGrp);
 	WritePackCell(pack, style);
-	Format(szQuery, 1024, "INSERT INTO ck_bonus (steamid, name, mapname, runtime, zonegroup, style) VALUES ('%s', '%s', '%s', '%f', '%i', '%i')", szSteamId, szName, g_szMapName, FinalTime, zoneGrp, style);
+	Format(szQuery, 1024, "INSERT INTO ck_bonus (steamid, name, mapname, runtime, zonegroup, style, velStartXY, velStartXYZ, velStartZ) VALUES ('%s', '%s', '%s', '%f', '%i', '%i', '%i', '%i', '%i')", szSteamId, szName, g_szMapName, FinalTime, zoneGrp, style, g_iPreStrafeBonus[0][zoneGrp][style][client], g_iPreStrafeBonus[1][zoneGrp][style][client], g_iPreStrafeBonus[2][zoneGrp][style][client]);
 	SQL_TQuery(g_hDb, SQL_insertBonusStyleCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -7136,7 +7179,7 @@ public void db_updateBonusStyle(int client, char szSteamId[32], char szUName[128
 	WritePackCell(datapack, zoneGrp);
 	WritePackCell(datapack, style);
 	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH * 2 + 1);
-	Format(szQuery, 1024, "UPDATE ck_bonus SET runtime = '%f', name = '%s' WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = %i AND style = %i", FinalTime, szName, szSteamId, g_szMapName, zoneGrp, style);
+	Format(szQuery, 1024, "UPDATE ck_bonus SET runtime = '%f', name = '%s', velStartXY = %i, velStartXYZ = %i, velStartZ = %i WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = %i AND style = %i;", FinalTime, szName, g_iPreStrafeBonus[0][zoneGrp][style][client], g_iPreStrafeBonus[1][zoneGrp][style][client], g_iPreStrafeBonus[2][zoneGrp][style][client], szSteamId, g_szMapName, zoneGrp, style);
 	SQL_TQuery(g_hDb, SQL_updateBonusStyleCallback, szQuery, datapack, DBPrio_Low);
 }
 
