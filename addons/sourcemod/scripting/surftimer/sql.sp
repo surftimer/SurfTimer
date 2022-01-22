@@ -6204,9 +6204,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 				PlayWRCPRecord();
 				SendNewWRCPForward(client, stage, sz_srRawDiff);
 
-				g_iRecordPreStrafe[0][stage][0] = g_iPreStrafe[0][stage][0][client];
-				g_iRecordPreStrafe[1][stage][0] = g_iPreStrafe[1][stage][0][client];
-				g_iRecordPreStrafe[2][stage][0] = g_iPreStrafe[2][stage][0][client];
+				SetNewRecordPrestrafe(client, stage, 0, false);
 			}
 			else
 			{
@@ -6232,9 +6230,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			PlayWRCPRecord();
 			SendNewWRCPForward(client, stage, sz_srRawDiff);
 
-			g_iRecordPreStrafe[0][stage][0] = g_iPreStrafe[0][stage][0][client];
-			g_iRecordPreStrafe[1][stage][0] = g_iPreStrafe[1][stage][0][client];
-			g_iRecordPreStrafe[2][stage][0] = g_iPreStrafe[2][stage][0][client];
+			SetNewRecordPrestrafe(client, stage, 0, false);
 		}
 	}
 	else if (style != 0) // styles
@@ -6257,9 +6253,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 				PlayWRCPRecord();
 				SendNewWRCPForward(client, stage, sz_srRawDiff);
 
-				g_iRecordPreStrafe[0][stage][style] = g_iPreStrafe[0][stage][style][client];
-				g_iRecordPreStrafe[1][stage][style] = g_iPreStrafe[1][stage][style][client];
-				g_iRecordPreStrafe[2][stage][style] = g_iPreStrafe[2][stage][style][client];
+				SetNewRecordPrestrafe(client, stage, style, false);
 			}
 			else
 			{
@@ -6283,9 +6277,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			PlayWRCPRecord();
 			SendNewWRCPForward(client, stage, sz_srRawDiff);
 
-			g_iRecordPreStrafe[0][stage][style] = g_iPreStrafe[0][stage][style][client];
-			g_iRecordPreStrafe[1][stage][style] = g_iPreStrafe[1][stage][style][client];
-			g_iRecordPreStrafe[2][stage][style] = g_iPreStrafe[2][stage][style][client];
+			SetNewRecordPrestrafe(client, stage, style, false);
 		}
 	}
 
