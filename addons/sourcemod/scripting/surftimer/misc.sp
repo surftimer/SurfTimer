@@ -676,9 +676,10 @@ public void readHints()
 	{
 		while (!IsEndOfFile(fileHandle) && ReadFileLine(fileHandle, line, sizeof(line)))
 		{
+			TrimString(line);
 			if (strlen(line) > MAX_HINT_MESSAGES_SIZE)
 				LogError("[surftimer] '%s' is too big. Maximum size of a hint is %i", line, MAX_HINT_MESSAGES_SIZE);
-			else if (StrContains(line, "//", false) == 0 || IsNullString(line) || StrEqual(line, "", false))
+			else if (StrContains(line, "//", false) == 0 || IsNullString(line) || strlen(line) == 0)
 				continue;
 			else
 				g_aHints.PushString(line);

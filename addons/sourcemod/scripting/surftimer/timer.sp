@@ -476,6 +476,7 @@ public Action ShowHintsTimer(Handle timer)
 			g_iHintNumber = 0;
 	}
 
+	// Format and print hint
 	Format(szMessage, sizeof(szMessage), "%s %s", g_szChatPrefix, szHint);
 	for (int i = 0; i <= MaxClients; i++)
 	{

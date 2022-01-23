@@ -1640,15 +1640,15 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Prestrafe messages are now {red}disabled"
 	}
-	"TipsToggleOn"
+	"HintsToggleOn"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Tips are now {green}enabled"
+		"en"		"{1} Hints are now {green}enabled"
 	}
-	"TipsToggleOff"
+	"HintsToggleOff"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Tips are now {red}disabled"
+		"en"		"{1} Hints are now {red}disabled"
 	}
 	"StageNotRecorded"
 	{

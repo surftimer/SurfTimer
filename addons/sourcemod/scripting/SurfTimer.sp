@@ -1764,14 +1764,6 @@ public void OnMapStart()
 	// main.cfg & replays
 	CreateTimer(1.0, DelayedStuff, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 	CreateTimer(GetConVarFloat(g_replayBotDelay), LoadReplaysTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE); // replay bots
-	
-	// Timer for hints
-	if (GetConVarFloat(g_iHintsInterval) != 0.0 && g_aHints.Length != 0)
-	{
-		CreateTimer(GetConVarFloat(g_iHintsInterval), ShowHintsTimer, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
-		float abctmp = GetConVarFloat(g_iHintsInterval);
-		LogMessage("Amount of messages : %i, interval %f", g_aHints.Length, abctmp);
-	}
 
 	int iEnt;
 
@@ -1921,8 +1913,12 @@ public void OnConfigsExecuted()
 	else
 		readMultiServerMapcycle();
 
-	if (GetConVarFloat(g_iHintsInterval) != 0)
+	if (GetConVarFloat(g_iHintsInterval) != 0.0)
+	{
 		readHints();
+		if (g_aHints.Length != 0)
+			CreateTimer(GetConVarFloat(g_iHintsInterval), ShowHintsTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+	}
 
 	if (GetConVarBool(g_hEnforceDefaultTitles))
 		ReadDefaultTitlesWhitelist();
