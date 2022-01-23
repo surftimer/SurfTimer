@@ -1734,7 +1734,7 @@ public void OnMapStart()
 	ServerCommand("sv_pure 0");
 
 	// reload language files
-	LoadTranslations("surftimertmp.phrases");
+	LoadTranslations("surftimer.phrases");
 
 	CheatFlag("bot_zombie", false, true);
 	g_bTierFound = false;
@@ -2691,7 +2691,7 @@ public void OnPluginStart()
 	g_bServerDataLoaded = false;
 
 	// Language File
-	LoadTranslations("surftimertmp.phrases");
+	LoadTranslations("surftimer.phrases");
 
 	CreateConVars();
 	CreateCommands();
