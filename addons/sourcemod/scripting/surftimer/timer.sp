@@ -451,30 +451,35 @@ public Action HelpMsgTimer(Handle timer, any client)
 	return Plugin_Handled;
 }
 
+// Shows in game hint to the user
 public Action ShowHintsTimer(Handle timer)
 {
-	if (g_Hints.Length == 0)
-		return Plugin_Stop;
-
 	char szHint[MAX_HINT_MESSAGES_SIZE];
 	char szMessage[512];
+
+	// Random order
 	if (GetConVarBool(g_bHintsRandomOrder))
 	{
 		int iNumber;
-		iNumber = GetRandomInt(0, g_Hints.Length);
+		iNumber = GetRandomInt(0, g_aHints.Length - 1);
 
-		g_Hints.GetString(iNumber, szHint, sizeof(szHint));
+		g_aHints.GetString(iNumber, szHint, sizeof(szHint));
 	}
+	// Fixed order
 	else
 	{
-		g_Hints.GetString(g_iHintNumber, szHint, sizeof(szHint));
+		g_aHints.GetString(g_iHintNumber, szHint, sizeof(szHint));
 		g_iHintNumber++;
+
+		// Go back to the first hint if last hint was used
+		if (g_iHintNumber == g_aHints.Length - 1)
+			g_iHintNumber = 0;
 	}
 
 	Format(szMessage, sizeof(szMessage), "%s %s", g_szChatPrefix, szHint);
 	for (int i = 0; i <= MaxClients; i++)
 	{
-		if (g_bAllowHints[i])
+		if (IsValidClient(i) && !IsFakeClient(i) && g_bAllowHints[i])
 			CPrintToChat(i, szMessage);
 	}
 

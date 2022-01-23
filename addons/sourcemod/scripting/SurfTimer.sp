@@ -1012,7 +1012,7 @@ int g_iCurrentlyPlayingStage;
 /*----------  Misc  ----------*/
 
 // Used to load all the hints
-ArrayList g_Hints;
+ArrayList g_aHints;
 
 // Hint number
 int g_iHintNumber = 0;
@@ -1764,10 +1764,14 @@ public void OnMapStart()
 	// main.cfg & replays
 	CreateTimer(1.0, DelayedStuff, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 	CreateTimer(GetConVarFloat(g_replayBotDelay), LoadReplaysTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE); // replay bots
-
+	
 	// Timer for hints
-	if (GetConVarFloat(g_iHintsInterval) != 0)
+	if (GetConVarFloat(g_iHintsInterval) != 0.0 && g_aHints.Length != 0)
+	{
 		CreateTimer(GetConVarFloat(g_iHintsInterval), ShowHintsTimer, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+		float abctmp = GetConVarFloat(g_iHintsInterval);
+		LogMessage("Amount of messages : %i, interval %f", g_aHints.Length, abctmp);
+	}
 
 	int iEnt;
 
@@ -1942,7 +1946,6 @@ public void OnConfigsExecuted()
 	ServerCommand("mp_endmatch_votenextmap 0;mp_do_warmup_period 0;mp_warmuptime 0;mp_match_can_clinch 0;mp_match_end_changelevel 1;mp_match_restart_delay 10;mp_endmatch_votenextleveltime 10;mp_endmatch_votenextmap 0;mp_halftime 0;bot_zombie 1;mp_do_warmup_period 0;mp_maxrounds 1");
 	ServerCommand("sv_infinite_ammo 2");
 	ServerCommand("sv_autobunnyhopping 1");
-
 }
 
 public void OnClientConnected(int client)
@@ -2711,7 +2714,7 @@ public void OnPluginStart()
 		OnAdminMenuReady(tpMenu);
 
 	// Tips array
-	g_Hints = new ArrayList(MAX_HINT_SIZE);
+	g_aHints = new ArrayList(MAX_HINT_SIZE);
 
 	// mapcycle array
 	int arraySize = ByteCountToCells(PLATFORM_MAX_PATH);
