@@ -2256,10 +2256,7 @@ void TeleSide(int client, bool menu = false)
 
 void PrespeedText(int client, bool menu = false)
 {
-	if (g_iPrespeedText[client])
-		g_iPrespeedText[client] = false;
-	else
-		g_iPrespeedText[client] = true;
+	g_iPrespeedText[client] = !g_iPrespeedText[client];
 	
 	if (menu)
 		MiscellaneousOptions(client);
@@ -2267,10 +2264,7 @@ void PrespeedText(int client, bool menu = false)
 
 void HintsText(int client, bool menu = false)
 {
-	if (g_bAllowHints[client])
-		g_bAllowHints[client] = false;
-	else
-		g_bAllowHints[client] = true;
+	g_bAllowHints[client] = !g_bAllowHints[client];
 	
 	if (menu)
 		MiscellaneousOptions(client);
