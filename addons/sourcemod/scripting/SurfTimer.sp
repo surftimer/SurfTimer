@@ -1014,8 +1014,8 @@ int g_iCurrentlyPlayingStage;
 // Used to load all the hints
 ArrayList g_aHints;
 
-// Hint number
-int g_iHintNumber = 0;
+// Last hint number
+int g_iLastHintNumber = 0;
 
 // Allow hints
 bool g_bAllowHints[MAXPLAYERS + 1];

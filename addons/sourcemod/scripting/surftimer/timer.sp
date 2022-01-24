@@ -457,23 +457,27 @@ public Action ShowHintsTimer(Handle timer)
 	char szHint[MAX_HINT_MESSAGES_SIZE];
 	char szMessage[512];
 
+	if (g_aHints.Length == 1)
+		g_aHints.GetString(0, szHint, sizeof(szHint));
 	// Random order
-	if (GetConVarBool(g_bHintsRandomOrder))
+	else if (GetConVarBool(g_bHintsRandomOrder))
 	{
 		int iNumber;
-		iNumber = GetRandomInt(0, g_aHints.Length - 1);
+		// Avoid showing the same hint twice
+		while (iNumber != g_iLastHintNumber)
+			iNumber = GetRandomInt(0, g_aHints.Length);
 
 		g_aHints.GetString(iNumber, szHint, sizeof(szHint));
 	}
 	// Fixed order
 	else
 	{
-		g_aHints.GetString(g_iHintNumber, szHint, sizeof(szHint));
-		g_iHintNumber++;
+		g_iLastHintNumber++;
+		g_aHints.GetString(g_iLastHintNumber, szHint, sizeof(szHint));
 
 		// Go back to the first hint if last hint was used
-		if (g_iHintNumber == g_aHints.Length - 1)
-			g_iHintNumber = 0;
+		if (g_iLastHintNumber == g_aHints.Length - 1)
+			g_iLastHintNumber = 0;
 	}
 
 	// Format and print hint

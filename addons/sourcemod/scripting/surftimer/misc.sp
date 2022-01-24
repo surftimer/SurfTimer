@@ -666,8 +666,10 @@ public int getZoneID(int zoneGrp, int stage)
 
 public void readHints()
 {
+	g_aHints.Clear();
+
 	char sPath[PLATFORM_MAX_PATH];
-	char line[128];
+	char line[MAX_HINT_MESSAGES_SIZE];
 
 	BuildPath(Path_SM, sPath, sizeof(sPath), "%s", HINTS_PATH);
 	Handle fileHandle = OpenFile(sPath, "r");
