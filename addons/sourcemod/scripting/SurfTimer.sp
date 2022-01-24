@@ -2709,7 +2709,7 @@ public void OnPluginStart()
 	if (LibraryExists("adminmenu") && ((tpMenu = GetAdminTopMenu()) != null))
 		OnAdminMenuReady(tpMenu);
 
-	// Tips array
+	// Hints array
 	g_aHints = new ArrayList(MAX_HINT_SIZE);
 
 	// mapcycle array
