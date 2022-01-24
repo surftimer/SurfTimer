@@ -3902,7 +3902,7 @@ public void db_updateBonus(int client, char szSteamId[32], char szUName[128], fl
 	WritePackCell(datapack, client);
 	WritePackCell(datapack, zoneGrp);
 	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH * 2 + 1);
-	Format(szQuery, 1024, sql_updateBonus, FinalTime, szName, g_iPreStrafeBonus[1][zoneGrp][0][client], g_iPreStrafeBonus[2][zoneGrp][0][client], szSteamId, g_szMapName, zoneGrp, g_iPreStrafeBonus[0][zoneGrp][0][client]);
+	Format(szQuery, 1024, sql_updateBonus,FinalTime, szName, g_iPreStrafeBonus[0][zoneGrp][0][client], g_iPreStrafeBonus[1][zoneGrp][0][client], g_iPreStrafeBonus[2][zoneGrp][0][client], szSteamId, g_szMapName, zoneGrp);
 	SQL_TQuery(g_hDb, SQL_updateBonusCallback, szQuery, datapack, DBPrio_Low);
 }
 
