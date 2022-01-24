@@ -50,16 +50,6 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Weapon viewmodel enabled"
 	}
-	"AdvertBonus"
-	{
-		"#format"	"{1:s}"
-		"en"		"{1} Type {lightgreen}!bonus {default}to teleport to the bonus stage"
-	}
-	"AdvertWRCP"
-	{
-		"#format"	"{1:s}"
-		"en"		"{1} Type {lightgreen}!srcp {default}to see your stage times"
-	}
 	"AvgTime"
 	{
 		"#format"	"{1:s},{2:s},{3:i}"
