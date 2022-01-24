@@ -1015,7 +1015,7 @@ int g_iCurrentlyPlayingStage;
 ArrayList g_aHints;
 
 // Last hint number
-int g_iLastHintNumber = 0;
+int g_iLastHintNumber = -1;
 
 // Allow hints
 bool g_bAllowHints[MAXPLAYERS + 1];

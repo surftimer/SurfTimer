@@ -464,9 +464,10 @@ public Action ShowHintsTimer(Handle timer)
 	{
 		int iNumber;
 		// Avoid showing the same hint twice
-		while (iNumber != g_iLastHintNumber)
+		while (iNumber != g_iLastHintNumber - 1)
 			iNumber = GetRandomInt(0, g_aHints.Length);
 
+		g_iLastHintNumber = iNumber;
 		g_aHints.GetString(iNumber, szHint, sizeof(szHint));
 	}
 	// Fixed order
