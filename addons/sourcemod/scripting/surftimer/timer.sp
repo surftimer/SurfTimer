@@ -464,8 +464,8 @@ public Action ShowHintsTimer(Handle timer)
 	{
 		int iNumber;
 		// Avoid showing the same hint twice
-		while (iNumber != g_iLastHintNumber - 1)
-			iNumber = GetRandomInt(0, g_aHints.Length);
+		while (iNumber == g_iLastHintNumber)
+			iNumber = GetRandomInt(0, g_aHints.Length - 1);
 
 		g_iLastHintNumber = iNumber;
 		g_aHints.GetString(iNumber, szHint, sizeof(szHint));
@@ -476,9 +476,9 @@ public Action ShowHintsTimer(Handle timer)
 		g_iLastHintNumber++;
 		g_aHints.GetString(g_iLastHintNumber, szHint, sizeof(szHint));
 
-		// Go back to the first hint if last hint was used
+		// Go back to the first hint if the last hint was used
 		if (g_iLastHintNumber == g_aHints.Length - 1)
-			g_iLastHintNumber = 0;
+			g_iLastHintNumber = -1;
 	}
 
 	// Format and print hint

@@ -8,7 +8,7 @@ Type {lightgreen}!bonus {default}to teleport to the bonus stage
 Type {lightgreen}!stages {default}to teleport to a stage
 Type {lightgreen}!reset {default}or {lightgreen}!r {default}to go back to the beginning of the map
 Type {lightgreen}!rs {default}to go back to the beginning of your stage
-Type {lightgreen}!maptop {default}to see the map times
+Type {lightgreen}!maptop {default}to see the top map times
 Type {lightgreen}!replay {default}to see a replay of the fastest map run
 Type {lightgreen}!flashlight {default}if the map is too dark
 Type {lightgreen}!howto {default}to see a tutorial on how to surf
