@@ -398,7 +398,6 @@ float g_fZoneCorners[MAXZONES][8][3];
 /*----------  AntiJump & AntiDuck Variables  ----------*/
 bool g_bInDuck[MAXPLAYERS + 1] = {false, ...};
 bool g_bInJump[MAXPLAYERS + 1] = {false, ...};
-bool g_bInPushTrigger[MAXPLAYERS + 1] = {false, ...};
 bool g_bJumpZoneTimer[MAXPLAYERS + 1] = {false, ...};
 bool g_bInStartZone[MAXPLAYERS + 1] = {false, ...};
 bool g_bInStageZone[MAXPLAYERS + 1];
@@ -683,20 +682,6 @@ char g_szZoneDefaultNames[ZONEAMOUNT][128] = { "Stop", "Start", "End", "Stage", 
 // Zone sprites
 int g_BeamSprite;
 int g_HaloSprite;
-
-/*----------  PushFix by Mev, George & Blacky  ----------*/
-// https://forums.alliedmods.net/showthread.php?t=267131
-ConVar g_hTriggerPushFixEnable;
-bool g_bPushing[MAXPLAYERS + 1];
-
-/*----------  Slope Boost Fix by Mev & Blacky  ----------*/
-// https://forums.alliedmods.net/showthread.php?t=266888
-float g_vCurrent[MAXPLAYERS + 1][3];
-float g_vLast[MAXPLAYERS + 1][3];
-bool g_bOnGround[MAXPLAYERS + 1];
-bool g_bLastOnGround[MAXPLAYERS + 1];
-bool g_bFixingRamp[MAXPLAYERS + 1];
-ConVar g_hSlopeFixEnable;
 
 /*----------  Forwards  ----------*/
 GlobalForward g_MapFinishForward;
@@ -1766,15 +1751,6 @@ public void OnMapStart()
 	CreateTimer(GetConVarFloat(g_replayBotDelay), LoadReplaysTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE); // replay bots
 
 	int iEnt;
-
-	// PushFix by Mev, George, & Blacky
-	// https://forums.alliedmods.net/showthread.php?t=267131
-	iEnt = -1;
-	while ((iEnt = FindEntityByClassname(iEnt, "trigger_push")) != -1)
-	{
-		SDKHook(iEnt, SDKHook_Touch, OnTouchPushTrigger);
-		SDKHook(iEnt, SDKHook_EndTouch, OnEndTouchPushTrigger);
-	}
 
 	// Trigger Gravity Fix
 	iEnt = -1;
