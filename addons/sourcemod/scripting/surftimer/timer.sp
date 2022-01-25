@@ -451,31 +451,44 @@ public Action HelpMsgTimer(Handle timer, any client)
 	return Plugin_Handled;
 }
 
-public Action AdvertTimer(Handle timer)
+// Shows in game hint to the user
+public Action ShowHintsTimer(Handle timer)
 {
-	g_Advert++;
-	if ((g_Advert % 2) == 0)
+	char szHint[MAX_HINT_MESSAGES_SIZE];
+	char szMessage[512];
+
+	if (g_aHints.Length == 1)
+		g_aHints.GetString(0, szHint, sizeof(szHint));
+	// Random order
+	else if (GetConVarBool(g_bHintsRandomOrder))
 	{
-		if (g_bhasBonus)
-		{
-			CPrintToChatAll("%t", "AdvertBonus", g_szChatPrefix);
-		}
-		else if (g_bhasStages)
-		{
-			CPrintToChatAll("%t", "AdvertWRCP", g_szChatPrefix);
-		}
+		int iNumber;
+		// Avoid showing the same hint twice
+		while (iNumber == g_iLastHintNumber)
+			iNumber = GetRandomInt(0, g_aHints.Length - 1);
+
+		g_iLastHintNumber = iNumber;
+		g_aHints.GetString(iNumber, szHint, sizeof(szHint));
 	}
+	// Fixed order
 	else
 	{
-		if (g_bhasStages)
-		{
-			CPrintToChatAll("%t", "AdvertWRCP", g_szChatPrefix);
-		}
-		else if (g_bhasBonus)
-		{
-			CPrintToChatAll("%t", "AdvertBonus", g_szChatPrefix);
-		}
+		g_iLastHintNumber++;
+		g_aHints.GetString(g_iLastHintNumber, szHint, sizeof(szHint));
+
+		// Go back to the first hint if the last hint was used
+		if (g_iLastHintNumber == g_aHints.Length - 1)
+			g_iLastHintNumber = -1;
 	}
+
+	// Format and print hint
+	Format(szMessage, sizeof(szMessage), "%s %s", g_szChatPrefix, szHint);
+	for (int i = 0; i <= MaxClients; i++)
+	{
+		if (IsValidClient(i) && !IsFakeClient(i) && g_bAllowHints[i])
+			CPrintToChat(i, szMessage);
+	}
+
 	return Plugin_Continue;
 }
 

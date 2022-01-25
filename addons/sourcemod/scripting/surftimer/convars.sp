@@ -109,7 +109,9 @@ ConVar g_hLimitSpeedType = null;
 ConVar g_drDeleteSecurity = null;
 ConVar g_iAdminCountryTags = null;
 ConVar g_replayBotDelay = null;
-ConVar g_hAllowCheckpointRecreation = null;								// Allows players to recreate checkpoints along with where to display info.
+ConVar g_hAllowCheckpointRecreation = null;						// Allows players to recreate checkpoints along with where to display info
+ConVar g_iHintsInterval = null;									// Time between two hints. 0 = off
+ConVar g_bHintsRandomOrder = null;								// If hints are in random order
 
 void CreateConVars()
 {
@@ -149,8 +151,6 @@ void CreateConVars()
 	g_henableChatProcessing = AutoExecConfig_CreateConVar("ck_chat_enable", "1", "(1 / 0) Enable or disable SurfTimers chat processing.", FCVAR_NOTIFY);
 	g_hMultiServerMapcycle = AutoExecConfig_CreateConVar("ck_multi_server_mapcycle", "0", "0 = Use mapcycle.txt to load servers maps, 1 = use configs/surftimer/multi_server_mapcycle.txt to load maps", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hDBMapcycle = AutoExecConfig_CreateConVar("ck_db_mapcycle", "1", "0 = use non-db map cycles, 1 use maps from ck_maptier", FCVAR_NOTIFY, true, 0.0, true, 1.0);
-	g_hTriggerPushFixEnable = AutoExecConfig_CreateConVar("ck_triggerpushfix_enable", "1", "Enables trigger push fix.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
-	g_hSlopeFixEnable = AutoExecConfig_CreateConVar("ck_slopefix_enable", "1", "Enables slope fix.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hDoubleRestartCommand = AutoExecConfig_CreateConVar("ck_double_restart_command", "1", "(1 / 0) Requires 2 successive !r commands to restart the player to prevent accidental usage.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hBackupReplays = AutoExecConfig_CreateConVar("ck_replay_backup", "1", "(1 / 0) Back up replay files, when they are being replaced", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hReplaceReplayTime = 	AutoExecConfig_CreateConVar("ck_replay_replace_faster", "1", "(1 / 0) Replace record bots if a players time is faster than the bot, even if the time is not a server record.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
@@ -158,6 +158,8 @@ void CreateConVars()
 	g_drDeleteSecurity = AutoExecConfig_CreateConVar("ck_dr_delete_security", "1", "(1 / 0) Enable/Disable delete security for !dr command", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_iAdminCountryTags = AutoExecConfig_CreateConVar("ck_admin_country_tags", "0", "(1 / 0) Enable/Disable country tags for admins", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_replayBotDelay = AutoExecConfig_CreateConVar("ck_replay_bot_delay", "10", "Delay in seconds after initial mapstart after the bots join the server", FCVAR_NOTIFY, true, 10.0);
+	g_iHintsInterval = AutoExecConfig_CreateConVar("ck_hints_interval", "240", "Seconds between two hints. Leave empty or set to 0 to disable", FCVAR_NOTIFY, true, 1.0);
+	g_bHintsRandomOrder = AutoExecConfig_CreateConVar("ck_hints_random_order", "1", "(1 / 0) Enable/Disable hints shown in a random order", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 
 	g_hPointSystem = AutoExecConfig_CreateConVar("ck_point_system", "1", "on/off - Player point system", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	HookConVarChange(g_hPointSystem, OnSettingChanged);

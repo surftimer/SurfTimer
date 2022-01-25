@@ -1,0 +1,16 @@
+// Write down all the hints you want to show in game here
+// Maximum size of a hint is 265 characters
+//
+// Each hint is automatically preceded by your chat prefix
+// Each line is a new hint
+
+Type {lightgreen}!bonus {default}to teleport to the bonus stage
+Type {lightgreen}!stages {default}to teleport to a stage
+Type {lightgreen}!reset {default}or {lightgreen}!r {default}to go back to the beginning of the map
+Type {lightgreen}!rs {default}to go back to the beginning of your stage
+Type {lightgreen}!maptop {default}to see the top map times
+Type {lightgreen}!replay {default}to see a replay of the fastest map run
+Type {lightgreen}!flashlight {default}if the map is too dark
+Type {lightgreen}!howto {default}to see a tutorial on how to surf
+Type {lightgreen}!nc {default}to toggle noclip on and off
+Tired of seeing these hints? Type {lightgreen}!togglehints {default}to toggle them on or off
