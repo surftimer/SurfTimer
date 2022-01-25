@@ -674,15 +674,6 @@ public Action Event_OnRoundStart(Handle event, const char[] name, bool dontBroad
 	
 	db_viewMapSettings();
 
-	// PushFix by Mev, George, & Blacky
-	// https://forums.alliedmods.net/showthread.php?t=267131
-	iEnt = -1;
-	while ((iEnt = FindEntityByClassname(iEnt, "trigger_push")) != -1)
-	{
-		SDKHook(iEnt, SDKHook_Touch, OnTouchPushTrigger);
-		SDKHook(iEnt, SDKHook_EndTouch, OnEndTouchPushTrigger);
-	}
-
 	// fluffys gravity
 	iEnt = -1;
 	while ((iEnt = FindEntityByClassname(iEnt, "trigger_gravity")) != -1)
@@ -777,50 +768,6 @@ public Action OnEndTouchAllTriggers(int entity, int other)
 	return Plugin_Continue;
 }
 
-// PushFix by Mev, George, & Blacky
-// https://forums.alliedmods.net/showthread.php?t=267131
-public Action OnTouchPushTrigger(int entity, int other)
-{
-	if (IsValidClient(other) && GetConVarBool(g_hTriggerPushFixEnable) == true)
-	{
-		if (IsFakeClient(other))
-			return Plugin_Handled;
-
-		// fluffys
-		g_bInPushTrigger[other] = true;
-
-		if (IsValidEntity(entity))
-		{
-			float m_vecPushDir[3];
-			GetEntPropVector(entity, Prop_Data, "m_vecPushDir", m_vecPushDir);
-			if (m_vecPushDir[2] == 0.0)
-				return Plugin_Continue;
-			else
-				DoPush(entity, other, m_vecPushDir);
-		}
-		return Plugin_Handled;
-	}
-
-	return Plugin_Continue;
-}
-
-public Action OnEndTouchPushTrigger(int entity, int other)
-{
-	if (IsValidClient(other) && GetConVarBool(g_hTriggerPushFixEnable) == true)
-	{
-		if (IsFakeClient(other))
-			return Plugin_Handled;
-
-		if (IsValidEntity(entity))
-		{
-			g_bInPushTrigger[other] = false;
-		}
-		return Plugin_Handled;
-	}
-
-	return Plugin_Continue;
-}
-
 public Action OnEndTouchGravityTrigger(int entity, int other)
 {
 	if (IsValidClient(other) && !IsFakeClient(other))
@@ -882,15 +829,9 @@ public Action OnLogAction(Handle source, Identity ident, int client, int target,
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
-
 	if (buttons & IN_DUCK && g_bInDuck[client] == true)
 	{
 		CPrintToChat(client, "%t", "Hooks11", g_szChatPrefix);
-	}
-	else if (buttons & IN_DUCK && g_bInPushTrigger[client] == true)
-	{
-		buttons &= ~IN_DUCK;
-		g_bInPushTrigger[client] = false;
 	}
 	else if (g_bInMaxSpeed[client])
 	{
@@ -1279,12 +1220,6 @@ public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 {
 	if (!IsValidClient(client))
 		return MRES_Ignored;
-
-	if (g_bPushing[client])
-	{
-		g_bPushing[client] = false;
-		return MRES_Ignored;
-	}
 
 	if (g_bFixingRamp[client])
 	{
