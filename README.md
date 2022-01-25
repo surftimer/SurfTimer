@@ -28,35 +28,41 @@ Yes, but not any more than other projects currently and for past years.
 	- That means you won't delete any pre-entered questions!
 - Give clear and as precise information as you can
 	- If applicable include related logs / configs (posted to [pastebin](https://pastebin.com/))
-- Don't edit issues 
+- Don't edit issues
 	- Always write a new comment below!
 
 ## Installation and Requirements
-* [SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable)
+
 * [Metamod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable)
-* [SourceMod-Discord API](https://github.com/Deathknife/sourcemod-discord)
+* [SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable) (only the latest stable version is supported)
 * A MySQL Database (MySQL 5.7, MySQL 8+, MariaDB supported)
+* *(recommended)* [Stripper:Source](http://www.bailopan.net/stripper/) - Allows adding/modifying/removing entities from a map before it loads (config files included)
 
-<sup>(We only support the latest stable version of Sourcemod.)</sup>
-
-**Extensions:**
-* [DHooks](https://github.com/peace-maker/DHooks2/releases/latest)
+**SourceMod Extensions**
+* [DHooks](https://github.com/peace-maker/DHooks2)
 * [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604)
 * [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
+* *(recommended)* [Cleaner](https://github.com/Accelerator74/Cleaner) - Suppresses server console warnings
 
-**Compilation Requirements (Includes):**
-* [SourceMod Includes](https://www.sourcemod.net/downloads.php?branch=stable)
+**SourceMod Libraries**
 * [SMLib](https://github.com/bcserv/smlib/tree/transitional_syntax)
-* [ColorLib](https://github.com/c0rp3n/colorlib-sm/blob/master/addons/sourcemod/scripting/include/colorlib.inc)
-* [AutoExecConfig](https://github.com/Impact123/AutoExecConfig/blob/development/autoexecconfig.inc)
+* [ColorLib](https://github.com/c0rp3n/colorlib-sm)
+* [AutoExecConfig](https://github.com/Impact123/AutoExecConfig)
+* [SourceMod-Discord API](https://github.com/Deathknife/sourcemod-discord)
 
-**Recommended:**
-* [Cleaner Extension](https://github.com/Accelerator74/Cleaner) (Suppresses console warnings)
-* [Stripper:Source](https://forums.alliedmods.net/showthread.php?t=39439) (Allows you to add/modify/removes entities from maps, recommended filter file included)
+**SourceMod Plugins**
+* *(recommended)* [Movement Unlocker](https://forums.alliedmods.net/showthread.php?t=255298) - Enables ground sliding
+* *(recommended)* [MomSurfFix](https://github.com/GAMMACASE/MomSurfFix) - Fixes ramp glitches
+* *(recommended)* [RNGFix](https://github.com/jason-e/rngfix) - Fixes a bunch of engine physics "bugs"
+* *(recommended)* [End-Touch-Fix](https://github.com/rumourA/End-Touch-Fix) - Checks EntityUntouch on PostThink instead of server frames
+* *(recommended)* [HeadBugFix](https://github.com/GAMMACASE/HeadBugFix) - Fixes the head boundary box poping up when you start ducking
+* *(recommended)* [PushFixDE](https://github.com/GAMMACASE/PushFixDE) - Fixes client prediction errors in push triggers
+* *(recommended)* [crouchboostfix](https://github.com/t5mat/crouchboostfix) - Prevents crouchboosting
+* *(recommended)* [Normalized-Run-Speed](https://github.com/sneak-it/Normalized-Run-Speed) - Normalizes players run speed across all weapons
+* *(optional)* [Surftimer-Discord](https://github.com/Sarrus1/SurfTimer-discord) - Discord WR notifications
 
-**Optional:**
-* [Surftimer-Web-Stats](https://github.com/KristianP26/Surftimer-Web-Stats) - Web Statistics
-* [Surftimer-Discord](https://github.com/Sarrus1/SurfTimer-discord/releases/latest) - Discord Record Notifications
+**Misc**
+* *(optional)* [Surftimer-Web-Stats](https://github.com/KristianP26/Surftimer-Web-Stats) - Web statistics
 
 ## Issue Rules
 
@@ -103,8 +109,8 @@ Yes, but not any more than other projects currently and for past years.
 
 ## Point System
 <details>
-  <summary>Explanation</summary> 
-  
+  <summary>Explanation</summary>
+
 The points system has seen a massive overhaul from the original ckSurf; it is now a percentile tiered system. Points are now distributed in two ways: (1) map completion, and (2) map ranking. Map completion points will be given to all players who complete a specific and are dependent on the tier.
 * Tier 1: 25
 * Tier 2: 50
@@ -147,7 +153,7 @@ Take surf_aircontrol_nbv for example: (You can use sm_mi to see this menu)
 <img src="http://puu.sh/ykaR8/7520a6b0d6.jpg" width="372" height="469" />
 
 ###### Credit to NDiamond for theory crafting this point system, I just implemented his idea
-  
+
 </details>
 
 ## Credits
@@ -157,18 +163,17 @@ Extensions used in this version:
 *   [Discord API](https://github.com/Deathknife/sourcemod-discord) (Deathknife)
 *   [Trails Chroma](https://github.com/Nickelony/Trails-Chroma) (Nickelony)
 <details>
-  <summary>forked from fluffys - contributors</summary> 
-  
+  <summary>forked from fluffys - contributors</summary>
+
 *   Jonitaikaponi - Original ckSurf creator
 *   sneaK
 *   nikooo777 - ckSurf 1.19 Fork
 *   fluffys
 *   Jakeey802
 *   Grandpa Goose
-  
+
 </details>
 
 *	[Ace](https://github.com/13ace37) [xace.ch](https://xace.ch)
 *	[olokos](https://github.com/olokos) [Steam](https://steamcommunity.com/id/olokos/) [My server](https://kiepownica.pl/)
 *	and many, many more people who contributed to the project!
-
