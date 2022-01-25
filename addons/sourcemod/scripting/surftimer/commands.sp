@@ -197,6 +197,8 @@ void CreateCommands()
 	// Setting Commands
 	RegConsoleCmd("sm_pre", Command_Prestrafe, "[surftimer] [settings] Toggles prestrafe messages for player");
 	RegConsoleCmd("sm_prestrafe", Command_Prestrafe, "[surftimer] [settings] Toggles prestrafe messages for player");
+	RegConsoleCmd("sm_togglehints", Command_ToggleHints, "[surftimer] [settings] Toggles the hint messages");
+	RegConsoleCmd("sm_hints", Command_ToggleHints, "[surftimer] [settings] Toggles the hint messages");
 	RegConsoleCmd("sm_silentspec", Command_SilentSpec, "[surftimer] [settings] Toggles silent spectate for player");
 	RegConsoleCmd("sm_sspec", Command_SilentSpec, "[surftimer] [settings] Toggles silent spectate for player");
 	RegConsoleCmd("sm_togglewrcps", Command_ToggleWrcps, "[surftimer] [settings] on/off - Enable player checkpoints");
@@ -341,6 +343,18 @@ public Action Command_Prestrafe(int client, int args) {
 	} else {
 		g_iPrespeedText[client] = true;
 		CPrintToChat(client, "%t", "PrestrafeMessageToggleOn", g_szChatPrefix);
+	}
+	return Plugin_Handled;
+}
+
+public Action Command_ToggleHints(int client, int args)
+{
+	if (g_bAllowHints[client]) {
+		g_bAllowHints[client] = false;
+		CPrintToChat(client, "%t", "HintsToggleOff", g_szChatPrefix);
+	} else {
+		g_bAllowHints[client] = true;
+		CPrintToChat(client, "%t", "HintsToggleOn", g_szChatPrefix);
 	}
 	return Plugin_Handled;
 }
@@ -2242,10 +2256,15 @@ void TeleSide(int client, bool menu = false)
 
 void PrespeedText(int client, bool menu = false)
 {
-	if (g_iPrespeedText[client])
-		g_iPrespeedText[client] = false;
-	else
-		g_iPrespeedText[client] = true;
+	g_iPrespeedText[client] = !g_iPrespeedText[client];
+	
+	if (menu)
+		MiscellaneousOptions(client);
+}
+
+void HintsText(int client, bool menu = false)
+{
+	g_bAllowHints[client] = !g_bAllowHints[client];
 	
 	if (menu)
 		MiscellaneousOptions(client);
@@ -3369,6 +3388,12 @@ public void MiscellaneousOptions(int client)
 		AddMenuItem(menu, "", "[ON] Prestrafe Message");
 	else
 		AddMenuItem(menu, "", "[OFF] Prestrafe Message");
+
+	// Show hints
+	if (g_bAllowHints[client])
+		AddMenuItem(menu, "", "[ON] Hints");
+	else
+		AddMenuItem(menu, "", "[OFF] Hints");
 	
 	SetMenuExitBackButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
@@ -3389,6 +3414,7 @@ public int MiscellaneousOptionsHandler(Menu menu, MenuAction action, int param1,
 			case 6: HideChat(param1, true);
 			case 7: HideViewModel(param1, true);
 			case 8: PrespeedText(param1, true);
+			case 9: HintsText(param1, true);
 		}
 	}
 	else if (action == MenuAction_Cancel)

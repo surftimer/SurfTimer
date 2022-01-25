@@ -664,6 +664,38 @@ public int getZoneID(int zoneGrp, int stage)
 	return -1;
 }
 
+public void readHints()
+{
+	g_aHints.Clear();
+
+	char sPath[PLATFORM_MAX_PATH];
+	char line[MAX_HINT_MESSAGES_SIZE];
+
+	BuildPath(Path_SM, sPath, sizeof(sPath), "%s", HINTS_PATH);
+	Handle fileHandle = OpenFile(sPath, "r");
+
+	if (fileHandle != null)
+	{
+		while (!IsEndOfFile(fileHandle) && ReadFileLine(fileHandle, line, sizeof(line)))
+		{
+			TrimString(line);
+			if (strlen(line) > MAX_HINT_MESSAGES_SIZE)
+				LogError("[surftimer] '%s' is too big. Maximum size of a hint is %i", line, MAX_HINT_MESSAGES_SIZE);
+			else if (StrContains(line, "//", false) == 0 || IsNullString(line) || strlen(line) == 0)
+				continue;
+			else
+				g_aHints.PushString(line);
+		}
+	}
+	else
+		SetFailState("[surftimer] %s is empty or does not exist.", HINTS_PATH);
+
+	if (fileHandle != null)
+		CloseHandle(fileHandle);
+
+	return;
+}
+
 public void readMultiServerMapcycle()
 {
 	char sPath[PLATFORM_MAX_PATH];
