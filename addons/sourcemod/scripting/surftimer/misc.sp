@@ -3575,9 +3575,9 @@ public void CenterHudAlive(int client)
 					else
 					{
 						if (g_iCurrentStyle[client] == 0)
-							Format(g_szLastPBDifference[client], 64, "PB: %s", g_szPersonalRecordBonus[g_iClientInZone[client][2]][client]);
+							Format(g_szLastPBDifference[client], 64, "PB: %s	", g_szPersonalRecordBonus[g_iClientInZone[client][2]][client]);
 						else if (g_iCurrentStyle[client] != 0) // Styles
-							Format(g_szLastPBDifference[client], 64, "PB: %s", g_szStylePersonalRecordBonus[style][g_iClientInZone[client][2]][client]);
+							Format(g_szLastPBDifference[client], 64, "PB: %s	", g_szStylePersonalRecordBonus[style][g_iClientInZone[client][2]][client]);
 					}
 				}
 				Format(module[i], 128, "%s", g_szLastPBDifference[client]);
