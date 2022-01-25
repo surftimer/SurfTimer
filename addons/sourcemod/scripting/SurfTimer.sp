@@ -683,15 +683,6 @@ char g_szZoneDefaultNames[ZONEAMOUNT][128] = { "Stop", "Start", "End", "Stage", 
 int g_BeamSprite;
 int g_HaloSprite;
 
-/*----------  Slope Boost Fix by Mev & Blacky  ----------*/
-// https://forums.alliedmods.net/showthread.php?t=266888
-float g_vCurrent[MAXPLAYERS + 1][3];
-float g_vLast[MAXPLAYERS + 1][3];
-bool g_bOnGround[MAXPLAYERS + 1];
-bool g_bLastOnGround[MAXPLAYERS + 1];
-bool g_bFixingRamp[MAXPLAYERS + 1];
-ConVar g_hSlopeFixEnable;
-
 /*----------  Forwards  ----------*/
 GlobalForward g_MapFinishForward;
 GlobalForward g_MapCheckpointForward;

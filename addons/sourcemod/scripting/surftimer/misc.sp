@@ -2827,7 +2827,7 @@ public void NoClipCheck(int client)
 {
 	MoveType mt;
 	mt = GetEntityMoveType(client);
-	if (!(g_bOnGround[client]))
+	if (!(GetEntityFlags(client) & FL_ONGROUND))
 	{
 		if (mt == MOVETYPE_NOCLIP)
 			g_bNoClipUsed[client] = true;
@@ -2845,7 +2845,7 @@ public void AutoBhopFunction(int client, int &buttons)
 	if (g_bAutoBhop && g_bAutoBhopClient[client])
 	{
 		if (buttons & IN_JUMP)
-			if (!(g_bOnGround[client]))
+			if (!(GetEntityFlags(client) & FL_ONGROUND))
 			if (!(GetEntityMoveType(client) & MOVETYPE_LADDER))
 			if (GetEntProp(client, Prop_Data, "m_nWaterLevel") <= 1)
 			buttons &= ~IN_JUMP;
