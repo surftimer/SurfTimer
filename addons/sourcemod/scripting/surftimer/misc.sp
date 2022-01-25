@@ -3431,44 +3431,44 @@ public void CenterHudAlive(int client)
 					if (g_bPause[client])
 					{
 						// Paused
-						Format(module[i], 128, "<font color='#ec8'>%s       </font>", pAika);
+						Format(module[i], 128, "<font color='#ec8'>%s	</font>", pAika);
 					}
 					else if (g_bPracticeMode[client])
 					{
 						// Prac mode
-						Format(module[i], 128, "<font color='#8cd'>[P]: %s       </font>", pAika);
+						Format(module[i], 128, "<font color='#8cd'>[P]: %s	</font>", pAika);
 					}
 					else if (g_bInBonus[client])
 					{
 						// In Bonus
-						Format(module[i], 128, "<font color='#5e5'>%s       </font>", pAika);
+						Format(module[i], 128, "<font color='#5e5'>%s 	</font>", pAika);
 					}
 					else if (g_bMissedMapBest[client] && g_fPersonalRecord[client] > 0.0)
 					{
 						// Missed Personal Best time
-						Format(module[i], 128, "<font color='#f32'>%s       </font>", pAika);
+						Format(module[i], 128, "<font color='#f32'>%s 	</font>", pAika);
 					}
 					else if (g_fPersonalRecord[client] < 0.1)
 					{
 						// No Personal Best on map
-						Format(module[i], 128, "<font color='#5e5'>%s       </font>", pAika);
+						Format(module[i], 128, "<font color='#5e5'>%s 	</font>", pAika);
 					}
 					else
 					{
 						// Hasn't missed Personal Best yet
-						Format(module[i], 128, "<font color='#5e5'>%s       </font>", pAika);
+						Format(module[i], 128, "<font color='#5e5'>%s 	</font>", pAika);
 					}
 				}
 				else if (g_bWrcpTimeractivated[client] && !g_bPracticeMode[client])
 				{
 					FormatTimeFloat(client, g_fCurrentWrcpRunTime[client], 3, pAika, 128);
-					Format(module[i], 128, "<font color='#8cd'>%s       </font>", pAika);
+					Format(module[i], 128, "<font color='#8cd'>%s 	</font>", pAika);
 				}
 				else if (!g_bTimerEnabled[client])
-					Format(module[i], 128, "<font color='#f32'>Disabled       </font>");
+					Format(module[i], 128, "<font color='#f32'>Disabled	</font>");
 				else
 				{
-					Format(module[i], 128, "<font color='#f32'>00:00:00       </font>");
+					Format(module[i], 128, "<font color='#f32'>00:00:00		</font>");
 				}
 
 				if (g_iCurrentStyle[client] != 0)
@@ -3555,10 +3555,10 @@ public void CenterHudAlive(int client)
 							if (g_fPersonalRecord[client] > 0.0)
 								Format(g_szLastPBDifference[client], 64, "PB: %s", g_szPersonalRecord[client]);
 							else
-								Format(g_szLastPBDifference[client], 64, "PB: N/A");
+								Format(g_szLastPBDifference[client], 64, "PB: N/A	");
 						}
 						else
-							Format(g_szLastPBDifference[client], 64, "PB: N/A");
+							Format(g_szLastPBDifference[client], 64, "PB: N/A	");
 					}
 					else if (g_iClientInZone[client][2] == 0 && g_iCurrentStyle[client] != 0) // Styles
 					{
@@ -3567,10 +3567,10 @@ public void CenterHudAlive(int client)
 							if (g_fPersonalStyleRecord[style][client] > 0.0)
 								Format(g_szLastPBDifference[client], 64, "PB: %s", g_szPersonalStyleRecord[style][client]);
 							else
-								Format(g_szLastPBDifference[client], 64, "PB: N/A");
+								Format(g_szLastPBDifference[client], 64, "PB: N/A	");
 						}
 						else
-							Format(g_szLastPBDifference[client], 64, "PB: N/A");
+							Format(g_szLastPBDifference[client], 64, "PB: N/A	");
 					}
 					else
 					{
@@ -3591,20 +3591,20 @@ public void CenterHudAlive(int client)
 					if (g_iCurrentStyle[client] == 0) // Normal
 					{
 						if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
-							Format(szRank, 64, "Rank: %i / %i", g_MapRankBonus[g_iClientInZone[client][2]][client], g_iBonusCount[g_iClientInZone[client][2]]);
+							Format(szRank, 64, "Rank: %i/%i", g_MapRankBonus[g_iClientInZone[client][2]][client], g_iBonusCount[g_iClientInZone[client][2]]);
 						else
 							if (g_iBonusCount[g_iClientInZone[client][2]] > 0)
-								Format(szRank, 64, "Rank: - / %i", g_iBonusCount[g_iClientInZone[client][2]]);
+								Format(szRank, 64, "Rank: -/%i", g_iBonusCount[g_iClientInZone[client][2]]);
 							else
 								Format(szRank, 64, "Rank: N/A");
 					}
 					else if (g_iCurrentStyle[client] != 0) // Styles
 					{
 						if (g_fStylePersonalRecordBonus[style][g_iClientInZone[client][2]][client] > 0.0)
-							Format(szRank, 64, "Rank: %i / %i", g_StyleMapRankBonus[style][g_iClientInZone[client][2]][client], g_iStyleBonusCount[style][g_iClientInZone[client][2]]);
+							Format(szRank, 64, "Rank: %i/%i", g_StyleMapRankBonus[style][g_iClientInZone[client][2]][client], g_iStyleBonusCount[style][g_iClientInZone[client][2]]);
 						else
 							if (g_iStyleBonusCount[style][g_iClientInZone[client][2]] > 0)
-								Format(szRank, 64, "Rank: - / %i", g_iStyleBonusCount[style][g_iClientInZone[client][2]]);
+								Format(szRank, 64, "Rank: -/%i", g_iStyleBonusCount[style][g_iClientInZone[client][2]]);
 							else
 								Format(szRank, 64, "Rank: N/A");
 					}
@@ -3614,20 +3614,20 @@ public void CenterHudAlive(int client)
 					if (g_iCurrentStyle[client] == 0) // Normal
 					{
 						if (g_fPersonalRecord[client] > 0.0)
-							Format(szRank, 64, "Rank: %i / %i", g_MapRank[client], g_MapTimesCount);
+							Format(szRank, 64, "Rank: %i/%i", g_MapRank[client], g_MapTimesCount);
 						else
 							if (g_MapTimesCount > 0)
-								Format(szRank, 64, "Rank: - / %i", g_MapTimesCount);
+								Format(szRank, 64, "Rank: -/%i", g_MapTimesCount);
 							else
 								Format(szRank, 64, "Rank: N/A");
 					}
 					else if (g_iCurrentStyle[client] != 0) // Styles
 					{
 						if (g_fPersonalStyleRecord[style][client] > 0.0)
-							Format(szRank, 64, "Rank: %i / %i", g_StyleMapRank[style][client], g_StyleMapTimesCount[style]);
+							Format(szRank, 64, "Rank: %i/%i", g_StyleMapRank[style][client], g_StyleMapTimesCount[style]);
 						else
 							if (g_StyleMapTimesCount[style] > 0)
-								Format(szRank, 64, "Rank: - / %i", g_StyleMapTimesCount[style]);
+								Format(szRank, 64, "Rank: -/%i", g_StyleMapTimesCount[style]);
 							else
 								Format(szRank, 64, "Rank: N/A");
 					}
@@ -3650,16 +3650,16 @@ public void CenterHudAlive(int client)
 						{
 							if (g_bSaveLocTele[client]) // Has the player teleported to saveloc?
 							{
-								Format(module[i], 128, "Stage: %i / %i", g_iPlayerPracLocationSnap[client][g_iPlayerPracLocationSnapIdClient[client]], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+								Format(module[i], 128, "Stage: %i/%i", g_iPlayerPracLocationSnap[client][g_iPlayerPracLocationSnapIdClient[client]], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
 							}
 							else
 							{
-								Format(module[i], 128, "Stage: %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+								Format(module[i], 128, "Stage: %i/%i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
 							}
 						}
 						else
 						{
-							Format(module[i], 128, "Stage: %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1)); // less \t's to make lines align
+							Format(module[i], 128, "Stage: %i/%i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1)); // less \t's to make lines align
 						}
 					}
 				}
@@ -3675,12 +3675,12 @@ public void CenterHudAlive(int client)
 				if (RoundToNearest(g_fLastSpeed[client]) < 10 && RoundToNearest(g_fLastSpeed[client]) > -1)
 				{
 					if (i == 0 || i == 2 || i == 4)
-						Format(module[i], 128, "Speed: <font color='%s'>%i</font> u/s       ", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
+						Format(module[i], 128, "Speed: <font color='%s'>%i</font>", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
 					else
-						Format(module[i], 128, "Speed: <font color='%s'>%i</font> u/s", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
+						Format(module[i], 128, "Speed: <font color='%s'>%i</font>", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
 				}
 				else
-					Format(module[i], 128, "Speed: <font color='%s'>%i</font> u/s", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
+					Format(module[i], 128, "Speed: <font color='%s'>%i</font>", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
 			}
 			else if (g_iCentreHudModule[client][i] == 7)
 			{
@@ -4012,9 +4012,9 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 			Format(sz_srDiff_colorless, 128, "-%s", sz_srDiff);
 			Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
 			if (zonegroup > 0)
-				Format(g_szLastSRDifference[client], 64, "SR: <font color='#5e5'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "SR:<font color='#5e5'>%s</font>", sz_srDiff_colorless);
 			else
-				Format(g_szLastSRDifference[client], 64, "SR: <font color='#5e5'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "SR:<font color='#5e5'>%s</font>", sz_srDiff_colorless);
 
 		}
 		else
@@ -4022,11 +4022,11 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 			Format(sz_srDiff_colorless, 128, "+%s", sz_srDiff);
 			Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
 			if (zonegroup > 0)
-				Format(g_szLastSRDifference[client], 64, "SR: <font color='#f32'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "SR:<font color='#f32'>%s</font>", sz_srDiff_colorless);
 			else if (g_iCurrentStyle[client] > 0)
-				Format(g_szLastSRDifference[client], 64, "\tSR: <font color='#f32'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "\tSR:<font color='#f32'>%s</font>", sz_srDiff_colorless);
 			else
-				Format(g_szLastSRDifference[client], 64, "SR: <font color='#f32'>%s</font>", sz_srDiff_colorless);
+				Format(g_szLastSRDifference[client], 64, "SR:<font color='#f32'>%s</font>", sz_srDiff_colorless);
 		}
 		g_fLastDifferenceTime[client] = GetGameTime();
 	}
@@ -4060,9 +4060,9 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 			Format(szDiff_colorless, 32, "-%s", szDiff);
 			Format(szDiff, sizeof(szDiff), "%c-%s", LIGHTGREEN, szDiff);
 			if (zonegroup > 0)
-				Format(g_szLastPBDifference[client], 64, "PB: <font color='#5e5'>%s</font>", szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "PB:<font color='#5e5'>%s</font>	", szDiff_colorless);
 			else
-				Format(g_szLastPBDifference[client], 64, "PB: <font color='#5e5'>%s</font>", szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "PB:<font color='#5e5'>%s</font>	", szDiff_colorless);
 
 		}
 		else
@@ -4070,9 +4070,9 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 			Format(szDiff_colorless, 32, "+%s", szDiff);
 			Format(szDiff, sizeof(szDiff), "%c+%s", RED, szDiff);
 			if (zonegroup > 0)
-				Format(g_szLastPBDifference[client], 64, "PB: <font color='#f32'>%s</font>", szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "PB:<font color='#f32'>%s</font>	", szDiff_colorless);
 			else
-				Format(g_szLastPBDifference[client], 64, "PB: <font color='#f32'>%s</font>", szDiff_colorless);
+				Format(g_szLastPBDifference[client], 64, "PB:<font color='#f32'>%s</font>	", szDiff_colorless);
 
 		}
 		g_fLastDifferenceTime[client] = GetGameTime();
