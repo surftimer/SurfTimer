@@ -137,8 +137,8 @@
 	}
 	"NewMapRecord"
 	{
-		"#format"	"{1:s},{2:s}"
-		"en"		"{1} {yellow}{2} {default}beat the map record!"
+		"#format"	"{1:s},{2:s},{3:s}"
+		"en"		"{1} {yellow}{2} {default}beat the map record! {3}"
 	}
 	"ReplayFinishingMsg"
 	{

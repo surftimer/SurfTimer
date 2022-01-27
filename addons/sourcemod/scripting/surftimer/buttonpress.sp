@@ -295,6 +295,7 @@ public void CL_OnEndTimerPress(int client)
 				{
 					// New fastest time in map
 					g_bMapSRVRecord[client] = true;
+					g_fOldRecordMapTime = g_fRecordMapTime;
 					g_fRecordMapTime = g_fFinalTime[client];
 					Format(g_szRecordPlayer, 128, "%s", szName);
 					FormatTimeFloat(1, g_fRecordMapTime, 3, g_szRecordMapTime, 128);
@@ -331,6 +332,7 @@ public void CL_OnEndTimerPress(int client)
 				}
 
 				g_bMapSRVRecord[client] = true;
+				g_fOldRecordMapTime = g_fFinalTime[client];
 				g_fRecordMapTime = g_fFinalTime[client];
 				Format(g_szRecordPlayer, 128, "%s", szName);
 				FormatTimeFloat(1, g_fRecordMapTime, 3, g_szRecordMapTime, 128);
