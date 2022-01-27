@@ -6873,7 +6873,8 @@ public void sql_selectStyleRecordCallback(Handle owner, Handle hndl, const char[
 
 
 	char szQuery[512];
-
+	char szRecordDiff[54];
+	float RecordDiff;
 	// Found old time from database
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
@@ -6882,11 +6883,20 @@ public void sql_selectStyleRecordCallback(Handle owner, Handle hndl, const char[
 		// If old time was slower than the new time, update record
 		if ((g_fFinalTime[data] <= time || time <= 0.0))
 		{
+			RecordDiff = time - g_fFinalTime[data];
+			FormatTimeFloat(data, RecordDiff, 3, szRecordDiff, 54);
+			Format(szRecordDiff, 54, "-%s", szRecordDiff);
+			SendNewRecordForward(data, szRecordDiff);
 			db_updateStyleRecord(data, style);
 		}
 	}
 	else
 	{ // No record found from database - Let's insert
+
+	// Anounce the record
+	FormatTimeFloat(data, 0.0, 3, szRecordDiff, 54);
+	Format(szRecordDiff, 54, "-%s", szRecordDiff);
+	SendNewRecordForward(data, szRecordDiff);
 
 	// Escape name for SQL injection protection
 	char szName[MAX_NAME_LENGTH * 2 + 1], szUName[MAX_NAME_LENGTH];
