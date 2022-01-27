@@ -1479,6 +1479,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
+				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathWR);
 				EmitSoundToClientNoPreCache(i, buffer);
 			}
 		}
@@ -1489,6 +1490,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
+				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathWR);
 				EmitSoundToClientNoPreCache(i, buffer);
 			}
 		}
@@ -1499,6 +1501,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
+				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathTop);
 				EmitSoundToClientNoPreCache(i, buffer);
 			}
 		}
@@ -1509,6 +1512,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
+				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathTop);
 				EmitSoundToClientNoPreCache(i, buffer);
 			}
 		}
