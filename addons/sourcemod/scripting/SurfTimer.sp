@@ -859,6 +859,9 @@ char g_szTimeDifference[MAXPLAYERS + 1][32];
 // Record map time in seconds
 float g_fRecordMapTime;
 
+// Old map record time in seconds
+float g_fOldRecordMapTime;
+
 // Record map time in 00:00:00 format
 char g_szRecordMapTime[64];
 
