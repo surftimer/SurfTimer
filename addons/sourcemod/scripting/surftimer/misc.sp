@@ -1479,8 +1479,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathWR);
-				EmitSoundToClientNoPreCache(i, buffer);
+				EmitSoundToClientNoPreCache(i, g_szRelativeSoundPathWR);
 			}
 		}
 	}
@@ -1490,8 +1489,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathWR);
-				EmitSoundToClientNoPreCache(i, buffer);
+				EmitSoundToClientNoPreCache(i, g_szRelativeSoundPathWR);
 			}
 		}
 	}
@@ -1501,8 +1499,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathTop);
-				EmitSoundToClientNoPreCache(i, buffer);
+				EmitSoundToClientNoPreCache(i, g_szRelativeSoundPathTop);
 			}
 		}
 	}
@@ -1512,8 +1509,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				Format(buffer, sizeof(buffer), "play %s", g_szRelativeSoundPathTop);
-				EmitSoundToClientNoPreCache(i, buffer);
+				EmitSoundToClientNoPreCache(i, g_szRelativeSoundPathTop);
 			}
 		}
 	}
@@ -1550,7 +1546,7 @@ public void PlayWRCPRecord()
 	{
 		if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 		{
-			EmitSoundToClientNoPreCache(i, buffer);
+			EmitSoundToClientNoPreCache(i, g_szRelativeSoundPathWRCP);
 		}
 	}
 }
