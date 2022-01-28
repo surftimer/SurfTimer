@@ -1472,14 +1472,13 @@ public void SetCashState()
 
 public void PlayRecordSound(int iRecordtype)
 {
-	char buffer[PLATFORM_MAX_PATH];
 	if (iRecordtype == 1)
 	{
 		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				EmitSoundToClientNoPreCache(i, buffer);
+				EmitSoundToClientNoPreCache(i, g_szRelativeSoundPathWR);
 			}
 		}
 	}
@@ -1489,7 +1488,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				EmitSoundToClientNoPreCache(i, buffer);
+				EmitSoundToClientNoPreCache(i, g_szRelativeSoundPathWR);
 			}
 		}
 	}
@@ -1499,7 +1498,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				EmitSoundToClientNoPreCache(i, buffer);
+				EmitSoundToClientNoPreCache(i, g_szRelativeSoundPathTop);
 			}
 		}
 	}
@@ -1509,7 +1508,7 @@ public void PlayRecordSound(int iRecordtype)
 		{
 			if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 			{
-				EmitSoundToClientNoPreCache(i, buffer);
+				EmitSoundToClientNoPreCache(i, g_szRelativeSoundPathTop);
 			}
 		}
 	}
@@ -1541,12 +1540,11 @@ public void PlayUnstoppableSound(int client)
 
 public void PlayWRCPRecord()
 {
-	char buffer[255];
 	for (int i = 1; i <= MaxClients; i++)
 	{
 		if (IsValidClient(i) && !IsFakeClient(i) && g_bEnableQuakeSounds[i] == true)
 		{
-			EmitSoundToClientNoPreCache(i, buffer);
+			EmitSoundToClientNoPreCache(i, g_szRelativeSoundPathWRCP);
 		}
 	}
 }
@@ -1832,9 +1830,19 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 
 					if (g_bMapSRVRecord[client])
 					{
+						float fRecordDiff;
+						char szRecordDiff[54] = "";
 						// int r = GetRandomInt(1, 2);
+
+						if (g_fOldRecordMapTime != g_fFinalTime[client])
+						{
+							fRecordDiff = g_fOldRecordMapTime - g_fFinalTime[client];
+							FormatTimeFloat(client, fRecordDiff, 3, szRecordDiff, 54);
+							Format(szRecordDiff, 54, "[%c-%s%c]", LIGHTGREEN, szRecordDiff, WHITE);
+						}
+
 						PlayRecordSound(2);
-						CPrintToChat(i, "%t", "NewMapRecord", g_szChatPrefix, szName);
+						CPrintToChat(i, "%t", "NewMapRecord", g_szChatPrefix, szName, szRecordDiff);
 						PrintToConsole(i, "surftimer | %s scored a new MAP RECORD", szName);
 					}
 				}
