@@ -6675,7 +6675,7 @@ public int StageTopMenuHandler(Menu menu, MenuAction action, int client, int ite
 public void db_viewStageRecords()
 {
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT cp1.name, cp1.runtimepro, cp1.stage, cp1.style, cp1.velStartXY, cp1.velStartXYZ, cp1.velstartZ from ck_wrcps cp1 where cp1.mapname = '%s' and cp1.runtimepro = (select min(runtimepro) from ck_wrcps cp2 where cp2.mapname = cp1.mapname and cp1.stage = cp2.stage and cp2.style = cp1.style);", g_szMapName);
+	Format(szQuery, 512, "SELECT cp1.name, cp1.runtimepro, cp1.stage, cp1.style, cp1.velStartXY, cp1.velStartXYZ, cp1.velstartZ FROM ck_wrcps cp1 JOIN ( SELECT MIN(runtimepro) AS min_runtime, stage, style, mapname FROM ck_wrcps GROUP BY stage, mapname, style ) AS cp2 ON cp1.stage = cp2.stage AND cp1.runtimepro = cp2.min_runtime AND cp1.mapname=cp2.mapname AND cp1.style=cp2.style WHERE cp1.mapname='%s'", g_szMapName);
 	SQL_TQuery(g_hDb, sql_viewStageRecordsCallback, szQuery, 0, DBPrio_Low);
 }
 
@@ -6873,7 +6873,8 @@ public void sql_selectStyleRecordCallback(Handle owner, Handle hndl, const char[
 
 
 	char szQuery[512];
-
+	char szRecordDiff[54];
+	float RecordDiff;
 	// Found old time from database
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
@@ -6882,11 +6883,20 @@ public void sql_selectStyleRecordCallback(Handle owner, Handle hndl, const char[
 		// If old time was slower than the new time, update record
 		if ((g_fFinalTime[data] <= time || time <= 0.0))
 		{
+			RecordDiff = time - g_fFinalTime[data];
+			FormatTimeFloat(data, RecordDiff, 3, szRecordDiff, 54);
+			Format(szRecordDiff, 54, "-%s", szRecordDiff);
+			SendNewRecordForward(data, szRecordDiff);
 			db_updateStyleRecord(data, style);
 		}
 	}
 	else
 	{ // No record found from database - Let's insert
+
+	// Anounce the record
+	FormatTimeFloat(data, 0.0, 3, szRecordDiff, 54);
+	Format(szRecordDiff, 54, "-%s", szRecordDiff);
+	SendNewRecordForward(data, szRecordDiff);
 
 	// Escape name for SQL injection protection
 	char szName[MAX_NAME_LENGTH * 2 + 1], szUName[MAX_NAME_LENGTH];

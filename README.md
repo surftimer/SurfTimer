@@ -40,15 +40,12 @@ Yes, but not any more than other projects currently and for past years.
 
 **SourceMod Extensions**
 * [DHooks](https://github.com/peace-maker/DHooks2)
-* [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604)
-* [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556)
 * *(recommended)* [Cleaner](https://github.com/Accelerator74/Cleaner) - Suppresses server console warnings
 
 **SourceMod Libraries**
 * [SMLib](https://github.com/bcserv/smlib/tree/transitional_syntax)
 * [ColorLib](https://github.com/c0rp3n/colorlib-sm)
 * [AutoExecConfig](https://github.com/Impact123/AutoExecConfig)
-* [SourceMod-Discord API](https://github.com/Deathknife/sourcemod-discord)
 
 **SourceMod Plugins**
 * *(recommended)* [Movement Unlocker](https://forums.alliedmods.net/showthread.php?t=255298) - Enables ground sliding
@@ -63,6 +60,7 @@ Yes, but not any more than other projects currently and for past years.
 
 **Misc**
 * *(optional)* [Surftimer-Web-Stats](https://github.com/KristianP26/Surftimer-Web-Stats) - Web statistics
+* *(optional)* [Surftimer-Discord-Bot](https://github.com/Sarrus1/SurfTimer-Discord-Bot) - Discord BOT
 
 ## Issue Rules
 
