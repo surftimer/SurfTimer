@@ -1598,26 +1598,6 @@ public void InitPrecache()
 	PrecacheModel("models/weapons/ct_arms.mdl", true);
 }
 
-
-// thx to V952 https://forums.alliedmods.net/showthread.php?t=212886
-stock int TraceClientViewEntity(int client)
-{
-	float m_vecOrigin[3];
-	float m_angRotation[3];
-	GetClientEyePosition(client, m_vecOrigin);
-	GetClientEyeAngles(client, m_angRotation);
-	Handle tr = TR_TraceRayFilterEx(m_vecOrigin, m_angRotation, MASK_VISIBLE, RayType_Infinite, TRDontHitSelf, client);
-	int pEntity = -1;
-	if (TR_DidHit(tr))
-	{
-		pEntity = TR_GetEntityIndex(tr);
-		CloseHandle(tr);
-		return pEntity;
-	}
-	CloseHandle(tr);
-	return -1;
-}
-
 // thx to V952 https://forums.alliedmods.net/showthread.php?t=212886
 public bool TRDontHitSelf(int entity, int mask, any data)
 {
