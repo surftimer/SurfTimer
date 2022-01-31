@@ -2000,9 +2000,6 @@ public void OnClientPutInServer(int client)
 	if (GetConVarBool(g_hcvarRestore) && !g_bRenaming && !g_bInTransactionChain)
 	db_selectLastRun(client);
 
-	if (g_bLateLoaded && IsPlayerAlive(client))
-	PlayerSpawn(client);
-
 	if (g_bTierFound)
 		AnnounceTimer[client] = CreateTimer(20.0, AnnounceMap, client, TIMER_FLAG_NO_MAPCHANGE);
 

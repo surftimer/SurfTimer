@@ -256,11 +256,6 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 	return Plugin_Continue;
 }
 
-public void PlayerSpawn(int client)
-{
-
-}
-
 public Action Say_Hook(int client, const char[] command, int argc)
 {
 	// Call Admin - Own Reason
