@@ -4182,6 +4182,7 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 	}
 	if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 	{
+		SendNewRecordForward(client, szRecordDiff, zGroup);
 		CPrintToChatAll("%t", "Misc37", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style]);
 		if (g_tmpBonusCount[zGroup] == 0)
 			CPrintToChatAll("%t", "Misc38", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], g_szFinalTime[client]);
@@ -4190,6 +4191,7 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 	}
 	if (g_bBonusPBRecord[client] && g_bBonusSRVRecord[client])
 	{
+		SendNewRecordForward(client, szRecordDiff, zGroup);
 		CPrintToChatAll("%t", "Misc37", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style]);
 		CPrintToChatAll("%t", "Misc39", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], szRecordDiff, g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szFinalTime[client]);
 	}
