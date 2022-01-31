@@ -1,4 +1,8 @@
-﻿public int Native_GetTimerStatus(Handle plugin, int numParams)
+﻿/*===================================
+=              Natives              =
+===================================*/
+
+public int Native_GetTimerStatus(Handle plugin, int numParams)
 {
 	return g_bTimerRunning[GetNativeCell(1)];
 }
@@ -193,3 +197,167 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 }
 
 /*======  End of Natives  ======*/
+
+
+/*===================================
+=             Forwards              =
+===================================*/
+
+void Register_Forwards()
+{
+	g_MapFinishForward = new GlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell);
+	g_MapCheckpointForward = new GlobalForward("surftimer_OnCheckpoint", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String);
+	g_BonusFinishForward = new GlobalForward("surftimer_OnBonusFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell, Param_Cell);
+	g_PracticeFinishForward = new GlobalForward("surftimer_OnPracticeFinished", ET_Event, Param_Cell, Param_Float, Param_String);
+	g_NewRecordForward = new GlobalForward("surftimer_OnNewRecord", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
+	g_NewWRCPForward = new GlobalForward("surftimer_OnNewWRCP", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
+}
+
+/**
+ * Sends a map finish forward on surftimer_OnMapFinished.
+ * 
+ * @param client           Index of the client who beat the map.
+ * @param count            The number of times the map has been beaten.
+ */
+void SendMapFinishForward(int client, int count)
+{
+	/* Start function call */
+	Call_StartForward(g_MapFinishForward);
+
+	/* Push parameters one at a time */
+	Call_PushCell(client);
+	Call_PushFloat(g_fFinalTime[client]);
+	Call_PushString(g_szFinalTime[client]);
+	Call_PushCell(g_MapRank[client]);
+	Call_PushCell(count);
+
+	/* Finish the call, get the result */
+	Call_Finish();
+}
+
+/**
+ * Sends a map checkpoint forward on surftimer_OnCheckpoint.
+ * 
+ * @param client               Index of the client.
+ * @param zonegroup            ID of the zone group.
+ * @param zone                 ID of the zone.
+ * @param time                 Time at the zone.
+ * @param szTime               Formatted time.
+ * @param szDiff_colorless     Colorless time diff.
+ * @param sz_srDiff_colorless  Colorless time diff with the record.
+ */
+void SendMapCheckpointForward(
+	int client, 
+	int zonegroup, 
+	int zone, 
+	float time, 
+	const char[] szTime, 
+	const char[] szDiff_colorless, 
+	const char[] sz_srDiff_colorless)
+{
+	// Checkpoint forward
+	Call_StartForward(g_MapCheckpointForward);
+
+	/* Push parameters one at a time */
+	Call_PushCell(client);
+	Call_PushFloat(time);
+	Call_PushString(szTime);
+	Call_PushFloat(g_fCheckpointTimesRecord[zonegroup][client][zone]);
+	Call_PushString(szDiff_colorless);
+	Call_PushFloat(g_fCheckpointServerRecord[zonegroup][zone]);
+	Call_PushString(sz_srDiff_colorless);
+
+	/* Finish the call, get the result */
+	Call_Finish();
+}
+
+/**
+ * Sends a bonus finish forward on surftimer_OnBonusFinished.
+ * 
+ * @param client           Index of the client.
+ * @param rank             Rank of the client.
+ * @param zGroup           Zone group of the bonus.
+ */
+void SendBonusFinishForward(int client, int rank, int zGroup)
+{
+	/* Start function call */
+	Call_StartForward(g_BonusFinishForward);
+
+	/* Push parameters one at a time */
+	Call_PushCell(client);
+	Call_PushFloat(g_fFinalTime[client]);
+	Call_PushString(g_szFinalTime[client]);
+	Call_PushCell(rank);
+	Call_PushCell(g_iBonusCount[zGroup]);
+	Call_PushCell(zGroup);
+
+	/* Finish the call, get the result */
+	Call_Finish();
+}
+
+/**
+ * Sends a practive finish forward on surftimer_OnPracticeFinished.
+ * 
+ * @param client           Index of the client.
+ */
+void SendPracticeFinishForward(int client)
+{
+	/* Start function call */
+	Call_StartForward(g_PracticeFinishForward);
+
+	/* Push parameters one at a time */
+	Call_PushCell(client);
+	Call_PushFloat(g_fFinalTime[client]);
+	Call_PushString(g_szFinalTime[client]);
+
+	/* Finish the call, get the result */
+	Call_Finish();
+}
+
+/**
+ * Sends a new record forward on surftimer_OnNewRecord.
+ * 
+ * @param client           Index of the client.
+ * @param szRecordDiff     String containing the formatted difference with the previous record.
+ * @param bonusGroup       Number of the bonus. Default = -1.
+ */
+void SendNewRecordForward(int client, const char[] szRecordDiff, int bonusGroup = -1)
+{
+	/* Start New record function call */
+	Call_StartForward(g_NewRecordForward);
+
+	/* Push parameters one at a time */
+	Call_PushCell(client);
+	Call_PushCell(g_iCurrentStyle[client]);
+	Call_PushString(g_szFinalTime[client]);
+	Call_PushString(szRecordDiff);
+	Call_PushCell(bonusGroup);
+
+	/* Finish the call, get the result */
+	Call_Finish();
+}
+
+/**
+ * Sends a new WRCP forward on surftimer_OnNewWRCP.
+ * 
+ * @param client           Index of the client.
+ * @param stage            ID of the stage.
+ * @param szRecordDiff     String containing the formatted difference with the previous record.
+ */
+void SendNewWRCPForward(int client, int stage, const char[] szRecordDiff)
+{
+	/* Start New record function call */
+	Call_StartForward(g_NewWRCPForward);
+
+	/* Push parameters one at a time */
+	Call_PushCell(client);
+	Call_PushCell(g_iCurrentStyle[client]);
+	Call_PushString(g_szFinalWrcpTime[client]);
+	Call_PushString(szRecordDiff);
+	Call_PushCell(stage);
+
+	/* Finish the call, get the result */
+	Call_Finish();
+}
+
+/*======  End of Forwards  ======*/

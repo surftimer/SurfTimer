@@ -231,16 +231,7 @@ public void CL_OnEndTimerPress(int client)
 		else
 			CPrintToChat(client, "%t", "BPress5", g_szChatPrefix, szName, g_szPracticeTime[client]);
 		
-		/* Start function call */
-		Call_StartForward(g_PracticeFinishForward);
-
-		/* Push parameters one at a time */
-		Call_PushCell(client);
-		Call_PushFloat(g_fFinalTime[client]);
-		Call_PushString(g_szFinalTime[client]);
-
-		/* Finish the call, get the result */
-		Call_Finish();
+		SendPracticeFinishForward(client);
 
 		// Stop Timer
 		Client_Stop(client, 1);
