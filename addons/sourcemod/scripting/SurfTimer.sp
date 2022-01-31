@@ -2760,11 +2760,6 @@ public void OnPluginStart()
 
 }
 
-public void OnAllPluginsLoaded()
-{
-	// nothing
-}
-
 /*======  End of Events  ======*/
 
 public Action ItemFoundMsg(UserMsg msg_id, Protobuf msg, const int[] players, int playersNum, bool reliable, bool init)
