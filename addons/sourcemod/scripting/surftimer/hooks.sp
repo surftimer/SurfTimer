@@ -51,23 +51,23 @@ public Action SayText2(UserMsg msg_id, Handle bf, int[] players, int playersNum,
 public Action Event_OnFire(Handle event, const char[] name, bool dontBroadcast)
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-	if (client > 0 && IsClientInGame(client) && GetConVarBool(g_hAttackSpamProtection))
+	if (client <= 0 || !IsClientInGame(client) || !GetConVarBool(g_hAttackSpamProtection))
 	{
-		char weapon[64];
-		GetEventString(event, "weapon", weapon, 64);
-		if (StrContains(weapon, "knife", true) == -1 && g_AttackCounter[client] < 41)
-		{
-			if (g_AttackCounter[client] < 41)
-			{
-				g_AttackCounter[client]++;
-				if (StrContains(weapon, "grenade", true) != -1 || StrContains(weapon, "flash", true) != -1)
-				{
-					g_AttackCounter[client] = g_AttackCounter[client] + 9;
-					if (g_AttackCounter[client] > 41)
-						g_AttackCounter[client] = 41;
-				}
-			}
-		}
+		return Plugin_Continue;
+	}
+
+	char weapon[64];
+	GetEventString(event, "weapon", weapon, 64);
+
+	if (StrContains(weapon, "knife", true) != -1 || g_AttackCounter[client] >= 41)
+	{
+		return Plugin_Continue;
+	}
+
+	g_AttackCounter[client]++;
+	if (StrContains(weapon, "grenade", true) != -1 || StrContains(weapon, "flash", true) != -1)
+	{
+		g_AttackCounter[client] = g_AttackCounter[client] > 32 ? 41 : g_AttackCounter[client] + 9;
 	}
 
 	return Plugin_Continue;
@@ -254,11 +254,6 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		SetEntData(client, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
 	}
 	return Plugin_Continue;
-}
-
-public void PlayerSpawn(int client)
-{
-
 }
 
 public Action Say_Hook(int client, const char[] command, int argc)
