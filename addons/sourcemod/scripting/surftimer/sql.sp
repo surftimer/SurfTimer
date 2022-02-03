@@ -3211,7 +3211,7 @@ public void SQL_LastRunCallback(Handle owner, Handle hndl, const char[] error, a
 		{
 			if (fl_time > 0.0)
 			{
-				g_fStartTime[data] = GetGameTime() - fl_time;
+				g_fStartTime[data] = GetClientTickTime(data) - fl_time;
 				g_bTimerRunning[data] = true;
 			}
 

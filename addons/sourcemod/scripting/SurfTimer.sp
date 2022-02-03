@@ -449,7 +449,6 @@ bool g_bWrcpEndZone[MAXPLAYERS + 1] = {false, ...};
 int g_CurrentStage[MAXPLAYERS + 1];
 float g_fStartWrcpTime[MAXPLAYERS + 1];
 float g_fFinalWrcpTime[MAXPLAYERS + 1];
-float g_fOldFinalWrcpTime[MAXPLAYERS + 1];
 
 // Total time the run took in 00:00:00 format
 char g_szFinalWrcpTime[MAXPLAYERS + 1][32];
@@ -1392,6 +1391,8 @@ int g_iTicksOnGround[MAXPLAYERS + 1];
 bool g_bNewStage[MAXPLAYERS + 1];
 bool g_bLeftZone[MAXPLAYERS + 1];
 
+int g_iClientTick[MAXPLAYERS + 1];
+
 /*===================================
 =         Predefined Arrays         =
 ===================================*/
@@ -2071,8 +2072,8 @@ public void OnClientDisconnect(int client)
 	{
 		if (g_bPause[client])
 		{
-			g_fPauseTime[client] = GetGameTime() - g_fStartPauseTime[client];
-			g_fPlayerLastTime[client] = GetGameTime() - g_fStartTime[client] - g_fPauseTime[client];
+			g_fPauseTime[client] = GetClientTickTime(client) - g_fStartPauseTime[client];
+			g_fPlayerLastTime[client] = GetClientTickTime(client) - g_fStartTime[client] - g_fPauseTime[client];
 		}
 		else
 		{
