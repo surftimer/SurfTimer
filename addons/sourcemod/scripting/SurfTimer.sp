@@ -1635,6 +1635,15 @@ public void OnLibraryAdded(const char[] name)
 	}
 }
 
+public void OnAllPluginsLoaded()
+{
+	if (!LibraryExists("endtouchfix"))
+	{
+		SetFailState("Plugin \"End-Touch-Fix\" not loaded!");
+		return;
+	}
+}
+
 public void OnPluginEnd()
 {
 	// remove clan tags
