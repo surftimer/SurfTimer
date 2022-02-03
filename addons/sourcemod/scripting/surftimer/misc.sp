@@ -1598,26 +1598,6 @@ public void InitPrecache()
 	PrecacheModel("models/weapons/ct_arms.mdl", true);
 }
 
-
-// thx to V952 https://forums.alliedmods.net/showthread.php?t=212886
-stock int TraceClientViewEntity(int client)
-{
-	float m_vecOrigin[3];
-	float m_angRotation[3];
-	GetClientEyePosition(client, m_vecOrigin);
-	GetClientEyeAngles(client, m_angRotation);
-	Handle tr = TR_TraceRayFilterEx(m_vecOrigin, m_angRotation, MASK_VISIBLE, RayType_Infinite, TRDontHitSelf, client);
-	int pEntity = -1;
-	if (TR_DidHit(tr))
-	{
-		pEntity = TR_GetEntityIndex(tr);
-		CloseHandle(tr);
-		return pEntity;
-	}
-	CloseHandle(tr);
-	return -1;
-}
-
 // thx to V952 https://forums.alliedmods.net/showthread.php?t=212886
 public bool TRDontHitSelf(int entity, int mask, any data)
 {
@@ -1903,18 +1883,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		if (g_bMapFirstRecord[client] || g_bMapPBRecord[client] || g_bMapSRVRecord[client])
 			CheckMapRanks(client);
 
-		/* Start function call */
-		Call_StartForward(g_MapFinishForward);
-
-		/* Push parameters one at a time */
-		Call_PushCell(client);
-		Call_PushFloat(g_fFinalTime[client]);
-		Call_PushString(g_szFinalTime[client]);
-		Call_PushCell(g_MapRank[client]);
-		Call_PushCell(count);
-
-		/* Finish the call, get the result */
-		Call_Finish();
+		SendMapFinishForward(client, count);
 
 	}
 	// recalc avg
@@ -2032,19 +2001,7 @@ stock void PrintChatBonus(int client, int zGroup, int rank = 0)
 			db_insertAnnouncement(szName, g_szMapName, 1, g_szFinalTime[client], zGroup);
 	}
 
-	/* Start function call */
-	Call_StartForward(g_BonusFinishForward);
-
-	/* Push parameters one at a time */
-	Call_PushCell(client);
-	Call_PushFloat(g_fFinalTime[client]);
-	Call_PushString(g_szFinalTime[client]);
-	Call_PushCell(rank);
-	Call_PushCell(g_iBonusCount[zGroup]);
-	Call_PushCell(zGroup);
-
-	/* Finish the call, get the result */
-	Call_Finish();
+	SendBonusFinishForward(client, rank, zGroup);
 
 	CheckBonusRanks(client, zGroup);
 	db_CalcAvgRunTimeBonus();
@@ -4002,20 +3959,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		char szTime[32];
 		FormatTimeFloat(client, time, 3, szTime, 32);
 
-		// Checkpoint forward
-		Call_StartForward(g_MapCheckpointForward);
-
-		/* Push parameters one at a time */
-		Call_PushCell(client);
-		Call_PushFloat(time);
-		Call_PushString(szTime);
-		Call_PushFloat(g_fCheckpointTimesRecord[zonegroup][client][zone]);
-		Call_PushString(szDiff_colorless);
-		Call_PushFloat(g_fCheckpointServerRecord[zonegroup][zone]);
-		Call_PushString(sz_srDiff_colorless);
-
-		/* Finish the call, get the result */
-		Call_Finish();
+		SendMapCheckpointForward(client, zonegroup, zone, time, szTime, szDiff_colorless, sz_srDiff_colorless);
 
 		if (g_bCheckpointsEnabled[client] && g_iCpMessages[client])
 		{
@@ -4833,55 +4777,6 @@ stock bool IsStringNumeric(const char[] str)
 
 	return true;
 }
-
-
-/**
- * Sends a new record forward on surftimer_OnNewRecord.
- * 
- * @param client           Index of the client.
- * @param szRecordDiff     String containing the formatted difference with the previous record.
- * @param bonusGroup       Number of the bonus. Default = -1.
- */
-stock void SendNewRecordForward(int client, const char[] szRecordDiff, int bonusGroup = -1)
-{
-	/* Start New record function call */
-	Call_StartForward(g_NewRecordForward);
-
-	/* Push parameters one at a time */
-	Call_PushCell(client);
-	Call_PushCell(g_iCurrentStyle[client]);
-	Call_PushString(g_szFinalTime[client]);
-	Call_PushString(szRecordDiff);
-	Call_PushCell(bonusGroup);
-
-	/* Finish the call, get the result */
-	Call_Finish();
-}
-
-
-/**
- * Sends a new WRCP forward on surftimer_OnNewWRCP.
- * 
- * @param client           Index of the client.
- * @param stage            ID of the stage.
- * @param szRecordDiff     String containing the formatted difference with the previous record.
- */
-stock void SendNewWRCPForward(int client, int stage, const char[] szRecordDiff)
-{
-	/* Start New record function call */
-	Call_StartForward(g_NewWRCPForward);
-
-	/* Push parameters one at a time */
-	Call_PushCell(client);
-	Call_PushCell(g_iCurrentStyle[client]);
-	Call_PushString(g_szFinalWrcpTime[client]);
-	Call_PushString(szRecordDiff);
-	Call_PushCell(stage);
-
-	/* Finish the call, get the result */
-	Call_Finish();
-}
-
 
 bool CGetColor(const char[] sName, char[] sColor, int iColorSize)
 {
