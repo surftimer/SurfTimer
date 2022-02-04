@@ -57,6 +57,7 @@ Yes, but not any more than other projects currently and for past years.
 * *(recommended)* [crouchboostfix](https://github.com/t5mat/crouchboostfix) - Prevents crouchboosting
 * *(recommended)* [Normalized-Run-Speed](https://github.com/sneak-it/Normalized-Run-Speed) - Normalizes players run speed across all weapons
 * *(optional)* [Surftimer-Discord](https://github.com/Sarrus1/SurfTimer-discord) - Discord WR notifications
+* *(optional)* [Surftimer-GOTV](https://github.com/tslashd/SurfTimer-GOTV) - GOTV demos for WRs
 
 **Misc**
 * *(optional)* [Surftimer-Web-Stats](https://github.com/KristianP26/Surftimer-Web-Stats) - Web statistics
