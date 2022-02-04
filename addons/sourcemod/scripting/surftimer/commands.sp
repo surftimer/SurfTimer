@@ -611,9 +611,7 @@ public Action Command_createPlayerCheckpoint(int client, int args)
 		}
 	}
 	
-	float fGetGameTime = GetGameTime();
-
-	if ((fGetGameTime - g_fLastCheckpointMade[client]) < 1.0)
+	if ((GetGameTime() - g_fLastCheckpointMade[client]) < 1.0)
 		return Plugin_Handled;
 
 	if (g_iSaveLocCount[client] < MAX_LOCS)
@@ -665,40 +663,40 @@ public Action Command_createPlayerCheckpoint(int client, int args)
 		{	
 			if (!g_bPracticeMode[player])
 			{
-				g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]] = fGetGameTime - g_fStartTime[player] - g_fPauseTime[player];
+				g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]] = GetClientTickTime(player) - g_fStartTime[player] - g_fPauseTime[player];
 			}
 			else
 			{
 				if (g_iPreviousSaveLocIdClient[player] == g_iLastSaveLocIdClient[player]) // Did player Tele to earlier saveloc?
 				{
-					g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]] = (fGetGameTime - g_fPracModeStartTime[player] - g_fPauseTime[player]) + g_fPlayerPracTimeSnap[player][g_iLastSaveLocIdClient[player] - 1];	
+					g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]] = (GetClientTickTime(player) - g_fPracModeStartTime[player] - g_fPauseTime[player]) + g_fPlayerPracTimeSnap[player][g_iLastSaveLocIdClient[player] - 1];	
 				}
 				else
 				{
-					g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]] = (fGetGameTime - g_fPracModeStartTime[player] - g_fPauseTime[player]) + g_fPlayerPracTimeSnap[player][g_iPreviousSaveLocIdClient[player]];
+					g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]] = (GetClientTickTime(player) - g_fPracModeStartTime[player] - g_fPauseTime[player]) + g_fPlayerPracTimeSnap[player][g_iPreviousSaveLocIdClient[player]];
 				}
 
-				g_fPracModeStartTime[client] = fGetGameTime;
+				g_fPracModeStartTime[client] = GetClientTickTime(player);
 			}
 		}
 		else if (g_bWrcpTimeractivated[player])
 		{
 			if (!g_bPracticeMode[player])
 			{
-				g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]] = fGetGameTime -  g_fStartWrcpTime[player] - g_fPauseTime[player];
+				g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]] = GetClientTickTime(player) -  g_fStartWrcpTime[player] - g_fPauseTime[player];
 			}
 			else
 			{
 				if (g_iPreviousSaveLocIdClient[player] == g_iLastSaveLocIdClient[player]) // Did player Tele to earlier saveloc?
 				{
-					g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]] = (fGetGameTime - g_fStartWrcpTime[player] - g_fPauseTime[player]) + g_fPlayerPracTimeSnap[player][g_iLastSaveLocIdClient[player] - 1];	
+					g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]] = (GetClientTickTime(player) - g_fStartWrcpTime[player] - g_fPauseTime[player]) + g_fPlayerPracTimeSnap[player][g_iLastSaveLocIdClient[player] - 1];	
 				}
 				else
 				{
-					g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]] = (fGetGameTime - g_fStartWrcpTime[player] - g_fPauseTime[player]) + g_fPlayerPracTimeSnap[player][g_iPreviousSaveLocIdClient[player]];
+					g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]] = (GetClientTickTime(player) - g_fStartWrcpTime[player] - g_fPauseTime[player]) + g_fPlayerPracTimeSnap[player][g_iPreviousSaveLocIdClient[player]];
 				}
 
-				g_fPracModeStartTime[client] = fGetGameTime;
+				g_fPracModeStartTime[client] = GetClientTickTime(player);
 			}
 		}
 
@@ -707,17 +705,17 @@ public Action Command_createPlayerCheckpoint(int client, int args)
 		{
 			if (!g_bPracticeMode[player])
 			{
-				g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = fGetGameTime -  g_fStartPracSrcpTime[player] - g_fPauseTime[player];
+				g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = GetClientTickTime(player) -  g_fStartPracSrcpTime[player] - g_fPauseTime[player];
 			}
 			else
 			{
 				if (g_iPreviousSaveLocIdClient[player] == g_iLastSaveLocIdClient[player]) // Did player Tele to earlier saveloc?
 				{	
-					g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = (fGetGameTime -  g_fStartPracSrcpTime[player] - g_fPauseTime[player]) + g_fPlayerPracSrcpTimeSnap[player][g_iLastSaveLocIdClient[player] - 1];
+					g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = (GetClientTickTime(player) -  g_fStartPracSrcpTime[player] - g_fPauseTime[player]) + g_fPlayerPracSrcpTimeSnap[player][g_iLastSaveLocIdClient[player] - 1];
 				}
 				else
 				{
-					g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = (fGetGameTime -  g_fStartPracSrcpTime[player] - g_fPauseTime[player]) + g_fPlayerPracSrcpTimeSnap[player][g_iPreviousSaveLocIdClient[player]];
+					g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = (GetClientTickTime(player) -  g_fStartPracSrcpTime[player] - g_fPauseTime[player]) + g_fPlayerPracSrcpTimeSnap[player][g_iPreviousSaveLocIdClient[player]];
 				}
 			}
 		}
@@ -757,7 +755,7 @@ public Action Command_createPlayerCheckpoint(int client, int args)
 			}
 		}
 
-		g_fLastCheckpointMade[client] = fGetGameTime;
+		g_fLastCheckpointMade[client] = GetGameTime();
 		g_iSaveLocUnix[g_iSaveLocCount[client]][client] = GetTime();
 
 		GetClientName(client, g_szSaveLocClientName[client][g_iSaveLocCount[client]], MAX_NAME_LENGTH);
@@ -786,7 +784,6 @@ public Action Command_goToPlayerCheckpoint(int client, int args)
 	if (g_iSaveLocCount[client] > 0)
 	{	
 		g_bSaveLocTele[client] = true;
-		g_fOldFinalWrcpTime[client] = 0.0;
 		
 		// This bypasses checkpoint enforcer when in PracMode as players wont always be passing all checkpoints
 		g_bIsValidRun[client] = true;
@@ -855,9 +852,7 @@ public Action Command_recreatePlayerCheckpoint(int client, int args)
 		return Plugin_Handled;
 	}
 
-	float fGetGameTime = GetGameTime();
-	
-	if ((fGetGameTime - g_fLastCheckpointMade[client]) < 1.0)
+	if ((GetGameTime() - g_fLastCheckpointMade[client]) < 1.0)
 		return Plugin_Handled;
 
 	if (g_iSaveLocCount[client] < MAX_LOCS)
@@ -901,7 +896,7 @@ public Action Command_recreatePlayerCheckpoint(int client, int args)
 			g_iSaveLocInBonus[client][id] = StringToInt(input[14]);
 
 			g_iSaveLocUnix[id][client] = GetTime();
-			g_fLastCheckpointMade[client] = fGetGameTime;
+			g_fLastCheckpointMade[client] = GetGameTime();
 
 			CReplyToCommand(client, "%t", "Commands7Added", g_szChatPrefix, id);
 			
@@ -1030,8 +1025,8 @@ public Action Command_Teleport(int client, int args)
 	// Throttle using !back to fix errors with replays
 	if ((GetGameTime() - g_fLastCommandBack[client]) < 1.0)
 		return Plugin_Handled;
-	else
-		g_fLastCommandBack[client] = GetGameTime();
+
+	g_fLastCommandBack[client] = GetGameTime();
 
 	if (g_Stage[g_iClientInZone[client][2]][client] == 1)
 	{
@@ -2574,7 +2569,7 @@ public void PauseMethod(int client)
 		// Timer enabled?
 		if (g_bTimerRunning[client] == true)
 		{
-			g_fStartPauseTime[client] = GetGameTime();
+			g_fStartPauseTime[client] = GetClientTickTime(client);
 			if (g_fPauseTime[client] > 0.0)
 			{
 				g_fStartPauseTime[client] = g_fStartPauseTime[client] - g_fPauseTime[client];
@@ -2587,7 +2582,7 @@ public void PauseMethod(int client)
 	{
 		if (g_fStartTime[client] != -1.0 && g_bTimerRunning[client] == true)
 		{
-			g_fPauseTime[client] = GetGameTime() - g_fStartPauseTime[client];
+			g_fPauseTime[client] = GetClientTickTime(client) - g_fStartPauseTime[client];
 			g_fSrcpPauseTime[client] = g_fPauseTime[client];
 		}
 
@@ -4030,8 +4025,7 @@ public int StyleSelectMenuHandler(Menu menu, MenuAction action, int param1, int 
 // Rate Limiting Commands
 public void RateLimit(int client)
 {
-	float currentTime = GetGameTime();
-	if (currentTime - g_fCommandLastUsed[client] < 2)
+	if (GetGameTime() - g_fCommandLastUsed[client] < 2)
 	{
 		CPrintToChat(client, "%t", "Commands46", g_szChatPrefix);
 		g_bRateLimit[client] = true;
