@@ -177,7 +177,7 @@ enum struct FileHeader
 {
 	int BinaryFormatVersion;
 	char Time[32];
-	char Playername[32];
+	char Playername[MAX_NAME_LENGTH];
 	int Checkpoints;
 	int TickCount;
 	float InitialPosition[3];
