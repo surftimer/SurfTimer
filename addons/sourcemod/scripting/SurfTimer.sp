@@ -233,10 +233,10 @@ enum ResponseType
 public Plugin myinfo =
 {
 	name = "SurfTimer",
-	author = "Ace & olokos",
+	author = "All contributors",
 	description = "a fork from fluffys cksurf fork",
 	version = VERSION,
-	url = "https://github.com/olokos/Surftimer-olokos"
+	url = "https://github.com/surftimer/Surftimer-Official"
 };
 
 /*===================================
