@@ -1,4 +1,4 @@
-name: Update Test Server
+name: Compile test and upload
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build:
+  workflow:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,18 +31,18 @@ jobs:
           wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/addons/sourcemod/scripting/include/colorlib.inc -P $INCLUDE_PATH
 
       - name: Create upload directory
-        run: mkdir -p $GITHUB_WORKSPACE/upload/addons/sourcemod/plugins
+        run: mkdir -p ./upload/csgo/addons/sourcemod/plugins/SurfTimer
 
       - name: Compile surftimer.sp
         run: |
           echo -e "\nCompiling SurfTimer.sp..."
-          spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH -o $GITHUB_WORKSPACE/upload/addons/sourcemod/plugins/SurfTimer.smx SurfTimer.sp
+          spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH -o $GITHUB_WORKSPACE/upload/csgo/addons/sourcemod/plugins/SurfTimer/SurfTimer.smx SurfTimer.sp
         working-directory: ${{ env.SCRIPTING_PATH }}/
 
       - name: Compile SurfTimer-telefinder.sp
         run: |
           echo -e "\nCompiling SurfTimer-telefinder.sp..."
-          spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH -o $GITHUB_WORKSPACE/upload/addons/sourcemod/plugins/SurfTimer-telefinder.smx SurfTimer-telefinder.sp
+          spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH -o $GITHUB_WORKSPACE/upload/csgo/addons/sourcemod/plugins/SurfTimer/SurfTimer-telefinder.smx SurfTimer-telefinder.sp
         working-directory: ${{ env.SCRIPTING_PATH }}/
 
       - name: Upload files
