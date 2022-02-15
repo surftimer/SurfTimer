@@ -9256,7 +9256,7 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
 		g_bdbHasCustomTitle[client] = true;
-		SQL_FetchString(hndl, 0, g_szCustomTitleColoured[client], sizeof(g_szCustomTitleColoured));
+		SQL_FetchString(hndl, 0, g_szCustomTitleColoured[client], sizeof(g_szCustomTitleColoured[]));
 
 		// fluffys temp fix for scoreboard
 		// int RankValue[SkillGroup];
