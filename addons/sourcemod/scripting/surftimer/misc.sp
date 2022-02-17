@@ -132,6 +132,13 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 {
 	if (!IsValidClient(client))
 		return;
+
+	RateLimit(client);
+
+	if (g_bRateLimit[client])
+	{
+		return;
+	}
 	
 	// dpexx stop teleporting if in trigger_multiple
 	/* if (g_TeleInTriggerMultiple[client]){
