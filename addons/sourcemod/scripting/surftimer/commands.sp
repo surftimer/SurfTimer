@@ -1271,6 +1271,9 @@ public Action Command_ToStage(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
+	if (RateLimitTeleport(client))
+		return Plugin_Handled;
+
 	g_fPauseTime[client] = 0.0;
 	g_fSrcpPauseTime[client] = 0.0;
 	g_wrcpStage2Fix[client] = false; // Stops "StageNotRecorded" when tele to s2, createloc, teletoloc, sm_rs, complete stage
