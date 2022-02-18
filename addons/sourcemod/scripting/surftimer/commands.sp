@@ -1324,6 +1324,9 @@ public Action Command_ToEnd(int client, int args)
 
 public Action Command_Restart(int client, int args)
 {
+	if (RateLimitTeleport(client))
+		return Plugin_Handled;
+
 	if (GetConVarBool(g_hDoubleRestartCommand) && args == 0)
 	{
 		if (GetGameTime() - g_fClientRestarting[client] > 5.0)
@@ -4022,7 +4025,7 @@ public int StyleSelectMenuHandler(Menu menu, MenuAction action, int param1, int 
 	return 0;
 }
 
-// Rate Limiting Commands
+// Rate Limiting Command - Limits every 2 seconds
 public void RateLimit(int client)
 {
 	if (GetGameTime() - g_fCommandLastUsed[client] < 2)
@@ -4037,6 +4040,21 @@ public void RateLimit(int client)
 
 	g_fCommandLastUsed[client] = GetGameTime();
 }
+
+// Rate Limiting Command - Limits every 0.1 seconds
+public bool RateLimitTeleport(int client) 
+{
+	float currentTime = GetGameTime();
+	if (currentTime - g_fCommandLastUsed[client] < 0.1)
+	{
+		CPrintToChat(client, "%t", "Commands88", g_szChatPrefix);
+		return true;
+	}
+	
+	g_fCommandLastUsed[client] = GetGameTime();
+	return false;
+}
+
 
 public Action Command_SelectMapTime(int client, int args)
 {
