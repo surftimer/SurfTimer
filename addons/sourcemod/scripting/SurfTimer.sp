@@ -1112,9 +1112,6 @@ char g_BlockedChatText[256][256];
 // Last time an overlay was displayed
 float g_fLastOverlay[MAXPLAYERS + 1];
 
-// Stage 2 Bug Fixer
-bool g_wrcpStage2Fix[MAXPLAYERS + 1];
-
 // Is client trying to teleport inside a trigger_multiple
 //bool g_TeleInTriggerMultiple[MAXPLAYERS + 1];
 bool g_bTeleByCommand[MAXPLAYERS + 1];
@@ -1941,7 +1938,6 @@ public void OnClientConnected(int client)
 	g_Stage[0][client] = 1;
 	g_bWrcpTimeractivated[client] = false;
 	g_CurrentStage[client] = 1;
-	g_wrcpStage2Fix[client] = true;
 }
 
 public void OnClientPutInServer(int client)

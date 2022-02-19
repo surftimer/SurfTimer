@@ -1366,6 +1366,9 @@ public void SetClientDefaults(int client)
 	g_iNoclipSpeed[client] = g_iDefaultNoclipSpeed;
 
 	g_iClientTick[client] = 0;
+
+	g_bWrcpEndZone[client] = false;
+	g_iClientInZone[client][2] = 0;
 }
 
 float GetClientTickTime(int client)
