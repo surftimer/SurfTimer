@@ -1327,6 +1327,9 @@ public Action Command_ToEnd(int client, int args)
 
 public Action Command_Restart(int client, int args)
 {
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+
 	if (RateLimitTeleport(client))
 		return Plugin_Handled;
 
