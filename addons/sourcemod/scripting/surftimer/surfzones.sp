@@ -587,6 +587,8 @@ public void EndTouch(int client, int action[3])
 		{	
 			if (!g_bPracticeMode[client])
 			{
+				g_WrcpStage[client] = 1;
+				g_bWrcpEndZone[client] = false;
 				g_Stage[g_iClientInZone[client][2]][client] = 1;
 				lastCheckpoint[g_iClientInZone[client][2]][client] = 999;
 

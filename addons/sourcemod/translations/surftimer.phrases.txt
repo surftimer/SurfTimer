@@ -1646,11 +1646,6 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Hints are now {red}disabled"
 	}
-	"StageNotRecorded"
-	{
-		"#format"	"{1:s}"
-		"en"		"{1} Potential S1 to S2 glitch stopped. Stage time was not recorded"
-	}
 	"StartPrestrafe"
 	{
 		"#format"	"{1:s},{2:s},{3:s}"
