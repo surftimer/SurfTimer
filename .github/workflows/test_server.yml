@@ -30,8 +30,14 @@ jobs:
           wget https://raw.githubusercontent.com/Impact123/AutoExecConfig/development/autoexecconfig.inc -P $INCLUDE_PATH
           wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/addons/sourcemod/scripting/include/colorlib.inc -P $INCLUDE_PATH
 
-      - name: Create upload directory
-        run: mkdir -p ./upload/csgo/addons/sourcemod/plugins/SurfTimer
+      - name: Create upload directories
+        run: |
+          mkdir -p ./upload/csgo/addons/sourcemod/plugins/SurfTimer
+          mkdir -p ./upload/csgo/addons/sourcemod/translations
+      
+      - name: Move translation file
+        run: |
+          mv ./addons/sourcemod/translations/surftimer.phrases.txt ./upload/csgo/addons/sourcemod/translations
 
       - name: Compile surftimer.sp
         run: |
