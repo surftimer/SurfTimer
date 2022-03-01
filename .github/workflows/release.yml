@@ -34,6 +34,7 @@ jobs:
           wget https://raw.githubusercontent.com/peace-maker/DHooks2/dynhooks/sourcemod_files/scripting/include/dhooks.inc -P $INCLUDE_PATH
           wget https://raw.githubusercontent.com/Impact123/AutoExecConfig/development/autoexecconfig.inc -P $INCLUDE_PATH
           wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/addons/sourcemod/scripting/include/colorlib.inc -P $INCLUDE_PATH
+          wget https://github.com/rumourA/End-Touch-Fix/raw/master/scripting/EndTouchFix.sp -P $SCRIPTING_PATH
 
       - name: Replace version with tag name
         run: |
@@ -49,6 +50,12 @@ jobs:
         run: |
           echo -e "\nCompiling SurfTimer-telefinder.sp..."
           spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH -o $GITHUB_WORKSPACE/SurfTimer-telefinder.smx SurfTimer-telefinder.sp
+        working-directory: ${{ env.SCRIPTING_PATH }}/
+
+      - name: Compile EndTouchFix.sp
+        run: |
+          echo -e "\nCompiling EndTouchFix.sp..."
+          spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH -o $GITHUB_WORKSPACE/EndTouchFix.smx EndTouchFix.sp
         working-directory: ${{ env.SCRIPTING_PATH }}/
 
       - name: Create Release
@@ -68,7 +75,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./SurfTimer.smx
           asset_name: SurfTimer.smx
           asset_content_type: application/octet-stream
@@ -79,7 +86,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./SurfTimer-telefinder.smx
           asset_name: SurfTimer-telefinder.smx
+          asset_content_type: application/octet-stream
+
+      - name: Upload EndTouchFix
+        id: upload-endtouchfix
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./EndTouchFix.smx
+          asset_name: EndTouchFix.smx
           asset_content_type: application/octet-stream
