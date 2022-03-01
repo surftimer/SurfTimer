@@ -4694,7 +4694,7 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 		}
 
 		// 3rd ZoneTypeId
-		for (int i = 0; i < g_mapZoneGroupCount; i++)
+		 /*for (int i = 0; i < g_mapZoneGroupCount; i++)
 		for (int k = 0; k < ZONEAMOUNT; k++)
 		for (int x = 0; x < zoneTypeIdCheckerCount[i][k]; x++)
 		if (zoneTypeIdChecker[i][k][x] != 1 && (k == 3) || (k == 4))
@@ -4712,7 +4712,7 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 				Format(szerror, 258, "[SurfTimer] Duplicate Stage Zone ID's on %s [ZoneGroup: %i, ZoneType: 3, ZoneTypeId: %i]", g_szMapName, k, x);
 				LogError(szerror);
 			}
-		}
+		} */
 
 		RefreshZones();
 
