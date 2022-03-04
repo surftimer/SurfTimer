@@ -535,7 +535,7 @@
 	"Commands8"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} How did you hit 1024 save locs?"
+		"en"		"{1} How did you hit 128 save locs?"
 	}
 	"Commands9"
 	{
