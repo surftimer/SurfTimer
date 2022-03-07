@@ -364,7 +364,7 @@ public Action Command_DeleteRecords(int client, int args)
 	if(args > 0)
 	{
 		char sqlStripped[128];
-		GetCmdArg(1, sqlStripped[client], 128);
+		GetCmdArg(1, sqlStripped, 128);
 		SQL_EscapeString(g_hDb, sqlStripped, g_EditingMap[client], 256);
 	} else
 		Format(g_EditingMap[client], 256, g_szMapName);
