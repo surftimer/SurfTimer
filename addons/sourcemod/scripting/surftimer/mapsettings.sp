@@ -302,6 +302,7 @@ public void sql_insertMapSettingsCallback(Handle owner, Handle hndl, const char[
 	if (hndl == null)
 	{
 		LogError("[SurfTimer] SQL Error (sql_insertMapSettingsCallback): %s", error);
+		return;
 	}
 
 	db_viewMapSettings();

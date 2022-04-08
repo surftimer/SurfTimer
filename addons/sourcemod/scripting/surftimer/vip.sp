@@ -109,17 +109,17 @@ public void db_selectVipStatus(char szSteamId[128], int iVip, int type)
 
 public void db_selectVipStatusCallback(Handle owner, Handle hndl, const char[] error, any pack)
 {
-	if (hndl == null)
-	{
-		LogError("[SurfTimer] SQL Error (db_selectVipStatusCallback): %s", error);
-		return;
-	}
-
 	char szSteamId[128];
 	ResetPack(pack);
 	ReadPackString(pack, szSteamId, sizeof(szSteamId));
 	int iVip = ReadPackCell(pack);
 	CloseHandle(pack);
+
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_selectVipStatusCallback): %s", error);
+		return;
+	}
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
