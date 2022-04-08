@@ -282,6 +282,7 @@ public void sql_viewMapSettingsCallback(Handle owner, Handle hndl, const char[] 
 	if (hndl == null)
 	{
 		LogError("[SurfTimer] SQL Error (sql_viewMapSettingsCallback): %s", error);
+		return;
 	}
 
 	if (SQL_HasResultSet(hndl) && SQL_GetRowCount(hndl) > 0)
