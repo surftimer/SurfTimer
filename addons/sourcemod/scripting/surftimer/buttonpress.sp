@@ -84,7 +84,15 @@ public void CL_OnStartTimerPress(int client)
 			{
 				if (g_fPersonalRecord[client] > 0.0)
 					g_bMissedMapBest[client] = false;
-				iPrestrafeRecord = g_iRecordPreStrafe[g_SpeedMode[client]][0][g_iCurrentStyle[client]];
+				
+				/*
+					FORCE SHOW XYZ UNITS ON EVERY SPEEDMODE
+					g_SpeedMode[client] == 0 -> XY
+					g_SpeedMode[client] == 1 -> XYZ
+					g_SpeedMode[client] == 2 -> Z
+				*/
+				iPrestrafeRecord = g_iRecordPreStrafe[1][0][g_iCurrentStyle[client]];
+
 				SetPrestrafe(client, 0, g_iCurrentStyle[client], false);
 				SetPrestrafe(client, 1, g_iCurrentStyle[client], false);
 			}
@@ -92,7 +100,15 @@ public void CL_OnStartTimerPress(int client)
 			{
 				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
 					g_bMissedBonusBest[client] = false;
-				iPrestrafeRecord = g_iRecordPreStrafeBonus[g_SpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
+
+				/*
+					FORCE SHOW XYZ UNITS ON EVERY SPEEDMODE
+					g_SpeedMode[client] == 0 -> XY
+					g_SpeedMode[client] == 1 -> XYZ
+					g_SpeedMode[client] == 2 -> Z
+				*/
+				iPrestrafeRecord = g_iRecordPreStrafeBonus[1][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
+
 				SetPrestrafe(client, g_iClientInZone[client][2], g_iCurrentStyle[client], true);
 			}
 		}
@@ -100,7 +116,14 @@ public void CL_OnStartTimerPress(int client)
 		if (!g_bPracticeMode[client] && !IsFakeClient(client)) {
 			char szDifference[128], szSpeed[128], preMessage[128];
 			int iDifference;
-			int prestrafe = RoundToNearest(GetSpeed(client));
+
+			//FORCE XYZ UNITS ON PRESTRAFE
+			float fVelocity[3];
+			GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+			float speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0));
+
+			int prestrafe = RoundToNearest(speed);
+
 			if (iPrestrafeRecord == 0)
 			{
 				szDifference = "";
@@ -769,8 +792,16 @@ public void CL_OnStartWrcpTimerPress(int client)
 		if (g_Stage[0][client] > 1 && !g_bPracticeMode[client] && !IsFakeClient(client)) {
 			char szDifference[128], szSpeed[128], preMessage[128];
 			int iDifference;
-			int iPrestrafeRecord = g_iRecordPreStrafe[g_SpeedMode[client]][g_Stage[0][client]][g_iCurrentStyle[client]];
-			int prestrafe = RoundToNearest(GetSpeed(client));
+			//FORCE XYZ UNITS ON PRESTRAFE
+			int iPrestrafeRecord = g_iRecordPreStrafe[1][g_Stage[0][client]][g_iCurrentStyle[client]];
+			
+			float fVelocity[3];
+			GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+			//FORCE XYZ UNITS ON PRESTRAFE
+			float speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0));
+
+			int prestrafe = RoundToNearest(speed);
+
 
 			SetPrestrafe(client, g_Stage[0][client], g_iCurrentStyle[client], false);
 
