@@ -1952,13 +1952,6 @@ public void OnClientPutInServer(int client)
 	SetClientDefaults(client);
 	Command_Restart(client, 1);
 
-	//display center speed so doesnt have to be re-enabled in options
-	if (g_bCenterSpeedDisplay[client])
-	{
-		SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
-		CreateTimer(0.1, CenterSpeedDisplayTimer, client, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
-	}
-
 	// SDKHooks
 	SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
 	SDKHook(client, SDKHook_PostThinkPost, Hook_PostThinkPost);

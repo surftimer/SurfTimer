@@ -4195,10 +4195,15 @@ public void GetSpeedColour(int client, int speed, int type)
 		{
 			if (speed >= GetConVarInt(g_hMaxVelocity))
 				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#b8b");
-			else if (g_iPreviousSpeed[client] < speed || g_iPreviousSpeed[client] == speed)
+			//gaining speed or mainting
+			else if (g_iPreviousSpeed[client] < speed || (g_iPreviousSpeed[client] == speed && speed != 0) )
 				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#8cd");
-			else
+			//losing speed
+			else if (g_iPreviousSpeed[client] > speed )
 				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#f32");
+			//not moving (speed == 0)
+			else
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#eee");
 
 			g_iPreviousSpeed[client] = speed;
 		}
@@ -4223,13 +4228,18 @@ public void GetSpeedColour(int client, int speed, int type)
 			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), g_szRainbowGradient[pos]);
 		}
 		else if (type == 3 && g_SpeedMode[client] == 0) // gain/loss
-		{
+		{	
 			if (speed >= GetConVarInt(g_hMaxVelocity))
 				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#b8b");
-			else if (g_iPreviousSpeed[client] < speed || g_iPreviousSpeed[client] == speed)
+			//gaining speed or mainting
+			else if (g_iPreviousSpeed[client] < speed || (g_iPreviousSpeed[client] == speed && speed != 0) )
 				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#8cd");
-			else
+			//losing speed
+			else if (g_iPreviousSpeed[client] > speed )
 				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#f32");
+			//not moving (speed == 0)
+			else
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#eee");
 
 			g_iPreviousSpeed[client] = speed;
 		}
