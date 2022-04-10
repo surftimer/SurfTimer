@@ -2325,7 +2325,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 
 							SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
 
-							Format(szSpeed, sizeof(szSpeed), "%i", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[ObservedUser]));
+							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[ObservedUser]));
 						}
 					}
 				}
