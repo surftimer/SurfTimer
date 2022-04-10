@@ -1394,6 +1394,7 @@ int g_iClientTick[MAXPLAYERS + 1];
 =         Predefined Arrays         =
 ===================================*/
 
+/*
 char g_sz10000mvGradient[][] =
 {
 	"#FFFFFF",
@@ -1473,6 +1474,7 @@ char g_szRainbowGradient[][] =
 	"#2affb8",
 	"#00ff00"
 };
+*/
 
 char UnallowedTitles[][] =
 {
