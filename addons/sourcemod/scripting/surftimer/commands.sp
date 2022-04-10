@@ -267,11 +267,17 @@ public Action Command_ChangeSpeedMode(int client, int args) {
 public Action Command_ChangeSpeedGradient(int client, int args) {
 	if (g_SpeedGradient[client] == 0) { 
 		g_SpeedGradient[client]++;
-		CPrintToChat(client, "%t", "SpeedGradientGreen", g_szChatPrefix);
+		CPrintToChat(client, "%t", "SpeedGradientRed", g_szChatPrefix);
 	} else if (g_SpeedGradient[client] == 1) {
 		g_SpeedGradient[client]++;
-		CPrintToChat(client, "%t", "SpeedGradientRainbow", g_szChatPrefix);
+		CPrintToChat(client, "%t", "SpeedGradientGreen", g_szChatPrefix);
 	} else if (g_SpeedGradient[client] == 2) {
+		g_SpeedGradient[client]++;
+		CPrintToChat(client, "%t", "SpeedGradientBlue", g_szChatPrefix);
+	} else if (g_SpeedGradient[client] == 3) {
+		g_SpeedGradient[client]++;
+		CPrintToChat(client, "%t", "SpeedGradientYellow", g_szChatPrefix);
+	} else if (g_SpeedGradient[client] == 4) {
 		g_SpeedGradient[client]++;
 		CPrintToChat(client, "%t", "SpeedGradientMomentum", g_szChatPrefix);
 	} else {
@@ -2214,7 +2220,7 @@ public void ToggleTimer(int client)
 
 void SpeedGradient(int client, bool menu = false)
 {
-	if (g_SpeedGradient[client] != 3)
+	if (g_SpeedGradient[client] != 5)
 		g_SpeedGradient[client]++;
 	else
 		g_SpeedGradient[client] = 0;
@@ -2246,29 +2252,18 @@ void CenterSpeedDisplay(int client, bool menu = false)
 		{	
 
 			char szSpeed[128];
-			int displayColor[3] = { 255, 255, 255 };
+			int displayColor[3];
 
 			// player alive
 			if (IsPlayerAlive(client))
 			{	
 				
-				if (g_SpeedGradient[client] == 3 && g_SpeedMode[client] == 0){//XY WITH MOMENTUM MODE
+				displayColor = GetSpeedColourCSD(client, RoundToNearest(g_fLastSpeed[client]), g_SpeedGradient[client]);
 
-					GetSpeedColour(client, RoundToNearest(g_fLastSpeed[client]), g_SpeedGradient[client]);
-
-					if( strcmp( g_szSpeedColour[client],"#f32") == 0)
-						displayColor = { 255, 0, 0 };
-					else if( strcmp( g_szSpeedColour[client],"#8cd") == 0 )
-						displayColor = { 0, 255, 0 };
-					else 
-						displayColor = { 255, 255, 255 };
-
-					SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
-				}
-				else
-					SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
+				SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
 
 				Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
+
 
 			}
 			// player not alive (check wether spec'ing a bot or another player)
@@ -2317,42 +2312,18 @@ void CenterSpeedDisplay(int client, bool menu = false)
 								}
 							}
 
-							if (g_SpeedGradient[client] == 3 && g_SpeedMode[client] == 0){//XY WITH MOMENTUM MODE
-							
-								GetSpeedColour(client, RoundToNearest(fSpeedHUD), g_SpeedGradient[client]);
+							displayColor = GetSpeedColourCSD(client, RoundToNearest(fSpeedHUD), g_SpeedGradient[client]);
 
-								if( strcmp( g_szSpeedColour[client],"#f32") == 0)
-									displayColor = { 255, 0, 0 };
-								else if( strcmp( g_szSpeedColour[client],"#8cd") == 0 )
-									displayColor = { 0, 255, 0 };
-								else 
-									displayColor = { 255, 255, 255 };
-
-								SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
-							}
-							else
-								SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
+							SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
 
 							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(fSpeedHUD));
 						}
 						// spec'ing player
 						else {
 							
-							if (g_SpeedGradient[client] == 3 && g_SpeedMode[client] == 0){//XY WITH MOMENTUM MODE
+							displayColor = GetSpeedColourCSD(client, RoundToNearest(g_fLastSpeed[ObservedUser]), g_SpeedGradient[client]);
 
-								GetSpeedColour(client, RoundToNearest(g_fLastSpeed[ObservedUser]), g_SpeedGradient[client]);
-
-								if( strcmp( g_szSpeedColour[client],"#f32") == 0)
-									displayColor = { 255, 0, 0 };
-								else if( strcmp( g_szSpeedColour[client],"#8cd") == 0 )
-									displayColor = { 0, 255, 0 };
-								else 
-									displayColor = { 255, 255, 255 };
-
-								SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
-							}
-							else
-								SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
+							SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
 
 							Format(szSpeed, sizeof(szSpeed), "%i", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[ObservedUser]));
 						}
@@ -3476,9 +3447,13 @@ public void MiscellaneousOptions(int client)
 	if (g_SpeedGradient[client] == 0)
 		AddMenuItem(menu, "", "[WHITE] Speed Gradient");
 	else if (g_SpeedGradient[client] == 1)
-		AddMenuItem(menu, "", "[GREEN] Speed Gradient");
+		AddMenuItem(menu, "", "[RED] Speed Gradient");
 	else if (g_SpeedGradient[client] == 2)
-		AddMenuItem(menu, "", "[RAINBOW] Speed Gradient");
+		AddMenuItem(menu, "", "[GREEN] Speed Gradient");
+	else if (g_SpeedGradient[client] == 3)
+		AddMenuItem(menu, "", "[BLUE] Speed Gradient");
+	else if (g_SpeedGradient[client] == 4)
+		AddMenuItem(menu, "", "[YELLOW] Speed Gradient");
 	else
 		AddMenuItem(menu, "", "[MOMENTUM] Speed Gradient");
 	
