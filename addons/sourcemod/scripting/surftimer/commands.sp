@@ -2318,7 +2318,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 							}
 
 							if (g_SpeedGradient[client] == 3 && g_SpeedMode[client] == 0){//XY WITH MOMENTUM MODE
-							
+
 								GetSpeedColour(client, RoundToNearest(fSpeedHUD), g_SpeedGradient[client]);
 
 								if( strcmp( g_szSpeedColour[client],"#f32") == 0)
@@ -4376,9 +4376,12 @@ public Action Command_SelectBonusTime(int client, int args)
 
 // Show Triggers https://forums.alliedmods.net/showthread.php?t=290356
 public Action Command_ToggleTriggers(int client, int args)
-{
+{	
+	//ALLOW EVERY PLAYER TO USE SM_TRIGGERS
+	/*
 	if (!IsPlayerVip(client))
 		return Plugin_Handled;
+	*/
 
 	g_bShowTriggers[client] = !g_bShowTriggers[client];
 
