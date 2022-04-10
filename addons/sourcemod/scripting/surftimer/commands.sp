@@ -267,11 +267,17 @@ public Action Command_ChangeSpeedMode(int client, int args) {
 public Action Command_ChangeSpeedGradient(int client, int args) {
 	if (g_SpeedGradient[client] == 0) { 
 		g_SpeedGradient[client]++;
-		CPrintToChat(client, "%t", "SpeedGradientGreen", g_szChatPrefix);
+		CPrintToChat(client, "%t", "SpeedGradientRed", g_szChatPrefix);
 	} else if (g_SpeedGradient[client] == 1) {
 		g_SpeedGradient[client]++;
-		CPrintToChat(client, "%t", "SpeedGradientRainbow", g_szChatPrefix);
+		CPrintToChat(client, "%t", "SpeedGradientGreen", g_szChatPrefix);
 	} else if (g_SpeedGradient[client] == 2) {
+		g_SpeedGradient[client]++;
+		CPrintToChat(client, "%t", "SpeedGradientBlue", g_szChatPrefix);
+	} else if (g_SpeedGradient[client] == 3) {
+		g_SpeedGradient[client]++;
+		CPrintToChat(client, "%t", "SpeedGradientYellow", g_szChatPrefix);
+	} else if (g_SpeedGradient[client] == 4) {
 		g_SpeedGradient[client]++;
 		CPrintToChat(client, "%t", "SpeedGradientMomentum", g_szChatPrefix);
 	} else {
