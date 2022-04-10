@@ -236,15 +236,17 @@ public Action Command_ToggleNcTriggers(int client, int args) {
 }
 
 public Action Command_CenterSpeed(int client, int args) {
-	if (g_bCenterSpeedDisplay[client]) {
+	if (g_bCenterSpeedDisplay[client]){
 		g_bCenterSpeedDisplay[client] = false;
 		CPrintToChat(client, "%t", "CenterSpeedOff", g_szChatPrefix);
-	} else {
+	}
+	else{
 		g_bCenterSpeedDisplay[client] = true;
-		SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
-		CreateTimer(0.1, CenterSpeedDisplayTimer, client, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
 		CPrintToChat(client, "%t", "CenterSpeedOn", g_szChatPrefix);
 	}
+		
+
+	CenterSpeedDisplay(client, false);
 	return Plugin_Handled;
 }
 

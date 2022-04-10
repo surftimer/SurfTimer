@@ -180,14 +180,6 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 			StartRecording(client);
 			CreateTimer(1.5, CenterMsgTimer, client, TIMER_FLAG_NO_MAPCHANGE);
 
-			if (g_bCenterSpeedDisplay[client])
-			{
-				SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
-				CreateTimer(0.1, CenterSpeedDisplayTimer, client, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
-			}
-
-			g_iCurrentTick[client] = GetGameTickCount();
-
 			g_bFirstSpawn[client] = false;
 		}
 
@@ -837,6 +829,9 @@ public Action OnLogAction(Handle source, Identity ident, int client, int target,
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
+	//calling this function here makes it refresh musch faster/smoother
+	CenterSpeedDisplay(client,false);
+
 	if (buttons & IN_DUCK && g_bInDuck[client] == true)
 	{
 		CPrintToChat(client, "%t", "Hooks11", g_szChatPrefix);

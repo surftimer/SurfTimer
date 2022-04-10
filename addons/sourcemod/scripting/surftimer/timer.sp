@@ -612,24 +612,6 @@ public Action AnnouncementTimer(Handle timer)
 	return Plugin_Continue;
 }
 
-public Action CenterSpeedDisplayTimer(Handle timer, any client)
-{
-	if (IsValidClient(client) && !IsFakeClient(client) && g_bCenterSpeedDisplay[client])
-	{
-		char szSpeed[128];
-		if (IsPlayerAlive(client))
-			Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
-		else if (g_SpecTarget[client] != -1)
-			Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[g_SpecTarget[client]]));
-
-		ShowHudText(client, 2, szSpeed);
-	}
-	else
-		return Plugin_Stop;
-
-	return Plugin_Continue;
-}
-
 public Action EnableJoinMsgs(Handle timer)
 {
 	g_bEnableJoinMsgs = true;
