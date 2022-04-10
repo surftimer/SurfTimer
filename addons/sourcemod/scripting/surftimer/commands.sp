@@ -236,15 +236,17 @@ public Action Command_ToggleNcTriggers(int client, int args) {
 }
 
 public Action Command_CenterSpeed(int client, int args) {
-	if (g_bCenterSpeedDisplay[client]) {
+	if (g_bCenterSpeedDisplay[client]){
 		g_bCenterSpeedDisplay[client] = false;
 		CPrintToChat(client, "%t", "CenterSpeedOff", g_szChatPrefix);
-	} else {
+	}
+	else{
 		g_bCenterSpeedDisplay[client] = true;
-		SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
-		CreateTimer(0.1, CenterSpeedDisplayTimer, client, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
 		CPrintToChat(client, "%t", "CenterSpeedOn", g_szChatPrefix);
 	}
+		
+
+	CenterSpeedDisplay(client, false);
 	return Plugin_Handled;
 }
 
@@ -2233,13 +2235,133 @@ void SpeedMode(int client, bool menu = false)
 }
 
 void CenterSpeedDisplay(int client, bool menu = false)
-{
-	g_bCenterSpeedDisplay[client] = !g_bCenterSpeedDisplay[client];
-	
+{	
+	//only swap values if the call comes from the "options" menu OR using the "sm_centerspeed" command
+	if(menu)
+		g_bCenterSpeedDisplay[client] = !g_bCenterSpeedDisplay[client];
+
 	if (g_bCenterSpeedDisplay[client])
 	{
-		SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
-		CreateTimer(0.1, CenterSpeedDisplayTimer, client, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
+		if (IsValidClient(client) && !IsFakeClient(client) && g_bCenterSpeedDisplay[client])
+		{	
+
+			char szSpeed[128];
+			int displayColor[3] = { 255, 255, 255 };
+
+			// player alive
+			if (IsPlayerAlive(client))
+			{	
+				
+				if (g_SpeedGradient[client] == 3 && g_SpeedMode[client] == 0){//XY WITH MOMENTUM MODE
+
+					GetSpeedColour(client, RoundToNearest(g_fLastSpeed[client]), g_SpeedGradient[client]);
+
+					if( strcmp( g_szSpeedColour[client],"#f32") == 0)
+						displayColor = { 255, 0, 0 };
+					else if( strcmp( g_szSpeedColour[client],"#8cd") == 0 )
+						displayColor = { 0, 255, 0 };
+					else 
+						displayColor = { 255, 255, 255 };
+
+					SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
+				}
+				else
+					SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
+
+				Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
+
+			}
+			// player not alive (check wether spec'ing a bot or another player)
+			else {
+				int SpecMode;
+				int ObservedUser;
+
+				SpecMode = GetEntProp(client, Prop_Send, "m_iObserverMode");
+
+				ObservedUser = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
+
+				// spec'ing
+				if (SpecMode == 4 || SpecMode == 5)
+				{
+					g_SpecTarget[client] = ObservedUser;
+					if (IsValidClient(ObservedUser))
+					{	
+						//spec'ing a bot
+						if (IsFakeClient(ObservedUser))
+						{
+							float fSpeed[3];
+							GetEntPropVector(ObservedUser, Prop_Data, "m_vecVelocity", fSpeed);
+
+							float fSpeedHUD = SquareRoot(Pow(fSpeed[0], 2.0) + Pow(fSpeed[1], 2.0));
+
+							if (ObservedUser == g_RecordBot)
+							{
+								if (g_iSelectedReplayStyle == 5)
+								{
+									fSpeedHUD /= 0.5;
+								}
+								else if (g_iSelectedReplayStyle == 6)
+								{
+									fSpeedHUD /= 1.5;
+								}
+							}
+							else if (ObservedUser == g_BonusBot)
+							{
+								if (g_iSelectedBonusReplayStyle == 5)
+								{
+									fSpeedHUD /= 0.5;
+								}
+								else if (g_iSelectedBonusReplayStyle == 6)
+								{
+									fSpeedHUD /= 1.5;
+								}
+							}
+
+							if (g_SpeedGradient[client] == 3 && g_SpeedMode[client] == 0){//XY WITH MOMENTUM MODE
+							
+								GetSpeedColour(client, RoundToNearest(fSpeedHUD), g_SpeedGradient[client]);
+
+								if( strcmp( g_szSpeedColour[client],"#f32") == 0)
+									displayColor = { 255, 0, 0 };
+								else if( strcmp( g_szSpeedColour[client],"#8cd") == 0 )
+									displayColor = { 0, 255, 0 };
+								else 
+									displayColor = { 255, 255, 255 };
+
+								SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
+							}
+							else
+								SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
+
+							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(fSpeedHUD));
+						}
+						// spec'ing player
+						else {
+							
+							if (g_SpeedGradient[client] == 3 && g_SpeedMode[client] == 0){//XY WITH MOMENTUM MODE
+
+								GetSpeedColour(client, RoundToNearest(g_fLastSpeed[ObservedUser]), g_SpeedGradient[client]);
+
+								if( strcmp( g_szSpeedColour[client],"#f32") == 0)
+									displayColor = { 255, 0, 0 };
+								else if( strcmp( g_szSpeedColour[client],"#8cd") == 0 )
+									displayColor = { 0, 255, 0 };
+								else 
+									displayColor = { 255, 255, 255 };
+
+								SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
+							}
+							else
+								SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
+
+							Format(szSpeed, sizeof(szSpeed), "%i", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[ObservedUser]));
+						}
+					}
+				}
+			}
+
+			ShowHudText(client, 2,szSpeed);
+		}
 	}
 
 	if (menu)
