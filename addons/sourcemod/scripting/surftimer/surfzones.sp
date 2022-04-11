@@ -347,19 +347,6 @@ public void StartTouch(int client, int action[3])
 				g_CurrentStage[client] = 0;
 			}
 
-			// Start recording for record bot
-			if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) || (!IsFakeClient(client) && GetConVarBool(g_hBonusBot)))
-			{
-				if (IsPlayerAlive(client))
-				{
-					StartRecording(client);
-					if (g_bhasStages)
-					{
-						Stage_StartRecording(client);
-					}
-				}
-			}
-
 		}
 		else if (action[0] == 2) // End Zone
 		{
@@ -481,18 +468,6 @@ public void StartTouch(int client, int action[3])
 				else
 				{
 					lastCheckpoint[g_iClientInZone[client][2]][client] = g_iPlayerPracLocationSnap[client][g_iLastSaveLocIdClient[client]] - 1;
-				}
-
-				// Start recording for record bot
-				if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) || (!IsFakeClient(client) && GetConVarBool(g_hBonusBot)))
-				{
-					if (IsPlayerAlive(client))
-					{
-						if (g_bhasStages)
-						{
-							Stage_StartRecording(client);
-						}
-					}
 				}
 
 			}
