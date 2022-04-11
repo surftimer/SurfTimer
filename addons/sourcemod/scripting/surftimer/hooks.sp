@@ -986,7 +986,6 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 
 			//IF PLAYER IS IN A STARTZONE
 			if(g_bInStartZone[client] || g_bInStageZone[client]){
-				CPrintToChat(client,"START");
 
 				//IF PLAYER IS IN STARTZONE/STAGESTART , NOT MOVING AND NOT ON A RUN WE CAN STOP RECORDING WHEN HE STOPS MOVING
 				if(g_fLastSpeed[client] == 0 && g_aRecording[client] != null && !g_bTimerRunning[client])
