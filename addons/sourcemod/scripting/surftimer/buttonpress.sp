@@ -173,18 +173,6 @@ public void CL_OnStartTimerPress(int client)
 	// Play Start Sound
 	PlayButtonSound(client);
 
-	// Start recording for record bot
-	if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) || (!IsFakeClient(client) && GetConVarBool(g_hBonusBot)))
-	{
-		if (IsPlayerAlive(client))
-		{
-			StartRecording(client);
-			if (g_bhasStages)
-			{
-				Stage_StartRecording(client);
-			}
-		}
-	}
 }
 
 // End Timer
@@ -787,7 +775,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 			// Enable Trigger Output on Timer Restart
 			g_bTeleByCommand[client] = false;
 			g_WrcpStage[client] = g_Stage[0][client];
-			Stage_StartRecording(client);
+			//Stage_StartRecording(client);
 		}
 		if (g_Stage[0][client] > 1 && !g_bPracticeMode[client] && !IsFakeClient(client)) {
 			char szDifference[128], szSpeed[128], preMessage[128];
