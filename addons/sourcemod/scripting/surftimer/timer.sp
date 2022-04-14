@@ -488,6 +488,13 @@ public Action ShowHintsTimer(Handle timer)
 
 public Action TimeleftTimer(Handle timer,any client)
 {	
+
+	/* 
+	=====
+	Code used from : "https://github.com/FAQU2/timeleft-onscreen"
+	=====
+	*/
+
 	static int time;
    	static char timeleft[32];
 
