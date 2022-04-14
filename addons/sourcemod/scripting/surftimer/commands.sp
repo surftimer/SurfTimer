@@ -151,6 +151,8 @@ void CreateCommands()
 	RegConsoleCmd("sm_surftimer", Client_OptionMenu, "[surftimer] opens options menu");
 	RegConsoleCmd("sm_bhoptimer", Client_OptionMenu, "[surftimer] opens options menu");
 	RegConsoleCmd("sm_knife", Command_GiveKnife, "[surftimer] Give players a knife");
+	RegConsoleCmd("sm_timeleft", Command_Timeleft, "[surftimer] Display Timeleft on bottom of screen");
+
 
 	// New Commands
 	RegConsoleCmd("sm_mrank", Command_SelectMapTime, "[surftimer] prints a players map record in chat.");
@@ -236,6 +238,7 @@ public Action Command_ToggleNcTriggers(int client, int args) {
 }
 
 public Action Command_CenterSpeed(int client, int args) {
+
 	if (g_bCenterSpeedDisplay[client]){
 		g_bCenterSpeedDisplay[client] = false;
 		CPrintToChat(client, "%t", "CenterSpeedOff", g_szChatPrefix);
@@ -245,7 +248,6 @@ public Action Command_CenterSpeed(int client, int args) {
 		CPrintToChat(client, "%t", "CenterSpeedOn", g_szChatPrefix);
 	}
 		
-
 	CenterSpeedDisplay(client, false);
 	return Plugin_Handled;
 }
@@ -365,6 +367,21 @@ public Action Command_ToggleHints(int client, int args)
 		CPrintToChat(client, "%t", "HintsToggleOn", g_szChatPrefix);
 	}
 	return Plugin_Handled;
+}
+
+public Action Command_Timeleft(int client, int args){
+
+	if(g_bTimeleftDisplay[client]){
+		g_bTimeleftDisplay[client] = false;
+		CPrintToChat(client, "%t", "TimeleftOff", g_szChatPrefix);
+	}
+	else{
+		g_bTimeleftDisplay[client] = true;
+		CPrintToChat(client, "%t", "TimeleftOn", g_szChatPrefix);
+	}
+
+	return Plugin_Handled;
+
 }
 
 public Action Command_DeleteRecords(int client, int args)
@@ -2247,7 +2264,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 		g_bCenterSpeedDisplay[client] = !g_bCenterSpeedDisplay[client];
 
 	if (g_bCenterSpeedDisplay[client])
-	{
+	{	
 		if (IsValidClient(client) && !IsFakeClient(client) && g_bCenterSpeedDisplay[client])
 		{	
 
@@ -2260,7 +2277,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 				
 				displayColor = GetSpeedColourCSD(client, RoundToNearest(g_fLastSpeed[client]), g_SpeedGradient[client]);
 
-				SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
+				SetHudTextParams(-1.0, 0.30, 0.01, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
 
 				Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
 
@@ -2314,7 +2331,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 
 							displayColor = GetSpeedColourCSD(client, RoundToNearest(fSpeedHUD), g_SpeedGradient[client]);
 
-							SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
+							SetHudTextParams(-1.0, 0.30, 0.01, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
 
 							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(fSpeedHUD));
 						}
@@ -2323,7 +2340,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 							
 							displayColor = GetSpeedColourCSD(client, RoundToNearest(g_fLastSpeed[ObservedUser]), g_SpeedGradient[client]);
 
-							SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
+							SetHudTextParams(-1.0, 0.30, 0.01, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
 
 							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[ObservedUser]));
 						}
@@ -2331,7 +2348,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 				}
 			}
 
-			ShowHudText(client, 2,szSpeed);
+			ShowHudText(client, 0, szSpeed);
 		}
 	}
 
@@ -2362,6 +2379,14 @@ void HintsText(int client, bool menu = false)
 {
 	g_bAllowHints[client] = !g_bAllowHints[client];
 	
+	if (menu)
+		MiscellaneousOptions(client);
+}
+
+void TimeleftText(int client, bool menu = false)
+{	
+	g_bTimeleftDisplay[client] = !g_bTimeleftDisplay[client];
+
 	if (menu)
 		MiscellaneousOptions(client);
 }
@@ -3495,6 +3520,12 @@ public void MiscellaneousOptions(int client)
 	else
 		AddMenuItem(menu, "", "[OFF] Hints");
 	
+	// Show timeleft bottom screen
+	if (g_bTimeleftDisplay[client])
+		AddMenuItem(menu, "", "[ON] Timeleft");
+	else
+		AddMenuItem(menu, "", "[OFF] Timeleft");
+	
 	SetMenuExitBackButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
 }
@@ -3515,6 +3546,7 @@ public int MiscellaneousOptionsHandler(Menu menu, MenuAction action, int param1,
 			case 7: HideViewModel(param1, true);
 			case 8: PrespeedText(param1, true);
 			case 9: HintsText(param1, true);
+			case 10: TimeleftText(param1, true);
 		}
 	}
 	else if (action == MenuAction_Cancel)

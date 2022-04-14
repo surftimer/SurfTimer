@@ -998,6 +998,9 @@ int g_iCurrentlyPlayingStage;
 
 /*----------  Misc  ----------*/
 
+//Show Timeleft Display at the bottom of the screen
+bool g_bTimeleftDisplay[MAXPLAYERS + 1];
+
 // Used to load all the hints
 ArrayList g_aHints;
 
@@ -1909,6 +1912,8 @@ public void OnConfigsExecuted()
 		if (g_aHints.Length != 0)
 			CreateTimer(GetConVarFloat(g_iHintsInterval), ShowHintsTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 	}
+
+	CreateTimer(1.0, TimeleftTimer, _, TIMER_REPEAT);
 
 	if (GetConVarBool(g_hEnforceDefaultTitles))
 		ReadDefaultTitlesWhitelist();

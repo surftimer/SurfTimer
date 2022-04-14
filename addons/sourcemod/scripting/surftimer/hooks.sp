@@ -75,10 +75,10 @@ public Action Event_OnFire(Handle event, const char[] name, bool dontBroadcast)
 
 // Player Spawns
 public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
-{
+{	
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if (client != 0)
-	{
+	{	
 		g_SpecTarget[client] = -1;
 		g_bPause[client] = false;
 		g_bFirstTimerStart[client] = true;
@@ -184,6 +184,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 			CreateTimer(1.5, CenterMsgTimer, client, TIMER_FLAG_NO_MAPCHANGE);
 
 			g_bFirstSpawn[client] = false;
+
 		}
 
 		// Get Start Position For Challenge
@@ -823,6 +824,30 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 {
 	//calling this function here makes it refresh musch faster/smoother
 	CenterSpeedDisplay(client,false);
+
+	//DISPLAY TIMELEFT AT THE BOTTOM OF THE SCREEN
+	//TimeleftText_Display(client);
+	/* 
+	
+	I THINK THIS IS MORE TAXING ON THE SERVER?!
+	PERHAPS
+
+	if(g_bTimeleftDisplay[client]){
+		int time;
+   		char timeleft[32];
+		GetMapTimeLeft(time);
+
+		if (time > 3600)
+				FormatEx(timeleft, sizeof(timeleft), "Timeleft: %ih %02im", time / 3600, (time / 60) % 60);
+		else if (time < 60)
+			FormatEx(timeleft, sizeof(timeleft), "Timeleft: %02is", time);
+		else 
+			FormatEx(timeleft, sizeof(timeleft), "Timeleft: %im %02is", time / 60, time % 60);
+
+		SetHudTextParams(-1.0, 1.0, 1.0, 255, 255, 0, 255, 0, 0.0, 0.0, 0.0);
+		ShowHudText(client, 6, "%s", timeleft);
+	}
+	*/
 
 	if (buttons & IN_DUCK && g_bInDuck[client] == true)
 	{

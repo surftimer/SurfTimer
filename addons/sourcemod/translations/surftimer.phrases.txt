@@ -1791,4 +1791,14 @@
 		"#format"	"{1:s},{2:s}"
 		"en"		"{1} Auto-reset is enabled, but you weren't teleported because you're surfing in {gold}{2}"
 	}
+	"TimeleftOn"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} The timeleft display is now {green}enabled"
+	}
+	"TimeleftOff"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} The timeleft display is now {red}disabled"
+	}
 }
