@@ -3265,7 +3265,10 @@ public void db_viewRecordCheckpointInMap()
 }
 
 public void sql_selectRecordCheckpointsCallback(Handle owner, Handle hndl, const char[] error, any data)
-{
+{	
+
+	PrintToConsoleAll("YPU YPU YPU");
+
 	if (hndl == null)
 	{
 		LogError("[SurfTimer] SQL Error (sql_selectRecordCheckpointsCallback): %s", error);
@@ -3287,6 +3290,9 @@ public void sql_selectRecordCheckpointsCallback(Handle owner, Handle hndl, const
 					g_bCheckpointRecordFound[zonegroup] = true;
 			}
 		}
+
+		db_viewRecordCheckpointSpeedsInMap();
+
 	}
 
 	if (!g_bServerDataLoaded)
@@ -3365,7 +3371,7 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 	return;
 
 	if (SQL_HasResultSet(hndl))
-	{
+	{	
 		while (SQL_FetchRow(hndl))
 		{
 			zoneGrp = SQL_FetchInt(hndl, 0);
@@ -3374,6 +3380,13 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 			for (int i = 0; i < 35; i++)
 			{
 				g_fCheckpointTimesRecord[zoneGrp][client][i] = SQL_FetchFloat(hndl, k);
+				//PrintToConsole(client,"TIME value %i: %f",i,g_fCheckpointTimesRecord[zoneGrp][client][i]);
+				k++;
+			}
+			for (int i = 0; i < 35; i++)
+			{
+				g_fCheckpointSpeedsRecord[zoneGrp][client][i] = SQL_FetchFloat(hndl, k);
+				//PrintToConsole(client,"SPEED value %i: %f",i,g_fCheckpointSpeedsRecord[zoneGrp][client][i]);
 				k++;
 			}
 		}
@@ -3456,8 +3469,14 @@ public void db_viewCheckpointsinZoneGroupCallback(Handle owner, Handle hndl, con
 		for (int i = 0; i < 35; i++)
 		{
 			g_fCheckpointTimesRecord[zonegrp][client][i] = SQL_FetchFloat(hndl, i);
-			//CPrintToChat(client,"value %i: %f",i,g_fCheckpointTimesRecord[zonegrp][client][i]);
+			//PrintToConsole(client,"TIME value %i: %f",i,g_fCheckpointTimesRecord[zonegrp][client][i]);
 		}
+		for (int i = 0; i < 35; i++)
+		{
+			g_fCheckpointSpeedsRecord[zonegrp][client][i] = SQL_FetchFloat(hndl, i + 35);
+			//PrintToConsole(client,"SPEED value %i: %f",i,g_fCheckpointSpeedsRecord[zonegrp][client][i]);
+		}
+
 	}
 	else
 	{
@@ -3472,17 +3491,17 @@ public void db_UpdateCheckpoints(int client, char szSteamID[32], int zGroup)
 	WritePackCell(pack, zGroup);
 	if (g_bCheckpointsFound[zGroup][client])
 	{
-		char szQuery[1024];
+		char szQuery[2048];
 
-		Format(szQuery, 1024, sql_updateCheckpoints, g_fCheckpointTimesNew[zGroup][client][0], g_fCheckpointTimesNew[zGroup][client][1], g_fCheckpointTimesNew[zGroup][client][2], g_fCheckpointTimesNew[zGroup][client][3], g_fCheckpointTimesNew[zGroup][client][4], g_fCheckpointTimesNew[zGroup][client][5], g_fCheckpointTimesNew[zGroup][client][6], g_fCheckpointTimesNew[zGroup][client][7], g_fCheckpointTimesNew[zGroup][client][8], g_fCheckpointTimesNew[zGroup][client][9], g_fCheckpointTimesNew[zGroup][client][10], g_fCheckpointTimesNew[zGroup][client][11], g_fCheckpointTimesNew[zGroup][client][12], g_fCheckpointTimesNew[zGroup][client][13], g_fCheckpointTimesNew[zGroup][client][14], g_fCheckpointTimesNew[zGroup][client][15], g_fCheckpointTimesNew[zGroup][client][16], g_fCheckpointTimesNew[zGroup][client][17], g_fCheckpointTimesNew[zGroup][client][18], g_fCheckpointTimesNew[zGroup][client][19], g_fCheckpointTimesNew[zGroup][client][20], g_fCheckpointTimesNew[zGroup][client][21], g_fCheckpointTimesNew[zGroup][client][22], g_fCheckpointTimesNew[zGroup][client][23], g_fCheckpointTimesNew[zGroup][client][24], g_fCheckpointTimesNew[zGroup][client][25], g_fCheckpointTimesNew[zGroup][client][26], g_fCheckpointTimesNew[zGroup][client][27], g_fCheckpointTimesNew[zGroup][client][28], g_fCheckpointTimesNew[zGroup][client][29], g_fCheckpointTimesNew[zGroup][client][30], g_fCheckpointTimesNew[zGroup][client][31], g_fCheckpointTimesNew[zGroup][client][32], g_fCheckpointTimesNew[zGroup][client][33], g_fCheckpointTimesNew[zGroup][client][34], g_fCheckpointSpeedsNew[zGroup][client][0], g_fCheckpointSpeedsNew[zGroup][client][1], g_fCheckpointSpeedsNew[zGroup][client][2], g_fCheckpointSpeedsNew[zGroup][client][3], g_fCheckpointSpeedsNew[zGroup][client][4], g_fCheckpointSpeedsNew[zGroup][client][5], g_fCheckpointSpeedsNew[zGroup][client][6], g_fCheckpointSpeedsNew[zGroup][client][7], g_fCheckpointSpeedsNew[zGroup][client][8], g_fCheckpointSpeedsNew[zGroup][client][9], g_fCheckpointSpeedsNew[zGroup][client][10], g_fCheckpointSpeedsNew[zGroup][client][11], g_fCheckpointSpeedsNew[zGroup][client][12], g_fCheckpointSpeedsNew[zGroup][client][13], g_fCheckpointSpeedsNew[zGroup][client][14], g_fCheckpointSpeedsNew[zGroup][client][15], g_fCheckpointSpeedsNew[zGroup][client][16], g_fCheckpointSpeedsNew[zGroup][client][17], g_fCheckpointSpeedsNew[zGroup][client][18], g_fCheckpointSpeedsNew[zGroup][client][19], g_fCheckpointSpeedsNew[zGroup][client][20], g_fCheckpointSpeedsNew[zGroup][client][21], g_fCheckpointSpeedsNew[zGroup][client][22], g_fCheckpointSpeedsNew[zGroup][client][23], g_fCheckpointSpeedsNew[zGroup][client][24], g_fCheckpointSpeedsNew[zGroup][client][25], g_fCheckpointSpeedsNew[zGroup][client][26], g_fCheckpointSpeedsNew[zGroup][client][27], g_fCheckpointSpeedsNew[zGroup][client][28], g_fCheckpointSpeedsNew[zGroup][client][29], g_fCheckpointSpeedsNew[zGroup][client][30], g_fCheckpointSpeedsNew[zGroup][client][31], g_fCheckpointSpeedsNew[zGroup][client][32], g_fCheckpointSpeedsNew[zGroup][client][33], g_fCheckpointSpeedsNew[zGroup][client][34], szSteamID, g_szMapName, zGroup);
+		Format(szQuery, 2048, sql_updateCheckpoints, g_fCheckpointTimesNew[zGroup][client][0], g_fCheckpointTimesNew[zGroup][client][1], g_fCheckpointTimesNew[zGroup][client][2], g_fCheckpointTimesNew[zGroup][client][3], g_fCheckpointTimesNew[zGroup][client][4], g_fCheckpointTimesNew[zGroup][client][5], g_fCheckpointTimesNew[zGroup][client][6], g_fCheckpointTimesNew[zGroup][client][7], g_fCheckpointTimesNew[zGroup][client][8], g_fCheckpointTimesNew[zGroup][client][9], g_fCheckpointTimesNew[zGroup][client][10], g_fCheckpointTimesNew[zGroup][client][11], g_fCheckpointTimesNew[zGroup][client][12], g_fCheckpointTimesNew[zGroup][client][13], g_fCheckpointTimesNew[zGroup][client][14], g_fCheckpointTimesNew[zGroup][client][15], g_fCheckpointTimesNew[zGroup][client][16], g_fCheckpointTimesNew[zGroup][client][17], g_fCheckpointTimesNew[zGroup][client][18], g_fCheckpointTimesNew[zGroup][client][19], g_fCheckpointTimesNew[zGroup][client][20], g_fCheckpointTimesNew[zGroup][client][21], g_fCheckpointTimesNew[zGroup][client][22], g_fCheckpointTimesNew[zGroup][client][23], g_fCheckpointTimesNew[zGroup][client][24], g_fCheckpointTimesNew[zGroup][client][25], g_fCheckpointTimesNew[zGroup][client][26], g_fCheckpointTimesNew[zGroup][client][27], g_fCheckpointTimesNew[zGroup][client][28], g_fCheckpointTimesNew[zGroup][client][29], g_fCheckpointTimesNew[zGroup][client][30], g_fCheckpointTimesNew[zGroup][client][31], g_fCheckpointTimesNew[zGroup][client][32], g_fCheckpointTimesNew[zGroup][client][33], g_fCheckpointTimesNew[zGroup][client][34], g_fCheckpointSpeedsNew[zGroup][client][0], g_fCheckpointSpeedsNew[zGroup][client][1], g_fCheckpointSpeedsNew[zGroup][client][2], g_fCheckpointSpeedsNew[zGroup][client][3], g_fCheckpointSpeedsNew[zGroup][client][4], g_fCheckpointSpeedsNew[zGroup][client][5], g_fCheckpointSpeedsNew[zGroup][client][6], g_fCheckpointSpeedsNew[zGroup][client][7], g_fCheckpointSpeedsNew[zGroup][client][8], g_fCheckpointSpeedsNew[zGroup][client][9], g_fCheckpointSpeedsNew[zGroup][client][10], g_fCheckpointSpeedsNew[zGroup][client][11], g_fCheckpointSpeedsNew[zGroup][client][12], g_fCheckpointSpeedsNew[zGroup][client][13], g_fCheckpointSpeedsNew[zGroup][client][14], g_fCheckpointSpeedsNew[zGroup][client][15], g_fCheckpointSpeedsNew[zGroup][client][16], g_fCheckpointSpeedsNew[zGroup][client][17], g_fCheckpointSpeedsNew[zGroup][client][18], g_fCheckpointSpeedsNew[zGroup][client][19], g_fCheckpointSpeedsNew[zGroup][client][20], g_fCheckpointSpeedsNew[zGroup][client][21], g_fCheckpointSpeedsNew[zGroup][client][22], g_fCheckpointSpeedsNew[zGroup][client][23], g_fCheckpointSpeedsNew[zGroup][client][24], g_fCheckpointSpeedsNew[zGroup][client][25], g_fCheckpointSpeedsNew[zGroup][client][26], g_fCheckpointSpeedsNew[zGroup][client][27], g_fCheckpointSpeedsNew[zGroup][client][28], g_fCheckpointSpeedsNew[zGroup][client][29], g_fCheckpointSpeedsNew[zGroup][client][30], g_fCheckpointSpeedsNew[zGroup][client][31], g_fCheckpointSpeedsNew[zGroup][client][32], g_fCheckpointSpeedsNew[zGroup][client][33], g_fCheckpointSpeedsNew[zGroup][client][34], szSteamID, g_szMapName, zGroup);
 		//Format(szQuery, 1024, sql_updateCheckpoints, g_fCheckpointTimesNew[zGroup][client][0], g_fCheckpointTimesNew[zGroup][client][1], g_fCheckpointTimesNew[zGroup][client][2], g_fCheckpointTimesNew[zGroup][client][3], g_fCheckpointTimesNew[zGroup][client][4], g_fCheckpointTimesNew[zGroup][client][5], g_fCheckpointTimesNew[zGroup][client][6], g_fCheckpointTimesNew[zGroup][client][7], g_fCheckpointTimesNew[zGroup][client][8], g_fCheckpointTimesNew[zGroup][client][9], g_fCheckpointTimesNew[zGroup][client][10], g_fCheckpointTimesNew[zGroup][client][11], g_fCheckpointTimesNew[zGroup][client][12], g_fCheckpointTimesNew[zGroup][client][13], g_fCheckpointTimesNew[zGroup][client][14], g_fCheckpointTimesNew[zGroup][client][15], g_fCheckpointTimesNew[zGroup][client][16], g_fCheckpointTimesNew[zGroup][client][17], g_fCheckpointTimesNew[zGroup][client][18], g_fCheckpointTimesNew[zGroup][client][19], g_fCheckpointTimesNew[zGroup][client][20], g_fCheckpointTimesNew[zGroup][client][21], g_fCheckpointTimesNew[zGroup][client][22], g_fCheckpointTimesNew[zGroup][client][23], g_fCheckpointTimesNew[zGroup][client][24], g_fCheckpointTimesNew[zGroup][client][25], g_fCheckpointTimesNew[zGroup][client][26], g_fCheckpointTimesNew[zGroup][client][27], g_fCheckpointTimesNew[zGroup][client][28], g_fCheckpointTimesNew[zGroup][client][29], g_fCheckpointTimesNew[zGroup][client][30], g_fCheckpointTimesNew[zGroup][client][31], g_fCheckpointTimesNew[zGroup][client][32], g_fCheckpointTimesNew[zGroup][client][33], g_fCheckpointTimesNew[zGroup][client][34], szSteamID, g_szMapName, zGroup);
-		//CPrintToChat(client,"STRING :%s",szQuery);
+		//PrintToConsole(client,"STRING :%s",szQuery);
 		SQL_TQuery(g_hDb, SQL_updateCheckpointsCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
 	{
-		char szQuery[1024];
-		Format(szQuery, 1024, sql_insertCheckpoints, szSteamID, g_szMapName, g_fCheckpointTimesNew[zGroup][client][0], g_fCheckpointTimesNew[zGroup][client][1], g_fCheckpointTimesNew[zGroup][client][2], g_fCheckpointTimesNew[zGroup][client][3], g_fCheckpointTimesNew[zGroup][client][4], g_fCheckpointTimesNew[zGroup][client][5], g_fCheckpointTimesNew[zGroup][client][6], g_fCheckpointTimesNew[zGroup][client][7], g_fCheckpointTimesNew[zGroup][client][8], g_fCheckpointTimesNew[zGroup][client][9], g_fCheckpointTimesNew[zGroup][client][10], g_fCheckpointTimesNew[zGroup][client][11], g_fCheckpointTimesNew[zGroup][client][12], g_fCheckpointTimesNew[zGroup][client][13], g_fCheckpointTimesNew[zGroup][client][14], g_fCheckpointTimesNew[zGroup][client][15], g_fCheckpointTimesNew[zGroup][client][16], g_fCheckpointTimesNew[zGroup][client][17], g_fCheckpointTimesNew[zGroup][client][18], g_fCheckpointTimesNew[zGroup][client][19], g_fCheckpointTimesNew[zGroup][client][20], g_fCheckpointTimesNew[zGroup][client][21], g_fCheckpointTimesNew[zGroup][client][22], g_fCheckpointTimesNew[zGroup][client][23], g_fCheckpointTimesNew[zGroup][client][24], g_fCheckpointTimesNew[zGroup][client][25], g_fCheckpointTimesNew[zGroup][client][26], g_fCheckpointTimesNew[zGroup][client][27], g_fCheckpointTimesNew[zGroup][client][28], g_fCheckpointTimesNew[zGroup][client][29], g_fCheckpointTimesNew[zGroup][client][30], g_fCheckpointTimesNew[zGroup][client][31], g_fCheckpointTimesNew[zGroup][client][32], g_fCheckpointTimesNew[zGroup][client][33], g_fCheckpointTimesNew[zGroup][client][34], zGroup, g_fCheckpointSpeedsNew[zGroup][client][0],g_fCheckpointSpeedsNew[zGroup][client][1],g_fCheckpointSpeedsNew[zGroup][client][2],g_fCheckpointSpeedsNew[zGroup][client][3],g_fCheckpointSpeedsNew[zGroup][client][4],g_fCheckpointSpeedsNew[zGroup][client][5],g_fCheckpointSpeedsNew[zGroup][client][6],g_fCheckpointSpeedsNew[zGroup][client][7],g_fCheckpointSpeedsNew[zGroup][client][8],g_fCheckpointSpeedsNew[zGroup][client][9],g_fCheckpointSpeedsNew[zGroup][client][10],g_fCheckpointSpeedsNew[zGroup][client][11],g_fCheckpointSpeedsNew[zGroup][client][12],g_fCheckpointSpeedsNew[zGroup][client][13],g_fCheckpointSpeedsNew[zGroup][client][14],g_fCheckpointSpeedsNew[zGroup][client][15],g_fCheckpointSpeedsNew[zGroup][client][16],g_fCheckpointSpeedsNew[zGroup][client][17],g_fCheckpointSpeedsNew[zGroup][client][18],g_fCheckpointSpeedsNew[zGroup][client][19],g_fCheckpointSpeedsNew[zGroup][client][20],g_fCheckpointSpeedsNew[zGroup][client][21],g_fCheckpointSpeedsNew[zGroup][client][22],g_fCheckpointSpeedsNew[zGroup][client][23],g_fCheckpointSpeedsNew[zGroup][client][24],g_fCheckpointSpeedsNew[zGroup][client][25],g_fCheckpointSpeedsNew[zGroup][client][26],g_fCheckpointSpeedsNew[zGroup][client][27],g_fCheckpointSpeedsNew[zGroup][client][28],g_fCheckpointSpeedsNew[zGroup][client][29],g_fCheckpointSpeedsNew[zGroup][client][30],g_fCheckpointSpeedsNew[zGroup][client][31],g_fCheckpointSpeedsNew[zGroup][client][32],g_fCheckpointSpeedsNew[zGroup][client][33],g_fCheckpointSpeedsNew[zGroup][client][34]);
+		char szQuery[2048];
+		Format(szQuery, 2048, sql_insertCheckpoints, szSteamID, g_szMapName, g_fCheckpointTimesNew[zGroup][client][0], g_fCheckpointTimesNew[zGroup][client][1], g_fCheckpointTimesNew[zGroup][client][2], g_fCheckpointTimesNew[zGroup][client][3], g_fCheckpointTimesNew[zGroup][client][4], g_fCheckpointTimesNew[zGroup][client][5], g_fCheckpointTimesNew[zGroup][client][6], g_fCheckpointTimesNew[zGroup][client][7], g_fCheckpointTimesNew[zGroup][client][8], g_fCheckpointTimesNew[zGroup][client][9], g_fCheckpointTimesNew[zGroup][client][10], g_fCheckpointTimesNew[zGroup][client][11], g_fCheckpointTimesNew[zGroup][client][12], g_fCheckpointTimesNew[zGroup][client][13], g_fCheckpointTimesNew[zGroup][client][14], g_fCheckpointTimesNew[zGroup][client][15], g_fCheckpointTimesNew[zGroup][client][16], g_fCheckpointTimesNew[zGroup][client][17], g_fCheckpointTimesNew[zGroup][client][18], g_fCheckpointTimesNew[zGroup][client][19], g_fCheckpointTimesNew[zGroup][client][20], g_fCheckpointTimesNew[zGroup][client][21], g_fCheckpointTimesNew[zGroup][client][22], g_fCheckpointTimesNew[zGroup][client][23], g_fCheckpointTimesNew[zGroup][client][24], g_fCheckpointTimesNew[zGroup][client][25], g_fCheckpointTimesNew[zGroup][client][26], g_fCheckpointTimesNew[zGroup][client][27], g_fCheckpointTimesNew[zGroup][client][28], g_fCheckpointTimesNew[zGroup][client][29], g_fCheckpointTimesNew[zGroup][client][30], g_fCheckpointTimesNew[zGroup][client][31], g_fCheckpointTimesNew[zGroup][client][32], g_fCheckpointTimesNew[zGroup][client][33], g_fCheckpointTimesNew[zGroup][client][34], zGroup, g_fCheckpointSpeedsNew[zGroup][client][0],g_fCheckpointSpeedsNew[zGroup][client][1],g_fCheckpointSpeedsNew[zGroup][client][2],g_fCheckpointSpeedsNew[zGroup][client][3],g_fCheckpointSpeedsNew[zGroup][client][4],g_fCheckpointSpeedsNew[zGroup][client][5],g_fCheckpointSpeedsNew[zGroup][client][6],g_fCheckpointSpeedsNew[zGroup][client][7],g_fCheckpointSpeedsNew[zGroup][client][8],g_fCheckpointSpeedsNew[zGroup][client][9],g_fCheckpointSpeedsNew[zGroup][client][10],g_fCheckpointSpeedsNew[zGroup][client][11],g_fCheckpointSpeedsNew[zGroup][client][12],g_fCheckpointSpeedsNew[zGroup][client][13],g_fCheckpointSpeedsNew[zGroup][client][14],g_fCheckpointSpeedsNew[zGroup][client][15],g_fCheckpointSpeedsNew[zGroup][client][16],g_fCheckpointSpeedsNew[zGroup][client][17],g_fCheckpointSpeedsNew[zGroup][client][18],g_fCheckpointSpeedsNew[zGroup][client][19],g_fCheckpointSpeedsNew[zGroup][client][20],g_fCheckpointSpeedsNew[zGroup][client][21],g_fCheckpointSpeedsNew[zGroup][client][22],g_fCheckpointSpeedsNew[zGroup][client][23],g_fCheckpointSpeedsNew[zGroup][client][24],g_fCheckpointSpeedsNew[zGroup][client][25],g_fCheckpointSpeedsNew[zGroup][client][26],g_fCheckpointSpeedsNew[zGroup][client][27],g_fCheckpointSpeedsNew[zGroup][client][28],g_fCheckpointSpeedsNew[zGroup][client][29],g_fCheckpointSpeedsNew[zGroup][client][30],g_fCheckpointSpeedsNew[zGroup][client][31],g_fCheckpointSpeedsNew[zGroup][client][32],g_fCheckpointSpeedsNew[zGroup][client][33],g_fCheckpointSpeedsNew[zGroup][client][34]);
 		SQL_TQuery(g_hDb, SQL_updateCheckpointsCallback, szQuery, pack, DBPrio_Low);
 	}
 }
@@ -3564,8 +3583,6 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 		LogError("[SurfTimer] SQL Error (SQL_selectMapTierCallback): %s", error);
 		if (!g_bServerDataLoaded){
 			db_viewRecordCheckpointInMap();
-			db_viewRecordCheckpointSpeedsInMap();
-			
 		}
 		return;
 	}
@@ -3613,7 +3630,6 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 
 	if (!g_bServerDataLoaded){
 		db_viewRecordCheckpointInMap();
-		db_viewRecordCheckpointSpeedsInMap();
 	}
 
 	return;
@@ -4305,7 +4321,6 @@ public void SQLTxn_ZoneGroupRemovalSuccess(Handle db, any client, int numQueries
 	db_viewFastestBonus();
 	db_viewBonusTotalCount();
 	db_viewRecordCheckpointInMap();
-	db_viewRecordCheckpointSpeedsInMap();
 
 	if (IsValidClient(client))
 	{
