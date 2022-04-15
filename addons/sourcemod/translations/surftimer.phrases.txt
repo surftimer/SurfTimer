@@ -1341,8 +1341,8 @@
 	}
 	"Misc31"
 	{
-		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:s}"
-		"en"		"{1} {yellow}{2} {default}| CP [{lightgreen}{3}{default}]: {lightgreen}{4} {default}[PB: {5}{default} | {6}{default}]"
+		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:s},{7:s}"
+		"en"		"{1} {yellow}{2} {default}| CP [{lightgreen}{3}{default}]: {lightgreen}{4} {default}[PB: {5}{default} | {6}{default}] \n [{lightgreen}Speed:{default}{6} | SR: {7}{default}]"
 	}
 	"Misc32"
 	{
@@ -1351,8 +1351,8 @@
 	}
 	"Misc33"
 	{
-		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:s},{7:s}"
-		"en"		"{1} {yellow}{2} {default}| CP [{lightgreen}{3}{default}]: {lightgreen}{4} {default}[PB: {lightgreen}N/A{default} | {5}{default}] \n [{lightgreen}Speed:{default}{6} | SR: {7}{default}]"
+		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:s}"
+		"en"		"{1} {yellow}{2} {default}| CP [{lightgreen}{3}{default}]: {lightgreen}{4} {default}[PB: {lightgreen}N/A{default} | {5}{default}] \n [PB: {lightgreen}N/A{default} | SR: {6}{default}]"
 	}
 	"Misc34"
 	{
@@ -1416,8 +1416,13 @@
 	}
 	"Misc46"
 	{
+		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s}"
+		"en"		"{1} CP [{lightgreen}{2}{default}] {lightgreen}Speed: {default}{3} u/s {default}[PB: {4}{default} | {5}{default}]"
+	}
+	"Misc47"
+	{
 		"#format"	"{1:s},{2:i},{3:s},{4:s}"
-		"en"		"{1} CP [{lightgreen}{2}{default}] {lightgreen}Speed:{default} {3} u/s {default}[{4}{default}]"
+		"en"		"{1} CP [{lightgreen}{2}{default}] {lightgreen}Speed: {default}{3} u/s {default}[PB: {lightgreen}N/A{default} | {4}{default}]"
 	}
 	"SQL1"
 	{

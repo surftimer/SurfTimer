@@ -3964,14 +3964,22 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, float sp
 
 		//FORMAT SPEED
 
-		if(f_srSpeedDiff >= 0){
+		//SLOWER THAN WR
+		if(f_srSpeedDiff > 0){
 			Format(sz_srSpeedDiff_colorless, 128, "SR: -%s", sz_srSpeedDiff);
-			Format(sz_srSpeedDiff, 128, "SR:%c -%s %c", RED, sz_srSpeedDiff, WHITE);
+			Format(sz_srSpeedDiff, 128, "SR: %c-%s%c", RED, sz_srSpeedDiff, WHITE);
 		}
-		else{
+		//FASTER THAN WR
+		else if(f_srSpeedDiff < 0){
 			Format(sz_srSpeedDiff_colorless, 128, "SR: +%s", sz_srSpeedDiff);
-			Format(sz_srSpeedDiff, 128, "SR:%c +%i %c", GREEN, RoundToNearest(f_srSpeedDiff) * -1, WHITE);
+			Format(sz_srSpeedDiff, 128, "SR: %c+%i%c", GREEN, RoundToNearest(f_srSpeedDiff * (-1)), WHITE);
 		}
+		//SAME AS WR
+		else{
+			Format(sz_srSpeedDiff_colorless, 128, "SR: %s", sz_srSpeedDiff);
+			Format(sz_srSpeedDiff, 128, "SR: %c%i%c", WHITE, RoundToNearest(f_srSpeedDiff * (-1)), WHITE);
+		}
+
 
 	}
 	else{
@@ -3999,13 +4007,16 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, float sp
 		char szDiff[32];
 		char szDiff_colorless[32];
 
-		float f_srSpeedDiff = ( g_fCheckpointSpeedServerRecord[zonegroup][zone] - speed);
+		FormatTimeFloat(client, diff, 3, szDiff, 32);
+
 		//COMPARE AGAINST BESTRUNS CP SPEEDS
 		//IMPLEMENT THE COMMENTED VARIABLE WHICH ALLOWS STORAGE OF BEST RUN CP SPEEDS
 		//float g_fCheckpointSpeedsRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
+		float f_SpeedDiff = ( g_fCheckpointSpeedsRecord[zonegroup][client][zone] - speed);
+		char sz_SpeedDiff[32];
+		char sz_SpeedDiff_colorless[32];
 
-		FormatTimeFloat(client, diff, 3, szDiff, 32);
-		Format(sz_srSpeedDiff, 128, "%i", RoundToNearest(f_srSpeedDiff));
+		Format(sz_SpeedDiff, 128, "%i", RoundToNearest(f_SpeedDiff));
 
 		//CPrintToChat(client,"FLOAT DIFF : %i",RoundToNearest(f_srSpeedDiff));
 		//CPrintToChat(client,"STRING DIFF : %s",sz_srSpeedDiff);
@@ -4036,32 +4047,39 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, float sp
 		if (g_fCheckpointTimesRecord[zonegroup][client][zone] <= 0.0)
 			Format(szDiff, 128, "");
 
-		//FORMAT SPEED
-		if(f_srSpeedDiff >= 0){
-			Format(sz_srSpeedDiff_colorless, 128, "SR: -%s", sz_srSpeedDiff);
-			Format(sz_srSpeedDiff, 128, "SR:%c -%s %c", RED, sz_srSpeedDiff, WHITE);
-		}
-		else{
-			Format(sz_srSpeedDiff_colorless, 128, "SR: +%s", sz_srSpeedDiff);
-			Format(sz_srSpeedDiff, 128, "SR:%c +%i %c", GREEN, RoundToNearest(f_srSpeedDiff) * -1, WHITE);
-		}
-
 		char szTime[32];
 		FormatTimeFloat(client, time, 3, szTime, 32);
+
+		//FORMAT PB SPEED
+
+		//SLOWER THAN WR
+		if(f_SpeedDiff > 0){
+			Format(sz_SpeedDiff_colorless, 128, "-%s", sz_SpeedDiff);
+			Format(sz_SpeedDiff, 128, "%c-%s", RED, sz_SpeedDiff);
+		}
+		//FASTER THAN WR
+		else if(f_SpeedDiff < 0){
+			Format(sz_SpeedDiff_colorless, 128, "+%s", sz_SpeedDiff);
+			Format(sz_SpeedDiff, 128, "%c+%i", GREEN, RoundToNearest(f_SpeedDiff * (-1)));
+		}
+		//SAME AS WR
+		else{
+			Format(sz_SpeedDiff_colorless, 128, "%s", sz_SpeedDiff);
+			Format(sz_SpeedDiff, 128, "%c%i", WHITE, RoundToNearest(f_SpeedDiff * (-1)));
+		}
 
 		char szSpeed[32];
 		Format(szSpeed, 32, "%i", RoundToNearest(speed));
 
-		SendMapCheckpointForward(client, zonegroup, zone, time, speed, szTime, szSpeed, szDiff_colorless, sz_srDiff_colorless, sz_srSpeedDiff_colorless);
+		SendMapCheckpointForward(client, zonegroup, zone, time, speed, szTime, szSpeed, szDiff_colorless, sz_srDiff_colorless, sz_SpeedDiff_colorless, sz_srSpeedDiff_colorless);
 
 		if (g_bCheckpointsEnabled[client] && g_iCpMessages[client])
 		{
-			CPrintToChat(client,"HERE_1");
 			CPrintToChat(client, "%t", "Misc30", g_szChatPrefix, g_iClientInZone[client][1] + 1, szTime, szDiff, sz_srDiff);
-			CPrintToChat(client, "%t", "Misc46", g_szChatPrefix, g_iClientInZone[client][1] + 1, szSpeed, sz_srSpeedDiff);
+			CPrintToChat(client, "%t", "Misc46", g_szChatPrefix, g_iClientInZone[client][1] + 1, szSpeed, sz_SpeedDiff, sz_srSpeedDiff);
 		}
 
-		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "Misc31", g_szChatPrefix, szName, g_iClientInZone[client][1] + 1, szTime, szDiff, sz_srSpeedDiff);
+		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "Misc31", g_szChatPrefix, szName, g_iClientInZone[client][1] + 1, szTime, sz_srDiff, sz_SpeedDiff, sz_srSpeedDiff);
 		CheckpointToSpec(client, szSpecMessage);
 
 		// Saving difference time for next checkpoint
@@ -4093,8 +4111,11 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, float sp
 			Call_PushFloat(g_fCheckpointServerRecord[zonegroup][zone]);
 			Call_PushString(sz_srDiff_colorless);
 			Call_PushFloat(speed);
-			Call_PushString(sz_srSpeedDiff_colorless);
 			Call_PushString(szSpeed);
+			Call_PushFloat(420.0);
+			Call_PushString("N/A");
+			Call_PushFloat(g_fCheckpointSpeedServerRecord[zonegroup][zone]);
+			Call_PushString(sz_srSpeedDiff_colorless);
 
 			/* Finish the call, get the result */
 			Call_Finish();
@@ -4102,12 +4123,11 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, float sp
 			if (percent > -1.0)
 			{
 				if (g_bCheckpointsEnabled[client] && g_iCpMessages[client]){
-					CPrintToChat(client,"HERE_2");
 					CPrintToChat(client, "%t", "Misc32", g_szChatPrefix, g_iClientInZone[client][1] + 1, szTime, sz_srDiff);
-					CPrintToChat(client, "%t", "Misc46", g_szChatPrefix, g_iClientInZone[client][1] + 1, szSpeed, sz_srSpeedDiff);
+					CPrintToChat(client, "%t", "Misc47", g_szChatPrefix, g_iClientInZone[client][1] + 1, szSpeed, sz_srSpeedDiff);
 				}
 
-				Format(szSpecMessage, sizeof(szSpecMessage), "%t", "Misc33", g_szChatPrefix, szName, g_iClientInZone[client][1] + 1, szTime, sz_srDiff, szSpeed, sz_srSpeedDiff);
+				Format(szSpecMessage, sizeof(szSpecMessage), "%t", "Misc33", g_szChatPrefix, szName, g_iClientInZone[client][1] + 1, szTime, sz_srDiff, sz_srSpeedDiff);
 				CheckpointToSpec(client, szSpecMessage);
 			}
 		}

@@ -323,7 +323,7 @@ float g_fCheckpointTimesRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
 
 //NOT IMPLEMENTED
 // Clients best run's speed's
-//float g_fCheckpointSpeedsRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
+float g_fCheckpointSpeedsRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
 
 // Clients current run's times
 float g_fCheckpointTimesNew[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
