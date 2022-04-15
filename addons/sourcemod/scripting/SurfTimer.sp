@@ -320,17 +320,31 @@ bool g_bhasBonus;
 // Clients best run's times
 float g_fCheckpointTimesRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
 
+//NOT IMPLEMENTED
+// Clients best run's speed's
+//float g_fCheckpointSpeedsRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
+
 // Clients current run's times
 float g_fCheckpointTimesNew[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
+
+// Clients current run's speed's
+float g_fCheckpointSpeedsNew[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
 
 // Server record checkpoint times
 float g_fCheckpointServerRecord[MAXZONEGROUPS][CPLIMIT];
 
-// Last difference to the server record checkpoint
+// Server record checkpoint speed's
+float g_fCheckpointSpeedServerRecord[MAXZONEGROUPS][CPLIMIT];
+
+// Last difference to the server record checkpoint time
 char g_szLastSRDifference[MAXPLAYERS + 1][64];
 
 // Last difference to clients own record checkpoint
 char g_szLastPBDifference[MAXPLAYERS + 1][64];
+
+//NOT IMPLEMENTED
+// Last difference to clients own record checkpoint speed
+//char g_szLastPBSpeedDifference[MAXPLAYERS + 1][64];
 
 // The time difference was shown, used to show for a few seconds in timer panel
 float g_fLastDifferenceTime[MAXPLAYERS + 1];

@@ -458,7 +458,7 @@ public void StartTouch(int client, int action[3])
 				
 				if (g_iCurrentStyle[client] == 0)
 				{
-					Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime);
+					Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime, g_fLastSpeed[client]);
 				}
 				
 				if (!g_bSaveLocTele[client])
@@ -520,7 +520,7 @@ public void StartTouch(int client, int action[3])
 				// Announcing checkpoint in linear maps
 				if (g_iCurrentStyle[client] == 0)
 				{
-					Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime);
+					Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime, g_fLastSpeed[client]);
 					
 					if (!g_bSaveLocTele[client])
 					{
