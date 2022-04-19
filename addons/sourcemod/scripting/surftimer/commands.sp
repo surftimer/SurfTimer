@@ -3168,7 +3168,7 @@ public void OptionMenu(int client)
 	AddMenuItem(optionmenu, "CentreHud", "Centre Hud Options");
 	AddMenuItem(optionmenu, "SideHud", "Side Hud Options");
 	AddMenuItem(optionmenu, "Miscellaneous", "Miscellaneous Options");
-	AddMenuItem(optionmenu, "MMinimalHUD", "MinimalHUD Options");
+	AddMenuItem(optionmenu, "MinimalHUD", "MinimalHUD Options");
 
 	SetMenuOptionFlags(optionmenu, MENUFLAG_BUTTON_EXIT);
 	DisplayMenu(optionmenu, client, MENU_TIME_FOREVER);
@@ -3638,7 +3638,7 @@ public int MiscellaneousOptionsHandler(Menu menu, MenuAction action, int param1,
 public void MinimalHUDOptions(int client)
 {
 	Menu menu = CreateMenu(MinimalHUDOptionsHandler);
-	SetMenuTitle(menu, "Options Menu - Miscellaneous\n \n");
+	SetMenuTitle(menu, "Minimal HUD - Settings \n \n");
 
 	//COMPARISON MODE
 	if (g_bMinimalHUD[client])
