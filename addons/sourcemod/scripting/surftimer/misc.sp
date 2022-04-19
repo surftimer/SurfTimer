@@ -1273,6 +1273,8 @@ public void SetClientDefaults(int client)
 	g_fMaxPercCompleted[client] = 0.0;
 	Format(g_szLastSRDifference[client], 64, "");
 	Format(g_szLastPBDifference[client], 64, "");
+	Format(g_szLastSRDifferenceMinimalHUD[client], 64, "");
+	Format(g_szLastPBDifferenceMinimalHUD[client], 64, "");
 
 	Format(g_szPersonalRecord[client], 64, "");
 
@@ -3145,6 +3147,433 @@ public void SetInfoBotName(int ent)
 	CS_SetClientClanTag(g_InfoBot, "NEXTMAP");
 }
 
+public void MinimalHudAlive(int client){
+
+	if (!IsValidClient(client))
+		return;
+
+	if(g_bMinimalHUD[client]){
+
+		int style = g_iCurrentStyle[client];
+		char s_Timer[64];
+		char s_MapType[64];
+		char s_MapWorldRecord[64];
+		char s_MapPersonalRecord[64];
+		int displayColor[3];
+
+		//FORMAT TIMER
+		if (g_bTimerRunning[client])
+		{
+			FormatTimeFloat(client, g_fCurrentRunTime[client], 3, s_Timer, 64);
+			Format(s_Timer, 64, "[%s]",s_Timer);
+		}
+		else if (g_bWrcpTimeractivated[client] && !g_bPracticeMode[client])
+		{
+			FormatTimeFloat(client, g_fCurrentWrcpRunTime[client], 3, s_Timer, 64);
+			Format(s_Timer, 64, "[%s]",s_Timer);
+		}
+		else if (!g_bTimerEnabled[client])
+			Format(s_Timer, 64, "[Timer Disabled]");
+		else
+		{
+			Format(s_Timer, 64, "[00:00:00]");
+		}
+
+		if (g_iCurrentStyle[client] != 0)
+		{
+			switch (g_iCurrentStyle[client])
+			{
+				case 1: Format(s_Timer, 64, "[SW %s]", g_fCurrentRunTime[client]);
+				case 2: Format(s_Timer, 64, "[HSW %s]", g_fCurrentRunTime[client]);
+				case 3: Format(s_Timer, 64, "[BW %s]", g_fCurrentRunTime[client]);
+				case 4: Format(s_Timer, 64, "[LG %s]", g_fCurrentRunTime[client]);
+				case 5: Format(s_Timer, 64, "[SM %s]", g_fCurrentRunTime[client]);
+				case 6: Format(s_Timer, 64, "[FF %s]", g_fCurrentRunTime[client]);
+			}
+		}
+
+		displayColor = GetMinimalHUDColour(client, g_MinimalHUDSpeedGradient[client]);
+
+		SetHudTextParams(-1.0, 0.55, 0.5, displayColor[0],displayColor[1] , displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+
+		if ( (GetGameTime() - g_fLastDifferenceTime[client] <= 5.0) && g_bTimerRunning[client]){
+
+			if(g_bMinimalHUD_CompareWR[client])
+				Format(s_Timer, 64, "%s\n%s", s_Timer, g_szLastSRDifferenceMinimalHUD[client]);
+			else if(g_bMinimalHUD_ComparePB[client])
+				Format(s_Timer, 64, "%s\n%s", s_Timer, g_szLastPBDifferenceMinimalHUD[client]);
+
+		}
+
+		displayColor = GetMinimalHUDColour(client, g_MinimalHUDSpeedGradient[client]);
+
+		SetHudTextParams(-1.0, 0.55, 0.5, displayColor[0],displayColor[1] , displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+		ShowHudText(client,2,"%s", s_Timer);
+
+		//FORMAT MAP TYPE
+		if (g_iClientInZone[client][2] == 0)
+		{
+			if (!g_bhasStages) // map is linear
+			{
+				Format(s_MapType, 64, "Linear Map");
+			}
+			else // map has stages
+			{
+				if (g_bPracticeMode[client])
+				{
+					if (g_bSaveLocTele[client]) // Has the player teleported to saveloc?
+					{
+						Format(s_MapType, 64, "Stage: %i/%i", g_iPlayerPracLocationSnap[client][g_iPlayerPracLocationSnapIdClient[client]], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+					}
+					else
+					{
+						Format(s_MapType, 64, "Stage: %i/%i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+					}
+				}
+				else
+				{
+					Format(s_MapType, 64, "Stage: %i/%i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1)); // less \t's to make lines align
+				}
+			}
+		}
+		else
+		{
+			Format(s_MapType, 64, "Bonus %i", g_iClientInZone[client][2]);
+		}
+		
+		//FORMAT PB/WR TIMES
+
+		if (g_iClientInZone[client][2] == 0 && style == 0)
+		{
+			if (g_fRecordMapTime != 9999999.0)
+			{
+				// fluffys
+				if (g_bPracticeMode[client])
+					Format(s_MapWorldRecord, 64, "SR: %s", g_szRecordMapTime);
+				else
+					Format(s_MapWorldRecord, 64, "SR: %s", g_szRecordMapTime);
+			}
+			else
+				Format(s_MapWorldRecord, 64, "SR: N/A");
+		}
+		else if (g_iClientInZone[client][2] == 0 && g_iCurrentStyle[client] != 0) // Styles
+		{
+			if (g_fRecordStyleMapTime[style] != 9999999.0)
+			{
+				// fluffys
+				if (g_bPracticeMode[client])
+					Format(s_MapWorldRecord, 64, "SR: %s", g_szRecordStyleMapTime[style]);
+				else
+					Format(s_MapWorldRecord, 64, "SR: %s", g_szRecordStyleMapTime[style]);
+			}
+			else
+				Format(s_MapWorldRecord, 64, "SR: N/A");
+		}
+		else
+		{
+			if (g_iCurrentStyle[client] == 0)
+			{
+				if (StrEqual(g_szBonusFastestTime[g_iClientInZone[client][2]], "N/A"))
+				{
+					Format(s_MapWorldRecord, 64, "SR: %s", g_szBonusFastestTime[g_iClientInZone[client][2]]);
+				}
+				else
+				{	
+					Format(s_MapWorldRecord, 64, "SR: %s", g_szBonusFastestTime[g_iClientInZone[client][2]]);
+				}
+			}
+			else if (g_iCurrentStyle[client] != 0) // Styles
+			{
+				if (StrEqual(g_szStyleBonusFastestTime[style][g_iClientInZone[client][2]], "N/A"))
+				{
+					Format(s_MapWorldRecord, 64, "SR: %s", g_szStyleBonusFastestTime[style][g_iClientInZone[client][2]]);
+				}
+				else
+				{
+					Format(s_MapWorldRecord, 64, "SR: %s", g_szStyleBonusFastestTime[style][g_iClientInZone[client][2]]);
+				}
+			}
+		}
+	
+		//FORMAT PB
+		if (g_iClientInZone[client][2] == 0 && style == 0)
+		{
+			if (g_fRecordMapTime != 9999999.0)
+			{
+				if (g_fPersonalRecord[client] > 0.0)
+					Format(s_MapPersonalRecord, 64, "PB: %s", g_szPersonalRecord[client]);
+				else
+					Format(s_MapPersonalRecord, 64, "PB: N/A");
+			}
+			else
+				Format(s_MapPersonalRecord, 64, "PB: N/A");
+		}
+		else if (g_iClientInZone[client][2] == 0 && g_iCurrentStyle[client] != 0) // Styles
+		{
+			if (g_fRecordStyleMapTime[style] != 9999999.0)
+			{
+				if (g_fPersonalStyleRecord[style][client] > 0.0)
+					Format(s_MapPersonalRecord, 64, "PB: %s", g_szPersonalStyleRecord[style][client]);
+				else
+					Format(s_MapPersonalRecord, 64, "PB: N/A");
+			}
+			else
+				Format(s_MapPersonalRecord, 64, "PB: N/A");
+		}
+		else
+		{
+			if (g_iCurrentStyle[client] == 0)
+				Format(s_MapPersonalRecord, 64, "PB: %s	", g_szPersonalRecordBonus[g_iClientInZone[client][2]][client]);
+			else if (g_iCurrentStyle[client] != 0) // Styles
+				Format(s_MapPersonalRecord, 64, "PB: %s	", g_szStylePersonalRecordBonus[style][g_iClientInZone[client][2]][client]);
+		}
+
+		char final_string[256];
+		Format(final_string, 256, "[%s]\n[%s | %s]", s_MapType, s_MapPersonalRecord, s_MapWorldRecord);
+
+		displayColor = GetMinimalHUDColour(client, g_MinimalHUDSpeedGradient[client]);
+		SetHudTextParams(-1.0, 1.0, 0.5, displayColor[0],displayColor[1] , displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+		ShowHudText(client,4,final_string);
+		
+	}
+
+}
+public void MinimalHudDead(int client){
+
+	if(!g_bMinimalHUD[client])
+	{
+		return;
+	}
+
+	int ObservedUser;
+	ObservedUser = -1;
+	int SpecMode;
+	ObservedUser = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
+	SpecMode = GetEntProp(client, Prop_Send, "m_iObserverMode");
+	if (SpecMode == 4 || SpecMode == 5)
+	{
+		g_SpecTarget[client] = ObservedUser;
+		if (IsValidClient(ObservedUser))
+		{	
+			int style = g_iCurrentStyle[ObservedUser];
+			char s_Timer[64];
+			char s_MapType[64];
+			char s_MapWorldRecord[64];
+			char s_MapPersonalRecord[64];
+			int displayColor[3];
+			if(!IsFakeClient(ObservedUser)){
+
+				//FORMAT TIMER
+				if (g_bTimerRunning[ObservedUser])
+				{
+					FormatTimeFloat(client, g_fCurrentRunTime[ObservedUser], 3, s_Timer, 64);
+				}
+				else if (g_bWrcpTimeractivated[ObservedUser] && !g_bPracticeMode[ObservedUser])
+				{
+					FormatTimeFloat(ObservedUser, g_fCurrentWrcpRunTime[ObservedUser], 3, s_Timer, 64);
+				}
+				else if (!g_bTimerEnabled[ObservedUser])
+					Format(s_Timer, 64, "Timer Disabled");
+				else
+				{
+					Format(s_Timer, 64, "00:00:00");
+				}
+
+				if (GetGameTime() - g_fLastDifferenceTime[ObservedUser] <= 5.0){
+					if(g_bMinimalHUD_CompareWR[client]){
+						Format(s_Timer, 64, "[%s]\n[%s]", s_Timer, g_szLastSRDifferenceMinimalHUD[ObservedUser]);
+					}
+					else if(g_bMinimalHUD_ComparePB[client]){
+						Format(s_Timer, 64, "%s\n%s", s_Timer, g_szLastPBDifferenceMinimalHUD[ObservedUser]);
+					}
+				}
+
+				displayColor = GetMinimalHUDColour(client, g_MinimalHUDSpeedGradient[client]);
+
+				SetHudTextParams(-1.0, 0.55, 0.5, displayColor[0],displayColor[1] , displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+				ShowHudText(client,2,"%s",s_Timer);
+
+				//FORMAT MAP TYPE
+				if (g_iClientInZone[ObservedUser][2] == 0)
+				{
+					if (!g_bhasStages) // map is linear
+					{
+						Format(s_MapType, 64, "Linear Map");
+					}
+					else // map has stages
+					{
+						if (g_bPracticeMode[ObservedUser])
+						{
+							if (g_bSaveLocTele[ObservedUser]) // Has the player teleported to saveloc?
+							{
+								Format(s_MapType, 64, "Stage: %i/%i", g_iPlayerPracLocationSnap[ObservedUser][g_iPlayerPracLocationSnapIdClient[ObservedUser]], (g_mapZonesTypeCount[g_iClientInZone[ObservedUser][2]][3] + 1));
+							}
+							else
+							{
+								Format(s_MapType, 64, "Stage: %i/%i", g_Stage[g_iClientInZone[ObservedUser][2]][ObservedUser], (g_mapZonesTypeCount[g_iClientInZone[ObservedUser][2]][3] + 1));
+							}
+						}
+						else
+						{
+							Format(s_MapType, 64, "Stage: %i/%i", g_Stage[g_iClientInZone[ObservedUser][2]][ObservedUser], (g_mapZonesTypeCount[g_iClientInZone[ObservedUser][2]][3] + 1)); // less \t's to make lines align
+						}
+					}
+				}
+				else
+				{
+					Format(s_MapType, 64, "Bonus %i", g_iClientInZone[ObservedUser][2]);
+				}
+				
+				//FORMAT PB/WR TIMES
+
+				if (g_iClientInZone[ObservedUser][2] == 0 && style == 0)
+				{
+					if (g_fRecordMapTime != 9999999.0)
+					{
+						// fluffys
+						if (g_bPracticeMode[ObservedUser])
+							Format(s_MapWorldRecord, 64, "SR: %s", g_szRecordMapTime);
+						else
+							Format(s_MapWorldRecord, 64, "SR: %s", g_szRecordMapTime);
+					}
+					else
+						Format(s_MapWorldRecord, 64, "SR: N/A");
+				}
+				else if (g_iClientInZone[ObservedUser][2] == 0 && g_iCurrentStyle[ObservedUser] != 0) // Styles
+				{
+					if (g_fRecordStyleMapTime[style] != 9999999.0)
+					{
+						// fluffys
+						if (g_bPracticeMode[ObservedUser])
+							Format(s_MapWorldRecord, 64, "SR: %s", g_szRecordStyleMapTime[style]);
+						else
+							Format(s_MapWorldRecord, 64, "SR: %s", g_szRecordStyleMapTime[style]);
+					}
+					else
+						Format(s_MapWorldRecord, 64, "SR: N/A");
+				}
+				else
+				{
+					if (g_iCurrentStyle[ObservedUser] == 0)
+					{
+						if (StrEqual(g_szBonusFastestTime[g_iClientInZone[ObservedUser][2]], "N/A"))
+						{
+							Format(s_MapWorldRecord, 64, "SR: %s", g_szBonusFastestTime[g_iClientInZone[ObservedUser][2]]);
+						}
+						else
+						{	
+							Format(s_MapWorldRecord, 64, "SR: %s", g_szBonusFastestTime[g_iClientInZone[ObservedUser][2]]);
+						}
+					}
+					else if (g_iCurrentStyle[ObservedUser] != 0) // Styles
+					{
+						if (StrEqual(g_szStyleBonusFastestTime[style][g_iClientInZone[ObservedUser][2]], "N/A"))
+						{
+							Format(s_MapWorldRecord, 64, "SR: %s", g_szStyleBonusFastestTime[style][g_iClientInZone[ObservedUser][2]]);
+						}
+						else
+						{
+							Format(s_MapWorldRecord, 64, "SR: %s", g_szStyleBonusFastestTime[style][g_iClientInZone[ObservedUser][2]]);
+						}
+					}
+				}
+			
+				//FORMAT PB
+				if (g_iClientInZone[ObservedUser][2] == 0 && style == 0)
+				{
+					if (g_fRecordMapTime != 9999999.0)
+					{
+						if (g_fPersonalRecord[ObservedUser] > 0.0)
+							Format(s_MapPersonalRecord, 64, "PB: %s", g_szPersonalRecord[ObservedUser]);
+						else
+							Format(s_MapPersonalRecord, 64, "PB: N/A");
+					}
+					else
+						Format(s_MapPersonalRecord, 64, "PB: N/A");
+				}
+				else if (g_iClientInZone[ObservedUser][2] == 0 && g_iCurrentStyle[ObservedUser] != 0) // Styles
+				{
+					if (g_fRecordStyleMapTime[style] != 9999999.0)
+					{
+						if (g_fPersonalStyleRecord[style][ObservedUser] > 0.0)
+							Format(s_MapPersonalRecord, 64, "PB: %s", g_szPersonalStyleRecord[style][ObservedUser]);
+						else
+							Format(s_MapPersonalRecord, 64, "PB: N/A");
+					}
+					else
+						Format(s_MapPersonalRecord, 64, "PB: N/A");
+				}
+				else
+				{
+					if (g_iCurrentStyle[ObservedUser] == 0)
+						Format(s_MapPersonalRecord, 64, "PB: %s	", g_szPersonalRecordBonus[g_iClientInZone[ObservedUser][2]][ObservedUser]);
+					else if (g_iCurrentStyle[client] != 0) // Styles
+						Format(s_MapPersonalRecord, 64, "PB: %s	", g_szStylePersonalRecordBonus[style][g_iClientInZone[ObservedUser][2]][client]);
+				}
+
+				char final_string[256];
+				Format(final_string, 256, "[%s]\n[%s | %s]", s_MapType, s_MapPersonalRecord, s_MapWorldRecord);
+
+				displayColor = GetMinimalHUDColour(client, g_MinimalHUDSpeedGradient[client]);
+				SetHudTextParams(-1.0, 1.0, 0.5, displayColor[0],displayColor[1] , displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+				ShowHudText(client,4,final_string);
+			}
+			else{
+
+				//FORMAT MAP TYPE
+				if (g_iClientInZone[ObservedUser][2] == 0)
+				{
+					if (!g_bhasStages) // map is linear
+					{
+						Format(s_MapType, 64, "Linear Map");
+					}
+					else // map has stages
+					{
+						if (g_bPracticeMode[ObservedUser])
+						{
+							if (g_bSaveLocTele[ObservedUser]) // Has the player teleported to saveloc?
+							{
+								Format(s_MapType, 64, "Stage: %i/%i", g_iPlayerPracLocationSnap[ObservedUser][g_iPlayerPracLocationSnapIdClient[ObservedUser]], (g_mapZonesTypeCount[g_iClientInZone[ObservedUser][2]][3] + 1));
+							}
+							else
+							{
+								Format(s_MapType, 64, "Stage: %i/%i", g_Stage[g_iClientInZone[ObservedUser][2]][ObservedUser], (g_mapZonesTypeCount[g_iClientInZone[ObservedUser][2]][3] + 1));
+							}
+						}
+						else
+						{
+							Format(s_MapType, 64, "Stage: %i/%i", g_Stage[g_iClientInZone[ObservedUser][2]][ObservedUser], (g_mapZonesTypeCount[g_iClientInZone[ObservedUser][2]][3] + 1)); // less \t's to make lines align
+						}
+					}
+				}
+				else
+				{
+					Format(s_MapType, 64, "Bonus %i", g_iClientInZone[ObservedUser][2]);
+				}
+
+				char final_string[256];
+				
+				if (ObservedUser == g_RecordBot)
+					Format(final_string, 256, "[Map Replay]\n[%s]\n[(%s) WR : %s]", s_MapType, g_szRecordPlayer, g_szRecordMapTime);
+				else if (ObservedUser == g_BonusBot)
+					Format(final_string, 256, "[%s Record Replay]\n[(%s) WR : %s]", s_MapType, g_szBonusName, g_szBonusTime);
+				else if (ObservedUser == g_WrcpBot)
+					if (g_bManualStageReplayPlayback)
+						Format(final_string, 256, "[Stage %i Replay]\n[(%s) WRCP : %s]", g_iSelectedReplayStage, g_szWrcpReplayName[g_iSelectedReplayStage], g_szWrcpReplayTime[g_iSelectedReplayStage]);
+					else
+						Format(final_string, 256, "[Stage %i Replay]\n[(%s) WRCP : %s]", g_StageReplayCurrentStage, g_szWrcpReplayName[g_StageReplayCurrentStage], g_szWrcpReplayTime[g_StageReplayCurrentStage]);
+
+				displayColor = GetMinimalHUDColour(client, g_MinimalHUDSpeedGradient[client]);
+				SetHudTextParams(-1.0, 1.0, 0.5, displayColor[0],displayColor[1] , displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+				ShowHudText(client,4,final_string);
+			}
+		}
+	}
+	else
+		g_SpecTarget[client] = -1;
+
+}
+
 public void CenterHudDead(int client)
 {
 	if(!g_bCentreHud[client])
@@ -3294,7 +3723,7 @@ public void CenterHudAlive(int client)
 		return;
 
 	if (g_bCentreHud[client])
-	{
+	{	
 		int style = g_iCurrentStyle[client];
 		char module[6][1024];
 		char pAika[54];
@@ -3584,6 +4013,7 @@ public void CenterHudAlive(int client)
 			PrintCSGOHUDText(client, "<pre><font class='fontSize-sm'>%15s\t %15s\n%15s\t %15s\n%15s\t %15s</font></pre>", module[0], module[1], module[2], module[3], module[4], module[5]);
 		}
 	}
+
 }
 
 public void SideHudAlive(int client)
@@ -3908,16 +4338,17 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, float sp
 		{
 			Format(sz_srDiff_colorless, 128, "-%s", sz_srDiff);
 			Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
+			Format(g_szLastSRDifferenceMinimalHUD[client], 64, "[SR: %s]", sz_srDiff_colorless);
 			if (zonegroup > 0)
 				Format(g_szLastSRDifference[client], 64, "SR:<font color='#5e5'>%s</font>", sz_srDiff_colorless);
 			else
 				Format(g_szLastSRDifference[client], 64, "SR:<font color='#5e5'>%s</font>", sz_srDiff_colorless);
-
 		}
 		else
 		{
 			Format(sz_srDiff_colorless, 128, "+%s", sz_srDiff);
 			Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
+			Format(g_szLastSRDifferenceMinimalHUD[client], 64, "[SR: %s]", sz_srDiff_colorless);
 			if (zonegroup > 0)
 				Format(g_szLastSRDifference[client], 64, "SR:<font color='#f32'>%s</font>", sz_srDiff_colorless);
 			else if (g_iCurrentStyle[client] > 0)
@@ -3950,6 +4381,8 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, float sp
 	else{
 		Format(sz_srDiff, 128, "%cSR: %cN/A%c", WHITE, LIGHTGREEN, WHITE);
 		Format(sz_srSpeedDiff, 128, "%cSR: %cN/A%c", WHITE, LIGHTGREEN, WHITE);
+		g_fLastDifferenceTime[client] = GetGameTime();
+		Format(g_szLastSRDifferenceMinimalHUD[client], 64, "[SR: N/A]");
 	}
 
 	// Get client name for spectators
@@ -3991,6 +4424,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, float sp
 		{
 			Format(szDiff_colorless, 32, "-%s", szDiff);
 			Format(szDiff, sizeof(szDiff), "%c-%s", LIGHTGREEN, szDiff);
+			Format(g_szLastPBDifferenceMinimalHUD[client], 64, "[PB: %s]", szDiff_colorless);
 			if (zonegroup > 0)
 				Format(g_szLastPBDifference[client], 64, "PB:<font color='#5e5'>%s</font>	", szDiff_colorless);
 			else
@@ -4001,6 +4435,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, float sp
 		{
 			Format(szDiff_colorless, 32, "+%s", szDiff);
 			Format(szDiff, sizeof(szDiff), "%c+%s", RED, szDiff);
+			Format(g_szLastPBDifferenceMinimalHUD[client], 64, "[PB: %s]", szDiff_colorless);
 			if (zonegroup > 0)
 				Format(g_szLastPBDifference[client], 64, "PB:<font color='#f32'>%s</font>	", szDiff_colorless);
 			else
@@ -4058,6 +4493,8 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, float sp
 				CS_SetClientAssists(client, RoundToFloor(g_fMaxPercCompleted[client]));
 			else
 				CS_SetClientAssists(client, 100);
+
+			Format(g_szLastPBDifferenceMinimalHUD[client], 64, "[PB: N/A]");
 
 			char szTime[32];
 			FormatTimeFloat(client, time, 3, szTime, 32);
@@ -4447,6 +4884,69 @@ int[] GetSpeedColourCSD(int client, int speed, int type)
 				displayColor = {255,255,255}; //WHITE
 
 			g_iPreviousSpeed[client] = speed;
+			return displayColor;
+		}
+		else
+			return displayColor; //WHITE
+	}
+}
+
+int[] GetMinimalHUDColour(int client, int type)
+{	
+	int displayColor[3] = {255, 255, 255};
+	if (g_fMaxVelocity == 10000.0)
+	{	
+		// RED
+		if (type == 1 && g_SpeedMode[client] == 0) // green
+		{
+			displayColor = {255,0,0};
+			return displayColor;
+		}
+		// GREEN
+		else if (type == 2 && g_SpeedMode[client] == 0)
+		{
+			displayColor = {0,255,0};
+			return displayColor;
+		}
+		// BLUE
+		else if (type == 3 && g_SpeedMode[client] == 0)
+		{
+			displayColor = {0,0,255};
+			return displayColor;
+		}
+		// YELLOW
+		else if (type == 4 && g_SpeedMode[client] == 0)
+		{
+			displayColor = {255,255,0};
+			return displayColor;
+		}
+		else
+			return displayColor; //WHITE
+	}
+	else
+	{
+		// RED
+		if (type == 1 && g_SpeedMode[client] == 0) // green
+		{
+			displayColor = {255,0,0};
+			return displayColor;
+		}
+		// GREEN
+		else if (type == 2 && g_SpeedMode[client] == 0)
+		{
+			displayColor = {0,255,0};
+			return displayColor;
+		}
+		// BLUE
+		else if (type == 3 && g_SpeedMode[client] == 0)
+		{
+			displayColor = {0,0,255};
+			return displayColor;
+		}
+		// YELLOW
+		else if (type == 4 && g_SpeedMode[client] == 0)
+		{
+			displayColor = {255,255,0};
 			return displayColor;
 		}
 		else

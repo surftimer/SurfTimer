@@ -763,7 +763,9 @@ public void CL_OnEndTimerPress(int client)
 
 // Start Timer
 public void CL_OnStartWrcpTimerPress(int client)
-{
+{	
+
+	CPrintToChat(client,"STAGE TIMER STARTED");
 	if (!g_bSpectate[client] && !g_bNoClip[client] && ((GetGameTime() - g_fLastTimeNoClipUsed[client]) > 2.0))
 	{
 		int zGroup = g_iClientInZone[client][2];
@@ -794,7 +796,6 @@ public void CL_OnStartWrcpTimerPress(int client)
 			float speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0));
 
 			int prestrafe = RoundToNearest(speed);
-
 
 			SetPrestrafe(client, g_Stage[0][client], g_iCurrentStyle[client], false);
 
@@ -899,6 +900,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		// Make a new stage replay bot?
 		if (GetConVarBool(g_hReplaceReplayTime) && (!g_bStageReplay[stage] || g_fFinalWrcpTime[client] < g_fStageReplayTimes[stage]))
 		{
+			PrintToConsole(client,"SAVING STAGE RECORD");
 			Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 		}
 		else
@@ -906,12 +908,14 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 			if (g_TotalStageRecords[stage] > 0)
 			{ // If the server already has a record
 				if (g_fFinalWrcpTime[client] < g_fStageRecord[stage] && g_fFinalWrcpTime[client] > 0.0)
-				{
+				{	
+					PrintToConsole(client,"SAVING STAGE RECORD (HAS REC)");
 					Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 				}
 			}
 			else
 			{
+				PrintToConsole(client,"SAVING STAGE RECORD (NOT HAS REC)");
 				Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 			}
 		}

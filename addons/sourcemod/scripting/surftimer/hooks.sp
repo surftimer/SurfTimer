@@ -177,6 +177,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 			}
 
 			//START RECORDING
+			g_StoppedRecording = false;
 			StartRecording(client);
 			if(g_bhasStages)
 				Stage_StartRecording(client);
@@ -1028,7 +1029,8 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 						g_iStageStartFrame[client] = g_iRecordedTicks[client];
 				}
 				//IF THE PLAYER IS NOT BEING RECORDED BUT STARTS MOVING AGAIN, START RECORDING PLAYER
-				else if(speed > 0 && g_StoppedRecording){
+				else if(speed > 0 && g_StoppedRecording && !g_bTimerRunning[client]){
+					StopRecording(client);
 					StartRecording(client);
 					if (g_bhasStages)
 					{

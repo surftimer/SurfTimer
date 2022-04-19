@@ -122,10 +122,14 @@ public Action CKTimer1(Handle timer)
 				}
 
 				CenterHudAlive(client);
+				MinimalHudAlive(client);
 				MovementCheck(client);
 			}
-			else
+			else{
 				CenterHudDead(client);
+				MinimalHudDead(client);
+			}
+				
 		}
 	}
 	return Plugin_Continue;
@@ -509,10 +513,12 @@ public Action TimeleftTimer(Handle timer,any client)
 				FormatEx(timeleft, sizeof(timeleft), "Timeleft: %02is", time);
 			else 
 				FormatEx(timeleft, sizeof(timeleft), "Timeleft: %im %02is", time / 60, time % 60);
-					
-			SetHudTextParams(-1.0, 1.0, 1.0, 255, 255, 0, 255, 0, 0.0, 0.0, 0.0);
+			
+			int displayColor[3];
+			displayColor = GetMinimalHUDColour(client, g_MinimalHUDSpeedGradient[i]);
+			SetHudTextParams(-1.0, 0.05, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
 
-			ShowHudText(i, 1, timeleft);
+			ShowHudText(i, 0, timeleft);
 		}
 
 	return Plugin_Continue;

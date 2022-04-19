@@ -1811,4 +1811,14 @@
 		"#format"	"{1:s}"
 		"en"		"{1} The timeleft display is now {red}disabled"
 	}
+	"MinimalHUDOn"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} The Minimal HUD is now {green}enabled"
+	}
+	"MinimalHUDOff"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} The Minimal HUD is now {red}disabled"
+	}
 }
