@@ -1338,9 +1338,18 @@ Handle g_hDestinations;
 
 // CPR command
 float g_fClientCPs[MAXPLAYERS + 1][36];
+
 float g_fTargetTime[MAXPLAYERS + 1];
 char g_szTargetCPR[MAXPLAYERS + 1][MAX_NAME_LENGTH];
 char g_szCPRMapName[MAXPLAYERS + 1][128];
+
+//PRINFO command
+float g_fTimeinZone[MAXPLAYERS + 1];
+float g_fCompletes[MAXPLAYERS + 1];
+float g_fAttempts[MAXPLAYERS + 1];
+float g_fstComplete[MAXPLAYERS + 1];
+bool g_bStartCountintTimeinZone[MAXPLAYERS + 1];
+float g_fTimeIncrement[MAXPLAYERS + 1];
 
 // surf_christmas2
 bool g_bUsingStageTeleport[MAXPLAYERS + 1];

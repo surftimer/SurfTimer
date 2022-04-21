@@ -154,6 +154,11 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 
 			return Plugin_Continue;
 		}
+		else{
+			//PRINFO STUFF
+			g_bStartCountintTimeinZone[client] = false;
+			g_fTimeIncrement[client] = 0.0;
+		}
 
 		// Change Player Skin
 		if (GetConVarBool(g_hPlayerSkinChange) && (GetClientTeam(client) > 1))
@@ -558,11 +563,14 @@ public Action Event_OnPlayerTeam(Handle event, const char[] name, bool dontBroad
 public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontBroadcast)
 {
 	if (GetConVarBool(g_hDisconnectMsg))
-	{
+	{	
 		char szName[64];
 		char disconnectReason[64];
 		int clientid = GetEventInt(event, "userid");
 		int client = GetClientOfUserId(clientid);
+
+		db_UpdatePRinfo(client, g_szSteamID[client], 1);
+
 		if (!IsValidClient(client) || IsFakeClient(client))
 			return Plugin_Handled;
 		GetEventString(event, "name", szName, sizeof(szName));
@@ -849,6 +857,19 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		ShowHudText(client, 6, "%s", timeleft);
 	}
 	*/
+
+	if (g_iCurrentStyle[client] == 0){
+
+		if(g_bStartCountintTimeinZone[client]){
+			if(g_bTimerRunning[client])
+				g_fTimeIncrement[client] = g_fCurrentRunTime[client];
+
+			//char szTemp[32];
+			//FormatTimeFloat(client, g_fTimeIncrement[client], 2, szTemp, 32);
+			//CPrintToChat(client, "TIME %s\n", szTemp);
+		}
+
+	}
 
 	if (buttons & IN_DUCK && g_bInDuck[client] == true)
 	{

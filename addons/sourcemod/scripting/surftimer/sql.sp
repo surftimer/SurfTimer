@@ -100,6 +100,7 @@ public void db_createTables()
 	SQL_AddQuery(createTableTnx, sql_createAnnouncements);
 	SQL_AddQuery(createTableTnx, sql_createVipAdmins);
 	SQL_AddQuery(createTableTnx, sql_createWrcps);
+	SQL_AddQuery(createTableTnx, sql_CreatePrinfo);
 
 	SQL_ExecuteTransaction(g_hDb, createTableTnx, SQLTxn_CreateDatabaseSuccess, SQLTxn_CreateDatabaseFailed);
 
@@ -2488,6 +2489,7 @@ public void sql_selectRecordCallback(Handle owner, Handle hndl, const char[] err
 		if ((g_fFinalTime[data] <= time || time <= 0.0))
 		{
 			db_updateRecordPro(data);
+
 		}
 	}
 	else
@@ -3362,6 +3364,8 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 	if (hndl == null)
 	{
 		LogError("[SurfTimer] SQL Error (SQL_selectCheckpointsCallback): %s", error);
+		if (!g_bSettingsLoaded[client])
+			LoadClientSetting(client, g_iSettingToLoad[client]);
 		return;
 	}
 
@@ -3397,41 +3401,7 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
 		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewCheckpoints in %fs", g_szSteamID[client], tick);
-
-		float time = g_fTick[client][1] - g_fClientsLoading[client][0];
-		char szName[32];
-		GetClientName(client, szName, sizeof(szName));
-		LogToFileEx(g_szLogFile, "[SurfTimer] Finished loading %s - %s settings in %fs", g_szSteamID[client], szName, time);
-		
-		// Print a VIP's custom join msg to all
-		if (g_bEnableJoinMsgs && !StrEqual(g_szCustomJoinMsg[client], "none") && IsPlayerVip(client, true, false))
-			CPrintToChatAll("%s", g_szCustomJoinMsg[client]);
-
-		// CalculatePlayerRank(client);
-		g_bSettingsLoaded[client] = true;
-		g_bLoadingSettings[client] = false;
-
-		db_UpdateLastSeen(client);
-
-		if (GetConVarBool(g_hTeleToStartWhenSettingsLoaded))
-		{
-			Command_Restart(client, 1);
-			CreateTimer(0.1, RestartPlayer, client);
-		}
-
-		// Seach for next client to load
-		for (int i = 1; i < MAXPLAYERS + 1; i++)
-		{
-			if (IsValidClient(i) && !IsFakeClient(i) && !g_bSettingsLoaded[i] && !g_bLoadingSettings[i])
-			{
-				char szSteamID[32];
-				GetClientAuthId(i, AuthId_Steam2, szSteamID, 32, true);
-				g_iSettingToLoad[i] = 0;
-				LoadClientSetting(i, g_iSettingToLoad[i]);
-				g_bLoadingSettings[i] = true;
-				break;
-			}
-		}
+		LoadClientSetting(client, g_iSettingToLoad[client]);
 	}
 }
 
@@ -3535,6 +3505,153 @@ public void SQL_deleteCheckpointsCallback(Handle owner, Handle hndl, const char[
 		LogError("[SurfTimer] SQL Error (SQL_deleteCheckpointsCallback): %s", error);
 		return;
 	}
+}
+
+public void db_viewPRinfo(int client,  char szSteamID[32], char szMapName[128])
+{
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackString(pack, szSteamID);
+	WritePackString(pack, szMapName);
+
+	char szQuery[1024];
+	Format(szQuery, 1024, sql_selectPR, szSteamID, szMapName, 1);
+	PrintToConsole(client,szQuery);
+	SQL_TQuery(g_hDb, db_viewPRinfoCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_viewPRinfoCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{	
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+
+	char szSteamID[32];
+	ReadPackString(pack, szSteamID, 32);
+
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_viewPRinfoCallback): %s", error);
+		return;
+	}
+
+	if(SQL_HasResultSet(hndl) && SQL_FetchRow(hndl)){
+		PrintToConsole(client,"HERE_-1");
+
+		g_fTimeinZone[client] = SQL_FetchFloat(hndl, 4);
+		g_fCompletes[client] = SQL_FetchFloat(hndl, 5);
+		CPrintToChat(client,"COMPLETES %f", g_fCompletes[client]);
+		g_fAttempts[client] = SQL_FetchFloat(hndl, 6);
+		g_fstComplete[client] = SQL_FetchFloat(hndl, 7);
+	}
+	else{
+		char szQuery[1024];
+
+		g_fTimeinZone[client] = 0.0;
+		g_fCompletes[client] = 0.0;
+		g_fAttempts[client] = 0.0;
+		g_fstComplete[client] = 0.0;
+
+		Format(szQuery, 1024, "SELECT runtimepro FROM ck_playertimes WHERE steamid = '%s' AND style = 1", szSteamID);
+		PrintToConsole(client,szQuery);
+		SQL_TQuery(g_hDb, db_prinforuntimecallback, szQuery, pack, DBPrio_Low);
+	}
+
+	if (!g_bSettingsLoaded[client])
+	{
+		g_fTick[client][1] = GetGameTime();
+		float tick = g_fTick[client][1] - g_fTick[client][0];
+		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPR in %fs", g_szSteamID[client], tick);
+		g_fTick[client][0] = GetGameTime();
+
+		// Print a VIP's custom join msg to all
+		if (g_bEnableJoinMsgs && !StrEqual(g_szCustomJoinMsg[client], "none") && IsPlayerVip(client, true, false))
+			CPrintToChatAll("%s", g_szCustomJoinMsg[client]);
+
+		// CalculatePlayerRank(client);
+		g_bSettingsLoaded[client] = true;
+		g_bLoadingSettings[client] = false;
+
+		db_UpdateLastSeen(client);
+
+		if (GetConVarBool(g_hTeleToStartWhenSettingsLoaded))
+		{
+			Command_Restart(client, 1);
+			CreateTimer(0.1, RestartPlayer, client);
+		}
+
+		// Seach for next client to load
+		for (int i = 1; i < MAXPLAYERS + 1; i++)
+		{
+			if (IsValidClient(i) && !IsFakeClient(i) && !g_bSettingsLoaded[i] && !g_bLoadingSettings[i])
+			{
+				szSteamID = "";
+				GetClientAuthId(i, AuthId_Steam2, szSteamID, 32, true);
+				g_iSettingToLoad[i] = 0;
+				LoadClientSetting(i, g_iSettingToLoad[i]);
+				g_bLoadingSettings[i] = true;
+				break;
+			}
+		}
+
+		float time = g_fTick[client][1] - g_fClientsLoading[client][0];
+		char szName[32];
+		GetClientName(client, szName, sizeof(szName));
+		LogToFileEx(g_szLogFile, "[SurfTimer] Finished loading %s - %s settings in %fs", g_szSteamID[client], szName, time);
+	}
+
+	return;
+}
+
+public void db_prinforuntimecallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+
+	char szSteamID[32];
+	ReadPackString(pack, szSteamID, 32);
+
+	char szMapName[32];
+	ReadPackString(pack, szMapName, 32);
+
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_prinforuntimecallback): %s", error);
+		return;
+	}
+
+	if(SQL_HasResultSet(hndl) && SQL_FetchRow(hndl)){
+		PrintToConsole(client,"HERE_-1");
+
+		float runtime = SQL_FetchFloat(hndl, 0);
+
+		char szName[32];
+		GetClientName(client, szName, sizeof(szName));
+
+		char szQuery[1024];
+		Format(szQuery, 1024, sql_insertPR, szSteamID, szName, szMapName, runtime, 1, 0.0, 0.0, 0.0, 0.0);
+		SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, pack, DBPrio_Low);
+	}
+	else{
+
+		char szName[32];
+		GetClientName(client, szName, sizeof(szName));
+
+		char szQuery[1024];
+		Format(szQuery, 1024, sql_insertPR, szSteamID, szName, szMapName, 0.0, 1, 0.0, 0.0, 0.0, 0.0);
+		SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, pack, DBPrio_Low);
+	}
+	return;
+}
+
+public void db_UpdatePRinfo(int client, char szSteamID[32], int zGroup)
+{	
+
+	char szQuery[2048];
+	PrintToConsole(client, "%f || %f || %f || %f\n", g_fTimeinZone[client], g_fCompletes[client], g_fAttempts[client], g_fstComplete[client]);
+	Format(szQuery, 2048, sql_updatePrinfo, g_fTimeinZone[client], g_fCompletes[client], g_fAttempts[client], g_fstComplete[client], szSteamID, g_szMapName, 1);
+	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
 }
 
 /*===================================
@@ -8776,16 +8893,14 @@ public void SQL_ViewMapNamePrCallback(Handle owner, Handle hndl, const char[] er
 	int client = ReadPackCell(pack);
 	char szSteamId[32];
 	ReadPackString(pack, szSteamId, 32);
-	CloseHandle(pack);
 	
 	if (hndl == null)
 	{
 		LogError("[surftimer] SQL Error (SQL_ViewMapNamePrCallback): %s ", error);
 		CPrintToChat(client, "%t", "SQLTwo1", g_szChatPrefix);
+		CloseHandle(pack);
 		return;
 	}
-
-	
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
@@ -9942,6 +10057,243 @@ public void SQL_SelectCPRTargetCPsCallback(Handle owner, Handle hndl, const char
 }
 
 public int CPRMenuHandler(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_End)
+		delete menu;
+
+	return 0;
+}
+
+public void db_selectPRinfo(int client, int rank, const char szMapName[128])
+{
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackCell(pack, rank);
+	
+	char szQuery[512];
+	Format(szQuery, sizeof(szQuery), "SELECT name, PRtimeinzone, PRcomplete, PRattempts, PRstcomplete FROM ck_prinfo WHERE steamid = '%s' AND mapname LIKE '%c%s%c' AND zonegroup = 1;", g_szSteamID[client], PERCENT, szMapName, PERCENT);
+	SQL_TQuery(g_hDb, SQL_SelectPRinfoCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void SQL_SelectPRinfoCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[surftimer] SQL Error (SQL_SelectPRTimeCallback): %s", error);
+		CloseHandle(pack);
+		return;
+	}
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	int rank = ReadPackCell(pack);
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	{	
+
+		char playername[32];
+		
+		SQL_FetchString(hndl, 0, playername, 32);
+
+		float time_in_zone = SQL_FetchFloat(hndl, 1);
+		float completes = SQL_FetchFloat(hndl, 2);
+		float attempts = SQL_FetchFloat(hndl, 3);
+		float stcomplete = SQL_FetchFloat(hndl, 4);
+
+		Menu menu = CreateMenu(PRMenuHandler);
+		char szItem[256];
+
+		char szTimeinZoneformatted[32];
+		FormatTimeFloat(client, time_in_zone, 2, szTimeinZoneformatted, 32);
+
+		char szstCompleteFormatted[32];
+		FormatTimeFloat(client, stcomplete, 2, szstCompleteFormatted, 32);
+
+		Format(szItem, sizeof(szItem), "Rank: %i\n\n", rank);
+		AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+
+		Format(szItem, sizeof(szItem), "Total Time: %s\n", szTimeinZoneformatted);
+		AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+
+		if(g_fAttempts[client] != 0.0){
+			Format(szItem, sizeof(szItem), "Completes : (%i / %i) (%.2f %%)\n\n", RoundToFloor(completes), RoundToFloor(attempts), completes / attempts );
+			AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+		}
+		else{
+			Format(szItem, sizeof(szItem), "Completes : N/A\n\n");
+			AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+		}
+
+		if(g_fstComplete[client] != 0.0){
+			Format(szItem, sizeof(szItem), "First Complete: %s\n", szstCompleteFormatted);
+			AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+		}
+		else{
+			Format(szItem, sizeof(szItem), "First Complete: N/A\n\n");
+			AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+		}
+
+		SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
+		SetMenuTitle(menu, "PR info for %s on %s\n\n", playername, g_szMapName);
+
+		DisplayMenu(menu, client, MENU_TIME_FOREVER);
+
+	}
+	else
+	{
+		CPrintToChat(client, "%t", "SQLTwo7", g_szChatPrefix);
+		CloseHandle(pack);
+	}
+}
+
+// sm_prinfo @x command with map parameter
+public void db_selectPRinfoUnknown(int client, int rank, char szMapName[128])
+{
+	char szQuery[1024];
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackCell(pack, rank);
+
+	rank = rank - 1;
+	Format(szQuery, 1024, "SELECT steamid, name , mapname, PRtimeinzone, PRcomplete, PRattempts, PRstcomplete FROM ck_prinfo WHERE `mapname` LIKE '%c%s%c' AND zonegroup = 1 ORDER BY runtime ASC LIMIT %i, 1;", PERCENT, szMapName, PERCENT, rank);
+	SQL_TQuery(g_hDb, db_selectPRinfoUnknownWithMapCallback, szQuery, pack, DBPrio_Low);
+}
+
+// sm_prinfo @x command without map parameter (current mapname being used)
+public void db_selectPRinfoUnknownWithMap(int client, int rank, char szMapName[128])
+{
+    char szQuery[1024];
+    Handle pack = CreateDataPack();
+    WritePackCell(pack, client);
+    WritePackCell(pack, rank);
+
+    rank = Math_Min(rank - 1, 0);
+    Format(szQuery, 1024, "SELECT steamid, name, mapname, PRtimeinzone, PRcomplete, PRattempts, PRstcomplete FROM ck_prinfo WHERE mapname = '%s' AND zonegroup = 1 ORDER BY runtime ASC LIMIT %i, 1;", szMapName, rank);
+    SQL_TQuery(g_hDb, db_selectPRinfoUnknownWithMapCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_selectPRinfoUnknownWithMapCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{	
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	int rank = ReadPackCell(pack);
+	CloseHandle(pack);
+
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_selectMapRankUnknownCallback): %s", error);
+		return;
+	}
+	
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	{	
+
+		char szSteamId[32];
+		char playername[MAX_NAME_LENGTH];
+		char mapname[128];
+		float PRTimeinZone;
+		float PRCompletes;
+		float PRAttempts;
+		float PRstcomplete;
+
+		SQL_FetchString(hndl, 0, szSteamId, 32);
+		SQL_FetchString(hndl, 1, playername, sizeof(playername));
+		SQL_FetchString(hndl, 2, mapname, sizeof(mapname));
+
+		PRTimeinZone = SQL_FetchFloat(hndl, 3);
+		PRCompletes = SQL_FetchFloat(hndl, 4);
+		PRAttempts = SQL_FetchFloat(hndl, 5);
+		PRstcomplete = SQL_FetchFloat(hndl, 6);
+		
+		Handle pack_aux = CreateDataPack();
+		WritePackCell(pack_aux, client);
+		WritePackCell(pack_aux, rank);
+		WritePackString(pack_aux, szSteamId);
+		WritePackString(pack_aux, playername);
+		WritePackString(pack_aux, mapname);
+		WritePackFloat(pack_aux, PRTimeinZone);
+		WritePackFloat(pack_aux, PRCompletes);
+		WritePackFloat(pack_aux, PRAttempts);
+		WritePackFloat(pack_aux, PRstcomplete);
+
+		db_PRinfoDoneCallback(pack_aux);
+	}
+	else
+	{
+		CPrintToChat(client, "%t", "SQL28", g_szChatPrefix);
+	}
+}
+
+public void db_PRinfoDoneCallback(any pack)
+{
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	int rank = ReadPackCell(pack);
+	char szSteamId[32];
+	ReadPackString(pack, szSteamId, sizeof(szSteamId));
+	char playername[MAX_NAME_LENGTH];
+	ReadPackString(pack, playername, sizeof(playername));
+	char mapname[128];
+	ReadPackString(pack, mapname, sizeof(mapname));
+	float PRTimeinZone = ReadPackFloat(pack);
+	float PRCompletes = ReadPackFloat(pack);
+	float PRAttempts = ReadPackFloat(pack);
+	float PRstComplete = ReadPackFloat(pack);
+
+	CloseHandle(pack);
+
+	if (pack == 0)
+	{
+		LogError("[SurfTimer] SQL Error (db_PRinfoDoneCallback)");
+		return;
+	}
+
+	float time_in_zone = PRTimeinZone;
+	float completes = PRCompletes;
+	float attempts = PRAttempts;
+	float stcomplete = PRstComplete;
+
+	Menu menu = CreateMenu(PRMenuHandler);
+	char szItem[256];
+
+	char szTimeinZoneformatted[32];
+	FormatTimeFloat(client, time_in_zone, 2, szTimeinZoneformatted, 32);
+
+	char szstCompleteFormatted[32];
+	FormatTimeFloat(client, stcomplete, 2, szstCompleteFormatted, 32);
+
+	Format(szItem, sizeof(szItem), "Rank: %i\n\n", rank);
+	AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+
+	Format(szItem, sizeof(szItem), "Total Time: %s\n", szTimeinZoneformatted);
+	AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+
+	if(attempts != 0.0){
+		Format(szItem, sizeof(szItem), "Completes : (%i / %i) (%.2f %%)\n\n", RoundToFloor(completes), RoundToFloor(attempts), completes / attempts );
+		AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+	}
+	else{
+		Format(szItem, sizeof(szItem), "Completes : N/A\n\n");
+		AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+	}
+
+	if(stcomplete != 0.0){
+		Format(szItem, sizeof(szItem), "First Complete: %s\n", szstCompleteFormatted);
+		AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+	}
+	else{
+		Format(szItem, sizeof(szItem), "First Complete: N/A\n\n");
+		AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+	}
+
+	SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
+	SetMenuTitle(menu, "PR info for %s on %s\n\n", playername, g_szMapName);
+
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+public int PRMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_End)
 		delete menu;

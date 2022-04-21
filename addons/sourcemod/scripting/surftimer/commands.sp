@@ -185,6 +185,8 @@ void CreateCommands()
 
 	// CPR
 	RegConsoleCmd("sm_cpr", Command_CPR, "[surftimer] Compare clients time to another clients time");
+	RegConsoleCmd("sm_prinfo", Command_PRinfo, "[surftimer] Information about personal info on a map");
+	
 
 	// reload map
 	RegAdminCmd("sm_rm", Command_ReloadMap, ADMFLAG_ROOT, "[surftimer] Reloads the current map");
@@ -5210,6 +5212,43 @@ public Action Command_CPR(int client, int args)
 			}
 			if (!found)
 				CReplyToCommand(client, "%t", "Commands85", g_szChatPrefix);
+		}
+	}
+
+	return Plugin_Handled;
+}
+
+public Action Command_PRinfo(int client, int args)
+{
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+
+	if (args == 0)
+	{
+		db_selectPRinfo(client, g_MapRank[client], g_szMapName);
+	}
+	else
+	{
+		char arg1[128];
+		char arg2[128];
+		GetCmdArg(1, arg1, sizeof(arg1));
+		GetCmdArg(2, arg2, sizeof(arg2));
+
+		if (StrContains(arg1[0], "surf_", true) != -1)
+		{
+			db_selectPRinfo(client, g_MapRank[client], arg1);
+		}
+		else if (StrContains(arg1, "@") != -1)
+		{
+			ReplaceString(arg1, 128, "@", "");
+			int rank = StringToInt(arg1);
+
+			GetCmdArg(2, arg2, sizeof(arg2));
+
+			if (!arg2[0])
+				db_selectPRinfoUnknownWithMap(client, rank, g_szMapName);
+			else
+				db_selectPRinfoUnknown(client, rank, arg2);
 		}
 	}
 
