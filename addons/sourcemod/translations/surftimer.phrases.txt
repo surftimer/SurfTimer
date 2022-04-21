@@ -852,7 +852,6 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Please wait 0.1 seconds before using this command again"
 	}
-
 	"BotInUse"
 	{
 		"#format"	"{1:s},{2:s}"

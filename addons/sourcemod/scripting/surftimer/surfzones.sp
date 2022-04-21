@@ -320,6 +320,13 @@ public void StartTouch(int client, int action[3])
 		}
 		else if (action[0] == 1 || action[0] == 5) // Start Zone or Speed Start
 		{
+
+			if(g_fTimeIncrement[client] != 0.0){
+				g_bStartCountintTimeinZone[client] = false;
+				g_fTimeinZone[client] += g_fTimeIncrement[client];
+				g_fTimeIncrement[client] = 0.0;
+			}
+
 			// Set Default Values
 			Client_Stop(client, 1);
 			ResetGravity(client);
@@ -348,7 +355,7 @@ public void StartTouch(int client, int action[3])
 			}
 		}
 		else if (action[0] == 2) // End Zone
-		{
+		{	
 			if (g_iClientInZone[client][2] == action[2]) // Cant end bonus timer in this zone && in the having the same timer on
 			{
 				// fluffys gravity
