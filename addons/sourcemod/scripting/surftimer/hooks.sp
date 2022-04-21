@@ -570,6 +570,7 @@ public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontB
 		int clientid = GetEventInt(event, "userid");
 		int client = GetClientOfUserId(clientid);
 
+		g_fTimeinZone[client] += g_fTimeIncrement[client];
 		db_UpdatePRinfo(client, g_szSteamID[client], 1);
 
 		if (!IsValidClient(client) || IsFakeClient(client))
