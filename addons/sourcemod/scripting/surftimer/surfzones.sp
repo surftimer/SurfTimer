@@ -321,10 +321,20 @@ public void StartTouch(int client, int action[3])
 		else if (action[0] == 1 || action[0] == 5) // Start Zone or Speed Start
 		{
 
-			if(g_fTimeIncrement[client] != 0.0){
-				g_bStartCountintTimeinZone[client] = false;
-				g_fTimeinZone[client] += g_fTimeIncrement[client];
-				g_fTimeIncrement[client] = 0.0;
+
+			if(g_iClientInZone[client][2] == 0){
+				if(g_fTimeIncrement[client][0] != 0.0){
+					g_bStartCountintTimeinZone[client][0] = false;
+					g_fTimeinZone[client][0] += g_fTimeIncrement[client][0];
+					g_fTimeIncrement[client][0] = 0.0;
+				}
+			}
+			else{
+				if(g_fTimeIncrement[client][g_iClientInZone[client][2]] != 0.0){
+					g_bStartCountintTimeinZone[client][g_iClientInZone[client][2]] = false;
+					g_fTimeinZone[client][g_iClientInZone[client][2]] += g_fTimeIncrement[client][g_iClientInZone[client][2]];
+					g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
+				}
 			}
 
 			// Set Default Values

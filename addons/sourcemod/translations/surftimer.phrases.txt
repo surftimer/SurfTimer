@@ -592,6 +592,10 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Usage: !btop <bonus id> <mapname>"
 	}
+	"BonusPRinfoUsage"{
+		"#format"	"{1:s}"
+		"en"		"{1} Usage: !prinfo <mapname> <bonus id> <rank>"
+	}
 	"Commands19"
 	{
 		"#format"	"{1:s}"
@@ -1790,4 +1794,14 @@
 		"#format"	"{1:s},{2:s}"
 		"en"		"{1} Auto-reset is enabled, but you weren't teleported because you're surfing in {gold}{2}"
 	}
+	"PRinfo_help_chat"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Open {yellow}console{default} to see the {yellow}formatted{default} options"
+	}
+	"PRinfo_help"
+	{
+		"en"		"FORMATTING OPTIONS FOR COMMAND !prinfo \n!prinfo (with no arguments automatically selects the zone you are in) \n!prinfo <mapname> \n!prinfo <rank> \n!prinfo <bonus number> \n!prinfo <mapname> <rank> OR !prinfo <mapname> <bonus number> \n!prinfo <rank> <mapname> OR !prinfo <rank> <bonus number> \n!prinfo <bonus number> <mapname> OR !prinfo <bonus number> <rank> \n!prinfo <mapname> <rank> OR !prinfo <mapname> <bonus number> \n"
+	}
+
 }
