@@ -1,0 +1,73 @@
+name: Compile test and upload
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  workflow:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set environment variables
+        run: |
+          SOURCEMOD_PATH=$GITHUB_WORKSPACE/addons/sourcemod
+          echo "SOURCEMOD_PATH=$SOURCEMOD_PATH" >> $GITHUB_ENV
+          echo "SCRIPTING_PATH=$SOURCEMOD_PATH/scripting" >> $GITHUB_ENV
+          echo "INCLUDE_PATH=$SOURCEMOD_PATH/scripting/include" >> $GITHUB_ENV
+
+      - name: Setup SourcePawn Compiler 1.10
+        uses: rumblefrog/setup-sp@master
+        with:
+          version: "1.10"
+
+      - name: Fetch plugin dependencies
+        run: |
+          wget https://raw.githubusercontent.com/peace-maker/DHooks2/dynhooks/sourcemod_files/scripting/include/dhooks.inc -P $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/Impact123/AutoExecConfig/development/autoexecconfig.inc -P $INCLUDE_PATH
+          wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/addons/sourcemod/scripting/include/colorlib.inc -P $INCLUDE_PATH
+
+      - name: Create upload directories
+        run: |
+          mkdir -p ./upload/csgo/addons/sourcemod/plugins/SurfTimer
+          mkdir -p ./upload/csgo/addons/sourcemod/translations
+      
+      - name: Move translation file
+        run: |
+          mv ./addons/sourcemod/translations/surftimer.phrases.txt ./upload/csgo/addons/sourcemod/translations
+
+      - name: Compile surftimer.sp
+        run: |
+          echo -e "\nCompiling SurfTimer.sp..."
+          spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH -o $GITHUB_WORKSPACE/upload/csgo/addons/sourcemod/plugins/SurfTimer/SurfTimer.smx SurfTimer.sp
+        working-directory: ${{ env.SCRIPTING_PATH }}/
+
+      - name: Compile SurfTimer-telefinder.sp
+        run: |
+          echo -e "\nCompiling SurfTimer-telefinder.sp..."
+          spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH -o $GITHUB_WORKSPACE/upload/csgo/addons/sourcemod/plugins/SurfTimer/SurfTimer-telefinder.smx SurfTimer-telefinder.sp
+        working-directory: ${{ env.SCRIPTING_PATH }}/
+
+      - name: Upload files
+        uses: SamKirkland/FTP-Deploy-Action@2.0.0
+        env:
+          FTP_SERVER: ${{ secrets.SFTP_HOST }}
+          FTP_USERNAME: ${{ secrets.SFTP_USER }}
+          FTP_PASSWORD: ${{ secrets.SFTP_PASS }}
+          LOCAL_DIR: upload
+          METHOD: sftp
+          PORT: ${{ secrets.SFTP_PORT }}
+          ARGS: --no-empty-dirs
+
+      - name: Restart test server
+        shell: bash
+        run: |
+          curl --request POST \
+            --url ${{ secrets.BASE_URL }}api/client/servers/${{ secrets.SERVER_ID }}/power \
+            --header 'Accept: application/json' \
+            --header 'Authorization: Bearer ${{ secrets.API_KEY }}' \
+            --header 'Content-Type: application/json' \
+            --data '{ "signal": "restart" }'

@@ -546,7 +546,7 @@ public Action Event_OnPlayerTeam(Handle event, const char[] name, bool dontBroad
 		}
 		if (g_bTimerRunning[client])
 		{
-			g_fStartPauseTime[client] = GetGameTime();
+			g_fStartPauseTime[client] = GetClientTickTime(client);
 			if (g_fPauseTime[client] > 0.0)
 				g_fStartPauseTime[client] = g_fStartPauseTime[client] - g_fPauseTime[client];
 		}
@@ -1144,6 +1144,9 @@ public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 
 public void Hook_PostThinkPost(int entity)
 {
+	++g_iClientTick[entity];
+	UpdateClientCurrentRunTimes(entity);
+
 	SetEntProp(entity, Prop_Send, "m_bInBuyZone", 0);
 }
 
@@ -1181,54 +1184,53 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 
 			// This logic for detecting bhops is pretty terrible and should be reworked -sneaK
 			g_iTicksOnGround[client] = 0;
-			float time = GetGameTime();
-			float cTime = time - g_iLastJump[client];
+			float diff = GetClientTickTime(client) - g_iLastJump[client];
 			if (!g_bInBhop[client])
 			{
 				if (g_bFirstJump[client])
 				{
-					if (cTime > 0.8 && g_iCurrentStyle[client] != 4 && g_iCurrentStyle[client] != 5) // cTime Normal Threshold + Exclude LG/SM
+					if (diff > 0.8 && g_iCurrentStyle[client] != 4 && g_iCurrentStyle[client] != 5) // diff Normal Threshold + Exclude LG/SM
 					{
 						g_bFirstJump[client] = true;
-						g_iLastJump[client] = GetGameTime();
+						g_iLastJump[client] = GetClientTickTime(client);
 					}
 
-					else if (cTime > 1.6 && (g_iCurrentStyle[client] == 4 || g_iCurrentStyle[client] == 5)) // LG/SM jump time threshold
+					else if (diff > 1.6 && (g_iCurrentStyle[client] == 4 || g_iCurrentStyle[client] == 5)) // LG/SM jump time threshold
 					{
 						g_bFirstJump[client] = true;
-						g_iLastJump[client] = GetGameTime();
+						g_iLastJump[client] = GetClientTickTime(client);
 					}
 					
 					else
 					{
-						g_iLastJump[client] = GetGameTime();
+						g_iLastJump[client] = GetClientTickTime(client);
 						g_bInBhop[client] = true;
 					}
 				}
 				else
 				{
-					g_iLastJump[client] = GetGameTime();
+					g_iLastJump[client] = GetClientTickTime(client);
 					g_bFirstJump[client] = true;
 				}
 			}
 			else
 			{
-				// 0.2s no-jump buffer (cTime + 0.2) to register as no longer in bhop.
-				if (cTime > 1 && g_iCurrentStyle[client] != 4 && g_iCurrentStyle[client] != 5) // Not LG/SM
+				// 0.2s no-jump buffer (diff + 0.2) to register as no longer in bhop.
+				if (diff > 1 && g_iCurrentStyle[client] != 4 && g_iCurrentStyle[client] != 5) // Not LG/SM
 				{
 					g_bInBhop[client] = false;
-					g_iLastJump[client] = GetGameTime();
+					g_iLastJump[client] = GetClientTickTime(client);
 				}
 
-				else if (cTime > 1.8 && (g_iCurrentStyle[client] == 4 || g_iCurrentStyle[client] == 5)) // LG/SM
+				else if (diff > 1.8 && (g_iCurrentStyle[client] == 4 || g_iCurrentStyle[client] == 5)) // LG/SM
 				{
 					g_bInBhop[client] = false;
-					g_iLastJump[client] = GetGameTime();
+					g_iLastJump[client] = GetClientTickTime(client);
 				}
 
 				else
 				{
-					g_iLastJump[client] = GetGameTime();
+					g_iLastJump[client] = GetClientTickTime(client);
 				}
 			}
 		}
@@ -1243,7 +1245,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 					{
 						g_bJumpedInZone[client] = true;
 						g_bResetOneJump[client] = true;
-						g_fJumpedInZoneTime[client] = GetGameTime();
+						g_fJumpedInZoneTime[client] = GetClientTickTime(client);
 						if (g_iCurrentStyle[client] == 5 || g_iCurrentStyle[client] == 4)
 							CreateTimer(1.7, ResetOneJump, client, TIMER_FLAG_NO_MAPCHANGE);
 						else
@@ -1252,10 +1254,9 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 					else
 					{
 						g_bResetOneJump[client] = false;
-						float time = GetGameTime();
-						float time2 = time - g_fJumpedInZoneTime[client];
+						float diff = GetClientTickTime(client) - g_fJumpedInZoneTime[client];
 						g_bJumpedInZone[client] = false;
-						if ((time2 <= 0.9 && g_iCurrentStyle[client] != 4 && g_iCurrentStyle[client] != 5) || (time2 <= 1.6 && (g_iCurrentStyle[client] == 4 || g_iCurrentStyle[client] == 5)))
+						if ((diff <= 0.9 && g_iCurrentStyle[client] != 4 && g_iCurrentStyle[client] != 5) || (diff <= 1.6 && (g_iCurrentStyle[client] == 4 || g_iCurrentStyle[client] == 5)))
 						{
 							CPrintToChat(client, "%t", "Hooks15", g_szChatPrefix);
 							Handle pack;

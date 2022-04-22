@@ -535,7 +535,7 @@
 	"Commands8"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} How did you hit 1024 save locs?"
+		"en"		"{1} You reached the maximum of 128 savelocs!"
 	}
 	"Commands9"
 	{
@@ -847,6 +847,12 @@
 		"#format"	"{1:s}"
 		"en"		"{1} This is a linear map."
 	}
+	"Commands88"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Please wait 0.1 seconds before using this command again"
+	}
+
 	"BotInUse"
 	{
 		"#format"	"{1:s},{2:s}"
@@ -1639,11 +1645,6 @@
 	{
 		"#format"	"{1:s}"
 		"en"		"{1} Hints are now {red}disabled"
-	}
-	"StageNotRecorded"
-	{
-		"#format"	"{1:s}"
-		"en"		"{1} Potential S1 to S2 glitch stopped. Stage time was not recorded"
 	}
 	"StartPrestrafe"
 	{

@@ -120,7 +120,6 @@ public Action CKTimer1(Handle timer)
 					CreateTimer(10.0, WelcomeMsgTimer, client, TIMER_FLAG_NO_MAPCHANGE);
 					CreateTimer(70.0, HelpMsgTimer, client, TIMER_FLAG_NO_MAPCHANGE);
 				}
-				GetcurrentRunTime(client);
 
 				CenterHudAlive(client);
 				MovementCheck(client);
@@ -224,18 +223,10 @@ public Action CKTimer2(Handle timer)
 		// Scoreboard
 		if (!g_bPause[i])
 		{
-			float fltime;
-			fltime = GetGameTime() - g_fStartTime[i] - g_fPauseTime[i] + 1.0;
 			if (IsPlayerAlive(i) && g_bTimerRunning[i])
-			{
-				int time;
-				time = RoundToZero(fltime);
-				Client_SetScore(i, time);
-			}
+				Client_SetScore(i, RoundToZero(GetClientTickTime(i) - g_fStartTime[i] - g_fPauseTime[i] + 1.0));
 			else
-			{
 				Client_SetScore(i, 0);
-			}
 
 			if (g_pr_AllPlayers[0] < g_PlayerRank[i][0] || g_PlayerRank[i][0] == 0)
 				CS_SetClientContributionScore(i, -99999);
@@ -344,6 +335,9 @@ public Action StyleBonusReplayTimer(Handle timer, Handle pack)
 public Action SetClanTag(Handle timer, any client)
 {
 	if (!IsValidClient(client) || IsFakeClient(client) || g_pr_Calculating[client])
+		return Plugin_Handled;
+
+	if (!g_hOverrideClantag.BoolValue)
 		return Plugin_Handled;
 
 	/*char buffer[MAX_NAME_LENGTH];

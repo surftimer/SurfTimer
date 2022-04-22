@@ -48,15 +48,16 @@ Yes, but not any more than other projects currently and for past years.
 * [AutoExecConfig](https://github.com/Impact123/AutoExecConfig)
 
 **SourceMod Plugins**
+* [End-Touch-Fix](https://github.com/rumourA/End-Touch-Fix) - Checks EntityUntouch on PostThink instead of server frames
 * *(recommended)* [Movement Unlocker](https://forums.alliedmods.net/showthread.php?t=255298) - Enables ground sliding
 * *(recommended)* [MomSurfFix](https://github.com/GAMMACASE/MomSurfFix) - Fixes ramp glitches
 * *(recommended)* [RNGFix](https://github.com/jason-e/rngfix) - Fixes a bunch of engine physics "bugs"
-* *(recommended)* [End-Touch-Fix](https://github.com/rumourA/End-Touch-Fix) - Checks EntityUntouch on PostThink instead of server frames
 * *(recommended)* [HeadBugFix](https://github.com/GAMMACASE/HeadBugFix) - Fixes the head boundary box poping up when you start ducking
 * *(recommended)* [PushFixDE](https://github.com/GAMMACASE/PushFixDE) - Fixes client prediction errors in push triggers
 * *(recommended)* [crouchboostfix](https://github.com/t5mat/crouchboostfix) - Prevents crouchboosting
 * *(recommended)* [Normalized-Run-Speed](https://github.com/sneak-it/Normalized-Run-Speed) - Normalizes players run speed across all weapons
 * *(optional)* [Surftimer-Discord](https://github.com/Sarrus1/SurfTimer-discord) - Discord WR notifications
+* *(optional)* [Surftimer-GOTV](https://github.com/tslashd/SurfTimer-GOTV) - GOTV demos for WRs
 
 **Misc**
 * *(optional)* [Surftimer-Web-Stats](https://github.com/KristianP26/Surftimer-Web-Stats) - Web statistics

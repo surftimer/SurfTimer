@@ -486,7 +486,7 @@ void TeamChangeActual(int client, int toteam)
 	{
 		if (g_fStartTime[client] != -1.0 && g_bTimerRunning[client] == true)
 		{
-			g_fPauseTime[client] = GetGameTime() - g_fStartPauseTime[client];
+			g_fPauseTime[client] = GetClientTickTime(client) - g_fStartPauseTime[client];
 			
 			if (g_iClientInZone[client][0] == 3)
 			{
@@ -898,7 +898,6 @@ public Action CallAdmin_OnDrawOwnReason(int client)
 
 public bool checkSpam(int client)
 {
-	float time = GetGameTime();
 	if (GetConVarFloat(g_hChatSpamFilter) == 0.0)
 		return false;
 
@@ -907,7 +906,7 @@ public bool checkSpam(int client)
 
 	bool result = false;
 
-	if (time - g_fLastChatMessage[client] < GetConVarFloat(g_hChatSpamFilter))
+	if (GetGameTime() - g_fLastChatMessage[client] < GetConVarFloat(g_hChatSpamFilter))
 	{
 		result = true;
 		g_messages[client]++;
@@ -924,7 +923,7 @@ public bool checkSpam(int client)
 		return true;
 	}
 
-	g_fLastChatMessage[client] = time;
+	g_fLastChatMessage[client] = GetGameTime();
 	return result;
 }
 
@@ -1206,22 +1205,21 @@ public bool Base_TraceFilter(int entity, int contentsMask, any data)
 
 public void SetClientDefaults(int client)
 {
-	float GameTime = GetGameTime();
-	g_fLastCommandBack[client] = GameTime;
+	g_fLastCommandBack[client] = GetGameTime();
 	g_ClientSelectedZone[client] = -1;
 	g_Editing[client] = 0;
 	g_iSelectedTrigger[client] = -1;
 
 	g_bClientRestarting[client] = false;
-	g_fClientRestarting[client] = GameTime;
-	g_fErrorMessage[client] = GameTime;
+	g_fClientRestarting[client] = GetGameTime();
+	g_fErrorMessage[client] = GetGameTime();
 
 	g_bLoadingSettings[client] = false;
 	g_bSettingsLoaded[client] = false;
 
 	g_fLastDifferenceTime[client] = 0.0;
 
-	g_flastClientUsp[client] = GameTime;
+	g_flastClientUsp[client] = GetGameTime();
 
 	g_ClientRenamingZone[client] = false;
 
@@ -1266,7 +1264,7 @@ public void SetClientDefaults(int client)
 	g_fPauseTime[client] = 0.0;
 	g_MapRank[client] = 99999;
 	g_OldMapRank[client] = 99999;
-	g_fProfileMenuLastQuery[client] = GameTime;
+	g_fProfileMenuLastQuery[client] = GetGameTime();
 	Format(g_szPlayerPanelText[client], 512, "");
 	Format(g_pr_rankname[client], 128, "");
 	Format(g_pr_rankname_style[client], 32, "");
@@ -1291,7 +1289,7 @@ public void SetClientDefaults(int client)
 		}
 	}
 
-	// g_fLastPlayerCheckpoint[client] = GameTime;
+	// g_fLastPlayerCheckpoint[client] = GetGameTime();
 	g_bCreatedTeleport[client] = false;
 	g_bPracticeMode[client] = false;
 
@@ -1366,44 +1364,43 @@ public void SetClientDefaults(int client)
 
 	// New noclipspeed
 	g_iNoclipSpeed[client] = g_iDefaultNoclipSpeed;
+
+	g_iClientTick[client] = 0;
+
+	g_bWrcpEndZone[client] = false;
+	g_iClientInZone[client][2] = 0;
 }
 
-// Get Runtime
-public void GetcurrentRunTime(int client)
+float GetClientTickTime(int client)
 {
-	float fGetGameTime = GetGameTime();
-	float fPauseTime = g_fPauseTime[client];
-	float fSrcpPauseTime = g_fSrcpPauseTime[client];
+	return g_iClientTick[client] * GetTickInterval();
+}
 
+public void UpdateClientCurrentRunTimes(int client)
+{
 	if (g_bPracticeMode[client]) // If in PracMode then use normal CurrentRunTime + time from saveloc
 	{
-		g_fCurrentRunTime[client] = (fGetGameTime - g_fPracModeStartTime[client] - fPauseTime) + g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]];
+		g_fCurrentRunTime[client] = (GetClientTickTime(client) - g_fPracModeStartTime[client] - g_fPauseTime[client]) + g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]];
 	}
 	else // If not in PracMode then use normal CurrentRunTime
 	{
 		if (g_bTimerRunning[client])
-			g_fCurrentRunTime[client] = fGetGameTime - g_fStartTime[client] - fPauseTime;
+			g_fCurrentRunTime[client] = GetClientTickTime(client) - g_fStartTime[client] - g_fPauseTime[client];
 		else
 			g_fCurrentRunTime[client] = -1.0;
 	}
 	
 	if (g_bWrcpTimeractivated[client])
 	{
-		g_fCurrentWrcpRunTime[client] = fGetGameTime - g_fStartWrcpTime[client] - fSrcpPauseTime;
+		g_fCurrentWrcpRunTime[client] = GetClientTickTime(client) - g_fStartWrcpTime[client] - g_fSrcpPauseTime[client];
 	}
 
 	if (g_bPracSrcpTimerActivated[client])
 	{
-		float fStartPracSrcpTime = g_fStartPracSrcpTime[client];
-		
 		if (!g_bSaveLocTele[client])
-		{
-			g_fCurrentPracSrcpRunTime[client] = fGetGameTime - fStartPracSrcpTime - fSrcpPauseTime;
-		}
+			g_fCurrentPracSrcpRunTime[client] = GetClientTickTime(client) - g_fStartPracSrcpTime[client] - g_fSrcpPauseTime[client];
 		else
-		{
-			g_fCurrentPracSrcpRunTime[client] = (fGetGameTime - fStartPracSrcpTime - fSrcpPauseTime) + g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]];
-		}
+			g_fCurrentPracSrcpRunTime[client] = (GetClientTickTime(client) - g_fStartPracSrcpTime[client] - g_fSrcpPauseTime[client]) + g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]];
 	}
 }
 
@@ -2912,9 +2909,8 @@ public void SpecListMenuDead(int client) // What Spectators see
 				if (g_bTimerRunning[ObservedUser])
 				{
 					char szTime[32];
-					float Time;
-					Time = GetGameTime() - g_fStartTime[ObservedUser] - g_fPauseTime[ObservedUser];
-					FormatTimeFloat(client, Time, 4, szTime, sizeof(szTime));
+					float time = GetClientTickTime(ObservedUser) - g_fStartTime[ObservedUser] - g_fPauseTime[ObservedUser];
+					FormatTimeFloat(client, time, 4, szTime, sizeof(szTime));
 					if (!g_bPause[ObservedUser])
 					{
 						if (!IsFakeClient(ObservedUser))
@@ -3244,14 +3240,14 @@ public void CenterHudDead(int client)
 				}
 				else
 				{
-					obsTimer = GetGameTime() - g_fStartTime[ObservedUser] - g_fPauseTime[ObservedUser];
+					obsTimer = GetClientTickTime(ObservedUser) - g_fStartTime[ObservedUser] - g_fPauseTime[ObservedUser];
 				}
 
 				FormatTimeFloat(client, obsTimer, 3, obsAika, sizeof(obsAika));
 			}
 			else if (g_bWrcpTimeractivated[ObservedUser] && !g_bTimerRunning[ObservedUser])
 			{
-				obsTimer = GetGameTime() - g_fStartWrcpTime[ObservedUser] - g_fPauseTime[ObservedUser];
+				obsTimer = GetClientTickTime(ObservedUser) - g_fStartWrcpTime[ObservedUser] - g_fPauseTime[ObservedUser];
 				FormatTimeFloat(client, obsTimer, 3, obsAika, sizeof(obsAika));
 			}
 			else if (!g_bTimerEnabled[ObservedUser])
@@ -3288,8 +3284,6 @@ public void CenterHudAlive(int client)
 		int style = g_iCurrentStyle[client];
 		char module[6][1024];
 		char pAika[54];
-
-		float gametime = GetGameTime();
 
 		for (int i = 0; i < 6; i++)
 		{
@@ -3363,7 +3357,7 @@ public void CenterHudAlive(int client)
 			else if (g_iCentreHudModule[client][i] == 2)
 			{
 				// server records (change from WR)
-				if (gametime - g_fLastDifferenceTime[client] > 5.0)
+				if (GetGameTime() - g_fLastDifferenceTime[client] > 5.0)
 				{
 					if (g_iClientInZone[client][2] == 0 && style == 0)
 					{
@@ -3422,7 +3416,7 @@ public void CenterHudAlive(int client)
 			else if (g_iCentreHudModule[client][i] == 3)
 			{
 				// PB
-				if (gametime - g_fLastDifferenceTime[client] > 5.0)
+				if (GetGameTime() - g_fLastDifferenceTime[client] > 5.0)
 				{
 					if (g_iClientInZone[client][2] == 0 && style == 0)
 					{
@@ -4473,7 +4467,7 @@ public void TeleportToSaveloc(int client, int id)
 
 	CL_OnStartTimerPress(client);
 	CL_OnStartPracSrcpTimerPress(client);
-	GetcurrentRunTime(client);
+	UpdateClientCurrentRunTimes(client);
 	DispatchKeyValue(client, "targetname", g_szSaveLocTargetname[id]);
 	SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, 0.0 } ));
 	TeleportEntity(client, g_fSaveLocCoords[client][id], g_fSaveLocAngle[client][id], g_fSaveLocVel[client][id]);

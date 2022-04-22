@@ -177,7 +177,7 @@ enum struct FileHeader
 {
 	int BinaryFormatVersion;
 	char Time[32];
-	char Playername[32];
+	char Playername[MAX_NAME_LENGTH];
 	int Checkpoints;
 	int TickCount;
 	float InitialPosition[3];
@@ -233,10 +233,10 @@ enum ResponseType
 public Plugin myinfo =
 {
 	name = "SurfTimer",
-	author = "Ace & olokos",
+	author = "All contributors",
 	description = "a fork from fluffys cksurf fork",
 	version = VERSION,
-	url = "https://github.com/olokos/Surftimer-olokos"
+	url = "https://github.com/surftimer/Surftimer-Official"
 };
 
 /*===================================
@@ -449,7 +449,6 @@ bool g_bWrcpEndZone[MAXPLAYERS + 1] = {false, ...};
 int g_CurrentStage[MAXPLAYERS + 1];
 float g_fStartWrcpTime[MAXPLAYERS + 1];
 float g_fFinalWrcpTime[MAXPLAYERS + 1];
-float g_fOldFinalWrcpTime[MAXPLAYERS + 1];
 
 // Total time the run took in 00:00:00 format
 char g_szFinalWrcpTime[MAXPLAYERS + 1][32];
@@ -1113,9 +1112,6 @@ char g_BlockedChatText[256][256];
 // Last time an overlay was displayed
 float g_fLastOverlay[MAXPLAYERS + 1];
 
-// Stage 2 Bug Fixer
-bool g_wrcpStage2Fix[MAXPLAYERS + 1];
-
 // Is client trying to teleport inside a trigger_multiple
 //bool g_TeleInTriggerMultiple[MAXPLAYERS + 1];
 bool g_bTeleByCommand[MAXPLAYERS + 1];
@@ -1392,6 +1388,8 @@ int g_iTicksOnGround[MAXPLAYERS + 1];
 bool g_bNewStage[MAXPLAYERS + 1];
 bool g_bLeftZone[MAXPLAYERS + 1];
 
+int g_iClientTick[MAXPLAYERS + 1];
+
 /*===================================
 =         Predefined Arrays         =
 ===================================*/
@@ -1634,6 +1632,15 @@ public void OnLibraryAdded(const char[] name)
 	}
 }
 
+public void OnAllPluginsLoaded()
+{
+	if (!LibraryExists("endtouchfix"))
+	{
+		SetFailState("Plugin \"End-Touch-Fix\" not loaded!");
+		return;
+	}
+}
+
 public void OnPluginEnd()
 {
 	// remove clan tags
@@ -1644,7 +1651,8 @@ public void OnPluginEnd()
 			SetEntPropEnt(x, Prop_Send, "m_bSpotted", 1);
 			SetEntProp(x, Prop_Send, "m_iHideHUD", 0);
 			SetEntProp(x, Prop_Send, "m_iAccount", 1);
-			CS_SetClientClanTag(x, "");
+			if (g_hOverrideClantag.BoolValue)
+				CS_SetClientClanTag(x, "");
 			OnClientDisconnect(x);
 		}
 	}
@@ -1893,7 +1901,7 @@ public void OnConfigsExecuted()
 	else
 		readMultiServerMapcycle();
 
-	if (GetConVarFloat(g_iHintsInterval) != 0.0)
+	if (GetConVarFloat(g_iHintsInterval) > 0.0)
 	{
 		readHints();
 		if (g_aHints.Length != 0)
@@ -1931,7 +1939,6 @@ public void OnClientConnected(int client)
 	g_Stage[0][client] = 1;
 	g_bWrcpTimeractivated[client] = false;
 	g_CurrentStage[client] = 1;
-	g_wrcpStage2Fix[client] = true;
 }
 
 public void OnClientPutInServer(int client)
@@ -2071,8 +2078,8 @@ public void OnClientDisconnect(int client)
 	{
 		if (g_bPause[client])
 		{
-			g_fPauseTime[client] = GetGameTime() - g_fStartPauseTime[client];
-			g_fPlayerLastTime[client] = GetGameTime() - g_fStartTime[client] - g_fPauseTime[client];
+			g_fPauseTime[client] = GetClientTickTime(client) - g_fStartPauseTime[client];
+			g_fPlayerLastTime[client] = GetClientTickTime(client) - g_fStartTime[client] - g_fPauseTime[client];
 		}
 		else
 		{
