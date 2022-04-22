@@ -156,8 +156,12 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		}
 		else{
 			//PRINFO STUFF
-			g_bStartCountintTimeinZone[client] = false;
-			g_fTimeIncrement[client] = 0.0;
+
+			for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++){
+				g_bStartCountintTimeinZone[client][zonegroup] = false;
+				g_fTimeIncrement[client][zonegroup] = 0.0;
+			}
+
 		}
 
 		// Change Player Skin
@@ -569,8 +573,12 @@ public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontB
 		int clientid = GetEventInt(event, "userid");
 		int client = GetClientOfUserId(clientid);
 
-		g_fTimeinZone[client] += g_fTimeIncrement[client];
-		db_UpdatePRinfo(client, g_szSteamID[client], 1);
+		if(IsValidClient(client) && !IsFakeClient(client)){
+			for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++){
+				g_fTimeinZone[client][zonegroup] += g_fTimeIncrement[client][zonegroup];
+				db_UpdatePRinfo_disconencted_randomly(client, g_szSteamID[client], zonegroup);
+			}
+		}
 
 		if (!IsValidClient(client) || IsFakeClient(client))
 			return Plugin_Handled;
@@ -860,17 +868,19 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	*/
 
 	if (g_iCurrentStyle[client] == 0){
-
-		if(g_bStartCountintTimeinZone[client]){
-			if(g_bTimerRunning[client])
-				g_fTimeIncrement[client] = g_fCurrentRunTime[client];
-
-			//char szTemp[32];
-			//FormatTimeFloat(client, g_fTimeIncrement[client], 2, szTemp, 32);
-			//CPrintToChat(client, "TIME %s\n", szTemp);
+		if(g_iClientInZone[client][2] == 0){
+			if(g_bStartCountintTimeinZone[client][0]){
+				if(g_bTimerRunning[client])
+					g_fTimeIncrement[client][0] = g_fCurrentRunTime[client];
+			}
 		}
-
-	}
+		else{
+			if(g_bStartCountintTimeinZone[client][g_iClientInZone[client][2]]){
+				if(g_bTimerRunning[client])
+					g_fTimeIncrement[client][g_iClientInZone[client][2]] = g_fCurrentRunTime[client];
+			}
+		}
+	} 
 
 	if (buttons & IN_DUCK && g_bInDuck[client] == true)
 	{
