@@ -160,7 +160,7 @@ void CreateConVars()
 	g_drDeleteSecurity = AutoExecConfig_CreateConVar("ck_dr_delete_security", "1", "(1 / 0) Enable/Disable delete security for !dr command", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_iAdminCountryTags = AutoExecConfig_CreateConVar("ck_admin_country_tags", "0", "(1 / 0) Enable/Disable country tags for admins", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_replayBotDelay = AutoExecConfig_CreateConVar("ck_replay_bot_delay", "10", "Delay in seconds after initial mapstart after the bots join the server", FCVAR_NOTIFY, true, 10.0);
-	g_iHintsInterval = AutoExecConfig_CreateConVar("ck_hints_interval", "240", "Seconds between two hints. Leave empty or set to 0 to disable", FCVAR_NOTIFY, true, 1.0);
+	g_iHintsInterval = AutoExecConfig_CreateConVar("ck_hints_interval", "240", "Seconds between two hints. Leave empty or set to 0 to disable", FCVAR_NOTIFY, true, 0.0);
 	g_bHintsRandomOrder = AutoExecConfig_CreateConVar("ck_hints_random_order", "1", "(1 / 0) Enable/Disable hints shown in a random order", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hOverrideClantag = AutoExecConfig_CreateConVar("ck_override_clantag", "1", "Override player's clantag", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 

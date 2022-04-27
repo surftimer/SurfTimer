@@ -1939,7 +1939,7 @@ public void OnConfigsExecuted()
 	else
 		readMultiServerMapcycle();
 
-	if (GetConVarFloat(g_iHintsInterval) != 0.0)
+	if (GetConVarFloat(g_iHintsInterval) > 0.0)
 	{
 		readHints();
 		if (g_aHints.Length != 0)
