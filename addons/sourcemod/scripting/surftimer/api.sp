@@ -133,15 +133,15 @@ public int Native_GetMapData(Handle plugin, int numParams)
 
 public int Native_GetPlayerData(Handle plugin, int numParams)
 {
-	int client = GetNativeCell(1);
+	int client = GetNativeCellRef(1);
 	int rank = 99999;
 	if (IsValidClient(client) && !IsFakeClient(client))
 	{
 		char szTime[64], szCountry[16];
 
-		GetNativeString(1, szTime, 64);
-		rank = GetNativeCell(2);
-		GetNativeString(3, szCountry, 16);
+		GetNativeString(2, szTime, 64);
+		rank = GetNativeCellRef(3);
+		GetNativeString(4, szCountry, 16);
 
 		if (g_fPersonalRecord[client] > 0.0)
 			Format(szTime, 64, "%s", g_szPersonalRecord[client]);
@@ -153,6 +153,7 @@ public int Native_GetPlayerData(Handle plugin, int numParams)
 		rank = g_MapRank[client];
 
 		SetNativeString(2, szTime, sizeof(szTime), true);
+		SetNativeCellRef(3, rank);
 		SetNativeString(4, szCountry, sizeof(szCountry), true);
 	}
 
