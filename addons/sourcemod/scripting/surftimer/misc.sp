@@ -930,7 +930,7 @@ public bool checkSpam(int client)
 
 stock bool IsValidClient(int client)
 {
-	if (client >= 1 && client <= MaxClients && IsValidEntity(client) && IsClientConnected(client) && IsClientInGame(client))
+	if (client >= 1 && client <= MaxClients && IsClientInGame(client))
 		return true;
 	return false;
 }
@@ -1861,7 +1861,12 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		// Send Announcements
 		if (g_bMapSRVRecord[client])
 		{
-			SendNewRecordForward(client, g_szTimeDifference[client]);
+			float fRecordDiff = g_fOldRecordMapTime - g_fRecordMapTime;
+			char szRecordDiff[64];
+			FormatTimeFloat(client, fRecordDiff, 3, szRecordDiff, sizeof szRecordDiff);
+			Format(szRecordDiff, sizeof szRecordDiff, "-%s", szRecordDiff);
+
+			SendNewRecordForward(client, szRecordDiff);
 
 			SetNewRecordPrestrafe(client, 0, 0, false);
 			
