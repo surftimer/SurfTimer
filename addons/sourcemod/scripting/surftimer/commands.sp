@@ -94,6 +94,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_refreshprofile", Admin_RefreshProfile, "[surftimer] Recalculates player profile for given steam id");
 	RegConsoleCmd("sm_clearassists", Admin_ClearAssists, "[surftimer] Clears assist points (map progress) from all players");// reload map
 	RegConsoleCmd("sm_refreshranks", Admin_RefreshPlayerRankTable, "[surftimer] Refresh player rank table");
+	RegConsoleCmd("sm_ave", Command_VoteExtend,"[surftimer] Admin vote to extend the map");
 
 	// Zoning/Mapsetting Commands
 	RegConsoleCmd("sm_zones", Command_Zones, "[surftimer] [zoner] Opens up the zone creation menu.");
@@ -124,7 +125,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_customtitle", Command_SetDbTitle, "[surftimer] [vip] VIPs can set their own custom title into a db");
 	RegConsoleCmd("sm_namecolour", Command_SetDbNameColour, "[surftimer] [vip] VIPs can set their own custom name colour into the db");
 	RegConsoleCmd("sm_textcolour", Command_SetDbTextColour, "[surftimer] [vip] VIPs can set their own custom text colour into the db");
-	RegConsoleCmd("sm_ve", Command_VoteExtend, "[surftimer] [vip] Vote to extend the map");
 	RegConsoleCmd("sm_colours", Command_ListColours, "[surftimer] Lists available colours for sm_mytitle and sm_namecolour");
 	RegConsoleCmd("sm_colors", Command_ListColours, "[surftimer] Lists available colours for sm_mytitle and sm_namecolour");
 	RegConsoleCmd("sm_toggletitle", Command_ToggleTitle, "[surftimer] [vip] VIPs can toggle their title.");
@@ -601,10 +601,12 @@ public int CustomTitleMenuHandler(Handle menu, MenuAction action, int param1, in
 
 public Action Command_VoteExtend(int client, int args)
 {
-	if (!IsValidClient(client) || !IsPlayerVip(client))
+	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	VoteExtend(client);
+	if (IsPlayerTimerAdmin(client))
+		VoteExtend(client);
+
 	return Plugin_Handled;
 }
 
@@ -612,12 +614,6 @@ public void VoteExtend(int client)
 {
 	int timeleft;
 	GetMapTimeLeft(timeleft);
-
-	if (timeleft > 300)
-	{
-		CPrintToChat(client, "%t", "Commands4", g_szChatPrefix);
-		return;
-	}
 
 	if (IsVoteInProgress())
 	{
