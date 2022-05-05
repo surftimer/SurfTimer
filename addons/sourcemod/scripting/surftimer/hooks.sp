@@ -155,12 +155,9 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 			return Plugin_Continue;
 		}
 		else{
-			//PRINFO STUFF
-
-			for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++){
+			//PRINFO TIME INCREMENT
+			for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++)
 				g_fTimeIncrement[client][zonegroup] = 0.0;
-			}
-
 		}
 
 		// Change Player Skin
@@ -188,13 +185,14 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 			StartRecording(client);
 			CreateTimer(1.5, CenterMsgTimer, client, TIMER_FLAG_NO_MAPCHANGE);
 
-			if (g_bCenterSpeedDisplay[client])
-			{
-				SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
-				CreateTimer(0.1, CenterSpeedDisplayTimer, client, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
+			//THIS "FIXES" A BUG WHERE THE TIMEINCREMENT WOULD BE CHANGED IN THE BEGINNING FOR FUCK ALL REASON...
+			for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++){
+				if(g_fTimeIncrement[client][zonegroup] != 0.0)
+					g_fTimeIncrement[client][zonegroup] = 0.0;
 			}
 
 			g_bFirstSpawn[client] = false;
+
 		}
 
 		// Get Start Position For Challenge
@@ -842,16 +840,6 @@ public Action OnLogAction(Handle source, Identity ident, int client, int target,
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
-	//PRINFO
-	if (g_iCurrentStyle[client] == 0){
-		//PLAYER IS IN A RUN
-		if(g_bTimerRunning[client])
-			g_fTimeIncrement[client][g_iClientInZone[client][2]] = g_fCurrentRunTime[client];
-		//PLAYER IS JUST DOING STAGES
-		else if(g_bWrcpTimeractivated[client] && !g_bTimerRunning[client] && !g_bInStartZone[client] && !g_bInStageZone[client])
-			g_fTimeIncrement[client][g_iClientInZone[client][2]] = g_fCurrentWrcpRunTime[client];
-	} 
-
 	if (buttons & IN_DUCK && g_bInDuck[client] == true)
 	{
 		CPrintToChat(client, "%t", "Hooks11", g_szChatPrefix);
@@ -1014,6 +1002,22 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		else
 		{
 			RecordReplay(client, buttons, subtype, seed, impulse, weapon, angles, vel);
+			//PRINFO
+			if (g_iCurrentStyle[client] == 0 && !g_bPracticeMode[client] && (g_bTimerRunning[client] || g_bWrcpTimeractivated[client])){
+				
+				//char szTime[32];
+				//FormatTimeFloat(client, g_fTimeIncrement[client][g_iClientInZone[client][2]], 3, szTime, 32);
+				//if(g_fTimeIncrement[client][g_iClientInZone[client][2]] != 0.0)
+				//CPrintToChat(client,"VALUE OF TIME INCR (STRING) : %s\n", szTime);
+
+				//PLAYER IS IN A RUN
+				if(g_bTimerRunning[client])
+					g_fTimeIncrement[client][g_iClientInZone[client][2]] = g_fCurrentRunTime[client];
+				//PLAYER IS JUST DOING STAGES
+				//else if(g_bWrcpTimeractivated[client] && !g_bTimerRunning[client] && !g_bInStartZone[client] && !g_bInStageZone[client])
+				else if(g_bWrcpTimeractivated[client])
+					g_fTimeIncrement[client][g_iClientInZone[client][2]] = g_fCurrentWrcpRunTime[client];
+			}
 		}
 
 		// Strafe Sync taken from shavit's bhoptimer

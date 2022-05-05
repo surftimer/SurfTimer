@@ -317,13 +317,8 @@ public void StartTouch(int client, int action[3])
 		//PRINFO
 		if ((action[0] == 1 || action[0] == 2 || action[0] == 3) && (!g_bPracticeMode[client] && !IsFakeClient(client) && g_iCurrentStyle[client] == 0)){
 			
-			//PLAYER JUST DOING STAGES
-			if(action[0] == 3 && (g_bWrcpTimeractivated[client] && !g_bTimerRunning[client] && !g_bInStartZone[client] && !g_bInStageZone[client])){
-				g_fTimeinZone[client][g_iClientInZone[client][2]] += g_fTimeIncrement[client][g_iClientInZone[client][2]];
-				g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
-			}
 			//PLAYER ON A RUN
-			else if(g_bTimerRunning[client] && action[0] == 2){
+			if(action[0] == 2 && g_bTimerRunning[client]){
 				g_fCompletes[client][g_iClientInZone[client][2]]++;
 
 				g_fTimeinZone[client][g_iClientInZone[client][2]] += fCurrentRunTime;
@@ -336,6 +331,19 @@ public void StartTouch(int client, int action[3])
 					db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], 0, g_fFinalTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
 				else
 					db_UpdatePRinfo(client, g_szSteamID[client], 0);
+			}
+			//PLAYER JUST DOING STAGES
+			//else if(action[0] == 3 && (g_bWrcpTimeractivated[client] && !g_bTimerRunning[client] && !g_bInStartZone[client] && !g_bInStageZone[client])){
+			else if(action[0] == 3 && g_bWrcpTimeractivated[client] && !g_bTimerRunning[client]){
+				//g_fTimeinZone[client][g_iClientInZone[client][2]] += g_fTimeIncrement[client][g_iClientInZone[client][2]];
+				g_fTimeinZone[client][g_iClientInZone[client][2]] += fCurrentWrcpRunTime;
+				g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
+			}
+			else if(action[0] == 1){
+				if( g_fTimeIncrement[client][g_iClientInZone[client][2]] != 0.0){
+					g_fTimeinZone[client][g_iClientInZone[client][2]] += g_fTimeIncrement[client][g_iClientInZone[client][2]];
+					g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
+				}
 			}
 
 			/*
@@ -618,13 +626,17 @@ public void EndTouch(int client, int action[3])
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 
 		//PRINFO
-		if ((action[0] == 1 || action[0] == 3) && (!g_bPracticeMode[client] && !IsFakeClient(client) && g_iCurrentStyle[client] == 0)){
-			if(IsValidClient(client)){
+		if ((action[0] == 1 || action[0] == 3) && (!g_bPracticeMode[client] && !IsFakeClient(client) && IsValidClient(client) && g_iCurrentStyle[client] == 0)){
+			//ONE EXAMPLE
+			//IF THE PLAYER IS DOING ONLY STAGES
+			//IF HE DOESNT FINISH THE STAGE
+			//WE STILL NEED TO ADD THE TIME
+			if( g_fTimeIncrement[client][g_iClientInZone[client][2]] != 0.0){
 				g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
-				
-				if(action[0] == 1)
-					g_fAttempts[client][g_iClientInZone[client][2]]++;	
 			}
+			
+			if(action[0] == 1)
+				g_fAttempts[client][g_iClientInZone[client][2]]++;	
 		}
 
 		if (action[0] == 1 || action[0] == 5)
