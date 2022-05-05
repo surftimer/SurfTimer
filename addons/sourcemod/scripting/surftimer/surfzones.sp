@@ -313,6 +313,26 @@ public void StartTouch(int client, int action[3])
 		float fCurrentPracSrcpRunTime = g_fCurrentPracSrcpRunTime[client];
 		
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0) // fluffys: NoBhop(9), NoCrouch(10)
+
+		//PRINFO
+		if ((action[0] == 1 || action[0] == 2 || action[0] == 3) && (!g_bPracticeMode[client] && !IsFakeClient(client) && g_iCurrentStyle[client] == 0)){
+			g_fTimeinZone[client][g_iClientInZone[client][2]] += g_fTimeIncrement[client][g_iClientInZone[client][2]];
+			g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
+
+			//REACHED ENDZONE OF THE MAP DURING A RUN
+			if(g_bTimerRunning[client] && action[0] == 2){
+				g_fCompletes[client][g_iClientInZone[client][2]]++;
+
+				if(g_fstComplete[client][g_iClientInZone[client][2]] == 0.0)
+					g_fstComplete[client][g_iClientInZone[client][2]] = g_fTimeinZone[client][0];
+
+				if((g_fPersonalRecord[client] - g_fFinalTime[client]) > 0)
+					db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], 0, g_fFinalTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
+				else
+					db_UpdatePRinfo(client, g_szSteamID[client], 0);
+			}
+		}
+
 		if (action[0] == 0) // Stop Zone
 		{
 			Client_Stop(client, 1);
@@ -320,23 +340,6 @@ public void StartTouch(int client, int action[3])
 		}
 		else if (action[0] == 1 || action[0] == 5) // Start Zone or Speed Start
 		{
-
-
-			if(g_iClientInZone[client][2] == 0){
-				if(g_fTimeIncrement[client][0] != 0.0){
-					g_bStartCountintTimeinZone[client][0] = false;
-					g_fTimeinZone[client][0] += g_fTimeIncrement[client][0];
-					g_fTimeIncrement[client][0] = 0.0;
-				}
-			}
-			else{
-				if(g_fTimeIncrement[client][g_iClientInZone[client][2]] != 0.0){
-					g_bStartCountintTimeinZone[client][g_iClientInZone[client][2]] = false;
-					g_fTimeinZone[client][g_iClientInZone[client][2]] += g_fTimeIncrement[client][g_iClientInZone[client][2]];
-					g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
-				}
-			}
-
 			// Set Default Values
 			Client_Stop(client, 1);
 			ResetGravity(client);
@@ -602,6 +605,17 @@ public void EndTouch(int client, int action[3])
 		// CPrintToChat(client, "%f %f %f", CurVelVec[0], CurVelVec[1], CurVelVec[2]);
 
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
+
+		//PRINFO
+		if ((action[0] == 1 || action[0] == 3) && (!g_bPracticeMode[client] && !IsFakeClient(client) && g_iCurrentStyle[client] == 0)){
+			if(IsValidClient(client)){
+				g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
+				
+				if(action[0] == 1)
+					g_fAttempts[client][g_iClientInZone[client][2]]++;	
+			}
+		}
+
 		if (action[0] == 1 || action[0] == 5)
 		{	
 			if (!g_bPracticeMode[client])

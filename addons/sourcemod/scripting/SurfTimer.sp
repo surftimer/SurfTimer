@@ -1348,7 +1348,6 @@ float g_fTimeinZone[MAXPLAYERS + 1][MAXZONEGROUPS];
 float g_fCompletes[MAXPLAYERS + 1][MAXZONEGROUPS];
 float g_fAttempts[MAXPLAYERS + 1][MAXZONEGROUPS];
 float g_fstComplete[MAXPLAYERS + 1][MAXZONEGROUPS];
-bool g_bStartCountintTimeinZone[MAXPLAYERS + 1][MAXZONEGROUPS];
 float g_fTimeIncrement[MAXPLAYERS + 1][MAXZONEGROUPS];
 int g_iPRinfoMapRank[MAXPLAYERS + 1];
 int g_iPRinfoMapRankBonus[MAXPLAYERS + 1];
