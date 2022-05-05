@@ -316,12 +316,18 @@ public void StartTouch(int client, int action[3])
 
 		//PRINFO
 		if ((action[0] == 1 || action[0] == 2 || action[0] == 3) && (!g_bPracticeMode[client] && !IsFakeClient(client) && g_iCurrentStyle[client] == 0)){
-			g_fTimeinZone[client][g_iClientInZone[client][2]] += g_fTimeIncrement[client][g_iClientInZone[client][2]];
-			g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
-
-			//REACHED ENDZONE OF THE MAP DURING A RUN
-			if(g_bTimerRunning[client] && action[0] == 2){
+			
+			//PLAYER JUST DOING STAGES
+			if(action[0] == 3 && (g_bWrcpTimeractivated[client] && !g_bTimerRunning[client] && !g_bInStartZone[client] && !g_bInStageZone[client])){
+				g_fTimeinZone[client][g_iClientInZone[client][2]] += g_fTimeIncrement[client][g_iClientInZone[client][2]];
+				g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
+			}
+			//PLAYER ON A RUN
+			else if(g_bTimerRunning[client] && action[0] == 2){
 				g_fCompletes[client][g_iClientInZone[client][2]]++;
+
+				g_fTimeinZone[client][g_iClientInZone[client][2]] += fCurrentRunTime;
+				g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
 
 				if(g_fstComplete[client][g_iClientInZone[client][2]] == 0.0)
 					g_fstComplete[client][g_iClientInZone[client][2]] = g_fTimeinZone[client][0];
@@ -331,6 +337,13 @@ public void StartTouch(int client, int action[3])
 				else
 					db_UpdatePRinfo(client, g_szSteamID[client], 0);
 			}
+
+			/*
+			CPrintToChat(client,"VALUE OF TIME INCR : %f\n", g_fTimeIncrement[client][g_iClientInZone[client][2]]);
+			char szTime[32];
+			FormatTimeFloat(client, g_fTimeIncrement[client][g_iClientInZone[client][2]], 3, szTime, 32);
+			CPrintToChat(client,"VALUE OF TIME INCR (STRING) : %s\n", szTime);
+			*/
 		}
 
 		if (action[0] == 0) // Stop Zone
