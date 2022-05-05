@@ -3171,15 +3171,24 @@ public void MinimalHudAlive(int client){
 		if (g_bTimerRunning[client])
 		{
 			FormatTimeFloat(client, g_fCurrentRunTime[client], 3, s_Timer, 64);
-			Format(s_Timer, 64, "[%s]",s_Timer);
+
+			if (g_bPause[client])
+				Format(s_Timer, 64, "[PAUSED]");
+			else if (g_bPracticeMode[client])
+				Format(s_Timer, 64, "[P : %s]", s_Timer);
+			else
+				Format(s_Timer, 64, "[%s]", s_Timer);
+
 		}
 		else if (g_bWrcpTimeractivated[client] && !g_bPracticeMode[client])
 		{
 			FormatTimeFloat(client, g_fCurrentWrcpRunTime[client], 3, s_Timer, 64);
-			Format(s_Timer, 64, "[%s]",s_Timer);
+			Format(s_Timer, 64, "[%s]", s_Timer);
 		}
 		else if (!g_bTimerEnabled[client])
+		{
 			Format(s_Timer, 64, "[Timer Disabled]");
+		}
 		else
 		{
 			Format(s_Timer, 64, "[00:00:00]");
@@ -3213,7 +3222,7 @@ public void MinimalHudAlive(int client){
 
 		displayColor = GetMinimalHUDColour(client, g_MinimalHUDSpeedGradient[client]);
 
-		SetHudTextParams(-1.0, 0.55, 0.5, displayColor[0],displayColor[1] , displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+		SetHudTextParams(-1.0, 0.55, 0.5, displayColor[0], displayColor[1] , displayColor[2], 255, 0, 0.0, 0.0, 0.0);
 		ShowHudText(client,2,"%s", s_Timer);
 
 		//FORMAT MAP TYPE
@@ -3248,7 +3257,7 @@ public void MinimalHudAlive(int client){
 		}
 		
 		//FORMAT PB/WR TIMES
-
+		//FORMAT WR
 		if (g_iClientInZone[client][2] == 0 && style == 0)
 		{
 			if (g_fRecordMapTime != 9999999.0)
@@ -3372,22 +3381,30 @@ public void MinimalHudDead(int client){
 				//FORMAT TIMER
 				if (g_bTimerRunning[ObservedUser])
 				{
-					FormatTimeFloat(client, g_fCurrentRunTime[ObservedUser], 3, s_Timer, 64);
+					if (g_bPracticeMode[ObservedUser]){
+						FormatTimeFloat(client, g_fCurrentRunTime[ObservedUser], 3, s_Timer, 64);
+						Format(s_Timer, 64, "[P : %s]", s_Timer);
+					}
+					else{
+						FormatTimeFloat(client, ( GetClientTickTime(ObservedUser) - g_fStartTime[ObservedUser] - g_fPauseTime[ObservedUser] ), 3, s_Timer, 64);
+						Format(s_Timer, 64, "[%s]", s_Timer);
+					}
 				}
 				else if (g_bWrcpTimeractivated[ObservedUser] && !g_bPracticeMode[ObservedUser])
 				{
-					FormatTimeFloat(ObservedUser, g_fCurrentWrcpRunTime[ObservedUser], 3, s_Timer, 64);
+					FormatTimeFloat(ObservedUser, ( GetClientTickTime(ObservedUser) - g_fStartWrcpTime[ObservedUser] - g_fPauseTime[ObservedUser] ), 3, s_Timer, 64);
+					Format(s_Timer, 64, "[%s]", s_Timer);
 				}
 				else if (!g_bTimerEnabled[ObservedUser])
-					Format(s_Timer, 64, "Timer Disabled");
+					Format(s_Timer, 64, "[Timer Disabled]");
 				else
 				{
-					Format(s_Timer, 64, "00:00:00");
+					Format(s_Timer, 64, "[00:00:00]");
 				}
 
 				if (GetGameTime() - g_fLastDifferenceTime[ObservedUser] <= 5.0){
 					if(g_bMinimalHUD_CompareWR[client]){
-						Format(s_Timer, 64, "[%s]\n[%s]", s_Timer, g_szLastSRDifferenceMinimalHUD[ObservedUser]);
+						Format(s_Timer, 64, "%s\n%s", s_Timer, g_szLastSRDifferenceMinimalHUD[ObservedUser]);
 					}
 					else if(g_bMinimalHUD_ComparePB[client]){
 						Format(s_Timer, 64, "%s\n%s", s_Timer, g_szLastPBDifferenceMinimalHUD[ObservedUser]);
@@ -3431,7 +3448,7 @@ public void MinimalHudDead(int client){
 				}
 				
 				//FORMAT PB/WR TIMES
-
+				//FORMAT WR
 				if (g_iClientInZone[ObservedUser][2] == 0 && style == 0)
 				{
 					if (g_fRecordMapTime != 9999999.0)
