@@ -100,20 +100,6 @@ public void CL_OnStartTimerPress(int client)
 
 		if (!g_bPracticeMode[client] && !IsFakeClient(client) && g_iCurrentStyle[client] == 0) {
 
-			if(IsValidClient(client)){
-				if(g_iClientInZone[client][2] == 0){
-					g_bStartCountintTimeinZone[client][0] = true;
-					g_fTimeIncrement[client][0] = 0.0;
-					g_fAttempts[client][0]++;
-				}
-				else{
-					g_bStartCountintTimeinZone[client][g_iClientInZone[client][2]] = true;
-					g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
-					g_fAttempts[client][g_iClientInZone[client][2]]++;	
-				}
-			}
-
-
 			char szDifference[128], szSpeed[128], preMessage[128];
 			int iDifference;
 			int prestrafe = RoundToNearest(GetSpeed(client));
@@ -265,21 +251,6 @@ public void CL_OnEndTimerPress(int client)
 	{
 		if (style == 0)
 		{	
-			if(IsValidClient(client)){
-				if(g_iClientInZone[client][2] == 0){
-					if(g_bStartCountintTimeinZone[client][0]){
-						g_bStartCountintTimeinZone[client][0] = false;
-
-						g_fTimeinZone[client][0] += g_fTimeIncrement[client][0];
-						g_fCompletes[client][0]++;
-
-						if(g_fstComplete[client][0] == 0.0)
-							g_fstComplete[client][0] = g_fTimeinZone[client][0];
-					}
-					db_UpdatePRinfo(client, g_szSteamID[client], 0, g_fFinalTime[client]);
-				}
-			}
-
 			// Make a new record bot?
 			if (GetConVarBool(g_hReplaceReplayTime) && (g_fFinalTime[client] < g_fReplayTimes[0][0] || g_fReplayTimes[0][0] == 0.0))
 			{
@@ -528,20 +499,7 @@ public void CL_OnEndTimerPress(int client)
 		=            Handle Bonus            =
 		====================================*/
 		if (style == 0)
-		{	
-			if(IsValidClient(client)){
-				if(g_bStartCountintTimeinZone[client][g_iClientInZone[client][2]]){
-					g_bStartCountintTimeinZone[client][g_iClientInZone[client][2]] = false;
-
-					g_fTimeinZone[client][g_iClientInZone[client][2]] += g_fTimeIncrement[client][g_iClientInZone[client][2]];
-					g_fCompletes[client][g_iClientInZone[client][2]]++;
-
-					if(g_fstComplete[client][g_iClientInZone[client][2]] == 0.0)
-						g_fstComplete[client][g_iClientInZone[client][2]] = g_fTimeinZone[client][g_iClientInZone[client][2]];
-				}
-				db_UpdatePRinfo(client, g_szSteamID[client], g_iClientInZone[client][2], g_fFinalTime[client]);
-			}
-
+		{
 			if (GetConVarBool(g_hReplaceReplayTime) && (g_fFinalTime[client] < g_fReplayTimes[zGroup][0] || g_fReplayTimes[zGroup][0] == 0.0))
 			{
 				if (GetConVarBool(g_hBonusBot) && !g_bPositionRestored[client])

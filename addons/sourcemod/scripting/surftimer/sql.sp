@@ -3766,7 +3766,7 @@ public void db_bonusprinforuntimecallback(Handle owner, Handle hndl, const char[
 	return;
 }
 
-public void db_UpdatePRinfo(int client, char szSteamID[32], int zGroup, float runtime)
+public void db_UpdatePRinfo_WithRuntime(int client, char szSteamID[32], int zGroup, float runtime)
 {	
 	if (!IsValidClient(client))
 		return;
@@ -3776,14 +3776,14 @@ public void db_UpdatePRinfo(int client, char szSteamID[32], int zGroup, float ru
 	Format(szQuery, 2048, sql_updatePrinfo_withruntime, g_fTimeinZone[client][zGroup], g_fCompletes[client], g_fAttempts[client][zGroup], g_fstComplete[client][zGroup], runtime, szSteamID, g_szMapName, zGroup);
 	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
 }
-
-public void db_UpdatePRinfo_disconencted_randomly(int client, char szSteamID[32], int zGroup)
+//this is called whenever the player's time stops and he is not in a end zone (map/bonus/stage)
+public void db_UpdatePRinfo(int client, char szSteamID[32], int zGroup)
 {	
 	if (!IsValidClient(client))
 		return;
 
 	char szQuery[2048];
-	//PrintToConsole(client, "%f || %f || %f || %f\n", g_fTimeinZone[client][zGroup], g_fCompletes[client][zGroup], g_fAttempts[client][zGroup], g_fstComplete[client][zGroup]);
+	//PrintToConsoleAll("%f || %f || %f || %f\n", g_fTimeinZone[client][zGroup], g_fCompletes[client][zGroup], g_fAttempts[client][zGroup], g_fstComplete[client][zGroup]);
 	Format(szQuery, 2048, sql_updatePrinfo, g_fTimeinZone[client][zGroup], g_fCompletes[client], g_fAttempts[client][zGroup], g_fstComplete[client][zGroup], szSteamID, g_szMapName, zGroup);
 	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
 }
