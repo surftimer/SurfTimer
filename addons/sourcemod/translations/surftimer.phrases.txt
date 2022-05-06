@@ -1791,4 +1791,10 @@
 		"#format"	"{1:s},{2:s}"
 		"en"		"{1} Auto-reset is enabled, but you weren't teleported because you're surfing in {gold}{2}"
 	}
+	"ColorChangeValue"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Type new value (0 - 255) in the chat, or {darkred}cancel{default} to cancel"
+	}
+
 }

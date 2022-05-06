@@ -2212,13 +2212,13 @@ public void ToggleTimer(int client)
 
 void SpeedGradient(int client, bool menu = false)
 {
-	if (g_SpeedGradient[client] != 3)
+	if (g_SpeedGradient[client] != 6)
 		g_SpeedGradient[client]++;
 	else
 		g_SpeedGradient[client] = 0;
 
 	if (menu)
-		MiscellaneousOptions(client);
+		CSDOptions(client);
 }
 
 void SpeedMode(int client, bool menu = false)
@@ -2229,21 +2229,222 @@ void SpeedMode(int client, bool menu = false)
 		g_SpeedMode[client] = 0;
 	
 	if (menu)
-		MiscellaneousOptions(client);
+		CSDOptions(client);
+}
+
+void CSD_PosX(int client, bool menu = false)
+{
+	if (g_fCSD_POS_X[client] < 1.0){
+		g_fCSD_POS_X[client] += 0.1;
+	}
+	else
+		g_fCSD_POS_X[client] = 0.0;
+
+	if (menu)
+		CSDOptions(client);
+}
+
+void CSD_PosY(int client, bool menu = false)
+{
+	
+	if (g_fCSD_POS_Y[client] < 1.0)
+		g_fCSD_POS_Y[client] += 0.1;
+	else
+		g_fCSD_POS_Y[client] = 0.0;
+
+	if (menu)
+		CSDOptions(client);
+}
+
+void CSD_R(int client, bool menu = false)
+{
+	
+	ChangeColor(client, 0, menu);
+
+	/*
+	if (g_iCSD_R[client] < 255)
+		g_iCSD_R[client] += 1;
+	else
+		g_iCSD_R[client] = 0;
+	*/
+}
+
+void CSD_G(int client, bool menu = false)
+{
+	ChangeColor(client, 1, menu);
+
+	/*
+	if (g_iCSD_G[client] < 255)
+		g_iCSD_G[client] += 1;
+	else
+		g_iCSD_G[client] = 0;
+	*/
+
+}
+
+void CSD_B(int client, bool menu = false)
+{
+	ChangeColor(client, 2, menu);
+	
+	/*
+	if (g_iCSD_B[client] < 255)
+		g_iCSD_B[client] += 1;
+	else
+		g_iCSD_B[client] = 0;
+	*/
+}
+
+public void ChangeColor(int client, int color_index, bool menu)
+{
+	g_iColorChangeIndex[client] = color_index;
+	CPrintToChat(client, "%t", "ColorChangeValue", g_szChatPrefix);
+	g_iWaitingForResponse[client] = ColorValue;
+	
+}
+
+void CSDUpdateRate(int client, bool menu = false)
+{
+	if (g_iCSDUpdateRate[client] != 2)
+		g_iCSDUpdateRate[client]++;
+	else
+		g_iCSDUpdateRate[client] = 0;
+
+	if (menu)
+		CSDOptions(client);
 }
 
 void CenterSpeedDisplay(int client, bool menu = false)
-{
-	g_bCenterSpeedDisplay[client] = !g_bCenterSpeedDisplay[client];
+{	
+	//only swap values if the call comes from the "options" menu OR using the "sm_centerspeed" command
+	if(menu)
+		g_bCenterSpeedDisplay[client] = !g_bCenterSpeedDisplay[client];
+
+	//THE LOWER THE NUMBER THE FASTER THE UPDATING IS
+	int update_rate;
+	switch(g_iCSDUpdateRate[client]){
+		case 0: update_rate = 15;
+		case 1:	update_rate = 10;
+		case 2: update_rate = 5;
+		default: update_rate = 15;
+	}
+
+	float fCSD_PosX;
+	float fCSD_PosY;
+	switch(g_fCSD_POS_X[client]){
+		case 0.5: fCSD_PosX = -1.0;
+		default: fCSD_PosX = g_fCSD_POS_X[client];
+	}
+	switch(g_fCSD_POS_Y[client]){
+		case 0.5: fCSD_PosY = -1.0;
+		default: fCSD_PosY = g_fCSD_POS_Y[client];
+	}
 	
-	if (g_bCenterSpeedDisplay[client])
+	if(GetGameTickCount() - g_iCurrentTick[client] >= update_rate)
 	{
-		SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
-		CreateTimer(0.1, CenterSpeedDisplayTimer, client, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
+		g_iCurrentTick[client] += update_rate;
+		if (IsValidClient(client) && !IsFakeClient(client) && g_bCenterSpeedDisplay[client])
+		{
+
+			char szSpeed[128];
+			int displayColor[3];
+
+			// player alive
+			if (IsPlayerAlive(client))
+			{	
+				if(g_SpeedGradient[client] != 6)
+					displayColor = GetSpeedColourCSD(client, RoundToNearest(g_fLastSpeed[client]), g_SpeedGradient[client]);
+				else{
+					displayColor[0] = g_iCSD_R[client];
+					displayColor[1] = g_iCSD_G[client];
+					displayColor[2] = g_iCSD_B[client];
+				}
+
+				SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate/g_fTickrate, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+
+				Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
+			}
+			// player not alive (check wether spec'ing a bot or another player)
+			else {
+				int SpecMode;
+				int ObservedUser;
+
+				SpecMode = GetEntProp(client, Prop_Send, "m_iObserverMode");
+
+				ObservedUser = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
+
+				// spec'ing
+				if (SpecMode == 4 || SpecMode == 5)
+				{
+					g_SpecTarget[client] = ObservedUser;
+					if (IsValidClient(ObservedUser))
+					{	
+						//spec'ing a bot
+						if (IsFakeClient(ObservedUser))
+						{
+							float fSpeed[3];
+							GetEntPropVector(ObservedUser, Prop_Data, "m_vecVelocity", fSpeed);
+
+							float fSpeedHUD = SquareRoot(Pow(fSpeed[0], 2.0) + Pow(fSpeed[1], 2.0));
+
+							if (ObservedUser == g_RecordBot)
+							{
+								if (g_iSelectedReplayStyle == 5)
+								{
+									fSpeedHUD /= 0.5;
+								}
+								else if (g_iSelectedReplayStyle == 6)
+								{
+									fSpeedHUD /= 1.5;
+								}
+							}
+							else if (ObservedUser == g_BonusBot)
+							{
+								if (g_iSelectedBonusReplayStyle == 5)
+								{
+									fSpeedHUD /= 0.5;
+								}
+								else if (g_iSelectedBonusReplayStyle == 6)
+								{
+									fSpeedHUD /= 1.5;
+								}
+							}
+
+							if(g_SpeedGradient[client] != 6)
+								displayColor = GetSpeedColourCSD(client, RoundToNearest(fSpeedHUD), g_SpeedGradient[client]);
+							else{
+								displayColor[0] = g_iCSD_R[client];
+								displayColor[1] = g_iCSD_G[client];
+								displayColor[2] = g_iCSD_B[client];
+							}
+
+							SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate/g_fTickrate, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+
+							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(fSpeedHUD));
+						}
+						// spec'ing player
+						else {
+							if(g_SpeedGradient[client] != 6)
+								displayColor = GetSpeedColourCSD(client, RoundToNearest(g_fLastSpeed[ObservedUser]), g_SpeedGradient[client]);
+							else{
+								displayColor[0] = g_iCSD_R[client];
+								displayColor[1] = g_iCSD_G[client];
+								displayColor[2] = g_iCSD_B[client];
+							}
+
+							SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate/g_fTickrate, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+
+							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[ObservedUser]));
+						}
+					}
+				}
+			}
+
+			ShowHudText(client, 1, szSpeed);
+		}
 	}
 
 	if (menu)
-		MiscellaneousOptions(client);
+		CSDOptions(client);
 }
 
 void TeleSide(int client, bool menu = false)
@@ -2975,6 +3176,7 @@ public void OptionMenu(int client)
 
 	AddMenuItem(optionmenu, "CentreHud", "Centre Hud Options");
 	AddMenuItem(optionmenu, "SideHud", "Side Hud Options");
+	AddMenuItem(optionmenu, "CSDOptions", "Center Speed Options\n \n");
 	AddMenuItem(optionmenu, "Miscellaneous", "Miscellaneous Options");
 
 	SetMenuOptionFlags(optionmenu, MENUFLAG_BUTTON_EXIT);
@@ -2994,7 +3196,8 @@ public int OptionMenuHandler(Menu menu, MenuAction action, int param1, int param
 			}
 			case 1: CentreHudOptions(param1, 0);
 			case 2: SideHudOptions(param1, 0);
-			case 3: MiscellaneousOptions(param1);
+			case 3: CSDOptions(param1);
+			case 4: MiscellaneousOptions(param1);
 		}
 	}
 	else if (action == MenuAction_End)
@@ -3350,30 +3553,6 @@ public void MiscellaneousOptions(int client)
 	else
 		AddMenuItem(menu, "", "[RIGHT] Start Side");
 
-	// Speed Gradient
-	if (g_SpeedGradient[client] == 0)
-		AddMenuItem(menu, "", "[WHITE] Speed Gradient");
-	else if (g_SpeedGradient[client] == 1)
-		AddMenuItem(menu, "", "[GREEN] Speed Gradient");
-	else if (g_SpeedGradient[client] == 2)
-		AddMenuItem(menu, "", "[RAINBOW] Speed Gradient");
-	else
-		AddMenuItem(menu, "", "[MOMENTUM] Speed Gradient");
-	
-	// Speed Mode
-	if (g_SpeedMode[client] == 0)
-		AddMenuItem(menu, "", "[XY] Speed Mode");
-	else if (g_SpeedMode[client] == 1)
-		AddMenuItem(menu, "", "[XYZ] Speed Mode");
-	else
-		AddMenuItem(menu, "", "[Z] Speed Mode");
-
-	// Centre Speed Display
-	if (g_bCenterSpeedDisplay[client])
-		AddMenuItem(menu, "", "[ON] Centre Speed Display");
-	else
-		AddMenuItem(menu, "", "[OFF] Centre Speed Display");
-
 	// Hide Chat
 	if (g_bHideChat[client])
 		AddMenuItem(menu, "", "[ON] Hide Chat");
@@ -3411,13 +3590,103 @@ public int MiscellaneousOptionsHandler(Menu menu, MenuAction action, int param1,
 			case 0: HideMethod(param1, true);
 			case 1: QuakeSounds(param1, true);
 			case 2: TeleSide(param1, true);
-			case 3: SpeedGradient(param1, true);
-			case 4: SpeedMode(param1, true);
-			case 5: CenterSpeedDisplay(param1, true);
-			case 6: HideChat(param1, true);
-			case 7: HideViewModel(param1, true);
-			case 8: PrespeedText(param1, true);
-			case 9: HintsText(param1, true);
+			case 3: HideChat(param1, true);
+			case 4: HideViewModel(param1, true);
+			case 5: PrespeedText(param1, true);
+			case 6: HintsText(param1, true);
+		}
+	}
+	else if (action == MenuAction_Cancel)
+		OptionMenu(param1);
+	else if (action == MenuAction_End)
+		delete menu;
+
+	return 0;
+}
+
+public void CSDOptions(int client)
+{
+	Menu menu = CreateMenu(CSDOptionsHandler);
+	SetMenuTitle(menu, "Center Speed Options Menu\n \n");
+
+	// Centre Speed Display
+	if (g_bCenterSpeedDisplay[client])
+		AddMenuItem(menu, "", "[ON] Centre Speed Display");
+	else
+		AddMenuItem(menu, "", "[OFF] Centre Speed Display");
+
+	// Speed Mode
+	if (g_SpeedMode[client] == 0)
+		AddMenuItem(menu, "", "[XY] Speed Mode");
+	else if (g_SpeedMode[client] == 1)
+		AddMenuItem(menu, "", "[XYZ] Speed Mode");
+	else
+		AddMenuItem(menu, "", "[Z] Speed Mode");
+
+	//CENTER SPEED POSITIONS
+	char Display_String[256];
+	//POS X
+	Format(Display_String, 256, "Position X : %f", g_fCSD_POS_X[client]);
+	AddMenuItem(menu, "", Display_String);
+	//POX Y
+	Format(Display_String, 256, "Position Y : %f", g_fCSD_POS_Y[client]);
+	AddMenuItem(menu, "", Display_String);
+
+	// Speed Gradient
+	if (g_SpeedGradient[client] == 0)
+		AddMenuItem(menu, "", "[WHITE] Speed Gradient");
+	else if (g_SpeedGradient[client] == 1)
+		AddMenuItem(menu, "", "[RED] Speed Gradient");
+	else if (g_SpeedGradient[client] == 2)
+		AddMenuItem(menu, "", "[GREEN] Speed Gradient");
+	else if (g_SpeedGradient[client] == 3)
+		AddMenuItem(menu, "", "[BLUE] Speed Gradient");
+	else if (g_SpeedGradient[client] == 4)
+		AddMenuItem(menu, "", "[YELLOW] Speed Gradient");
+	else if(g_SpeedGradient[client] == 5)
+		AddMenuItem(menu, "", "[MOMENTUM] Speed Gradient");
+	else
+		AddMenuItem(menu, "", "[Custom] Speed Gradient");
+
+	//CENTER SPEED CUSTOM VALUES
+	char Display_String_Custom[256];
+	//RED
+	Format(Display_String_Custom, 256, "[R] : %i", g_iCSD_R[client]);
+	AddMenuItem(menu, "", Display_String_Custom);
+	//GREEN
+	Format(Display_String_Custom, 256, "[G] : %i", g_iCSD_G[client]);
+	AddMenuItem(menu, "", Display_String_Custom);
+	//BLUE
+	Format(Display_String_Custom, 256, "[B] : %i", g_iCSD_B[client]);
+	AddMenuItem(menu, "", Display_String_Custom);
+
+	//CSD Update Rate
+	if (g_iCSDUpdateRate[client] == 0)
+		AddMenuItem(menu, "", "[SLOW] CSD Update Rate");
+	else if (g_iCSDUpdateRate[client] == 1)
+		AddMenuItem(menu, "", "[MEDIUM] CSD Update Rate");
+	else
+		AddMenuItem(menu, "", "[FAST] CSD Update Rate");
+	
+	SetMenuExitBackButton(menu, true);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+public int CSDOptionsHandler(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		switch (param2)
+		{	
+			case 0: CenterSpeedDisplay(param1, true);
+			case 1: SpeedMode(param1, true);
+			case 2: CSD_PosX(param1, true);
+			case 3: CSD_PosY(param1, true);
+			case 4: SpeedGradient(param1, true);
+			case 5: CSD_R(param1, true);
+			case 6: CSD_G(param1, true);
+			case 7: CSD_B(param1, true);
+			case 8: CSDUpdateRate(param1, true);
 		}
 	}
 	else if (action == MenuAction_Cancel)
