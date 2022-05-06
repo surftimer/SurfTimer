@@ -224,6 +224,7 @@ enum ResponseType
   MaxVelocity,
   TargetName,
   ClientEdit,
+  ColorValue,
 }
 
 /*===================================
@@ -790,6 +791,17 @@ bool g_bMinimalHUD[MAXPLAYERS + 1];
 bool g_bMinimalHUD_CompareWR[MAXPLAYERS + 1];
 bool g_bMinimalHUD_ComparePB[MAXPLAYERS + 1];
 int g_MinimalHUDSpeedGradient[MAXPLAYERS + 1];
+
+//CSD OPTIONS
+float g_fCSD_POS_X[MAXPLAYERS + 1];
+float g_fCSD_POS_Y[MAXPLAYERS + 1];
+
+int g_iCSD_R[MAXPLAYERS + 1];
+int g_iCSD_G[MAXPLAYERS + 1];
+int g_iCSD_B[MAXPLAYERS + 1];
+int g_iColorChangeIndex[MAXPLAYERS + 1];
+
+int g_iCSDUpdateRate[MAXPLAYERS + 1];
 
 // Custom tele side
 int g_iTeleSide[MAXPLAYERS + 1];
@@ -1424,6 +1436,8 @@ bool g_bNewStage[MAXPLAYERS + 1];
 bool g_bLeftZone[MAXPLAYERS + 1];
 
 int g_iClientTick[MAXPLAYERS + 1];
+
+int g_iCurrentTick[MAXPLAYERS + 1];
 
 /*===================================
 =         Predefined Arrays         =

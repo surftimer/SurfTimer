@@ -5942,8 +5942,8 @@ public void SQL_CheckCallback4(Handle owner, Handle hndl, const char[] error, an
 public void db_viewPlayerOptions(int client, char szSteamId[32])
 {
 	g_bLoadedModules[client] = false;
-	char szQuery[1024];
-	Format(szQuery, 1024, sql_selectPlayerOptions, szSteamId);
+	char szQuery[2048];
+	Format(szQuery, 2048, sql_selectPlayerOptions, szSteamId);
 	SQL_TQuery(g_hDb, db_viewPlayerOptionsCallback, szQuery, client, DBPrio_Low);
 }
 
@@ -5994,7 +5994,12 @@ public void db_viewPlayerOptionsCallback(Handle owner, Handle hndl, const char[]
 		g_MinimalHUDSpeedGradient[client] = SQL_FetchInt(hndl, 30);
 		g_bMinimalHUD_CompareWR[client] = view_as<bool>(SQL_FetchInt(hndl, 31));
 		g_bMinimalHUD_ComparePB[client] = view_as<bool>(SQL_FetchInt(hndl, 32));
-		
+		g_iCSDUpdateRate[client] = SQL_FetchInt(hndl, 33);
+		g_fCSD_POS_X[client] = SQL_FetchFloat(hndl, 34);
+		g_fCSD_POS_Y[client] = SQL_FetchFloat(hndl, 35);
+		g_iCSD_R[client] = SQL_FetchInt(hndl, 36);
+		g_iCSD_G[client] = SQL_FetchInt(hndl, 37);
+		g_iCSD_B[client] = SQL_FetchInt(hndl, 38);
 
 		// Functionality for normal spec list
 		if (g_iSideHudModule[client][0] == 5 && (g_iSideHudModule[client][1] == 0 && g_iSideHudModule[client][2] == 0 && g_iSideHudModule[client][3] == 0 && g_iSideHudModule[client][4] == 0))
@@ -6049,6 +6054,12 @@ public void db_viewPlayerOptionsCallback(Handle owner, Handle hndl, const char[]
 		g_MinimalHUDSpeedGradient[client] = 0;
 		g_bMinimalHUD_CompareWR[client] = false;
 		g_bMinimalHUD_ComparePB[client] = false;
+		g_iCSDUpdateRate[client] = 1;
+		g_fCSD_POS_X[client] = 0.5;
+		g_fCSD_POS_Y[client] = 0.3;
+		g_iCSD_R[client] = 255;
+		g_iCSD_G[client] = 255;
+		g_iCSD_B[client] = 255;
 	}
 
 	if (!g_bSettingsLoaded[client])
@@ -6065,11 +6076,11 @@ public void db_viewPlayerOptionsCallback(Handle owner, Handle hndl, const char[]
 
 public void db_updatePlayerOptions(int client)
 {
-	char szQuery[1024];
+	char szQuery[2048];
 	// "UPDATE ck_playeroptions2 SET timer = %i, hide = %i, sounds = %i, chat = %i, viewmodel = %i, autobhop = %i, checkpoints = %i, centrehud = %i, module1c = %i, module2c = %i, module3c = %i, module4c = %i, module5c = %i, module6c = %i, sidehud = %i, module1s = %i, module2s = %i, module3s = %i, module4s = %i, module5s = %i where steamid = '%s'";
 	if (g_bSettingsLoaded[client] && g_bServerDataLoaded && g_bLoadedModules[client])
 	{
-		Format(szQuery, 1024, sql_updatePlayerOptions, BooltoInt(g_bTimerEnabled[client]), BooltoInt(g_bHide[client]), BooltoInt(g_bEnableQuakeSounds[client]), BooltoInt(g_bHideChat[client]), BooltoInt(g_bViewModel[client]), BooltoInt(g_bAutoBhopClient[client]), BooltoInt(g_bCheckpointsEnabled[client]), g_SpeedGradient[client], g_SpeedMode[client], BooltoInt(g_bCenterSpeedDisplay[client]), BooltoInt(g_bCentreHud[client]), g_iTeleSide[client], g_iCentreHudModule[client][0], g_iCentreHudModule[client][1], g_iCentreHudModule[client][2], g_iCentreHudModule[client][3], g_iCentreHudModule[client][4], g_iCentreHudModule[client][5], BooltoInt(g_bSideHud[client]), g_iSideHudModule[client][0], g_iSideHudModule[client][1], g_iSideHudModule[client][2], g_iSideHudModule[client][3], g_iSideHudModule[client][4], BooltoInt(g_iPrespeedText[client]), BooltoInt(g_iCpMessages[client]), BooltoInt(g_iWrcpMessages[client]), BooltoInt(g_bAllowHints[client]), BooltoInt(g_bTimeleftDisplay[client]), BooltoInt(g_bMinimalHUD[client]), g_MinimalHUDSpeedGradient[client], BooltoInt(g_bMinimalHUD_CompareWR[client]), BooltoInt(g_bMinimalHUD_ComparePB[client]), g_szSteamID[client]);
+		Format(szQuery, 2048, sql_updatePlayerOptions, BooltoInt(g_bTimerEnabled[client]), BooltoInt(g_bHide[client]), BooltoInt(g_bEnableQuakeSounds[client]), BooltoInt(g_bHideChat[client]), BooltoInt(g_bViewModel[client]), BooltoInt(g_bAutoBhopClient[client]), BooltoInt(g_bCheckpointsEnabled[client]), g_SpeedGradient[client], g_SpeedMode[client], BooltoInt(g_bCenterSpeedDisplay[client]), BooltoInt(g_bCentreHud[client]), g_iTeleSide[client], g_iCentreHudModule[client][0], g_iCentreHudModule[client][1], g_iCentreHudModule[client][2], g_iCentreHudModule[client][3], g_iCentreHudModule[client][4], g_iCentreHudModule[client][5], BooltoInt(g_bSideHud[client]), g_iSideHudModule[client][0], g_iSideHudModule[client][1], g_iSideHudModule[client][2], g_iSideHudModule[client][3], g_iSideHudModule[client][4], BooltoInt(g_iPrespeedText[client]), BooltoInt(g_iCpMessages[client]), BooltoInt(g_iWrcpMessages[client]), BooltoInt(g_bAllowHints[client]), BooltoInt(g_bTimeleftDisplay[client]), BooltoInt(g_bMinimalHUD[client]), g_MinimalHUDSpeedGradient[client], BooltoInt(g_bMinimalHUD_CompareWR[client]), BooltoInt(g_bMinimalHUD_ComparePB[client]), g_iCSDUpdateRate[client], g_fCSD_POS_X[client], g_fCSD_POS_Y[client], g_iCSD_R[client], g_iCSD_G[client], g_iCSD_B[client], g_szSteamID[client]);
 		//Format(szQuery, 1024, sql_updatePlayerOptions, BooltoInt(g_bTimerEnabled[client]), BooltoInt(g_bHide[client]), BooltoInt(g_bEnableQuakeSounds[client]), BooltoInt(g_bHideChat[client]), BooltoInt(g_bViewModel[client]), BooltoInt(g_bAutoBhopClient[client]), BooltoInt(g_bCheckpointsEnabled[client]), g_SpeedGradient[client], g_SpeedMode[client], BooltoInt(g_bCenterSpeedDisplay[client]), BooltoInt(g_bCentreHud[client]), g_iTeleSide[client], g_iCentreHudModule[client][0], g_iCentreHudModule[client][1], g_iCentreHudModule[client][2], g_iCentreHudModule[client][3], g_iCentreHudModule[client][4], g_iCentreHudModule[client][5], BooltoInt(g_bSideHud[client]), g_iSideHudModule[client][0], g_iSideHudModule[client][1], g_iSideHudModule[client][2], g_iSideHudModule[client][3], g_iSideHudModule[client][4], BooltoInt(g_iPrespeedText[client]), BooltoInt(g_iCpMessages[client]), BooltoInt(g_iWrcpMessages[client]), BooltoInt(g_bAllowHints[client]), BooltoInt(g_bTimeleftDisplay[client]), g_szSteamID[client]);
 		SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, client, DBPrio_Low);
 	}
