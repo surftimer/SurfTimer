@@ -3859,7 +3859,7 @@ public void db_UpdatePRinfo(int client, char szSteamID[32], int zGroup)
 
 	char szQuery[2048];
 	//PrintToConsoleAll("%f || %f || %f || %f\n", g_fTimeinZone[client][zGroup], g_fCompletes[client][zGroup], g_fAttempts[client][zGroup], g_fstComplete[client][zGroup]);
-	Format(szQuery, 2048, sql_updatePrinfo, g_fTimeinZone[client][zGroup], g_fCompletes[client], g_fAttempts[client][zGroup], g_fstComplete[client][zGroup], szSteamID, g_szMapName, zGroup);
+	Format(szQuery, 2048, sql_updatePrinfo, g_fTimeinZone[client][zGroup], g_fCompletes[client][zGroup], g_fAttempts[client][zGroup], g_fstComplete[client][zGroup], szSteamID, g_szMapName, zGroup);
 	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
 }
 
@@ -10935,7 +10935,7 @@ public void db_PRinfoDoneCallback(any pack){
 	AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
 
 	if(attempts != 0.0){
-		Format(szItem, sizeof(szItem), "Completes : (%i / %i) (%.2f %%)\n\n", RoundToFloor(completes), RoundToFloor(attempts), completes / attempts );
+		Format(szItem, sizeof(szItem), "Completes : (%i / %i) (%.2f %%)\n\n", RoundToFloor(completes), RoundToFloor(attempts), (completes / attempts) * 100.0 );
 		AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
 	}
 	else{
