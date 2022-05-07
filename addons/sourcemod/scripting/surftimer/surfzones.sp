@@ -325,12 +325,12 @@ public void StartTouch(int client, int action[3])
 				g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
 
 				if(g_fstComplete[client][g_iClientInZone[client][2]] == 0.0)
-					g_fstComplete[client][g_iClientInZone[client][2]] = g_fTimeinZone[client][0];
+					g_fstComplete[client][g_iClientInZone[client][2]] = g_fTimeinZone[client][g_iClientInZone[client][2]];
 
 				if((g_fPersonalRecord[client] - g_fFinalTime[client]) > 0)
-					db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], 0, g_fFinalTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
+					db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], g_iClientInZone[client][2], g_fFinalTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
 				else
-					db_UpdatePRinfo(client, g_szSteamID[client], 0);
+					db_UpdatePRinfo(client, g_szSteamID[client], g_iClientInZone[client][2]);
 			}
 			//PLAYER JUST DOING STAGES
 			//else if(action[0] == 3 && (g_bWrcpTimeractivated[client] && !g_bTimerRunning[client] && !g_bInStartZone[client] && !g_bInStageZone[client])){
