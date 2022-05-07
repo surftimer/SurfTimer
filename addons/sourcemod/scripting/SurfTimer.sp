@@ -321,7 +321,6 @@ bool g_bhasBonus;
 // Clients best run's times
 float g_fCheckpointTimesRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
 
-//NOT IMPLEMENTED
 // Clients best run's speed's
 float g_fCheckpointSpeedsRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
 
@@ -345,9 +344,26 @@ char g_szLastSRDifferenceMinimalHUD[MAXPLAYERS + 1][64];
 char g_szLastPBDifference[MAXPLAYERS + 1][64];
 char g_szLastPBDifferenceMinimalHUD[MAXPLAYERS + 1][64];
 
+char g_szCustomLastTimeDifferenceMinimalHUD[MAXPLAYERS + 1][64];
+//char g_szCustomLastSpeedDifferenceMinimalHUD[MAXPLAYERS + 1][64];
+
 //NOT IMPLEMENTED
 // Last difference to clients own record checkpoint speed
 //char g_szLastPBSpeedDifference[MAXPLAYERS + 1][64];
+
+//VARIABLES FOR THE DIFFERENT TYPES OF CP'S COMPARISONS
+//ONLY ALLOCATE 6 SPACES BECAUSE THERE ARE ALREADY 2 OTHER VARIABLES THAT CONTAIN PB && WR
+float g_fCustomCheckpointsTimes[6][CPLIMIT];
+//NOT IMPLEMENTED
+//float g_fCustomCheckpointsSpeeds[6][CPLIMIT];
+
+//VARIABLES THAT ALLOW TO CHECK IF A CERTAIN TIME EXISTS
+int g_bTOP;
+int g_bG1;
+int g_bG2;
+int g_bG3;
+int g_bG4;
+int g_bG5;
 
 // The time difference was shown, used to show for a few seconds in timer panel
 float g_fLastDifferenceTime[MAXPLAYERS + 1];
@@ -788,8 +804,8 @@ int g_iSideHudModule[MAXPLAYERS + 1][5];
 
 //MINIMAL HUD
 bool g_bMinimalHUD[MAXPLAYERS + 1];
-bool g_bMinimalHUD_CompareWR[MAXPLAYERS + 1];
-bool g_bMinimalHUD_ComparePB[MAXPLAYERS + 1];
+int g_iMinimalHUD_CompareType[MAXPLAYERS + 1];
+//bool g_bMinimalHUD_ComparePB[MAXPLAYERS + 1];
 int g_MinimalHUDSpeedGradient[MAXPLAYERS + 1];
 
 //CSD OPTIONS

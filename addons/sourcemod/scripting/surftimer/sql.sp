@@ -601,6 +601,7 @@ public void sql_selectPlayerProCountCallback(Handle owner, Handle hndl, const ch
 	{
 		db_viewFastestBonus();
 	}
+
 	return;
 }
 
@@ -3373,6 +3374,185 @@ public void sql_selectRecordCheckpointSpeedsCallback(Handle owner, Handle hndl, 
 	return;
 }
 
+public void db_LoadCPTypesTimes(int client)
+{
+
+	char szQuery[4096];
+	int rank;
+
+	PrintToConsoleAll("total : %i\n", g_MapTimesCount);
+
+	if(g_MapTimesCount >= 10)
+		g_bTOP = true;
+	if(g_MapTimesCount > 10)
+		g_bG1 = true;
+	if(g_MapTimesCount > g_G2Bot)
+		g_bG2 = true;
+	if(g_MapTimesCount > g_G3Bot)
+		g_bG3 = true;
+	if(g_MapTimesCount > g_G4Bot)
+		g_bG4 = true;
+	if(g_MapTimesCount > g_G5Bot)
+		g_bG5 = true;
+
+	PrintToConsoleAll("%b | %b | %b | %b | %b | %b\n", g_bTOP, g_bG1, g_bG2, g_bG3, g_bG4, g_bG5);
+
+	for(int i = 0; i < 6; i++){
+		rank = 0;
+		if(i == 0){
+			if(g_MapTimesCount >= 10){
+				Format(szQuery, 4096, sql_selectCheckpointsTimesType, g_szMapName, g_szMapName, 10-1);
+				SQL_TQuery(g_hDb, sql_selectCheckpointsTimesTypeCallback, szQuery, i, DBPrio_Low);
+			}
+		}
+		else if(i == 1){
+
+			if(g_MapTimesCount > 10){
+				if(g_MapTimesCount > g_G1Top){
+					rank = g_G1Top;
+				}
+				else if(g_MapTimesCount <= g_G1Top){
+					rank = g_MapTimesCount;
+				}
+
+				Format(szQuery, 4096, sql_selectCheckpointsTimesType, g_szMapName, g_szMapName, rank-1);
+				SQL_TQuery(g_hDb, sql_selectCheckpointsTimesTypeCallback, szQuery, i, DBPrio_Low);
+			}
+		}
+		else if(i == 2){
+
+			if(g_MapTimesCount >= g_G2Bot){
+				if(g_MapTimesCount > g_G2Top){
+					rank = g_G2Top;
+				}
+				else if(g_MapTimesCount <= g_G2Top){
+					rank = g_MapTimesCount;
+				}
+
+				Format(szQuery, 4096, sql_selectCheckpointsTimesType, g_szMapName, g_szMapName, rank-1);
+				SQL_TQuery(g_hDb, sql_selectCheckpointsTimesTypeCallback, szQuery, i, DBPrio_Low);
+			}
+		}
+		else if(i == 3){
+
+			if(g_MapTimesCount >= g_G3Bot){
+				if(g_MapTimesCount > g_G3Top){
+					rank = g_G3Top;
+				}
+				else if(g_MapTimesCount <= g_G3Top){
+					rank = g_MapTimesCount;
+				}
+
+				Format(szQuery, 4096, sql_selectCheckpointsTimesType, g_szMapName, g_szMapName, rank-1);
+				SQL_TQuery(g_hDb, sql_selectCheckpointsTimesTypeCallback, szQuery, i, DBPrio_Low);
+			}
+		}
+		else if(i == 4){
+
+			if(g_MapTimesCount >= g_G4Bot){
+				if(g_MapTimesCount > g_G4Top){
+					rank = g_G4Top;
+				}
+				else if(g_MapTimesCount <= g_G4Top){
+					rank = g_MapTimesCount;
+				}
+
+				Format(szQuery, 4096, sql_selectCheckpointsTimesType, g_szMapName, g_szMapName, rank-1);
+				SQL_TQuery(g_hDb, sql_selectCheckpointsTimesTypeCallback, szQuery, i, DBPrio_Low);
+			}
+		}
+		else if(i == 5){
+
+			if(g_MapTimesCount >= g_G5Bot){
+				if(g_MapTimesCount > g_G5Top){
+					rank = g_G5Top;
+				}
+				else if(g_MapTimesCount <= g_G5Top){
+					rank = g_MapTimesCount;
+				}
+
+				Format(szQuery, 4096, sql_selectCheckpointsTimesType, g_szMapName, g_szMapName, rank-1);
+				SQL_TQuery(g_hDb, sql_selectCheckpointsTimesTypeCallback, szQuery, i, DBPrio_Low);
+			}
+		}
+
+	}
+
+}
+
+public void sql_selectCheckpointsTimesTypeCallback(Handle owner, Handle hndl, const char[] error, any rank)
+{	
+	// fluffys come back
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (sql_selectCheckpointsTimesTypeCallback): %s", error);
+		return;
+	}
+
+	if (SQL_HasResultSet(hndl))
+	{	
+		while(SQL_FetchRow(hndl)){
+			for(int i = 0; i < 35; i++){
+				g_fCustomCheckpointsTimes[rank][i] = SQL_FetchFloat(hndl, i);
+				//PrintToConsoleAll("value %i: %f\n", i, g_fCustomCheckpointsTimes[rank][i]);
+			}
+		}
+	}
+
+}
+
+public void db_LoadCPTypesSpeeds()
+{
+	char szQuery[1024];
+
+	for(int i = 0; i < 6; i++){
+
+		if(i == 0){
+			Format(szQuery, 1024, sql_selectCheckpointsSpeedsType, g_szMapName, g_szMapName, 10);
+			SQL_TQuery(g_hDb, sql_selectCheckpointsSpeedsTypeCallback, szQuery, i, DBPrio_Low);
+		}
+		else if(i == 1){
+			Format(szQuery, 1024, sql_selectCheckpointsSpeedsType, g_szMapName, g_szMapName, g_G1Top);
+			SQL_TQuery(g_hDb, sql_selectCheckpointsSpeedsTypeCallback, szQuery, i, DBPrio_Low);
+		}
+		else if(i == 2){
+			Format(szQuery, 1024, sql_selectCheckpointsSpeedsType, g_szMapName, g_szMapName, g_G2Top);
+			SQL_TQuery(g_hDb, sql_selectCheckpointsSpeedsTypeCallback, szQuery, i, DBPrio_Low);
+		}
+		else if(i == 3){
+			Format(szQuery, 1024, sql_selectCheckpointsSpeedsType, g_szMapName, g_szMapName, g_G3Top);
+			SQL_TQuery(g_hDb, sql_selectCheckpointsSpeedsTypeCallback, szQuery, i, DBPrio_Low);
+		}
+		else if(i == 4){
+			Format(szQuery, 1024, sql_selectCheckpointsSpeedsType, g_szMapName, g_szMapName, g_G4Top);
+			SQL_TQuery(g_hDb, sql_selectCheckpointsSpeedsTypeCallback, szQuery, i, DBPrio_Low);
+		}
+		else if(i == 5){
+			Format(szQuery, 1024, sql_selectCheckpointsSpeedsType, g_szMapName, g_szMapName, g_G5Top);
+			SQL_TQuery(g_hDb, sql_selectCheckpointsSpeedsTypeCallback, szQuery, i, DBPrio_Low);
+		}
+
+	}
+
+}
+
+public void sql_selectCheckpointsSpeedsTypeCallback(Handle owner, Handle hndl, const char[] error, any rank)
+{
+	// fluffys come back
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (sql_selectCheckpointsTimesTypeCallback): %s", error);
+		return;
+	}
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	{	
+		//for(int i = 0; i < 35; i++)
+			//g_fCustomCheckpointsSpeeds[rank][i] = SQL_FetchFloat(hndl, i);
+	}
+
+}
+
 public void db_viewCheckpoints(int client, char szSteamID[32], char szMapName[128])
 {
 	char szQuery[1024];
@@ -3426,6 +3606,10 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewCheckpoints in %fs", g_szSteamID[client], tick);
 		LoadClientSetting(client, g_iSettingToLoad[client]);
 	}
+
+	db_LoadCPTypesTimes(client);
+	//db_LoadCPTypesSpeeds();
+
 }
 
 public void db_viewCheckpointsinZoneGroup(int client, char szSteamID[32], char szMapName[128], int zonegroup)
@@ -6378,14 +6562,13 @@ public void db_viewPlayerOptionsCallback(Handle owner, Handle hndl, const char[]
 		g_bTimeleftDisplay[client] = view_as<bool>(SQL_FetchInt(hndl, 28));
 		g_bMinimalHUD[client] = view_as<bool>(SQL_FetchInt(hndl, 29));
 		g_MinimalHUDSpeedGradient[client] = SQL_FetchInt(hndl, 30);
-		g_bMinimalHUD_CompareWR[client] = view_as<bool>(SQL_FetchInt(hndl, 31));
-		g_bMinimalHUD_ComparePB[client] = view_as<bool>(SQL_FetchInt(hndl, 32));
-		g_iCSDUpdateRate[client] = SQL_FetchInt(hndl, 33);
-		g_fCSD_POS_X[client] = SQL_FetchFloat(hndl, 34);
-		g_fCSD_POS_Y[client] = SQL_FetchFloat(hndl, 35);
-		g_iCSD_R[client] = SQL_FetchInt(hndl, 36);
-		g_iCSD_G[client] = SQL_FetchInt(hndl, 37);
-		g_iCSD_B[client] = SQL_FetchInt(hndl, 38);
+		g_iMinimalHUD_CompareType[client] = SQL_FetchInt(hndl, 31);
+		g_iCSDUpdateRate[client] = SQL_FetchInt(hndl, 32);
+		g_fCSD_POS_X[client] = SQL_FetchFloat(hndl, 33);
+		g_fCSD_POS_Y[client] = SQL_FetchFloat(hndl, 34);
+		g_iCSD_R[client] = SQL_FetchInt(hndl, 35);
+		g_iCSD_G[client] = SQL_FetchInt(hndl, 36);
+		g_iCSD_B[client] = SQL_FetchInt(hndl, 37);
 
 		// Functionality for normal spec list
 		if (g_iSideHudModule[client][0] == 5 && (g_iSideHudModule[client][1] == 0 && g_iSideHudModule[client][2] == 0 && g_iSideHudModule[client][3] == 0 && g_iSideHudModule[client][4] == 0))
@@ -6438,8 +6621,7 @@ public void db_viewPlayerOptionsCallback(Handle owner, Handle hndl, const char[]
 		g_bTimeleftDisplay[client] = true;
 		g_bMinimalHUD[client] = false;
 		g_MinimalHUDSpeedGradient[client] = 0;
-		g_bMinimalHUD_CompareWR[client] = false;
-		g_bMinimalHUD_ComparePB[client] = false;
+		g_iMinimalHUD_CompareType[client] = 2;
 		g_iCSDUpdateRate[client] = 1;
 		g_fCSD_POS_X[client] = 0.5;
 		g_fCSD_POS_Y[client] = 0.3;
@@ -6466,7 +6648,7 @@ public void db_updatePlayerOptions(int client)
 	// "UPDATE ck_playeroptions2 SET timer = %i, hide = %i, sounds = %i, chat = %i, viewmodel = %i, autobhop = %i, checkpoints = %i, centrehud = %i, module1c = %i, module2c = %i, module3c = %i, module4c = %i, module5c = %i, module6c = %i, sidehud = %i, module1s = %i, module2s = %i, module3s = %i, module4s = %i, module5s = %i where steamid = '%s'";
 	if (g_bSettingsLoaded[client] && g_bServerDataLoaded && g_bLoadedModules[client])
 	{
-		Format(szQuery, 2048, sql_updatePlayerOptions, BooltoInt(g_bTimerEnabled[client]), BooltoInt(g_bHide[client]), BooltoInt(g_bEnableQuakeSounds[client]), BooltoInt(g_bHideChat[client]), BooltoInt(g_bViewModel[client]), BooltoInt(g_bAutoBhopClient[client]), BooltoInt(g_bCheckpointsEnabled[client]), g_SpeedGradient[client], g_SpeedMode[client], BooltoInt(g_bCenterSpeedDisplay[client]), BooltoInt(g_bCentreHud[client]), g_iTeleSide[client], g_iCentreHudModule[client][0], g_iCentreHudModule[client][1], g_iCentreHudModule[client][2], g_iCentreHudModule[client][3], g_iCentreHudModule[client][4], g_iCentreHudModule[client][5], BooltoInt(g_bSideHud[client]), g_iSideHudModule[client][0], g_iSideHudModule[client][1], g_iSideHudModule[client][2], g_iSideHudModule[client][3], g_iSideHudModule[client][4], BooltoInt(g_iPrespeedText[client]), BooltoInt(g_iCpMessages[client]), BooltoInt(g_iWrcpMessages[client]), BooltoInt(g_bAllowHints[client]), BooltoInt(g_bTimeleftDisplay[client]), BooltoInt(g_bMinimalHUD[client]), g_MinimalHUDSpeedGradient[client], BooltoInt(g_bMinimalHUD_CompareWR[client]), BooltoInt(g_bMinimalHUD_ComparePB[client]), g_iCSDUpdateRate[client], g_fCSD_POS_X[client], g_fCSD_POS_Y[client], g_iCSD_R[client], g_iCSD_G[client], g_iCSD_B[client], g_szSteamID[client]);
+		Format(szQuery, 2048, sql_updatePlayerOptions, BooltoInt(g_bTimerEnabled[client]), BooltoInt(g_bHide[client]), BooltoInt(g_bEnableQuakeSounds[client]), BooltoInt(g_bHideChat[client]), BooltoInt(g_bViewModel[client]), BooltoInt(g_bAutoBhopClient[client]), BooltoInt(g_bCheckpointsEnabled[client]), g_SpeedGradient[client], g_SpeedMode[client], BooltoInt(g_bCenterSpeedDisplay[client]), BooltoInt(g_bCentreHud[client]), g_iTeleSide[client], g_iCentreHudModule[client][0], g_iCentreHudModule[client][1], g_iCentreHudModule[client][2], g_iCentreHudModule[client][3], g_iCentreHudModule[client][4], g_iCentreHudModule[client][5], BooltoInt(g_bSideHud[client]), g_iSideHudModule[client][0], g_iSideHudModule[client][1], g_iSideHudModule[client][2], g_iSideHudModule[client][3], g_iSideHudModule[client][4], BooltoInt(g_iPrespeedText[client]), BooltoInt(g_iCpMessages[client]), BooltoInt(g_iWrcpMessages[client]), BooltoInt(g_bAllowHints[client]), BooltoInt(g_bTimeleftDisplay[client]), BooltoInt(g_bMinimalHUD[client]), g_MinimalHUDSpeedGradient[client], g_iMinimalHUD_CompareType[client], g_iCSDUpdateRate[client], g_fCSD_POS_X[client], g_fCSD_POS_Y[client], g_iCSD_R[client], g_iCSD_G[client], g_iCSD_B[client], g_szSteamID[client]);
 		//Format(szQuery, 1024, sql_updatePlayerOptions, BooltoInt(g_bTimerEnabled[client]), BooltoInt(g_bHide[client]), BooltoInt(g_bEnableQuakeSounds[client]), BooltoInt(g_bHideChat[client]), BooltoInt(g_bViewModel[client]), BooltoInt(g_bAutoBhopClient[client]), BooltoInt(g_bCheckpointsEnabled[client]), g_SpeedGradient[client], g_SpeedMode[client], BooltoInt(g_bCenterSpeedDisplay[client]), BooltoInt(g_bCentreHud[client]), g_iTeleSide[client], g_iCentreHudModule[client][0], g_iCentreHudModule[client][1], g_iCentreHudModule[client][2], g_iCentreHudModule[client][3], g_iCentreHudModule[client][4], g_iCentreHudModule[client][5], BooltoInt(g_bSideHud[client]), g_iSideHudModule[client][0], g_iSideHudModule[client][1], g_iSideHudModule[client][2], g_iSideHudModule[client][3], g_iSideHudModule[client][4], BooltoInt(g_iPrespeedText[client]), BooltoInt(g_iCpMessages[client]), BooltoInt(g_iWrcpMessages[client]), BooltoInt(g_bAllowHints[client]), BooltoInt(g_bTimeleftDisplay[client]), g_szSteamID[client]);
 		SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, client, DBPrio_Low);
 	}

@@ -3229,10 +3229,12 @@ public void MinimalHudAlive(int client){
 
 		if ( (GetGameTime() - g_fLastDifferenceTime[client] <= 5.0) && g_bTimerRunning[client]){
 
-			if(g_bMinimalHUD_CompareWR[client])
-				Format(s_Timer, 64, "%s\n%s", s_Timer, g_szLastSRDifferenceMinimalHUD[client]);
-			else if(g_bMinimalHUD_ComparePB[client])
+			if(g_iMinimalHUD_CompareType[client] == 1)
 				Format(s_Timer, 64, "%s\n%s", s_Timer, g_szLastPBDifferenceMinimalHUD[client]);
+			else if(g_iMinimalHUD_CompareType[client] == 2)
+				Format(s_Timer, 64, "%s\n%s", s_Timer, g_szLastSRDifferenceMinimalHUD[client]);
+			else
+				Format(s_Timer, 64, "%s\n%s", s_Timer, g_szCustomLastTimeDifferenceMinimalHUD[client]);
 
 		}
 
@@ -3419,11 +3421,12 @@ public void MinimalHudDead(int client){
 				}
 
 				if (GetGameTime() - g_fLastDifferenceTime[ObservedUser] <= 5.0){
-					if(g_bMinimalHUD_CompareWR[client]){
-						Format(s_Timer, 64, "%s\n%s", s_Timer, g_szLastSRDifferenceMinimalHUD[ObservedUser]);
-					}
-					else if(g_bMinimalHUD_ComparePB[client]){
+
+					if(g_iMinimalHUD_CompareType[client] == 1){
 						Format(s_Timer, 64, "%s\n%s", s_Timer, g_szLastPBDifferenceMinimalHUD[ObservedUser]);
+					}
+					else if(g_iMinimalHUD_CompareType[client] == 2){
+						Format(s_Timer, 64, "%s\n%s", s_Timer, g_szLastSRDifferenceMinimalHUD[ObservedUser]);
 					}
 				}
 
@@ -4363,12 +4366,95 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, float sp
 	char sz_srSpeedDiff[128];
 	char sz_srSpeedDiff_colorless[128];
 
+	float f_srDiff;
+	float f_srSpeedDiff;
+
+	//CUSTOM CHECKPOINTS
+	if(g_iMinimalHUD_CompareType[client] > 2){
+
+		if(g_iMinimalHUD_CompareType[client] == 3)
+			if(g_bTOP)
+				f_srDiff = (g_fCustomCheckpointsTimes[0][zone] - time);
+			else
+				f_srDiff = 0.0;
+		else if(g_iMinimalHUD_CompareType[client] == 4)
+			if(g_bG1)
+				f_srDiff = (g_fCustomCheckpointsTimes[1][zone] - time);
+			else
+				f_srDiff = 0.0;
+		else if(g_iMinimalHUD_CompareType[client] == 5)
+			if(g_bG2)
+				f_srDiff = (g_fCustomCheckpointsTimes[2][zone] - time);
+			else
+				f_srDiff = 0.0;
+		else if(g_iMinimalHUD_CompareType[client] == 6)
+			if(g_bG3)
+				f_srDiff = (g_fCustomCheckpointsTimes[3][zone] - time);
+			else
+				f_srDiff = 0.0;
+		else if(g_iMinimalHUD_CompareType[client] == 7)
+			if(g_bG4)
+				f_srDiff = (g_fCustomCheckpointsTimes[4][zone] - time);
+			else
+				f_srDiff = 0.0;
+		else if(g_iMinimalHUD_CompareType[client] == 8)
+			if(g_bG5)
+				f_srDiff = (g_fCustomCheckpointsTimes[5][zone] - time);
+			else
+				f_srDiff = 0.0;
+		
+
+		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
+
+		if (f_srDiff > 0){
+			Format(sz_srDiff_colorless, 128, "-%s", sz_srDiff);
+			Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
+		}
+		else{
+			Format(sz_srDiff_colorless, 128, "+%s", sz_srDiff);
+			Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
+		}
+
+		if(g_iMinimalHUD_CompareType[client] == 3)
+			if(g_bTOP)
+				Format(g_szCustomLastTimeDifferenceMinimalHUD[client], 64, "[R10: %s]", sz_srDiff_colorless);
+			else
+				Format(g_szCustomLastTimeDifferenceMinimalHUD[client], 64, "[R10: N/A]");
+		else if(g_iMinimalHUD_CompareType[client] == 4)
+			if(g_bG1)
+				Format(g_szCustomLastTimeDifferenceMinimalHUD[client], 64, "[G1: %s]", sz_srDiff_colorless);
+			else
+				Format(g_szCustomLastTimeDifferenceMinimalHUD[client], 64, "[G1: N/A]", sz_srDiff_colorless);
+		else if(g_iMinimalHUD_CompareType[client] == 5)
+			if(g_bG2)
+				Format(g_szCustomLastTimeDifferenceMinimalHUD[client], 64, "[G2: %s]", sz_srDiff_colorless);
+			else
+				Format(g_szCustomLastTimeDifferenceMinimalHUD[client], 64, "[G2: N/A]", sz_srDiff_colorless);
+		else if(g_iMinimalHUD_CompareType[client] == 6)
+			if(g_bG3)
+				Format(g_szCustomLastTimeDifferenceMinimalHUD[client], 64, "[G3: %s]", sz_srDiff_colorless);
+			else
+				Format(g_szCustomLastTimeDifferenceMinimalHUD[client], 64, "[G3: N/A]", sz_srDiff_colorless);
+		else if(g_iMinimalHUD_CompareType[client] == 7)
+			if(g_bG4)
+				Format(g_szCustomLastTimeDifferenceMinimalHUD[client], 64, "[G4: %s]", sz_srDiff_colorless);
+			else
+				Format(g_szCustomLastTimeDifferenceMinimalHUD[client], 64, "[G4: N/A]", sz_srDiff_colorless);
+		else if(g_iMinimalHUD_CompareType[client] == 8)
+			if(g_bG5)
+				Format(g_szCustomLastTimeDifferenceMinimalHUD[client], 64, "[G5: %s]", sz_srDiff_colorless);
+			else
+				Format(g_szCustomLastTimeDifferenceMinimalHUD[client], 64, "[G5: N/A]", sz_srDiff_colorless);
+
+	}
+
 	//FORMAT THE COMPARISONS STRINGS AGAINST THE SR
 	//IF THERE IS A RECORD
 	if (g_bCheckpointRecordFound[zonegroup] && g_fCheckpointServerRecord[zonegroup][zone] > 0.0 && g_bTimerRunning[client])
 	{
-		float f_srDiff = (g_fCheckpointServerRecord[zonegroup][zone] - time);
-		float f_srSpeedDiff = ( g_fCheckpointSpeedServerRecord[zonegroup][zone] - speed);
+
+		f_srDiff = (g_fCheckpointServerRecord[zonegroup][zone] - time);
+		f_srSpeedDiff = ( g_fCheckpointSpeedServerRecord[0][zone] - speed);
 
 		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
 		Format(sz_srSpeedDiff, 128, "%i", RoundToNearest(f_srSpeedDiff));
@@ -4449,7 +4535,11 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, float sp
 		//COMPARE AGAINST BESTRUNS CP SPEEDS
 		//IMPLEMENT THE COMMENTED VARIABLE WHICH ALLOWS STORAGE OF BEST RUN CP SPEEDS
 		//float g_fCheckpointSpeedsRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
-		float f_SpeedDiff = ( g_fCheckpointSpeedsRecord[zonegroup][client][zone] - speed);
+
+		float f_SpeedDiff;
+		
+		f_SpeedDiff = (g_fCheckpointSpeedsRecord[zonegroup][client][zone] - speed);
+
 		char sz_SpeedDiff[32];
 		char sz_SpeedDiff_colorless[32];
 
@@ -4513,9 +4603,11 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, float sp
 		SendMapCheckpointForward(client, zonegroup, zone, time, speed, szTime, szSpeed, szDiff_colorless, sz_srDiff_colorless, sz_SpeedDiff_colorless, sz_srSpeedDiff_colorless);
 
 		if (g_bCheckpointsEnabled[client] && g_iCpMessages[client])
-		{
+		{	
+			
 			CPrintToChat(client, "%t", "Misc30", g_szChatPrefix, g_iClientInZone[client][1] + 1, szTime, szDiff, sz_srDiff);
 			CPrintToChat(client, "%t", "Misc46", g_szChatPrefix, g_iClientInZone[client][1] + 1, szSpeed, sz_SpeedDiff, sz_srSpeedDiff);
+
 		}
 
 		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "Misc31", g_szChatPrefix, szName, g_iClientInZone[client][1] + 1, szTime, sz_srDiff, sz_SpeedDiff, sz_srSpeedDiff);
@@ -4564,8 +4656,10 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, float sp
 			if (percent > -1.0)
 			{
 				if (g_bCheckpointsEnabled[client] && g_iCpMessages[client]){
+					
 					CPrintToChat(client, "%t", "Misc32", g_szChatPrefix, g_iClientInZone[client][1] + 1, szTime, sz_srDiff);
 					CPrintToChat(client, "%t", "Misc47", g_szChatPrefix, g_iClientInZone[client][1] + 1, szSpeed, sz_srSpeedDiff);
+
 				}
 
 				Format(szSpecMessage, sizeof(szSpecMessage), "%t", "Misc33", g_szChatPrefix, szName, g_iClientInZone[client][1] + 1, szTime, sz_srDiff, sz_srSpeedDiff);

@@ -2319,6 +2319,12 @@ void MinimalHUDSpeedGradient(int client, bool menu = false)
 
 void MinimalHUDSetComparisons(int client, bool menu = false)
 {
+	if(g_iMinimalHUD_CompareType[client] != 8)
+		g_iMinimalHUD_CompareType[client]++;
+	else
+		g_iMinimalHUD_CompareType[client] = 1;
+
+	/*
 	if (g_bMinimalHUD_CompareWR[client]){
 		g_bMinimalHUD_CompareWR[client] = !g_bMinimalHUD_CompareWR[client];
 		g_bMinimalHUD_ComparePB[client] = true;
@@ -2327,6 +2333,7 @@ void MinimalHUDSetComparisons(int client, bool menu = false)
 		g_bMinimalHUD_ComparePB[client] = !g_bMinimalHUD_ComparePB[client];
 		g_bMinimalHUD_CompareWR[client] = true;
 	}
+	*/
 
 	if (menu)
 		MinimalHUDOptions(client);
@@ -3770,10 +3777,22 @@ public void MinimalHUDOptions(int client)
 		AddMenuItem(menu, "", "[YELLOW] Speed Gradient");
 	
 	//COMPARISON MODE
-	if (g_bMinimalHUD_ComparePB[client])
+	if (g_iMinimalHUD_CompareType[client] == 1)
 		AddMenuItem(menu, "", "Compare To : [PB]");
-	else if(g_bMinimalHUD_CompareWR[client])
+	else if(g_iMinimalHUD_CompareType[client] == 2)
 		AddMenuItem(menu, "", "Compare To : [WR]");
+	else if(g_iMinimalHUD_CompareType[client] == 3)
+		AddMenuItem(menu, "", "Compare To : [TOP 10]");
+	else if(g_iMinimalHUD_CompareType[client] == 4)
+		AddMenuItem(menu, "", "Compare To : [G1]");
+	else if(g_iMinimalHUD_CompareType[client] == 5)
+		AddMenuItem(menu, "", "Compare To : [G2]");
+	else if(g_iMinimalHUD_CompareType[client] == 6)
+		AddMenuItem(menu, "", "Compare To : [G3]");
+	else if(g_iMinimalHUD_CompareType[client] == 7)
+		AddMenuItem(menu, "", "Compare To : [G4]");
+	else if(g_iMinimalHUD_CompareType[client] == 8)
+		AddMenuItem(menu, "", "Compare To : [G5]");
 	
 	SetMenuExitBackButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
