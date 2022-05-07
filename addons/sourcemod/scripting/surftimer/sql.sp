@@ -322,6 +322,13 @@ public int callback_Confirm(Menu menu, MenuAction action, int client, int key)
 					Format(BonusPRruntime, 512, sql_clearPRruntime, steamID, g_EditingMap[client], g_SelectedType[client]);
 					PrintToServer(szQuery);
 					SQL_TQuery(g_hDb, SQL_CheckCallback, BonusPRruntime, DBPrio_Low);
+					
+					//DELETE PLAYER TO DELETE ENTRIES ON CK_TRACK
+					char RemovePlayerTrackQuery[1024];
+					Format(RemovePlayerTrackQuery, 1024, sql_RemovePlayerTrack, steamID, g_szMapName, g_SelectedType[client]);
+					PrintToServer(szQuery);
+					SQL_TQuery(g_hDb, SQL_CheckCallback, RemovePlayerTrackQuery, DBPrio_Low);
+					//UPDATE THE REST OF THE PLAYERS
 				}
 			}
 			SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
@@ -812,6 +819,7 @@ public void sql_CountFinishedBonusCallback(Handle owner, Handle hndl, const char
 			finishedbonuses++;
 			// Total amount of players who have finished the bonus
 			rank = SQL_FetchInt(hndl, 1);
+
 			SQL_FetchString(hndl, 0, szMap, 128);
 			for (int i = 0; i < GetArraySize(g_MapList); i++) // Check that the map is in the mapcycle
 			{
@@ -3986,6 +3994,9 @@ public void db_viewBonusRunRank(Handle owner, Handle hndl, const char[] error, a
 	}
 
 	PrintChatBonus(client, zGroup, rank);
+
+	char szName[128];
+	GetClientName(client, szName, 128);
 }
 
 public void db_viewMapRankBonus(int client, int zgroup, int type)
@@ -4033,6 +4044,7 @@ public void db_viewMapRankBonusCallback(Handle owner, Handle hndl, const char[] 
 			PrintChatBonus(client, zgroup);
 		}
 	}
+
 }
 
 // Get player rank in bonus - current map
@@ -4263,6 +4275,7 @@ public void db_insertBonus(int client, char szSteamId[32], char szUName[128], fl
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackCell(pack, zoneGrp);
+	WritePackString(pack, szUName);
 	Format(szQuery, 1024, sql_insertBonus, szSteamId, szName, g_szMapName, FinalTime, zoneGrp, g_iPreStrafeBonus[0][zoneGrp][0][client], g_iPreStrafeBonus[1][zoneGrp][0][client], g_iPreStrafeBonus[2][zoneGrp][0][client]);
 	SQL_TQuery(g_hDb, SQL_insertBonusCallback, szQuery, pack, DBPrio_Low);
 }
@@ -4278,6 +4291,8 @@ public void SQL_insertBonusCallback(Handle owner, Handle hndl, const char[] erro
 	ResetPack(data);
 	int client = ReadPackCell(data);
 	int zgroup = ReadPackCell(data);
+	char szName[128];
+	ReadPackString(data, szName, sizeof(szName));
 	CloseHandle(data);
 
 	db_viewMapRankBonus(client, zgroup, 1);
@@ -4292,6 +4307,7 @@ public void db_updateBonus(int client, char szSteamId[32], char szUName[128], fl
 	Handle datapack = CreateDataPack();
 	WritePackCell(datapack, client);
 	WritePackCell(datapack, zoneGrp);
+	WritePackString(datapack, szUName);
 	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH * 2 + 1);
 	Format(szQuery, 1024, sql_updateBonus,FinalTime, szName, g_iPreStrafeBonus[0][zoneGrp][0][client], g_iPreStrafeBonus[1][zoneGrp][0][client], g_iPreStrafeBonus[2][zoneGrp][0][client], szSteamId, g_szMapName, zoneGrp);
 	SQL_TQuery(g_hDb, SQL_updateBonusCallback, szQuery, datapack, DBPrio_Low);
@@ -4309,6 +4325,8 @@ public void SQL_updateBonusCallback(Handle owner, Handle hndl, const char[] erro
 	ResetPack(data);
 	int client = ReadPackCell(data);
 	int zgroup = ReadPackCell(data);
+	char szName[128];
+	ReadPackString(data, szName, sizeof(szName));
 	CloseHandle(data);
 
 	db_viewMapRankBonus(client, zgroup, 2);
@@ -5322,11 +5340,302 @@ public int LatestRecordsMenuHandler(Handle menu, MenuAction action, int param1, 
 	return 0;
 }
 
+//RECENTLY LOST
+public void db_ViewRecentlyLost(int client)
+{	
+	char szQuery[2048];
+	Format(szQuery, 2048, sql_RecentlyLost, g_szSteamID[client]);
+
+	SQL_TQuery(g_hDb, sql_selectRecentlyLostCallback, szQuery, client, DBPrio_Low);
+}
+
+public void sql_selectRecentlyLostCallback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (sql_selectRecentlyLostCallback): %s", error);
+		return;
+	}
+
+	char szMapName[32];
+	int zonegroup;
+	int previous_rank, new_rank;
+
+	PrintToConsole(data, "----------------------------------------------------------------------------------------------------");
+	PrintToConsole(data, "Recently Lost Times:");
+	if (SQL_HasResultSet(hndl))
+	{
+		Menu menu = CreateMenu(RecentlyLostMenuHandler);
+		SetMenuTitle(menu, "Recently Lost Times");
+
+		int i = 1;
+		char szItem[128];
+		while (SQL_FetchRow(hndl))
+		{
+			SQL_FetchString(hndl, 0, szMapName, 64);
+			zonegroup = SQL_FetchInt(hndl, 1);
+			previous_rank = SQL_FetchInt(hndl, 2);
+			new_rank = SQL_FetchInt(hndl, 3);
+			
+			char sz_ZoneGroupFormatted[128];
+			char previous_rank_szGroup[128];
+			char new_rank_szGroup[128];
+
+			//SETUP ZONEGROUP
+			if(zonegroup == 0)
+				Format(sz_ZoneGroupFormatted, 128, "Map");
+			else
+				Format(sz_ZoneGroupFormatted, 128, "Bonus %i", zonegroup);
+
+			//SETUP PREVIOUS_RANK GROUP
+			if (previous_rank >= 11 && previous_rank <= g_G1Top)
+				Format(previous_rank_szGroup, 128, "G1");
+			else if (previous_rank >= g_G2Bot && previous_rank <= g_G2Top)
+				Format(previous_rank_szGroup, 128, "G2");
+			else if (previous_rank >= g_G3Bot && previous_rank <= g_G3Top)
+				Format(previous_rank_szGroup, 128, "G3");
+			else if (previous_rank >= g_G4Bot && previous_rank <= g_G4Top)
+				Format(previous_rank_szGroup, 128, "G4");
+			else if (previous_rank >= g_G5Bot && previous_rank <= g_G5Top)
+				Format(previous_rank_szGroup, 128, "G5");
+			else
+				Format(previous_rank_szGroup, 128, "R%i", previous_rank);
+
+			//SETUP NEW_RANK GROUP
+			if (new_rank >= 11 && new_rank <= g_G1Top)
+				Format(new_rank_szGroup, 128, "G1");
+			else if (new_rank >= g_G2Bot && new_rank <= g_G2Top)
+				Format(new_rank_szGroup, 128, "G2");
+			else if (new_rank >= g_G3Bot && new_rank <= g_G3Top)
+				Format(new_rank_szGroup, 128, "G3");
+			else if (new_rank >= g_G4Bot && new_rank <= g_G4Top)
+				Format(new_rank_szGroup, 128, "G4");
+			else if (new_rank >= g_G5Bot && new_rank <= g_G5Top)
+				Format(new_rank_szGroup, 128, "G5");
+			else
+				Format(new_rank_szGroup, 128, "R%i", new_rank);
+			
+			if(previous_rank == 0)
+				Format(szItem, sizeof(szItem), "%s | %s | N/A -> %s | R%i -> R%i", szMapName, sz_ZoneGroupFormatted, new_rank_szGroup, previous_rank, new_rank);
+			else
+				Format(szItem, sizeof(szItem), "%s | %s | %s -> %s | R%i -> R%i", szMapName, sz_ZoneGroupFormatted, previous_rank_szGroup, new_rank_szGroup, previous_rank, new_rank);
+
+			PrintToConsole(data, szItem);
+			AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+			i++;
+		}
+		if (i == 1)
+		{
+			PrintToConsole(data, "No times found.");
+			delete menu;
+		}
+		else
+		{
+			SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
+			DisplayMenu(menu, data, MENU_TIME_FOREVER);
+		}
+	}
+	else
+	PrintToConsole(data, "No times found.");
+	PrintToConsole(data, "----------------------------------------------------------------------------------------------------");
+	CPrintToChat(data, "%t", "ConsoleOutput", g_szChatPrefix);
+}
+
+public int RecentlyLostMenuHandler(Handle menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_End)
+		delete menu;
+
+	return 0;
+}
+
+//TRACK ALL
+//RECENTLY LOST
+public void db_ViewTracking(int client)
+{	
+	char szQuery[2048];
+	Format(szQuery, 2048, sql_Tracking, g_szSteamID[client]);
+
+	SQL_TQuery(g_hDb, sql_selectTrackingCallback, szQuery, client, DBPrio_Low);
+}
+
+public void sql_selectTrackingCallback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (sql_selectRecentlyLostCallback): %s", error);
+		return;
+	}
+
+	char szMapName[32];
+	int zonegroup;
+	int previous_rank, new_rank;
+
+	PrintToConsole(data, "----------------------------------------------------------------------------------------------------");
+	PrintToConsole(data, "Track of Recent Times:");
+	if (SQL_HasResultSet(hndl))
+	{
+		Menu menu = CreateMenu(RecentlyLostMenuHandler);
+		SetMenuTitle(menu, "Track of Recent Times:");
+
+		int i = 1;
+		char szItem[128];
+		while (SQL_FetchRow(hndl))
+		{
+			SQL_FetchString(hndl, 0, szMapName, 64);
+			zonegroup = SQL_FetchInt(hndl, 1);
+			previous_rank = SQL_FetchInt(hndl, 2);
+			new_rank = SQL_FetchInt(hndl, 3);
+			
+			char sz_ZoneGroupFormatted[128];
+			char previous_rank_szGroup[128];
+			char new_rank_szGroup[128];
+
+			//SETUP ZONEGROUP
+			if(zonegroup == 0)
+				Format(sz_ZoneGroupFormatted, 128, "Map");
+			else
+				Format(sz_ZoneGroupFormatted, 128, "Bonus %i", zonegroup);
+
+			//SETUP PREVIOUS_RANK GROUP
+			if (previous_rank >= 11 && previous_rank <= g_G1Top)
+				Format(previous_rank_szGroup, 128, "G1");
+			else if (previous_rank >= g_G2Bot && previous_rank <= g_G2Top)
+				Format(previous_rank_szGroup, 128, "G2");
+			else if (previous_rank >= g_G3Bot && previous_rank <= g_G3Top)
+				Format(previous_rank_szGroup, 128, "G3");
+			else if (previous_rank >= g_G4Bot && previous_rank <= g_G4Top)
+				Format(previous_rank_szGroup, 128, "G4");
+			else if (previous_rank >= g_G5Bot && previous_rank <= g_G5Top)
+				Format(previous_rank_szGroup, 128, "G5");
+			else
+				Format(previous_rank_szGroup, 128, "R%i", previous_rank);
+
+			//SETUP NEW_RANK GROUP
+			if (new_rank >= 11 && new_rank <= g_G1Top)
+				Format(new_rank_szGroup, 128, "G1");
+			else if (new_rank >= g_G2Bot && new_rank <= g_G2Top)
+				Format(new_rank_szGroup, 128, "G2");
+			else if (new_rank >= g_G3Bot && new_rank <= g_G3Top)
+				Format(new_rank_szGroup, 128, "G3");
+			else if (new_rank >= g_G4Bot && new_rank <= g_G4Top)
+				Format(new_rank_szGroup, 128, "G4");
+			else if (new_rank >= g_G5Bot && new_rank <= g_G5Top)
+				Format(new_rank_szGroup, 128, "G5");
+			else
+				Format(new_rank_szGroup, 128, "R%i", new_rank);
+			
+			if(previous_rank == 0)
+				Format(szItem, sizeof(szItem), "%s | %s | N/A -> %s | R%i -> R%i", szMapName, sz_ZoneGroupFormatted, new_rank_szGroup, previous_rank, new_rank);
+			else
+				Format(szItem, sizeof(szItem), "%s | %s | %s -> %s | R%i -> R%i", szMapName, sz_ZoneGroupFormatted, previous_rank_szGroup, new_rank_szGroup, previous_rank, new_rank);
+
+			PrintToConsole(data, szItem);
+			AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+			i++;
+		}
+		if (i == 1)
+		{
+			PrintToConsole(data, "No times found.");
+			delete menu;
+		}
+		else
+		{
+			SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
+			DisplayMenu(menu, data, MENU_TIME_FOREVER);
+		}
+	}
+	else
+	PrintToConsole(data, "No times found.");
+	PrintToConsole(data, "----------------------------------------------------------------------------------------------------");
+	CPrintToChat(data, "%t", "ConsoleOutput", g_szChatPrefix);
+}
+
+public int TrackingMenuHandler(Handle menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_End)
+		delete menu;
+
+	return 0;
+}
+
 public void db_InsertLatestRecords(char szSteamID[32], char szName[128], float FinalTime)
 {
 	char szQuery[512];
 	Format(szQuery, 512, sql_insertLatestRecords, szSteamID, szName, FinalTime, g_szMapName);
 	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
+}
+
+public void db_InsertTrack(char szSteamID[32], char szName[128], char szMapName[128], int zonegroup, int previous_rank, int new_rank)
+{	
+	char szQuery[1024];
+	Format(szQuery, 1024, sql_InsertTrack, szSteamID, szName, szMapName, zonegroup, previous_rank, new_rank);
+	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
+
+	db_UpdateTrack(szMapName, szName, new_rank, zonegroup);
+}
+
+public void db_UpdateTrack(char szMapName[128],char szName[128], int rank, int zonegroup)
+{
+
+	Handle pack = CreateDataPack();
+	WritePackString(pack, szName);
+	WritePackCell(pack, rank);
+
+	char szQuery[1024];
+	Format(szQuery, 1024, sql_GetPlayersToUpdate, szMapName, zonegroup);
+	SQL_TQuery(g_hDb, sql_GetPlayersToUpdateCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void sql_GetPlayersToUpdateCallback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (SQL_db_CalcAvgRunTimeCallback): %s", error);
+		return;
+	}
+
+	if (SQL_HasResultSet(hndl))
+	{	
+		char szName[MAX_NAME_LENGTH];
+
+		ResetPack(data);
+		ReadPackString(data, szName, MAX_NAME_LENGTH);
+		int player_rank = ReadPackCell(data);
+		CloseHandle(data);
+
+		char szSteamID[32];
+		char szMapName[32];
+		int zonegroup;
+		int previous_rank, new_rank;
+		ArrayList PlayersCheck;
+		PlayersCheck = new ArrayList(MAX_NAME_LENGTH);
+		PlayersCheck.PushString(szName);
+		szName = "";
+
+		while (SQL_FetchRow(hndl))
+		{
+			SQL_FetchString(hndl, 0, szSteamID, 32);
+			SQL_FetchString(hndl, 1, szName, MAX_NAME_LENGTH);
+			SQL_FetchString(hndl, 2, szMapName, 32);
+			zonegroup = SQL_FetchInt(hndl, 3);
+			previous_rank = SQL_FetchInt(hndl, 4);
+			new_rank = SQL_FetchInt(hndl, 5);
+
+			if(PlayersCheck.FindString(szName) != -1)
+				continue;
+			else
+				PlayersCheck.PushString(szName);
+
+			previous_rank = new_rank;
+			if(player_rank <= new_rank){
+				char szQuery[1024];
+				Format(szQuery, 1024, sql_InsertTrack, szSteamID, szName, szMapName, zonegroup, previous_rank, new_rank+1);
+				SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
+			}
+
+		}
+	}
 }
 
 public void db_CalcAvgRunTime()

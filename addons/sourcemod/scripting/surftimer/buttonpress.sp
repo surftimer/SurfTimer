@@ -286,9 +286,9 @@ public void CL_OnEndTimerPress(int client)
 			diff = g_fPersonalRecord[client] - g_fFinalTime[client];
 			FormatTimeFloat(client, diff, 3, szDiff, sizeof(szDiff));
 			if (diff > 0.0)
-			Format(g_szTimeDifference[client], sizeof(szDiff), "-%s", szDiff);
+				Format(g_szTimeDifference[client], sizeof(szDiff), "-%s", szDiff);
 			else
-			Format(g_szTimeDifference[client], sizeof(szDiff), "+%s", szDiff);
+				Format(g_szTimeDifference[client], sizeof(szDiff), "+%s", szDiff);
 
 			// If the server already has a record
 			if (g_MapTimesCount > 0)
@@ -533,7 +533,7 @@ public void CL_OnEndTimerPress(int client)
 			g_bBonusFirstRecord[client] = false;
 			g_bBonusPBRecord[client] = false;
 			g_bBonusSRVRecord[client] = false;
-
+			
 			g_OldMapRankBonus[zGroup][client] = g_MapRankBonus[zGroup][client];
 
 			diff = g_fPersonalRecordBonus[zGroup][client] - g_fFinalTime[client];
@@ -624,6 +624,7 @@ public void CL_OnEndTimerPress(int client)
 				g_pr_showmsg[client] = true;
 				db_UpdateCheckpoints(client, g_szSteamID[client], zGroup);
 				db_insertBonus(client, g_szSteamID[client], szName, g_fFinalTime[client], zGroup);
+
 			}
 
 			else if (diff > 0.0)

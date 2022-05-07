@@ -40,6 +40,8 @@ void CreateCommands()
 	RegConsoleCmd("+noclip", NoClip, "[surftimer] Player noclip on");
 	RegConsoleCmd("-noclip", UnNoClip, "[surftimer] Player noclip off");
 	RegConsoleCmd("sm_nc", Command_ckNoClip, "[surftimer] Player noclip on/off");
+	RegConsoleCmd("sm_rl", Client_RecentlyLost, "[surftimer] Player Recently Lost Times");
+	RegConsoleCmd("sm_track", Client_Tracking, "[surftimer] Player Recent Time Changes");
 
 	// Teleportation Commands
 	RegConsoleCmd("sm_stages", Command_SelectStage, "[surftimer] Opens up the stage selector");
@@ -2611,6 +2613,18 @@ void HideMethod(int client, bool menu = false)
 public Action Client_Latest(int client, int args)
 {
 	db_ViewLatestRecords(client);
+	return Plugin_Handled;
+}
+
+public Action Client_RecentlyLost(int client, int args)
+{
+	db_ViewRecentlyLost(client);
+	return Plugin_Handled;
+}
+
+public Action Client_Tracking(int client, int args)
+{
+	db_ViewTracking(client);
 	return Plugin_Handled;
 }
 
