@@ -5677,10 +5677,8 @@ public void sql_GetPlayersToUpdateCallback(Handle owner, Handle hndl, const char
 		int previous_rank, new_rank;
 		ArrayList PlayersCheck;
 		PlayersCheck = new ArrayList(MAX_NAME_LENGTH);
-		if(!deleting){
-			PlayersCheck.PushString(szName);
-			szName = "";
-		}
+		PlayersCheck.PushString(szName);
+		szName = "";
 
 		while (SQL_FetchRow(hndl))
 		{
