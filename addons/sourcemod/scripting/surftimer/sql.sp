@@ -2543,10 +2543,15 @@ public void SQL_CurrentRunRank_PracCallback(Handle owner, Handle hndl, const cha
 	{
 		g_iPracRunTimeRank[client] = SQL_FetchInt(hndl, 0);
 
-		if (g_iClientInZone[client][2] > 0)
-			CPrintToChat(client, "%t", "BPress4", g_szChatPrefix, g_szPracticeTime[client], g_iPracRunTimeRank[client] - 1);
+		if(g_iPracRunTimeRank[client] <= 2)
+			g_iPracRunTimeRank[client] = 1;
 		else
-			CPrintToChat(client, "%t", "BPress5", g_szChatPrefix, g_szPracticeTime[client], g_iPracRunTimeRank[client] - 1);
+			g_iPracRunTimeRank[client]--;
+
+		if (g_iClientInZone[client][2] > 0)
+			CPrintToChat(client, "%t", "BPress4", g_szChatPrefix, g_szPracticeTime[client], g_iPracRunTimeRank[client]);
+		else
+			CPrintToChat(client, "%t", "BPress5", g_szChatPrefix, g_szPracticeTime[client], g_iPracRunTimeRank[client]);
 	}
 }
 
