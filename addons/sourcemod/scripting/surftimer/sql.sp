@@ -2521,6 +2521,35 @@ public void SQL_CurrentRunRankCallback(Handle owner, Handle hndl, const char[] e
 	MapFinishedMsgs(client, rank);
 }
 
+public void db_currentRunRank_Prac(int client)
+{
+	if (!IsValidClient(client))
+		return;
+
+	char szQuery[512];
+	Format(szQuery, 512, "SELECT count(runtimepro)+1 FROM `ck_playertimes` WHERE `mapname` = '%s' AND `runtimepro` < %f;", g_szMapName, g_fCurrentRunTime[client]);
+	SQL_TQuery(g_hDb, SQL_CurrentRunRank_PracCallback, szQuery, client, DBPrio_Low);
+}
+
+public void SQL_CurrentRunRank_PracCallback(Handle owner, Handle hndl, const char[] error, any client)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (SQL_CurrentRunRankCallback): %s", error);
+		return;
+	}
+	// Get players rank, 9999999 = error
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	{
+		g_iPracRunTimeRank[client] = SQL_FetchInt(hndl, 0);
+
+		if (g_iClientInZone[client][2] > 0)
+			CPrintToChat(client, "%t", "BPress4", g_szChatPrefix, g_szPracticeTime[client], g_iPracRunTimeRank[client] - 1);
+		else
+			CPrintToChat(client, "%t", "BPress5", g_szChatPrefix, g_szPracticeTime[client], g_iPracRunTimeRank[client] - 1);
+	}
+}
+
 // Get clients record from database
 // Called when a player finishes a map
 public void db_selectRecord(int client)

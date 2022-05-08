@@ -409,13 +409,13 @@
 	}
 	"BPress4"
 	{
-		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {yellow}{2}{default} finished the bonus in [{blue}{3}{default}] in practice mode!"
+		"#format"	"{1:s},{2:s},{3:i}"
+		"en"		"{1} finished the bonus in [{blue}{2}{default} | Rank {blue}{3}{default}] in practice mode!"
 	}
 	"BPress5"
 	{
-		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {yellow}{2}{default} finished the map in [{blue}{3}{default}] in practice mode!"
+		"#format"	"{1:s},{2:s},{3:i}"
+		"en"		"{1} finished the map in [{blue}{2}{default} | Rank {blue}{3}{default}] in practice mode!"
 	}
 	"BPress6"
 	{
