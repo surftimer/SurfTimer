@@ -90,7 +90,7 @@ public void sql_selectNewestMapsCallback(Handle owner, Handle hndl, const char[]
 			SQL_FetchString(hndl, 0, szMapName, 64);
 			SQL_FetchString(hndl, 1, szDate, 64);
 			Format(szItem, sizeof(szItem), "%s since %s", szMapName, szDate);
-			AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+			AddMenuItem(menu, "", szItem, ITEMDRAW_DEFAULT);
 			i++;
 		}
 		if (i == 1)

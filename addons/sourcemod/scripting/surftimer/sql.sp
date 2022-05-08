@@ -398,7 +398,7 @@ public void db_WipePlayer(int client, char szSteamID[32])
 
 	//UPDATE CK_TRACK VALUES
 	db_InsertTrack_All(szSteamID);
-	db_UpdateTrack_All(szSteamID);
+	//db_UpdateTrack_All(szSteamID);
 
 	DataPack pack = new DataPack();
 	pack.WriteCell(GetClientUserId(client));
@@ -5818,7 +5818,7 @@ public void db_InsertTrack(char szSteamID[32], char szName[128], char szMapName[
 	Format(szQuery, 1024, sql_InsertTrack, szSteamID, szName, szMapName, zonegroup, previous_rank, new_rank);
 	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
 
-	db_UpdateTrack(szMapName, szName, new_rank, zonegroup, false);
+	//db_UpdateTrack(szMapName, szName, new_rank, zonegroup, false);
 }
 
 public void db_UpdateTrack(char szMapName[128],char szName[128], int rank, int zonegroup, bool deleting)
