@@ -891,6 +891,9 @@ float g_fCurrentRunTime[MAXPLAYERS + 1];
 // PracticeMode total time the run took in 00:00:00 format
 char g_szPracticeTime[MAXPLAYERS + 1][32];
 
+//Rank of the PracticeMode time
+int g_iPracRunTimeRank[MAXPLAYERS + 1];
+
 // Missed personal record time?
 bool g_bMissedMapBest[MAXPLAYERS + 1];
 
