@@ -3381,8 +3381,6 @@ public void db_LoadCPTypesTimes(int client)
 	char szQuery[4096];
 	int rank;
 
-	PrintToConsoleAll("total : %i\n", g_MapTimesCount);
-
 	if(g_MapTimesCount >= 10)
 		g_bTOP = true;
 	if(g_MapTimesCount > 10)
@@ -3395,8 +3393,6 @@ public void db_LoadCPTypesTimes(int client)
 		g_bG4 = true;
 	if(g_MapTimesCount > g_G5Bot)
 		g_bG5 = true;
-
-	PrintToConsoleAll("%b | %b | %b | %b | %b | %b\n", g_bTOP, g_bG1, g_bG2, g_bG3, g_bG4, g_bG5);
 
 	for(int i = 0; i < 6; i++){
 		rank = 0;
