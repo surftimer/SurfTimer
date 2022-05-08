@@ -378,6 +378,13 @@ public Action Say_Hook(int client, const char[] command, int argc)
 				{
 					//COLOR VALUE FOR CENTER SPEED
 					int color_value = StringToInt(sText);
+
+					//KEEP VALUES BETWEEN 0-255
+					if(color_value > 255)
+						color_value = 255;
+					else if(color_value < 0)
+						color_value = 0;
+
 					switch(g_iColorChangeIndex[client]){
 						case 0: g_iCSD_R[client] = color_value;
 						case 1: g_iCSD_G[client] = color_value;
