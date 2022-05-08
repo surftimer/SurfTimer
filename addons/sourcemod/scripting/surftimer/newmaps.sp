@@ -21,7 +21,40 @@ public Action Client_AddNewMap(int client, int args)
 }
 
 public int NewMapMenuHandler(Menu menu, MenuAction action, int param1, int param2)
-{
+{	
+
+	//ALLOW NOMINATING A MAP FROM NEWMAPS
+	if(action == MenuAction_Select){
+
+		char map[PLATFORM_MAX_PATH], name[MAX_NAME_LENGTH], displayName[PLATFORM_MAX_PATH];
+		menu.GetItem(param2, map, sizeof(map), _, displayName, sizeof(displayName));
+		
+		GetClientName(param1, name, sizeof(name));
+
+		NominateResult result = NominateMap(map, false, param1);
+		
+		/* Don't need to check for InvalidMap because the menu did that already */
+		if (result == Nominate_AlreadyInVote)
+		{
+			CPrintToChat(param1, "%t", "Map Already Nominated", g_szChatPrefix);
+			return 0;
+		}
+		else if (result == Nominate_VoteFull)
+		{
+			CPrintToChat(param1, "%t", "Max Nominations", g_szChatPrefix);
+			return 0;
+		}
+
+		if (result == Nominate_Replaced)
+		{
+			CPrintToChatAll("%t", "Map Nomination Changed", g_szChatPrefix, name, displayName);
+			return 0;	
+		}
+		
+		CPrintToChatAll("%t", "Map Nominated", g_szChatPrefix, name, displayName);
+
+	}
+
 	if (action == MenuAction_End)
 		delete menu;
 
