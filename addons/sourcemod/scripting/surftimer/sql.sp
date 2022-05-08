@@ -2175,6 +2175,7 @@ public void sql_selectMapRecordCallback(Handle owner, Handle hndl, const char[] 
 		db_viewMapProRankCount();
 		CreateTimer(3.0, RefreshZonesTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 	}
+
 	return;
 }
 
@@ -7187,7 +7188,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 				PlayWRCPRecord();
 				SendNewWRCPForward(client, stage, sz_srRawDiff);
 
-				SetNewRecordPrestrafe(client, stage, 0, false);
+				SetNewRecordPrestrafe(client, stage, 0, false, false, true);
 			}
 			else
 			{
@@ -7213,7 +7214,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			PlayWRCPRecord();
 			SendNewWRCPForward(client, stage, sz_srRawDiff);
 
-			SetNewRecordPrestrafe(client, stage, 0, false);
+			SetNewRecordPrestrafe(client, stage, 0, false, false, true);
 		}
 	}
 	else if (style != 0) // styles
@@ -7236,7 +7237,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 				PlayWRCPRecord();
 				SendNewWRCPForward(client, stage, sz_srRawDiff);
 
-				SetNewRecordPrestrafe(client, stage, style, false);
+				SetNewRecordPrestrafe(client, stage, style, false, false, true);
 			}
 			else
 			{
@@ -7260,7 +7261,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			PlayWRCPRecord();
 			SendNewWRCPForward(client, stage, sz_srRawDiff);
 
-			SetNewRecordPrestrafe(client, stage, style, false);
+			SetNewRecordPrestrafe(client, stage, style, false, false, true);
 		}
 	}
 
@@ -7681,9 +7682,9 @@ public void sql_viewStageRecordsCallback(Handle owner, Handle hndl, const char[]
 	{
 		for (int s = 0; s < MAX_STYLES; s++)
 		{
-			g_iRecordPreStrafe[0][i][s] = 0;
-			g_iRecordPreStrafe[1][i][s] = 0;
-			g_iRecordPreStrafe[2][i][s] = 0;
+			g_iRecordPreStrafeStage[0][i][s] = 0;
+			g_iRecordPreStrafeStage[1][i][s] = 0;
+			g_iRecordPreStrafeStage[2][i][s] = 0;
 		}
 	}
 
@@ -7729,9 +7730,9 @@ public void sql_viewStageRecordsCallback(Handle owner, Handle hndl, const char[]
 					g_fStyleStageRecord[style][stage] = 9999999.0;
 				}
 			}
-			g_iRecordPreStrafe[0][stage][style] = SQL_FetchInt(hndl, 4);
-			g_iRecordPreStrafe[1][stage][style] = SQL_FetchInt(hndl, 5);
-			g_iRecordPreStrafe[2][stage][style] = SQL_FetchInt(hndl, 6);
+			g_iRecordPreStrafeStage[0][stage][style] = SQL_FetchInt(hndl, 4);
+			g_iRecordPreStrafeStage[1][stage][style] = SQL_FetchInt(hndl, 5);
+			g_iRecordPreStrafeStage[2][stage][style] = SQL_FetchInt(hndl, 6);
 		}
 	}
 	else

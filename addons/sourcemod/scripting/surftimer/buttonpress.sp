@@ -94,8 +94,8 @@ public void CL_OnStartTimerPress(int client)
 				*/
 				iPrestrafeRecord = g_iRecordPreStrafe[1][0][g_iCurrentStyle[client]];
 
-				SetPrestrafe(client, 0, g_iCurrentStyle[client], false);
-				SetPrestrafe(client, 1, g_iCurrentStyle[client], false);
+				SetPrestrafe(client, 0, g_iCurrentStyle[client], true, false, false );
+				SetPrestrafe(client, 1, g_iCurrentStyle[client], true, false, false );
 			}
 			else
 			{
@@ -110,7 +110,7 @@ public void CL_OnStartTimerPress(int client)
 				*/
 				iPrestrafeRecord = g_iRecordPreStrafeBonus[1][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
 
-				SetPrestrafe(client, g_iClientInZone[client][2], g_iCurrentStyle[client], true);
+				SetPrestrafe(client, g_iClientInZone[client][2], g_iCurrentStyle[client], false, true, false);
 			}
 		}
 
@@ -767,8 +767,10 @@ public void CL_OnEndTimerPress(int client)
 // Start Timer
 public void CL_OnStartWrcpTimerPress(int client)
 {
+
 	if (!g_bSpectate[client] && !g_bNoClip[client] && ((GetGameTime() - g_fLastTimeNoClipUsed[client]) > 2.0))
 	{
+
 		int zGroup = g_iClientInZone[client][2];
 		if(zGroup != 0)
 		{
@@ -785,11 +787,11 @@ public void CL_OnStartWrcpTimerPress(int client)
 			g_WrcpStage[client] = g_Stage[0][client];
 			//Stage_StartRecording(client);
 		}
-		if (g_Stage[0][client] > 1 && !g_bPracticeMode[client] && !IsFakeClient(client)) {
+		if (g_Stage[0][client] >= 1 && !g_bPracticeMode[client] && !IsFakeClient(client)) {
 			char szDifference[128], szSpeed[128], preMessage[128];
 			int iDifference;
 			//FORCE XYZ UNITS ON PRESTRAFE
-			int iPrestrafeRecord = g_iRecordPreStrafe[1][g_Stage[0][client]][g_iCurrentStyle[client]];
+			int iPrestrafeRecord = g_iRecordPreStrafeStage[1][g_Stage[0][client]][g_iCurrentStyle[client]];
 			
 			float fVelocity[3];
 			GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
@@ -798,7 +800,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 
 			int prestrafe = RoundToNearest(speed);
 
-			SetPrestrafe(client, g_Stage[0][client], g_iCurrentStyle[client], false);
+			SetPrestrafe(client, g_Stage[0][client], g_iCurrentStyle[client], false, false, true);
 
 			if (iPrestrafeRecord == 0)
 			{
