@@ -238,23 +238,23 @@
 	====================================*/
 	"PracWrcp1"
 	{
-		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s}"
-		"en"		"{1} Stage {2}:{default} {lightgreen}{3} {default}[{4}{default} | {5}{default}]"
+		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s},{6:i}"
+		"en"		"{1} {blue}[Practice]{default} Stage {2}:{default} {lightgreen}{3} {default}[{4}{default} | {5}{default}] {blue}[Rank {6}]"
 	}
 	"PracWrcp2"
 	{
-		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:s}"
-		"en"		"{1} {yellow}{2} {default}| {purple}Stage {3}:{default} {lightgreen}{4} {default}[{5}{default} | {6}{default}]"
+		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:s},{7:i}"
+		"en"		"{1} {blue}[Practice]{default} {yellow}{2} {default}| {purple}Stage {3}:{default} {lightgreen}{4} {default}[{5}{default} | {6}{default}] {blue}[Rank {7}]"
 	}
 	"PracWrcp3"
 	{
-		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s},{6:i},{7:i}"
-		"en"		"{1} Completed {default}Stage {2} {red}{3} {default}in {lightgreen}{4} {5} {default}[Rank: {lightgreen}{6}/{7}{default}]"
+		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s},{6:i},{7:i},{8:i}"
+		"en"		"{1} {blue}[Practice]{default} Completed {default}Stage {2} {red}{3} {default}in {lightgreen}{4} {5} {default}[Rank: {lightgreen}{6}/{7}{default}] {blue}[Rank {8}]"
 	}
 	"PracWrcp4"
 	{
-		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s},{6:i},{7:i}"
-		"en"		"{1} Completed {default}Stage {2} {red}{3} {default}in {lightgreen}{4} {5} {default}[Rank: {lightgreen}{6}/{7}{default}]"
+		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s},{6:i},{7:i},{8:i}"
+		"en"		"{1} {blue}[Practice]{default} Completed {default}Stage {2} {red}{3} {default}in {lightgreen}{4} {5} {default}[Rank: {lightgreen}{6}/{7}{default}] {blue}[Rank {8}]"
 	}
 	/*============END============*/
 	"ReplayFinishingMsg"
@@ -409,13 +409,13 @@
 	}
 	"BPress4"
 	{
-		"#format"	"{1:s},{2:s},{3:i}"
-		"en"		"{1} finished the bonus in [{blue}{2}{default} | Rank {blue}{3}{default}] in practice mode!"
+		"#format"	"{1:s},{2:s},{3:s},{4:i}"
+		"en"		"{1} {blue}[Practice]{default} finished the bonus in {yellow}{2}{default} [{blue}{3}{default} | {blue}Rank {4}{default}]"
 	}
 	"BPress5"
 	{
-		"#format"	"{1:s},{2:s},{3:i}"
-		"en"		"{1} finished the map in [{blue}{2}{default} | Rank {blue}{3}{default}] in practice mode!"
+		"#format"	"{1:s},{2:s},{3:s},{4:i}"
+		"en"		"{1} {blue}[Practice]{default} finished the map in {yellow}{2}{default} [{blue}{3}{default} | {blue}Rank {4}{default}]"
 	}
 	"BPress6"
 	{

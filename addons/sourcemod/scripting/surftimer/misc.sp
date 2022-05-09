@@ -5489,7 +5489,7 @@ void PrintCSGOHUDText(int client, const char[] format, any ...)
 	EndMessage();
 }
 
-public void PrintPracSrcp(int client, int style, int stage, float fClientPbStageTime)
+public void PrintPracSrcp(int client, int style, int stage, int stage_rank, float fClientPbStageTime)
 {
 	char szName[MAX_NAME_LENGTH];
 	GetClientName(client, szName, MAX_NAME_LENGTH);
@@ -5539,17 +5539,17 @@ public void PrintPracSrcp(int client, int style, int stage, float fClientPbStage
 	{
 		if (g_iWrcpMessages[client])
 		{
-			CPrintToChat(client, "%t", "PracWrcp1", g_szChatPrefix, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff);
+			CPrintToChat(client, "%t", "PracWrcp1", g_szChatPrefix, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff, stage_rank);
 		}
-		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp2", g_szChatPrefix, szName, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff);
+		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp2", g_szChatPrefix, szName, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff, stage_rank);
 	}
 	else if (style != 0) // styles
 	{
 		if (g_iWrcpMessages[client])
 		{
-			CPrintToChat(client, "%t", "PracWrcp3", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
+			CPrintToChat(client, "%t", "PracWrcp3", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage], stage_rank);
 		}
-		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp4", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
+		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp4", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage], stage_rank);
 	}
 
 	CheckpointToSpec(client, szSpecMessage);

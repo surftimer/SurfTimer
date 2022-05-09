@@ -237,10 +237,13 @@ public void CL_OnEndTimerPress(int client)
 		// Get CurrentRunTime and format it to a string
 		FormatTimeFloat(client, g_fCurrentRunTime[client], 3, g_szPracticeTime[client], 32);
 
-		if (!g_bMapSRVRecord[client] && !g_bMapFirstRecord[client] && !g_bMapPBRecord[client])
-		{
-			// for ck_min_rank_announce
-			db_currentRunRank_Prac(client);
+		if (g_iClientInZone[client][2] == 0 && g_iCurrentStyle[client] == 0){
+			if (!g_bMapSRVRecord[client] && !g_bMapFirstRecord[client] && !g_bMapPBRecord[client])
+				db_currentRunRank_Prac(client, 0, true);
+		}
+		else if(g_iClientInZone[client][2] > 0 && g_iCurrentStyle[client] == 0){
+			if (!g_bBonusSRVRecord[client] && !g_bBonusFirstRecord[client] && !g_bBonusPBRecord[client])
+				db_currentRunRank_Prac(client, g_iClientInZone[client][2], false);
 		}
 		
 		SendPracticeFinishForward(client);
@@ -904,7 +907,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		// Make a new stage replay bot?
 		if (GetConVarBool(g_hReplaceReplayTime) && (!g_bStageReplay[stage] || g_fFinalWrcpTime[client] < g_fStageReplayTimes[stage]))
 		{
-			PrintToConsole(client,"SAVING STAGE RECORD");
+			//PrintToConsole(client,"SAVING STAGE RECORD");
 			Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 		}
 		else
