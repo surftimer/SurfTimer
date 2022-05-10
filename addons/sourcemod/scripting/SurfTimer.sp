@@ -1387,6 +1387,11 @@ float g_fTimeIncrement[MAXPLAYERS + 1][MAXZONEGROUPS];
 int g_iPRinfoMapRank[MAXPLAYERS + 1];
 int g_iPRinfoMapRankBonus[MAXPLAYERS + 1];
 
+//CCP COMMAND
+Menu ccp_menu;
+float g_fCCPRecordCheckpointTimes[CPLIMIT];
+float g_fCCPPlayerCheckpointTimes[CPLIMIT];
+
 // surf_christmas2
 bool g_bUsingStageTeleport[MAXPLAYERS + 1];
 
