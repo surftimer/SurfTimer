@@ -2643,7 +2643,6 @@ public void sql_selectRecordCallback(Handle owner, Handle hndl, const char[] err
 		if ((g_fFinalTime[data] <= time || time <= 0.0))
 		{
 			db_updateRecordPro(data);
-
 		}
 	}
 	else
