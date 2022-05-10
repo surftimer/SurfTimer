@@ -1824,4 +1824,24 @@
 		"en"		"{1} Type new value (0 - 255) in the chat, or {darkred}cancel{default} to cancel"
 	}
 
+	"CCP_01"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} sm_ccp only works on staged maps."
+	}
+	"CCP_02"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Map not completed."
+	}
+	"CCP_03"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} No completion found for that rank."
+	}
+	"CCP_04"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} No map record found."
+	}
 }
