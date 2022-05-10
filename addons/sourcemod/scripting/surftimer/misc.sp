@@ -3202,8 +3202,21 @@ public void MinimalHudAlive(int client){
 				Format(s_Timer, 64, "[PAUSED]");
 			else if (g_bPracticeMode[client])
 				Format(s_Timer, 64, "[P : %s]", s_Timer);
-			else
-				Format(s_Timer, 64, "[%s]", s_Timer);
+			else{
+				if (g_iCurrentStyle[client] != 0){
+					switch (g_iCurrentStyle[client])
+					{
+						case 1: Format(s_Timer, 64, "[SW %s]", s_Timer);
+						case 2: Format(s_Timer, 64, "[HSW %s]", s_Timer);
+						case 3: Format(s_Timer, 64, "[BW %s]", s_Timer);
+						case 4: Format(s_Timer, 64, "[LG %s]", s_Timer);
+						case 5: Format(s_Timer, 64, "[SM %s]", s_Timer);
+						case 6: Format(s_Timer, 64, "[FF %s]", s_Timer);
+					}
+				}
+				else
+					Format(s_Timer, 64, "[%s]", s_Timer);
+			}
 
 		}
 		else if (g_bWrcpTimeractivated[client] && !g_bPracticeMode[client])
@@ -3218,19 +3231,6 @@ public void MinimalHudAlive(int client){
 		else
 		{
 			Format(s_Timer, 64, "[00:00:00]");
-		}
-
-		if (g_iCurrentStyle[client] != 0)
-		{
-			switch (g_iCurrentStyle[client])
-			{
-				case 1: Format(s_Timer, 64, "[SW %s]", g_fCurrentRunTime[client]);
-				case 2: Format(s_Timer, 64, "[HSW %s]", g_fCurrentRunTime[client]);
-				case 3: Format(s_Timer, 64, "[BW %s]", g_fCurrentRunTime[client]);
-				case 4: Format(s_Timer, 64, "[LG %s]", g_fCurrentRunTime[client]);
-				case 5: Format(s_Timer, 64, "[SM %s]", g_fCurrentRunTime[client]);
-				case 6: Format(s_Timer, 64, "[FF %s]", g_fCurrentRunTime[client]);
-			}
 		}
 
 		displayColor = GetMinimalHUDColour(client, g_MinimalHUDSpeedGradient[client]);
