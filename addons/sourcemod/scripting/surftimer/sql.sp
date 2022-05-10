@@ -11189,15 +11189,15 @@ public void SQL_viewCCP_GetMapStageRankCallback(Handle owner, Handle hndl, const
 public void db_viewCCP_GetMapStageRankTotal(int client, char szMapName[128], int map_rank, int total_map_completions, char szMapTimeFormatted[32], char szMapTimeDiffFormatted[32], int stage, int stage_rank, char szStageTimeFormatted[32])
 {
 	Handle stage_pack = CreateDataPack();
-	WritePackCell(stage_pack, client);
-	WritePackString(stage_pack, szMapName);
-	WritePackCell(stage_pack, map_rank);
-	WritePackCell(stage_pack, total_map_completions);
-	WritePackString(stage_pack, szMapTimeFormatted);
-	WritePackString(stage_pack, szMapTimeDiffFormatted);
-	WritePackCell(stage_pack, stage);
-	WritePackCell(stage_pack, stage_rank);
-	WritePackString(stage_pack, szStageTimeFormatted);
+	WritePackCell(stage_pack, client); //CLIENT WHO DID SM_CCP
+	WritePackString(stage_pack, szMapName); //MAP USED ON CCP
+	WritePackCell(stage_pack, map_rank); //PLAYERS MAP RANK
+	WritePackCell(stage_pack, total_map_completions); // TOTAL COMPLETIONS ON GIVEN MAP
+	WritePackString(stage_pack, szMapTimeFormatted); // FORMATTED PLAYERS MAP TIME IN 00:00:00
+	WritePackString(stage_pack, szMapTimeDiffFormatted); // FORMATTED PLAYERS RECORD TIME DIFFERENCE IN IN 00:00:00
+	WritePackCell(stage_pack, stage); // CURRENT STAGE BEING PROCESSED
+	WritePackCell(stage_pack, stage_rank); // PLAYERS RANK OF THE CURRENT STAGE BEING PROCESSED
+	WritePackString(stage_pack, szStageTimeFormatted); //PLAYERS STAGE TIME IN 00:00:00
 
 	char szQuery[2048];
 	Format(szQuery, 2048, "SELECT count(runtimepro)+1 FROM ck_wrcps WHERE mapname = '%s' AND stage = '%i' AND style = '0';", szMapName, stage+1);
