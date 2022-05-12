@@ -5146,9 +5146,8 @@ public Action Command_ResetStartpos(int client, int args)
 		if(g_bStageStartposUsed[client][g_iClientInZone[client][1]])
 			g_bStageStartposUsed[client][g_iClientInZone[client][1]] = false;
 	}
-	else{
-		g_bStageStartposUsed[client][g_iClientInZone[client][1]] = false;
-	}
+	else
+		g_bStartposUsed[client][g_iClientInZone[client][2]] = false;
 
 	CReplyToCommand(client, "%t", "Commands83", g_szChatPrefix);
 
@@ -5170,7 +5169,7 @@ public void Startpos(int client)
 		GetClientAbsOrigin(client, g_fStageStartposLocation[client][g_iClientInZone[client][1]]);
 		GetClientEyeAngles(client, g_fStageStartposAngle[client][g_iClientInZone[client][1]]);
 		g_bStageStartposUsed[client][g_iClientInZone[client][1]] = true;
-		CPrintToChat(client, "%t", "Commands68", g_szChatPrefix);
+		CPrintToChat(client, "%t", "Commands89", g_szChatPrefix);
 	}
 	else
 	{
