@@ -227,7 +227,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 				g_iTeleportingZoneId[client] = zId;
 
 			teleportEntitySafe(client, g_fStartposLocation[client][zonegroup], g_fStartposAngle[client][zonegroup], view_as<float>( { 0.0, 0.0, 0.0 } ), stopTime);
-
+			
 			return;
 		}
 	}
@@ -283,9 +283,11 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	{
 		// Check if the map has zones
 		if (g_mapZonesCount > 0)
-		{
+		{	
 			// Search for the zoneid we're teleporting to:
-			int destinationZoneId = getZoneID(zonegroup, zone);
+			int destinationZoneId;
+			destinationZoneId = getZoneID(zonegroup, zone);
+
 			g_iTeleportingZoneId[client] = destinationZoneId;
 
 			// Check if zone was found
@@ -350,7 +352,13 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 
 					// Set spawn location to the destination zone:
 					if (destinationFound)
-						Array_Copy(origin, g_fTeleLocation[client], 3);
+						if(zone != 1)
+							if(g_bStageStartposUsed[client][zone-2] && g_fCurrentRunTime[client] <= 0.0)
+								Array_Copy(g_fStageStartposLocation[client][zone-2] , g_fTeleLocation[client], 3);
+							else
+								Array_Copy(origin, g_fTeleLocation[client], 3);
+						else
+							Array_Copy(origin, g_fTeleLocation[client], 3);
 					else
 						Array_Copy(g_mapZones[destinationZoneId].CenterPoint, g_fTeleLocation[client], 3);
 
@@ -374,7 +382,13 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 
 					float fLocation[3];
 					if (destinationFound)
-						Array_Copy(origin, fLocation, 3);
+						if(zone != 1)
+							if(g_bStageStartposUsed[client][zone-2] && g_fCurrentRunTime[client] <= 0.0)
+								Array_Copy(g_fStageStartposLocation[client][zone-2], fLocation, 3);
+							else
+								Array_Copy(origin, fLocation, 3);
+						else
+							Array_Copy(origin, fLocation, 3);
 					else
 						Array_Copy(g_mapZones[destinationZoneId].CenterPoint, fLocation, 3);
 
@@ -1336,6 +1350,9 @@ public void SetClientDefaults(int client)
 	// Goose Start Pos
 	for (int i = 0; i < MAXZONEGROUPS; i++)
 		g_bStartposUsed[client][i] = false;
+	
+	for (int i = 0; i < CPLIMIT; i++)
+		g_bStageStartposUsed[client][i] = false;
 
 	// Save loc
 	g_iLastSaveLocIdClient[client] = 0;
