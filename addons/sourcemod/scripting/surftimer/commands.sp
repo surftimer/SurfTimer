@@ -179,7 +179,9 @@ void CreateCommands()
 
 	// !Startpos -- Goose
 	RegConsoleCmd("sm_startpos", Command_Startpos, "[surftimer] Saves current location as new !r spawn.");
+	RegConsoleCmd("sm_sp", Command_Startpos, "[surftimer] Saves current location as new !r spawn.");
 	RegConsoleCmd("sm_resetstartpos", Command_ResetStartpos, "[surftimer] Removes custom !r spawn.");
+	RegConsoleCmd("sm_rsp", Command_ResetStartpos, "[surftimer] Removes custom !r spawn.");
 
 	// CPR
 	RegConsoleCmd("sm_cpr", Command_CPR, "[surftimer] Compare clients time to another clients time");
