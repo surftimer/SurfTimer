@@ -124,7 +124,7 @@ char sql_insertPR[] = "INSERT INTO ck_prinfo (steamid, name, mapname, runtime, z
 
 char sql_selectBonusPR[] = "SELECT steamid, name, mapname, zonegroup, PRtimeinzone, PRcomplete, PRattempts, PRstcomplete FROM ck_prinfo WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = '%i';";
 
-char sql_updatePrinfo[] = "UPDATE ck_prinfo SET PRtimeinzone = '%f', PRcomplete = '%f', PRattempts = '%f', PRstcomplete = '%f' WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = '%i';";
+char sql_updatePrinfo[] = "UPDATE ck_prinfo SET runtime = '%f', PRtimeinzone = '%f', PRcomplete = '%f', PRattempts = '%f', PRstcomplete = '%f' WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = '%i';";
 char sql_updatePrinfo_withruntime[] = "UPDATE ck_prinfo SET PRtimeinzone = '%f', PRcomplete = '%f', PRattempts = '%f', PRstcomplete = '%f', runtime = '%f' WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = '%i';";
 
 char sql_clearPRruntime[] = "UPDATE ck_prinfo SET runtime = '0.0' WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = '%i';";
