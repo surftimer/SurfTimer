@@ -630,7 +630,6 @@ public void CL_OnEndTimerPress(int client)
 				db_insertBonus(client, g_szSteamID[client], szName, g_fFinalTime[client], zGroup);
 
 			}
-
 			else if (diff > 0.0)
 			{
 				// client's new record
