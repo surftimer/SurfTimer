@@ -929,6 +929,10 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		db_selectWrcpRecord(client, 0, stage);
 		
 		g_bWrcpTimeractivated[client] = false;
+
+		if(g_aRecording[client] != null && g_bTimerRunning[client] && g_Recording){
+			Stage_StartRecording(client);
+		}
 	}
 	else if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] != 0) // styles
 	{
