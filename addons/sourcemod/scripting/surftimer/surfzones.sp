@@ -407,6 +407,8 @@ public void StartTouch(int client, int action[3])
 				g_bWrcpTimeractivated[client] = false;
 				g_bPracSrcpTimerActivated[client] = false;
 				g_CurrentStage[client] = 0;
+
+				Stage_StartRecording(client);
 			}
 		}
 		else if (action[0] == 2) // End Zone

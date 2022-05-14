@@ -181,7 +181,6 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 				g_bIgnoreZone[client] = false;
 			}
 
-
 			StartRecording(client);
 			CreateTimer(1.5, CenterMsgTimer, client, TIMER_FLAG_NO_MAPCHANGE);
 
