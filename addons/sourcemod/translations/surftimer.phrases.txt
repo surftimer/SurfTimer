@@ -774,7 +774,7 @@
 	"Commands69"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} You must be in a start zone to use {lightgreen}!startpos"
+		"en"		"{1} You must be in a start/stage start zone to use {lightgreen}!startpos"
 	}
 	"Commands70"
 	{
@@ -855,6 +855,11 @@
 	{
 		"#format"	"{1:s}"
 		"en"		"{1} Please wait 0.1 seconds before using this command again"
+	}
+	"Commands89"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} New stage start position saved"
 	}
 	"BotInUse"
 	{
