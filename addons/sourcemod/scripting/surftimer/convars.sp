@@ -113,7 +113,8 @@ ConVar g_hAllowCheckpointRecreation = null;						// Allows players to recreate c
 ConVar g_iHintsInterval = null;									// Time between two hints. 0 = off
 ConVar g_bHintsRandomOrder = null;								// If hints are in random order
 ConVar g_hOverrideClantag = null;
-bool g_StoppedRecording = false; //THIS VAR ALOWS TO STOP LOOPING THE CALL TOT HE FUNCTION
+bool g_Recording = false; //THIS VAR ALOWS TO STOP LOOPING THE CALL TO THE FUNCTION
+bool g_StageRecording = false; //THIS VAR ALOWS TO STOP LOOPING THE CALL TO THE FUNCTION
 
 void CreateConVars()
 {

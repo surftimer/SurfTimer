@@ -906,7 +906,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		// Make a new stage replay bot?
 		if (GetConVarBool(g_hReplaceReplayTime) && (!g_bStageReplay[stage] || g_fFinalWrcpTime[client] < g_fStageReplayTimes[stage]))
 		{
-			//PrintToConsole(client,"SAVING STAGE RECORD");
+			PrintToConsole(client,"NEW BOT");
 			Stage_SaveRecording(client, stage, g_szFinalWrcpTime[client]);
 		}
 		else
