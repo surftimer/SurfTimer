@@ -3363,9 +3363,9 @@ public void MinimalHudAlive(int client){
 		else
 		{
 			if (g_iCurrentStyle[client] == 0)
-				Format(s_MapPersonalRecord, 64, "PB: %s	", g_szPersonalRecordBonus[g_iClientInZone[client][2]][client]);
+				Format(s_MapPersonalRecord, 64, "PB: %s", g_szPersonalRecordBonus[g_iClientInZone[client][2]][client]);
 			else if (g_iCurrentStyle[client] != 0) // Styles
-				Format(s_MapPersonalRecord, 64, "PB: %s	", g_szStylePersonalRecordBonus[style][g_iClientInZone[client][2]][client]);
+				Format(s_MapPersonalRecord, 64, "PB: %s", g_szStylePersonalRecordBonus[style][g_iClientInZone[client][2]][client]);
 		}
 
 		char final_string[256];
