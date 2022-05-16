@@ -118,6 +118,16 @@ native int surftimer_GetMapData(char[] name, char[] time);
 native void surftimer_GetPlayerData(int& client, char[] time, int& rank, char[] country);
 
 /**
+ * Retrieves the client's current info.
+ *
+ * @param client			The client's ID.
+ * @param iWrcpTimer		Int to store the client's WRCP timer.
+ * @param iPracMode			Int to store the client's Practice mode.
+ * @param iStage			Int to store the client's current stage.
+ */
+native void surftimer_GetPlayerInfo(int& client, int& iWrcpTimer, int& iPracMode, int& iStage);
+
+/**
  * Teleport a client safely, without triggering end touches
  * and sets the client's location correctly.
  *
