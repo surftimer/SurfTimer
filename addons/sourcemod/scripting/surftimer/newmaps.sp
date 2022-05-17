@@ -21,7 +21,40 @@ public Action Client_AddNewMap(int client, int args)
 }
 
 public int NewMapMenuHandler(Menu menu, MenuAction action, int param1, int param2)
-{
+{	
+
+	//ALLOW NOMINATING A MAP FROM NEWMAPS
+	if(action == MenuAction_Select){
+
+		char map[PLATFORM_MAX_PATH], name[MAX_NAME_LENGTH], displayName[PLATFORM_MAX_PATH];
+		menu.GetItem(param2, map, sizeof(map), _, displayName, sizeof(displayName));
+		
+		GetClientName(param1, name, sizeof(name));
+
+		NominateResult result = NominateMap(map, false, param1);
+		
+		/* Don't need to check for InvalidMap because the menu did that already */
+		if (result == Nominate_AlreadyInVote)
+		{
+			CPrintToChat(param1, "%t", "Map Already Nominated", g_szChatPrefix);
+			return 0;
+		}
+		else if (result == Nominate_VoteFull)
+		{
+			CPrintToChat(param1, "%t", "Max Nominations", g_szChatPrefix);
+			return 0;
+		}
+
+		if (result == Nominate_Replaced)
+		{
+			CPrintToChatAll("%t", "Map Nomination Changed", g_szChatPrefix, name, displayName);
+			return 0;	
+		}
+		
+		CPrintToChatAll("%t", "Map Nominated", g_szChatPrefix, name, displayName);
+
+	}
+
 	if (action == MenuAction_End)
 		delete menu;
 
@@ -57,7 +90,7 @@ public void sql_selectNewestMapsCallback(Handle owner, Handle hndl, const char[]
 			SQL_FetchString(hndl, 0, szMapName, 64);
 			SQL_FetchString(hndl, 1, szDate, 64);
 			Format(szItem, sizeof(szItem), "%s since %s", szMapName, szDate);
-			AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+			AddMenuItem(menu, "", szItem, ITEMDRAW_DEFAULT);
 			i++;
 		}
 		if (i == 1)
@@ -76,7 +109,7 @@ public void db_InsertNewestMaps()
 {
 	char sql_insertNewestMaps[] = "INSERT INTO ck_newmaps (mapname) VALUES('%s');";
 	char szQuery[512];
-	Format(szQuery, 512, sql_insertNewestMaps, g_szMapName);
+	Format(szQuery, sizeof(szQuery), sql_insertNewestMaps, g_szMapName);
 	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
 }
 

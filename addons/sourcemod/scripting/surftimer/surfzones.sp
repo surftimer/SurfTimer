@@ -307,12 +307,53 @@ public void StartTouch(int client, int action[3])
 	} */
 
 	if (IsValidClient(client))
-	{
+	{	
 		float fCurrentRunTime = g_fCurrentRunTime[client];
 		float fCurrentWrcpRunTime = g_fCurrentWrcpRunTime[client];
 		float fCurrentPracSrcpRunTime = g_fCurrentPracSrcpRunTime[client];
 		
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0) // fluffys: NoBhop(9), NoCrouch(10)
+
+		//PRINFO
+		if ((action[0] == 1 || action[0] == 2 || action[0] == 3) && (!g_bPracticeMode[client] && !IsFakeClient(client) && g_iCurrentStyle[client] == 0)){
+			
+			//PLAYER ON A RUN
+			if(action[0] == 2 && g_bTimerRunning[client]){
+				g_fCompletes[client][g_iClientInZone[client][2]]++;
+
+				g_fTimeinZone[client][g_iClientInZone[client][2]] += fCurrentRunTime;
+				g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
+
+				if(g_fstComplete[client][g_iClientInZone[client][2]] == 0.0)
+					g_fstComplete[client][g_iClientInZone[client][2]] = g_fTimeinZone[client][g_iClientInZone[client][2]];
+
+				if((g_fPersonalRecord[client] - g_fFinalTime[client]) > 0)
+					db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], g_iClientInZone[client][2], g_fFinalTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
+				else
+					db_UpdatePRinfo(client, g_szSteamID[client], g_iClientInZone[client][2]);
+			}
+			//PLAYER JUST DOING STAGES
+			//else if(action[0] == 3 && (g_bWrcpTimeractivated[client] && !g_bTimerRunning[client] && !g_bInStartZone[client] && !g_bInStageZone[client])){
+			else if(action[0] == 3 && g_bWrcpTimeractivated[client] && !g_bTimerRunning[client]){
+				//g_fTimeinZone[client][g_iClientInZone[client][2]] += g_fTimeIncrement[client][g_iClientInZone[client][2]];
+				g_fTimeinZone[client][g_iClientInZone[client][2]] += fCurrentWrcpRunTime;
+				g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
+			}
+			else if(action[0] == 1){
+				if( g_fTimeIncrement[client][g_iClientInZone[client][2]] != 0.0){
+					g_fTimeinZone[client][g_iClientInZone[client][2]] += g_fTimeIncrement[client][g_iClientInZone[client][2]];
+					g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
+				}
+			}
+
+			/*
+			CPrintToChat(client,"VALUE OF TIME INCR : %f\n", g_fTimeIncrement[client][g_iClientInZone[client][2]]);
+			char szTime[32];
+			FormatTimeFloat(client, g_fTimeIncrement[client][g_iClientInZone[client][2]], 3, szTime, 32);
+			CPrintToChat(client,"VALUE OF TIME INCR (STRING) : %s\n", szTime);
+			*/
+		}
+
 		if (action[0] == 0) // Stop Zone
 		{
 			Client_Stop(client, 1);
@@ -345,10 +386,16 @@ public void StartTouch(int client, int action[3])
 				g_bWrcpTimeractivated[client] = false;
 				g_bPracSrcpTimerActivated[client] = false;
 				g_CurrentStage[client] = 0;
+
 			}
+
+			if(g_aRecording[client] != null){
+				StopRecording(client);
+			}
+
 		}
 		else if (action[0] == 2) // End Zone
-		{
+		{	
 			if (g_iClientInZone[client][2] == action[2]) // Cant end bonus timer in this zone && in the having the same timer on
 			{
 				// fluffys gravity
@@ -457,7 +504,7 @@ public void StartTouch(int client, int action[3])
 				
 				if (g_iCurrentStyle[client] == 0)
 				{
-					Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime);
+					Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime, g_fLastSpeed[client]);
 				}
 				
 				if (!g_bSaveLocTele[client])
@@ -468,6 +515,7 @@ public void StartTouch(int client, int action[3])
 				{
 					lastCheckpoint[g_iClientInZone[client][2]][client] = g_iPlayerPracLocationSnap[client][g_iLastSaveLocIdClient[client]] - 1;
 				}
+
 			}
 			else if (!g_bTimerRunning[client])
 			{
@@ -518,7 +566,7 @@ public void StartTouch(int client, int action[3])
 				// Announcing checkpoint in linear maps
 				if (g_iCurrentStyle[client] == 0)
 				{
-					Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime);
+					Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime, g_fLastSpeed[client]);
 					
 					if (!g_bSaveLocTele[client])
 					{
@@ -583,6 +631,21 @@ public void EndTouch(int client, int action[3])
 		// CPrintToChat(client, "%f %f %f", CurVelVec[0], CurVelVec[1], CurVelVec[2]);
 
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
+
+		//PRINFO
+		if ((action[0] == 1 || action[0] == 3) && (!g_bPracticeMode[client] && !IsFakeClient(client) && IsValidClient(client) && g_iCurrentStyle[client] == 0)){
+			//ONE EXAMPLE
+			//IF THE PLAYER IS DOING ONLY STAGES
+			//IF HE DOESNT FINISH THE STAGE
+			//WE STILL NEED TO ADD THE TIME
+			if( g_fTimeIncrement[client][g_iClientInZone[client][2]] != 0.0){
+				g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
+			}
+			
+			if(action[0] == 1)
+				g_fAttempts[client][g_iClientInZone[client][2]]++;	
+		}
+
 		if (action[0] == 1 || action[0] == 5)
 		{	
 			if (!g_bPracticeMode[client])

@@ -75,10 +75,10 @@ public Action Event_OnFire(Handle event, const char[] name, bool dontBroadcast)
 
 // Player Spawns
 public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
-{
+{	
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if (client != 0)
-	{
+	{	
 		g_SpecTarget[client] = -1;
 		g_bPause[client] = false;
 		g_bFirstTimerStart[client] = true;
@@ -154,6 +154,11 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 
 			return Plugin_Continue;
 		}
+		else{
+			//PRINFO TIME INCREMENT
+			for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++)
+				g_fTimeIncrement[client][zonegroup] = 0.0;
+		}
 
 		// Change Player Skin
 		if (GetConVarBool(g_hPlayerSkinChange) && (GetClientTeam(client) > 1))
@@ -176,11 +181,25 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 				g_bIgnoreZone[client] = false;
 			}
 
-
+			//START RECORDING
 			StartRecording(client);
+			if(g_bhasStages)
+				Stage_StartRecording(client);
+
 			CreateTimer(1.5, CenterMsgTimer, client, TIMER_FLAG_NO_MAPCHANGE);
 
+			//THIS "FIXES" A BUG WHERE THE TIMEINCREMENT WOULD BE CHANGED IN THE BEGINNING FOR FUCK ALL REASON...
+			if(!IsFakeClient(client)){
+				for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++){
+					if(g_fTimeIncrement[client][zonegroup] != 0.0)
+						g_fTimeIncrement[client][zonegroup] = 0.0;
+				}
+			}
+
+			g_iCurrentTick[client] = GetGameTickCount();
+
 			g_bFirstSpawn[client] = false;
+
 		}
 
 		// Get Start Position For Challenge
@@ -374,6 +393,24 @@ public Action Say_Hook(int client, const char[] command, int argc)
 
 					SQL_TQuery(g_hDb, sql_DeleteMenuView, szQuery, GetClientSerial(client));
 				}
+				case ColorValue:
+				{
+					//COLOR VALUE FOR CENTER SPEED
+					int color_value = StringToInt(sText);
+
+					//KEEP VALUES BETWEEN 0-255
+					if(color_value > 255)
+						color_value = 255;
+					else if(color_value < 0)
+						color_value = 0;
+
+					switch(g_iColorChangeIndex[client]){
+						case 0: g_iCSD_R[client] = color_value;
+						case 1: g_iCSD_G[client] = color_value;
+						case 2: g_iCSD_B[client] = color_value;
+					}
+					CSDOptions(client);
+				}
 			}
 
 			g_iWaitingForResponse[client] = None;
@@ -553,11 +590,21 @@ public Action Event_OnPlayerTeam(Handle event, const char[] name, bool dontBroad
 public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontBroadcast)
 {
 	if (GetConVarBool(g_hDisconnectMsg))
-	{
+	{	
 		char szName[64];
 		char disconnectReason[64];
 		int clientid = GetEventInt(event, "userid");
 		int client = GetClientOfUserId(clientid);
+
+		//PRINFO
+		if(IsValidClient(client) && !IsFakeClient(client)){
+			for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++){
+				if(g_fTimeIncrement[client][zonegroup] != 0.0)
+					g_fTimeinZone[client][zonegroup] += g_fTimeIncrement[client][zonegroup];
+				db_UpdatePRinfo(client, g_szSteamID[client], zonegroup);
+			}
+		}
+
 		if (!IsValidClient(client) || IsFakeClient(client))
 			return Plugin_Handled;
 		GetEventString(event, "name", szName, sizeof(szName));
@@ -821,6 +868,30 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	//calling this function here makes it refresh musch faster/smoother
 	CenterSpeedDisplay(client,false);
 
+	//DISPLAY TIMELEFT AT THE BOTTOM OF THE SCREEN
+	//TimeleftText_Display(client);
+	/* 
+	
+	I THINK THIS IS MORE TAXING ON THE SERVER?!
+	PERHAPS
+
+	if(g_bTimeleftDisplay[client]){
+		int time;
+   		char timeleft[32];
+		GetMapTimeLeft(time);
+
+		if (time > 3600)
+				FormatEx(timeleft, sizeof(timeleft), "Timeleft: %ih %02im", time / 3600, (time / 60) % 60);
+		else if (time < 60)
+			FormatEx(timeleft, sizeof(timeleft), "Timeleft: %02is", time);
+		else 
+			FormatEx(timeleft, sizeof(timeleft), "Timeleft: %im %02is", time / 60, time % 60);
+
+		SetHudTextParams(-1.0, 1.0, 1.0, 255, 255, 0, 255, 0, 0.0, 0.0, 0.0);
+		ShowHudText(client, 6, "%s", timeleft);
+	}
+	*/ 
+
 	if (buttons & IN_DUCK && g_bInDuck[client] == true)
 	{
 		CPrintToChat(client, "%t", "Hooks11", g_szChatPrefix);
@@ -983,6 +1054,57 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		else
 		{
 			RecordReplay(client, buttons, subtype, seed, impulse, weapon, angles, vel);
+
+			//IF PLAYER IS IN A STARTZONE/STAGE
+			if((g_bInStartZone[client] || g_bInStageZone[client]) && g_iCurrentStyle[client] == 0){
+
+				int speed = RoundToNearest(g_fLastSpeed[client]);
+
+				//MAP START
+				//IF PLAYER IS IN STARTZONE/STAGESTART , NOT MOVING, NOT ON A RUN AND NOT RECORDING ,WE CAN STOP RECORDING WHEN HE STOPS MOVING
+				if(speed == 0 && g_aRecording[client] != null && !g_bTimerRunning[client] && g_Recording){
+					StopRecording(client);
+				}
+				//IF THE PLAYER IS NOT BEING RECORDED BUT STARTS MOVING AGAIN, START RECORDING PLAYER
+				if(speed > 0 && !g_Recording && !g_bTimerRunning[client]){
+					StopRecording(client);
+					StartRecording(client);
+					if (g_bhasStages)
+					{
+						Stage_StartRecording(client);
+					}
+				}
+
+				//STAGE START
+				//IF THE PLAYER GETS A WRCP DURING A RUN BUT STOPS AT THE STARTZONE WE TRIM THE FRAMES
+				if(speed == 0 && g_aRecording[client] != null && g_bTimerRunning[client] && g_Recording && g_StageRecording && g_bInStageZone[client]){
+					if(g_bhasStages){
+						g_StageRecording = false;
+						//g_iStageStartFrame[client] = g_iRecordedTicks[client];
+					}
+				}
+				if(speed > 0 && g_aRecording[client] != null && g_bTimerRunning[client] && g_Recording && !g_StageRecording && g_bInStageZone[client]){
+					if(g_bhasStages)
+						Stage_StartRecording(client);
+				}
+			}
+
+			//PRINFO
+			if (g_iCurrentStyle[client] == 0 && !g_bPracticeMode[client] && (g_bTimerRunning[client] || g_bWrcpTimeractivated[client])){
+				
+				//char szTime[32];
+				//FormatTimeFloat(client, g_fTimeIncrement[client][g_iClientInZone[client][2]], 3, szTime, 32);
+				//if(g_fTimeIncrement[client][g_iClientInZone[client][2]] != 0.0)
+				//CPrintToChat(client,"VALUE OF TIME INCR (STRING) : %s\n", szTime);
+
+				//PLAYER IS IN A RUN
+				if(g_bTimerRunning[client])
+					g_fTimeIncrement[client][g_iClientInZone[client][2]] = g_fCurrentRunTime[client];
+				//PLAYER IS JUST DOING STAGES
+				//else if(g_bWrcpTimeractivated[client] && !g_bTimerRunning[client] && !g_bInStartZone[client] && !g_bInStageZone[client])
+				else if(g_bWrcpTimeractivated[client])
+					g_fTimeIncrement[client][g_iClientInZone[client][2]] = g_fCurrentWrcpRunTime[client];
+			}
 		}
 
 		// Strafe Sync taken from shavit's bhoptimer
