@@ -10498,10 +10498,10 @@ public void db_PRinfoDoneCallback(any pack){
 	char szItem[256];
 
 	char szTimeinZoneformatted[32];
-	FormatTimeFloat(client, time_in_zone, 2, szTimeinZoneformatted, 32);
+	FormatTimeFloat(client, time_in_zone, 7, szTimeinZoneformatted, 32);
 
 	char szstCompleteFormatted[32];
-	FormatTimeFloat(client, stcomplete, 2, szstCompleteFormatted, 32);
+	FormatTimeFloat(client, stcomplete, 7, szstCompleteFormatted, 32);
 
 	char szruntimeFormatted[32];
 	FormatTimeFloat(client, runtime, 3, szruntimeFormatted, 32);
