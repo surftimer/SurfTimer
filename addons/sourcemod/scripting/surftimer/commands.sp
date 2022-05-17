@@ -245,7 +245,6 @@ public Action Command_CenterSpeed(int client, int args) {
 		g_bCenterSpeedDisplay[client] = true;
 		CPrintToChat(client, "%t", "CenterSpeedOn", g_szChatPrefix);
 	}
-		
 
 	CenterSpeedDisplay(client, false);
 	return Plugin_Handled;
