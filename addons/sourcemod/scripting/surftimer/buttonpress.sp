@@ -80,6 +80,10 @@ public void CL_OnStartTimerPress(int client)
 			for (int i = 0; i < CPLIMIT; i++)
 			g_fCheckpointTimesNew[g_iClientInZone[client][2]][client][i] = 0.0;
 
+			// Reset Stage Times
+			for (int i = 0; i < CPLIMIT; i++)
+				g_fStageTimesNew[g_iClientInZone[client][2]][client][i] = 0.0;
+
 			// Set missed record time variables
 			if (g_iClientInZone[client][2] == 0)
 			{
@@ -862,6 +866,8 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 			CPrintToChat(client, "%t", "ErrorStageTime", g_szChatPrefix, stage);
 			return;
 		}
+
+		g_fStageTimesNew[0][client][g_Stage[0][client]-1] = g_fFinalWrcpTime[client];
 
 		char sz_srDiff[128];
 		float time = g_fFinalWrcpTime[client];

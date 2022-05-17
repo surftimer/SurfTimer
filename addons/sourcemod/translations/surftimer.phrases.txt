@@ -1827,21 +1827,21 @@
 	"CCP_01"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} sm_ccp only works on staged maps."
+		"en"		"{1} sm_ccp only works on staged maps"
 	}
 	"CCP_02"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Map not completed."
+		"en"		"{1} Map not completed"
 	}
 	"CCP_03"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} No completion found for that rank."
+		"en"		"{1} No completion found for that rank"
 	}
 	"CCP_04"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} No map record found."
+		"en"		"{1} No map record found"
 	}
 }
