@@ -238,23 +238,23 @@
 	====================================*/
 	"PracWrcp1"
 	{
-		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s}"
-		"en"		"{1} Stage {2}:{default} {lightgreen}{3} {default}[{4}{default} | {5}{default}]"
+		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s},{6:i}"
+		"en"		"{1} {blue}[Practice]{default} Stage {2}:{default} {lightgreen}{3} {default}[{4}{default} | {5}{default}] {blue}[Rank {6}]"
 	}
 	"PracWrcp2"
 	{
-		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:s}"
-		"en"		"{1} {yellow}{2} {default}| {purple}Stage {3}:{default} {lightgreen}{4} {default}[{5}{default} | {6}{default}]"
+		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:s},{7:i}"
+		"en"		"{1} {blue}[Practice]{default} {yellow}{2} {default}| {purple}Stage {3}:{default} {lightgreen}{4} {default}[{5}{default} | {6}{default}] {blue}[Rank {7}]"
 	}
 	"PracWrcp3"
 	{
-		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s},{6:i},{7:i}"
-		"en"		"{1} Completed {default}Stage {2} {red}{3} {default}in {lightgreen}{4} {5} {default}[Rank: {lightgreen}{6}/{7}{default}]"
+		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s},{6:i},{7:i},{8:i}"
+		"en"		"{1} {blue}[Practice]{default} Completed {default}Stage {2} {red}{3} {default}in {lightgreen}{4} {5} {default}[Rank: {lightgreen}{6}/{7}{default}] {blue}[Rank {8}]"
 	}
 	"PracWrcp4"
 	{
-		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s},{6:i},{7:i}"
-		"en"		"{1} Completed {default}Stage {2} {red}{3} {default}in {lightgreen}{4} {5} {default}[Rank: {lightgreen}{6}/{7}{default}]"
+		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s},{6:i},{7:i},{8:i}"
+		"en"		"{1} {blue}[Practice]{default} Completed {default}Stage {2} {red}{3} {default}in {lightgreen}{4} {5} {default}[Rank: {lightgreen}{6}/{7}{default}] {blue}[Rank {8}]"
 	}
 	/*============END============*/
 	"ReplayFinishingMsg"
@@ -409,13 +409,13 @@
 	}
 	"BPress4"
 	{
-		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {yellow}{2}{default} finished the bonus in [{blue}{3}{default}] in practice mode!"
+		"#format"	"{1:s},{2:s},{3:s},{4:i}"
+		"en"		"{1} {blue}[Practice]{default} finished the bonus in {yellow}{2}{default} [{blue}{3}{default} | {blue}Rank {4}{default}]"
 	}
 	"BPress5"
 	{
-		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {yellow}{2}{default} finished the map in [{blue}{3}{default}] in practice mode!"
+		"#format"	"{1:s},{2:s},{3:s},{4:i}"
+		"en"		"{1} {blue}[Practice]{default} finished the map in {yellow}{2}{default} [{blue}{3}{default} | {blue}Rank {4}{default}]"
 	}
 	"BPress6"
 	{
@@ -591,6 +591,10 @@
 	{
 		"#format"	"{1:s}"
 		"en"		"{1} Usage: !btop <bonus id> <mapname>"
+	}
+	"BonusPRinfoUsage"{
+		"#format"	"{1:s}"
+		"en"		"{1} Usage: !prinfo <mapname> <bonus id> <rank>"
 	}
 	"Commands19"
 	{
@@ -770,7 +774,7 @@
 	"Commands69"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} You must be in a start zone to use {lightgreen}!startpos"
+		"en"		"{1} You must be in a start/stage start zone to use {lightgreen}!startpos"
 	}
 	"Commands70"
 	{
@@ -852,7 +856,11 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Please wait 0.1 seconds before using this command again"
 	}
-
+	"Commands89"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} New stage start position saved"
+	}
 	"BotInUse"
 	{
 		"#format"	"{1:s},{2:s}"
@@ -1338,8 +1346,8 @@
 	}
 	"Misc31"
 	{
-		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:s}"
-		"en"		"{1} {yellow}{2} {default}| CP [{lightgreen}{3}{default}]: {lightgreen}{4} {default}[PB: {5}{default} | {6}{default}]"
+		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:s},{7:s}"
+		"en"		"{1} {yellow}{2} {default}| CP [{lightgreen}{3}{default}]: {lightgreen}{4} {default}[PB: {5}{default} | {6}{default}] \n [{lightgreen}Speed:{default}{6} | SR: {7}{default}]"
 	}
 	"Misc32"
 	{
@@ -1348,8 +1356,8 @@
 	}
 	"Misc33"
 	{
-		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s}"
-		"en"		"{1} {yellow}{2} {default}| CP [{lightgreen}{3}{default}]: {lightgreen}{4} {default}[PB: {lightgreen}N/A{default} | {5}{default}]"
+		"#format"	"{1:s},{2:s},{3:i},{4:s},{5:s},{6:s}"
+		"en"		"{1} {yellow}{2} {default}| CP [{lightgreen}{3}{default}]: {lightgreen}{4} {default}[PB: {lightgreen}N/A{default} | {5}{default}] \n [PB: {lightgreen}N/A{default} | SR: {6}{default}]"
 	}
 	"Misc34"
 	{
@@ -1410,6 +1418,16 @@
 	{
 		"#format"	"{1:s}"
 		"en"		"{1} Report sent - thanks"
+	}
+	"Misc46"
+	{
+		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s}"
+		"en"		"{1} CP [{lightgreen}{2}{default}] {lightgreen}Speed: {default}{3} u/s {default}[PB: {4}{default} | {5}{default}]"
+	}
+	"Misc47"
+	{
+		"#format"	"{1:s},{2:i},{3:s},{4:s}"
+		"en"		"{1} CP [{lightgreen}{2}{default}] {lightgreen}Speed: {default}{3} u/s {default}[PB: {lightgreen}N/A{default} | {4}{default}]"
 	}
 	"SQL1"
 	{
@@ -1736,6 +1754,11 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Your speed gradient is now {yellow}yellow"
 	}
+	"SpeedGradientRainbow"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Your speed gradient is now {yellow}yellow"
+	}
 	"SpeedGradientMomentum"
 	{
 		"#format"	"{1:s}"
@@ -1800,5 +1823,69 @@
 	{
 		"#format"	"{1:s},{2:s}"
 		"en"		"{1} Auto-reset is enabled, but you weren't teleported because you're surfing in {gold}{2}"
+	}
+	"TimeleftOn"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} The timeleft display is now {green}enabled"
+	}
+	"TimeleftOff"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} The timeleft display is now {red}disabled"
+	}
+	"MinimalHUDOn"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} The Minimal HUD is now {green}enabled"
+	}
+	"MinimalHUDOff"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} The Minimal HUD is now {red}disabled"
+	}
+	"CenterHUDOn"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} The Center HUD is now {green}enabled"
+	}
+	"CenterHUDOff"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} The Center HUD is now {red}disabled"
+	}
+	"PRinfo_help_chat"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Open {yellow}console{default} to see the {yellow}formatted{default} options"
+	}
+	"PRinfo_help"
+	{
+		"en"		"FORMATTING OPTIONS FOR COMMAND !prinfo \n!prinfo (with no arguments automatically selects the zone you are in) \n!prinfo <mapname> \n!prinfo <rank> \n!prinfo <bonus number> \n!prinfo <mapname> <rank> OR !prinfo <mapname> <bonus number> \n!prinfo <rank> <mapname> OR !prinfo <rank> <bonus number> \n!prinfo <bonus number> <mapname> OR !prinfo <bonus number> <rank> \n!prinfo <mapname> <rank> OR !prinfo <mapname> <bonus number> \n"
+	}
+	"ColorChangeValue"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Type new value (0 - 255) in the chat, or {darkred}cancel{default} to cancel"
+	}
+	"CCP_01"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} sm_ccp only works on staged maps."
+	}
+	"CCP_02"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Map not completed."
+	}
+	"CCP_03"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} No completion found for that rank."
+	}
+	"CCP_04"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} No map record found."
 	}
 }

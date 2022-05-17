@@ -1,0 +1,1 @@
+ALTER TABLE ck_playeroptions2 ADD minimalhud int(11) NOT NULL DEFAULT '0', ADD minimalgradient int(11) NOT NULL DEFAULT '0', ADD comparePB int(11) NOT NULL DEFAULT '0', ADD compareWR int(11) NOT NULL DEFAULT '0';

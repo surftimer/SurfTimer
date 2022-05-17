@@ -40,6 +40,8 @@ void CreateCommands()
 	RegConsoleCmd("+noclip", NoClip, "[surftimer] Player noclip on");
 	RegConsoleCmd("-noclip", UnNoClip, "[surftimer] Player noclip off");
 	RegConsoleCmd("sm_nc", Command_ckNoClip, "[surftimer] Player noclip on/off");
+	RegConsoleCmd("sm_rl", Client_RecentlyLost, "[surftimer] Player Recently Lost Times");
+	RegConsoleCmd("sm_track", Client_Tracking, "[surftimer] Player Recent Time Changes");
 
 	// Teleportation Commands
 	RegConsoleCmd("sm_stages", Command_SelectStage, "[surftimer] Opens up the stage selector");
@@ -94,6 +96,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_refreshprofile", Admin_RefreshProfile, "[surftimer] Recalculates player profile for given steam id");
 	RegConsoleCmd("sm_clearassists", Admin_ClearAssists, "[surftimer] Clears assist points (map progress) from all players");// reload map
 	RegConsoleCmd("sm_refreshranks", Admin_RefreshPlayerRankTable, "[surftimer] Refresh player rank table");
+	RegConsoleCmd("sm_ave", Command_VoteExtend,"[surftimer] Admin vote to extend the map");
 
 	// Zoning/Mapsetting Commands
 	RegConsoleCmd("sm_zones", Command_Zones, "[surftimer] [zoner] Opens up the zone creation menu.");
@@ -124,7 +127,6 @@ void CreateCommands()
 	RegConsoleCmd("sm_customtitle", Command_SetDbTitle, "[surftimer] [vip] VIPs can set their own custom title into a db");
 	RegConsoleCmd("sm_namecolour", Command_SetDbNameColour, "[surftimer] [vip] VIPs can set their own custom name colour into the db");
 	RegConsoleCmd("sm_textcolour", Command_SetDbTextColour, "[surftimer] [vip] VIPs can set their own custom text colour into the db");
-	RegConsoleCmd("sm_ve", Command_VoteExtend, "[surftimer] [vip] Vote to extend the map");
 	RegConsoleCmd("sm_colours", Command_ListColours, "[surftimer] Lists available colours for sm_mytitle and sm_namecolour");
 	RegConsoleCmd("sm_colors", Command_ListColours, "[surftimer] Lists available colours for sm_mytitle and sm_namecolour");
 	RegConsoleCmd("sm_toggletitle", Command_ToggleTitle, "[surftimer] [vip] VIPs can toggle their title.");
@@ -152,6 +154,10 @@ void CreateCommands()
 	RegConsoleCmd("sm_bhoptimer", Client_OptionMenu, "[surftimer] opens options menu");
 	RegConsoleCmd("sm_knife", Command_GiveKnife, "[surftimer] Give players a knife");
 	RegConsoleCmd("sm_csd", Command_CenterSpeed, "[surftimer] [settings] on/off - toggle center speed display");
+	RegConsoleCmd("sm_timeleft", Command_Timeleft, "[surftimer] Display Timeleft on bottom of screen");
+	RegConsoleCmd("sm_mhud", Command_MinimalHUD, "[surftimer] Use Minimal HUD");
+	RegConsoleCmd("sm_chud", Command_CentreSpeedHud, "[surftimer] Use Center HUD");
+	RegConsoleCmd("sm_prinfo_help", Command_PRinfo_help, "[surftimer] Show in console how to use the command");
 
 	// New Commands
 	RegConsoleCmd("sm_mrank", Command_SelectMapTime, "[surftimer] prints a players map record in chat.");
@@ -178,10 +184,16 @@ void CreateCommands()
 
 	// !Startpos -- Goose
 	RegConsoleCmd("sm_startpos", Command_Startpos, "[surftimer] Saves current location as new !r spawn.");
+	RegConsoleCmd("sm_sp", Command_Startpos, "[surftimer] Saves current location as new !r spawn.");
 	RegConsoleCmd("sm_resetstartpos", Command_ResetStartpos, "[surftimer] Removes custom !r spawn.");
+	RegConsoleCmd("sm_rsp", Command_ResetStartpos, "[surftimer] Removes custom !r spawn.");
 
 	// CPR
 	RegConsoleCmd("sm_cpr", Command_CPR, "[surftimer] Compare clients time to another clients time");
+	RegConsoleCmd("sm_prinfo", Command_PRinfo, "[surftimer] Information about personal info on a map");
+
+	//CCP
+	RegConsoleCmd("sm_ccp", Command_CCP, "[surftimer] Information about checkpoints info on a map");
 
 	// reload map
 	RegAdminCmd("sm_rm", Command_ReloadMap, ADMFLAG_ROOT, "[surftimer] Reloads the current map");
@@ -212,6 +224,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_nctriggers", Command_ToggleNcTriggers, "[surftimer] [settings] on/off - toggle triggers while noclipping");
 	RegConsoleCmd("sm_autoreset", Command_ToggleAutoReset, "[surftimer] [settings] on/off - toggle auto reset for your current map/bonus run if your above your pb");
 
+
 }
 
 public Action Command_ToggleAutoReset(int client, int args) {
@@ -237,6 +250,7 @@ public Action Command_ToggleNcTriggers(int client, int args) {
 }
 
 public Action Command_CenterSpeed(int client, int args) {
+
 	if (g_bCenterSpeedDisplay[client]){
 		g_bCenterSpeedDisplay[client] = false;
 		CPrintToChat(client, "%t", "CenterSpeedOff", g_szChatPrefix);
@@ -245,7 +259,7 @@ public Action Command_CenterSpeed(int client, int args) {
 		g_bCenterSpeedDisplay[client] = true;
 		CPrintToChat(client, "%t", "CenterSpeedOn", g_szChatPrefix);
 	}
-
+  
 	CenterSpeedDisplay(client, false);
 	return Plugin_Handled;
 }
@@ -365,6 +379,66 @@ public Action Command_ToggleHints(int client, int args)
 		CPrintToChat(client, "%t", "HintsToggleOn", g_szChatPrefix);
 	}
 	return Plugin_Handled;
+}
+
+public Action Command_Timeleft(int client, int args){
+
+	if(g_bTimeleftDisplay[client]){
+		g_bTimeleftDisplay[client] = false;
+		CPrintToChat(client, "%t", "TimeleftOff", g_szChatPrefix);
+	}
+	else{
+		g_bTimeleftDisplay[client] = true;
+		CPrintToChat(client, "%t", "TimeleftOn", g_szChatPrefix);
+	}
+
+	return Plugin_Handled;
+
+}
+
+public Action Command_MinimalHUD(int client, int args){
+
+	if(g_bMinimalHUD[client]){
+		g_bMinimalHUD[client] = false;
+		CPrintToChat(client, "%t", "MinimalHUDOff", g_szChatPrefix);
+	}
+	else{
+		g_bMinimalHUD[client] = true;
+		if(g_bCentreHud[client])
+			g_bCentreHud[client] = false;
+
+		CPrintToChat(client, "%t", "MinimalHUDOn", g_szChatPrefix);
+	}
+
+	return Plugin_Handled;
+
+}
+
+public Action Command_CentreSpeedHud(int client, int args){
+
+	g_bCentreHud[client] = !g_bCentreHud[client];
+
+	if(g_bCentreHud[client]){
+		if(g_bMinimalHUD[client])
+			g_bMinimalHUD[client] = false;
+		CPrintToChat(client, "%t", "CenterHUDOn", g_szChatPrefix);
+	}
+	else
+		CPrintToChat(client, "%t", "CenterHUDOff", g_szChatPrefix);
+
+	return Plugin_Handled;
+
+}
+
+public Action Command_PRinfo_help(int client, int args){
+
+	if(IsValidClient(client)){
+		PrintToConsole(client, "%t", "PRinfo_help");
+		CPrintToChat(client, "%t", "PRinfo_help_chat", g_szChatPrefix);
+	}
+
+	return Plugin_Handled;
+
 }
 
 public Action Command_DeleteRecords(int client, int args)
@@ -533,10 +607,12 @@ public int CustomTitleMenuHandler(Handle menu, MenuAction action, int param1, in
 
 public Action Command_VoteExtend(int client, int args)
 {
-	if (!IsValidClient(client) || !IsPlayerVip(client))
+	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	VoteExtend(client);
+	if (IsPlayerTimerAdmin(client))
+		VoteExtend(client);
+
 	return Plugin_Handled;
 }
 
@@ -544,12 +620,6 @@ public void VoteExtend(int client)
 {
 	int timeleft;
 	GetMapTimeLeft(timeleft);
-
-	if (timeleft > 300)
-	{
-		CPrintToChat(client, "%t", "Commands4", g_szChatPrefix);
-		return;
-	}
 
 	if (IsVoteInProgress())
 	{
@@ -2226,7 +2296,51 @@ void SpeedGradient(int client, bool menu = false)
 		g_SpeedGradient[client] = 0;
 
 	if (menu)
-		MiscellaneousOptions(client);
+		CSDOptions(client);
+}
+
+void MinimalHUD(int client, bool menu = false)
+{
+	g_bMinimalHUD[client] = !g_bMinimalHUD[client];
+
+	if(g_bMinimalHUD[client] && g_bCentreHud[client])
+		g_bCentreHud[client] = false;
+	
+	if (menu)
+		MinimalHUDOptions(client);
+}
+
+void MinimalHUDSpeedGradient(int client, bool menu = false)
+{
+	if (g_MinimalHUDSpeedGradient[client] != 4)
+		g_MinimalHUDSpeedGradient[client]++;
+	else
+		g_MinimalHUDSpeedGradient[client] = 0;
+
+	if (menu)
+		MinimalHUDOptions(client);
+}
+
+void MinimalHUDSetComparisons(int client, bool menu = false)
+{
+	if(g_iMinimalHUD_CompareType[client] != 8)
+		g_iMinimalHUD_CompareType[client]++;
+	else
+		g_iMinimalHUD_CompareType[client] = 1;
+
+	/*
+	if (g_bMinimalHUD_CompareWR[client]){
+		g_bMinimalHUD_CompareWR[client] = !g_bMinimalHUD_CompareWR[client];
+		g_bMinimalHUD_ComparePB[client] = true;
+	}
+	else if(g_bMinimalHUD_ComparePB[client]){
+		g_bMinimalHUD_ComparePB[client] = !g_bMinimalHUD_ComparePB[client];
+		g_bMinimalHUD_CompareWR[client] = true;
+	}
+	*/
+
+	if (menu)
+		MinimalHUDOptions(client);
 }
 
 void SpeedMode(int client, bool menu = false)
@@ -2237,7 +2351,88 @@ void SpeedMode(int client, bool menu = false)
 		g_SpeedMode[client] = 0;
 	
 	if (menu)
-		MiscellaneousOptions(client);
+		CSDOptions(client);
+}
+
+void CSD_PosX(int client, bool menu = false)
+{
+	if (g_fCSD_POS_X[client] < 1.0){
+		g_fCSD_POS_X[client] += 0.1;
+	}
+	else
+		g_fCSD_POS_X[client] = 0.0;
+
+	if (menu)
+		CSDOptions(client);
+}
+
+void CSD_PosY(int client, bool menu = false)
+{
+	
+	if (g_fCSD_POS_Y[client] < 1.0)
+		g_fCSD_POS_Y[client] += 0.1;
+	else
+		g_fCSD_POS_Y[client] = 0.0;
+
+	if (menu)
+		CSDOptions(client);
+}
+
+void CSD_R(int client, bool menu = false)
+{
+	
+	ChangeColor(client, 0, menu);
+
+	/*
+	if (g_iCSD_R[client] < 255)
+		g_iCSD_R[client] += 1;
+	else
+		g_iCSD_R[client] = 0;
+	*/
+}
+
+void CSD_G(int client, bool menu = false)
+{
+	ChangeColor(client, 1, menu);
+
+	/*
+	if (g_iCSD_G[client] < 255)
+		g_iCSD_G[client] += 1;
+	else
+		g_iCSD_G[client] = 0;
+	*/
+
+}
+
+void CSD_B(int client, bool menu = false)
+{
+	ChangeColor(client, 2, menu);
+	
+	/*
+	if (g_iCSD_B[client] < 255)
+		g_iCSD_B[client] += 1;
+	else
+		g_iCSD_B[client] = 0;
+	*/
+}
+
+public void ChangeColor(int client, int color_index, bool menu)
+{
+	g_iColorChangeIndex[client] = color_index;
+	CPrintToChat(client, "%t", "ColorChangeValue", g_szChatPrefix);
+	g_iWaitingForResponse[client] = ColorValue;
+	
+}
+
+void CSDUpdateRate(int client, bool menu = false)
+{
+	if (g_iCSDUpdateRate[client] != 2)
+		g_iCSDUpdateRate[client]++;
+	else
+		g_iCSDUpdateRate[client] = 0;
+
+	if (menu)
+		CSDOptions(client);
 }
 
 void CenterSpeedDisplay(int client, bool menu = false)
@@ -2246,10 +2441,31 @@ void CenterSpeedDisplay(int client, bool menu = false)
 	if(menu)
 		g_bCenterSpeedDisplay[client] = !g_bCenterSpeedDisplay[client];
 
-	if (g_bCenterSpeedDisplay[client])
+	//THE LOWER THE NUMBER THE FASTER THE UPDATING IS
+	int update_rate;
+	switch(g_iCSDUpdateRate[client]){
+		case 0: update_rate = 15;
+		case 1:	update_rate = 10;
+		case 2: update_rate = 5;
+		default: update_rate = 15;
+	}
+
+	float fCSD_PosX;
+	float fCSD_PosY;
+	switch(g_fCSD_POS_X[client]){
+		case 0.5: fCSD_PosX = -1.0;
+		default: fCSD_PosX = g_fCSD_POS_X[client];
+	}
+	switch(g_fCSD_POS_Y[client]){
+		case 0.5: fCSD_PosY = -1.0;
+		default: fCSD_PosY = g_fCSD_POS_Y[client];
+	}
+	
+	if(GetGameTickCount() - g_iCurrentTick[client] >= update_rate)
 	{
+		g_iCurrentTick[client] += update_rate;
 		if (IsValidClient(client) && !IsFakeClient(client) && g_bCenterSpeedDisplay[client])
-		{	
+		{
 
 			char szSpeed[128];
 			int displayColor[3];
@@ -2257,14 +2473,18 @@ void CenterSpeedDisplay(int client, bool menu = false)
 			// player alive
 			if (IsPlayerAlive(client))
 			{	
-				
-				displayColor = GetSpeedColourCSD(client, RoundToNearest(g_fLastSpeed[client]), g_SpeedGradient[client]);
 
-				SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
+				if(g_SpeedGradient[client] != 5)
+					displayColor = GetSpeedColourCSD(client, RoundToNearest(g_fLastSpeed[client]), g_SpeedGradient[client]);
+				else{
+					displayColor[0] = g_iCSD_R[client];
+					displayColor[1] = g_iCSD_G[client];
+					displayColor[2] = g_iCSD_B[client];
+				}
+
+				SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate/g_fTickrate, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
 
 				Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
-
-
 			}
 			// player not alive (check wether spec'ing a bot or another player)
 			else {
@@ -2312,18 +2532,32 @@ void CenterSpeedDisplay(int client, bool menu = false)
 								}
 							}
 
-							displayColor = GetSpeedColourCSD(client, RoundToNearest(fSpeedHUD), g_SpeedGradient[client]);
+              if(g_SpeedGradient[client] != 6)
+								displayColor = GetSpeedColourCSD(client, RoundToNearest(fSpeedHUD), g_SpeedGradient[client]);
+							else{
+								displayColor[0] = g_iCSD_R[client];
+								displayColor[1] = g_iCSD_G[client];
+								displayColor[2] = g_iCSD_B[client];
+							}
 
-							SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
+							SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate/g_fTickrate, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+
 
 							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(fSpeedHUD));
 						}
 						// spec'ing player
 						else {
-							
-							displayColor = GetSpeedColourCSD(client, RoundToNearest(g_fLastSpeed[ObservedUser]), g_SpeedGradient[client]);
 
-							SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
+							if(g_SpeedGradient[client] != 6)
+								displayColor = GetSpeedColourCSD(client, RoundToNearest(g_fLastSpeed[ObservedUser]), g_SpeedGradient[client]);
+							else{
+								displayColor[0] = g_iCSD_R[client];
+								displayColor[1] = g_iCSD_G[client];
+								displayColor[2] = g_iCSD_B[client];
+							}
+
+							SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate/g_fTickrate, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+
 
 							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[ObservedUser]));
 						}
@@ -2331,12 +2565,12 @@ void CenterSpeedDisplay(int client, bool menu = false)
 				}
 			}
 
-			ShowHudText(client, 2,szSpeed);
+			ShowHudText(client, 1, szSpeed);
 		}
 	}
 
 	if (menu)
-		MiscellaneousOptions(client);
+		CSDOptions(client);
 }
 
 void TeleSide(int client, bool menu = false)
@@ -2366,6 +2600,14 @@ void HintsText(int client, bool menu = false)
 		MiscellaneousOptions(client);
 }
 
+void TimeleftText(int client, bool menu = false)
+{	
+	g_bTimeleftDisplay[client] = !g_bTimeleftDisplay[client];
+
+	if (menu)
+		MiscellaneousOptions(client);
+}
+
 public Action Client_Hide(int client, int args)
 {
 	HideMethod(client);
@@ -2386,6 +2628,18 @@ void HideMethod(int client, bool menu = false)
 public Action Client_Latest(int client, int args)
 {
 	db_ViewLatestRecords(client);
+	return Plugin_Handled;
+}
+
+public Action Client_RecentlyLost(int client, int args)
+{
+	db_ViewRecentlyLost(client);
+	return Plugin_Handled;
+}
+
+public Action Client_Tracking(int client, int args)
+{
+	db_ViewTracking(client);
 	return Plugin_Handled;
 }
 
@@ -3068,6 +3322,8 @@ public void OptionMenu(int client)
 
 	AddMenuItem(optionmenu, "CentreHud", "Centre Hud Options");
 	AddMenuItem(optionmenu, "SideHud", "Side Hud Options");
+	AddMenuItem(optionmenu, "MinimalHUD", "Minimal Hud Options\n \n");
+	AddMenuItem(optionmenu, "CSDOptions", "Center Speed Options\n \n");
 	AddMenuItem(optionmenu, "Miscellaneous", "Miscellaneous Options");
 
 	SetMenuOptionFlags(optionmenu, MENUFLAG_BUTTON_EXIT);
@@ -3087,7 +3343,9 @@ public int OptionMenuHandler(Menu menu, MenuAction action, int param1, int param
 			}
 			case 1: CentreHudOptions(param1, 0);
 			case 2: SideHudOptions(param1, 0);
-			case 3: MiscellaneousOptions(param1);
+			case 3: MinimalHUDOptions(param1);
+			case 4: CSDOptions(param1);
+			case 5: MiscellaneousOptions(param1);
 		}
 	}
 	else if (action == MenuAction_End)
@@ -3134,6 +3392,8 @@ public int CentreHudOptionsHandler(Menu menu, MenuAction action, int param1, int
 		if (param2 == 0)
 		{
 			g_bCentreHud[param1] = !g_bCentreHud[param1];
+			if(g_bCentreHud[param1])
+				g_bMinimalHUD[param1] = false;
 			CentreHudOptions(param1, 0);
 		}
 		else if (param2 == 1)
@@ -3442,35 +3702,7 @@ public void MiscellaneousOptions(int client)
 		AddMenuItem(menu, "", "[LEFT] Start Side");
 	else
 		AddMenuItem(menu, "", "[RIGHT] Start Side");
-
-	// Speed Gradient
-	if (g_SpeedGradient[client] == 0)
-		AddMenuItem(menu, "", "[WHITE] Speed Gradient");
-	else if (g_SpeedGradient[client] == 1)
-		AddMenuItem(menu, "", "[RED] Speed Gradient");
-	else if (g_SpeedGradient[client] == 2)
-		AddMenuItem(menu, "", "[GREEN] Speed Gradient");
-	else if (g_SpeedGradient[client] == 3)
-		AddMenuItem(menu, "", "[BLUE] Speed Gradient");
-	else if (g_SpeedGradient[client] == 4)
-		AddMenuItem(menu, "", "[YELLOW] Speed Gradient");
-	else
-		AddMenuItem(menu, "", "[MOMENTUM] Speed Gradient");
-	
-	// Speed Mode
-	if (g_SpeedMode[client] == 0)
-		AddMenuItem(menu, "", "[XY] Speed Mode");
-	else if (g_SpeedMode[client] == 1)
-		AddMenuItem(menu, "", "[XYZ] Speed Mode");
-	else
-		AddMenuItem(menu, "", "[Z] Speed Mode");
-
-	// Centre Speed Display
-	if (g_bCenterSpeedDisplay[client])
-		AddMenuItem(menu, "", "[ON] Centre Speed Display");
-	else
-		AddMenuItem(menu, "", "[OFF] Centre Speed Display");
-
+    
 	// Hide Chat
 	if (g_bHideChat[client])
 		AddMenuItem(menu, "", "[ON] Hide Chat");
@@ -3495,6 +3727,12 @@ public void MiscellaneousOptions(int client)
 	else
 		AddMenuItem(menu, "", "[OFF] Hints");
 	
+	// Show timeleft bottom screen
+	if (g_bTimeleftDisplay[client])
+		AddMenuItem(menu, "", "[ON] Timeleft");
+	else
+		AddMenuItem(menu, "", "[OFF] Timeleft");
+	
 	SetMenuExitBackButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
 }
@@ -3508,13 +3746,168 @@ public int MiscellaneousOptionsHandler(Menu menu, MenuAction action, int param1,
 			case 0: HideMethod(param1, true);
 			case 1: QuakeSounds(param1, true);
 			case 2: TeleSide(param1, true);
-			case 3: SpeedGradient(param1, true);
-			case 4: SpeedMode(param1, true);
-			case 5: CenterSpeedDisplay(param1, true);
-			case 6: HideChat(param1, true);
-			case 7: HideViewModel(param1, true);
-			case 8: PrespeedText(param1, true);
-			case 9: HintsText(param1, true);
+			case 3: HideChat(param1, true);
+			case 4: HideViewModel(param1, true);
+			case 5: PrespeedText(param1, true);
+			case 6: HintsText(param1, true);
+			case 7: TimeleftText(param1, true);
+		}
+	}
+	else if (action == MenuAction_Cancel)
+		OptionMenu(param1);
+	else if (action == MenuAction_End)
+		delete menu;
+
+	return 0;
+}
+
+public void MinimalHUDOptions(int client)
+{
+	Menu menu = CreateMenu(MinimalHUDOptionsHandler);
+	SetMenuTitle(menu, "Minimal HUD - Settings \n \n");
+
+	//COMPARISON MODE
+	if (g_bMinimalHUD[client])
+		AddMenuItem(menu, "", "[ON] Show HUD");
+	else
+		AddMenuItem(menu, "", "[OFF] Sow HUD");
+
+	// Speed Gradient
+	if (g_MinimalHUDSpeedGradient[client] == 0)
+		AddMenuItem(menu, "", "[WHITE] Speed Gradient");
+	else if (g_MinimalHUDSpeedGradient[client] == 1)
+		AddMenuItem(menu, "", "[RED] Speed Gradient");
+	else if (g_MinimalHUDSpeedGradient[client] == 2)
+		AddMenuItem(menu, "", "[GREEN] Speed Gradient");
+	else if (g_MinimalHUDSpeedGradient[client] == 3)
+		AddMenuItem(menu, "", "[BLUE] Speed Gradient");
+	else
+		AddMenuItem(menu, "", "[YELLOW] Speed Gradient");
+	
+	//COMPARISON MODE
+	if (g_iMinimalHUD_CompareType[client] == 1)
+		AddMenuItem(menu, "", "Compare To : [PB]");
+	else if(g_iMinimalHUD_CompareType[client] == 2)
+		AddMenuItem(menu, "", "Compare To : [WR]");
+	else if(g_iMinimalHUD_CompareType[client] == 3)
+		AddMenuItem(menu, "", "Compare To : [TOP 10]");
+	else if(g_iMinimalHUD_CompareType[client] == 4)
+		AddMenuItem(menu, "", "Compare To : [G1]");
+	else if(g_iMinimalHUD_CompareType[client] == 5)
+		AddMenuItem(menu, "", "Compare To : [G2]");
+	else if(g_iMinimalHUD_CompareType[client] == 6)
+		AddMenuItem(menu, "", "Compare To : [G3]");
+	else if(g_iMinimalHUD_CompareType[client] == 7)
+		AddMenuItem(menu, "", "Compare To : [G4]");
+	else if(g_iMinimalHUD_CompareType[client] == 8)
+		AddMenuItem(menu, "", "Compare To : [G5]");
+	
+	SetMenuExitBackButton(menu, true);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+public int MinimalHUDOptionsHandler(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		switch (param2)
+		{	
+			case 0: MinimalHUD(param1, true);
+			case 1: MinimalHUDSpeedGradient(param1, true);
+			case 2: MinimalHUDSetComparisons(param1, true);
+		}
+	}
+	else if (action == MenuAction_Cancel)
+		OptionMenu(param1);
+	else if (action == MenuAction_End)
+		delete menu;
+
+	return 0;
+}
+
+public void CSDOptions(int client)
+{
+	Menu menu = CreateMenu(CSDOptionsHandler);
+	SetMenuTitle(menu, "Center Speed Options Menu\n \n");
+
+	// Centre Speed Display
+	if (g_bCenterSpeedDisplay[client])
+		AddMenuItem(menu, "", "[ON] Centre Speed Display");
+	else
+		AddMenuItem(menu, "", "[OFF] Centre Speed Display");
+
+	// Speed Mode
+	if (g_SpeedMode[client] == 0)
+		AddMenuItem(menu, "", "[XY] Speed Mode");
+	else if (g_SpeedMode[client] == 1)
+		AddMenuItem(menu, "", "[XYZ] Speed Mode");
+	else
+		AddMenuItem(menu, "", "[Z] Speed Mode");
+
+	//CENTER SPEED POSITIONS
+	char Display_String[256];
+	//POS X
+	Format(Display_String, 256, "Position X : %f", g_fCSD_POS_X[client]);
+	AddMenuItem(menu, "", Display_String);
+	//POX Y
+	Format(Display_String, 256, "Position Y : %f", g_fCSD_POS_Y[client]);
+	AddMenuItem(menu, "", Display_String);
+
+	// Speed Gradient
+	if (g_SpeedGradient[client] == 0)
+		AddMenuItem(menu, "", "[WHITE] Speed Gradient");
+	else if (g_SpeedGradient[client] == 1)
+		AddMenuItem(menu, "", "[RED] Speed Gradient");
+	else if (g_SpeedGradient[client] == 2)
+		AddMenuItem(menu, "", "[GREEN] Speed Gradient");
+	else if (g_SpeedGradient[client] == 3)
+		AddMenuItem(menu, "", "[BLUE] Speed Gradient");
+	else if (g_SpeedGradient[client] == 4)
+		AddMenuItem(menu, "", "[YELLOW] Speed Gradient");
+	else if(g_SpeedGradient[client] == 5)
+		AddMenuItem(menu, "", "[MOMENTUM] Speed Gradient");
+	else
+		AddMenuItem(menu, "", "[Custom] Speed Gradient");
+
+	//CENTER SPEED CUSTOM VALUES
+	char Display_String_Custom[256];
+	//RED
+	Format(Display_String_Custom, 256, "[R] : %i", g_iCSD_R[client]);
+	AddMenuItem(menu, "", Display_String_Custom);
+	//GREEN
+	Format(Display_String_Custom, 256, "[G] : %i", g_iCSD_G[client]);
+	AddMenuItem(menu, "", Display_String_Custom);
+	//BLUE
+	Format(Display_String_Custom, 256, "[B] : %i", g_iCSD_B[client]);
+	AddMenuItem(menu, "", Display_String_Custom);
+
+	//CSD Update Rate
+	if (g_iCSDUpdateRate[client] == 0)
+		AddMenuItem(menu, "", "[SLOW] CSD Update Rate");
+	else if (g_iCSDUpdateRate[client] == 1)
+		AddMenuItem(menu, "", "[MEDIUM] CSD Update Rate");
+	else
+		AddMenuItem(menu, "", "[FAST] CSD Update Rate");
+	
+	SetMenuExitBackButton(menu, true);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+public int CSDOptionsHandler(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		switch (param2)
+		{	
+			case 0: CenterSpeedDisplay(param1, true);
+			case 1: SpeedMode(param1, true);
+			case 2: CSD_PosX(param1, true);
+			case 3: CSD_PosY(param1, true);
+			case 4: SpeedGradient(param1, true);
+			case 5: CSD_R(param1, true);
+			case 6: CSD_G(param1, true);
+			case 7: CSD_B(param1, true);
+			case 8: CSDUpdateRate(param1, true);
 		}
 	}
 	else if (action == MenuAction_Cancel)
@@ -4351,9 +4744,12 @@ public Action Command_SelectBonusTime(int client, int args)
 
 // Show Triggers https://forums.alliedmods.net/showthread.php?t=290356
 public Action Command_ToggleTriggers(int client, int args)
-{
+{	
+	//ALLOW EVERY PLAYER TO USE SM_TRIGGERS
+	/*
 	if (!IsPlayerVip(client))
 		return Plugin_Handled;
+	*/
 
 	g_bShowTriggers[client] = !g_bShowTriggers[client];
 
@@ -4971,7 +5367,13 @@ public Action Command_ResetStartpos(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	g_bStartposUsed[client][g_iClientInZone[client][2]] = false;
+	if(g_iClientInZone[client][0] == 3){
+		if(g_bStageStartposUsed[client][g_iClientInZone[client][1]])
+			g_bStageStartposUsed[client][g_iClientInZone[client][1]] = false;
+	}
+	else
+		g_bStartposUsed[client][g_iClientInZone[client][2]] = false;
+
 	CReplyToCommand(client, "%t", "Commands83", g_szChatPrefix);
 
 	return Plugin_Handled;
@@ -4979,12 +5381,20 @@ public Action Command_ResetStartpos(int client, int args)
 
 public void Startpos(int client)
 {
-	if (IsPlayerAlive(client) && g_iClientInZone[client][0] == 1 && GetEntityFlags(client) & FL_ONGROUND)
-	{
+
+	if (IsPlayerAlive(client) && g_iClientInZone[client][0] == 1 && GetEntityFlags(client) & FL_ONGROUND)//MAP START
+	{	
 		GetClientAbsOrigin(client, g_fStartposLocation[client][g_iClientInZone[client][2]]);
 		GetClientEyeAngles(client, g_fStartposAngle[client][g_iClientInZone[client][2]]);
 		g_bStartposUsed[client][g_iClientInZone[client][2]] = true;
 		CPrintToChat(client, "%t", "Commands68", g_szChatPrefix);
+	}
+	else if(IsPlayerAlive(client) && g_iClientInZone[client][0] == 3 && GetEntityFlags(client) & FL_ONGROUND)//STAGE START
+	{
+		GetClientAbsOrigin(client, g_fStageStartposLocation[client][g_iClientInZone[client][1]]);
+		GetClientEyeAngles(client, g_fStageStartposAngle[client][g_iClientInZone[client][1]]);
+		g_bStageStartposUsed[client][g_iClientInZone[client][1]] = true;
+		CPrintToChat(client, "%t", "Commands89", g_szChatPrefix);
 	}
 	else
 	{
@@ -5045,6 +5455,213 @@ public Action Command_CPR(int client, int args)
 			}
 			if (!found)
 				CReplyToCommand(client, "%t", "Commands85", g_szChatPrefix);
+		}
+	}
+
+	return Plugin_Handled;
+}
+
+public Action Command_PRinfo(int client, int args)
+{
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+
+	switch(args){
+		//WORKS
+		//prinfo (in map zone) || (in bonus zone)
+		case 0:{
+			if(g_iClientInZone[client][2] == 0)
+				db_selectPRinfoUnknown(client, g_MapRank[client], 0, g_szSteamID[client]);
+			else
+				db_selectPRinfoUnknown(client, g_MapRankBonus[g_iClientInZone[client][2]][client], g_iClientInZone[client][2], g_szSteamID[client]);
+		}
+		//WORKS
+		//prinfo <mapname>
+		//prinfo <rank>
+		//prinfo <bonus number>
+		case 1:{
+			char arg1[128];
+			GetCmdArg(1, arg1, sizeof(arg1));
+
+			if (StrContains(arg1, "surf_", true) != -1)
+			{
+				db_viewPRinfoMapRank(client, g_szSteamID[client], arg1);
+			}
+			else if (StrContains(arg1, "@") != -1)
+			{
+				ReplaceString(arg1, 128, "@", "");
+				int rank = StringToInt(arg1);
+
+				//db_selectPRinfoUnknownWithMap(client, rank, g_szMapName, 0);
+
+				if(g_iClientInZone[client][2] == 0)
+					db_GetRankSteamID(client, g_szMapName, rank, 0);
+				else
+					db_GetRankSteamID(client, g_szMapName , rank, g_iClientInZone[client][2]);
+
+			}
+			else if (StrContains(arg1, "b") != -1)
+			{
+				ReplaceString(arg1, 128, "b", "");
+				int bonus_number = StringToInt(arg1);
+
+				if (0 < bonus_number < MAXZONEGROUPS)
+					db_selectPRinfoUnknown(client, g_MapRankBonus[bonus_number][client], bonus_number, g_szSteamID[client]);
+				else
+					CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, bonus_number);
+			}
+		}
+		//WORKS
+		
+		case 2:{
+			char arg1[128];
+			char arg2[128];
+			GetCmdArg(1, arg1, sizeof(arg1));
+			GetCmdArg(2, arg2, sizeof(arg2));
+
+			if (StrContains(arg1, "surf_", true) != -1)
+			{	
+				if (StrContains(arg2, "@") != -1){
+					ReplaceString(arg2, 128, "@", "");
+					int rank = StringToInt(arg2);
+					db_GetRankSteamID(client, arg1, rank, 0);
+					//db_selectPRinfoUnknownWithMap(client, rank, arg1, 0);
+				}
+				else if(StrContains(arg2, "b") != -1){
+					ReplaceString(arg2, 128, "b", "");
+					int bonus_number = StringToInt(arg2);
+
+					if (0 < bonus_number < MAXZONEGROUPS)
+						db_viewPRinfoMapRankBonus(client, g_szSteamID[client], arg1, bonus_number);
+					else
+						CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, bonus_number);
+				}
+			}
+			else if (StrContains(arg1, "@") != -1)
+			{
+				if (StrContains(arg2, "surf_") != -1){
+					ReplaceString(arg1, 128, "@", "");
+					int rank = StringToInt(arg1);
+
+					//db_selectPRinfoUnknownWithMap(client, rank, arg2, 0);
+					db_GetRankSteamID(client, arg2, rank, 0);
+				}
+				else if(StrContains(arg2, "b") != -1){
+					ReplaceString(arg1, 128, "@", "");
+					int rank = StringToInt(arg1);
+
+					ReplaceString(arg2, 128, "b", "");
+					int bonus_number = StringToInt(arg2);
+
+					if (0 < bonus_number < MAXZONEGROUPS)
+						db_GetRankSteamID(client, g_szMapName, rank, bonus_number);
+						//db_selectPRinfoUnknown(client, rank, bonus_number);
+					else
+						CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, bonus_number);
+
+				}
+			}
+			else if (StrContains(arg1, "b") != -1)
+			{	
+				if (StrContains(arg2, "surf_") != -1){
+					ReplaceString(arg1, 128, "b", "");
+					int bonus_number = StringToInt(arg1);
+
+					if (0 < bonus_number < MAXZONEGROUPS)
+						db_viewPRinfoMapRankBonus(client, g_szSteamID[client], arg2, bonus_number);
+					else
+						CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, bonus_number);
+				}
+				else if(StrContains(arg2, "@") != -1){
+					ReplaceString(arg1, 128, "b", "");
+					int bonus_number = StringToInt(arg1);
+
+					ReplaceString(arg2, 128, "@", "");
+					int rank = StringToInt(arg2);
+
+					if (0 < bonus_number < MAXZONEGROUPS)
+						db_GetRankSteamID(client, g_szMapName, rank, bonus_number);
+						//db_selectPRinfoUnknown(client, rank, bonus_number);
+					else
+						CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, bonus_number);
+				}
+			}
+		}
+		//WORKS
+		//prinfo <mapname> <bonus number> <rank>
+		case 3:{
+			char arg1[128];
+			char arg2[128];
+			char arg3[128];
+
+			GetCmdArg(1, arg1, sizeof(arg1));
+			GetCmdArg(2, arg2, sizeof(arg2));
+			GetCmdArg(3, arg3, sizeof(arg3));
+
+			if( (StrContains(arg1, "surf_") != -1) && (StrContains(arg2, "b") != -1) && (StrContains(arg3, "@") != -1)){
+
+				ReplaceString(arg2, 128, "b", "");
+				int bonus_number = StringToInt(arg2);
+
+				ReplaceString(arg3, 128, "@", "");
+				int rank = StringToInt(arg3);
+
+				if (0 < bonus_number < MAXZONEGROUPS)
+					db_GetRankSteamID(client, arg1, rank, bonus_number-1);
+					//db_selectPRinfoUnknownWithMap(client, rank, arg1, bonus_number);
+				else
+					CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, bonus_number);
+
+			}
+			else{
+				CPrintToChat(client, "%t", "BonusPRinfoUsage", g_szChatPrefix);
+			}
+		}
+		default:{
+			CPrintToChat(client, "DEFAULT");
+			db_selectPRinfoUnknownWithMap(client, g_MapRank[client], g_szMapName, 0, g_szSteamID[client]);
+		}
+	}
+
+	return Plugin_Handled;
+}
+
+public Action Command_CCP(int client, int args)
+{
+
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+	
+	//CCP MENU
+	ccp_menu = new Menu(CCPMenuHandler);
+
+	switch(args){
+		case 0:{
+			if(g_bhasStages)
+				db_viewCCP_GetMapRank(client, g_szSteamID[client], g_szMapName);
+			else
+				CPrintToChat(client, "%t", "CCP_01", g_szChatPrefix);
+		}
+		//TODO CCP FOR OTHERMAPS AND RANKS
+		case 1:{
+			char arg1[32];
+			GetCmdArg(1, arg1, sizeof(arg1));
+
+			if (StrContains(arg1, "surf_", true) != -1)
+			{	
+				isLinear(client, g_szSteamID[client], arg1);
+			}
+			else if (StrContains(arg1, "@") != -1)
+			{
+				ReplaceString(arg1, 32, "@", "");
+				int rank = StringToInt(arg1);
+
+				if(g_bhasStages)
+					db_viewCCP_WithMapRank(client, g_szSteamID[client], g_szMapName, rank);
+				else
+					CPrintToChat(client, "%t", "CCP_01", g_szChatPrefix);
+
+			}
 		}
 	}
 

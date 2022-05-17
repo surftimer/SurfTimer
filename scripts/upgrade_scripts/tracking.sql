@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS ck_track (steamid VARCHAR(32), name VARCHAR(32), mapname VARCHAR(32), zonegroup INT(12) NOT NULL DEFAULT '0', previous_rank INT(12) NOT NULL DEFAULT '0', new_rank INT(12) NOT NULL DEFAULT '0', RegDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(steamid, mapname, zonegroup)) DEFAULT CHARSET=utf8mb4;";

@@ -133,15 +133,15 @@ public int Native_GetMapData(Handle plugin, int numParams)
 
 public int Native_GetPlayerData(Handle plugin, int numParams)
 {
-	int client = GetNativeCell(1);
+	int client = GetNativeCellRef(1);
 	int rank = 99999;
 	if (IsValidClient(client) && !IsFakeClient(client))
 	{
 		char szTime[64], szCountry[16];
 
-		GetNativeString(1, szTime, 64);
-		rank = GetNativeCell(2);
-		GetNativeString(3, szCountry, 16);
+		GetNativeString(2, szTime, 64);
+		rank = GetNativeCellRef(3);
+		GetNativeString(4, szCountry, 16);
 
 		if (g_fPersonalRecord[client] > 0.0)
 			Format(szTime, 64, "%s", g_szPersonalRecord[client]);
@@ -153,6 +153,7 @@ public int Native_GetPlayerData(Handle plugin, int numParams)
 		rank = g_MapRank[client];
 
 		SetNativeString(2, szTime, sizeof(szTime), true);
+		SetNativeCellRef(3, rank);
 		SetNativeString(4, szCountry, sizeof(szCountry), true);
 	}
 
@@ -206,7 +207,8 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 void Register_Forwards()
 {
 	g_MapFinishForward = new GlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell);
-	g_MapCheckpointForward = new GlobalForward("surftimer_OnCheckpoint", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String);
+	//g_MapCheckpointForward = new GlobalForward("surftimer_OnCheckpoint", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String, Param_String, Param_String);
+	g_MapCheckpointForward = new GlobalForward("surftimer_OnCheckpoint", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String);
 	g_BonusFinishForward = new GlobalForward("surftimer_OnBonusFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell, Param_Cell);
 	g_PracticeFinishForward = new GlobalForward("surftimer_OnPracticeFinished", ET_Event, Param_Cell, Param_Float, Param_String);
 	g_NewRecordForward = new GlobalForward("surftimer_OnNewRecord", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
@@ -251,9 +253,13 @@ void SendMapCheckpointForward(
 	int zonegroup, 
 	int zone, 
 	float time, 
+	float speed, 
 	const char[] szTime, 
+	const char[] szSpeed, 
 	const char[] szDiff_colorless, 
-	const char[] sz_srDiff_colorless)
+	const char[] sz_srDiff_colorless,
+	const char[] sz_SpeedDiff_colorless,
+	const char[] sz_srSpeedDiff_colorless)
 {
 	// Checkpoint forward
 	Call_StartForward(g_MapCheckpointForward);
@@ -266,6 +272,12 @@ void SendMapCheckpointForward(
 	Call_PushString(szDiff_colorless);
 	Call_PushFloat(g_fCheckpointServerRecord[zonegroup][zone]);
 	Call_PushString(sz_srDiff_colorless);
+	Call_PushFloat(speed);
+	Call_PushString(szSpeed);
+	Call_PushFloat(g_fCheckpointSpeedsRecord[zonegroup][client][zone]);
+	Call_PushString(sz_SpeedDiff_colorless);
+	Call_PushFloat(g_fCheckpointSpeedServerRecord[zonegroup][zone]);
+	Call_PushString(sz_srSpeedDiff_colorless);
 
 	/* Finish the call, get the result */
 	Call_Finish();
