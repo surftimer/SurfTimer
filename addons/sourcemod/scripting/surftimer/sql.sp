@@ -5627,7 +5627,7 @@ public void db_viewPlayerOptionsCallback(Handle owner, Handle hndl, const char[]
 		g_bViewModel[client] = true;
 		g_bAutoBhopClient[client] = true;
 		g_bCheckpointsEnabled[client] = true;
-		g_SpeedGradient[client] = 3;
+		g_SpeedGradient[client] = 0;
 		g_SpeedMode[client] = 0;
 		g_bCenterSpeedDisplay[client] = false;
 		g_bCentreHud[client] = true;
