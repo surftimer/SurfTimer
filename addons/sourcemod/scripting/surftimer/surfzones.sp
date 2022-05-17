@@ -327,10 +327,31 @@ public void StartTouch(int client, int action[3])
 				if(g_fstComplete[client][g_iClientInZone[client][2]] == 0.0)
 					g_fstComplete[client][g_iClientInZone[client][2]] = g_fTimeinZone[client][g_iClientInZone[client][2]];
 
-				if((g_fPersonalRecord[client] - g_fFinalTime[client]) > 0)
-					db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], g_iClientInZone[client][2], g_fFinalTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
+				//END ZONE OF MAP
+				if(g_iClientInZone[client][2] == 0)
+					//PLAYER ALREADY HAS A COMPLETION
+					if( g_fPersonalRecord[client] > 0.0 )
+						//IMPROVES COMPLETION
+						if((g_fPersonalRecord[client] - g_fFinalTime[client]) > 0)
+							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], g_iClientInZone[client][2], g_fFinalTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
+						else
+							db_UpdatePRinfo(client, g_szSteamID[client], g_iClientInZone[client][2]); //UPDATE THE PLAYERS PRINFO EXECPT FOR THE RUNTIME
+					//PLAYER FINISHES FOR THE 1ST TIME
+					else
+						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], g_iClientInZone[client][2], g_fFinalTime[client]);
+				//ENDZONE OF BONUS
 				else
-					db_UpdatePRinfo(client, g_szSteamID[client], g_iClientInZone[client][2]);
+					//PLAYER ALREADY HAS A COMPLETION
+					if(g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0)
+						//IMPROVES COMPLETION
+						if((g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] - g_fFinalTime[client]) > 0)
+							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], g_iClientInZone[client][2], g_fFinalTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
+						else
+							db_UpdatePRinfo(client, g_szSteamID[client], g_iClientInZone[client][2]); //UPDATE THE PLAYERS PRINFO EXECPT FOR THE RUNTIME
+					//PLAYER FINISHES FOR THE 1ST TIME
+					else
+						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], g_iClientInZone[client][2], g_fFinalTime[client]);
+
 			}
 			//PLAYER JUST DOING STAGES
 			//else if(action[0] == 3 && (g_bWrcpTimeractivated[client] && !g_bTimerRunning[client] && !g_bInStartZone[client] && !g_bInStageZone[client])){
