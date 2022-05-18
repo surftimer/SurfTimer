@@ -317,40 +317,42 @@ public void StartTouch(int client, int action[3])
 		//PRINFO
 		if ((action[0] == 1 || action[0] == 2 || action[0] == 3) && (!g_bPracticeMode[client] && !IsFakeClient(client) && g_iCurrentStyle[client] == 0)){
 			
+			int zGroup = g_iClientInZone[client][2]; //ease of use 
+
 			//PLAYER ON A RUN
 			if(action[0] == 2 && g_bTimerRunning[client]){
-				g_fCompletes[client][g_iClientInZone[client][2]]++;
+				g_fCompletes[client][zGroup]++;
 
-				g_fTimeinZone[client][g_iClientInZone[client][2]] += fCurrentRunTime;
-				g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
+				g_fTimeinZone[client][zGroup] += fCurrentRunTime;
+				g_fTimeIncrement[client][zGroup] = 0.0;
 
-				if(g_fstComplete[client][g_iClientInZone[client][2]] == 0.0)
-					g_fstComplete[client][g_iClientInZone[client][2]] = g_fTimeinZone[client][g_iClientInZone[client][2]];
+				if(g_fstComplete[client][zGroup] == 0.0)
+					g_fstComplete[client][zGroup] = g_fTimeinZone[client][zGroup];
 
 				//END ZONE OF MAP
-				if(g_iClientInZone[client][2] == 0)
+				if(zGroup == 0)
 					//PLAYER ALREADY HAS A COMPLETION
 					if( g_fPersonalRecord[client] > 0.0 )
 						//IMPROVES COMPLETION
-						if((g_fPersonalRecord[client] - g_fFinalTime[client]) > 0)
-							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], g_iClientInZone[client][2], g_fFinalTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
+						if(g_fCurrentRunTime[client] < g_fPersonalRecord[client])
+							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fFinalTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
 						else
-							db_UpdatePRinfo(client, g_szSteamID[client], g_iClientInZone[client][2]); //UPDATE THE PLAYERS PRINFO EXECPT FOR THE RUNTIME
+							db_UpdatePRinfo(client, g_szSteamID[client], zGroup); //UPDATE THE PLAYERS PRINFO EXECPT FOR THE RUNTIME
 					//PLAYER FINISHES FOR THE 1ST TIME
 					else
-						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], g_iClientInZone[client][2], g_fFinalTime[client]);
+						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fFinalTime[client]);
 				//ENDZONE OF BONUS
 				else
 					//PLAYER ALREADY HAS A COMPLETION
-					if(g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0)
+					if(g_fPersonalRecordBonus[zGroup][client] > 0)
 						//IMPROVES COMPLETION
-						if((g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] - g_fFinalTime[client]) > 0)
-							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], g_iClientInZone[client][2], g_fFinalTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
+						if (g_fCurrentRunTime[client] < g_fPersonalRecordBonus[zGroup][client])
+							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fFinalTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
 						else
-							db_UpdatePRinfo(client, g_szSteamID[client], g_iClientInZone[client][2]); //UPDATE THE PLAYERS PRINFO EXECPT FOR THE RUNTIME
+							db_UpdatePRinfo(client, g_szSteamID[client], zGroup); //UPDATE THE PLAYERS PRINFO EXECPT FOR THE RUNTIME
 					//PLAYER FINISHES FOR THE 1ST TIME
 					else
-						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], g_iClientInZone[client][2], g_fFinalTime[client]);
+						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fFinalTime[client]);
 
 			}
 			//PLAYER JUST DOING STAGES
