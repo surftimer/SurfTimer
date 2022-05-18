@@ -11183,7 +11183,7 @@ public void SQL_viewCCP_GetMapStageRankCallback(Handle owner, Handle hndl, const
 
 		int stage_rank = SQL_FetchInt(hndl, 0);
 
-		db_viewCCP_GetMapStageRankTotal(client, szMapName, map_rank, total_map_completions, szMapTimeFormatted, szMapTimeDiffFormatted, stage, stage_rank, szStageTimeFormatted);
+		db_viewCCP_GetMapStageRankTotal(client, szMapName, map_rank, total_map_completions, szMapTimeFormatted, szMapTimeDiffFormatted, stage, stage_rank+1, szStageTimeFormatted);
 
 	}
 
