@@ -366,8 +366,8 @@ public Action Command_ToggleHints(int client, int args)
 public Action Command_PRinfo_help(int client, int args){
 
 	if(IsValidClient(client)){
-		PrintToConsole(client, "%t", "PRinfo_help");
-		CPrintToChat(client, "%t", "PRinfo_help_chat", g_szChatPrefix);
+		PrintToConsole(client, "%T", "PRinfo_help");
+		CPrintToChat(client, "%T", "PRinfo_help_chat", g_szChatPrefix);
 	}
 
 	return Plugin_Handled;
@@ -4995,9 +4995,9 @@ public Action Command_PRinfo(int client, int args)
 			{
 				db_viewPRinfoMapRank(client, g_szSteamID[client], arg1);
 			}
-			else if (StrContains(arg1, "@") != -1)
+			else if (arg1[0] == '@')
 			{
-				ReplaceString(arg1, 128, "@", "");
+				ReplaceString(arg1, sizeof(arg1), "@", "");
 				int rank = StringToInt(arg1);
 
 				//db_selectPRinfoUnknownWithMap(client, rank, g_szMapName, 0);
@@ -5008,9 +5008,9 @@ public Action Command_PRinfo(int client, int args)
 					db_GetRankSteamID(client, g_szMapName , rank, g_iClientInZone[client][2]);
 
 			}
-			else if (StrContains(arg1, "b") != -1)
+			else if (arg1[0] == 'b')
 			{
-				ReplaceString(arg1, 128, "b", "");
+				ReplaceString(arg1, sizeof(arg1), "b", "");
 				int bonus_number = StringToInt(arg1);
 
 				if (0 < bonus_number < MAXZONEGROUPS)
@@ -5030,13 +5030,13 @@ public Action Command_PRinfo(int client, int args)
 			if (StrContains(arg1, "surf_", true) != -1)
 			{	
 				if (StrContains(arg2, "@") != -1){
-					ReplaceString(arg2, 128, "@", "");
+					ReplaceString(arg2, sizeof(arg2), "@", "");
 					int rank = StringToInt(arg2);
 					db_GetRankSteamID(client, arg1, rank, 0);
 					//db_selectPRinfoUnknownWithMap(client, rank, arg1, 0);
 				}
-				else if(StrContains(arg2, "b") != -1){
-					ReplaceString(arg2, 128, "b", "");
+				else if(arg2[0] == 'b'){
+					ReplaceString(arg2, sizeof(arg2), "b", "");
 					int bonus_number = StringToInt(arg2);
 
 					if (0 < bonus_number < MAXZONEGROUPS)
@@ -5045,17 +5045,17 @@ public Action Command_PRinfo(int client, int args)
 						CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, bonus_number);
 				}
 			}
-			else if (StrContains(arg1, "@") != -1)
+			else if (arg1[0] == '@')
 			{
 				if (StrContains(arg2, "surf_") != -1){
-					ReplaceString(arg1, 128, "@", "");
+					ReplaceString(arg1, sizeof(arg1), "@", "");
 					int rank = StringToInt(arg1);
 
 					//db_selectPRinfoUnknownWithMap(client, rank, arg2, 0);
 					db_GetRankSteamID(client, arg2, rank, 0);
 				}
 				else if(StrContains(arg2, "b") != -1){
-					ReplaceString(arg1, 128, "@", "");
+					ReplaceString(arg1, sizeof(arg2), "@", "");
 					int rank = StringToInt(arg1);
 
 					ReplaceString(arg2, 128, "b", "");
@@ -5069,10 +5069,10 @@ public Action Command_PRinfo(int client, int args)
 
 				}
 			}
-			else if (StrContains(arg1, "b") != -1)
+			else if (arg1[0] == 'b')
 			{	
 				if (StrContains(arg2, "surf_") != -1){
-					ReplaceString(arg1, 128, "b", "");
+					ReplaceString(arg1, sizeof(arg1), "b", "");
 					int bonus_number = StringToInt(arg1);
 
 					if (0 < bonus_number < MAXZONEGROUPS)
@@ -5081,10 +5081,10 @@ public Action Command_PRinfo(int client, int args)
 						CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, bonus_number);
 				}
 				else if(StrContains(arg2, "@") != -1){
-					ReplaceString(arg1, 128, "b", "");
+					ReplaceString(arg1, sizeof(arg2), "b", "");
 					int bonus_number = StringToInt(arg1);
 
-					ReplaceString(arg2, 128, "@", "");
+					ReplaceString(arg2, sizeof(arg2), "@", "");
 					int rank = StringToInt(arg2);
 
 					if (0 < bonus_number < MAXZONEGROUPS)
@@ -5106,12 +5106,12 @@ public Action Command_PRinfo(int client, int args)
 			GetCmdArg(2, arg2, sizeof(arg2));
 			GetCmdArg(3, arg3, sizeof(arg3));
 
-			if( (StrContains(arg1, "surf_") != -1) && (StrContains(arg2, "b") != -1) && (StrContains(arg3, "@") != -1)){
+			if( (StrContains(arg1, "surf_") != -1) && (arg2[0] == 'b') && (arg3[0] == '@')){
 
-				ReplaceString(arg2, 128, "b", "");
+				ReplaceString(arg2, sizeof(arg2), "b", "");
 				int bonus_number = StringToInt(arg2);
 
-				ReplaceString(arg3, 128, "@", "");
+				ReplaceString(arg3, sizeof(arg3), "@", "");
 				int rank = StringToInt(arg3);
 
 				if (0 < bonus_number < MAXZONEGROUPS)
