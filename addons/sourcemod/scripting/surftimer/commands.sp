@@ -5055,10 +5055,10 @@ public Action Command_PRinfo(int client, int args)
 					db_GetRankSteamID(client, arg2, rank, 0);
 				}
 				else if(StrContains(arg2, "b") != -1){
-					ReplaceString(arg1, sizeof(arg2), "@", "");
+					ReplaceString(arg1, sizeof(arg1), "@", "");
 					int rank = StringToInt(arg1);
 
-					ReplaceString(arg2, 128, "b", "");
+					ReplaceString(arg2, sizeof(arg2), "b", "");
 					int bonus_number = StringToInt(arg2);
 
 					if (0 < bonus_number < MAXZONEGROUPS)
@@ -5081,7 +5081,7 @@ public Action Command_PRinfo(int client, int args)
 						CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, bonus_number);
 				}
 				else if(StrContains(arg2, "@") != -1){
-					ReplaceString(arg1, sizeof(arg2), "b", "");
+					ReplaceString(arg1, sizeof(arg1), "b", "");
 					int bonus_number = StringToInt(arg1);
 
 					ReplaceString(arg2, sizeof(arg2), "@", "");
