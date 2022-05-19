@@ -170,6 +170,7 @@ public int Native_GetPlayerInfo(Handle plugin, int numParams)
 		SetNativeCellRef(2, g_bWrcpTimeractivated[client]);
 		SetNativeCellRef(3, g_bPracticeMode[client]);
 		SetNativeCellRef(4, iStage);
+		SetNativeCellRef(5, g_iInBonus[client]);
 	}
 
 	return iStage;
