@@ -366,8 +366,8 @@ public Action Command_ToggleHints(int client, int args)
 public Action Command_PRinfo_help(int client, int args){
 
 	if(IsValidClient(client)){
-		PrintToConsole(client, "%T", "PRinfo_help");
-		CPrintToChat(client, "%T", "PRinfo_help_chat", g_szChatPrefix);
+		PrintToConsole(client, "%T", "PRinfo_help", client);
+		CPrintToChat(client, "%T", "PRinfo_help_chat", g_szChatPrefix, client);
 	}
 
 	return Plugin_Handled;
