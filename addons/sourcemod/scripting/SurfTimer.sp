@@ -1939,6 +1939,7 @@ public void OnClientConnected(int client)
 	g_Stage[0][client] = 1;
 	g_bWrcpTimeractivated[client] = false;
 	g_CurrentStage[client] = 1;
+	g_iInBonus[client] = 0;
 }
 
 public void OnClientPutInServer(int client)

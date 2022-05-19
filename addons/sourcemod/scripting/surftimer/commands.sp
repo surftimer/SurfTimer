@@ -1185,7 +1185,8 @@ public Action Command_ToBonus(int client, int args)
 		zoneGrp = 1;
 
 	g_bInBonus[client] = true;
-	g_iInBonus[client] = zoneGrp;
+	if (g_mapZoneGroupCount > zoneGrp)
+		g_iInBonus[client] = zoneGrp;
 	teleportClient(client, zoneGrp, 1, true);
 	return Plugin_Handled;
 }

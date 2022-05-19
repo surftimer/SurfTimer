@@ -124,8 +124,9 @@ native void surftimer_GetPlayerData(int& client, char[] time, int& rank, char[] 
  * @param iWrcpTimer		Int to store the client's WRCP timer.
  * @param iPracMode			Int to store the client's Practice mode.
  * @param iStage			Int to store the client's current stage.
+ * @param iBonus			Int to store the client's current bonus.
  */
-native void surftimer_GetPlayerInfo(int& client, int& iWrcpTimer, int& iPracMode, int& iStage);
+native void surftimer_GetPlayerInfo(int& client, int& iWrcpTimer, int& iPracMode, int& iStage, int& iBonus);
 
 /**
  * Teleport a client safely, without triggering end touches
