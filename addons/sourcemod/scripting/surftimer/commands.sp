@@ -2392,7 +2392,13 @@ void CenterSpeedDisplay(int client, bool menu = false)
 							float fSpeed[3];
 							GetEntPropVector(ObservedUser, Prop_Data, "m_vecVelocity", fSpeed);
 
-							float fSpeedHUD = SquareRoot(Pow(fSpeed[0], 2.0) + Pow(fSpeed[1], 2.0));
+							float fSpeedHUD;
+							if(g_SpeedMode[client] == 0) //XY
+								fSpeedHUD = SquareRoot(Pow(fSpeed[0], 2.0) + Pow(fSpeed[1], 2.0));
+							else if(g_SpeedMode[client] == 1) //XYZ
+								fSpeedHUD = SquareRoot(Pow(fSpeed[0], 2.0) + Pow(fSpeed[1], 2.0) + Pow(fSpeed[2], 2.0));
+							else if(g_SpeedMode[client] == 2) //Z
+								fSpeedHUD = SquareRoot(Pow(fSpeed[2], 2.0));
 
 							if (ObservedUser == g_RecordBot)
 							{
