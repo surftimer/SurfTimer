@@ -3195,8 +3195,13 @@ public void CenterHudDead(int client)
 			{
 				float fSpeed[3];
 				GetEntPropVector(ObservedUser, Prop_Data, "m_vecVelocity", fSpeed);
-
-				float fSpeedHUD = SquareRoot(Pow(fSpeed[0], 2.0) + Pow(fSpeed[1], 2.0));
+				float fSpeedHUD;
+				if(g_SpeedMode[client] == 0) //XY
+					fSpeedHUD = SquareRoot(Pow(fSpeed[0], 2.0) + Pow(fSpeed[1], 2.0));
+				else if(g_SpeedMode[client] == 1) //XYZ
+					fSpeedHUD = SquareRoot(Pow(fSpeed[0], 2.0) + Pow(fSpeed[1], 2.0) + Pow(fSpeed[2], 2.0));
+				else if(g_SpeedMode[client] == 2) //Z
+					fSpeedHUD = SquareRoot(Pow(fSpeed[2], 2.0));
 
 				if (ObservedUser == g_RecordBot)
 				{
@@ -4179,86 +4184,86 @@ public void GetSpeedColour(int client, int speed, int type)
 	if (g_fMaxVelocity == 10000.0)
 	{	
 		// RED
-		if (type == 1 && g_SpeedMode[client] == 0) 
+		if (type == 1) 
 		{
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#f00");
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#f00");
 		}
 		// GREEN
-		else if (type == 2 && g_SpeedMode[client] == 0)
+		else if (type == 2)
 		{
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#0f0");
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#0f0");
 		}
 		// BLUE
-		else if (type == 3 && g_SpeedMode[client] == 0) 
+		else if (type == 3) 
 		{
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#00f");
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#00f");
 		}
 		// YELLOW
-		else if (type == 4 && g_SpeedMode[client] == 0) 
+		else if (type == 4) 
 		{
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#ff0");
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#ff0");
 		}
 		//MOMENTUM
-		else if (type == 5 && g_SpeedMode[client] == 0) 
+		else if (type == 5) 
 		{
 			if (speed >= GetConVarInt(g_hMaxVelocity))
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#fff");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#fff");
 			//gaining speed or mainting
 			else if (g_iPreviousSpeed[client] < speed || (g_iPreviousSpeed[client] == speed && speed != 0) )
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#0f0");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#0f0");
 			//losing speed
 			else if (g_iPreviousSpeed[client] > speed )
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#f00");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#f00");
 			//not moving (speed == 0)
 			else
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#fff");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#fff");
 
 			g_iPreviousSpeed[client] = speed;
 		}
 		else
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#fff");
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#fff");
 	}
 	else
 	{
 		// RED
-		if (type == 1 && g_SpeedMode[client] == 0) 
+		if (type == 1) 
 		{
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#f00");
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#f00");
 		}
 		// GREEN
-		else if (type == 2 && g_SpeedMode[client] == 0)
+		else if (type == 2)
 		{
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#0f0");
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#0f0");
 		}
 		// BLUE
-		else if (type == 3 && g_SpeedMode[client] == 0) 
+		else if (type == 3) 
 		{
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#00f");
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#00f");
 		}
 		// YELLOW
-		else if (type == 4 && g_SpeedMode[client] == 0) 
+		else if (type == 4) 
 		{
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#ff0");
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#ff0");
 		}
 		//MOMENTUM
-		else if (type == 5 && g_SpeedMode[client] == 0) 
+		else if (type == 5) 
 		{
 			if (speed >= GetConVarInt(g_hMaxVelocity))
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#fff");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#fff");
 			//gaining speed or mainting
 			else if (g_iPreviousSpeed[client] < speed || (g_iPreviousSpeed[client] == speed && speed != 0) )
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#0f0");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#0f0");
 			//losing speed
 			else if (g_iPreviousSpeed[client] > speed )
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#f00");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#f00");
 			//not moving (speed == 0)
 			else
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#fff");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#fff");
 
 			g_iPreviousSpeed[client] = speed;
 		}
 		else
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour[]), "#fff");
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#fff");
 	}
 }
 
@@ -4268,31 +4273,31 @@ int[] GetSpeedColourCSD(int client, int speed, int type)
 	if (g_fMaxVelocity == 10000.0)
 	{	
 		// RED
-		if (type == 1 && g_SpeedMode[client] == 0) // green
+		if (type == 1) // green
 		{
 			displayColor = {255,0,0};
 			return displayColor;
 		}
 		// GREEN
-		else if (type == 2 && g_SpeedMode[client] == 0)
+		else if (type == 2)
 		{
 			displayColor = {0,255,0};
 			return displayColor;
 		}
 		// BLUE
-		else if (type == 3 && g_SpeedMode[client] == 0)
+		else if (type == 3)
 		{
 			displayColor = {0,0,255};
 			return displayColor;
 		}
 		// YELLOW
-		else if (type == 4 && g_SpeedMode[client] == 0)
+		else if (type == 4)
 		{
 			displayColor = {255,255,0};
 			return displayColor;
 		}
 		//MOMENTUM
-		else if (type == 5 && g_SpeedMode[client] == 0)
+		else if (type == 5)
 		{
 			if (speed >= GetConVarInt(g_hMaxVelocity))
 				displayColor = {0,255,0}; //GREEN
@@ -4315,31 +4320,31 @@ int[] GetSpeedColourCSD(int client, int speed, int type)
 	else
 	{
 		// RED
-		if (type == 1 && g_SpeedMode[client] == 0) // green
+		if (type == 1) // green
 		{
 			displayColor = {255,0,0};
 			return displayColor;
 		}
 		// GREEN
-		else if (type == 2 && g_SpeedMode[client] == 0)
+		else if (type == 2)
 		{
 			displayColor = {0,255,0};
 			return displayColor;
 		}
 		// BLUE
-		else if (type == 3 && g_SpeedMode[client] == 0)
+		else if (type == 3)
 		{
 			displayColor = {0,0,255};
 			return displayColor;
 		}
 		// YELLOW
-		else if (type == 4 && g_SpeedMode[client] == 0)
+		else if (type == 4)
 		{
 			displayColor = {255,255,0};
 			return displayColor;
 		}
 		//MOMENTUM
-		else if (type == 5 && g_SpeedMode[client] == 0)
+		else if (type == 5)
 		{
 			if (speed >= GetConVarInt(g_hMaxVelocity))
 				displayColor = {0,255,0}; //GREEN
