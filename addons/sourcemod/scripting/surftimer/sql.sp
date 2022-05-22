@@ -3585,8 +3585,10 @@ public void db_prinforuntimecallback(Handle owner, Handle hndl, const char[] err
 
 		float runtime = SQL_FetchFloat(hndl, 0);
 
-		char szName[32];
-		GetClientName(client, szName, sizeof(szName));
+		// Escape name for SQL injection protection
+		char szName[MAX_NAME_LENGTH * 2 + 1], szUName[MAX_NAME_LENGTH];
+		GetClientName(client, szUName, MAX_NAME_LENGTH);
+		SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH);
 
 		char szQuery[1024];
 		Format(szQuery, 1024, sql_insertPR, szSteamID, szName, szMapName, runtime, 0, 0.0, 0.0, 0.0, 0.0);
@@ -3594,8 +3596,11 @@ public void db_prinforuntimecallback(Handle owner, Handle hndl, const char[] err
 	}
 	else{
 
-		char szName[32];
-		GetClientName(client, szName, sizeof(szName));
+		// Escape name for SQL injection protection
+		char szName[MAX_NAME_LENGTH * 2 + 1], szUName[MAX_NAME_LENGTH];
+		GetClientName(client, szUName, MAX_NAME_LENGTH);
+		SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH);
+
 
 		char szQuery[1024];
 		Format(szQuery, 1024, sql_insertPR, szSteamID, szName, szMapName, 0.0, 0, 0.0, 0.0, 0.0, 0.0);
@@ -3756,8 +3761,10 @@ public void db_bonusprinforuntimecallback(Handle owner, Handle hndl, const char[
 		float runtime;
 		int zonegroup;
 
-		char szName[32];
-		GetClientName(client, szName, sizeof(szName));
+		// Escape name for SQL injection protection
+		char szName[MAX_NAME_LENGTH * 2 + 1], szUName[MAX_NAME_LENGTH];
+		GetClientName(client, szUName, MAX_NAME_LENGTH);
+		SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH);
 		
 		char szQuery[1024];
 		runtime = SQL_FetchFloat(hndl, 0);
@@ -3770,8 +3777,10 @@ public void db_bonusprinforuntimecallback(Handle owner, Handle hndl, const char[
 	else{
 		//PrintToConsole(client,"NEW ENTRY");
 
-		char szName[32];
-		GetClientName(client, szName, sizeof(szName));
+		// Escape name for SQL injection protection
+		char szName[MAX_NAME_LENGTH * 2 + 1], szUName[MAX_NAME_LENGTH];
+		GetClientName(client, szUName, MAX_NAME_LENGTH);
+		SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH);
 
 		int zonegroup = ReadPackCell(pack);
 
