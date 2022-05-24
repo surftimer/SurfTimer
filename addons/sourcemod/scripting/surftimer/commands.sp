@@ -2279,50 +2279,14 @@ void CSD_PosY(int client, bool menu = false)
 		CSDOptions(client);
 }
 
-void CSD_R(int client, bool menu = false)
-{
-	
-	ChangeColor(client, 0, menu);
-
-	/*
-	if (g_iCSD_R[client] < 255)
-		g_iCSD_R[client] += 1;
-	else
-		g_iCSD_R[client] = 0;
-	*/
-}
-
-void CSD_G(int client, bool menu = false)
-{
-	ChangeColor(client, 1, menu);
-
-	/*
-	if (g_iCSD_G[client] < 255)
-		g_iCSD_G[client] += 1;
-	else
-		g_iCSD_G[client] = 0;
-	*/
-
-}
-
-void CSD_B(int client, bool menu = false)
-{
-	ChangeColor(client, 2, menu);
-	
-	/*
-	if (g_iCSD_B[client] < 255)
-		g_iCSD_B[client] += 1;
-	else
-		g_iCSD_B[client] = 0;
-	*/
-}
-
 public void ChangeColor(int client, int color_index, bool menu)
 {
 	g_iColorChangeIndex[client] = color_index;
 	CPrintToChat(client, "%t", "ColorChangeValue", g_szChatPrefix);
 	g_iWaitingForResponse[client] = ColorValue;
-	
+
+	if (menu)
+		CSDOptions(client);
 }
 
 void CSDUpdateRate(int client, bool menu = false)
@@ -2382,7 +2346,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 					displayColor[2] = g_iCSD_B[client];
 				}
 
-				SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate/g_fTickrate, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+				SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate * 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
 
 				Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
 			}
@@ -2446,7 +2410,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 								displayColor[2] = g_iCSD_B[client];
 							}
 
-							SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate/g_fTickrate, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+							SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate * 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
 
 							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(fSpeedHUD));
 						}
@@ -2460,7 +2424,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 								displayColor[2] = g_iCSD_B[client];
 							}
 
-							SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate/g_fTickrate, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+							SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate * 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
 
 							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[ObservedUser]));
 						}
@@ -3712,9 +3676,9 @@ public int CSDOptionsHandler(Menu menu, MenuAction action, int param1, int param
 			case 2: CSD_PosX(param1, true);
 			case 3: CSD_PosY(param1, true);
 			case 4: SpeedGradient(param1, true);
-			case 5: CSD_R(param1, true);
-			case 6: CSD_G(param1, true);
-			case 7: CSD_B(param1, true);
+			case 5: ChangeColor(param1, 0, true);
+			case 6: ChangeColor(param1, 1, true);
+			case 7: ChangeColor(param1, 2, true);
 			case 8: CSDUpdateRate(param1, true);
 		}
 	}
