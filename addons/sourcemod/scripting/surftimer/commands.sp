@@ -151,6 +151,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_surftimer", Client_OptionMenu, "[surftimer] opens options menu");
 	RegConsoleCmd("sm_bhoptimer", Client_OptionMenu, "[surftimer] opens options menu");
 	RegConsoleCmd("sm_knife", Command_GiveKnife, "[surftimer] Give players a knife");
+	RegConsoleCmd("sm_csd", Command_CenterSpeed, "[surftimer] [settings] on/off - toggle center speed display");
 
 	// New Commands
 	RegConsoleCmd("sm_mrank", Command_SelectMapTime, "[surftimer] prints a players map record in chat.");
@@ -236,15 +237,16 @@ public Action Command_ToggleNcTriggers(int client, int args) {
 }
 
 public Action Command_CenterSpeed(int client, int args) {
-	if (g_bCenterSpeedDisplay[client]) {
+	if (g_bCenterSpeedDisplay[client]){
 		g_bCenterSpeedDisplay[client] = false;
 		CPrintToChat(client, "%t", "CenterSpeedOff", g_szChatPrefix);
-	} else {
+	}
+	else{
 		g_bCenterSpeedDisplay[client] = true;
-		SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
-		CreateTimer(0.1, CenterSpeedDisplayTimer, client, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
 		CPrintToChat(client, "%t", "CenterSpeedOn", g_szChatPrefix);
 	}
+
+	CenterSpeedDisplay(client, false);
 	return Plugin_Handled;
 }
 
@@ -265,11 +267,17 @@ public Action Command_ChangeSpeedMode(int client, int args) {
 public Action Command_ChangeSpeedGradient(int client, int args) {
 	if (g_SpeedGradient[client] == 0) { 
 		g_SpeedGradient[client]++;
-		CPrintToChat(client, "%t", "SpeedGradientGreen", g_szChatPrefix);
+		CPrintToChat(client, "%t", "SpeedGradientRed", g_szChatPrefix);
 	} else if (g_SpeedGradient[client] == 1) {
 		g_SpeedGradient[client]++;
-		CPrintToChat(client, "%t", "SpeedGradientRainbow", g_szChatPrefix);
+		CPrintToChat(client, "%t", "SpeedGradientGreen", g_szChatPrefix);
 	} else if (g_SpeedGradient[client] == 2) {
+		g_SpeedGradient[client]++;
+		CPrintToChat(client, "%t", "SpeedGradientBlue", g_szChatPrefix);
+	} else if (g_SpeedGradient[client] == 3) {
+		g_SpeedGradient[client]++;
+		CPrintToChat(client, "%t", "SpeedGradientYellow", g_szChatPrefix);
+	} else if (g_SpeedGradient[client] == 4) {
 		g_SpeedGradient[client]++;
 		CPrintToChat(client, "%t", "SpeedGradientMomentum", g_szChatPrefix);
 	} else {
@@ -2213,7 +2221,7 @@ public void ToggleTimer(int client)
 
 void SpeedGradient(int client, bool menu = false)
 {
-	if (g_SpeedGradient[client] != 3)
+	if (g_SpeedGradient[client] != 5)
 		g_SpeedGradient[client]++;
 	else
 		g_SpeedGradient[client] = 0;
@@ -2234,13 +2242,104 @@ void SpeedMode(int client, bool menu = false)
 }
 
 void CenterSpeedDisplay(int client, bool menu = false)
-{
-	g_bCenterSpeedDisplay[client] = !g_bCenterSpeedDisplay[client];
-	
+{	
+	//only swap values if the call comes from the "options" menu OR using the "sm_centerspeed" command
+	if(menu)
+		g_bCenterSpeedDisplay[client] = !g_bCenterSpeedDisplay[client];
+
 	if (g_bCenterSpeedDisplay[client])
 	{
-		SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
-		CreateTimer(0.1, CenterSpeedDisplayTimer, client, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
+		if (IsValidClient(client) && !IsFakeClient(client) && g_bCenterSpeedDisplay[client])
+		{	
+
+			char szSpeed[128];
+			int displayColor[3];
+
+			// player alive
+			if (IsPlayerAlive(client))
+			{	
+				
+				displayColor = GetSpeedColourCSD(client, RoundToNearest(g_fLastSpeed[client]), g_SpeedGradient[client]);
+
+				SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
+
+				Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
+
+
+			}
+			// player not alive (check wether spec'ing a bot or another player)
+			else {
+				int SpecMode;
+				int ObservedUser;
+
+				SpecMode = GetEntProp(client, Prop_Send, "m_iObserverMode");
+
+				ObservedUser = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
+
+				// spec'ing
+				if (SpecMode == 4 || SpecMode == 5)
+				{
+					g_SpecTarget[client] = ObservedUser;
+					if (IsValidClient(ObservedUser))
+					{	
+						//spec'ing a bot
+						if (IsFakeClient(ObservedUser))
+						{
+							float fSpeed[3];
+							GetEntPropVector(ObservedUser, Prop_Data, "m_vecVelocity", fSpeed);
+
+							float fSpeedHUD;
+							if(g_SpeedMode[client] == 0) //XY
+								fSpeedHUD = SquareRoot(Pow(fSpeed[0], 2.0) + Pow(fSpeed[1], 2.0));
+							else if(g_SpeedMode[client] == 1) //XYZ
+								fSpeedHUD = SquareRoot(Pow(fSpeed[0], 2.0) + Pow(fSpeed[1], 2.0) + Pow(fSpeed[2], 2.0));
+							else if(g_SpeedMode[client] == 2) //Z
+								fSpeedHUD = SquareRoot(Pow(fSpeed[2], 2.0));
+
+							if (ObservedUser == g_RecordBot)
+							{
+								if (g_iSelectedReplayStyle == 5)
+								{
+									fSpeedHUD /= 0.5;
+								}
+								else if (g_iSelectedReplayStyle == 6)
+								{
+									fSpeedHUD /= 1.5;
+								}
+							}
+							else if (ObservedUser == g_BonusBot)
+							{
+								if (g_iSelectedBonusReplayStyle == 5)
+								{
+									fSpeedHUD /= 0.5;
+								}
+								else if (g_iSelectedBonusReplayStyle == 6)
+								{
+									fSpeedHUD /= 1.5;
+								}
+							}
+
+							displayColor = GetSpeedColourCSD(client, RoundToNearest(fSpeedHUD), g_SpeedGradient[client]);
+
+							SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
+
+							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(fSpeedHUD));
+						}
+						// spec'ing player
+						else {
+							
+							displayColor = GetSpeedColourCSD(client, RoundToNearest(g_fLastSpeed[ObservedUser]), g_SpeedGradient[client]);
+
+							SetHudTextParams(-1.0, 0.30, 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.25, 0.0, 0.0);
+
+							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[ObservedUser]));
+						}
+					}
+				}
+			}
+
+			ShowHudText(client, 2,szSpeed);
+		}
 	}
 
 	if (menu)
@@ -3355,9 +3454,13 @@ public void MiscellaneousOptions(int client)
 	if (g_SpeedGradient[client] == 0)
 		AddMenuItem(menu, "", "[WHITE] Speed Gradient");
 	else if (g_SpeedGradient[client] == 1)
-		AddMenuItem(menu, "", "[GREEN] Speed Gradient");
+		AddMenuItem(menu, "", "[RED] Speed Gradient");
 	else if (g_SpeedGradient[client] == 2)
-		AddMenuItem(menu, "", "[RAINBOW] Speed Gradient");
+		AddMenuItem(menu, "", "[GREEN] Speed Gradient");
+	else if (g_SpeedGradient[client] == 3)
+		AddMenuItem(menu, "", "[BLUE] Speed Gradient");
+	else if (g_SpeedGradient[client] == 4)
+		AddMenuItem(menu, "", "[YELLOW] Speed Gradient");
 	else
 		AddMenuItem(menu, "", "[MOMENTUM] Speed Gradient");
 	

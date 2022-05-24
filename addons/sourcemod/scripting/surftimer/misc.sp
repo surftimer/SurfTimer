@@ -3200,8 +3200,13 @@ public void CenterHudDead(int client)
 			{
 				float fSpeed[3];
 				GetEntPropVector(ObservedUser, Prop_Data, "m_vecVelocity", fSpeed);
-
-				float fSpeedHUD = SquareRoot(Pow(fSpeed[0], 2.0) + Pow(fSpeed[1], 2.0));
+				float fSpeedHUD;
+				if(g_SpeedMode[client] == 0) //XY
+					fSpeedHUD = SquareRoot(Pow(fSpeed[0], 2.0) + Pow(fSpeed[1], 2.0));
+				else if(g_SpeedMode[client] == 1) //XYZ
+					fSpeedHUD = SquareRoot(Pow(fSpeed[0], 2.0) + Pow(fSpeed[1], 2.0) + Pow(fSpeed[2], 2.0));
+				else if(g_SpeedMode[client] == 2) //Z
+					fSpeedHUD = SquareRoot(Pow(fSpeed[2], 2.0));
 
 				if (ObservedUser == g_RecordBot)
 				{
@@ -3234,7 +3239,9 @@ public void CenterHudDead(int client)
 					Format(obsAika, sizeof(obsAika), "<font color='#ec8'>%s</font>", g_szWrcpReplayTime[g_iCurrentlyPlayingStage]);
 				}
 
-				PrintCSGOHUDText(client, "<pre>%s\nSpeed: <font color='#5e5'>%i u/s\n%s</pre>", obsAika, RoundToNearest(fSpeedHUD), sResult);
+				GetSpeedColour(client, RoundToNearest(fSpeedHUD), g_SpeedGradient[client]);
+				//Format(module[i], 128, "Speed: <font color='%s'>%i</font>", g_szSpeedColour[client], RoundToNearest(g_fLastSpeed[client]));
+				PrintCSGOHUDText(client, "<pre>%s\nSpeed: <font color='%s'>%i</font> u/s\n%s</pre>", obsAika, g_szSpeedColour[client],RoundToNearest(fSpeedHUD), sResult);
 				return;
 			}
 			else if (g_bTimerRunning[ObservedUser])
@@ -4179,67 +4186,188 @@ public void CheckBonusStyleRanks(int client, int zGroup, int style)
 
 public void GetSpeedColour(int client, int speed, int type)
 {
-	int pos;
 	if (g_fMaxVelocity == 10000.0)
-	{
-		if (type == 1 && g_SpeedMode[client] == 0) // green
+	{	
+		// RED
+		if (type == 1) 
 		{
-			pos = RoundToFloor(speed / 400.0);
-			if (pos > 24)
-				pos = 24;
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), g_sz10000mvGradient[pos]);
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#f00");
 		}
-		else if (type == 2 && g_SpeedMode[client] == 0) // rainbow
+		// GREEN
+		else if (type == 2)
 		{
-			pos = RoundToFloor(speed / 500.0);
-			if (pos > 7)
-				pos = 7;
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), g_szRainbowGradient[pos]);
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#0f0");
 		}
-		else if (type == 3 && g_SpeedMode[client] == 0) // gain/loss
+		// BLUE
+		else if (type == 3) 
+		{
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#00f");
+		}
+		// YELLOW
+		else if (type == 4) 
+		{
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#ff0");
+		}
+		//MOMENTUM
+		else if (type == 5) 
 		{
 			if (speed >= GetConVarInt(g_hMaxVelocity))
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#b8b");
-			else if (g_iPreviousSpeed[client] < speed || g_iPreviousSpeed[client] == speed)
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#8cd");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#fff");
+			//gaining speed or mainting
+			else if (g_iPreviousSpeed[client] < speed || (g_iPreviousSpeed[client] == speed && speed != 0) )
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#0f0");
+			//losing speed
+			else if (g_iPreviousSpeed[client] > speed )
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#f00");
+			//not moving (speed == 0)
 			else
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#f32");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#fff");
 
 			g_iPreviousSpeed[client] = speed;
 		}
 		else
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#eee");
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#fff");
 	}
 	else
 	{
-		if (type == 1 && g_SpeedMode[client] == 0) // green
+		// RED
+		if (type == 1) 
 		{
-			pos = RoundToFloor(speed / 100.0);
-			if (pos > 34)
-				pos = 34;
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), g_sz3500mvGradient[pos]);
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#f00");
 		}
-		else if (type == 2 && g_SpeedMode[client] == 0) // rainbow
+		// GREEN
+		else if (type == 2)
 		{
-			pos = RoundToFloor(speed / 500.0);
-			if (pos > 7)
-				pos = 7;
-
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), g_szRainbowGradient[pos]);
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#0f0");
 		}
-		else if (type == 3 && g_SpeedMode[client] == 0) // gain/loss
+		// BLUE
+		else if (type == 3) 
+		{
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#00f");
+		}
+		// YELLOW
+		else if (type == 4) 
+		{
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#ff0");
+		}
+		//MOMENTUM
+		else if (type == 5) 
 		{
 			if (speed >= GetConVarInt(g_hMaxVelocity))
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#b8b");
-			else if (g_iPreviousSpeed[client] < speed || g_iPreviousSpeed[client] == speed)
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#8cd");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#fff");
+			//gaining speed or mainting
+			else if (g_iPreviousSpeed[client] < speed || (g_iPreviousSpeed[client] == speed && speed != 0) )
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#0f0");
+			//losing speed
+			else if (g_iPreviousSpeed[client] > speed )
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#f00");
+			//not moving (speed == 0)
 			else
-				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#f32");
+				Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#fff");
 
 			g_iPreviousSpeed[client] = speed;
 		}
 		else
-			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#eee");
+			Format(g_szSpeedColour[client], sizeof(g_szSpeedColour), "#fff");
+	}
+}
+
+int[] GetSpeedColourCSD(int client, int speed, int type)
+{	
+	int displayColor[3] = {255, 255, 255};
+	if (g_fMaxVelocity == 10000.0)
+	{	
+		// RED
+		if (type == 1) // green
+		{
+			displayColor = {255,0,0};
+			return displayColor;
+		}
+		// GREEN
+		else if (type == 2)
+		{
+			displayColor = {0,255,0};
+			return displayColor;
+		}
+		// BLUE
+		else if (type == 3)
+		{
+			displayColor = {0,0,255};
+			return displayColor;
+		}
+		// YELLOW
+		else if (type == 4)
+		{
+			displayColor = {255,255,0};
+			return displayColor;
+		}
+		//MOMENTUM
+		else if (type == 5)
+		{
+			if (speed >= GetConVarInt(g_hMaxVelocity))
+				displayColor = {0,255,0}; //GREEN
+			//gaining speed or mainting
+			else if (g_iPreviousSpeed[client] < speed || (g_iPreviousSpeed[client] == speed && speed != 0) )
+				displayColor = {0,255,0}; //GREEN
+			//losing speed
+			else if (g_iPreviousSpeed[client] > speed )
+				displayColor = {255,0,0}; //RED
+			//not moving (speed == 0)
+			else
+				displayColor = {255,255,255}; //WHITE
+
+			g_iPreviousSpeed[client] = speed;
+			return displayColor;
+		}
+		else
+			return displayColor; //WHITE
+	}
+	else
+	{
+		// RED
+		if (type == 1) // green
+		{
+			displayColor = {255,0,0};
+			return displayColor;
+		}
+		// GREEN
+		else if (type == 2)
+		{
+			displayColor = {0,255,0};
+			return displayColor;
+		}
+		// BLUE
+		else if (type == 3)
+		{
+			displayColor = {0,0,255};
+			return displayColor;
+		}
+		// YELLOW
+		else if (type == 4)
+		{
+			displayColor = {255,255,0};
+			return displayColor;
+		}
+		//MOMENTUM
+		else if (type == 5)
+		{
+			if (speed >= GetConVarInt(g_hMaxVelocity))
+				displayColor = {0,255,0}; //GREEN
+			//gaining speed or mainting
+			else if (g_iPreviousSpeed[client] < speed || (g_iPreviousSpeed[client] == speed && speed != 0) )
+				displayColor = {0,255,0}; //GREEN
+			//losing speed
+			else if (g_iPreviousSpeed[client] > speed )
+				displayColor = {255,0,0}; //RED
+			//not moving (speed == 0)
+			else
+				displayColor = {255,255,255}; //WHITE
+
+			g_iPreviousSpeed[client] = speed;
+			return displayColor;
+		}
+		else
+			return displayColor; //WHITE
 	}
 }
 
