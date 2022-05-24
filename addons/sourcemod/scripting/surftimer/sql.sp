@@ -2521,30 +2521,30 @@ public void SQL_CurrentRunRankCallback(Handle owner, Handle hndl, const char[] e
 	MapFinishedMsgs(client, rank);
 }
 
-public void db_currentRunRank_Prac(int client, int style, int zgroup, bool map)
+public void db_currentRunRank_Prac(int client, int style, int zgroup)
 {
 	if (!IsValidClient(client))
 		return;
 
 	char szQuery[512];
-	if(map){
+	if(zgroup == 0){
 
 		Handle data = CreateDataPack();
 		WritePackCell(data, client);
 		WritePackCell(data, zgroup);
 		WritePackFloat(data, g_fCurrentRunTime[client]);
 
-		Format(szQuery, 512, "SELECT count(runtimepro)+1 FROM ck_playertimes WHERE AND mapname = '%s' AND style = '%i' AND runtimepro < '%f';", g_szMapName, style, g_fCurrentRunTime[client]);
+		Format(szQuery, sizeof(szQuery), "SELECT count(runtimepro)+1 FROM ck_playertimes WHERE mapname = '%s' AND style = '%i' AND runtimepro < '%f';", g_szMapName, style, g_fCurrentRunTime[client]);
 		SQL_TQuery(g_hDb, SQL_CurrentRunRank_PracCallback, szQuery, data, DBPrio_Low);
 	}
-	else if(!map){
+	else if(zgroup > 0){
 
 		Handle data = CreateDataPack();
 		WritePackCell(data, client);
 		WritePackCell(data, zgroup);
 		WritePackFloat(data, g_fCurrentRunTime[client]);
 
-		Format(szQuery, 512, "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '%s' AND style = '%i' AND zonegroup = '%i' AND runtime < '%f'", g_szMapName, zgroup, style, g_fCurrentRunTime[client]);
+		Format(szQuery, sizeof(szQuery), "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '%s' AND style = '%i' AND zonegroup = '%i' AND runtime < '%f'", g_szMapName, zgroup, style, g_fCurrentRunTime[client]);
 		SQL_TQuery(g_hDb, SQL_CurrentRunRank_PracCallback, szQuery, data, DBPrio_Low);
 	}
 }
