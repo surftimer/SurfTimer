@@ -180,6 +180,8 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 			StartRecording(client);
 			CreateTimer(1.5, CenterMsgTimer, client, TIMER_FLAG_NO_MAPCHANGE);
 
+			g_iCurrentTick[client] = g_iClientTick[client];
+
 			g_bFirstSpawn[client] = false;
 		}
 

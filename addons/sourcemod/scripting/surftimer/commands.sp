@@ -2293,29 +2293,31 @@ void CenterSpeedDisplay(int client, bool menu = false)
 
 	//THE LOWER THE NUMBER THE FASTER THE UPDATING IS
 	int update_rate;
-	switch(g_iCSDUpdateRate[client]){
-		case 0: update_rate = 15;
-		case 1:	update_rate = 10;
-		case 2: update_rate = 5;
-		default: update_rate = 15;
-	}
-
-	float fCSD_PosX;
-	float fCSD_PosY;
-	switch(g_fCSD_POS_X[client]){
-		case 0.5: fCSD_PosX = -1.0;
-		default: fCSD_PosX = g_fCSD_POS_X[client];
-	}
-	switch(g_fCSD_POS_Y[client]){
-		case 0.5: fCSD_PosY = -1.0;
-		default: fCSD_PosY = g_fCSD_POS_Y[client];
+	if(g_bCenterSpeedDisplay[client]){
+		switch(g_iCSDUpdateRate[client]){
+			case 0: update_rate = 15;
+			case 1:	update_rate = 10;
+			case 2: update_rate = 5;
+			default: update_rate = 15;
+		}
 	}
 	
-	if(GetGameTickCount() - g_iCurrentTick[client] >= update_rate)
+	if(g_iClientTick[client] - g_iCurrentTick[client] >= update_rate)
 	{
 		g_iCurrentTick[client] += update_rate;
 		if (IsValidClient(client) && !IsFakeClient(client) && g_bCenterSpeedDisplay[client])
 		{
+
+			float fCSD_PosX;
+			float fCSD_PosY;
+			switch(g_fCSD_POS_X[client]){
+				case 0.5: fCSD_PosX = -1.0;
+				default: fCSD_PosX = g_fCSD_POS_X[client];
+			}
+			switch(g_fCSD_POS_Y[client]){
+				case 0.5: fCSD_PosY = -1.0;
+				default: fCSD_PosY = g_fCSD_POS_Y[client];
+			}
 
 			char szSpeed[128];
 			int displayColor[3];
@@ -2331,7 +2333,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 					displayColor[2] = g_iCSD_B[client];
 				}
 
-				SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate * 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+				SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate / g_fTickrate, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
 
 				Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
 			}
@@ -2395,7 +2397,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 								displayColor[2] = g_iCSD_B[client];
 							}
 
-							SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate * 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+							SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate / g_fTickrate, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
 
 							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(fSpeedHUD));
 						}
@@ -2409,7 +2411,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 								displayColor[2] = g_iCSD_B[client];
 							}
 
-							SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate * 1.0, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+							SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate / g_fTickrate, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
 
 							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[ObservedUser]));
 						}
