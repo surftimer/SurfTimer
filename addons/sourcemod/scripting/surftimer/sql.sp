@@ -329,10 +329,10 @@ public int callback_Confirm(Menu menu, MenuAction action, int client, int key)
 					char BonusPRruntime[512];
 					Format(BonusPRruntime, 512, sql_clearPRruntime, steamID, g_EditingMap[client], g_SelectedType[client]);
 					PrintToServer(szQuery);
-					SQL_TQuery(g_hDb, SQL_CheckCallback, BonusPRruntime, DBPrio_Low);
+					SQL_TQuery(g_hDb, SQL_CheckCallback, BonusPRruntime, .prio=DBPrio_Low);
 				}
 			}
-			SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
+			SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, .prio=DBPrio_Low);
 			
 			// Looking for online player to refresh his record after deleting it.
 			char player_steamID[32];
@@ -3811,7 +3811,7 @@ public void db_UpdatePRinfo_WithRuntime(int client, char szSteamID[32], int zGro
 	char szQuery[2048];
 	//PrintToConsole(client, "%f || %f || %f || %f || %f\n", g_fTimeinZone[client][zGroup], g_fCompletes[client][zGroup], g_fAttempts[client][zGroup], g_fstComplete[client][zGroup], runtime);
 	Format(szQuery, 2048, sql_updatePrinfo_withruntime, g_fTimeinZone[client][zGroup], g_fCompletes[client], g_fAttempts[client][zGroup], g_fstComplete[client][zGroup], runtime, szSteamID, g_szMapName, zGroup);
-	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
+	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, .prio=DBPrio_Low);
 }
 //this is called whenever the player's time stops and he is not in a end zone (map/bonus/stage)
 public void db_UpdatePRinfo(int client, char szSteamID[32], int zGroup)
@@ -3822,7 +3822,7 @@ public void db_UpdatePRinfo(int client, char szSteamID[32], int zGroup)
 	char szQuery[2048];
 	//PrintToConsoleAll("%f || %f || %f || %f\n", g_fTimeinZone[client][zGroup], g_fCompletes[client][zGroup], g_fAttempts[client][zGroup], g_fstComplete[client][zGroup]);
 	Format(szQuery, sizeof(szQuery), sql_updatePrinfo, g_fTimeinZone[client][zGroup], g_fCompletes[client][zGroup], g_fAttempts[client][zGroup], g_fstComplete[client][zGroup], szSteamID, g_szMapName, zGroup);
-	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, DBPrio_Low);
+	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, .prio=DBPrio_Low);
 }
 
 /*===================================
