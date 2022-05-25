@@ -573,15 +573,6 @@ public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontB
 		int clientid = GetEventInt(event, "userid");
 		int client = GetClientOfUserId(clientid);
 
-		//PRINFO
-		if(IsValidClient(client) && !IsFakeClient(client)){
-			for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++){
-				if(g_fTimeIncrement[client][zonegroup] != 0.0)
-					g_fTimeinZone[client][zonegroup] += g_fTimeIncrement[client][zonegroup];
-				db_UpdatePRinfo(client, g_szSteamID[client], zonegroup);
-			}
-		}
-
 		if (!IsValidClient(client) || IsFakeClient(client))
 			return Plugin_Handled;
 		GetEventString(event, "name", szName, sizeof(szName));
@@ -1004,22 +995,16 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		else
 		{
 			RecordReplay(client, buttons, subtype, seed, impulse, weapon, angles, vel);
-			//PRINFO
-			if (g_iCurrentStyle[client] == 0 && !g_bPracticeMode[client] && (g_bTimerRunning[client] || g_bWrcpTimeractivated[client])){
-				
-				//char szTime[32];
-				//FormatTimeFloat(client, g_fTimeIncrement[client][g_iClientInZone[client][2]], 3, szTime, 32);
-				//if(g_fTimeIncrement[client][g_iClientInZone[client][2]] != 0.0)
-				//CPrintToChat(client,"VALUE OF TIME INCR (STRING) : %s\n", szTime);
+		}
 
-				//PLAYER IS IN A RUN
-				if(g_bTimerRunning[client])
-					g_fTimeIncrement[client][g_iClientInZone[client][2]] = g_fCurrentRunTime[client];
-				//PLAYER IS JUST DOING STAGES
-				//else if(g_bWrcpTimeractivated[client] && !g_bTimerRunning[client] && !g_bInStartZone[client] && !g_bInStageZone[client])
-				else if(g_bWrcpTimeractivated[client])
-					g_fTimeIncrement[client][g_iClientInZone[client][2]] = g_fCurrentWrcpRunTime[client];
-			}
+		//PRINFO
+		if (!IsFakeClient(client) && g_iCurrentStyle[client] == 0 && !g_bPracticeMode[client] && (g_bTimerRunning[client] || g_bWrcpTimeractivated[client])){
+			//PLAYER IS IN A RUN
+			if(g_bTimerRunning[client])
+				g_fTimeIncrement[client][g_iClientInZone[client][2]] = g_fCurrentRunTime[client];
+			//PLAYER IS JUST DOING STAGES
+			else if(g_bWrcpTimeractivated[client])
+				g_fTimeIncrement[client][g_iClientInZone[client][2]] = g_fCurrentWrcpRunTime[client];
 		}
 
 		// Strafe Sync taken from shavit's bhoptimer

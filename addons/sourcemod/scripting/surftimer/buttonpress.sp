@@ -99,6 +99,9 @@ public void CL_OnStartTimerPress(int client)
 		}
 
 		if (!g_bPracticeMode[client] && !IsFakeClient(client) && g_iCurrentStyle[client] == 0) {
+			
+			//PRINFO INCREMENT ATTEMPTS
+			g_fAttempts[client][g_iClientInZone[client][2]]++;
 
 			char szDifference[128], szSpeed[128], preMessage[128];
 			int iDifference;

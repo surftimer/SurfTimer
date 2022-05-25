@@ -2148,6 +2148,15 @@ public void OnClientDisconnect(int client)
 
 	// New noclipspeed
 	sv_noclipspeed.FloatValue = g_iDefaultNoclipSpeed;
+
+	//PRINFO
+	if(IsValidClient(client) && !IsFakeClient(client)){
+		for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++){
+			if(g_fTimeIncrement[client][zonegroup] != 0.0)
+				g_fTimeinZone[client][zonegroup] += g_fTimeIncrement[client][zonegroup];
+			db_UpdatePRinfo(client, g_szSteamID[client], zonegroup);
+		}
+	}
 }
 
 public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] newValue)

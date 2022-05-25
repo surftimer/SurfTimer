@@ -315,9 +315,8 @@ public void StartTouch(int client, int action[3])
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0) // fluffys: NoBhop(9), NoCrouch(10)
 
 		//PRINFO
+		int zGroup = g_iClientInZone[client][2]; //ease of use 
 		if ((action[0] == 1 || action[0] == 2 || action[0] == 3) && (!g_bPracticeMode[client] && !IsFakeClient(client) && g_iCurrentStyle[client] == 0)){
-			
-			int zGroup = g_iClientInZone[client][2]; //ease of use 
 
 			//PLAYER ON A RUN
 			if(action[0] == 2 && g_bTimerRunning[client]){
@@ -353,28 +352,25 @@ public void StartTouch(int client, int action[3])
 					//PLAYER FINISHES FOR THE 1ST TIME
 					else
 						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fFinalTime[client]);
-
 			}
 			//PLAYER JUST DOING STAGES
-			//else if(action[0] == 3 && (g_bWrcpTimeractivated[client] && !g_bTimerRunning[client] && !g_bInStartZone[client] && !g_bInStageZone[client])){
 			else if(action[0] == 3 && g_bWrcpTimeractivated[client] && !g_bTimerRunning[client]){
-				//g_fTimeinZone[client][g_iClientInZone[client][2]] += g_fTimeIncrement[client][g_iClientInZone[client][2]];
-				g_fTimeinZone[client][g_iClientInZone[client][2]] += fCurrentWrcpRunTime;
-				g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
-			}
-			else if(action[0] == 1){
-				if( g_fTimeIncrement[client][g_iClientInZone[client][2]] != 0.0){
-					g_fTimeinZone[client][g_iClientInZone[client][2]] += g_fTimeIncrement[client][g_iClientInZone[client][2]];
-					g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
+				//CHECK IF THERE IS TIME NOT ADDED TO TIMEINZONE
+				if(g_fTimeIncrement[client][zGroup] != 0.0){
+					g_fTimeinZone[client][zGroup] += g_fTimeIncrement[client][zGroup];
+					g_fTimeIncrement[client][zGroup] = 0.0;
 				}
 			}
-
-			/*
-			CPrintToChat(client,"VALUE OF TIME INCR : %f\n", g_fTimeIncrement[client][g_iClientInZone[client][2]]);
-			char szTime[32];
-			FormatTimeFloat(client, g_fTimeIncrement[client][g_iClientInZone[client][2]], 3, szTime, 32);
-			CPrintToChat(client,"VALUE OF TIME INCR (STRING) : %s\n", szTime);
-			*/
+			//CASE WHERE PLAYER IS RUNNING THE MAP BUT MID RUN SWAP TO LETS SAY /B 1, THE VALUE CONTINUES STORES IN THE g_fTimeIncrement[ZONEGROUP 0], WHEN PLAYER GOES BACK
+			//TO MAP STARTZONE THE PREVIOUSLY INCREMENTED VALUE IS NOW ADDED TO THE TIMEINZONE
+			//MAP OR BONUS STARTZONE
+			else if(action[0] == 1){
+				//CHECK IF THERE IS TIME NOT ADDED TO TIMEINZONE
+				if(g_fTimeIncrement[client][zGroup] != 0.0){
+					g_fTimeinZone[client][zGroup] += g_fTimeIncrement[client][zGroup];
+					g_fTimeIncrement[client][zGroup] = 0.0;
+				}
+			}
 		}
 
 		if (action[0] == 0) // Stop Zone
@@ -647,20 +643,6 @@ public void EndTouch(int client, int action[3])
 		// CPrintToChat(client, "%f %f %f", CurVelVec[0], CurVelVec[1], CurVelVec[2]);
 
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
-
-		//PRINFO
-		if ((action[0] == 1 || action[0] == 3) && (!g_bPracticeMode[client] && !IsFakeClient(client) && IsValidClient(client) && g_iCurrentStyle[client] == 0)){
-			//ONE EXAMPLE
-			//IF THE PLAYER IS DOING ONLY STAGES
-			//IF HE DOESNT FINISH THE STAGE
-			//WE STILL NEED TO ADD THE TIME
-			if( g_fTimeIncrement[client][g_iClientInZone[client][2]] != 0.0){
-				g_fTimeIncrement[client][g_iClientInZone[client][2]] = 0.0;
-			}
-			
-			if(action[0] == 1)
-				g_fAttempts[client][g_iClientInZone[client][2]]++;	
-		}
 
 		if (action[0] == 1 || action[0] == 5)
 		{	
