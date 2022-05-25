@@ -192,8 +192,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 						g_fTimeIncrement[client][zonegroup] = 0.0;
 				}
 			}
-
-			g_iCurrentTick[client] = GetGameTickCount();
+			g_iCurrentTick[client] = g_iClientTick[client];
 
 			g_bFirstSpawn[client] = false;
 
