@@ -73,6 +73,10 @@ public void db_setupDatabase()
 		{
 			db_upgradeDatabase(3);
 		}
+		else if (!SQL_FastQuery(g_hDb, "SELECT steamid FROM ck_prinfo  LIMIT 1"))
+		{
+			db_upgradeDatabase(4);
+		}
 	}
 
 	SQL_UnlockDatabase(g_hDb);
@@ -154,6 +158,10 @@ public void db_upgradeDatabase(int ver)
   {
 	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER centrehud;");
 	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_spawnlocations DROP PRIMARY KEY, ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER stage, ADD PRIMARY KEY (mapname, zonegroup, stage, teleside);");
+  }
+  else if (ver == 4)
+  {
+	  SQL_FastQuery(g_hDb, sql_CreatePrinfo);
   }
   
   SQL_UnlockDatabase(g_hDb);
