@@ -833,6 +833,9 @@ public Action OnLogAction(Handle source, Identity ident, int client, int target,
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
+	//calling this function here makes it refresh musch faster/smoother
+	CenterSpeedDisplay(client,false);
+
 	if (buttons & IN_DUCK && g_bInDuck[client] == true)
 	{
 		CPrintToChat(client, "%t", "Hooks11", g_szChatPrefix);

@@ -133,15 +133,15 @@ public int Native_GetMapData(Handle plugin, int numParams)
 
 public int Native_GetPlayerData(Handle plugin, int numParams)
 {
-	int client = GetNativeCell(1);
+	int client = GetNativeCellRef(1);
 	int rank = 99999;
 	if (IsValidClient(client) && !IsFakeClient(client))
 	{
 		char szTime[64], szCountry[16];
 
-		GetNativeString(1, szTime, 64);
-		rank = GetNativeCell(2);
-		GetNativeString(3, szCountry, 16);
+		GetNativeString(2, szTime, 64);
+		rank = GetNativeCellRef(3);
+		GetNativeString(4, szCountry, 16);
 
 		if (g_fPersonalRecord[client] > 0.0)
 			Format(szTime, 64, "%s", g_szPersonalRecord[client]);
@@ -153,10 +153,27 @@ public int Native_GetPlayerData(Handle plugin, int numParams)
 		rank = g_MapRank[client];
 
 		SetNativeString(2, szTime, sizeof(szTime), true);
+		SetNativeCellRef(3, rank);
 		SetNativeString(4, szCountry, sizeof(szCountry), true);
 	}
 
 	return rank;
+}
+
+public int Native_GetPlayerInfo(Handle plugin, int numParams)
+{
+	int client = GetNativeCellRef(1);
+	int iStage = 9999;
+	if (IsValidClient(client) && !IsFakeClient(client))
+	{
+		iStage = g_Stage[0][client];
+		SetNativeCellRef(2, g_bWrcpTimeractivated[client]);
+		SetNativeCellRef(3, g_bPracticeMode[client]);
+		SetNativeCellRef(4, iStage);
+		SetNativeCellRef(5, g_iInBonus[client]);
+	}
+
+	return iStage;
 }
 
 public int Native_GetMapTier(Handle plugin, int numParams)
@@ -186,6 +203,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	CreateNative("surftimer_GetPlayerNameColored", Native_GetPlayerNameColored);
 	CreateNative("surftimer_GetMapData", Native_GetMapData);
 	CreateNative("surftimer_GetPlayerData", Native_GetPlayerData);
+	CreateNative("surftimer_GetPlayerInfo", Native_GetPlayerInfo);
 	CreateNative("surftimer_GetMapTier", Native_GetMapTier);
 	CreateNative("surftimer_GetMapStages", Native_GetMapStages);
 	CreateNative("surftimer_SafeTeleport", Native_SafeTeleport);

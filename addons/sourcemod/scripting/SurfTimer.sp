@@ -1404,86 +1404,6 @@ int g_iClientTick[MAXPLAYERS + 1];
 =         Predefined Arrays         =
 ===================================*/
 
-char g_sz10000mvGradient[][] =
-{
-	"#FFFFFF",
-	"#F4FFF4",
-	"#E9FFE9",
-	"#DFFFDF",
-	"#D4FFD4",
-	"#C9FFC9",
-	"#BFFFBF",
-	"#B4FFB4",
-	"#AAFFAA",
-	"#9FFF9F",
-	"#94FF94",
-	"#8AFF8A",
-	"#7FFF7F",
-	"#74FF74",
-	"#74FF74",
-	"#5FFF5F",
-	"#55FF55",
-	"#4AFF4A",
-	"#3FFF3F",
-	"#35FF35",
-	"#2AFF2A",
-	"#1FFF1F",
-	"#15FF15",
-	"#0AFF0A",
-	"#00FF00"
-};
-
-char g_sz3500mvGradient[][] =
-{
-	"#FFFFFF",
-	"#F7FFF7",
-	"#F0FFF0",
-	"#E8FFE8",
-	"#E1FFE1",
-	"#D9FFD9",
-	"#D2FFD2",
-	"#CAFFCA",
-	"#C3FFC3",
-	"#BBFFBB",
-	"#B4FFB4",
-	"#ACFFAC",
-	"#A5FFA5",
-	"#9DFF9D",
-	"#96FF96",
-	"#8EFF8E",
-	"#87FF87",
-	"#7FFF7F",
-	"#78FF78",
-	"#70FF70",
-	"#69FF69",
-	"#61FF61",
-	"#5AFF5A",
-	"#52FF52",
-	"#4BFF4B",
-	"#43FF43",
-	"#3CFF3C",
-	"#34FF34",
-	"#2DFF2D",
-	"#25FF25",
-	"#1EFF1E",
-	"#16FF16",
-	"#0FFF0F",
-	"#07FF07",
-	"#00FF00"
-};
-
-char g_szRainbowGradient[][] =
-{
-	"#FFFFFF",
-	"#FFD4F0",
-	"#e2aaff",
-	"#e38be6",
-	"#7f7fff",
-	"#55c6ff",
-	"#2affb8",
-	"#00ff00"
-};
-
 char UnallowedTitles[][] =
 {
 	"NEWBIE",
@@ -1911,7 +1831,7 @@ public void OnConfigsExecuted()
 	else
 		readMultiServerMapcycle();
 
-	if (GetConVarFloat(g_iHintsInterval) != 0.0)
+	if (GetConVarFloat(g_iHintsInterval) > 0.0)
 	{
 		readHints();
 		if (g_aHints.Length != 0)
@@ -1949,6 +1869,7 @@ public void OnClientConnected(int client)
 	g_Stage[0][client] = 1;
 	g_bWrcpTimeractivated[client] = false;
 	g_CurrentStage[client] = 1;
+	g_iInBonus[client] = 0;
 }
 
 public void OnClientPutInServer(int client)
@@ -1961,13 +1882,6 @@ public void OnClientPutInServer(int client)
 	// Defaults
 	SetClientDefaults(client);
 	Command_Restart(client, 1);
-
-	//display center speed so doesnt have to be re-enabled in options
-	if (g_bCenterSpeedDisplay[client])
-	{
-		SetHudTextParams(-1.0, 0.30, 1.0, 255, 255, 255, 255, 0, 0.25, 0.0, 0.0);
-		CreateTimer(0.1, CenterSpeedDisplayTimer, client, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
-	}
 
 	// SDKHooks
 	SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
