@@ -4,7 +4,8 @@ public void CL_OnStartTimerPress(int client)
 	if (!IsFakeClient(client))
 	{
 		if (IsValidClient(client))
-		{
+		{	
+
 			if (!g_bServerDataLoaded)
 			{
 				if (GetGameTime() - g_fErrorMessage[client] > 1.0)
@@ -43,7 +44,7 @@ public void CL_OnStartTimerPress(int client)
 	if (!g_bSpectate[client] && !g_bNoClip[client] && ((GetGameTime() - g_fLastTimeNoClipUsed[client]) > 2.0))
 	{
 		if (g_bActivateCheckpointsOnStart[client])
-		g_bCheckpointsEnabled[client] = true;
+			g_bCheckpointsEnabled[client] = true;
 
 		// Reset Run Variables
 		tmpDiff[client] = 9999.0;
@@ -97,7 +98,11 @@ public void CL_OnStartTimerPress(int client)
 			}
 		}
 
-		if (!g_bPracticeMode[client] && !IsFakeClient(client)) {
+		if (!g_bPracticeMode[client] && !IsFakeClient(client) && g_iCurrentStyle[client] == 0) {
+			
+			//PRINFO INCREMENT ATTEMPTS
+			g_fAttempts[client][g_iClientInZone[client][2]]++;
+
 			char szDifference[128], szSpeed[128], preMessage[128];
 			int iDifference;
 			int prestrafe = RoundToNearest(GetSpeed(client));
@@ -176,7 +181,7 @@ public void CL_OnEndTimerPress(int client)
 		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (IsValidClient(i) && !IsPlayerAlive(i))
-			{
+			{	
 				int SpecMode = GetEntProp(i, Prop_Send, "m_iObserverMode");
 				if (SpecMode == 4 || SpecMode == 5)
 				{
@@ -248,7 +253,7 @@ public void CL_OnEndTimerPress(int client)
 	if (zGroup == 0)
 	{
 		if (style == 0)
-		{
+		{	
 			// Make a new record bot?
 			if (GetConVarBool(g_hReplaceReplayTime) && (g_fFinalTime[client] < g_fReplayTimes[0][0] || g_fReplayTimes[0][0] == 0.0))
 			{

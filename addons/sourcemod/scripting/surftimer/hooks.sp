@@ -154,6 +154,11 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 
 			return Plugin_Continue;
 		}
+		else{
+			//PRINFO TIME INCREMENT
+			for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++)
+				g_fTimeIncrement[client][zonegroup] = 0.0;
+		}
 
 		// Change Player Skin
 		if (GetConVarBool(g_hPlayerSkinChange) && (GetClientTeam(client) > 1))
@@ -180,7 +185,16 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 			StartRecording(client);
 			CreateTimer(1.5, CenterMsgTimer, client, TIMER_FLAG_NO_MAPCHANGE);
 
+			//THIS "FIXES" A BUG WHERE THE TIMEINCREMENT WOULD BE CHANGED IN THE BEGINNING FOR FUCK ALL REASON...
+			if(!IsFakeClient(client)){
+				for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++){
+					if(g_fTimeIncrement[client][zonegroup] != 0.0)
+						g_fTimeIncrement[client][zonegroup] = 0.0;
+				}
+			}
+
 			g_bFirstSpawn[client] = false;
+
 		}
 
 		// Get Start Position For Challenge
@@ -553,11 +567,12 @@ public Action Event_OnPlayerTeam(Handle event, const char[] name, bool dontBroad
 public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontBroadcast)
 {
 	if (GetConVarBool(g_hDisconnectMsg))
-	{
+	{	
 		char szName[64];
 		char disconnectReason[64];
 		int clientid = GetEventInt(event, "userid");
 		int client = GetClientOfUserId(clientid);
+
 		if (!IsValidClient(client) || IsFakeClient(client))
 			return Plugin_Handled;
 		GetEventString(event, "name", szName, sizeof(szName));
@@ -983,6 +998,16 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		else
 		{
 			RecordReplay(client, buttons, subtype, seed, impulse, weapon, angles, vel);
+		}
+
+		//PRINFO
+		if (!IsFakeClient(client) && g_iCurrentStyle[client] == 0 && !g_bPracticeMode[client] && (g_bTimerRunning[client] || g_bWrcpTimeractivated[client])){
+			//PLAYER IS IN A RUN
+			if(g_bTimerRunning[client])
+				g_fTimeIncrement[client][g_iClientInZone[client][2]] = g_fCurrentRunTime[client];
+			//PLAYER IS JUST DOING STAGES
+			else if(g_bWrcpTimeractivated[client])
+				g_fTimeIncrement[client][g_iClientInZone[client][2]] = g_fCurrentWrcpRunTime[client];
 		}
 
 		// Strafe Sync taken from shavit's bhoptimer

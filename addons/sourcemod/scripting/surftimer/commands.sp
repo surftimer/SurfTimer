@@ -151,6 +151,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_surftimer", Client_OptionMenu, "[surftimer] opens options menu");
 	RegConsoleCmd("sm_bhoptimer", Client_OptionMenu, "[surftimer] opens options menu");
 	RegConsoleCmd("sm_knife", Command_GiveKnife, "[surftimer] Give players a knife");
+	RegConsoleCmd("sm_prinfo_help", Command_PRinfo_help, "[surftimer] Show in console how to use the command");
 	RegConsoleCmd("sm_csd", Command_CenterSpeed, "[surftimer] [settings] on/off - toggle center speed display");
 
 	// New Commands
@@ -182,6 +183,8 @@ void CreateCommands()
 
 	// CPR
 	RegConsoleCmd("sm_cpr", Command_CPR, "[surftimer] Compare clients time to another clients time");
+	RegConsoleCmd("sm_prinfo", Command_PRinfo, "[surftimer] Information about personal info on a map");
+	
 
 	// reload map
 	RegAdminCmd("sm_rm", Command_ReloadMap, ADMFLAG_ROOT, "[surftimer] Reloads the current map");
@@ -365,6 +368,17 @@ public Action Command_ToggleHints(int client, int args)
 		CPrintToChat(client, "%t", "HintsToggleOn", g_szChatPrefix);
 	}
 	return Plugin_Handled;
+}
+
+public Action Command_PRinfo_help(int client, int args){
+
+	if(IsValidClient(client)){
+		PrintToConsole(client, "%t", "PRinfo_help");
+		CPrintToChat(client, "%t", "PRinfo_help_chat", g_szChatPrefix);
+	}
+
+	return Plugin_Handled;
+
 }
 
 public Action Command_DeleteRecords(int client, int args)
@@ -5052,6 +5066,171 @@ public Action Command_CPR(int client, int args)
 			}
 			if (!found)
 				CReplyToCommand(client, "%t", "Commands85", g_szChatPrefix);
+		}
+	}
+
+	return Plugin_Handled;
+}
+
+public Action Command_PRinfo(int client, int args)
+{
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+
+	switch(args){
+		//WORKS
+		//prinfo (in map zone) || (in bonus zone)
+		case 0:{
+			if(g_iClientInZone[client][2] == 0)
+				db_selectPRinfoUnknown(client, g_MapRank[client], 0, g_szSteamID[client]);
+			else
+				db_selectPRinfoUnknown(client, g_MapRankBonus[g_iClientInZone[client][2]][client], g_iClientInZone[client][2], g_szSteamID[client]);
+		}
+		//WORKS
+		//prinfo <mapname>
+		//prinfo <rank>
+		//prinfo <bonus number>
+		case 1:{
+			char arg1[128];
+			GetCmdArg(1, arg1, sizeof(arg1));
+
+			if (StrContains(arg1, "surf_", true) != -1)
+			{
+				db_viewPRinfoMapRank(client, g_szSteamID[client], arg1);
+			}
+			else if (arg1[0] == '@')
+			{
+				ReplaceString(arg1, sizeof(arg1), "@", "");
+				int rank = StringToInt(arg1);
+
+				//db_selectPRinfoUnknownWithMap(client, rank, g_szMapName, 0);
+
+				if(g_iClientInZone[client][2] == 0)
+					db_GetRankSteamID(client, g_szMapName, rank, 0);
+				else
+					db_GetRankSteamID(client, g_szMapName , rank, g_iClientInZone[client][2]);
+
+			}
+			else if (arg1[0] == 'b')
+			{
+				ReplaceString(arg1, sizeof(arg1), "b", "");
+				int bonus_number = StringToInt(arg1);
+
+				if (0 < bonus_number < MAXZONEGROUPS)
+					db_selectPRinfoUnknown(client, g_MapRankBonus[bonus_number][client], bonus_number, g_szSteamID[client]);
+				else
+					CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, bonus_number);
+			}
+		}
+		//WORKS
+		
+		case 2:{
+			char arg1[128];
+			char arg2[128];
+			GetCmdArg(1, arg1, sizeof(arg1));
+			GetCmdArg(2, arg2, sizeof(arg2));
+
+			if (StrContains(arg1, "surf_", true) != -1)
+			{	
+				if (StrContains(arg2, "@") != -1){
+					ReplaceString(arg2, sizeof(arg2), "@", "");
+					int rank = StringToInt(arg2);
+					db_GetRankSteamID(client, arg1, rank, 0);
+					//db_selectPRinfoUnknownWithMap(client, rank, arg1, 0);
+				}
+				else if(arg2[0] == 'b'){
+					ReplaceString(arg2, sizeof(arg2), "b", "");
+					int bonus_number = StringToInt(arg2);
+
+					if (0 < bonus_number < MAXZONEGROUPS)
+						db_viewPRinfoMapRankBonus(client, g_szSteamID[client], arg1, bonus_number);
+					else
+						CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, bonus_number);
+				}
+			}
+			else if (arg1[0] == '@')
+			{
+				if (StrContains(arg2, "surf_") != -1){
+					ReplaceString(arg1, sizeof(arg1), "@", "");
+					int rank = StringToInt(arg1);
+
+					//db_selectPRinfoUnknownWithMap(client, rank, arg2, 0);
+					db_GetRankSteamID(client, arg2, rank, 0);
+				}
+				else if(StrContains(arg2, "b") != -1){
+					ReplaceString(arg1, sizeof(arg1), "@", "");
+					int rank = StringToInt(arg1);
+
+					ReplaceString(arg2, sizeof(arg2), "b", "");
+					int bonus_number = StringToInt(arg2);
+
+					if (0 < bonus_number < MAXZONEGROUPS)
+						db_GetRankSteamID(client, g_szMapName, rank, bonus_number);
+						//db_selectPRinfoUnknown(client, rank, bonus_number);
+					else
+						CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, bonus_number);
+
+				}
+			}
+			else if (arg1[0] == 'b')
+			{	
+				if (StrContains(arg2, "surf_") != -1){
+					ReplaceString(arg1, sizeof(arg1), "b", "");
+					int bonus_number = StringToInt(arg1);
+
+					if (0 < bonus_number < MAXZONEGROUPS)
+						db_viewPRinfoMapRankBonus(client, g_szSteamID[client], arg2, bonus_number);
+					else
+						CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, bonus_number);
+				}
+				else if(StrContains(arg2, "@") != -1){
+					ReplaceString(arg1, sizeof(arg1), "b", "");
+					int bonus_number = StringToInt(arg1);
+
+					ReplaceString(arg2, sizeof(arg2), "@", "");
+					int rank = StringToInt(arg2);
+
+					if (0 < bonus_number < MAXZONEGROUPS)
+						db_GetRankSteamID(client, g_szMapName, rank, bonus_number);
+						//db_selectPRinfoUnknown(client, rank, bonus_number);
+					else
+						CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, bonus_number);
+				}
+			}
+		}
+		//WORKS
+		//prinfo <mapname> <bonus number> <rank>
+		case 3:{
+			char arg1[128];
+			char arg2[128];
+			char arg3[128];
+
+			GetCmdArg(1, arg1, sizeof(arg1));
+			GetCmdArg(2, arg2, sizeof(arg2));
+			GetCmdArg(3, arg3, sizeof(arg3));
+
+			if( (StrContains(arg1, "surf_") != -1) && (arg2[0] == 'b') && (arg3[0] == '@')){
+
+				ReplaceString(arg2, sizeof(arg2), "b", "");
+				int bonus_number = StringToInt(arg2);
+
+				ReplaceString(arg3, sizeof(arg3), "@", "");
+				int rank = StringToInt(arg3);
+
+				if (0 < bonus_number < MAXZONEGROUPS)
+					db_GetRankSteamID(client, arg1, rank, bonus_number-1);
+					//db_selectPRinfoUnknownWithMap(client, rank, arg1, bonus_number);
+				else
+					CPrintToChat(client, "%t", "InvalidBonusID", g_szChatPrefix, bonus_number);
+
+			}
+			else{
+				CPrintToChat(client, "%t", "BonusPRinfoUsage", g_szChatPrefix);
+			}
+		}
+		default:{
+			CPrintToChat(client, "DEFAULT");
+			db_selectPRinfoUnknownWithMap(client, g_MapRank[client], g_szMapName, 0, g_szSteamID[client]);
 		}
 	}
 

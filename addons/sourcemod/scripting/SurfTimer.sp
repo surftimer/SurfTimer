@@ -1313,9 +1313,19 @@ Handle g_hDestinations;
 
 // CPR command
 float g_fClientCPs[MAXPLAYERS + 1][36];
+
 float g_fTargetTime[MAXPLAYERS + 1];
 char g_szTargetCPR[MAXPLAYERS + 1][MAX_NAME_LENGTH];
 char g_szCPRMapName[MAXPLAYERS + 1][128];
+
+//PRINFO command
+float g_fTimeinZone[MAXPLAYERS + 1][MAXZONEGROUPS];
+float g_fCompletes[MAXPLAYERS + 1][MAXZONEGROUPS];
+float g_fAttempts[MAXPLAYERS + 1][MAXZONEGROUPS];
+float g_fstComplete[MAXPLAYERS + 1][MAXZONEGROUPS];
+float g_fTimeIncrement[MAXPLAYERS + 1][MAXZONEGROUPS];
+int g_iPRinfoMapRank[MAXPLAYERS + 1];
+int g_iPRinfoMapRankBonus[MAXPLAYERS + 1];
 
 // surf_christmas2
 bool g_bUsingStageTeleport[MAXPLAYERS + 1];
@@ -2052,6 +2062,15 @@ public void OnClientDisconnect(int client)
 
 	// New noclipspeed
 	sv_noclipspeed.FloatValue = g_iDefaultNoclipSpeed;
+
+	//PRINFO
+	if(IsValidClient(client) && !IsFakeClient(client)){
+		for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++){
+			if(g_fTimeIncrement[client][zonegroup] != 0.0)
+				g_fTimeinZone[client][zonegroup] += g_fTimeIncrement[client][zonegroup];
+			db_UpdatePRinfo(client, g_szSteamID[client], zonegroup);
+		}
+	}
 }
 
 public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] newValue)

@@ -99,6 +99,7 @@ public void LoadClientSetting(int client, int setting)
 			case 5: db_CheckVIPAdmin(client, g_szSteamID[client]);
 			case 6: db_viewCustomTitles(client, g_szSteamID[client]);
 			case 7: db_viewCheckpoints(client, g_szSteamID[client], g_szMapName);
+			case 8: db_viewPRinfo(client, g_szSteamID[client], g_szMapName);
 			default: db_viewPersonalRecords(client, g_szSteamID[client], g_szMapName);
 		}
 		g_iSettingToLoad[client]++;
@@ -2078,11 +2079,14 @@ public void FormatTimeFloat(int client, float time, int type, char[] string, int
 	char szMilli2[16];
 	char szSeconds2[16];
 	char szMinutes2[16];
+	char szHours2[16];
+	char szDays[16];
 	int imilli;
 	int imilli2;
 	int iseconds;
 	int iminutes;
 	int ihours;
+	int idays;
 	if (type != 6)
 		time = FloatAbs(time);
 	imilli = RoundToZero(time * 100);
@@ -2094,6 +2098,8 @@ public void FormatTimeFloat(int client, float time, int type, char[] string, int
 	iminutes = RoundToZero(time / 60);
 	iminutes = iminutes % 60;
 	ihours = RoundToZero((time / 60) / 60);
+	ihours = ihours % 24;
+	idays = RoundToZero( ((time / 60) / 60) / 24);
 
 	if (imilli < 10)
 		Format(szMilli, 16, "0%dms", imilli);
@@ -2107,6 +2113,10 @@ public void FormatTimeFloat(int client, float time, int type, char[] string, int
 		Format(szMinutes, 16, "0%dm", iminutes);
 	else
 		Format(szMinutes, 16, "%dm", iminutes);
+	if (ihours < 10)
+		Format(szHours, 16, "0%dh", ihours);
+	else
+		Format(szHours, 16, "%dh", ihours);
 
 	Format(szMilli2, 16, "%d", imilli2);
 	if (iseconds < 10)
@@ -2117,6 +2127,11 @@ public void FormatTimeFloat(int client, float time, int type, char[] string, int
 		Format(szMinutes2, 16, "0%d", iminutes);
 	else
 		Format(szMinutes2, 16, "%d", iminutes);
+	if (ihours < 10)
+		Format(szHours2, 16, "0%h", ihours);
+	else
+		Format(szHours2, 16, "%h", ihours);
+
 	// Time: 00m 00s 00ms
 	if (type == 0)
 	{
@@ -2262,6 +2277,28 @@ public void FormatTimeFloat(int client, float time, int type, char[] string, int
 			Format(string, length, "+%s", string);
 		else
 			Format(string, length, "-%s", string);
+	}
+	// 00d 00h 00m 00s 00ms
+	if (type == 7)
+	{
+		imilli = RoundToZero(time * 1000);
+		imilli = imilli % 1000;
+		if (imilli < 10)
+			Format(szMilli, 16, "00%dms", imilli);
+		else
+			if (imilli < 100)
+				Format(szMilli, 16, "0%dms", imilli);
+			else
+				Format(szMilli, 16, "%dms", imilli);
+
+		if(idays > 0){
+			Format(szDays, 16, "%dd", idays);
+			Format(string, 32, "%s %s %s %s %s", szDays, szHours, szMinutes, szSeconds, szMilli);
+		}
+		else{
+			Format(string, 32, "%s %s %s %s", szHours, szMinutes, szSeconds, szMilli);
+		}
+		
 	}
 }
 
