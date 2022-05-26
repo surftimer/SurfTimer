@@ -283,9 +283,12 @@ public Action Command_ChangeSpeedGradient(int client, int args) {
 	} else if (g_SpeedGradient[client] == 4) {
 		g_SpeedGradient[client]++;
 		CPrintToChat(client, "%t", "SpeedGradientMomentum", g_szChatPrefix);
+	}else if (g_SpeedGradient[client] == 5) {
+		g_SpeedGradient[client]++;
+		CPrintToChat(client, "%t", "SpeedGradientWhite", g_szChatPrefix);
 	} else {
 		g_SpeedGradient[client] = 0;
-		CPrintToChat(client, "%t", "SpeedGradientWhite", g_szChatPrefix);
+		CPrintToChat(client, "%t", "SpeedGradienCustom", g_szChatPrefix);
 	}
 	return Plugin_Handled;
 }
