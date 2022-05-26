@@ -77,6 +77,10 @@ public void db_setupDatabase()
 		{
 			db_upgradeDatabase(4);
 		}
+		else if (!SQL_FastQuery(g_hDb, "SELECT csd_update_rate FROM ck_playeroptions2 LIMIT 1"))
+		{
+			db_upgradeDatabase(5);
+		}
 	}
 
 	SQL_UnlockDatabase(g_hDb);
@@ -162,6 +166,10 @@ public void db_upgradeDatabase(int ver)
   else if (ver == 4)
   {
 	  SQL_FastQuery(g_hDb, sql_CreatePrinfo);
+  }
+  else if (ver == 5)
+  {
+	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD csd_update_rate int(11) NOT NULL DEFAULT '1', ADD csd_pos_x float(11) NOT NULL DEFAULT '0.5', ADD csd_pos_y float(11) NOT NULL DEFAULT '0.3', ADD csd_r int(11) NOT NULL DEFAULT '255', ADD csd_g int(11) NOT NULL DEFAULT '255', ADD csd_b int(11) NOT NULL DEFAULT '255';");
   }
   
   SQL_UnlockDatabase(g_hDb);
