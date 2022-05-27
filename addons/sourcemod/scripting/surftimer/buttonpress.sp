@@ -856,7 +856,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		stage = 1;
 
 	if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0 && g_fCurrentRunTime[client] != 0.0 && g_iClientInZone[client][2] == 0)
-		g_fStageTimesNew[0][client][stage-1] = g_fFinalWrcpTime[client];
+		g_fStageTimesNew[0][client][stage-1] = g_fCurrentWrcpRunTime[client];
 
 	if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0)
 	{
