@@ -855,6 +855,9 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 	else if (stage < 1)
 		stage = 1;
 
+	if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0 && g_fCurrentRunTime[client] != 0.0 && g_iClientInZone[client][2] == 0)
+		g_fStageTimesNew[0][client][stage-1] = g_fFinalWrcpTime[client];
+
 	if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0)
 	{
 		// int stage = g_CurrentStage[client];
@@ -866,8 +869,6 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 			CPrintToChat(client, "%t", "ErrorStageTime", g_szChatPrefix, stage);
 			return;
 		}
-
-		g_fStageTimesNew[0][client][g_Stage[0][client]-1] = g_fFinalWrcpTime[client];
 
 		char sz_srDiff[128];
 		float time = g_fFinalWrcpTime[client];

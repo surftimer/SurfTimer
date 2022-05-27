@@ -3485,6 +3485,33 @@ public void SQL_updateCheckpointsCallback(Handle owner, Handle hndl, const char[
 	int zonegrp = ReadPackCell(data);
 	CloseHandle(data);
 
+	db_UpdateStageTimes(client, g_szSteamID[client], zonegrp);
+	//db_viewCheckpointsinZoneGroup(client, g_szSteamID[client], g_szMapName, zonegrp);
+}
+
+public void db_UpdateStageTimes(int client, char szSteamID[32], int zGroup)
+{
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackCell(pack, zGroup);
+	char szQuery[4096];
+
+	Format(szQuery, sizeof(szQuery), sql_updateStageTimes, g_fStageTimesNew[zGroup][client][0], g_fStageTimesNew[zGroup][client][1], g_fStageTimesNew[zGroup][client][2], g_fStageTimesNew[zGroup][client][3], g_fStageTimesNew[zGroup][client][4], g_fStageTimesNew[zGroup][client][5], g_fStageTimesNew[zGroup][client][6], g_fStageTimesNew[zGroup][client][7], g_fStageTimesNew[zGroup][client][8], g_fStageTimesNew[zGroup][client][9], g_fStageTimesNew[zGroup][client][10], g_fStageTimesNew[zGroup][client][11], g_fStageTimesNew[zGroup][client][12], g_fStageTimesNew[zGroup][client][13], g_fStageTimesNew[zGroup][client][14], g_fStageTimesNew[zGroup][client][15], g_fStageTimesNew[zGroup][client][16], g_fStageTimesNew[zGroup][client][17], g_fStageTimesNew[zGroup][client][18], g_fStageTimesNew[zGroup][client][19], g_fStageTimesNew[zGroup][client][20], g_fStageTimesNew[zGroup][client][21], g_fStageTimesNew[zGroup][client][22], g_fStageTimesNew[zGroup][client][23], g_fStageTimesNew[zGroup][client][24], g_fStageTimesNew[zGroup][client][25], g_fStageTimesNew[zGroup][client][26], g_fStageTimesNew[zGroup][client][27], g_fStageTimesNew[zGroup][client][28], g_fStageTimesNew[zGroup][client][29], g_fStageTimesNew[zGroup][client][30], g_fStageTimesNew[zGroup][client][31], g_fStageTimesNew[zGroup][client][32], g_fStageTimesNew[zGroup][client][33], g_fStageTimesNew[zGroup][client][34], szSteamID, g_szMapName, zGroup);
+	SQL_TQuery(g_hDb, SQL_updateStageTimesCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void SQL_updateStageTimesCallback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (SQL_updateStageTimesCallback): %s", error);
+		return;
+	}
+	ResetPack(data);
+	int client = ReadPackCell(data);
+	int zonegrp = ReadPackCell(data);
+	CloseHandle(data);
+
 	db_viewCheckpointsinZoneGroup(client, g_szSteamID[client], g_szMapName, zonegrp);
 }
 
@@ -11045,7 +11072,7 @@ public void SQL_viewCCP_GetMapStageTimes_RecordPracCallback(Handle owner, Handle
 		ReadPackString(pack, szMapTimeDiffFormatted, sizeof(szMapTimeDiffFormatted));
 
 		//SAVE THE CHECKPOINT TIMES TO A GLOBAL ARRAY
-		for(int i = 0; i < g_TotalStages - 1; i++){
+		for(int i = 0; i < g_TotalStages; i++){
 			g_fCCPRecordCheckpointTimes[i] = SQL_FetchFloat(hndl, i);
 		}
 
@@ -11111,6 +11138,7 @@ public void SQL_viewCCP_GetMapStageTimes_PlayerPracCallback(Handle owner, Handle
 		//SAVE THE CHECKPOINT TIMES TO A GLOBAL ARRAY
 		for(int i = 0; i < g_TotalStages; i++){
 			g_fCCPPlayerCheckpointTimes[i] = SQL_FetchFloat(hndl, i);
+			PrintToChatAll("stage %d : %f", i+1, g_fCCPPlayerCheckpointTimes[i]);
 		}
 
 		if(g_fCCPPlayerCheckpointTimes[0] != 0.0){
