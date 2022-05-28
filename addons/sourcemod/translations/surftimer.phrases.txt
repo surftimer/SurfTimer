@@ -1844,4 +1844,9 @@
 		"#format"	"{1:s}"
 		"en"		"{1} No map record found"
 	}
+	"CCP_05"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Old Personal Record, Improve your time"
+	}
 }

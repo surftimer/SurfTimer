@@ -10812,7 +10812,7 @@ public void db_viewCCP_GetMapRank(int client, char szSteamID[32], char szMapName
 	WritePackString(pack, szSteamID);
 	WritePackString(pack, szMapName);
 	
-	Format(szQuery, 2048, "SELECT COUNT(*), runtimepro, steamid FROM ck_playertimes WHERE runtimepro <= (SELECT runtimepro FROM ck_playertimes WHERE steamid = '%s' AND mapname LIKE '%c%s%c' AND style = 0 AND runtimepro > -1.0) AND mapname LIKE '%c%s%c' AND style = 0 AND runtimepro > -1.0;", szSteamID, PERCENT, szMapName, PERCENT, PERCENT, szMapName, PERCENT);
+	Format(szQuery, sizeof(szQuery), "SELECT COUNT(*), runtimepro, steamid FROM ck_playertimes WHERE runtimepro <= (SELECT runtimepro FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND style = 0 AND runtimepro > -1.0) AND mapname = '%s' AND style = 0 AND runtimepro > -1.0;", szSteamID, szMapName, szMapName);
 	SQL_TQuery(g_hDb, SQL_viewCCP_GetMapRankCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -11109,16 +11109,21 @@ public void SQL_viewCCP_GetMapStageTimes_PlayerPracCallback(Handle owner, Handle
 		ReadPackString(pack, szMapTimeDiffFormatted, sizeof(szMapTimeDiffFormatted));
 
 		//SAVE THE CHECKPOINT TIMES TO A GLOBAL ARRAY
-		for(int i = 0; i < g_TotalStages - 1; i++){
+		for(int i = 0; i < g_TotalStages; i++){
 			g_fCCPPlayerCheckpointTimes[i] = SQL_FetchFloat(hndl, i);
 		}
 
-		char szStageTimeFormatted[32];
+		if(g_fCCPPlayerCheckpointTimes[0] != 0.0){
+			char szStageTimeFormatted[32];
 
-		//GET EACH STAGE TIME AND FORMAT IT
-		for(int i=0; i < g_TotalStages; i++){
-			FormatTimeFloat(client, g_fCCPPlayerCheckpointTimes[i], 3, szStageTimeFormatted, 32);
-			db_viewCCP_GetMapStageRank(client, szSteamID, szMapName, map_rank, total_map_completions, szMapTimeFormatted, szMapTimeDiffFormatted, i+1, g_fCCPPlayerCheckpointTimes[i], szStageTimeFormatted);
+			//GET EACH STAGE TIME AND FORMAT IT
+			for(int i=0; i < g_TotalStages; i++){
+				FormatTimeFloat(client, g_fCCPPlayerCheckpointTimes[i], 3, szStageTimeFormatted, 32);
+				db_viewCCP_GetMapStageRank(client, szSteamID, szMapName, map_rank, total_map_completions, szMapTimeFormatted, szMapTimeDiffFormatted, i+1, g_fCCPPlayerCheckpointTimes[i], szStageTimeFormatted);
+			}
+		}
+		else{
+			CPrintToChat(client, "%t", "CCP_05", g_szChatPrefix);	
 		}
 
 	}
