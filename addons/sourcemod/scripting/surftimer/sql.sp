@@ -6022,6 +6022,7 @@ public void db_viewPlayerOptionsCallback(Handle owner, Handle hndl, const char[]
 		g_bAllowHints[client] = true;
 		g_iCSDUpdateRate[client] = 1;
 		g_fCSD_POS_X[client] = 0.5;
+		g_fCSD_POS_Y[client] = 0.4;
 		g_iCSD_R[client] = 255;
 		g_iCSD_G[client] = 255;
 		g_iCSD_B[client] = 255;
