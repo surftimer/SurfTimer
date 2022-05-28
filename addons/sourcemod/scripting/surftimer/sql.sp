@@ -11138,7 +11138,6 @@ public void SQL_viewCCP_GetMapStageTimes_PlayerPracCallback(Handle owner, Handle
 		//SAVE THE CHECKPOINT TIMES TO A GLOBAL ARRAY
 		for(int i = 0; i < g_TotalStages; i++){
 			g_fCCPPlayerCheckpointTimes[i] = SQL_FetchFloat(hndl, i);
-			PrintToChatAll("stage %d : %f", i+1, g_fCCPPlayerCheckpointTimes[i]);
 		}
 
 		if(g_fCCPPlayerCheckpointTimes[0] != 0.0){
