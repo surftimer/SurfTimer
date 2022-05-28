@@ -2436,8 +2436,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 					}
 				}
 			}
-
-			ShowHudText(client, 1, szSpeed);
+			ShowSyncHudText(client, HUD_Handle, szSpeed);
 		}
 	}
 
