@@ -2623,7 +2623,7 @@ public void SQL_UpdateRecordProCallback(Handle owner, Handle hndl, const char[] 
 
 		// Find out how many times are are faster than the players time
 		char szQuery[512];
-		Format(szQuery, sizeof(szQuery), "SELECT count(runtimepro) FROM `ck_playertimes` WHERE `mapname` = '%s' AND `runtimepro` < %.4f AND style = 0;", g_szMapName, time);
+		Format(szQuery, sizeof(szQuery), "SELECT count(runtimepro) FROM `ck_playertimes` WHERE `mapname` = '%s' AND `runtimepro` < %f AND style = 0;", g_szMapName, time);
 		SQL_TQuery(g_hDb, SQL_UpdateRecordProCallback2, szQuery, client, DBPrio_Low);
 
 	}
@@ -11210,7 +11210,7 @@ public void SQL_viewCCP_GetMapStageRankCallback(Handle owner, Handle hndl, const
 
 		int stage_rank = SQL_FetchInt(hndl, 0);
 
-		db_viewCCP_GetMapStageRankTotal(client, szMapName, map_rank, total_map_completions, szMapTimeFormatted, szMapTimeDiffFormatted, stage, stage_rank+1, szStageTimeFormatted);
+		db_viewCCP_GetMapStageRankTotal(client, szMapName, map_rank, total_map_completions, szMapTimeFormatted, szMapTimeDiffFormatted, stage, stage_rank, szStageTimeFormatted);
 
 	}
 
