@@ -11037,16 +11037,16 @@ public void db_viewCCP_GetMapStageTimes_Record(int client, char szSteamID[32], c
 	char szQuery[2048];
 
 	Format(szQuery, 2048, "SELECT cp_stagetime_1, cp_stagetime_2, cp_stagetime_3, cp_stagetime_4, cp_stagetime_5, cp_stagetime_6, cp_stagetime_7, cp_stagetime_8, cp_stagetime_9, cp_stagetime_10, cp_stagetime_11, cp_stagetime_12, cp_stagetime_13, cp_stagetime_14, cp_stagetime_15, cp_stagetime_16, cp_stagetime_17, cp_stagetime_18, cp_stagetime_19, cp_stagetime_20, cp_stagetime_21, cp_stagetime_22, cp_stagetime_23, cp_stagetime_24, cp_stagetime_25, cp_stagetime_26, cp_stagetime_27, cp_stagetime_28, cp_stagetime_29, cp_stagetime_30, cp_stagetime_31, cp_stagetime_32, cp_stagetime_33, cp_stagetime_34, cp_stagetime_35 FROM ck_checkpoints WHERE mapname = '%s' AND zonegroup = '0' AND steamid = '%s';", szMapName, Record_SteamID);
-	SQL_TQuery(g_hDb, SQL_viewCCP_GetMapStageTimes_RecordPracCallback, szQuery, pack, DBPrio_Low);
+	SQL_TQuery(g_hDb, SQL_viewCCP_GetMapStageTimes_RecordCallback, szQuery, pack, DBPrio_Low);
 
 }
 
-public void SQL_viewCCP_GetMapStageTimes_RecordPracCallback(Handle owner, Handle hndl, const char[] error, any pack)
+public void SQL_viewCCP_GetMapStageTimes_RecordCallback(Handle owner, Handle hndl, const char[] error, any pack)
 {
 
 	if (hndl == null)
 	{
-		LogError("[SurfTimer] SQL Error (SQL_viewCCP_GetMapStageTimesPracCallbac): %s ", error);
+		LogError("[SurfTimer] SQL Error (SQL_viewCCP_GetMapStageTimesCallback): %s ", error);
 		CloseHandle(pack);
 		return;
 	}
@@ -11101,16 +11101,16 @@ public void db_viewCCP_GetMapStageTimes_Player(int client, char szSteamID[32], c
 	char szQuery[2048];
 
 	Format(szQuery, 2048, "SELECT cp_stagetime_1, cp_stagetime_2, cp_stagetime_3, cp_stagetime_4, cp_stagetime_5, cp_stagetime_6, cp_stagetime_7, cp_stagetime_8, cp_stagetime_9, cp_stagetime_10, cp_stagetime_11, cp_stagetime_12, cp_stagetime_13, cp_stagetime_14, cp_stagetime_15, cp_stagetime_16, cp_stagetime_17, cp_stagetime_18, cp_stagetime_19, cp_stagetime_20, cp_stagetime_21, cp_stagetime_22, cp_stagetime_23, cp_stagetime_24, cp_stagetime_25, cp_stagetime_26, cp_stagetime_27, cp_stagetime_28, cp_stagetime_29, cp_stagetime_30, cp_stagetime_31, cp_stagetime_32, cp_stagetime_33, cp_stagetime_34, cp_stagetime_35 FROM ck_checkpoints WHERE mapname = '%s' AND zonegroup = '0' AND steamid = '%s';", szMapName, szSteamID);
-	SQL_TQuery(g_hDb, SQL_viewCCP_GetMapStageTimes_PlayerPracCallback, szQuery, pack, DBPrio_Low);
+	SQL_TQuery(g_hDb, SQL_viewCCP_GetMapStageTimes_PlayerCallback, szQuery, pack, DBPrio_Low);
 
 }
 
-public void SQL_viewCCP_GetMapStageTimes_PlayerPracCallback(Handle owner, Handle hndl, const char[] error, any pack)
+public void SQL_viewCCP_GetMapStageTimes_PlayerCallback(Handle owner, Handle hndl, const char[] error, any pack)
 {
 
 	if (hndl == null)
 	{
-		LogError("[SurfTimer] SQL Error (SQL_viewCCP_GetMapStageTimesPracCallbac): %s ", error);
+		LogError("[SurfTimer] SQL Error (SQL_viewCCP_GetMapStageTimesCallback): %s ", error);
 		CloseHandle(pack);
 		return;
 	}
