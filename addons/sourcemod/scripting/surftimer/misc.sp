@@ -4071,7 +4071,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time, float sp
 		char szSpeed[32];
 		Format(szSpeed, 32, "%i", RoundToNearest(speed));
 
-		SendMapCheckpointForward(client, zonegroup, zone, time, speed, szTime, szSpeed, szDiff_colorless, sz_srDiff_colorless, sz_SpeedDiff_colorless, sz_srSpeedDiff_colorless);
+		SendMapCheckpointForward(client, zonegroup, zone, time, szTime, szDiff_colorless, sz_srDiff_colorless, speed, szSpeed, sz_SpeedDiff_colorless, sz_srSpeedDiff_colorless);
 
 		if (g_bCheckpointsEnabled[client] && g_iCpMessages[client])
 		{

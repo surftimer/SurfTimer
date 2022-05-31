@@ -270,11 +270,11 @@ void SendMapCheckpointForward(
 	int zonegroup, 
 	int zone, 
 	float time, 
-	float speed, 
-	const char[] szTime, 
-	const char[] szSpeed, 
+	const char[] szTime,
 	const char[] szDiff_colorless, 
 	const char[] sz_srDiff_colorless,
+	float speed, 
+	const char[] szSpeed,
 	const char[] sz_SpeedDiff_colorless,
 	const char[] sz_srSpeedDiff_colorless)
 {
