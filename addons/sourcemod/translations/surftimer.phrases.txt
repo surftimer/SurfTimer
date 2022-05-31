@@ -1651,18 +1651,18 @@
 	}
 	"StartPrestrafe"
 	{
-		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} Start Prestrafe: {2} u/s {3}"
+		"#format"	"{1:s},{2:s},{3:s},{4:s}"
+		"en"		"{1} Start Prestrafe: {lightgreen}{2} u/s {default}[PB: {3} | SR: {4}]"
 	}
 	"BonusPrestrafe"
 	{
-		"#format"	"{1:s},{2:i},{3:s},{4:s}"
-		"en"		"{1} Bonus {2} Prestrafe: {3} u/s {4}"
+		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s}"
+		"en"		"{1} Bonus {2} Prestrafe: {lightgreen}{3} u/s {default}[PB: {4} | SR: {5}]"
 	}
 	"StagePrestrafe"
 	{
-		"#format"	"{1:s},{2:i},{3:s},{4:s}"
-		"en"		"{1} Stage {2} Prestrafe: {3} u/s {4}"
+		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:s}"
+		"en"		"{1} Stage {2} Prestrafe: {lightgreen}{3} u/s {default}[PB: {4} | SR: {5}]"
 	}
 	"SilentSpecMessageToggleOn"
 	{
