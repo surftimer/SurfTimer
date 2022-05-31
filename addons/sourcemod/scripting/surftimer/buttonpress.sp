@@ -822,7 +822,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 
 			int prestrafe = RoundToNearest(GetSpeed(client));
 
-			SetPrestrafe(client, g_Stage[0][client], g_iCurrentStyle[client], false);
+			SetPrestrafe(client, g_Stage[0][client], g_iCurrentStyle[client], false, false, true);
 
 			if (iPrestrafeRecord == 0)
 			{
