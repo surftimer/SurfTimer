@@ -348,6 +348,9 @@ int lastCheckpoint[MAXZONEGROUPS][MAXPLAYERS + 1];
 // Clients checkpoints have been found?
 bool g_bCheckpointsFound[MAXZONEGROUPS][MAXPLAYERS + 1];
 
+// Clients Stage Times have been found?
+bool g_bStageTimesFound[MAXPLAYERS + 1];
+
 // Map record checkpoints found?
 bool g_bCheckpointRecordFound[MAXZONEGROUPS];
 

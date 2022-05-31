@@ -855,8 +855,11 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 	else if (stage < 1)
 		stage = 1;
 
-	if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0 && g_fCurrentRunTime[client] != 0.0 && g_iClientInZone[client][2] == 0)
+	if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0 && g_fCurrentRunTime[client] != 0.0 && g_iClientInZone[client][2] == 0){
 		g_fStageTimesNew[0][client][stage-1] = g_fCurrentWrcpRunTime[client];
+		PrintToServer("%f",g_fCurrentWrcpRunTime[client]);
+		PrintToServer("%f",view_as<float>(g_fCurrentWrcpRunTime[client]));
+	}
 
 	if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0)
 	{
