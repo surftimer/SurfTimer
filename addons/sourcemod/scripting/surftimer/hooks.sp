@@ -266,33 +266,32 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 
 public Action Say_Hook(int client, const char[] command, int argc)
 {
-	// Call Admin - Own Reason
-	if (g_bClientOwnReason[client])
-	{
-		g_bClientOwnReason[client] = false;
-		return Plugin_Continue;
-	}
-
-	char sText[1024];
-	GetCmdArgString(sText, sizeof(sText));
-
-	StripQuotes(sText);
-	TrimString(sText);
-
-	if (IsValidClient(client) && g_ClientRenamingZone[client])
-	{
-		Admin_renameZone(client, sText);
-		return Plugin_Handled;
-	}
-
 	if (!GetConVarBool(g_henableChatProcessing))
 		return Plugin_Continue;
 
 	if (IsValidClient(client))
 	{
-		if (client > 0)
-			if (BaseComm_IsClientGagged(client))
-				return Plugin_Handled;
+		char sText[1024];
+		GetCmdArgString(sText, sizeof(sText));
+
+		StripQuotes(sText);
+		TrimString(sText);
+
+		// Call Admin - Own Reason
+		if (g_bClientOwnReason[client])
+		{
+			g_bClientOwnReason[client] = false;
+			return Plugin_Continue;
+		}
+
+		if (g_ClientRenamingZone[client])
+		{
+			Admin_renameZone(client, sText);
+			return Plugin_Handled;
+		}
+
+		if (BaseComm_IsClientGagged(client))
+			return Plugin_Handled;
 
 		// Blocked Commands
 		for (int i = 0; i < sizeof(g_BlockedChatText); i++)
