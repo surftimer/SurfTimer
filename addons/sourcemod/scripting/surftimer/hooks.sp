@@ -450,7 +450,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 
 		if (GetClientTeam(client) == 1)
 		{
-			// Client is spectator
+			// Client is a spectator
 			PrintSpecMessageAll(client);
 			return Plugin_Handled;
 		}
