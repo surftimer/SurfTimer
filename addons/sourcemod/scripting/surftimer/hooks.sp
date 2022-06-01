@@ -271,6 +271,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 
 	if (IsValidClient(client))
 	{
+		// Get message text
 		char sText[1024];
 		GetCmdArgString(sText, sizeof(sText));
 
@@ -284,12 +285,14 @@ public Action Say_Hook(int client, const char[] command, int argc)
 			return Plugin_Continue;
 		}
 
+		// Renaming zone
 		if (g_ClientRenamingZone[client])
 		{
 			Admin_renameZone(client, sText);
 			return Plugin_Handled;
 		}
 
+		// Client is muted
 		if (BaseComm_IsClientGagged(client))
 			return Plugin_Handled;
 
@@ -297,9 +300,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		for (int i = 0; i < sizeof(g_BlockedChatText); i++)
 		{
 			if (StrEqual(g_BlockedChatText[i], sText, true))
-			{
 				return Plugin_Handled;
-			}
 		}
 
 		// Functions that require the client to input something via the chat box
@@ -362,6 +363,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 				}
 				case ClientEdit:
 				{
+					// Deleting records
 					g_SelectedType[client] = StringToInt(sText);
 					char szQuery[512];
 
@@ -405,6 +407,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		if (StrEqual(sText, " ") || !sText[0])
 			return Plugin_Handled;
 
+		// Spam check
 		if (checkSpam(client))
 			return Plugin_Handled;
 
@@ -424,12 +427,10 @@ public Action Say_Hook(int client, const char[] command, int argc)
 
 		// Hide ! commands
 		if (StrContains(sText, "!", false) == 0)
-		return Plugin_Handled;
+			return Plugin_Handled;
 
 		if ((IsChatTrigger() && sText[0] == '/') || (sText[0] == '@' && (GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)))
-		{
 			return Plugin_Continue;
-		}
 
 		char szName[64];
 		GetClientName(client, szName, 64);
@@ -439,40 +440,43 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		WriteChatLog(client, "say", sText);
 		PrintToServer("%s: %s", szName, sText);
 
+		// Name colors
 		if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
 			setNameColor(szName, g_iCustomColours[client][0], 64);
 
+		// Text colors
 		if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client] && g_bHasCustomTextColour[client])
 			setTextColor(sText, g_iCustomColours[client][1], 1024);
 
 		if (GetClientTeam(client) == 1)
 		{
+			// Client is spectator
 			PrintSpecMessageAll(client);
 			return Plugin_Handled;
 		}
 		else
 		{
-			char szChatRank[1024];
-			Format(szChatRank, sizeof(szChatRank), "%s", g_pr_chat_coloredrank[client]);
-
-			char szChatRankColor[1024];
-			Format(szChatRankColor, sizeof(szChatRankColor), "%s", g_pr_chat_coloredrank[client]);
-			CGetRankColor(szChatRankColor, sizeof(szChatRankColor));
-
-			if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
-				Format(szName, sizeof(szName), "{%s}%s", szChatRankColor, szName);
-
-			if (GetConVarBool(g_hCountry) && (GetConVarBool(g_hPointSystem)))
+			if (GetConVarBool(g_hPointSystem))
 			{
-				if (IsPlayerAlive(client))
-					CPrintToChatAll("%t", "Hooks6", g_szCountryCode[client], szChatRank, szName, sText);
-				else
-					CPrintToChatAll("%t", "Hooks7", g_szCountryCode[client], szChatRank, szName, sText);
-				return Plugin_Handled;
-			}
-			else
-			{
-				if (GetConVarBool(g_hPointSystem))
+				// Constructing the message
+				char szChatRank[1024];
+				Format(szChatRank, sizeof(szChatRank), "%s", g_pr_chat_coloredrank[client]);
+
+				char szChatRankColor[1024];
+				Format(szChatRankColor, sizeof(szChatRankColor), "%s", g_pr_chat_coloredrank[client]);
+				CGetRankColor(szChatRankColor, sizeof(szChatRankColor));
+
+				if (GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
+					Format(szName, sizeof(szName), "{%s}%s", szChatRankColor, szName);
+
+				if (GetConVarBool(g_hCountry)) {	// With country code
+					if (IsPlayerAlive(client))
+						CPrintToChatAll("%t", "Hooks6", g_szCountryCode[client], szChatRank, szName, sText);
+					else
+						CPrintToChatAll("%t", "Hooks7", g_szCountryCode[client], szChatRank, szName, sText);
+					return Plugin_Handled;
+				} 
+				else								// Without country code
 				{
 					if (IsPlayerAlive(client))
 						CPrintToChatAll("%t", "Hooks8", szChatRank, szName, sText);
