@@ -85,7 +85,7 @@ public void CL_OnStartTimerPress(int client)
 			{
 				if (g_fPersonalRecord[client] > 0.0)
 					g_bMissedMapBest[client] = false;
-				iPrestrafeRecord = g_iRecordPreStrafe[g_SpeedMode[client]][0][g_iCurrentStyle[client]];
+				iPrestrafeRecord = g_iRecordPreStrafe[g_PreSpeedMode[client]][0][g_iCurrentStyle[client]];
 				SetPrestrafe(client, 0, g_iCurrentStyle[client], false);
 				SetPrestrafe(client, 1, g_iCurrentStyle[client], false);
 			}
@@ -93,7 +93,7 @@ public void CL_OnStartTimerPress(int client)
 			{
 				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
 					g_bMissedBonusBest[client] = false;
-				iPrestrafeRecord = g_iRecordPreStrafeBonus[g_SpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
+				iPrestrafeRecord = g_iRecordPreStrafeBonus[g_PreSpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
 				SetPrestrafe(client, g_iClientInZone[client][2], g_iCurrentStyle[client], true);
 			}
 		}
@@ -105,7 +105,7 @@ public void CL_OnStartTimerPress(int client)
 
 			char szDifference[128], szSpeed[128], preMessage[128];
 			int iDifference;
-			int prestrafe = RoundToNearest(GetSpeed(client));
+			int prestrafe = RoundToNearest(GetPreSpeed(client));
 			if (iPrestrafeRecord == 0)
 			{
 				szDifference = "";
@@ -784,8 +784,8 @@ public void CL_OnStartWrcpTimerPress(int client)
 		if (g_Stage[0][client] > 1 && !g_bPracticeMode[client] && !IsFakeClient(client)) {
 			char szDifference[128], szSpeed[128], preMessage[128];
 			int iDifference;
-			int iPrestrafeRecord = g_iRecordPreStrafe[g_SpeedMode[client]][g_Stage[0][client]][g_iCurrentStyle[client]];
-			int prestrafe = RoundToNearest(GetSpeed(client));
+			int iPrestrafeRecord = g_iRecordPreStrafe[g_PreSpeedMode[client]][g_Stage[0][client]][g_iCurrentStyle[client]];
+			int prestrafe = RoundToNearest(GetPreSpeed(client));
 
 			SetPrestrafe(client, g_Stage[0][client], g_iCurrentStyle[client], false);
 
