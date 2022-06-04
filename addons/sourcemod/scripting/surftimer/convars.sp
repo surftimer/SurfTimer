@@ -138,18 +138,18 @@ void CreateConVars()
 	g_hRadioCommands = AutoExecConfig_CreateConVar("ck_use_radio", "0", "on/off - Allows players to use radio commands", _, true, 0.0, true, 1.0);
 	g_hAutohealing_Hp = AutoExecConfig_CreateConVar("ck_autoheal", "50", "Sets HP amount for autohealing (requires ck_godmode 0)", _, true, 0.0, true, 100.0);
 	g_hDynamicTimelimit = AutoExecConfig_CreateConVar("ck_dynamic_timelimit", "0", "on/off - Sets a suitable timelimit by calculating the average run time (This method requires ck_map_end 1, greater than 5 map times and a default timelimit in your server config for maps with less than 5 times", _, true, 0.0, true, 1.0);
-	g_hWelcomeMsg = AutoExecConfig_CreateConVar("ck_welcome_msg", "{yellow}>>{default} {grey}Welcome! This server is using {lime}SurfTimer", "Welcome message (supported color tags: {default}, {darkred}, {green}, {lightgreen}, {blue} {olive}, {lime}, {red}, {purple}, {grey}, {yellow}, {lightblue}, {darkblue}, {pink}, {lightred})", _);
-	g_hChecker = AutoExecConfig_CreateConVar("ck_zone_checker", "5.0", "The duration in seconds when the beams around zones are refreshed.", _);
-	g_hZoneDisplayType = AutoExecConfig_CreateConVar("ck_zone_drawstyle", "0", "0 = Do not display zones, 1 = display the lower edges of zones, 2 = display whole zones", _);
-	g_hZonesToDisplay = AutoExecConfig_CreateConVar("ck_zone_drawzones", "1", "Which zones are visible for players. 1 = draw start & end zones, 2 = draw start, end, stage and bonus zones, 3 = draw all zones.", _);
+	g_hWelcomeMsg = AutoExecConfig_CreateConVar("ck_welcome_msg", "{yellow}>>{default} {grey}Welcome! This server is using {lime}SurfTimer", "Welcome message (supported color tags: {default}, {darkred}, {green}, {lightgreen}, {blue} {olive}, {lime}, {red}, {purple}, {grey}, {yellow}, {lightblue}, {darkblue}, {pink}, {lightred})");
+	g_hChecker = AutoExecConfig_CreateConVar("ck_zone_checker", "5.0", "The duration in seconds when the beams around zones are refreshed.");
+	g_hZoneDisplayType = AutoExecConfig_CreateConVar("ck_zone_drawstyle", "0", "0 = Do not display zones, 1 = display the lower edges of zones, 2 = display whole zones");
+	g_hZonesToDisplay = AutoExecConfig_CreateConVar("ck_zone_drawzones", "1", "Which zones are visible for players. 1 = draw start & end zones, 2 = draw start, end, stage and bonus zones, 3 = draw all zones.");
 	g_hSpawnToStartZone = AutoExecConfig_CreateConVar("ck_spawn_to_start_zone", "1.0", "1 = Automatically spawn to the start zone when the client joins the team.", _, true, 0.0, true, 1.0);
 	g_hSoundEnabled = AutoExecConfig_CreateConVar("ck_startzone_sound_enabled", "1.0", "Enable the sound after leaving the start zone.", _, true, 0.0, true, 1.0);
-	g_hSoundPath = AutoExecConfig_CreateConVar("ck_startzone_sound_path", "buttons\\button3.wav", "The path to the sound file that plays after the client leaves the start zone..", _);
+	g_hSoundPath = AutoExecConfig_CreateConVar("ck_startzone_sound_path", "buttons\\button3.wav", "The path to the sound file that plays after the client leaves the start zone..");
 	g_hAnnounceRank = AutoExecConfig_CreateConVar("ck_min_rank_announce", "0", "Higher ranks than this won't be announced to the everyone on the server. 0 = Announce all records.", _, true, 0.0);
 	g_hAnnounceRecord = AutoExecConfig_CreateConVar("ck_chat_record_type", "0", "0: Announce all times to chat, 1: Only announce PB's to chat, 2: Only announce SR's to chat", _, true, 0.0, true, 2.0);
 	g_hForceCT = AutoExecConfig_CreateConVar("ck_force_players_ct", "0", "Forces all players to join the CT team.", _, true, 0.0, true, 1.0);
 	g_hChatSpamFilter = AutoExecConfig_CreateConVar("ck_chat_spamprotection_time", "1.0", "The frequency in seconds that players are allowed to send chat messages. 0.0 = No chat cap.", _, true, 0.0);
-	g_henableChatProcessing = AutoExecConfig_CreateConVar("ck_chat_enable", "1", "(1 / 0) Enable or disable SurfTimers chat processing.", _);
+	g_henableChatProcessing = AutoExecConfig_CreateConVar("ck_chat_enable", "1", "(1 / 0) Enable or disable SurfTimers chat processing.");
 	g_hMultiServerMapcycle = AutoExecConfig_CreateConVar("ck_multi_server_mapcycle", "0", "0 = Use mapcycle.txt to load servers maps, 1 = use configs/surftimer/multi_server_mapcycle.txt to load maps", _, true, 0.0, true, 1.0);
 	g_hDBMapcycle = AutoExecConfig_CreateConVar("ck_db_mapcycle", "1", "0 = use non-db map cycles, 1 use maps from ck_maptier", _, true, 0.0, true, 1.0);
 	g_hDoubleRestartCommand = AutoExecConfig_CreateConVar("ck_double_restart_command", "1", "(1 / 0) Requires 2 successive !r commands to restart the player to prevent accidental usage.", _, true, 0.0, true, 1.0);
@@ -167,13 +167,13 @@ void CreateConVars()
 	HookConVarChange(g_hPointSystem, OnSettingChanged);
 	g_hPlayerSkinChange = AutoExecConfig_CreateConVar("ck_custom_models", "1", "on/off - Allows SurfTimer to change the models of players and bots", _, true, 0.0, true, 1.0);
 	HookConVarChange(g_hPlayerSkinChange, OnSettingChanged);
-	g_hReplayBotPlayerModel = AutoExecConfig_CreateConVar("ck_replay_bot_skin", "models/player/tm_professional_var1.mdl", "Replay pro bot skin", _);
+	g_hReplayBotPlayerModel = AutoExecConfig_CreateConVar("ck_replay_bot_skin", "models/player/tm_professional_var1.mdl", "Replay pro bot skin");
 	HookConVarChange(g_hReplayBotPlayerModel, OnSettingChanged);
-	g_hReplayBotArmModel = AutoExecConfig_CreateConVar("ck_replay_bot_arm_skin", "models/weapons/t_arms_professional.mdl", "Replay pro bot arm skin", _);
+	g_hReplayBotArmModel = AutoExecConfig_CreateConVar("ck_replay_bot_arm_skin", "models/weapons/t_arms_professional.mdl", "Replay pro bot arm skin");
 	HookConVarChange(g_hReplayBotArmModel, OnSettingChanged);
-	g_hPlayerModel = AutoExecConfig_CreateConVar("ck_player_skin", "models/player/ctm_sas_varianta.mdl", "Player skin", _);
+	g_hPlayerModel = AutoExecConfig_CreateConVar("ck_player_skin", "models/player/ctm_sas_varianta.mdl", "Player skin");
 	HookConVarChange(g_hPlayerModel, OnSettingChanged);
-	g_hArmModel = AutoExecConfig_CreateConVar("ck_player_arm_skin", "models/weapons/ct_arms_sas.mdl", "Player arm skin", _);
+	g_hArmModel = AutoExecConfig_CreateConVar("ck_player_arm_skin", "models/weapons/ct_arms_sas.mdl", "Player arm skin");
 	HookConVarChange(g_hArmModel, OnSettingChanged);
 	g_hAutoBhopConVar = AutoExecConfig_CreateConVar("ck_auto_bhop", "1", "on/off - AutoBhop on surf_ maps", _, true, 0.0, true, 1.0);
 	HookConVarChange(g_hAutoBhopConVar, OnSettingChanged);
@@ -194,69 +194,69 @@ void CreateConVars()
 	g_hWrcpBot = AutoExecConfig_CreateConVar("ck_wrcp_bot", "1", "on/off - Bots mimic the local stage records", _, true, 0.0, true, 1.0);
 	HookConVarChange(g_hWrcpBot, OnSettingChanged);
 
-	g_hReplayBotColor = AutoExecConfig_CreateConVar("ck_replay_bot_color", "52 91 248", "The default replay bot color - Format: \"red green blue\" from 0 - 255.", _);
+	g_hReplayBotColor = AutoExecConfig_CreateConVar("ck_replay_bot_color", "52 91 248", "The default replay bot color - Format: \"red green blue\" from 0 - 255.");
 	HookConVarChange(g_hReplayBotColor, OnSettingChanged);
 	char szRBotColor[256];
 	GetConVarString(g_hReplayBotColor, szRBotColor, 256);
 	GetRGBColor(0, szRBotColor);
 
-	g_hBonusBotColor = AutoExecConfig_CreateConVar("ck_bonus_bot_color", "255 255 20", "The bonus replay bot color - Format: \"red green blue\" from 0 - 255.", _);
+	g_hBonusBotColor = AutoExecConfig_CreateConVar("ck_bonus_bot_color", "255 255 20", "The bonus replay bot color - Format: \"red green blue\" from 0 - 255.");
 	HookConVarChange(g_hBonusBotColor, OnSettingChanged);
 	szRBotColor = "";
 	GetConVarString(g_hBonusBotColor, szRBotColor, 256);
 	GetRGBColor(1, szRBotColor);
 
-	g_hzoneStartColor = AutoExecConfig_CreateConVar("ck_zone_startcolor", "000 255 000", "The color of START zones \"red green blue\" from 0 - 255", _);
+	g_hzoneStartColor = AutoExecConfig_CreateConVar("ck_zone_startcolor", "000 255 000", "The color of START zones \"red green blue\" from 0 - 255");
 	GetConVarString(g_hzoneStartColor, g_szZoneColors[1], 24);
 	StringRGBtoInt(g_szZoneColors[1], g_iZoneColors[1]);
 	HookConVarChange(g_hzoneStartColor, OnSettingChanged);
 
-	g_hzoneEndColor = AutoExecConfig_CreateConVar("ck_zone_endcolor", "255 000 000", "The color of END zones \"red green blue\" from 0 - 255", _);
+	g_hzoneEndColor = AutoExecConfig_CreateConVar("ck_zone_endcolor", "255 000 000", "The color of END zones \"red green blue\" from 0 - 255");
 	GetConVarString(g_hzoneEndColor, g_szZoneColors[2], 24);
 	StringRGBtoInt(g_szZoneColors[2], g_iZoneColors[2]);
 	HookConVarChange(g_hzoneEndColor, OnSettingChanged);
 
-	g_hzoneCheckerColor = AutoExecConfig_CreateConVar("ck_zone_checkercolor", "255 255 000", "The color of CHECKER zones \"red green blue\" from 0 - 255", _);
+	g_hzoneCheckerColor = AutoExecConfig_CreateConVar("ck_zone_checkercolor", "255 255 000", "The color of CHECKER zones \"red green blue\" from 0 - 255");
 	GetConVarString(g_hzoneCheckerColor, g_szZoneColors[10], 24);
 	StringRGBtoInt(g_szZoneColors[10], g_iZoneColors[10]);
 	HookConVarChange(g_hzoneCheckerColor, OnSettingChanged);
 
-	g_hzoneBonusStartColor = AutoExecConfig_CreateConVar("ck_zone_bonusstartcolor", "000 255 255", "The color of BONUS START zones \"red green blue\" from 0 - 255", _);
+	g_hzoneBonusStartColor = AutoExecConfig_CreateConVar("ck_zone_bonusstartcolor", "000 255 255", "The color of BONUS START zones \"red green blue\" from 0 - 255");
 	GetConVarString(g_hzoneBonusStartColor, g_szZoneColors[3], 24);
 	StringRGBtoInt(g_szZoneColors[3], g_iZoneColors[3]);
 	HookConVarChange(g_hzoneBonusStartColor, OnSettingChanged);
 
-	g_hzoneBonusEndColor = AutoExecConfig_CreateConVar("ck_zone_bonusendcolor", "255 000 255", "The color of BONUS END zones \"red green blue\" from 0 - 255", _);
+	g_hzoneBonusEndColor = AutoExecConfig_CreateConVar("ck_zone_bonusendcolor", "255 000 255", "The color of BONUS END zones \"red green blue\" from 0 - 255");
 	GetConVarString(g_hzoneBonusEndColor, g_szZoneColors[4], 24);
 	StringRGBtoInt(g_szZoneColors[4], g_iZoneColors[4]);
 	HookConVarChange(g_hzoneBonusEndColor, OnSettingChanged);
 
-	g_hzoneStageColor = AutoExecConfig_CreateConVar("ck_zone_stagecolor", "000 000 255", "The color of STAGE zones \"red green blue\" from 0 - 255", _);
+	g_hzoneStageColor = AutoExecConfig_CreateConVar("ck_zone_stagecolor", "000 000 255", "The color of STAGE zones \"red green blue\" from 0 - 255");
 	GetConVarString(g_hzoneStageColor, g_szZoneColors[5], 24);
 	StringRGBtoInt(g_szZoneColors[5], g_iZoneColors[5]);
 	HookConVarChange(g_hzoneStageColor, OnSettingChanged);
 
-	g_hzoneCheckpointColor = AutoExecConfig_CreateConVar("ck_zone_checkpointcolor", "000 000 255", "The color of CHECKPOINT zones \"red green blue\" from 0 - 255", _);
+	g_hzoneCheckpointColor = AutoExecConfig_CreateConVar("ck_zone_checkpointcolor", "000 000 255", "The color of CHECKPOINT zones \"red green blue\" from 0 - 255");
 	GetConVarString(g_hzoneCheckpointColor, g_szZoneColors[6], 24);
 	StringRGBtoInt(g_szZoneColors[6], g_iZoneColors[6]);
 	HookConVarChange(g_hzoneCheckpointColor, OnSettingChanged);
 
-	g_hzoneSpeedColor = AutoExecConfig_CreateConVar("ck_zone_speedcolor", "255 000 000", "The color of SPEED zones \"red green blue\" from 0 - 255", _);
+	g_hzoneSpeedColor = AutoExecConfig_CreateConVar("ck_zone_speedcolor", "255 000 000", "The color of SPEED zones \"red green blue\" from 0 - 255");
 	GetConVarString(g_hzoneSpeedColor, g_szZoneColors[7], 24);
 	StringRGBtoInt(g_szZoneColors[7], g_iZoneColors[7]);
 	HookConVarChange(g_hzoneSpeedColor, OnSettingChanged);
 
-	g_hzoneTeleToStartColor = AutoExecConfig_CreateConVar("ck_zone_teletostartcolor", "255 255 000", "The color of TELETOSTART zones \"red green blue\" from 0 - 255", _);
+	g_hzoneTeleToStartColor = AutoExecConfig_CreateConVar("ck_zone_teletostartcolor", "255 255 000", "The color of TELETOSTART zones \"red green blue\" from 0 - 255");
 	GetConVarString(g_hzoneTeleToStartColor, g_szZoneColors[8], 24);
 	StringRGBtoInt(g_szZoneColors[8], g_iZoneColors[8]);
 	HookConVarChange(g_hzoneTeleToStartColor, OnSettingChanged);
 
-	g_hzoneValidatorColor = AutoExecConfig_CreateConVar("ck_zone_validatorcolor", "255 255 255", "The color of VALIDATOR zones \"red green blue\" from 0 - 255", _);
+	g_hzoneValidatorColor = AutoExecConfig_CreateConVar("ck_zone_validatorcolor", "255 255 255", "The color of VALIDATOR zones \"red green blue\" from 0 - 255");
 	GetConVarString(g_hzoneValidatorColor, g_szZoneColors[9], 24);
 	StringRGBtoInt(g_szZoneColors[9], g_iZoneColors[9]);
 	HookConVarChange(g_hzoneValidatorColor, OnSettingChanged);
 
-	g_hzoneStopColor = AutoExecConfig_CreateConVar("ck_zone_stopcolor", "000 000 000", "The color of CHECKER zones \"red green blue\" from 0 - 255", _);
+	g_hzoneStopColor = AutoExecConfig_CreateConVar("ck_zone_stopcolor", "000 000 000", "The color of CHECKER zones \"red green blue\" from 0 - 255");
 	GetConVarString(g_hzoneStopColor, g_szZoneColors[0], 24);
 	StringRGBtoInt(g_szZoneColors[0], g_iZoneColors[0]);
 	HookConVarChange(g_hzoneStopColor, OnSettingChanged);
@@ -264,7 +264,7 @@ void CreateConVars()
 	bool validFlag;
 	char szFlag[24];
 	AdminFlag bufferFlag;
-	g_hAdminMenuFlag = AutoExecConfig_CreateConVar("ck_adminmenu_flag", "z", "Admin flag required to open the !ckadmin menu. Invalid or not set, requires flag z. Requires a server restart.", _);
+	g_hAdminMenuFlag = AutoExecConfig_CreateConVar("ck_adminmenu_flag", "z", "Admin flag required to open the !ckadmin menu. Invalid or not set, requires flag z. Requires a server restart.");
 	GetConVarString(g_hAdminMenuFlag, szFlag, 24);
 	validFlag = FindFlagByChar(szFlag[0], bufferFlag);
 	if (!validFlag)
@@ -278,7 +278,7 @@ void CreateConVars()
 	}
 	HookConVarChange(g_hAdminMenuFlag, OnSettingChanged);
 
-	g_hZonerFlag = AutoExecConfig_CreateConVar("ck_zoner_flag", "z", "Zoner status will automatically be granted to players with this flag. If the convar is invalid or not set, z (root) will be used by default.", _);
+	g_hZonerFlag = AutoExecConfig_CreateConVar("ck_zoner_flag", "z", "Zoner status will automatically be granted to players with this flag. If the convar is invalid or not set, z (root) will be used by default.");
 	GetConVarString(g_hZonerFlag, szFlag, 24);
 	validFlag = FindFlagByChar(szFlag[0], bufferFlag);
 	if (!validFlag)
@@ -296,7 +296,7 @@ void CreateConVars()
 	g_hGravityFix = AutoExecConfig_CreateConVar("ck_gravityfix_enable", "1", "Enables/Disables trigger_gravity fix", _, true, 0.0, true, 1.0);
 
 	// VIP ConVars
-	g_hAutoVipFlag = AutoExecConfig_CreateConVar("ck_vip_flag", "a", "VIP status will be automatically granted to players with this flag. If the convar is invalid or not set, a (reservation) will be used by default.", _);
+	g_hAutoVipFlag = AutoExecConfig_CreateConVar("ck_vip_flag", "a", "VIP status will be automatically granted to players with this flag. If the convar is invalid or not set, a (reservation) will be used by default.");
 	GetConVarString(g_hAutoVipFlag, szFlag, 24);
 	validFlag = FindFlagByChar(szFlag[0], bufferFlag);
 	if (!validFlag)
