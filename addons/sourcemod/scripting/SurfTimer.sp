@@ -327,6 +327,9 @@ float g_fCheckpointTimesNew[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
 // Clients current run's stage times
 float g_fStageTimesNew[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
 
+// Clients current run's stage attempts
+int g_iStageAttemptsNew[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
+
 // Server record checkpoint times
 float g_fCheckpointServerRecord[MAXZONEGROUPS][CPLIMIT];
 
@@ -1349,6 +1352,7 @@ int g_iPRinfoMapRankBonus[MAXPLAYERS + 1];
 Menu ccp_menu;
 float g_fCCPRecordCheckpointTimes[CPLIMIT];
 float g_fCCPPlayerCheckpointTimes[CPLIMIT];
+int g_iCCPPlayerCheckpointAttempts[CPLIMIT];
 
 // surf_christmas2
 bool g_bUsingStageTeleport[MAXPLAYERS + 1];

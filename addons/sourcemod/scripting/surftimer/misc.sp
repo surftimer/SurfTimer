@@ -1287,6 +1287,7 @@ public void SetClientDefaults(int client)
 		{
 			g_fCheckpointTimesNew[x][client][i] = 0.0;
 			g_fStageTimesNew[x][client][i] = 0.0;
+			g_iStageAttemptsNew[x][client][i] = 0;
 			g_fCheckpointTimesRecord[x][client][i] = 0.0;
 		}
 	}
