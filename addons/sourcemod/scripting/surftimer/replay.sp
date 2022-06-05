@@ -451,7 +451,10 @@ public void PlayRecord(int client, int type, int style)
 
 	FileHeader header;
 	BuildPath(Path_SM, sPath, sizeof(sPath), "%s", sPath);
-	LoadRecordFromFile(sPath, header, false);
+	if (!LoadRecordFromFile(sPath, header, false))
+	{
+		return;
+	}
 
 	if (type == 0)
 	{
@@ -516,7 +519,7 @@ public void PlayRecord(int client, int type, int style)
 	g_aReplayFrame[client] = header.Frames;
 	g_iReplayVersion[client] = header.BinaryFormatVersion;
 	g_iReplayTick[client] = 0;
-	g_iRecordedTicksCount[client] = header.TickCount;
+	g_iReplayTicksCount[client] = header.TickCount;
 	g_CurrentAdditionalTeleportIndex[client] = 0;
 
 	Array_Copy(header.InitialPosition, g_fInitialPosition[client], 3);
@@ -633,6 +636,11 @@ public bool LoadRecordFromFile(const char[] path, FileHeader header, bool header
 	{
 		delete fFile;
 		return true;
+	}
+	else if (header.TickCount == 0)
+	{
+		delete fFile;
+		return false;
 	}
 
 	if (header.BinaryFormatVersion >= BINARY_FORMAT_VERSION)
@@ -911,12 +919,12 @@ public void StopPlayerMimic(int client)
 
 	g_iReplayTick[client] = 0;
 	g_CurrentAdditionalTeleportIndex[client] = 0;
-	g_iRecordedTicksCount[client] = 0;
+	g_iReplayTicksCount[client] = 0;
 	g_bValidTeleportCall[client] = false;
 	delete g_aReplayFrame[client];
 }
 
-public void RecordReplay(int client, int &buttons, int &subtype, int &seed, int &impulse, int &weapon, float angles[3], float vel[3])
+public void Replay_Recording(int client, int &buttons, int &subtype, int &seed, int &impulse, int &weapon, float angles[3], float vel[3])
 {
 	if (g_aRecording[client] == null || g_bPause[client])
 	{
@@ -944,10 +952,10 @@ public void RecordReplay(int client, int &buttons, int &subtype, int &seed, int 
 	g_aRecording[client].SetArray(g_iRecordedTicks[client]++, aFrame, sizeof(aFrame));
 }
 
-public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &impulse, int &weapon, float angles[3], float vel[3])
+public void Replay_Playback(int client, int &buttons, int &subtype, int &seed, int &impulse, int &weapon, float angles[3], float vel[3])
 {
 	if (GetClientTeam(client) < CS_TEAM_T || 
-		g_aReplayFrame[client] == null)
+		g_aReplayFrame[client] == null || g_iReplayTicksCount[client] == 0)
 	{
 		return;
 	}
@@ -1184,7 +1192,7 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 
 static void LoopReplay(int client)
 {
-	if (g_iReplayTick[client] >= g_iRecordedTicksCount[client] || g_bReplayAtEnd[client])
+	if (g_iReplayTick[client] >= g_iReplayTicksCount[client] || g_bReplayAtEnd[client])
 	{
 		if (client == g_BonusBot)
 		{

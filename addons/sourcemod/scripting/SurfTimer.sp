@@ -942,10 +942,10 @@ int g_CurrentAdditionalTeleportIndex[MAXPLAYERS + 1];
 // Player's frame
 int g_iRecordedTicks[MAXPLAYERS + 1];
 
-// Amount of Player's frame
-int g_iRecordedTicksCount[MAXPLAYERS + 1];
+// Amount of bot's frame
+int g_iReplayTicksCount[MAXPLAYERS + 1];
 
-// Replay bot's frame
+// Replay bot's current frame
 int g_iReplayTick[MAXPLAYERS + 1];
 
 // Stage replays stuff
@@ -1607,10 +1607,10 @@ public void OnLibraryRemoved(const char[] name)
 public void OnEntityCreated(int entity, const char[] classname) {
 	if( (classname[0] == 't' ||  classname[0] == 'l') ? (StrEqual(classname, "trigger_teleport", false) ) : false)
 	{
-		SDKHook(entity, SDKHook_Use, ingnoreTriggers);
-		SDKHook(entity, SDKHook_StartTouch, ingnoreTriggers);
-		SDKHook(entity, SDKHook_Touch, ingnoreTriggers);
-		SDKHook(entity, SDKHook_EndTouch, ingnoreTriggers);
+		SDKHook(entity, SDKHook_Use, IgnoreTriggers);
+		SDKHook(entity, SDKHook_StartTouch, IgnoreTriggers);
+		SDKHook(entity, SDKHook_Touch, IgnoreTriggers);
+		SDKHook(entity, SDKHook_EndTouch, IgnoreTriggers);
 	}
 }
 

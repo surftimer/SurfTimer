@@ -144,13 +144,15 @@ public void CreateZoneEntity(int zoneIndex)
 	}
 }
 
-public Action ingnoreTriggers(int entity, int client) //add command to !options
+public Action IgnoreTriggers(int entity, int client) //add command to !options
 {
 	if (!(client > 0 && client <= MaxClients) || !IsPlayerAlive(client)) return Plugin_Continue;
 
 	if (GetEntityMoveType(client) != MOVETYPE_NOCLIP) return Plugin_Continue;
 
 	if (g_iDisableTriggers[client]) return Plugin_Continue;
+
+	if (IsFakeClient(client)) return Plugin_Continue;
 
 	return Plugin_Handled;
 } 
