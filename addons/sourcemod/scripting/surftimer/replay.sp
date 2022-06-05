@@ -954,13 +954,13 @@ public void Replay_Recording(int client, int &buttons, int &subtype, int &seed, 
 
 public void Replay_Playback(int client, int &buttons, int &subtype, int &seed, int &impulse, int &weapon, float angles[3], float vel[3])
 {
+	LoopReplay(client);
+
 	if (GetClientTeam(client) < CS_TEAM_T || 
 		g_aReplayFrame[client] == null || g_iReplayTicksCount[client] == 0)
 	{
 		return;
 	}
-
-	LoopReplay(client);
 
 	if(g_iReplayVersion[client] >= BINARY_FORMAT_VERSION)
 	{
