@@ -224,6 +224,7 @@ enum ResponseType
   MaxVelocity,
   TargetName,
   ClientEdit,
+  ColorValue,
 }
 
 /*===================================
@@ -768,6 +769,17 @@ int g_iCentreHudModule[MAXPLAYERS + 1][6];
 bool g_bSpecListOnly[MAXPLAYERS + 1];
 bool g_bSideHud[MAXPLAYERS + 1];
 int g_iSideHudModule[MAXPLAYERS + 1][5];
+
+//CSD OPTIONS
+float g_fCSD_POS_X[MAXPLAYERS + 1];
+float g_fCSD_POS_Y[MAXPLAYERS + 1];
+
+int g_iCSD_R[MAXPLAYERS + 1];
+int g_iCSD_G[MAXPLAYERS + 1];
+int g_iCSD_B[MAXPLAYERS + 1];
+int g_iColorChangeIndex[MAXPLAYERS + 1];
+
+int g_iCSDUpdateRate[MAXPLAYERS + 1];
 
 // Custom tele side
 int g_iTeleSide[MAXPLAYERS + 1];
@@ -1400,6 +1412,10 @@ bool g_bLeftZone[MAXPLAYERS + 1];
 
 int g_iClientTick[MAXPLAYERS + 1];
 
+int g_iCurrentTick[MAXPLAYERS + 1];
+
+Handle HUD_Handle;
+
 /*===================================
 =         Predefined Arrays         =
 ===================================*/
@@ -1761,6 +1777,9 @@ public void OnMapStart()
 
 	// Save Locs
 	ResetSaveLocs();
+
+	//CSD Hud Synchronizer
+	HUD_Handle = CreateHudSynchronizer();
 }
 
 public void OnMapEnd()

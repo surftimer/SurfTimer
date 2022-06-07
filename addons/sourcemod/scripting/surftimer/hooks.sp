@@ -192,6 +192,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 						g_fTimeIncrement[client][zonegroup] = 0.0;
 				}
 			}
+			g_iCurrentTick[client] = g_iClientTick[client];
 
 			g_bFirstSpawn[client] = false;
 
@@ -387,6 +388,24 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					}
 
 					SQL_TQuery(g_hDb, sql_DeleteMenuView, szQuery, GetClientSerial(client));
+				}
+				case ColorValue:
+				{
+					//COLOR VALUE FOR CENTER SPEED
+					int color_value = StringToInt(sText);
+
+					//KEEP VALUES BETWEEN 0-255
+					if(color_value > 255)
+						color_value = 255;
+					else if(color_value < 0)
+						color_value = 0;
+
+					switch(g_iColorChangeIndex[client]){
+						case 0: g_iCSD_R[client] = color_value;
+						case 1: g_iCSD_G[client] = color_value;
+						case 2: g_iCSD_B[client] = color_value;
+					}
+					CSDOptions(client);
 				}
 			}
 
