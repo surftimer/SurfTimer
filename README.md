@@ -1,18 +1,14 @@
-# Surftimer-Official for CS:GO
+# SurfTimer for CS:GO
 
-_We're entering a new chapter in CS:GO surf community - a milestone - project that is meant to unite people._
+This is an open source timer plugin made for CS:GO. The original plugin was known as ckSurf, developed by Jonitaikaponi. Since then, the plugin has recieved significant development from many different ([contributors.](https://github.com/surftimer/SurfTimer/graphs/contributors))
 
-## Project Goals
+# Project Goals
 
-As you probably all know there are quite some bugs in all open-source versions of cksurf or surftimer.
-Our main goal with this project to have a bug-free, properly optimized surf timer that would work as we all expect it to, across all configurations.
-Because of this, we will be putting new features and additions on the side, as they can potentially introduce new, unknown issues and there's plenty of those already.
+Since the vast majority of csgo surf communties use this plugin, our main goal with the project has been to fix major the bugs/issues that exist. Since we believe the vast majority of bugs to be fixed, we have started looking into adding some new features! 
 
-**Does it mean this version is buggy?**
+We encourage everyone who uses this plugin to also share their bug related fixes. If so, we can all work towards having a bug free, feature rich timer plugin.
 
-Yes, but not any more than other projects currently and for past years.
-
-**Pull requests and any contributions are welcome and encouraged!**
+Less bugs = better experience = more players for surf!
 
 ## Issue Rules
 
@@ -37,6 +33,7 @@ Yes, but not any more than other projects currently and for past years.
 * [SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable) (only the latest stable version is supported)
 * A MySQL Database (MySQL 5.7, MySQL 8+, MariaDB supported)
 * *(recommended)* [Stripper:Source](http://www.bailopan.net/stripper/) - Allows adding/modifying/removing entities from a map before it loads (config files included)
+* [End-Touch-Fix](https://github.com/rumourA/End-Touch-Fix) - Checks EntityUntouch on PostThink instead of server frames
 
 **SourceMod Extensions**
 * [DHooks](https://github.com/peace-maker/DHooks2)
@@ -48,7 +45,6 @@ Yes, but not any more than other projects currently and for past years.
 * [AutoExecConfig](https://github.com/Impact123/AutoExecConfig)
 
 **SourceMod Plugins**
-* [End-Touch-Fix](https://github.com/rumourA/End-Touch-Fix) - Checks EntityUntouch on PostThink instead of server frames
 * *(recommended)* [Movement Unlocker](https://forums.alliedmods.net/showthread.php?t=255298) - Enables ground sliding
 * *(recommended)* [MomSurfFix](https://github.com/GAMMACASE/MomSurfFix) - Fixes ramp glitches
 * *(recommended)* [RNGFix](https://github.com/jason-e/rngfix) - Fixes a bunch of engine physics "bugs"
@@ -61,21 +57,6 @@ Yes, but not any more than other projects currently and for past years.
 **Misc**
 * *(optional)* [Surftimer-Web-Stats](https://github.com/KristianP26/Surftimer-Web-Stats) - Web statistics
 * *(optional)* [Surftimer-Discord-Bot](https://github.com/Sarrus1/SurfTimer-Discord-Bot) - Discord BOT
-
-## Issue Rules
-
-**If any of the rules listed below are not followed, you must expect the issue to be closed immediately.**
-
-- Requirements:
-	- Ensure your timer version is up to date with the latest release
-	- SourceMod and Metamod are up to date (support will only be given for latest stable versions)
-	- Ensure includes for compilation are up to date
-	- Using the stock timer without any additional changes
-- You're following the template
-	- That means you won't delete any pre-entered questions!
-- You're giving clear information
-- You won't edit issues - you always write a new comment below!
-- **Any community/server specific bug/suggestion will be ignored/closed!**
 
 ## Fresh Install
 
@@ -160,18 +141,5 @@ Extensions used in this version:
 *   [DHooks](https://forums.alliedmods.net/showthread.php?t=180114) (Dr!fter)
 *   [Discord API](https://github.com/Deathknife/sourcemod-discord) (Deathknife)
 *   [Trails Chroma](https://github.com/Nickelony/Trails-Chroma) (Nickelony)
-<details>
-  <summary>forked from fluffys - contributors</summary>
 
-*   Jonitaikaponi - Original ckSurf creator
-*   sneaK
-*   nikooo777 - ckSurf 1.19 Fork
-*   fluffys
-*   Jakeey802
-*   Grandpa Goose
-
-</details>
-
-*	[Ace](https://github.com/13ace37) [xace.ch](https://xace.ch)
-*	[olokos](https://github.com/olokos) [Steam](https://steamcommunity.com/id/olokos/) [My server](https://kiepownica.pl/)
-*	and many, many more people who contributed to the project!
+*   ([Contributors](https://github.com/surftimer/SurfTimer/graphs/contributors))
