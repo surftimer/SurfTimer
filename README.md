@@ -1,10 +1,10 @@
 # SurfTimer for CS:GO
 
-This is an open source timer plugin made for CS:GO. The original plugin was known as ckSurf, developed by Jonitaikaponi. A year or so later fluffys released his updated [fork known as SurfTimer.](https://github.com/fluffyst/Surftimer) Since then, the plugin has recieved significant development from many different [contributors.](https://github.com/surftimer/SurfTimer/graphs/contributors)
+This is an open source timer plugin made for CS:GO. 
 
-# Project Goals
+## Project Goals
 
-Since the vast majority of csgo surf communties use this plugin, our main goal with the project has been to fix major the bugs/issues that exist. Since we now believe the vast majority of bugs to be fixed, we have started looking into adding some new features! 
+Since the vast majority of CS:GO surf communties use this plugin, our main goal with the project has been to fix major the bugs/issues that exist. Since we now believe the vast majority of bugs to be fixed, we have started looking into adding some new features! 
 
 We encourage everyone who uses this plugin to also share their bug related fixes. If so, we can all work towards having a bug free, feature rich timer plugin.
 
@@ -33,7 +33,6 @@ Less bugs = better experience = more players for surf!
 * [SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable) (only the latest stable version is supported)
 * A MySQL Database (MySQL 5.7, MySQL 8+, MariaDB supported)
 * *(recommended)* [Stripper:Source](http://www.bailopan.net/stripper/) - Allows adding/modifying/removing entities from a map before it loads (config files included)
-* [End-Touch-Fix](https://github.com/rumourA/End-Touch-Fix) - Checks EntityUntouch on PostThink instead of server frames
 
 **SourceMod Extensions**
 * [DHooks](https://github.com/peace-maker/DHooks2)
@@ -45,7 +44,8 @@ Less bugs = better experience = more players for surf!
 * [AutoExecConfig](https://github.com/Impact123/AutoExecConfig)
 
 **SourceMod Plugins**
-* *(recommended)* [Movement Unlocker](https://forums.alliedmods.net/showthread.php?t=255298) - Enables ground sliding
+* *(required)* [End-Touch-Fix](https://github.com/rumourA/End-Touch-Fix) - Checks EntityUntouch on PostThink instead of server frames. This is required to ensure times are always accurate.
+* *(recommended)* [Movement Unlocker](https://forums.alliedmods.net/showthread.php?t=255298) - Enables ground sliding AKA prestrafing
 * *(recommended)* [MomSurfFix](https://github.com/GAMMACASE/MomSurfFix) - Fixes ramp glitches
 * *(recommended)* [RNGFix](https://github.com/jason-e/rngfix) - Fixes a bunch of engine physics "bugs"
 * *(recommended)* [HeadBugFix](https://github.com/GAMMACASE/HeadBugFix) - Fixes the head boundary box poping up when you start ducking
@@ -65,7 +65,7 @@ Less bugs = better experience = more players for surf!
 *   Download latest stable SourceMod version (1.10+) for your OS ([Link](https://www.sourcemod.net/downloads.php?branch=stable))
 *   Windows: Put spcomp.exe and compile.exe in scripting folder and double click compile.exe
 *   If there are no errors, (warnings are fine, for now) move .smx files from compiled to /plugins
-*   Copy the rest of the files from this repository to your csgo directory
+*   Copy the rest of the files from this repository to your CS:GO directory
 *   Edit configs (databases.cfg, admins, etc.)
 
 ## Upgrading
@@ -73,14 +73,14 @@ Less bugs = better experience = more players for surf!
 ### Upgrading from SurfTimer (fluffys)
 
 *   Download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
-*   Copy the files to your csgo directory <br> - an update script can be found [here](https://github.com/z4lab/z4lab-surftimer/blob/master/scripts/upgrade_scripts/upgrade-fluffy.sh)
+*   Copy the files to your CS:GO directory <br> - an update script can be found [here](https://github.com/z4lab/z4lab-surftimer/blob/master/scripts/upgrade_scripts/upgrade-fluffy.sh)
 *   Edit configs (mysql db, etc, to do)
 *   Run `mysql-files/upgrade-fluffy.sql` in your surftimer db
 
 ### Upgrading from ckSurf (nikooo777)
 
 *   Download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
-*   Copy the files to your csgo directory
+*   Copy the files to your CS:GO directory
 *   Remove all old ckSurf data you don't want anymore
 *   Run `mysql-files/upgrade-niko.sql` in your ckSurf db
 *   Edit configs (mysql db, etc, to do)
@@ -143,5 +143,8 @@ Extensions used in this version:
 *   [Trails Chroma](https://github.com/Nickelony/Trails-Chroma) (Nickelony)
 
 Contributors:
+
+The original plugin was known as ckSurf, developed by Jonitaikaponi. A year or so later fluffys released his updated [fork known as SurfTimer.](https://github.com/fluffyst/Surftimer) Since then, the plugin has recieved significant development from many different [contributors.](https://github.com/surftimer/SurfTimer/graphs/contributors)
+
 *   [ckSurf Contributors](https://github.com/nikooo777/ckSurf/graphs/contributors)
 *   [SurfTimer Contributors](https://github.com/surftimer/SurfTimer/graphs/contributors)
