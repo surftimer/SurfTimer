@@ -1,6 +1,6 @@
 # SurfTimer for CS:GO
 
-This is an open source timer plugin made for CS:GO. The original plugin was known as ckSurf, developed by Jonitaikaponi. Since then, the plugin has recieved significant development from many different ([contributors.](https://github.com/surftimer/SurfTimer/graphs/contributors))
+This is an open source timer plugin made for CS:GO. The original plugin was known as ckSurf, developed by Jonitaikaponi. Since then, the plugin has recieved significant development from many different [contributors.](https://github.com/surftimer/SurfTimer/graphs/contributors)
 
 # Project Goals
 
@@ -142,4 +142,4 @@ Extensions used in this version:
 *   [Discord API](https://github.com/Deathknife/sourcemod-discord) (Deathknife)
 *   [Trails Chroma](https://github.com/Nickelony/Trails-Chroma) (Nickelony)
 
-*   ([Contributors](https://github.com/surftimer/SurfTimer/graphs/contributors))
+*   [Contributors](https://github.com/surftimer/SurfTimer/graphs/contributors)
