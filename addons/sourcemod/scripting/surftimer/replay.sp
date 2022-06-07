@@ -236,6 +236,7 @@ public void LoadReplays()
 	g_WrcpBot = -1;
 	g_iCurrentBonusReplayIndex = 0;
 	g_bFirstStageReplay = false;
+	FileHeader nullcache;
 
 	if (g_bhasStages)
 	{
@@ -251,7 +252,7 @@ public void LoadReplays()
 					g_bFirstStageReplay = true;
 				}
 
-				g_bStageReplay[i] = true;
+				g_bStageReplay[i] = LoadRecordFromFile(sPath2, nullcache, true);
 				SetReplayTime(0, i, 0);
 			}
 		}
@@ -265,7 +266,7 @@ public void LoadReplays()
 	if (FileExists(sPath))
 	{
 		SetReplayTime(0, 0, 0);
-		g_bMapReplay[0] = true;
+		g_bMapReplay[0] = LoadRecordFromFile(sPath, nullcache, true);
 	}
 	else// Check if backup exists
 	{
@@ -275,7 +276,7 @@ public void LoadReplays()
 		{
 			RenameFile(sPath, sPathBack);
 			SetReplayTime(0, 0, 0);
-			g_bMapReplay[0] = true;
+			g_bMapReplay[0] = LoadRecordFromFile(sPathBack, nullcache, true);
 		}
 	}
 
@@ -312,7 +313,7 @@ public void LoadReplays()
 			SetReplayTime(i, 0, 0);
 			g_iBonusToReplay[g_BonusBotCount] = i;
 			g_BonusBotCount++;
-			g_bMapBonusReplay[i][0] = true;
+			g_bMapBonusReplay[i][0] = LoadRecordFromFile(sPath, nullcache, true);
 		}
 		else
 		{
@@ -325,7 +326,7 @@ public void LoadReplays()
 				RenameFile(sPath, sPathBack);
 				g_iBonusToReplay[g_BonusBotCount] = i;
 				g_BonusBotCount++;
-				g_bMapBonusReplay[i][0] = true;
+				g_bMapBonusReplay[i][0] = LoadRecordFromFile(sPathBack, nullcache, true);
 			}
 		}
 	}
@@ -336,7 +337,7 @@ public void LoadReplays()
 		BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s_style_%d.rec", CK_REPLAY_PATH, g_szMapName, i);
 		if (FileExists(sPath))
 		{
-			g_bMapReplay[i] = true;
+			g_bMapReplay[i] = LoadRecordFromFile(sPath, nullcache, true);
 			SetReplayTime(0, 0, i);
 		}
 		else
@@ -346,7 +347,7 @@ public void LoadReplays()
 			BuildPath(Path_SM, sPathBack, sizeof(sPathBack), "%s%s_style_%d.rec.bak", CK_REPLAY_PATH, g_szMapName, i);
 			if (FileExists(sPathBack))
 			{
-				g_bMapReplay[i] = true;
+				g_bMapReplay[i] = LoadRecordFromFile(sPathBack, nullcache, true);
 				SetReplayTime(0, 0, i);
 				RenameFile(sPath, sPathBack);
 			}
@@ -361,7 +362,7 @@ public void LoadReplays()
 			BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s_bonus_%d_style_%d.rec", CK_REPLAY_PATH, g_szMapName, i, j);
 			if (FileExists(sPath))
 			{
-				g_bMapBonusReplay[i][j] = true;
+				g_bMapBonusReplay[i][j] = LoadRecordFromFile(sPath, nullcache, true);
 				SetReplayTime(i, 0, j);
 			}
 			else
@@ -371,7 +372,7 @@ public void LoadReplays()
 				BuildPath(Path_SM, sPathBack, sizeof(sPathBack), "%s%s_bonus_%d_style_%d.rec.bak", CK_REPLAY_PATH, g_szMapName, i, j);
 				if (FileExists(sPathBack))
 				{
-					g_bMapBonusReplay[i][j] = true;
+					g_bMapBonusReplay[i][j] = LoadRecordFromFile(sPathBack, nullcache, true);
 					SetReplayTime(i, 0, j);
 					RenameFile(sPath, sPathBack);
 				}
@@ -632,15 +633,29 @@ public bool LoadRecordFromFile(const char[] path, FileHeader header, bool header
 
 	header.Frames = null;
 
-	if (headerOnly)
+	if (header.TickCount <= 0) /* file broken? */
+	{
+		/* should we rename file or delete it directly? */
+		char sNewPath[PLATFORM_MAX_PATH];
+		strcopy(sNewPath, FindCharInString(path, '.', true) + 1, path);
+		StrCat(sNewPath, sizeof(sNewPath), "_broken.rec");
+
+		if(FileExists(sNewPath))
+		{
+			DeleteFile(sNewPath);
+		}
+
+		RenameFile(sNewPath, path);
+
+		LogError("Replay file: '%s' may broken, already rename to '%s', please check your file sizes.", path, sNewPath);
+
+		delete fFile;
+		return false;
+	}
+	else if (headerOnly)
 	{
 		delete fFile;
 		return true;
-	}
-	else if (header.TickCount == 0)
-	{
-		delete fFile;
-		return false;
 	}
 
 	if (header.BinaryFormatVersion >= BINARY_FORMAT_VERSION)
@@ -957,7 +972,7 @@ public void Replay_Playback(int client, int &buttons, int &subtype, int &seed, i
 	LoopReplay(client);
 
 	if (GetClientTeam(client) < CS_TEAM_T || 
-		g_aReplayFrame[client] == null || g_iReplayTicksCount[client] == 0)
+		g_aReplayFrame[client] == null || g_iReplayTicksCount[client] <= 0)
 	{
 		return;
 	}
