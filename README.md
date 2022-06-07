@@ -142,5 +142,6 @@ Extensions used in this version:
 *   [Discord API](https://github.com/Deathknife/sourcemod-discord) (Deathknife)
 *   [Trails Chroma](https://github.com/Nickelony/Trails-Chroma) (Nickelony)
 
-SurfTimer Contributors:
-*   [Contributors](https://github.com/surftimer/SurfTimer/graphs/contributors)
+Contributors:
+*   [ckSurf Contributors](https://github.com/nikooo777/ckSurf/graphs/contributors)
+*   [SurfTimer Contributors](https://github.com/surftimer/SurfTimer/graphs/contributors)
