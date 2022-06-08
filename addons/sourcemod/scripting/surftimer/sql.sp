@@ -45,45 +45,7 @@ public void db_setupDatabase()
 	g_bRenaming = false;
 	g_bInTransactionChain = false;
 
-	// If tables haven't been created yet.
-	if (!SQL_FastQuery(g_hDb, "SELECT steamid FROM ck_playerrank LIMIT 1"))
-	{
-		SQL_UnlockDatabase(g_hDb);
-		db_createTables();
-		return;
-	}
-	else
-	{
-		// Check for db upgrades
-		if (!SQL_FastQuery(g_hDb, "SELECT prespeed FROM ck_zones LIMIT 1"))
-		{
-			db_upgradeDatabase(0);
-			return;
-		}
-		else if(!SQL_FastQuery(g_hDb, "SELECT ranked FROM ck_maptier LIMIT 1") || !SQL_FastQuery(g_hDb, "SELECT style FROM ck_playerrank LIMIT 1;"))
-		{
-			db_upgradeDatabase(1);
-			return;
-		}
-		else if (!SQL_FastQuery(g_hDb, "SELECT wrcppoints FROM ck_playerrank LIMIT 1"))
-		{
-			db_upgradeDatabase(2);
-		}
-		else if (!SQL_FastQuery(g_hDb, "SELECT teleside FROM ck_playeroptions LIMIT 1"))
-		{
-			db_upgradeDatabase(3);
-		}
-		else if (!SQL_FastQuery(g_hDb, "SELECT steamid FROM ck_prinfo  LIMIT 1"))
-		{
-			db_upgradeDatabase(4);
-		}
-		else if (!SQL_FastQuery(g_hDb, "SELECT csd_update_rate FROM ck_playeroptions2 LIMIT 1"))
-		{
-			db_upgradeDatabase(5);
-		}
-	}
-
-	SQL_UnlockDatabase(g_hDb);
+	CheckDatabaseForUpdates();
 
 	for (int i = 0; i < sizeof(g_failedTransactions); i++)
 		g_failedTransactions[i] = 0;
@@ -122,6 +84,66 @@ public void SQLTxn_CreateDatabaseSuccess(Handle db, any data, int numQueries, Ha
 public void SQLTxn_CreateDatabaseFailed(Handle db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
 {
 	SetFailState("[SurfTimer] Database tables could not be created! Error: %s", error);
+}
+
+void CheckDatabaseForUpdates()
+{
+	// If tables haven't been created yet.
+	if (!SQL_FastQuery(g_hDb, "SELECT steamid FROM ck_playerrank LIMIT 1"))
+	{
+		SQL_UnlockDatabase(g_hDb);
+		db_createTables();
+		return;
+	}
+	else
+	{
+		LogMessage("Tables exists.");
+
+		// Check for db upgrades
+		if (!SQL_FastQuery(g_hDb, "SELECT prespeed FROM ck_zones LIMIT 1"))
+		{
+			db_upgradeDatabase(0);
+			return;
+		}
+		LogMessage("Version 0 looks good.");
+		
+		if(!SQL_FastQuery(g_hDb, "SELECT ranked FROM ck_maptier LIMIT 1") || !SQL_FastQuery(g_hDb, "SELECT style FROM ck_playerrank LIMIT 1;"))
+		{
+			db_upgradeDatabase(1);
+			return;
+		}
+		LogMessage("Version 1 looks good.");
+		
+		if (!SQL_FastQuery(g_hDb, "SELECT wrcppoints FROM ck_playerrank LIMIT 1"))
+		{
+			db_upgradeDatabase(2);
+			return;
+		}
+		LogMessage("Version 2 looks good.");
+		
+		if (!SQL_FastQuery(g_hDb, "SELECT teleside FROM ck_playeroptions LIMIT 1"))
+		{
+			db_upgradeDatabase(3);
+			return;
+		}
+		LogMessage("Version 3 looks good.");
+		
+		if (!SQL_FastQuery(g_hDb, "SELECT steamid FROM ck_prinfo  LIMIT 1"))
+		{
+			db_upgradeDatabase(4);
+			return;
+		}
+		LogMessage("Version 4 looks good.");
+		
+		if (!SQL_FastQuery(g_hDb, "SELECT csd_update_rate FROM ck_playeroptions2 LIMIT 1"))
+		{
+			db_upgradeDatabase(5);
+			return;
+		}
+		LogMessage("Version 5 looks good.");
+	}
+
+	SQL_UnlockDatabase(g_hDb);
 }
 
 public void db_upgradeDatabase(int ver)
@@ -172,7 +194,7 @@ public void db_upgradeDatabase(int ver)
 	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD csd_update_rate int(11) NOT NULL DEFAULT '1', ADD csd_pos_x float(11) NOT NULL DEFAULT '0.5', ADD csd_pos_y float(11) NOT NULL DEFAULT '0.3', ADD csd_r int(11) NOT NULL DEFAULT '255', ADD csd_g int(11) NOT NULL DEFAULT '255', ADD csd_b int(11) NOT NULL DEFAULT '255';");
   }
   
-  SQL_UnlockDatabase(g_hDb);
+  CheckDatabaseForUpdates();
 }
 
 /* Admin Delete Menu */
