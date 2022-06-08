@@ -1015,11 +1015,11 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	{
 		if (IsFakeClient(client))
 		{
-			PlayReplay(client, buttons, subtype, seed, impulse, weapon, angles, vel);
+			Replay_Playback(client, buttons, subtype, seed, impulse, weapon, angles, vel);
 		}
 		else
 		{
-			RecordReplay(client, buttons, subtype, seed, impulse, weapon, angles, vel);
+			Replay_Recording(client, buttons, subtype, seed, impulse, weapon, angles, vel);
 		}
 
 		//PRINFO
