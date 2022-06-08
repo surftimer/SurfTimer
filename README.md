@@ -27,12 +27,16 @@ Less bugs = better experience = more players for surf!
 - Don't edit issues
 	- Always write a new comment below!
 
-## Installation and Requirements
+## Installation
 
-* [Metamod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable)
-* [SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable) (only the latest stable version is supported)
-* A MySQL Database (MySQL 5.7, MySQL 8+, MariaDB supported)
-* *(recommended)* [Stripper:Source](http://www.bailopan.net/stripper/) - Allows adding/modifying/removing entities from a map before it loads (config files included)
+* Download and install [Metamod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable)
+* Download and install [SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable) (only the latest stable version is supported)
+* Download latest [release](https://github.com/surftimer/SurfTimer/releases/latest) and upload all the files to your csgo server directory
+* Set up A MySQL Database (MySQL 5.7, MySQL 8+, MariaDB supported)
+* Add a MySQL database called surftimer to csgo/addons/sourcemod/configs/databases.cfg
+* Ensure [End-Touch-Fix](https://github.com/rumourA/End-Touch-Fix) is loaded. This is required to ensure times are always accurate.
+
+## Requirements
 
 **SourceMod Extensions**
 * [DHooks](https://github.com/peace-maker/DHooks2)
@@ -44,7 +48,6 @@ Less bugs = better experience = more players for surf!
 * [AutoExecConfig](https://github.com/Impact123/AutoExecConfig)
 
 **SourceMod Plugins**
-* *(required)* [End-Touch-Fix](https://github.com/rumourA/End-Touch-Fix) - Checks EntityUntouch on PostThink instead of server frames. This is required to ensure times are always accurate.
 * *(recommended)* [Movement Unlocker](https://forums.alliedmods.net/showthread.php?t=255298) - Enables ground sliding AKA prestrafing
 * *(recommended)* [MomSurfFix](https://github.com/GAMMACASE/MomSurfFix) - Fixes ramp glitches
 * *(recommended)* [RNGFix](https://github.com/jason-e/rngfix) - Fixes a bunch of engine physics "bugs"
@@ -57,29 +60,20 @@ Less bugs = better experience = more players for surf!
 **Misc**
 * *(optional)* [Surftimer-Web-Stats](https://github.com/KristianP26/Surftimer-Web-Stats) - Web statistics
 * *(optional)* [Surftimer-Discord-Bot](https://github.com/Sarrus1/SurfTimer-Discord-Bot) - Discord BOT
-
-## Fresh Install
-
-*   Clone or download the repository ([Link](https://github.com/olokos/Surftimer-olokos-public/archive/master.zip))
-*   Obtain all of the [compilation requirements](https://github.com/olokos/Surftimer-olokos#installation-and-requirements)
-*   Download latest stable SourceMod version (1.10+) for your OS ([Link](https://www.sourcemod.net/downloads.php?branch=stable))
-*   Windows: Put spcomp.exe and compile.exe in scripting folder and double click compile.exe
-*   If there are no errors, (warnings are fine, for now) move .smx files from compiled to /plugins
-*   Copy the rest of the files from this repository to your CS:GO directory
-*   Edit configs (databases.cfg, admins, etc.)
+* *(recommended)* [Stripper:Source](http://www.bailopan.net/stripper/) - Allows adding/modifying/removing entities from a map before it loads (config files included)
 
 ## Upgrading
 
 ### Upgrading from SurfTimer (fluffys)
 
-*   Download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
+*   Download the latest version from the release page [here](https://github.com/surftimer/SurfTimer/releases/latest)
 *   Copy the files to your CS:GO directory <br> - an update script can be found [here](https://github.com/z4lab/z4lab-surftimer/blob/master/scripts/upgrade_scripts/upgrade-fluffy.sh)
 *   Edit configs (mysql db, etc, to do)
 *   Run `mysql-files/upgrade-fluffy.sql` in your surftimer db
 
 ### Upgrading from ckSurf (nikooo777)
 
-*   Download the latest version from the release page [here](https://github.com/z4lab/z4lab-surftimer/releases/latest)
+*   Download the latest version from the release page [here](https://github.com/surftimer/SurfTimer/releases/latest)
 *   Copy the files to your CS:GO directory
 *   Remove all old ckSurf data you don't want anymore
 *   Run `mysql-files/upgrade-niko.sql` in your ckSurf db
@@ -135,6 +129,10 @@ Take surf_aircontrol_nbv for example: (You can use sm_mi to see this menu)
 
 </details>
 
+## Extra
+
+[SurfTimer Discord](https://discord.gg/7SFDTvf)
+
 ## Credits
 
 Extensions used in this version:
@@ -142,9 +140,9 @@ Extensions used in this version:
 *   [Discord API](https://github.com/Deathknife/sourcemod-discord) (Deathknife)
 *   [Trails Chroma](https://github.com/Nickelony/Trails-Chroma) (Nickelony)
 
-Contributors:
+## Contributors
 
-The original plugin was known as ckSurf, developed by Jonitaikaponi. A year or so later fluffys released his updated [fork known as SurfTimer.](https://github.com/fluffyst/Surftimer) Since then, the plugin has recieved significant development from many different [contributors.](https://github.com/surftimer/SurfTimer/graphs/contributors)
+The original plugin was known as ckSurf, developed by Jonitaikaponi. A year or so later fluffys released his updated [fork known as SurfTimer.](https://github.com/fluffyst/Surftimer) Since then, the plugin has recieved significant development from many different contributors.
 
 *   [ckSurf Contributors](https://github.com/nikooo777/ckSurf/graphs/contributors)
 *   [SurfTimer Contributors](https://github.com/surftimer/SurfTimer/graphs/contributors)
