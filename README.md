@@ -4,7 +4,7 @@ This is an open source timer plugin made for CS:GO.
 
 ## Project Goals
 
-Since the vast majority of CS:GO surf communties use this plugin, our main goal with the project has been to fix major the bugs/issues that exist. Since we now believe the vast majority of bugs to be fixed, we have started looking into adding some new features! 
+Since the vast majority of CS:GO surf communties use this plugin, our main goal with the project has been to fix the major bugs/issues that exist. Since we now believe the vast majority to be fixed, we have now started looking into adding some new features! 
 
 We encourage everyone who uses this plugin to also share their bug related fixes. If so, we can all work towards having a bug free, feature rich timer plugin.
 
