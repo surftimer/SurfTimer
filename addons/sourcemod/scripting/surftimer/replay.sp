@@ -236,6 +236,7 @@ public void LoadReplays()
 	g_WrcpBot = -1;
 	g_iCurrentBonusReplayIndex = 0;
 	g_bFirstStageReplay = false;
+	FileHeader nullcache;
 
 	if (g_bhasStages)
 	{
@@ -251,7 +252,7 @@ public void LoadReplays()
 					g_bFirstStageReplay = true;
 				}
 
-				g_bStageReplay[i] = true;
+				g_bStageReplay[i] = LoadRecordFromFile(sPath2, nullcache, true);
 				SetReplayTime(0, i, 0);
 			}
 		}
@@ -265,7 +266,7 @@ public void LoadReplays()
 	if (FileExists(sPath))
 	{
 		SetReplayTime(0, 0, 0);
-		g_bMapReplay[0] = true;
+		g_bMapReplay[0] = LoadRecordFromFile(sPath, nullcache, true);
 	}
 	else// Check if backup exists
 	{
@@ -275,7 +276,7 @@ public void LoadReplays()
 		{
 			RenameFile(sPath, sPathBack);
 			SetReplayTime(0, 0, 0);
-			g_bMapReplay[0] = true;
+			g_bMapReplay[0] = LoadRecordFromFile(sPathBack, nullcache, true);
 		}
 	}
 
@@ -312,7 +313,7 @@ public void LoadReplays()
 			SetReplayTime(i, 0, 0);
 			g_iBonusToReplay[g_BonusBotCount] = i;
 			g_BonusBotCount++;
-			g_bMapBonusReplay[i][0] = true;
+			g_bMapBonusReplay[i][0] = LoadRecordFromFile(sPath, nullcache, true);
 		}
 		else
 		{
@@ -325,7 +326,7 @@ public void LoadReplays()
 				RenameFile(sPath, sPathBack);
 				g_iBonusToReplay[g_BonusBotCount] = i;
 				g_BonusBotCount++;
-				g_bMapBonusReplay[i][0] = true;
+				g_bMapBonusReplay[i][0] = LoadRecordFromFile(sPathBack, nullcache, true);
 			}
 		}
 	}
@@ -336,7 +337,7 @@ public void LoadReplays()
 		BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s_style_%d.rec", CK_REPLAY_PATH, g_szMapName, i);
 		if (FileExists(sPath))
 		{
-			g_bMapReplay[i] = true;
+			g_bMapReplay[i] = LoadRecordFromFile(sPath, nullcache, true);
 			SetReplayTime(0, 0, i);
 		}
 		else
@@ -346,7 +347,7 @@ public void LoadReplays()
 			BuildPath(Path_SM, sPathBack, sizeof(sPathBack), "%s%s_style_%d.rec.bak", CK_REPLAY_PATH, g_szMapName, i);
 			if (FileExists(sPathBack))
 			{
-				g_bMapReplay[i] = true;
+				g_bMapReplay[i] = LoadRecordFromFile(sPathBack, nullcache, true);
 				SetReplayTime(0, 0, i);
 				RenameFile(sPath, sPathBack);
 			}
@@ -361,7 +362,7 @@ public void LoadReplays()
 			BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s_bonus_%d_style_%d.rec", CK_REPLAY_PATH, g_szMapName, i, j);
 			if (FileExists(sPath))
 			{
-				g_bMapBonusReplay[i][j] = true;
+				g_bMapBonusReplay[i][j] = LoadRecordFromFile(sPath, nullcache, true);
 				SetReplayTime(i, 0, j);
 			}
 			else
@@ -371,7 +372,7 @@ public void LoadReplays()
 				BuildPath(Path_SM, sPathBack, sizeof(sPathBack), "%s%s_bonus_%d_style_%d.rec.bak", CK_REPLAY_PATH, g_szMapName, i, j);
 				if (FileExists(sPathBack))
 				{
-					g_bMapBonusReplay[i][j] = true;
+					g_bMapBonusReplay[i][j] = LoadRecordFromFile(sPathBack, nullcache, true);
 					SetReplayTime(i, 0, j);
 					RenameFile(sPath, sPathBack);
 				}
@@ -451,7 +452,10 @@ public void PlayRecord(int client, int type, int style)
 
 	FileHeader header;
 	BuildPath(Path_SM, sPath, sizeof(sPath), "%s", sPath);
-	LoadRecordFromFile(sPath, header, false);
+	if (!LoadRecordFromFile(sPath, header, false))
+	{
+		return;
+	}
 
 	if (type == 0)
 	{
@@ -516,7 +520,7 @@ public void PlayRecord(int client, int type, int style)
 	g_aReplayFrame[client] = header.Frames;
 	g_iReplayVersion[client] = header.BinaryFormatVersion;
 	g_iReplayTick[client] = 0;
-	g_iRecordedTicksCount[client] = header.TickCount;
+	g_iReplayTicksCount[client] = header.TickCount;
 	g_CurrentAdditionalTeleportIndex[client] = 0;
 
 	Array_Copy(header.InitialPosition, g_fInitialPosition[client], 3);
@@ -629,7 +633,26 @@ public bool LoadRecordFromFile(const char[] path, FileHeader header, bool header
 
 	header.Frames = null;
 
-	if (headerOnly)
+	if (header.TickCount <= 0) /* file broken? */
+	{
+		/* should we rename file or delete it directly? */
+		char sNewPath[PLATFORM_MAX_PATH];
+		strcopy(sNewPath, FindCharInString(path, '.', true) + 1, path);
+		StrCat(sNewPath, sizeof(sNewPath), "_broken.rec");
+
+		if(FileExists(sNewPath))
+		{
+			DeleteFile(sNewPath);
+		}
+
+		RenameFile(sNewPath, path);
+
+		LogError("Replay file: '%s' may broken, already rename to '%s', please check your file sizes.", path, sNewPath);
+
+		delete fFile;
+		return false;
+	}
+	else if (headerOnly)
 	{
 		delete fFile;
 		return true;
@@ -911,12 +934,12 @@ public void StopPlayerMimic(int client)
 
 	g_iReplayTick[client] = 0;
 	g_CurrentAdditionalTeleportIndex[client] = 0;
-	g_iRecordedTicksCount[client] = 0;
+	g_iReplayTicksCount[client] = 0;
 	g_bValidTeleportCall[client] = false;
 	delete g_aReplayFrame[client];
 }
 
-public void RecordReplay(int client, int &buttons, int &subtype, int &seed, int &impulse, int &weapon, float angles[3], float vel[3])
+public void Replay_Recording(int client, int &buttons, int &subtype, int &seed, int &impulse, int &weapon, float angles[3], float vel[3])
 {
 	if (g_aRecording[client] == null || g_bPause[client])
 	{
@@ -944,15 +967,15 @@ public void RecordReplay(int client, int &buttons, int &subtype, int &seed, int 
 	g_aRecording[client].SetArray(g_iRecordedTicks[client]++, aFrame, sizeof(aFrame));
 }
 
-public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &impulse, int &weapon, float angles[3], float vel[3])
+public void Replay_Playback(int client, int &buttons, int &subtype, int &seed, int &impulse, int &weapon, float angles[3], float vel[3])
 {
+	LoopReplay(client);
+
 	if (GetClientTeam(client) < CS_TEAM_T || 
-		g_aReplayFrame[client] == null)
+		g_aReplayFrame[client] == null || g_iReplayTicksCount[client] <= 0)
 	{
 		return;
 	}
-
-	LoopReplay(client);
 
 	if(g_iReplayVersion[client] >= BINARY_FORMAT_VERSION)
 	{
@@ -1184,7 +1207,7 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 
 static void LoopReplay(int client)
 {
-	if (g_iReplayTick[client] >= g_iRecordedTicksCount[client] || g_bReplayAtEnd[client])
+	if (g_iReplayTick[client] >= g_iReplayTicksCount[client] || g_bReplayAtEnd[client])
 	{
 		if (client == g_BonusBot)
 		{
