@@ -58,9 +58,9 @@ Less bugs = better experience = more players for surf!
 * *(optional)* [Surftimer-Discord](https://github.com/Sarrus1/SurfTimer-discord) - Discord WR notifications
 
 **Misc**
+* *(recommended)* [Stripper:Source](http://www.bailopan.net/stripper/) - Allows adding/modifying/removing entities from a map before it loads (config files included)
 * *(optional)* [Surftimer-Web-Stats](https://github.com/KristianP26/Surftimer-Web-Stats) - Web statistics
 * *(optional)* [Surftimer-Discord-Bot](https://github.com/Sarrus1/SurfTimer-Discord-Bot) - Discord BOT
-* *(recommended)* [Stripper:Source](http://www.bailopan.net/stripper/) - Allows adding/modifying/removing entities from a map before it loads (config files included)
 
 ## Upgrading
 
