@@ -121,7 +121,7 @@ void CheckDatabaseForUpdates()
 		}
 		LogMessage("Version 2 looks good.");
 		
-		if (!SQL_FastQuery(g_hDb, "SELECT teleside FROM ck_playeroptions LIMIT 1"))
+		if (!SQL_FastQuery(g_hDb, "SELECT teleside FROM ck_playeroptions2 LIMIT 1"))
 		{
 			db_upgradeDatabase(3);
 			return;
