@@ -1,6 +1,7 @@
 # SurfTimer for CS:GO
 
-This is an open source timer plugin made for CS:GO. 
+This is an open source timer plugin made for CS:GO.
+[SurfTimer Discord](https://discord.gg/7SFDTvf)
 
 ## Project Goals
 
@@ -173,17 +174,11 @@ Take surf_aircontrol_nbv for example: (You can use sm_mi to see this menu)
 
 </details>
 
-## Extra
-
-[SurfTimer Discord](https://discord.gg/7SFDTvf)
-
-## Credits
+## Credits & Contributors
 
 Extensions used in this version:
 *   [DHooks](https://forums.alliedmods.net/showthread.php?t=180114) (Dr!fter)
 *   [Trails Chroma](https://github.com/Nickelony/Trails-Chroma) (Nickelony)
-
-## Contributors
 
 The original plugin was known as ckSurf, developed by Jonitaikaponi. A year or so later fluffys released his updated [fork known as SurfTimer.](https://github.com/fluffyst/Surftimer) Since then, the plugin has recieved significant development from many different contributors.
 
