@@ -1,6 +1,7 @@
 # SurfTimer for CS:GO
 
 This is an open source timer plugin made for CS:GO.
+
 [SurfTimer Discord](https://discord.gg/7SFDTvf)
 
 ## Project Goals
