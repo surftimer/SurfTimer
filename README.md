@@ -31,8 +31,8 @@ Less bugs = better experience = more players for surf!
 
 ## Installation
 
-* Download and install [Metamod 1.10](https://www.sourcemm.net/downloads.php/?branch=stable)
-* Download and install [SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable) (only the latest stable version is supported)
+* Download and install [Metamod 1.11](https://www.sourcemm.net/downloads.php/?branch=stable)
+* Download and install [SourceMod 1.11](https://www.sourcemod.net/downloads.php?branch=stable) (only the latest stable version is supported)
 * Download latest [release](https://github.com/surftimer/SurfTimer/releases/latest) and upload all the files to your csgo server directory
 * Set up A MySQL Database (MySQL 5.7, MySQL 8+, MariaDB supported)
 * Add a MySQL database called surftimer to csgo/addons/sourcemod/configs/databases.cfg
