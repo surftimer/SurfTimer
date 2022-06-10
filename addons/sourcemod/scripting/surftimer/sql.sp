@@ -2571,7 +2571,10 @@ public void SQL_CurrentRunRank_PracCallback(Handle owner, Handle hndl, const cha
 		char sz_srDiff[128];
 		float f_srDiff;
 
-		f_srDiff = (g_fRecordMapTime - runtime);
+		if (g_iClientInZone[client][2] == 0)
+			f_srDiff = (g_fRecordMapTime - runtime);
+		else
+			f_srDiff = (g_fBonusFastest[g_iClientInZone[client][2]] - runtime);
 
 		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
 
