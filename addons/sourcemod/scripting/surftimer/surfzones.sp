@@ -633,19 +633,14 @@ public void StartTouch(int client, int action[3])
 		//WE SIMPLY ADD TO "g_iCPStartFrame" THE CURRENT REPLAY BOT TICK
 		//THIS WAY WHEN THE DATABASE HAS NO VALUES
 		//THE PLAYERS CAN SELECT THE CHECKPOINTS OPTION IN THE REPLAY MENU WITH THE CORRECT VALUES
-		if(IsPlayerAlive(client) && IsFakeClient(client)){
+		//ONLY PERFOM ACTIONS IF THE CLIENT INDEX IS THE MAP RECORD BOT'S INDEX AND IF THERE ARE NOT REPLAY TICKS FOUND
+		if(IsPlayerAlive(client) && IsFakeClient(client) && !g_bReplayTickFound[g_iCurrentStyle[client]] && client == g_RecordBot){
 			//MAKE BOTS REGISTER TICKS
+			if(action[0] == 3 || action[0] == 4)
+				g_iCPStartFrame[g_iCurrentStyle[client]][action[1]] = g_iReplayTick[client];
 
-			if(action[0] == 3){
-				if(g_iCPStartFrame[g_iCurrentStyle[client]][action[1]] == 0){
-					g_iCPStartFrame[g_iCurrentStyle[client]][action[1]] = g_iReplayTick[client];
-				}
-			}
-			else if(action[0] == 4){
-				if(g_iCPStartFrame[g_iCurrentStyle[client]][action[1]] == 0){
-					g_iCPStartFrame[g_iCurrentStyle[client]][action[1]] = g_iReplayTick[client];
-				}
-			}
+			if(action[0] == 2)
+				db_UpdateReplaysTick(client, g_iCurrentStyle[client]);
 		}
 
 	}
