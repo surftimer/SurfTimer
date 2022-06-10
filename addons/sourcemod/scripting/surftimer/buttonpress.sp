@@ -170,15 +170,13 @@ public void CL_OnStartTimerPress(int client)
 	// }
 
 	if (g_iRecordedTicks[client] == 0)
-	{
 		g_iStartPressTick[client] = g_iRecordedTicks[client];
-		CPrintToChat(client, "{gold}[REC] {green}StartTimerPress | g_iStartPressTick = {red}0");
-	} 
-	else if (g_iRecordedTicks[client] >= 128)
-	{
-		g_iStartPressTick[client] = g_iRecordedTicks[client] - 128;		
-		CPrintToChat(client, "{gold}[REC] {green}StartTimerPress | {darkred}Y U AFK{orchid}?{blue}!{green}? {orange}Recorded ticks: {red}%i{orange} | You left at: {red}%i", g_iRecordedTicks[client], g_iStartPressTick[client]);
-	}
+	else if (g_iRecordedTicks[client] >= (g_iTickrate * GetConVarInt(g_hReplayPre)))
+		g_iStartPressTick[client] = g_iRecordedTicks[client] - (g_iTickrate * GetConVarInt(g_hReplayPre));
+	else if (g_iRecordedTicks[client] >= g_iTickrate)
+		g_iStartPressTick[client] = g_iRecordedTicks[client] - g_iTickrate;
+			
+
 }
 
 // End Timer

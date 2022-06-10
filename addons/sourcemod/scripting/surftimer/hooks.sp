@@ -183,10 +183,8 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 
 			//1st spawn start recording
 			StartRecording(client); //Add pre
-			if (g_bhasStages){
-				// CPrintToChat(client, "{gold}[REC] FIRST SPAWN | {green}Started {blue}Stage{green} recording");
+			if (g_bhasStages)
 				Stage_StartRecording(client); //Add pre
-			}
 
 			CreateTimer(1.5, CenterMsgTimer, client, TIMER_FLAG_NO_MAPCHANGE);
 
