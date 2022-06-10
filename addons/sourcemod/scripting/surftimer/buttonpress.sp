@@ -155,17 +155,29 @@ public void CL_OnStartTimerPress(int client)
 	// Play Start Sound
 	PlayButtonSound(client);
 
-	// Start recording for record bot
-	if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) || (!IsFakeClient(client) && GetConVarBool(g_hBonusBot)))
+	// Add pre
+	// // Start recording for record bot
+	// if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) || (!IsFakeClient(client) && GetConVarBool(g_hBonusBot)))
+	// {
+	// 	if (IsPlayerAlive(client))
+	// 	{
+	// 		StartRecording(client);
+	// 		if (g_bhasStages)
+	// 		{
+	// 			Stage_StartRecording(client);
+	// 		}
+	// 	}
+	// }
+
+	if (g_iRecordedTicks[client] == 0)
 	{
-		if (IsPlayerAlive(client))
-		{
-			StartRecording(client);
-			if (g_bhasStages)
-			{
-				Stage_StartRecording(client);
-			}
-		}
+		g_iStartPressTick[client] = g_iRecordedTicks[client];
+		CPrintToChat(client, "{gold}[REC] {green}StartTimerPress | g_iStartPressTick = {red}0");
+	} 
+	else if (g_iRecordedTicks[client] >= 128)
+	{
+		g_iStartPressTick[client] = g_iRecordedTicks[client] - 128;		
+		CPrintToChat(client, "{gold}[REC] {green}StartTimerPress | {darkred}Y U AFK{orchid}?{blue}!{green}? {orange}Recorded ticks: {red}%i{orange} | You left at: {red}%i", g_iRecordedTicks[client], g_iStartPressTick[client]);
 	}
 }
 
@@ -769,7 +781,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 			// Enable Trigger Output on Timer Restart
 			g_bTeleByCommand[client] = false;
 			g_WrcpStage[client] = g_Stage[0][client];
-			Stage_StartRecording(client);
+			Stage_StartRecording(client); //Add pre
 		}
 		if (g_Stage[0][client] > 1 && !g_bPracticeMode[client] && !IsFakeClient(client)) {
 			char szDifference[128], szSpeed[128], preMessage[128];

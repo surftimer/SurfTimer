@@ -185,6 +185,8 @@ void CreateCommands()
 	RegConsoleCmd("sm_cpr", Command_CPR, "[surftimer] Compare clients time to another clients time");
 	RegConsoleCmd("sm_prinfo", Command_PRinfo, "[surftimer] Information about personal info on a map");
 	
+	// Add pre
+	RegConsoleCmd("sm_recordedticks", Command_RecordedTicks, "[surftimer] Current recorded ticks for client");
 
 	// reload map
 	RegAdminCmd("sm_rm", Command_ReloadMap, ADMFLAG_ROOT, "[surftimer] Reloads the current map");

@@ -396,6 +396,9 @@ public void StartTouch(int client, int action[3])
 			lastCheckpoint[g_iClientInZone[client][2]][client] = 1;
 			g_bSaveLocTele[client] = false;
 
+			// StopRecording(client); //Add pre
+			StartRecording(client); //Add pre
+
 			if (g_bPracticeMode[client])
 			{
 				g_bPracticeMode[client] = false;
@@ -407,6 +410,8 @@ public void StartTouch(int client, int action[3])
 				g_bWrcpTimeractivated[client] = false;
 				g_bPracSrcpTimerActivated[client] = false;
 				g_CurrentStage[client] = 0;
+				// Prevents the Stage(X) replay from starting before the Stage(X) start zone
+				g_iStageStartTouchTick[client] = g_iRecordedTicks[client]; //Add pre
 			}
 		}
 		else if (action[0] == 2) // End Zone
@@ -475,6 +480,8 @@ public void StartTouch(int client, int action[3])
 			g_bInDuck[client] = false;
 			g_KeyCount[client] = 0;
 
+			// Prevents the Stage(X) replay from starting before the Stage(X) start zone
+			g_iStageStartTouchTick[client] = g_iRecordedTicks[client]; //Add pre
 			// stop bot wrcp timer
 			if (client == g_WrcpBot)
 			{
