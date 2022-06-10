@@ -5158,7 +5158,7 @@ public void Startpos(int client)
 {
 
 	if (IsPlayerAlive(client) && g_iClientInZone[client][0] == 1 && GetEntityFlags(client) & FL_ONGROUND)//MAP START
-	{	
+	{
 		GetClientAbsOrigin(client, g_fStartposLocation[client][g_iClientInZone[client][2]]);
 		GetClientEyeAngles(client, g_fStartposAngle[client][g_iClientInZone[client][2]]);
 		g_bStartposUsed[client][g_iClientInZone[client][2]] = true;
@@ -5166,8 +5166,8 @@ public void Startpos(int client)
 	}
 	else if(IsPlayerAlive(client) && g_iClientInZone[client][0] == 3 && GetEntityFlags(client) & FL_ONGROUND)//STAGE START
 	{
-		GetClientAbsOrigin(client, g_fStageStartposLocation[client][g_iClientInZone[client][1]]);
-		GetClientEyeAngles(client, g_fStageStartposAngle[client][g_iClientInZone[client][1]]);
+		GetClientAbsOrigin(client, g_fStageStartposLocation[client][g_Stage[0][client]-2]);
+		GetClientEyeAngles(client, g_fStageStartposAngle[client][g_Stage[0][client]-2]);
 		g_bStageStartposUsed[client][g_iClientInZone[client][1]] = true;
 		CPrintToChat(client, "%t", "Commands89", g_szChatPrefix);
 	}

@@ -351,16 +351,18 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 						Client_Stop(client, 0);
 
 					// Set spawn location to the destination zone:
-					if (destinationFound)
-						if(zone != 1)
-							if(g_bStageStartposUsed[client][zone-2] && g_fCurrentRunTime[client] <= 0.0)
-								Array_Copy(g_fStageStartposLocation[client][zone-2] , g_fTeleLocation[client], 3);
-							else
-								Array_Copy(origin, g_fTeleLocation[client], 3);
-						else
-							Array_Copy(origin, g_fTeleLocation[client], 3);
+					//TP TO STAGE
+					if(zone != 1 && zonegroup == 0 && g_bStageStartposUsed[client][zone-2] && g_fCurrentRunTime[client] <= 0.0 && g_bTimerEnabled[client]){
+						Array_Copy(g_fStageStartposLocation[client][zone-2] , g_fTeleLocation[client], 3);
+
+						destinationFound = true;
+					}
+					//TP TO BONUSES
 					else
-						Array_Copy(g_mapZones[destinationZoneId].CenterPoint, g_fTeleLocation[client], 3);
+						if (destinationFound)
+							Array_Copy(origin, g_fTeleLocation[client], 3);
+						else
+							Array_Copy(g_mapZones[destinationZoneId].CenterPoint, g_fTeleLocation[client], 3);
 
 					// Set specToStage flag
 					g_bRespawnPosition[client] = false;
@@ -381,16 +383,19 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 					SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, -100.0 } ));
 
 					float fLocation[3];
-					if (destinationFound)
-						if(zone != 1)
-							if(g_bStageStartposUsed[client][zone-2] && g_fCurrentRunTime[client] <= 0.0)
-								Array_Copy(g_fStageStartposLocation[client][zone-2], fLocation, 3);
-							else
-								Array_Copy(origin, fLocation, 3);
-						else
-							Array_Copy(origin, fLocation, 3);
+					//TP TO STAGE
+					if(zone != 1 && zonegroup == 0 && g_bStageStartposUsed[client][zone-2] && g_fCurrentRunTime[client] <= 0.0 && g_bTimerEnabled[client]){
+						Array_Copy(g_fStageStartposLocation[client][zone-2], fLocation, 3);
+						Array_Copy(g_fStageStartposAngle[client][zone-2], ang, 3);
+
+						destinationFound = true;
+					}
+					//TP TO BONUSES
 					else
-						Array_Copy(g_mapZones[destinationZoneId].CenterPoint, fLocation, 3);
+						if (destinationFound)
+							Array_Copy(origin, fLocation, 3);
+						else
+							Array_Copy(g_mapZones[destinationZoneId].CenterPoint, fLocation, 3);
 
 					// fluffys dont cheat wrcps!
 					g_bWrcpTimeractivated[client] = false;
