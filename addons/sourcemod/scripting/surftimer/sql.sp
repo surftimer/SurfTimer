@@ -3412,6 +3412,95 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 	}
 }
 
+public void db_viewReplayCPTicks(char szMapName[128])
+{
+	for(int i = 0; i < MAX_STYLES; i++){
+		g_bReplayTickFound[i] = false;
+		for(int j = 0; j < CPLIMIT - 2; j++)
+			g_iCPStartFrame[i][j] = 0;
+	}
+
+	char szQuery[1024];
+	Format(szQuery, 1024, sql_selectReplayCPTicksAll, szMapName);
+	PrintToServer(szQuery);
+	SQL_TQuery(g_hDb, SQL_selectReplayCPTicksCallback, szQuery, DBPrio_Low);
+}
+
+public void SQL_selectReplayCPTicksCallback(Handle owner, Handle hndl, const char[] error, any client)
+{
+	// fluffys come back
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (SQL_selectReplayCPTicksCallback): %s", error);
+		if (!g_bServerDataLoaded)
+			loadAllClientSettings();
+		return;
+	}
+
+	if (SQL_HasResultSet(hndl))
+	{
+		while(SQL_FetchRow(hndl)){
+			int style = SQL_FetchInt(hndl, 35);
+
+			for(int j = 0; j < CPLIMIT - 2; j++){
+				g_iCPStartFrame[style][j] = SQL_FetchInt(hndl, j);
+
+				if (!g_bReplayTickFound[style] && g_iCPStartFrame[style][j] > 0)
+					g_bReplayTickFound[style] = true;
+			}
+		}
+	}
+	else{
+		for(int i = 0; i < MAX_STYLES; i++)
+			for(int j = 0; j < CPLIMIT - 2; j++)
+				g_iCPStartFrame[i][j] = 0;
+	}
+
+	for(int i = 0; i < MAX_STYLES; i++)
+		PrintToServer("style %d is %b", i, g_bReplayTickFound[i]);
+
+	for(int i = 0; i < MAX_STYLES; i++)
+		for(int j = 0; j < CPLIMIT - 2; j++)
+			if(g_iCPStartFrame[i][j] != 0)
+				PrintToServer("style %d | cp %d | value %d\n", i, j, g_iCPStartFrame[i][j]);
+	
+	if (!g_bServerDataLoaded)
+	{
+		g_fServerLoading[1] = GetGameTime();
+		g_bHasLatestID = true;
+		float time = g_fServerLoading[1] - g_fServerLoading[0];
+		LogToFileEx(g_szLogFile, "[SurfTimer] Finished loading server settings in %fs", time);
+		loadAllClientSettings();
+	} 
+}
+
+public void db_UpdateReplaysTick(int client, int style){
+	char szQuery[1024];
+
+	PrintToServer("style value: %d | %b", style, g_bReplayTickFound[style]);
+
+	if(!g_bReplayTickFound[style]){
+		g_bReplayTickFound[0] = true;
+		Format(szQuery, 1024, sql_insertReplayCPTicks, g_szMapName, g_iCPStartFrame[g_iCurrentStyle[client]][0], g_iCPStartFrame[g_iCurrentStyle[client]][1], g_iCPStartFrame[g_iCurrentStyle[client]][2], g_iCPStartFrame[g_iCurrentStyle[client]][3], g_iCPStartFrame[g_iCurrentStyle[client]][4], g_iCPStartFrame[g_iCurrentStyle[client]][5], g_iCPStartFrame[g_iCurrentStyle[client]][6], g_iCPStartFrame[g_iCurrentStyle[client]][7], g_iCPStartFrame[g_iCurrentStyle[client]][8], g_iCPStartFrame[g_iCurrentStyle[client]][9], g_iCPStartFrame[g_iCurrentStyle[client]][10], g_iCPStartFrame[g_iCurrentStyle[client]][11], g_iCPStartFrame[g_iCurrentStyle[client]][12], g_iCPStartFrame[g_iCurrentStyle[client]][13], g_iCPStartFrame[g_iCurrentStyle[client]][14], g_iCPStartFrame[g_iCurrentStyle[client]][15], g_iCPStartFrame[g_iCurrentStyle[client]][16], g_iCPStartFrame[g_iCurrentStyle[client]][17], g_iCPStartFrame[g_iCurrentStyle[client]][18], g_iCPStartFrame[g_iCurrentStyle[client]][19], g_iCPStartFrame[g_iCurrentStyle[client]][20], g_iCPStartFrame[g_iCurrentStyle[client]][21], g_iCPStartFrame[g_iCurrentStyle[client]][22], g_iCPStartFrame[g_iCurrentStyle[client]][23], g_iCPStartFrame[g_iCurrentStyle[client]][24], g_iCPStartFrame[g_iCurrentStyle[client]][25], g_iCPStartFrame[g_iCurrentStyle[client]][26], g_iCPStartFrame[g_iCurrentStyle[client]][27], g_iCPStartFrame[g_iCurrentStyle[client]][28], g_iCPStartFrame[g_iCurrentStyle[client]][29], g_iCPStartFrame[g_iCurrentStyle[client]][30], g_iCPStartFrame[g_iCurrentStyle[client]][31], g_iCPStartFrame[g_iCurrentStyle[client]][32], g_iCPStartFrame[g_iCurrentStyle[client]][33], g_iCPStartFrame[g_iCurrentStyle[client]][34], style);
+		PrintToServer(szQuery);
+		SQL_TQuery(g_hDb, SQL_UpdateReplaysTickCallback, szQuery, DBPrio_Low);
+	}
+	else{
+		Format(szQuery, 1024, sql_updateReplayCPTicks, g_iCPStartFrame[g_iCurrentStyle[client]][0], g_iCPStartFrame[g_iCurrentStyle[client]][1], g_iCPStartFrame[g_iCurrentStyle[client]][2], g_iCPStartFrame[g_iCurrentStyle[client]][3], g_iCPStartFrame[g_iCurrentStyle[client]][4], g_iCPStartFrame[g_iCurrentStyle[client]][5], g_iCPStartFrame[g_iCurrentStyle[client]][6], g_iCPStartFrame[g_iCurrentStyle[client]][7], g_iCPStartFrame[g_iCurrentStyle[client]][8], g_iCPStartFrame[g_iCurrentStyle[client]][9], g_iCPStartFrame[g_iCurrentStyle[client]][10], g_iCPStartFrame[g_iCurrentStyle[client]][11], g_iCPStartFrame[g_iCurrentStyle[client]][12], g_iCPStartFrame[g_iCurrentStyle[client]][13], g_iCPStartFrame[g_iCurrentStyle[client]][14], g_iCPStartFrame[g_iCurrentStyle[client]][15], g_iCPStartFrame[g_iCurrentStyle[client]][16], g_iCPStartFrame[g_iCurrentStyle[client]][17], g_iCPStartFrame[g_iCurrentStyle[client]][18], g_iCPStartFrame[g_iCurrentStyle[client]][19], g_iCPStartFrame[g_iCurrentStyle[client]][20], g_iCPStartFrame[g_iCurrentStyle[client]][21], g_iCPStartFrame[g_iCurrentStyle[client]][22], g_iCPStartFrame[g_iCurrentStyle[client]][23], g_iCPStartFrame[g_iCurrentStyle[client]][24], g_iCPStartFrame[g_iCurrentStyle[client]][25], g_iCPStartFrame[g_iCurrentStyle[client]][26], g_iCPStartFrame[g_iCurrentStyle[client]][27], g_iCPStartFrame[g_iCurrentStyle[client]][28], g_iCPStartFrame[g_iCurrentStyle[client]][29], g_iCPStartFrame[g_iCurrentStyle[client]][30], g_iCPStartFrame[g_iCurrentStyle[client]][31], g_iCPStartFrame[g_iCurrentStyle[client]][32], g_iCPStartFrame[g_iCurrentStyle[client]][33], g_iCPStartFrame[g_iCurrentStyle[client]][34], g_szMapName, style);
+		PrintToServer(szQuery);
+		SQL_TQuery(g_hDb, SQL_UpdateReplaysTickCallback, szQuery, DBPrio_Low);
+	}
+}
+
+public void SQL_UpdateReplaysTickCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (SQL_UpdateReplaysTickCallback): %s", error);
+		return;
+	}
+}
+
 public void db_viewCheckpointsinZoneGroup(int client, char szSteamID[32], char szMapName[128], int zonegroup)
 {
 	char szQuery[1024];
@@ -9911,9 +10000,8 @@ public void SQL_SelectAnnouncementsCallback(Handle owner, Handle hndl, const cha
 	if (hndl == null)
 	{
 		LogError("[surftimer] SQL Error (SQL_SelectAnnouncementsCallback): %s", error);
-
 		if (!g_bServerDataLoaded)
-			loadAllClientSettings();
+			db_viewReplayCPTicks(g_szMapName);
 		return;
 	}
 
@@ -9928,13 +10016,8 @@ public void SQL_SelectAnnouncementsCallback(Handle owner, Handle hndl, const cha
 	}
 
 	if (!g_bServerDataLoaded)
-	{
-		g_fServerLoading[1] = GetGameTime();
-		g_bHasLatestID = true;
-		float time = g_fServerLoading[1] - g_fServerLoading[0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] Finished loading server settings in %fs", time);
-		loadAllClientSettings();
-	} 
+		db_viewReplayCPTicks(g_szMapName);
+
 }
 
 public void db_insertAnnouncement(char szName[128], char szMapName[128], int szMode, char szTime[32], int szGroup)

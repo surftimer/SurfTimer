@@ -139,6 +139,14 @@ public void SaveRecording(int client, int zgroup, int style)
 	g_bNewReplay[client] = false;
 	g_bNewBonus[client] = false;
 
+	for(int i = 0; i < MAX_STYLES; i++)
+	{
+		for(int j = 0; j < CPLIMIT; j++)
+		{
+			g_iCPStartFrame[i][j] = g_iCPStartFrame_CurrentRun[i][j][client];
+		}
+	}
+
 	// Check if the default record folder exists
 	char sPath2[256];
 	BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s", CK_REPLAY_PATH);
@@ -194,6 +202,8 @@ public void SaveRecording(int client, int zgroup, int style)
 	{
 		StopRecording(client);
 	}
+
+	db_UpdateReplaysTick(client, style);
 }
 
 static void ClearFrame(int client)
@@ -396,12 +406,14 @@ public void LoadReplays()
 	}
 }
 
-public void PlayRecord(int client, int type, int style)
+public void PlayRecord(int client, int type, int style, int use_CP)
 {
 	if (!IsValidClient(client))
 	{
 		return;
 	}
+
+	//PrintToChatAll("style value inside : %d", style);
 
 	char buffer[256];
 	char sPath[256];
@@ -470,6 +482,7 @@ public void PlayRecord(int client, int type, int style)
 		}
 		else
 		{
+			//PrintToChatAll("\n\nHERE\n\n");
 			// get style acronym and make it upper case
 			char buffer2[128];
 			Format(buffer2, sizeof(buffer2), g_szStyleAcronyms[style]);
@@ -519,7 +532,12 @@ public void PlayRecord(int client, int type, int style)
 
 	g_aReplayFrame[client] = header.Frames;
 	g_iReplayVersion[client] = header.BinaryFormatVersion;
-	g_iReplayTick[client] = 0;
+
+	if(use_CP > 0)
+		g_iReplayTick[client] = g_iCPStartFrame[style][use_CP - 1];
+	else
+		g_iReplayTick[client] = 0;
+
 	g_iReplayTicksCount[client] = header.TickCount;
 	g_CurrentAdditionalTeleportIndex[client] = 0;
 
@@ -782,7 +800,7 @@ public void LoadRecordReplay()
 
 		SetEntityGravity(g_RecordBot, 0.0);
 
-		PlayRecord(g_RecordBot, 0, 0);
+		PlayRecord(g_RecordBot, 0, 0, 0);
 		// We can start multiple bots but first we need to get if bot has finished playing???
 		SetEntityRenderColor(g_RecordBot, g_ReplayBotColor[0], g_ReplayBotColor[1], g_ReplayBotColor[2], 50);
 		if (GetConVarBool(g_hPlayerSkinChange))
@@ -846,7 +864,7 @@ public void LoadBonusReplay()
 
 		SetEntityGravity(g_BonusBot, 0.0);
 
-		PlayRecord(g_BonusBot, 1, 0);
+		PlayRecord(g_BonusBot, 1, 0, 0);
 		SetEntityRenderColor(g_BonusBot, g_BonusBotColor[0], g_BonusBotColor[1], g_BonusBotColor[2], 50);
 		if (GetConVarBool(g_hPlayerSkinChange))
 		{
@@ -906,7 +924,7 @@ public void LoadWrcpReplay()
 
 		SetEntityGravity(g_WrcpBot, 0.0);
 
-		PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0);
+		PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0, 0);
 		SetEntityRenderColor(g_WrcpBot, 180, 142, 173, 50);
 		if (GetConVarBool(g_hPlayerSkinChange))
 		{
@@ -1223,7 +1241,7 @@ static void LoopReplay(int client)
 					g_bManualBonusReplayPlayback = false;
 					g_iCurrentBonusReplayIndex = 0;
 					g_iSelectedBonusReplayStyle = 0;
-					PlayRecord(g_BonusBot, 1, 0);
+					PlayRecord(g_BonusBot, 1, 0, 0);
 					g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
 				}
 			}
@@ -1240,7 +1258,7 @@ static void LoopReplay(int client)
 				}
 
 				g_iSelectedBonusReplayStyle = 0;
-				PlayRecord(g_BonusBot, 1, 0);
+				PlayRecord(g_BonusBot, 1, 0, 0);
 				g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
 			}
 		}
@@ -1257,7 +1275,7 @@ static void LoopReplay(int client)
 					g_iManualReplayCount = 0;
 					g_bManualReplayPlayback = false;
 					g_iSelectedReplayStyle = 0;
-					PlayRecord(g_RecordBot, 0, 0);
+					PlayRecord(g_RecordBot, 0, 0, 0);
 				}
 			}
 		}
@@ -1274,7 +1292,7 @@ static void LoopReplay(int client)
 					g_iManualStageReplayCount = 0;
 					g_bManualStageReplayPlayback = false;
 					g_StageReplaysLoop = 3;
-					PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0);
+					PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0, 0);
 				}
 			}
 			else
@@ -1317,7 +1335,7 @@ static void LoopReplay(int client)
 				}
 
 				g_StageReplaysLoop++;
-				PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0);
+				PlayRecord(g_WrcpBot, -g_StageReplayCurrentStage, 0, 0);
 			}
 		}
 

@@ -5545,36 +5545,10 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 		bool bSpec = true;
 		// Did the client select a map replay?
 		if ((StrContains(szBuffer, "map", false)) != -1)
-		{
-			if (g_bManualReplayPlayback)
-			{
-				bSpec = false;
-				CPrintToChat(param1, "%t", "BotInUse", g_szChatPrefix, "Map");
-			}
-			else
-			{
-				g_iSelectedReplayType = 0;
-				bot = g_RecordBot;
-
-				// Check for style replay
-				if ((StrContains(szBuffer, "style", false)) != -1)
-				{
-					g_iManualReplayCount = 0;
-					g_bManualReplayPlayback = true;
-					char szBuffer2[2][128];
-					ExplodeString(szBuffer, "style-", szBuffer2, 2, sizeof(szBuffer2));
-					int style = StringToInt(szBuffer2[1]);
-					g_iSelectedReplayStyle = style;
-					PlayRecord(bot, 0, style);
-				}
-				else
-				{
-					g_bManualReplayPlayback = true;
-					g_iManualReplayCount = 99;
-					g_iSelectedReplayStyle = 0;
-					PlayRecord(bot, 0, 0);
-				}
-			}
+		{	
+			bSpec = false;
+			g_iSelectedReplayType = 0;
+			PlayRecordCPMenu(param1, szBuffer);
 		}
 		else if ((StrContains(szBuffer, "bonus", false)) != -1)
 		{
@@ -5603,7 +5577,7 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 					g_iSelectedBonusReplayStyle = style;
 					g_iCurrentBonusReplayIndex = 99;
 					g_iManualBonusToReplay = bonus;
-					PlayRecord(bot, bonus, style);
+					PlayRecord(bot, bonus, style, 0);
 				}
 				else
 				{
@@ -5612,7 +5586,7 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 					g_iSelectedBonusReplayStyle = 0;
 					g_iCurrentBonusReplayIndex = 99;
 					g_iManualBonusToReplay = bonus;
-					PlayRecord(bot, bonus, 0);
+					PlayRecord(bot, bonus, 0, 0);
 				}
 			}
 		}
@@ -5637,7 +5611,7 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 				g_bManualStageReplayPlayback = true;
 				g_iManualStageReplayCount = 0;
 				g_iSelectedReplayStage = stage;
-				PlayRecord(bot, -stage, 0);
+				PlayRecord(bot, -stage, 0, 0);
 			}
 		}
 		if (bSpec)
@@ -5655,6 +5629,140 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 		delete menu;
 
 	return 0;
+}
+
+public void PlayRecordCPMenu(int client, char szBuffer[128])
+{	
+	Menu menu_replay_cp = CreateMenu(PlayRecordCPMenuHandler);
+	char szTitle[128], szItem[128], szBuffer_menu[128];
+	Format(szTitle, sizeof(szTitle), "Play Record: Map Replay");
+
+	int cp_count;
+	if(!g_bhasStages)
+		cp_count = g_TotalStages - 1;
+	else
+		cp_count = g_TotalStages;
+
+	//check for style replay
+	if ((StrContains(szBuffer, "style", false)) == -1)
+		for(int i = 0; i < cp_count; i++)
+		{
+			if(i == 0){
+				Format(szItem, sizeof(szItem), "Map Start");
+				Format(szBuffer_menu, sizeof(szBuffer_menu), "mapstart");
+				AddMenuItem(menu_replay_cp, szBuffer_menu, szItem);
+			}
+			else{
+				if(!g_bhasStages)
+					Format(szItem, sizeof(szItem), "Checkpoint %d ", i);
+				else
+					Format(szItem, sizeof(szItem), "Stage %d ", i);
+				Format(szBuffer_menu, sizeof(szBuffer_menu), "checkpoint-%d", i);
+				AddMenuItem(menu_replay_cp, szBuffer_menu, szItem);
+			}
+		}
+	else{
+		char szBuffer2[2][128];
+		ExplodeString(szBuffer, "style-", szBuffer2, 2, sizeof(szBuffer2));
+		int style = StringToInt(szBuffer2[1]);
+		g_iSelectedReplayStyle = style;
+
+		//PrintToChatAll("style %d", style);
+
+		for (int i = 0; i < cp_count; i++)
+			if (g_bMapReplay[style]){
+				if(i == 0){
+					Format(szItem, sizeof(szItem), "%s | Map Start", g_szStyleMenuPrint[style]);
+					Format(szBuffer_menu, sizeof(szBuffer_menu), "style-%i-mapstart", style);
+					AddMenuItem(menu_replay_cp, szBuffer_menu, szItem);
+				}
+				else{
+					if(!g_bhasStages)
+						Format(szItem, sizeof(szItem), "%s | Checkpoint %d ", g_szStyleMenuPrint[style], i);
+					else
+						Format(szItem, sizeof(szItem), "%s | Stage %d ", g_szStyleMenuPrint[style], i);
+					Format(szBuffer_menu, sizeof(szBuffer_menu), "style-%i-checkpoint-%d", style, i);
+					AddMenuItem(menu_replay_cp, szBuffer_menu, szItem);
+				}
+			}
+
+	}
+
+	SetMenuTitle(menu_replay_cp, szTitle);
+	SetMenuExitBackButton(menu_replay_cp, true);
+	DisplayMenu(menu_replay_cp, client, MENU_TIME_FOREVER);
+}
+
+public int PlayRecordCPMenuHandler(Handle menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char szBuffer[128];
+		GetMenuItem(menu, param2, szBuffer, sizeof(szBuffer));
+
+		char szBuffer_CP_split[4][128];
+		
+		int selected_CP;
+		int style;
+		if ((StrContains(szBuffer, "style", false)) != -1){
+			
+			if((StrContains(szBuffer, "checkpoint", false)) != -1){
+				ExplodeString(szBuffer, "-", szBuffer_CP_split, 4, 128);
+				selected_CP = StringToInt(szBuffer_CP_split[3]);
+				style = StringToInt(szBuffer_CP_split[1]);
+			}
+			else{
+				ExplodeString(szBuffer, "-", szBuffer_CP_split, 3, 128);
+				selected_CP = 0;
+				style = StringToInt(szBuffer_CP_split[1]);
+			}
+		}
+		else{
+			ExplodeString(szBuffer, "-", szBuffer_CP_split, 2, 128);
+			selected_CP = StringToInt(szBuffer_CP_split[1]);
+		}
+
+		//PrintToChatAll("SELECTED CP NUMBER %d", selected_CP);
+
+		int bot;
+		g_iSelectedReplayType = 0;
+		bot = g_RecordBot;
+		bool bSpec = true;
+		if (g_bManualReplayPlayback)
+		{
+			bSpec = false;
+			CPrintToChat(param1, "%t", "BotInUse", g_szChatPrefix, "Bonus");
+		}
+		else{
+
+			// Check for style replay
+			if ((StrContains(szBuffer, "style", false)) != -1)
+			{
+				g_iManualReplayCount = 0;
+				g_bManualReplayPlayback = true;
+				g_iSelectedReplayStyle = style;
+				//PrintToChatAll("style value %d", style);
+				PlayRecord(bot, 0, style, selected_CP);
+			}
+			else
+			{
+				g_bManualReplayPlayback = true;
+				g_iManualReplayCount = 99;
+				g_iSelectedReplayStyle = 0;
+				PlayRecord(bot, 0, 0, selected_CP);
+			}
+		}
+		if(bSpec){
+			Handle pack;
+			CreateDataTimer(0.2, SpecBot, pack);
+			WritePackCell(pack, GetClientUserId(param1));
+			WritePackCell(pack, bot);
+		}
+	}
+	else if (action == MenuAction_Cancel)
+		PlayRecordMenu(param1);
+	else if (action == MenuAction_End)
+		delete menu;
 }
 
 public Action Command_previousSaveloc(int client, int args)

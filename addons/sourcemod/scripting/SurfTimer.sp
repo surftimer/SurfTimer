@@ -348,6 +348,9 @@ bool g_bCheckpointsFound[MAXZONEGROUPS][MAXPLAYERS + 1];
 // Map record checkpoints found?
 bool g_bCheckpointRecordFound[MAXZONEGROUPS];
 
+// Map record checkpoints found?
+bool g_bReplayTickFound[MAX_STYLES];
+
 // The biggest % amount the player has reached in current map
 float g_fMaxPercCompleted[MAXPLAYERS + 1];
 
@@ -957,7 +960,11 @@ int g_iRecordedTicks[MAXPLAYERS + 1];
 // Amount of bot's frame
 int g_iReplayTicksCount[MAXPLAYERS + 1];
 
-// Replay bot's current frame
+// Checkpoints StartFrame
+int g_iCPStartFrame[MAX_STYLES][CPLIMIT];
+int g_iCPStartFrame_CurrentRun[MAX_STYLES][CPLIMIT][MAXPLAYERS + 1];
+
+// Replay bot's frame
 int g_iReplayTick[MAXPLAYERS + 1];
 
 // Stage replays stuff
@@ -1481,7 +1488,7 @@ char g_szStyleRecordPrint[][] =
 
 char g_szStyleMenuPrint[][] =
 {
-	"",
+	"Normal",
 	"Sideways",
 	"Half-Sideways",
 	"Backwards",
@@ -1686,6 +1693,9 @@ public void OnMapStart()
 		g_fBonusFastest[i] = 9999999.0;
 		g_bCheckpointRecordFound[i] = false;
 	}
+
+	for (int i = 0; i < MAX_STYLES; i++)
+		g_bReplayTickFound[i] = false;
 
 	// Precache
 	InitPrecache();
