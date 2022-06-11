@@ -2137,7 +2137,7 @@ public int SpecMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 			{
 				if (IsValidClient(i) && IsPlayerAlive(i) && i != param1 && !IsFakeClient(i))
 				{
-					if (g_PlayerRank[i][0] <= bestrank)
+					if (g_PlayerRank[i][0] <= bestrank && g_PlayerRank[i][0] > 0)
 					{
 						bestrank = g_PlayerRank[i][0];
 						playerid = i;
