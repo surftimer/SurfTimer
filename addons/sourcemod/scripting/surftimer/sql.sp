@@ -9829,26 +9829,8 @@ public int changeColoursMenuHandler(Handle menu, MenuAction action, int client, 
 			type = 0;
 		else if (StrEqual(szType, "text"))
 			type = 1;
-
-		switch (item)
-		{
-			case 0:db_updateColours(client, g_szSteamID[client], 0, type);
-			case 1:db_updateColours(client, g_szSteamID[client], 1, type);
-			case 2:db_updateColours(client, g_szSteamID[client], 2, type);
-			case 3:db_updateColours(client, g_szSteamID[client], 3, type);
-			case 4:db_updateColours(client, g_szSteamID[client], 4, type);
-			case 5:db_updateColours(client, g_szSteamID[client], 5, type);
-			case 6:db_updateColours(client, g_szSteamID[client], 6, type);
-			case 7:db_updateColours(client, g_szSteamID[client], 7, type);
-			case 8:db_updateColours(client, g_szSteamID[client], 8, type);
-			case 9:db_updateColours(client, g_szSteamID[client], 9, type);
-			case 10:db_updateColours(client, g_szSteamID[client], 10, type);
-			case 11:db_updateColours(client, g_szSteamID[client], 11, type);
-			case 12:db_updateColours(client, g_szSteamID[client], 12, type);
-			case 13:db_updateColours(client, g_szSteamID[client], 13, type);
-			case 14:db_updateColours(client, g_szSteamID[client], 14, type);
-			case 15:db_updateColours(client, g_szSteamID[client], 15, type);
-		}
+		if(item >= 0 && item <= 15)
+			db_updateColours(client, g_szSteamID[client], item, type);
 	}
 	else if (action == MenuAction_Cancel)
 	{
