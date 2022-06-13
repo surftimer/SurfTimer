@@ -9437,6 +9437,8 @@ public void SQL_checkCustomPlayerTitleCallback(Handle owner, Handle hndl, const 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
 		db_updateCustomPlayerTitle(client, szSteamID, arg);
+	} else {
+		db_insertCustomPlayerTitle(client, szSteamID, arg);
 	}
 }
 
