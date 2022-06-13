@@ -9364,7 +9364,7 @@ public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] er
 		g_bZoner[client] = view_as<bool>(SQL_FetchInt(hndl, 2));
 	}
 
-	if (!g_bVip[client] || !g_bZoner[client]) // No VIP or Zoner from database, let's check flags
+	if (!IsPlayerVip(client) || !g_bZoner[client]) // No VIP or Zoner from database, let's check flags
 	{
 		if (CheckCommandAccess(client, "", g_VipFlag))
 			g_bVip[client] = true;
