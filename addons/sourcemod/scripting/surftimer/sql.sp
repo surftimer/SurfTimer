@@ -141,6 +141,13 @@ void CheckDatabaseForUpdates()
 			return;
 		}
 		LogMessage("Version 5 looks good.");
+
+		if (!SQL_FastQuery(g_hDb, "SELECT hints FROM ck_playeroptions2 LIMIT 1"))
+		{
+			db_upgradeDatabase(6);
+			return;
+		}
+		LogMessage("Version 6 looks good.");
 	}
 
 	SQL_UnlockDatabase(g_hDb);
@@ -192,6 +199,10 @@ public void db_upgradeDatabase(int ver)
   else if (ver == 5)
   {
 	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD csd_update_rate int(11) NOT NULL DEFAULT '1', ADD csd_pos_x float(11) NOT NULL DEFAULT '0.5', ADD csd_pos_y float(11) NOT NULL DEFAULT '0.3', ADD csd_r int(11) NOT NULL DEFAULT '255', ADD csd_g int(11) NOT NULL DEFAULT '255', ADD csd_b int(11) NOT NULL DEFAULT '255';");
+  }
+  else if (ver == 6)
+  {
+	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD hints int(11) NOT NULL DEFAULT '1';");
   }
   
   CheckDatabaseForUpdates();
