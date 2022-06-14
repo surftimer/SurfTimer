@@ -4570,6 +4570,9 @@ bool IsPlayerVip(int client, bool admin = true, bool reply = false)
 			return true;
 	}
 
+	if (CheckCommandAccess(client, "", g_VipFlag))
+			return true;
+
 	if (!g_bVip[client] && !g_iHasEnforcedTitle[client])
 	{
 		if (reply)

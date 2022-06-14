@@ -338,7 +338,7 @@ public Action Command_ToggleCps(int client, int args) {
 }
 
 public Action Command_SilentSpec(int client, int args) {
-	if (!IsPlayerVip(client)) return Plugin_Handled;
+	if (!IsPlayerVip(client, _, true)) return Plugin_Handled;
 	
 	if (g_iSilentSpectate[client]) {
 		g_iSilentSpectate[client] = false;
@@ -550,7 +550,7 @@ public int CustomTitleMenuHandler(Handle menu, MenuAction action, int param1, in
 
 public Action Command_VoteExtend(int client, int args)
 {
-	if (!IsValidClient(client) || !IsPlayerVip(client))
+	if (!IsValidClient(client) || !IsPlayerVip(client, _, true))
 		return Plugin_Handled;
 
 	VoteExtend(client);
@@ -2515,7 +2515,7 @@ public Action Client_Help(int client, int args)
 			}
 			else if ((StrContains(desc, "[vip]", false) != -1))
 			{
-				if (!g_bVip[client])
+				if(!IsPlayerVip(client))
 					continue;
 			}
 
@@ -3697,14 +3697,14 @@ public int CSDOptionsHandler(Menu menu, MenuAction action, int param1, int param
 // fluffys
 public Action Command_PlayerTitle(int client, int args)
 {
-	if (IsValidClient(client) && IsPlayerVip(client))
+	if (IsValidClient(client) && IsPlayerVip(client, _, true))
 		CustomTitleMenu(client);
 	return Plugin_Handled;
 }
 
 public Action Command_SetDbTitle(int client, int args)
 {
-	if (!IsValidClient(client) || !IsPlayerVip(client))
+	if (!IsValidClient(client) || !IsPlayerVip(client, _, true))
 		return Plugin_Handled;
 
 	char arg[256], authSteamId[MAXPLAYERS + 1];
@@ -3762,7 +3762,7 @@ public Action Command_SetDbTitle(int client, int args)
 
 public Action Command_JoinMsg(int client, int args)
 {
-	if (!IsValidClient(client) || !IsPlayerVip(client))
+	if (!IsValidClient(client) || !IsPlayerVip(client, _, true))
 		return Plugin_Handled;
 
 	if (args == 0)
@@ -3780,7 +3780,7 @@ public Action Command_JoinMsg(int client, int args)
 
 public Action Command_ToggleTitle(int client, int args)
 {
-	if (!IsValidClient(client) || !IsPlayerVip(client))
+	if (!IsValidClient(client) || !IsPlayerVip(client, _, true))
 		return Plugin_Handled;
 
 	char authSteamId[MAXPLAYERS + 1];
@@ -3794,7 +3794,7 @@ public Action Command_ToggleTitle(int client, int args)
 
 public Action Command_SetDbNameColour(int client, int args)
 {
-	if (!IsValidClient(client) || !IsPlayerVip(client))
+	if (!IsValidClient(client) || !IsPlayerVip(client, _, true))
 		return Plugin_Handled;
 
 	char arg[128], authSteamId[MAXPLAYERS + 1];
@@ -3887,7 +3887,7 @@ public Action Command_SetDbNameColour(int client, int args)
 
 public Action Command_SetDbTextColour(int client, int args)
 {
-	if (!IsValidClient(client) || !IsPlayerVip(client))
+	if (!IsValidClient(client) || !IsPlayerVip(client, _, true))
 		return Plugin_Handled;
 
 	char arg[128], authSteamId[MAXPLAYERS + 1];
@@ -4521,7 +4521,7 @@ public Action Command_SelectBonusTime(int client, int args)
 // Show Triggers https://forums.alliedmods.net/showthread.php?t=290356
 public Action Command_ToggleTriggers(int client, int args)
 {
-	if (!IsPlayerVip(client))
+	if (!IsPlayerVip(client, _, true))
 		return Plugin_Handled;
 
 	g_bShowTriggers[client] = !g_bShowTriggers[client];
@@ -5395,11 +5395,8 @@ public Action Command_PlayRecord(int client, int args)
 {
 	if (GetConVarBool(g_hPlayReplayVipOnly))
 	{
-		if (!g_bVip[client])
-		{
-			CReplyToCommand(client, "%t", "Misc43", g_szChatPrefix);
+		if (!IsPlayerVip(client, _, true))
 			return Plugin_Handled;
-		}
 	}
 
 	PlayRecordMenu(client);
