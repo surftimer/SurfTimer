@@ -147,7 +147,7 @@ void CheckDatabaseForUpdates()
 			db_upgradeDatabase(6);
 			return;
 		}
-		LogMessage("Version 5 looks good.");
+		LogMessage("Version 6 looks good.");
 	}
 
 	SQL_UnlockDatabase(g_hDb);
