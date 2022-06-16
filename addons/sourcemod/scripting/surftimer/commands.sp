@@ -5639,13 +5639,13 @@ public void PlayRecordCPMenu(int client, char szBuffer[128])
 
 	int cp_count;
 	if(!g_bhasStages)
-		cp_count = g_TotalStages - 1;
+		cp_count = g_iTotalCheckpoints;
 	else
-		cp_count = g_TotalStages;
+		cp_count = g_TotalStages - 1;
 
 	//check for style replay
 	if ((StrContains(szBuffer, "style", false)) == -1)
-		for(int i = 0; i < cp_count; i++)
+		for(int i = 0; i <= cp_count; i++)
 		{
 			if(i == 0){
 				Format(szItem, sizeof(szItem), "Map Start");
@@ -5656,7 +5656,7 @@ public void PlayRecordCPMenu(int client, char szBuffer[128])
 				if(!g_bhasStages)
 					Format(szItem, sizeof(szItem), "Checkpoint %d ", i);
 				else
-					Format(szItem, sizeof(szItem), "Stage %d ", i);
+					Format(szItem, sizeof(szItem), "Stage %d ", i + 1);
 				Format(szBuffer_menu, sizeof(szBuffer_menu), "checkpoint-%d", i);
 				AddMenuItem(menu_replay_cp, szBuffer_menu, szItem);
 			}
@@ -5669,7 +5669,7 @@ public void PlayRecordCPMenu(int client, char szBuffer[128])
 
 		//PrintToChatAll("style %d", style);
 
-		for (int i = 0; i < cp_count; i++)
+		for (int i = 0; i <= cp_count; i++)
 			if (g_bMapReplay[style]){
 				if(i == 0){
 					Format(szItem, sizeof(szItem), "%s | Map Start", g_szStyleMenuPrint[style]);
@@ -5680,7 +5680,7 @@ public void PlayRecordCPMenu(int client, char szBuffer[128])
 					if(!g_bhasStages)
 						Format(szItem, sizeof(szItem), "%s | Checkpoint %d ", g_szStyleMenuPrint[style], i);
 					else
-						Format(szItem, sizeof(szItem), "%s | Stage %d ", g_szStyleMenuPrint[style], i);
+						Format(szItem, sizeof(szItem), "%s | Stage %d ", g_szStyleMenuPrint[style], i + 1);
 					Format(szBuffer_menu, sizeof(szBuffer_menu), "style-%i-checkpoint-%d", style, i);
 					AddMenuItem(menu_replay_cp, szBuffer_menu, szItem);
 				}
@@ -5731,7 +5731,7 @@ public int PlayRecordCPMenuHandler(Handle menu, MenuAction action, int param1, i
 		if (g_bManualReplayPlayback)
 		{
 			bSpec = false;
-			CPrintToChat(param1, "%t", "BotInUse", g_szChatPrefix, "Bonus");
+			CPrintToChat(param1, "%t", "BotInUse", g_szChatPrefix, "Map");
 		}
 		else{
 
