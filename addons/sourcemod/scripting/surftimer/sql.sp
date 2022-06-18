@@ -2572,20 +2572,24 @@ public void SQL_CurrentRunRank_PracCallback(Handle owner, Handle hndl, const cha
 		float f_srDiff;
 
 		if (g_iClientInZone[client][2] == 0)
-			f_srDiff = (g_fRecordMapTime - runtime);
+			if(g_fRecordMapTime != 9999999.0)
+				f_srDiff = (g_fRecordMapTime - runtime);
+			else
+				f_srDiff = runtime;
 		else
-			f_srDiff = (g_fBonusFastest[g_iClientInZone[client][2]] - runtime);
+			if(g_fBonusFastest[g_iClientInZone[client][2]] != 9999999.0)
+				f_srDiff = (g_fBonusFastest[g_iClientInZone[client][2]] - runtime);
+			else
+				f_srDiff = runtime;
 
 		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
 
-		if (f_srDiff > 0.0)
-		{
+		if(f_srDiff == runtime)
+			Format(sz_srDiff, 128, "SR: N/A", sz_srDiff);
+		else if (f_srDiff > 0.0)
 			Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
-		}
-		else
-		{
+		else if(f_srDiff <= 0.0)
 			Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
-		}
 
 		char szSpecMessage[512];
 	
