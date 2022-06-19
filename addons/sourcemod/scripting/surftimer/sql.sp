@@ -3953,7 +3953,7 @@ public void isLinear(int client, char szSteamID[32], char szMapName[32])
 	WritePackString(pack, szMapName);
 
 	char szQuery[1024];
-	Format(szQuery, 1024, "SELECT COUNT(zonetype) FROM ck_zones WHERE mapname LIKE '%s' AND zonetype = '3';", szMapName);
+	Format(szQuery, 1024, "SELECT COUNT(zonetype) FROM ck_zones WHERE mapname LIKE '%s' AND zonetype = 3;", szMapName);
 	SQL_TQuery(g_hDb, SQL_isLinearCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -11208,17 +11208,25 @@ public void SQL_viewCCP_GetMapStageTimes_PlayerCallback(Handle owner, Handle hnd
 		ReadPackString(pack, szMapTimeDiffFormatted, sizeof(szMapTimeDiffFormatted));
 
 		//SAVE THE CHECKPOINT TIMES TO A GLOBAL ARRAY
-		for(int i = 0; i < g_TotalStages; i++){
+		for(int i = 0; i < 35; i++){
 			g_fCCPPlayerCheckpointTimes[i] = SQL_FetchFloat(hndl, i);
+		}
+
+		int total_stages = 0;
+		for(int i = 0; i < 35; i++){
+			if(g_fCCPPlayerCheckpointTimes[i] != 0.0)
+				total_stages += 1;
+			else
+				break;
 		}
 
 		if(g_fCCPPlayerCheckpointTimes[0] != 0.0){
 			char szStageTimeFormatted[32];
 
 			//GET EACH STAGE TIME AND FORMAT IT
-			for(int i=0; i < g_TotalStages; i++){
+			for(int i=0; i < total_stages; i++){
 				FormatTimeFloat(client, g_fCCPPlayerCheckpointTimes[i], 3, szStageTimeFormatted, 32);
-				db_viewCCP_GetMapStageRank(client, szSteamID, szMapName, map_rank, total_map_completions, szMapTimeFormatted, szMapTimeDiffFormatted, i+1, g_fCCPPlayerCheckpointTimes[i], szStageTimeFormatted);
+				db_viewCCP_GetMapStageRank(client, szSteamID, szMapName, map_rank, total_map_completions, szMapTimeFormatted, szMapTimeDiffFormatted, i+1, g_fCCPPlayerCheckpointTimes[i], szStageTimeFormatted, total_stages);
 			}
 		}
 		else{
@@ -11231,7 +11239,7 @@ public void SQL_viewCCP_GetMapStageTimes_PlayerCallback(Handle owner, Handle hnd
 
 }
 
-public void db_viewCCP_GetMapStageRank(int client, char szSteamID[32], char szMapName[128], int map_rank,int total_map_completions, char szMapTimeFormatted[32], char szMapTimeDiffFormatted[32], int stage, float stage_time, char szStageTimeFormatted[32])
+public void db_viewCCP_GetMapStageRank(int client, char szSteamID[32], char szMapName[128], int map_rank,int total_map_completions, char szMapTimeFormatted[32], char szMapTimeDiffFormatted[32], int stage, float stage_time, char szStageTimeFormatted[32], int total_stages)
 {
 	Handle stage_pack = CreateDataPack();
 	WritePackCell(stage_pack, client);
@@ -11243,6 +11251,7 @@ public void db_viewCCP_GetMapStageRank(int client, char szSteamID[32], char szMa
 	WritePackString(stage_pack, szMapTimeDiffFormatted);
 	WritePackCell(stage_pack, stage);
 	WritePackString(stage_pack, szStageTimeFormatted);
+	WritePackCell(stage_pack, total_stages);
 
 	char szQuery[2048];
 	Format(szQuery, 2048, "SELECT count(runtimepro)+1 FROM ck_wrcps WHERE mapname = '%s' AND stage = '%i' AND style = '0' AND runtimepro < %f;", szMapName, stage, stage_time);
@@ -11286,15 +11295,17 @@ public void SQL_viewCCP_GetMapStageRankCallback(Handle owner, Handle hndl, const
 		char szStageTimeFormatted[32];
 		ReadPackString(stage_pack, szStageTimeFormatted, sizeof(szStageTimeFormatted));
 
+		int total_stages = ReadPackCell(stage_pack);
+
 		int stage_rank = SQL_FetchInt(hndl, 0);
 
-		db_viewCCP_GetMapStageRankTotal(client, szSteamID, szMapName, map_rank, total_map_completions, szMapTimeFormatted, szMapTimeDiffFormatted, stage, stage_rank, szStageTimeFormatted);
+		db_viewCCP_GetMapStageRankTotal(client, szSteamID, szMapName, map_rank, total_map_completions, szMapTimeFormatted, szMapTimeDiffFormatted, stage, stage_rank, szStageTimeFormatted, total_stages);
 
 	}
 
 }
 
-public void db_viewCCP_GetMapStageRankTotal(int client, char szSteamID[32], char szMapName[128], int map_rank, int total_map_completions, char szMapTimeFormatted[32], char szMapTimeDiffFormatted[32], int stage, int stage_rank, char szStageTimeFormatted[32])
+public void db_viewCCP_GetMapStageRankTotal(int client, char szSteamID[32], char szMapName[128], int map_rank, int total_map_completions, char szMapTimeFormatted[32], char szMapTimeDiffFormatted[32], int stage, int stage_rank, char szStageTimeFormatted[32], int total_stages)
 {
 	Handle stage_pack = CreateDataPack();
 	WritePackCell(stage_pack, client); //CLIENT WHO DID SM_CCP
@@ -11307,6 +11318,7 @@ public void db_viewCCP_GetMapStageRankTotal(int client, char szSteamID[32], char
 	WritePackCell(stage_pack, stage); // CURRENT STAGE BEING PROCESSED
 	WritePackCell(stage_pack, stage_rank); // PLAYERS RANK OF THE CURRENT STAGE BEING PROCESSED
 	WritePackString(stage_pack, szStageTimeFormatted); //PLAYERS STAGE TIME IN 00:00:00
+	WritePackCell(stage_pack, total_stages); // TOTAL STAGES OF SELECTED MAP
 
 	char szQuery[2048];
 	Format(szQuery, 2048, "SELECT count(runtimepro) FROM ck_wrcps WHERE mapname = '%s' AND stage = '%i' AND style = '0';", szMapName, stage);
@@ -11363,6 +11375,9 @@ public void DisplayCCPMenu(DataPack stage_pack)
 	char szStageTimeFormatted[32];
 	ReadPackString(stage_pack, szStageTimeFormatted, sizeof(szStageTimeFormatted));
 
+	int total_stages = ReadPackCell(stage_pack);
+	PrintToServer("TOTAL STAGES: %d", total_stages);
+
 	int stage_rank_total = ReadPackCell(stage_pack);
 
 	//MENU
@@ -11379,7 +11394,7 @@ public void DisplayCCPMenu(DataPack stage_pack)
 	AddMenuItem(ccp_menu, "", "", ITEMDRAW_SPACER);
 
 	//WHEN LAST STAGE IS REACHED DISPLAY THE CCP MENU
-	if(stage == g_TotalStages ){
+	if(stage == total_stages ){
 		Format(szItem, sizeof(szItem), "Map\nRank %i/%i\n%s (SR: %s)\n", map_rank, total_map_completions, szMapTimeFormatted, szMapTimeDiffFormatted);
 		AddMenuItem(ccp_menu, "", szItem, ITEMDRAW_DEFAULT);
 
