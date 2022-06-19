@@ -184,7 +184,6 @@ void CreateCommands()
 	// CPR
 	RegConsoleCmd("sm_cpr", Command_CPR, "[surftimer] Compare clients time to another clients time");
 	RegConsoleCmd("sm_prinfo", Command_PRinfo, "[surftimer] Information about personal info on a map");
-	
 
 	// reload map
 	RegAdminCmd("sm_rm", Command_ReloadMap, ADMFLAG_ROOT, "[surftimer] Reloads the current map");

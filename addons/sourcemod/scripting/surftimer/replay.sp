@@ -116,7 +116,15 @@ public void StartRecording(int client)
 		return;
 	}
 
-	g_iRecordedTicks[client] = 0;
+	//Add pre
+	if (g_bNewReplay[client] || g_bNewBonus[client]) // Don't allow starting the timer, if players record is being saved
+		return;
+	else
+	{
+		g_iRecordedTicks[client] = 0;
+		delete g_aRecording[client]; //Add pre
+		g_aRecording[client] = new ArrayList(sizeof(frame_t)); //Add pre
+	}
 }
 
 public void StopRecording(int client)
@@ -177,15 +185,36 @@ public void SaveRecording(int client, int zgroup, int style)
 	char szName[MAX_NAME_LENGTH];
 	GetClientName(client, szName, MAX_NAME_LENGTH);
 
+	//Add pre
+	int startFrame = g_iStartPressTick[client];
+	int endFrame = g_iRecordedTicks[client];
+
 	FileHeader header;
 	header.BinaryFormatVersion = BINARY_FORMAT_VERSION;
 	strcopy(header.Time, sizeof(FileHeader::Time), g_szFinalTime[client]);
-	header.TickCount = g_iRecordedTicks[client];
+	header.TickCount = endFrame - startFrame; //Add pre
 	strcopy(header.Playername, sizeof(FileHeader::Playername), szName);
 	header.Checkpoints = 0;
-	header.Frames = g_aRecording[client];
+
+	// Copy pasta stage separation method for proper Map/Bonus start frame
+	header.Frames = new ArrayList(sizeof(frame_t));
+	any aFrameData[sizeof(frame_t)];
+
+	for (int i = startFrame; i < endFrame; i++)
+	{
+		if (i == -1)
+		{
+			LogError("Map record cannot be saved. Client: \"%L\", startFrame: %d, endFrame: %d (g_iRecordedTicks: %d), i: %d, Path/File: %s", client, startFrame, endFrame, g_iRecordedTicks[client], i, sPath2);
+			continue;
+		}
+		
+		g_aRecording[client].GetArray(i, aFrameData, sizeof(frame_t));
+		header.Frames.PushArray(aFrameData, sizeof(frame_t));
+	}
 
 	WriteRecordToDisk(sPath2, header);
+
+	delete header.Frames;
 
 	g_bNewReplay[client] = false;
 	g_bNewBonus[client] = false;
@@ -1349,15 +1378,18 @@ public void Stage_StartRecording(int client)
 		return;
 	}
 
-	g_iStageStartFrame[client] = g_iRecordedTicks[client];
-
 	char szName[MAX_NAME_LENGTH];
 	GetClientName(client, szName, MAX_NAME_LENGTH);
 
-	if (g_aRecording[client] == null)
-	{
-		StartRecording(client);
-	}
+	// Set the stage recording start frame to up to 1 second before leaving the zone
+	if (g_iRecordedTicks[client] == 0)
+		g_iStageStartFrame[client] = g_iRecordedTicks[client];
+	else if (g_iRecordedTicks[client] >= (g_iTickrate * GetConVarInt(g_hReplayPre)))
+		g_iStageStartFrame[client] = g_iRecordedTicks[client] - (g_iTickrate * GetConVarInt(g_hReplayPre));
+	else if (g_iRecordedTicks[client] >= g_iTickrate)
+		g_iStageStartFrame[client] = g_iRecordedTicks[client] - g_iTickrate;
+	// Also prevent the start frame to be from the previous stage
+	if (g_iStageStartTouchTick[client] > g_iStageStartFrame[client]) g_iStageStartFrame[client] = g_iStageStartTouchTick[client];
 }
 
 public void Stage_SaveRecording(int client, int stage, char[] time)

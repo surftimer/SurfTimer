@@ -960,6 +960,10 @@ int g_iReplayTicksCount[MAXPLAYERS + 1];
 // Replay bot's current frame
 int g_iReplayTick[MAXPLAYERS + 1];
 
+// Add pre to replays
+int g_iStageStartTouchTick[MAXPLAYERS + 1];
+int g_iStartPressTick[MAXPLAYERS + 1]; 
+
 // Stage replays stuff
 int g_iStageStartFrame[MAXPLAYERS+1];
 bool g_bSavingWrcpReplay[MAXPLAYERS + 1];
