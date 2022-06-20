@@ -3403,7 +3403,13 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 		}
 	}
 
-	db_LoadStageTimes(client);
+	if (!g_bSettingsLoaded[client])
+	{
+		g_fTick[client][1] = GetGameTime();
+		float tick = g_fTick[client][1] - g_fTick[client][0];
+		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewCheckpoints in %fs", g_szSteamID[client], tick);
+		LoadClientSetting(client, g_iSettingToLoad[client]);
+	}
 
 }
 
@@ -3412,39 +3418,6 @@ public void db_LoadStageTimes(int client){
 	char szQuery[1024];
 	Format(szQuery, sizeof(szQuery), sql_selectStageTimes, g_szMapName, g_szSteamID[client]);
 	SQL_TQuery(g_hDb, SQL_LoadStageTimesCallback, szQuery, client, DBPrio_Low);
-
-}
-
-public void SQL_LoadStageTimesCallback(Handle owner, Handle hndl, const char[] error, any client)
-{
-	if (hndl == null)
-	{
-		LogError("[SurfTimer] SQL Error (SQL_LoadStageTimesCallback): %s", error);
-		return;
-	}
-
-	if (!IsValidClient(client))
-		return;
-
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-	{
-		g_bStageTimesFound[client] = true;
-		while (SQL_FetchRow(hndl))
-		{
-			for (int i = 0; i < 35; i++)
-			{
-				g_fCCPPlayerCheckpointTimes[i] = SQL_FetchFloat(hndl, i);
-			}
-		}
-	}
-
-	if (!g_bSettingsLoaded[client])
-	{
-		g_fTick[client][1] = GetGameTime();
-		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewCheckpoints in %fs", g_szSteamID[client], tick);
-		LoadClientSetting(client, g_iSettingToLoad[client]);
-	}
 
 }
 
