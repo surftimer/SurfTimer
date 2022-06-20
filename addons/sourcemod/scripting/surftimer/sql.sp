@@ -3413,14 +3413,6 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 
 }
 
-public void db_LoadStageTimes(int client){
-
-	char szQuery[1024];
-	Format(szQuery, sizeof(szQuery), sql_selectStageTimes, g_szMapName, g_szSteamID[client]);
-	SQL_TQuery(g_hDb, SQL_LoadStageTimesCallback, szQuery, client, DBPrio_Low);
-
-}
-
 public void db_viewCheckpointsinZoneGroup(int client, char szSteamID[32], char szMapName[128], int zonegroup)
 {
 	char szQuery[1024];
