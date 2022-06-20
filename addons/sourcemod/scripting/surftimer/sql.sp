@@ -3403,7 +3403,13 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 		}
 	}
 
-	db_LoadStageTimes(client);
+	if (!g_bSettingsLoaded[client])
+	{
+		g_fTick[client][1] = GetGameTime();
+		float tick = g_fTick[client][1] - g_fTick[client][0];
+		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewCheckpoints in %fs", g_szSteamID[client], tick);
+		LoadClientSetting(client, g_iSettingToLoad[client]);
+	}
 
 }
 
@@ -3420,6 +3426,8 @@ public void SQL_LoadStageTimesCallback(Handle owner, Handle hndl, const char[] e
 	if (hndl == null)
 	{
 		LogError("[SurfTimer] SQL Error (SQL_LoadStageTimesCallback): %s", error);
+		if (!g_bSettingsLoaded[client])
+			LoadClientSetting(client, g_iSettingToLoad[client]);
 		return;
 	}
 
