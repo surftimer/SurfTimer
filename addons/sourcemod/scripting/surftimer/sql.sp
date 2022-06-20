@@ -3420,7 +3420,8 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 	if (hndl == null)
 	{
 		LogError("[SurfTimer] SQL Error (SQL_selectCheckpointsCallback): %s", error);
-		db_viewCheckpointsSpeeds(client, g_szSteamID[client], g_szMapName);
+		if (!g_bSettingsLoaded[client])
+			LoadClientSetting(client, g_iSettingToLoad[client]);
 		return;
 	}
 
@@ -3443,7 +3444,14 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 			}
 		}
 
-		db_viewCheckpointsSpeeds(client, g_szSteamID[client], g_szMapName);
+	}
+
+	if (!g_bSettingsLoaded[client])
+	{
+		g_fTick[client][1] = GetGameTime();
+		float tick = g_fTick[client][1] - g_fTick[client][0];
+		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewCheckpoints in %fs", g_szSteamID[client], tick);
+		LoadClientSetting(client, g_iSettingToLoad[client]);
 	}
 }
 
@@ -3485,7 +3493,7 @@ public void SQL_viewCheckpointsSpeedsCallback(Handle owner, Handle hndl, const c
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewCheckpoints in %fs", g_szSteamID[client], tick);
+		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewCheckpointsSpeeds in %fs", g_szSteamID[client], tick);
 		LoadClientSetting(client, g_iSettingToLoad[client]);
 	}
 }
