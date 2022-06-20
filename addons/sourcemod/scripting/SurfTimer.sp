@@ -359,8 +359,14 @@ int lastCheckpoint[MAXZONEGROUPS][MAXPLAYERS + 1];
 // Clients checkpoints have been found?
 bool g_bCheckpointsFound[MAXZONEGROUPS][MAXPLAYERS + 1];
 
+// Clients checkpoints speeds have been found?
+bool g_bCheckpointsSpeedsFound[MAXZONEGROUPS][MAXPLAYERS + 1];
+
 // Map record checkpoints found?
 bool g_bCheckpointRecordFound[MAXZONEGROUPS];
+
+//Map record checkpoint speeds found?
+bool g_bCheckpointRecordSpeedsFound[MAXZONEGROUPS];
 
 // The biggest % amount the player has reached in current map
 float g_fMaxPercCompleted[MAXPLAYERS + 1];
@@ -1699,6 +1705,7 @@ public void OnMapStart()
 	{
 		g_fBonusFastest[i] = 9999999.0;
 		g_bCheckpointRecordFound[i] = false;
+		g_bCheckpointRecordSpeedsFound[i] = false;
 	}
 
 	// Precache
