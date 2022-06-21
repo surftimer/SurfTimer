@@ -154,10 +154,6 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	if (g_iInitalStyle[client] != 5 && g_iInitalStyle[client] != 6)
 	 	SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
 
-	// Hack fix for b1 of surf_aircontrol_ksf
-	if (StrEqual(g_szMapName, "surf_aircontrol_ksf_123") && zonegroup == 1)
-		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 2.0);
-
 	if (g_bPracticeMode[client])
 		Command_normalMode(client, 1);
 
@@ -316,30 +312,11 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 					*	Checks if coordinates are inside a zone
 					*	Return: zone id where location is in, or -1 if not inside a zone
 					**/
-					if (zonegroup > 0 && StrEqual(g_szMapName, "surf_mudkip_fix"))
+					if (IsInsideZone(origin) == destinationZoneId)
 					{
-						char szBuffer[128];
-						char szTargetName[128];
-						GetEntPropString(entity, Prop_Send, "m_iName", szBuffer, sizeof(szBuffer));
-						Format(szTargetName, 128, "bonus%i", zonegroup);
-						if (zonegroup == 5)
-							Format(szTargetName, 128, "%s_1", szTargetName);
-				
-						if (StrEqual(szBuffer, szTargetName))
-						{
-							destinationFound = true;
-							GetEntPropVector(entity, Prop_Send, "m_angRotation", ang);
-							break;
-						}
-					}
-					else
-					{
-						if (IsInsideZone(origin) == destinationZoneId)
-						{
-							destinationFound = true;
-							GetEntPropVector(entity, Prop_Send, "m_angRotation", ang);
-							break;
-						}
+						destinationFound = true;
+						GetEntPropVector(entity, Prop_Send, "m_angRotation", ang);
+						break;
 					}
 				}
 				// Check if client is spectating, or not chosen a team yet
