@@ -154,10 +154,6 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	if (g_iInitalStyle[client] != 5 && g_iInitalStyle[client] != 6)
 	 	SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
 
-	// Hack fix for b1 of surf_aircontrol_ksf
-	if (StrEqual(g_szMapName, "surf_aircontrol_ksf_123") && zonegroup == 1)
-		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 2.0);
-
 	if (g_bPracticeMode[client])
 		Command_normalMode(client, 1);
 

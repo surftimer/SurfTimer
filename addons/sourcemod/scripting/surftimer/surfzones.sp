@@ -198,15 +198,6 @@ public Action StartTouchTrigger(int caller, int activator)
 			{
 				return Plugin_Continue;
 			}
-
-			else if (StrEqual(g_szMapName, "surf_christmas2") && !g_bUsingStageTeleport[activator])
-			{
-				if (action[0] == 3)
-				{
-					if (action[1] > (g_Stage[g_iClientInZone[activator][2]][activator] + 1) || action[1] < (g_Stage[g_iClientInZone[activator][2]][activator] - 1))
-						return Plugin_Continue;
-				}
-			}
 		}
 	}
 	else
@@ -635,12 +626,6 @@ public void EndTouch(int client, int action[3])
 	if (IsValidClient(client))
 	{
 		LimitSpeed(client);
-		// Set Client targetName
-		if (StrEqual(g_szMapName, "surf_forgotten"))
-		{
-			if (!StrEqual("player", g_mapZones[g_iClientInZone[client][3]].TargetName))
-				DispatchKeyValue(client, "targetname", g_mapZones[g_iClientInZone[client][3]].TargetName);
-		}
 
 		// float CurVelVec[3];
 		// GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
@@ -694,23 +679,6 @@ public void EndTouch(int client, int action[3])
 		// fluffys
 		else if (action[0] == 3) // fluffys stage
 		{
-			// targetname filters
-			if (StrEqual(g_szMapName, "surf_treespam") && g_Stage[g_iClientInZone[client][2]][client] == 4)
-			{
-				DispatchKeyValue(client, "targetname", "s4neutral");
-			}
-			else if (StrEqual(g_szMapName, "surf_looksmodern"))
-			{	
-				if (g_Stage[g_iClientInZone[client][2]][client] == 2)
-					DispatchKeyValue(client, "classname", "two_1");
-				else if (g_Stage[g_iClientInZone[client][2]][client] == 3)
-					DispatchKeyValue(client, "classname", "threer");
-				else if (g_Stage[g_iClientInZone[client][2]][client] == 4)
-					DispatchKeyValue(client, "classname", "four_1");
-				else if (g_Stage[g_iClientInZone[client][2]][client] == 5)
-					DispatchKeyValue(client, "classname", "five_1");
-			}
-
 			g_bInStageZone[client] = false;
 
 			if (!g_bPracticeMode[client] && g_bTimerEnabled[client])
