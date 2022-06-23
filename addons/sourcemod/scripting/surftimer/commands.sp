@@ -439,7 +439,7 @@ public int ShowMainDeleteMenuHandler(Menu menu, MenuAction action, int client, i
 			}
 		}
 		
-		PrintToServer(szQuery);
+		// PrintToServer(szQuery); // Can we please NOT do this?
 		SQL_TQuery(g_hDb, sql_DeleteMenuView, szQuery, GetClientSerial(client));
 	}
 	else if(action == MenuAction_End)
