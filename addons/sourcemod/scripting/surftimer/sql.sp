@@ -2351,7 +2351,7 @@ public void db_selectBonusesInMapCallback(Handle owner, Handle hndl, const char[
 		if (SQL_GetRowCount(hndl) == 1)
 		{
 			SQL_FetchString(hndl, 0, mapname, 128);
-			db_selectBonusTopSurfers(client, mapname, SQL_FetchInt(hndl, 1));
+			db_selectBonusTopSurfers(client, mapname, SQL_FetchInt(hndl, 1), 0);
 			return;
 		}
 
@@ -2406,7 +2406,7 @@ public int MenuHandler_SelectBonusinMap(Handle sMenu, MenuAction action, int cli
 			GetMenuItem(sMenu, item, aID, sizeof(aID));
 			ExplodeString(aID, "-", splits, sizeof(splits), sizeof(splits[]));
 
-			db_selectBonusTopSurfers(client, splits[0], StringToInt(splits[1]));
+			db_selectBonusTopSurfers(client, splits[0], StringToInt(splits[1]), 0);
 		}
 		case MenuAction_End:
 		{
@@ -2417,10 +2417,10 @@ public int MenuHandler_SelectBonusinMap(Handle sMenu, MenuAction action, int cli
 	return 0;
 }
 
-public void db_selectBonusTopSurfers(int client, char mapname[128], int zGrp)
+public void db_selectBonusTopSurfers(int client, char mapname[128], int zGrp, int style)
 {
 	char szQuery[1024];
-	Format(szQuery, 1024, sql_selectTopBonusSurfers, mapname, zGrp);
+	Format(szQuery, 1024, style > 0 ? sql_selectTopBonusStyledSurfers : sql_selectTopBonusSurfers, mapname, zGrp, style, style);
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackString(pack, mapname);
