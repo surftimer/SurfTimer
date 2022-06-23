@@ -156,7 +156,7 @@ void CheckDatabaseForUpdates()
 		}
 		LogMessage("Version 7 looks good.");
 
-		if (!SQL_FastQuery(g_hDb, "SELECT cp1 FROM ck_replays LIMIT 1"))
+		if (!SQL_FastQuery(g_hDb, "SELECT mapname FROM ck_replays LIMIT 1"))
 		{
 			db_upgradeDatabase(8);
 			return;
@@ -3426,18 +3426,17 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 
 public void db_viewReplayCPTicks(char szMapName[128])
 {
-	for(int i = 0; i < MAX_STYLES; i++){
-		g_bReplayTickFound[i] = false;
-		for(int j = 0; j < CPLIMIT - 2; j++)
-			g_iCPStartFrame[i][j] = 0;
-	}
-
 	char szQuery[1024];
-	Format(szQuery, sizeof(szQuery), sql_selectReplayCPTicksAll, szMapName);
-	SQL_TQuery(g_hDb, SQL_selectReplayCPTicksCallback, szQuery, DBPrio_Low);
+
+	for(int style = 0; style < MAX_STYLES; style++){
+		g_bReplayTickFound[style] = false;
+
+		Format(szQuery, sizeof(szQuery), sql_selectReplayCPTicksAll, szMapName, style);
+		SQL_TQuery(g_hDb, SQL_selectReplayCPTicksCallback, szQuery, DBPrio_Low);
+	}
 }
 
-public void SQL_selectReplayCPTicksCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void SQL_selectReplayCPTicksCallback(Handle owner, Handle hndl, const char[] error, any data)
 {
 	// fluffys come back
 	if (hndl == null)
@@ -3450,20 +3449,24 @@ public void SQL_selectReplayCPTicksCallback(Handle owner, Handle hndl, const cha
 
 	if (SQL_HasResultSet(hndl))
 	{
+		int cp;
+		int frame;
+		int style;
+
 		while(SQL_FetchRow(hndl)){
-			int style = SQL_FetchInt(hndl, 35);
+			cp = SQL_FetchInt(hndl, 0);
+			frame = SQL_FetchInt(hndl, 1);
+			style = SQL_FetchInt(hndl, 2);
 
-			for(int j = 0; j < CPLIMIT - 2; j++){
-				g_iCPStartFrame[style][j] = SQL_FetchInt(hndl, j);
+			g_iCPStartFrame[style][cp] = frame;
 
-				if (!g_bReplayTickFound[style] && g_iCPStartFrame[style][j] > 0)
-					g_bReplayTickFound[style] = true;
-			}
+			if (!g_bReplayTickFound[style] && g_iCPStartFrame[style][cp - 1] > 0)
+				g_bReplayTickFound[style] = true;
 		}
 	}
 	else{
 		for(int i = 0; i < MAX_STYLES; i++)
-			for(int j = 0; j < CPLIMIT - 2; j++)
+			for(int j = 0; j < CPLIMIT; j++)
 				g_iCPStartFrame[i][j] = 0;
 	}
 	
@@ -3480,14 +3483,26 @@ public void SQL_selectReplayCPTicksCallback(Handle owner, Handle hndl, const cha
 public void db_UpdateReplaysTick(int client, int style){
 	char szQuery[1024];
 
+	int cp_count;
+	if(!g_bhasStages)
+		cp_count = g_iTotalCheckpoints;
+	else
+		cp_count = g_TotalStages - 1;
+
+	PrintToServer("cp count : %d", cp_count);
+
 	if(!g_bReplayTickFound[style]){
 		g_bReplayTickFound[style] = true;
-		Format(szQuery, sizeof(szQuery), sql_insertReplayCPTicks, g_szMapName, g_iCPStartFrame[g_iCurrentStyle[client]][0], g_iCPStartFrame[g_iCurrentStyle[client]][1], g_iCPStartFrame[g_iCurrentStyle[client]][2], g_iCPStartFrame[g_iCurrentStyle[client]][3], g_iCPStartFrame[g_iCurrentStyle[client]][4], g_iCPStartFrame[g_iCurrentStyle[client]][5], g_iCPStartFrame[g_iCurrentStyle[client]][6], g_iCPStartFrame[g_iCurrentStyle[client]][7], g_iCPStartFrame[g_iCurrentStyle[client]][8], g_iCPStartFrame[g_iCurrentStyle[client]][9], g_iCPStartFrame[g_iCurrentStyle[client]][10], g_iCPStartFrame[g_iCurrentStyle[client]][11], g_iCPStartFrame[g_iCurrentStyle[client]][12], g_iCPStartFrame[g_iCurrentStyle[client]][13], g_iCPStartFrame[g_iCurrentStyle[client]][14], g_iCPStartFrame[g_iCurrentStyle[client]][15], g_iCPStartFrame[g_iCurrentStyle[client]][16], g_iCPStartFrame[g_iCurrentStyle[client]][17], g_iCPStartFrame[g_iCurrentStyle[client]][18], g_iCPStartFrame[g_iCurrentStyle[client]][19], g_iCPStartFrame[g_iCurrentStyle[client]][20], g_iCPStartFrame[g_iCurrentStyle[client]][21], g_iCPStartFrame[g_iCurrentStyle[client]][22], g_iCPStartFrame[g_iCurrentStyle[client]][23], g_iCPStartFrame[g_iCurrentStyle[client]][24], g_iCPStartFrame[g_iCurrentStyle[client]][25], g_iCPStartFrame[g_iCurrentStyle[client]][26], g_iCPStartFrame[g_iCurrentStyle[client]][27], g_iCPStartFrame[g_iCurrentStyle[client]][28], g_iCPStartFrame[g_iCurrentStyle[client]][29], g_iCPStartFrame[g_iCurrentStyle[client]][30], g_iCPStartFrame[g_iCurrentStyle[client]][31], g_iCPStartFrame[g_iCurrentStyle[client]][32], g_iCPStartFrame[g_iCurrentStyle[client]][33], g_iCPStartFrame[g_iCurrentStyle[client]][34], style);
-		SQL_TQuery(g_hDb, SQL_UpdateReplaysTickCallback, szQuery, DBPrio_Low);
+		for(int i = 0; i < cp_count; i++){
+			Format(szQuery, sizeof(szQuery), sql_insertReplayCPTicks, g_szMapName, i+1, g_iCPStartFrame[style][i], style);
+			SQL_TQuery(g_hDb, SQL_UpdateReplaysTickCallback, szQuery, DBPrio_Low);
+		}
 	}
 	else{
-		Format(szQuery, sizeof(szQuery), sql_updateReplayCPTicks, g_iCPStartFrame[g_iCurrentStyle[client]][0], g_iCPStartFrame[g_iCurrentStyle[client]][1], g_iCPStartFrame[g_iCurrentStyle[client]][2], g_iCPStartFrame[g_iCurrentStyle[client]][3], g_iCPStartFrame[g_iCurrentStyle[client]][4], g_iCPStartFrame[g_iCurrentStyle[client]][5], g_iCPStartFrame[g_iCurrentStyle[client]][6], g_iCPStartFrame[g_iCurrentStyle[client]][7], g_iCPStartFrame[g_iCurrentStyle[client]][8], g_iCPStartFrame[g_iCurrentStyle[client]][9], g_iCPStartFrame[g_iCurrentStyle[client]][10], g_iCPStartFrame[g_iCurrentStyle[client]][11], g_iCPStartFrame[g_iCurrentStyle[client]][12], g_iCPStartFrame[g_iCurrentStyle[client]][13], g_iCPStartFrame[g_iCurrentStyle[client]][14], g_iCPStartFrame[g_iCurrentStyle[client]][15], g_iCPStartFrame[g_iCurrentStyle[client]][16], g_iCPStartFrame[g_iCurrentStyle[client]][17], g_iCPStartFrame[g_iCurrentStyle[client]][18], g_iCPStartFrame[g_iCurrentStyle[client]][19], g_iCPStartFrame[g_iCurrentStyle[client]][20], g_iCPStartFrame[g_iCurrentStyle[client]][21], g_iCPStartFrame[g_iCurrentStyle[client]][22], g_iCPStartFrame[g_iCurrentStyle[client]][23], g_iCPStartFrame[g_iCurrentStyle[client]][24], g_iCPStartFrame[g_iCurrentStyle[client]][25], g_iCPStartFrame[g_iCurrentStyle[client]][26], g_iCPStartFrame[g_iCurrentStyle[client]][27], g_iCPStartFrame[g_iCurrentStyle[client]][28], g_iCPStartFrame[g_iCurrentStyle[client]][29], g_iCPStartFrame[g_iCurrentStyle[client]][30], g_iCPStartFrame[g_iCurrentStyle[client]][31], g_iCPStartFrame[g_iCurrentStyle[client]][32], g_iCPStartFrame[g_iCurrentStyle[client]][33], g_iCPStartFrame[g_iCurrentStyle[client]][34], g_szMapName, style);
-		SQL_TQuery(g_hDb, SQL_UpdateReplaysTickCallback, szQuery, DBPrio_Low);
+		for(int i = 0; i < cp_count; i++){
+			Format(szQuery, sizeof(szQuery), sql_updateReplayCPTicks, g_szMapName, i+1, g_iCPStartFrame[style][i], style);
+			SQL_TQuery(g_hDb, SQL_UpdateReplaysTickCallback, szQuery, DBPrio_Low);
+		}
 	}
 }
 
