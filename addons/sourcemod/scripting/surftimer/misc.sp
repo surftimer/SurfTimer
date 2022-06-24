@@ -2974,9 +2974,9 @@ public void SpecListMenuDead(int client) // What Spectators see
 					else
 					{
 						if (ObservedUser == g_RecordBot)
-							Format(g_szPlayerPanelText[client], 512, "Map Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \n%s\n", g_szReplayName, g_szReplayTime, count, sSpecs, szStage);
+							Format(g_szPlayerPanelText[client], 512, "%s | Map Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \n%s\n", g_szStyleMenuPrint[g_iSelectedReplayStyle] ,g_szReplayName, g_szReplayTime, count, sSpecs, szStage);
 						else if (ObservedUser == g_BonusBot)
-							Format(g_szPlayerPanelText[client], 512, "Bonus Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \nBonus\n", g_szBonusName, g_szBonusTime, count, sSpecs);
+							Format(g_szPlayerPanelText[client], 512, "%s | Bonus Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \nBonus\n", g_szStyleMenuPrint[g_iSelectedReplayStyle], g_szBonusName, g_szBonusTime, count, sSpecs);
 						else if (ObservedUser == g_WrcpBot)
 						{
 							if (g_bManualStageReplayPlayback)
@@ -3654,7 +3654,7 @@ public void SideHudAlive(int client)
 						Format(szWRHolder, 64, g_szRecordPlayer);
 					else
 						Format(szWRHolder, 64, g_szBonusFastest[g_iClientInZone[client][2]]);
-
+					Format(szModule[i], 256, "%s\nby %s", szWR, szWRHolder);
 				}
 				else
 				{
@@ -3662,8 +3662,9 @@ public void SideHudAlive(int client)
 						Format(szWRHolder, 64, g_szRecordPlayer);
 					else
 						Format(szWRHolder, 64, g_szBonusFastest[g_iClientInZone[client][2]]);
+					
+					Format(szModule[i], 256, "%s | %s\nby %s", g_szStyleMenuPrint[g_iSelectedReplayStyle], szWR, szWRHolder);
 				}
-				Format(szModule[i], 256, "%s\nby %s", szWR, szWRHolder);
 
 				if ((i + 1) != moduleCount)
 					Format(szModule[i], 256, "%s\n \n", szModule[i]);
@@ -3866,6 +3867,9 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 {
 	if (!IsValidClient(client) || g_bPositionRestored[client] || IsFakeClient(client) || zone >= CPLIMIT)
 		return;
+
+	//PrintToChatAll("cp %i | %d tick count", zone, g_iRecordedTicks[client]);
+	g_iCPStartFrame_CurrentRun[0][zone][client] = g_iRecordedTicks[client];
 
 	float percent = -1.0;
 	int totalPoints = 0;

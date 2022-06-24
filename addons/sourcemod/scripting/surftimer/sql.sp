@@ -155,6 +155,14 @@ void CheckDatabaseForUpdates()
 			return;
 		}
 		LogMessage("Version 7 looks good.");
+
+		if (!SQL_FastQuery(g_hDb, "SELECT mapname FROM ck_replays LIMIT 1"))
+		{
+			db_upgradeDatabase(8);
+			return;
+		}
+		LogMessage("Version 8 looks good.");
+
 	}
 
 	SQL_UnlockDatabase(g_hDb);
@@ -216,6 +224,10 @@ public void db_upgradeDatabase(int ver)
 	  SQL_FastQuery(g_hDb, "ALTER TABLE `ck_bonus` ADD `timestamp` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;");
 	  SQL_FastQuery(g_hDb, "ALTER TABLE `ck_playertimes` ADD `timestamp` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;");
 	  SQL_FastQuery(g_hDb, "ALTER TABLE `ck_wrcps` ADD `timestamp` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;");
+  }
+  else if (ver == 8)
+  {
+	  SQL_FastQuery(g_hDb, sql_createReplays);
   }
   
   CheckDatabaseForUpdates();
@@ -3409,6 +3421,97 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 		float tick = g_fTick[client][1] - g_fTick[client][0];
 		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewCheckpoints in %fs", g_szSteamID[client], tick);
 		LoadClientSetting(client, g_iSettingToLoad[client]);
+	}
+}
+
+public void db_viewReplayCPTicks(char szMapName[128])
+{
+	char szQuery[1024];
+
+	for(int style = 0; style < MAX_STYLES; style++){
+		g_bReplayTickFound[style] = false;
+
+		Format(szQuery, sizeof(szQuery), sql_selectReplayCPTicksAll, szMapName, style);
+		SQL_TQuery(g_hDb, SQL_selectReplayCPTicksCallback, szQuery, DBPrio_Low);
+	}
+}
+
+public void SQL_selectReplayCPTicksCallback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	// fluffys come back
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (SQL_selectReplayCPTicksCallback): %s", error);
+		if (!g_bServerDataLoaded)
+			loadAllClientSettings();
+		return;
+	}
+
+	if (SQL_HasResultSet(hndl))
+	{
+		int cp;
+		int frame;
+		int style;
+
+		while(SQL_FetchRow(hndl)){
+			cp = SQL_FetchInt(hndl, 0);
+			frame = SQL_FetchInt(hndl, 1);
+			style = SQL_FetchInt(hndl, 2);
+
+			g_iCPStartFrame[style][cp] = frame;
+
+			if (!g_bReplayTickFound[style] && g_iCPStartFrame[style][cp - 1] > 0)
+				g_bReplayTickFound[style] = true;
+		}
+	}
+	else{
+		for(int i = 0; i < MAX_STYLES; i++)
+			for(int j = 0; j < CPLIMIT; j++)
+				g_iCPStartFrame[i][j] = 0;
+	}
+	
+	if (!g_bServerDataLoaded)
+	{
+		g_fServerLoading[1] = GetGameTime();
+		g_bHasLatestID = true;
+		float time = g_fServerLoading[1] - g_fServerLoading[0];
+		LogToFileEx(g_szLogFile, "[SurfTimer] Finished loading server settings in %fs", time);
+		loadAllClientSettings();
+	} 
+}
+
+public void db_UpdateReplaysTick(int client, int style){
+	char szQuery[1024];
+
+	int cp_count;
+	if(!g_bhasStages)
+		cp_count = g_iTotalCheckpoints;
+	else
+		cp_count = g_TotalStages - 1;
+
+	PrintToServer("cp count : %d", cp_count);
+
+	if(!g_bReplayTickFound[style]){
+		g_bReplayTickFound[style] = true;
+		for(int i = 0; i < cp_count; i++){
+			Format(szQuery, sizeof(szQuery), sql_insertReplayCPTicks, g_szMapName, i+1, g_iCPStartFrame[style][i], style);
+			SQL_TQuery(g_hDb, SQL_UpdateReplaysTickCallback, szQuery, DBPrio_Low);
+		}
+	}
+	else{
+		for(int i = 0; i < cp_count; i++){
+			Format(szQuery, sizeof(szQuery), sql_updateReplayCPTicks, g_szMapName, i+1, g_iCPStartFrame[style][i], style);
+			SQL_TQuery(g_hDb, SQL_UpdateReplaysTickCallback, szQuery, DBPrio_Low);
+		}
+	}
+}
+
+public void SQL_UpdateReplaysTickCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (SQL_UpdateReplaysTickCallback): %s", error);
+		return;
 	}
 }
 
@@ -9911,9 +10014,8 @@ public void SQL_SelectAnnouncementsCallback(Handle owner, Handle hndl, const cha
 	if (hndl == null)
 	{
 		LogError("[surftimer] SQL Error (SQL_SelectAnnouncementsCallback): %s", error);
-
 		if (!g_bServerDataLoaded)
-			loadAllClientSettings();
+			db_viewReplayCPTicks(g_szMapName);
 		return;
 	}
 
@@ -9928,13 +10030,8 @@ public void SQL_SelectAnnouncementsCallback(Handle owner, Handle hndl, const cha
 	}
 
 	if (!g_bServerDataLoaded)
-	{
-		g_fServerLoading[1] = GetGameTime();
-		g_bHasLatestID = true;
-		float time = g_fServerLoading[1] - g_fServerLoading[0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] Finished loading server settings in %fs", time);
-		loadAllClientSettings();
-	} 
+		db_viewReplayCPTicks(g_szMapName);
+
 }
 
 public void db_insertAnnouncement(char szName[128], char szMapName[128], int szMode, char szTime[32], int szGroup)

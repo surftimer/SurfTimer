@@ -129,5 +129,8 @@ char sql_updatePrinfo_withruntime[] = "UPDATE ck_prinfo SET PRtimeinzone = '%f',
 
 char sql_clearPRruntime[] = "UPDATE ck_prinfo SET runtime = '0.0' WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = '%i';";
 
-
-
+//ck_replays
+char sql_createReplays[] = "CREATE TABLE IF NOT EXISTS ck_replays (mapname VARCHAR(32), cp int(12) NOT NULL DEFAULT '0', frame int(12) NOT NULL DEFAULT '0', style INT(12) NOT NULL DEFAULT '0', PRIMARY KEY(mapname, cp, style)) DEFAULT CHARSET=utf8mb4;";
+char sql_selectReplayCPTicksAll[] = "SELECT cp, frame, style FROM ck_replays WHERE mapname = '%s' AND style = '%i' ORDER BY cp ASC;";
+char sql_insertReplayCPTicks[] = "INSERT INTO ck_replays (mapname, cp, frame, style) VALUES ('%s', '%i', '%i', '%i')";
+char sql_updateReplayCPTicks[] = "UPDATE ck_replays SET cp='%i', frame='%i' WHERE mapname='%s' AND style='%i';";
