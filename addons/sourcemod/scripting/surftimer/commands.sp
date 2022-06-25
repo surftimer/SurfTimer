@@ -179,7 +179,9 @@ void CreateCommands()
 
 	// !Startpos -- Goose
 	RegConsoleCmd("sm_startpos", Command_Startpos, "[surftimer] Saves current location as new !r spawn.");
+	RegConsoleCmd("sm_sp", Command_Startpos, "[surftimer] Saves current location as new !r spawn.");
 	RegConsoleCmd("sm_resetstartpos", Command_ResetStartpos, "[surftimer] Removes custom !r spawn.");
+	RegConsoleCmd("sm_rsp", Command_ResetStartpos, "[surftimer] Removes custom !r spawn.");
 
 	// CPR
 	RegConsoleCmd("sm_cpr", Command_CPR, "[surftimer] Compare clients time to another clients time");
@@ -5140,7 +5142,13 @@ public Action Command_ResetStartpos(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	g_bStartposUsed[client][g_iClientInZone[client][2]] = false;
+	if(g_iClientInZone[client][0] == 3){
+		if(g_bStageStartposUsed[client][g_iClientInZone[client][1]])
+			g_bStageStartposUsed[client][g_iClientInZone[client][1]] = false;
+	}
+	else
+		g_bStartposUsed[client][g_iClientInZone[client][2]] = false;
+
 	CReplyToCommand(client, "%t", "Commands83", g_szChatPrefix);
 
 	return Plugin_Handled;
@@ -5148,12 +5156,20 @@ public Action Command_ResetStartpos(int client, int args)
 
 public void Startpos(int client)
 {
-	if (IsPlayerAlive(client) && g_iClientInZone[client][0] == 1 && GetEntityFlags(client) & FL_ONGROUND)
+
+	if (IsPlayerAlive(client) && g_bInStartZone[client] && GetEntityFlags(client) & FL_ONGROUND)//MAP START
 	{
 		GetClientAbsOrigin(client, g_fStartposLocation[client][g_iClientInZone[client][2]]);
 		GetClientEyeAngles(client, g_fStartposAngle[client][g_iClientInZone[client][2]]);
 		g_bStartposUsed[client][g_iClientInZone[client][2]] = true;
 		CPrintToChat(client, "%t", "Commands68", g_szChatPrefix);
+	}
+	else if(IsPlayerAlive(client) && g_bInStageZone[client] && GetEntityFlags(client) & FL_ONGROUND)//STAGE START
+	{
+		GetClientAbsOrigin(client, g_fStageStartposLocation[client][g_Stage[0][client]-2]);
+		GetClientEyeAngles(client, g_fStageStartposAngle[client][g_Stage[0][client]-2]);
+		g_bStageStartposUsed[client][g_iClientInZone[client][1]] = true;
+		CPrintToChat(client, "%t", "Commands89", g_szChatPrefix);
 	}
 	else
 	{

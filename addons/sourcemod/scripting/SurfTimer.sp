@@ -1303,6 +1303,10 @@ float g_fStartposLocation[MAXPLAYERS + 1][MAXZONEGROUPS][3];
 float g_fStartposAngle[MAXPLAYERS + 1][MAXZONEGROUPS][3];
 bool g_bStartposUsed[MAXPLAYERS + 1][MAXZONEGROUPS];
 
+float g_fStageStartposLocation[MAXPLAYERS + 1][CPLIMIT][3];
+float g_fStageStartposAngle[MAXPLAYERS + 1][CPLIMIT][3];
+bool g_bStageStartposUsed[MAXPLAYERS + 1][CPLIMIT];
+
 // Strafe Sync (Taken from shavit's bhop timer)
 int g_iGoodGains[MAXPLAYERS + 1];
 int g_iTotalMeasures[MAXPLAYERS + 1];
