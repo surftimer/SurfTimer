@@ -329,7 +329,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 
 					// Set spawn location to the destination zone:
 					//TP TO STAGE
-					if(zone != 1 && zonegroup == 0 && g_bStageStartposUsed[client][zone-2] && g_fCurrentRunTime[client] <= 0.0 && g_bTimerEnabled[client]){
+					if(zone > 1 && zonegroup == 0 && g_bStageStartposUsed[client][zone-2] && g_fCurrentRunTime[client] <= 0.0 && g_bTimerEnabled[client]){
 						Array_Copy(g_fStageStartposLocation[client][zone-2] , g_fTeleLocation[client], 3);
 
 						destinationFound = true;
