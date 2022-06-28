@@ -732,7 +732,7 @@ public void RecalcPlayerRank(int client, char steamid[128])
 		Handle pack = CreateDataPack();
 		WritePackCell(pack, i);
 		WritePackCell(pack, client);
-		SQL_TQuery(g_hDb, sql_selectPlayerNameCallback, szQuery, _, pack);
+		SQL_TQuery(g_hDb, sql_selectPlayerNameCallback, szQuery, pack);
 	}
 }
 
