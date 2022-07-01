@@ -35,7 +35,7 @@ jobs:
         run: |
           git fetch --unshallow
           echo "COMMIT=$(git rev-list --count HEAD)" >> $GITHUB_ENV
-          echo "SHORT_SHA=$(git describe --always --long --dirty)" >> $GITHUB_ENV
+          echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
           SOURCEMOD_PATH=$GITHUB_WORKSPACE/addons/sourcemod
           echo "SOURCEMOD_PATH=$SOURCEMOD_PATH" >> $GITHUB_ENV
@@ -81,7 +81,7 @@ jobs:
           mkdir package
           mv ./{addons,cfg,maps,scripts,sound,LICENSE,README.md} package
 
-      - name: Create artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: SurfTimer.${{ steps.get_branch_name.outputs.branch }}.${{ env.COMMIT }}.${{ env.SHORT_SHA }}.SM${{ matrix.SM_VERSION }}
