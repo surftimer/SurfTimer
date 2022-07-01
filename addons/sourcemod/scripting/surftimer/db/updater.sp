@@ -228,7 +228,7 @@ public void SQLCheckDataType(Handle owner, Handle hndl, const char[] error, Data
 		{
 			ConvertDataTypeToDecimal(sTable, sColumn, 12, 6);
 		}
-		else
+		else if (sDataType[0] != 'd' && iPrecision != 12 && iScale != 6)
 		{
 			LogError("Unsupported table, column and datatype combination. Please open up an issue. Table: %s, Column: %s, DataType: %s, Precision: %d, Scale: %d", sTable, sColumn, sDataType, iPrecision, iScale);
 		}

@@ -223,10 +223,7 @@ public void OnMapStart()
 	g_hZoneTimer = CreateTimer(GetConVarFloat(g_hChecker), BeamBoxAll, _, TIMER_REPEAT);
 
 	// AutoBhop
-	if (GetConVarBool(g_hAutoBhopConVar))
-		g_bAutoBhop = true;
-	else
-		g_bAutoBhop = false;
+	g_bAutoBhop = GetConVarBool(g_hAutoBhopConVar);
 
 	// main.cfg & replays
 	CreateTimer(1.0, DelayedStuff, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
