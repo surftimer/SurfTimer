@@ -67,6 +67,7 @@ jobs:
 
       - name: Compile plugins
         run: |
+          mkdir -p $PLUGINS_PATH
           for file in *.sp
           do
             echo -e "\nCompiling $file..."
