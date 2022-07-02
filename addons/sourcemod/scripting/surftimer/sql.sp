@@ -2432,7 +2432,7 @@ public int MenuHandler_SelectBonusinMap(Handle sMenu, MenuAction action, int cli
 public void db_selectBonusTopSurfers(int client, char mapname[128], int zGrp, int style)
 {
 	char szQuery[1024];
-	Format(szQuery, 1024, sql_selectTopBonusSurfers, mapname, zGrp, style, style);
+	Format(szQuery, 1024, sql_selectTopBonusSurfers, mapname, style, style, zGrp);
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackString(pack, mapname);
