@@ -9636,8 +9636,13 @@ public void db_insertCustomPlayerTitle(int client, char[] szSteamID, char[] arg)
 	WritePackCell(pack, client);
 	WritePackString(pack, szSteamID);
 
+	// Escape title to prevent mysql injection
+	int buffer_len = strlen(arg) * 2 + 1;
+	char[] new_arg = new char[buffer_len];
+	SQL_EscapeString(g_hDb, arg, new_arg, buffer_len);
+
 	char szQuery[512];
-	Format(szQuery, 512, "INSERT INTO `ck_vipadmins` (steamid, title, inuse) VALUES ('%s', '%s', 1);", szSteamID, arg);
+	Format(szQuery, 512, "INSERT INTO `ck_vipadmins` (steamid, title, inuse) VALUES ('%s', '%s', 1);", szSteamID, new_arg);
 	SQL_TQuery(g_hDb, SQL_insertCustomPlayerTitleCallback, szQuery, pack, DBPrio_Low);
 }
 
