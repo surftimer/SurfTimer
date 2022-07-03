@@ -3342,8 +3342,6 @@ public void db_UpdateReplaysTick(int client, int style){
 	else
 		cp_count = g_TotalStages - 1;
 
-	PrintToServer("cp count : %d", cp_count);
-
 	if(!g_bReplayTickFound[style]){
 		g_bReplayTickFound[style] = true;
 		for(int i = 0; i < cp_count; i++){
