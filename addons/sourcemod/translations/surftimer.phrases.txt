@@ -409,8 +409,8 @@
 	}
 	"BPress4"
 	{
-		"#format"	"{1:s},{2:s},{3:s},{4:i}"
-		"en"		"{1} {blue}[Practice]{default} finished the bonus in {yellow}{2}{default} [{blue}{3}{default} | {blue}Rank {4}{default}]"
+		"#format"	"{1:s},{2:i},{3:s},{4:s},{5:i}"
+		"en"		"{1} {blue}[Practice]{default} finished bonus {yellow}{2}{default} in {yellow}{3}{default} [{blue}{4}{default} | {blue}Rank {5}{default}]"
 	}
 	"BPress5"
 	{

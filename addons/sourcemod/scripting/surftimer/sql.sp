@@ -2494,13 +2494,15 @@ public void sql_selectTopBonusSurfersCallback(Handle owner, Handle hndl, const c
 	topMenu.Display(client, MENU_TIME_FOREVER);
 }
 
-public void db_currentRunRank(int client)
+public void db_currentRunRank(int client, int style)
 {
 	if (!IsValidClient(client))
-	return;
+		return;
+
+	float runtime = g_fCurrentRunTime[client];
 
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT count(runtimepro)+1 FROM `ck_playertimes` WHERE `mapname` = '%s' AND `runtimepro` < %f;", g_szMapName, g_fFinalTime[client]);
+	Format(szQuery, 512, "SELECT count(runtimepro)+1 FROM ck_playertimes WHERE mapname = '%s' AND runtimepro < '%f' AND style = '%i';", g_szMapName, runtime, style);
 	SQL_TQuery(g_hDb, SQL_CurrentRunRankCallback, szQuery, client, DBPrio_Low);
 }
 
@@ -2518,69 +2520,16 @@ public void SQL_CurrentRunRankCallback(Handle owner, Handle hndl, const char[] e
 		rank = SQL_FetchInt(hndl, 0);
 	}
 
-	MapFinishedMsgs(client, rank);
-}
+	if(g_bPracticeMode[client]){
 
-public void db_currentRunRank_Prac(int client, int style, int zgroup)
-{
-	if (!IsValidClient(client))
-		return;
-
-	char szQuery[512];
-	if(zgroup == 0){
-
-		Handle data = CreateDataPack();
-		WritePackCell(data, client);
-		WritePackCell(data, zgroup);
-		WritePackFloat(data, g_fCurrentRunTime[client]);
-
-		Format(szQuery, sizeof(szQuery), "SELECT count(runtimepro)+1 FROM ck_playertimes WHERE mapname = '%s' AND style = '%i' AND runtimepro < '%f';", g_szMapName, style, g_fCurrentRunTime[client]);
-		SQL_TQuery(g_hDb, SQL_CurrentRunRank_PracCallback, szQuery, data, DBPrio_Low);
-	}
-	else if(zgroup > 0){
-
-		Handle data = CreateDataPack();
-		WritePackCell(data, client);
-		WritePackCell(data, zgroup);
-		WritePackFloat(data, g_fCurrentRunTime[client]);
-
-		Format(szQuery, sizeof(szQuery), "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '%s' AND style = '%i' AND zonegroup = '%i' AND runtime < '%f'", g_szMapName, zgroup, style, g_fCurrentRunTime[client]);
-		SQL_TQuery(g_hDb, SQL_CurrentRunRank_PracCallback, szQuery, data, DBPrio_Low);
-	}
-}
-
-public void SQL_CurrentRunRank_PracCallback(Handle owner, Handle hndl, const char[] error, any data)
-{
-	if (hndl == null)
-	{
-		LogError("[SurfTimer] SQL Error (SQL_CurrentRunRankCallback): %s", error);
-		delete view_as<DataPack>(data);
-		return;
-	}
-
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-	{	
-		ResetPack(data);
-		int client = ReadPackCell(data);
-		int zgroup = ReadPackCell(data);
-		float runtime = ReadPackFloat(data);
-		delete view_as<DataPack>(data);
-
-		g_iPracRunTimeRank[client] = SQL_FetchInt(hndl, 0);
-
-		char sz_srDiff[128];
+		float runtime = g_fCurrentRunTime[client];
 		float f_srDiff;
+		char sz_srDiff[128];
 
-		if (g_iClientInZone[client][2] == 0)
-			if(g_fRecordMapTime != 9999999.0)
-				f_srDiff = (g_fRecordMapTime - runtime);
-			else
-				f_srDiff = runtime;
+		if(g_fRecordMapTime != 9999999.0)
+			f_srDiff = (g_fRecordMapTime - runtime);
 		else
-			if(g_fBonusFastest[g_iClientInZone[client][2]] != 9999999.0)
-				f_srDiff = (g_fBonusFastest[g_iClientInZone[client][2]] - runtime);
-			else
-				f_srDiff = runtime;
+			f_srDiff = runtime;
 
 		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
 
@@ -2592,19 +2541,14 @@ public void SQL_CurrentRunRank_PracCallback(Handle owner, Handle hndl, const cha
 			Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
 
 		char szSpecMessage[512];
-	
-		if (zgroup > 0){
-			CPrintToChat(client, "%t", "BPress4", g_szChatPrefix, g_szPracticeTime[client], sz_srDiff, g_iPracRunTimeRank[client]);
-			Format(szSpecMessage, sizeof(szSpecMessage), "%t", "BPress4", g_szChatPrefix, g_szPracticeTime[client], sz_srDiff, g_iPracRunTimeRank[client]);
-		}
-		else{
-			CPrintToChat(client, "%t", "BPress5", g_szChatPrefix, g_szPracticeTime[client], sz_srDiff , g_iPracRunTimeRank[client]);
-			Format(szSpecMessage, sizeof(szSpecMessage), "%t", "BPress5", g_szChatPrefix, g_szPracticeTime[client], sz_srDiff, g_iPracRunTimeRank[client]);
-		}
+
+		CPrintToChat(client, "%t", "BPress5", g_szChatPrefix, g_szPracticeTime[client], sz_srDiff , rank);
+		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "BPress5", g_szChatPrefix, g_szPracticeTime[client], sz_srDiff, rank);
 
 		CheckpointToSpec(client, szSpecMessage);
-		
 	}
+	else
+		MapFinishedMsgs(client, rank);
 }
 
 public void db_currentRunRank_StagePrac(int client, int style, int stage, float fClientPbStageTime)
@@ -4112,13 +4056,16 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 =             SQL Bonus             =
 ===================================*/
 
-public void db_currentBonusRunRank(int client, int zGroup)
+public void db_currentBonusRunRank(int client, int style, int zGroup)
 {
 	char szQuery[512];
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackCell(pack, zGroup);
-	Format(szQuery, 512, "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '%s' AND zonegroup = '%i' AND runtime < %f", g_szMapName, zGroup, g_fFinalTime[client]);
+
+	float runtime = g_fCurrentRunTime[client];
+
+	Format(szQuery, 512, "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '%s' AND zonegroup = '%i' AND runtime < '%f' AND style = '%i';", g_szMapName, zGroup, runtime, style);
 	SQL_TQuery(g_hDb, db_viewBonusRunRank, szQuery, pack, DBPrio_Low);
 }
 
@@ -4140,7 +4087,34 @@ public void db_viewBonusRunRank(Handle owner, Handle hndl, const char[] error, a
 		rank = SQL_FetchInt(hndl, 0);
 	}
 
-	PrintChatBonus(client, zGroup, rank);
+	if(g_bPracticeMode[client]){
+		float runtime = g_fCurrentRunTime[client];
+		char sz_srDiff[128];
+		float f_srDiff;
+
+		if(g_fBonusFastest[g_iClientInZone[client][2]] != 9999999.0)
+			f_srDiff = (g_fBonusFastest[g_iClientInZone[client][2]] - runtime);
+		else
+			f_srDiff = runtime;
+
+		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
+
+		if(f_srDiff == runtime)
+			Format(sz_srDiff, 128, "SR: N/A", sz_srDiff);
+		else if (f_srDiff > 0.0)
+			Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
+		else if(f_srDiff <= 0.0)
+			Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
+
+		char szSpecMessage[512];
+		
+		CPrintToChat(client, "%t", "BPress4", g_szChatPrefix, zGroup, g_szPracticeTime[client], sz_srDiff, rank);
+		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "BPress4", g_szChatPrefix, zGroup, g_szPracticeTime[client], sz_srDiff, rank);
+
+		CheckpointToSpec(client, szSpecMessage);
+	}
+	else
+		PrintChatBonus(client, zGroup, rank);
 }
 
 public void db_viewMapRankBonus(int client, int zgroup, int type)
