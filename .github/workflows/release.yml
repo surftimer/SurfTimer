@@ -24,10 +24,10 @@ jobs:
             echo "PRE_RELEASE=false" >> $GITHUB_ENV
           fi
 
-      - name: Setup SourcePawn Compiler 1.10
+      - name: Setup SourcePawn Compiler 1.11
         uses: rumblefrog/setup-sp@master
         with:
-          version: "1.10"
+          version: "1.11"
 
       - name: Fetch plugin dependencies
         run: |
