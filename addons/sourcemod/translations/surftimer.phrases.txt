@@ -257,11 +257,6 @@
 		"en"		"{1} Completed {default}Stage {2} {red}{3} {default}in {lightgreen}{4} {5} {default}[Rank: {lightgreen}{6}/{7}{default}]"
 	}
 	/*============END============*/
-	"ReplayFinishingMsg"
-	{
-		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {yellow}{2}{default} has finished in [{lightgreen}{3}{default}]"
-	}
 	"BonusFinished7"
 	{
 		"#format"	"{1:s},{2:s},{3:s},{4:s},{5:i},{6:i},{7:s}"
