@@ -5364,3 +5364,36 @@ stock void EmitSoundToClientNoPreCache(int client, const char[] szPath, bool add
 	}
 	ClientCommand(client, szBuffer);
 }
+
+bool GetDatabaseName(char[] database, int length)
+{
+	char sFile[PLATFORM_MAX_PATH];
+	BuildPath(Path_SM, sFile, sizeof(sFile), "configs/databases.cfg");
+
+	KeyValues kv = new KeyValues("Databases");
+	if (!kv.ImportFromFile(sFile))
+	{
+		LogError("Can not read \"%s\" correctly or file doesn't exists(!?). Please check your config.", sFile);
+		delete kv;
+		return false;
+	}
+
+	if (!kv.JumpToKey("surftimer", false))
+	{
+		LogError("Can not find the \"surftimer\" entry in your databases.cfg. Please check your config.");
+		delete kv;
+		return false;
+	}
+
+	kv.GetString("database", database, length, "");
+
+	if (strlen(database) < 1)
+	{
+		LogError("Can not find the \"database\" name in your \"surftimer\" databases.cfg entry. Please check your config.");
+		delete kv;
+		return false;
+	}
+
+	delete kv;
+	return true;
+}
