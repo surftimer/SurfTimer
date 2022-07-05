@@ -155,10 +155,6 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	if (g_iInitalStyle[client] != 5 && g_iInitalStyle[client] != 6)
 	 	SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
 
-	// Hack fix for b1 of surf_aircontrol_ksf
-	if (StrEqual(g_szMapName, "surf_aircontrol_ksf_123") && zonegroup == 1)
-		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 2.0);
-
 	if (g_bPracticeMode[client])
 		Command_normalMode(client, 1);
 
@@ -228,7 +224,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 				g_iTeleportingZoneId[client] = zId;
 
 			teleportEntitySafe(client, g_fStartposLocation[client][zonegroup], g_fStartposAngle[client][zonegroup], view_as<float>( { 0.0, 0.0, 0.0 } ), stopTime);
-
+			
 			return;
 		}
 	}
@@ -284,9 +280,11 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	{
 		// Check if the map has zones
 		if (g_mapZonesCount > 0)
-		{
+		{	
 			// Search for the zoneid we're teleporting to:
-			int destinationZoneId = getZoneID(zonegroup, zone);
+			int destinationZoneId;
+			destinationZoneId = getZoneID(zonegroup, zone);
+
 			g_iTeleportingZoneId[client] = destinationZoneId;
 
 			// Check if zone was found
@@ -317,30 +315,11 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 					*	Checks if coordinates are inside a zone
 					*	Return: zone id where location is in, or -1 if not inside a zone
 					**/
-					if (zonegroup > 0 && StrEqual(g_szMapName, "surf_mudkip_fix"))
+					if (IsInsideZone(origin) == destinationZoneId)
 					{
-						char szBuffer[128];
-						char szTargetName[128];
-						GetEntPropString(entity, Prop_Send, "m_iName", szBuffer, sizeof(szBuffer));
-						Format(szTargetName, 128, "bonus%i", zonegroup);
-						if (zonegroup == 5)
-							Format(szTargetName, 128, "%s_1", szTargetName);
-				
-						if (StrEqual(szBuffer, szTargetName))
-						{
-							destinationFound = true;
-							GetEntPropVector(entity, Prop_Send, "m_angRotation", ang);
-							break;
-						}
-					}
-					else
-					{
-						if (IsInsideZone(origin) == destinationZoneId)
-						{
-							destinationFound = true;
-							GetEntPropVector(entity, Prop_Send, "m_angRotation", ang);
-							break;
-						}
+						destinationFound = true;
+						GetEntPropVector(entity, Prop_Send, "m_angRotation", ang);
+						break;
 					}
 				}
 				// Check if client is spectating, or not chosen a team yet
@@ -350,10 +329,18 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 						Client_Stop(client, 0);
 
 					// Set spawn location to the destination zone:
-					if (destinationFound)
-						Array_Copy(origin, g_fTeleLocation[client], 3);
+					//TP TO STAGE
+					if(zone > 1 && zonegroup == 0 && g_bStageStartposUsed[client][zone-2] && g_fCurrentRunTime[client] <= 0.0 && g_bTimerEnabled[client]){
+						Array_Copy(g_fStageStartposLocation[client][zone-2] , g_fTeleLocation[client], 3);
+
+						destinationFound = true;
+					}
+					//TP TO BONUSES
 					else
-						Array_Copy(g_mapZones[destinationZoneId].CenterPoint, g_fTeleLocation[client], 3);
+						if (destinationFound)
+							Array_Copy(origin, g_fTeleLocation[client], 3);
+						else
+							Array_Copy(g_mapZones[destinationZoneId].CenterPoint, g_fTeleLocation[client], 3);
 
 					// Set specToStage flag
 					g_bRespawnPosition[client] = false;
@@ -374,10 +361,19 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 					SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, -100.0 } ));
 
 					float fLocation[3];
-					if (destinationFound)
-						Array_Copy(origin, fLocation, 3);
+					//TP TO STAGE
+					if(zone > 1 && zonegroup == 0 && g_bStageStartposUsed[client][zone-2] && g_fCurrentRunTime[client] <= 0.0 && g_bTimerEnabled[client]){
+						Array_Copy(g_fStageStartposLocation[client][zone-2], fLocation, 3);
+						Array_Copy(g_fStageStartposAngle[client][zone-2], ang, 3);
+
+						destinationFound = true;
+					}
+					//TP TO BONUSES
 					else
-						Array_Copy(g_mapZones[destinationZoneId].CenterPoint, fLocation, 3);
+						if (destinationFound)
+							Array_Copy(origin, fLocation, 3);
+						else
+							Array_Copy(g_mapZones[destinationZoneId].CenterPoint, fLocation, 3);
 
 					// fluffys dont cheat wrcps!
 					g_bWrcpTimeractivated[client] = false;
@@ -1337,6 +1333,9 @@ public void SetClientDefaults(int client)
 	// Goose Start Pos
 	for (int i = 0; i < MAXZONEGROUPS; i++)
 		g_bStartposUsed[client][i] = false;
+	
+	for (int i = 0; i < CPLIMIT; i++)
+		g_bStageStartposUsed[client][i] = false;
 
 	// Save loc
 	g_iLastSaveLocIdClient[client] = 0;
@@ -3027,9 +3026,9 @@ public void SpecListMenuDead(int client) // What Spectators see
 					else
 					{
 						if (ObservedUser == g_RecordBot)
-							Format(g_szPlayerPanelText[client], 512, "Map Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \n%s\n", g_szReplayName, g_szReplayTime, count, sSpecs, szStage);
+							Format(g_szPlayerPanelText[client], 512, "%s | Map Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \n%s\n", g_szStyleMenuPrint[g_iSelectedReplayStyle] ,g_szReplayName, g_szReplayTime, count, sSpecs, szStage);
 						else if (ObservedUser == g_BonusBot)
-							Format(g_szPlayerPanelText[client], 512, "Bonus Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \nBonus\n", g_szBonusName, g_szBonusTime, count, sSpecs);
+							Format(g_szPlayerPanelText[client], 512, "%s | Bonus Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \nBonus\n", g_szStyleMenuPrint[g_iSelectedReplayStyle], g_szBonusName, g_szBonusTime, count, sSpecs);
 						else if (ObservedUser == g_WrcpBot)
 						{
 							if (g_bManualStageReplayPlayback)
@@ -3707,7 +3706,7 @@ public void SideHudAlive(int client)
 						Format(szWRHolder, 64, g_szRecordPlayer);
 					else
 						Format(szWRHolder, 64, g_szBonusFastest[g_iClientInZone[client][2]]);
-
+					Format(szModule[i], 256, "%s\nby %s", szWR, szWRHolder);
 				}
 				else
 				{
@@ -3715,8 +3714,9 @@ public void SideHudAlive(int client)
 						Format(szWRHolder, 64, g_szRecordPlayer);
 					else
 						Format(szWRHolder, 64, g_szBonusFastest[g_iClientInZone[client][2]]);
+					
+					Format(szModule[i], 256, "%s | %s\nby %s", g_szStyleMenuPrint[g_iSelectedReplayStyle], szWR, szWRHolder);
 				}
-				Format(szModule[i], 256, "%s\nby %s", szWR, szWRHolder);
 
 				if ((i + 1) != moduleCount)
 					Format(szModule[i], 256, "%s\n \n", szModule[i]);
@@ -3919,6 +3919,9 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 {
 	if (!IsValidClient(client) || g_bPositionRestored[client] || IsFakeClient(client) || zone >= CPLIMIT)
 		return;
+
+	//PrintToChatAll("cp %i | %d tick count", zone, g_iRecordedTicks[client]);
+	g_iCPStartFrame_CurrentRun[0][zone][client] = g_iRecordedTicks[client];
 
 	float percent = -1.0;
 	int totalPoints = 0;
@@ -4839,7 +4842,7 @@ void PrintCSGOHUDText(int client, const char[] format, any ...)
 	EndMessage();
 }
 
-public void PrintPracSrcp(int client, int style, int stage, float fClientPbStageTime)
+public void PrintPracSrcp(int client, int style, int stage, int stage_rank, float fClientPbStageTime)
 {
 	char szName[MAX_NAME_LENGTH];
 	GetClientName(client, szName, MAX_NAME_LENGTH);
@@ -4889,17 +4892,17 @@ public void PrintPracSrcp(int client, int style, int stage, float fClientPbStage
 	{
 		if (g_iWrcpMessages[client])
 		{
-			CPrintToChat(client, "%t", "PracWrcp1", g_szChatPrefix, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff);
+			CPrintToChat(client, "%t", "PracWrcp1", g_szChatPrefix, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff, stage_rank);
 		}
-		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp2", g_szChatPrefix, szName, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff);
+		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp2", g_szChatPrefix, szName, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff, stage_rank);
 	}
 	else if (style != 0) // styles
 	{
 		if (g_iWrcpMessages[client])
 		{
-			CPrintToChat(client, "%t", "PracWrcp3", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
+			CPrintToChat(client, "%t", "PracWrcp3", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage], stage_rank);
 		}
-		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp4", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
+		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp4", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage], stage_rank);
 	}
 
 	CheckpointToSpec(client, szSpecMessage);
@@ -5396,4 +5399,37 @@ stock void EmitSoundToClientNoPreCache(int client, const char[] szPath, bool add
 		strcopy(szBuffer, sizeof szBuffer, szPath);
 	}
 	ClientCommand(client, szBuffer);
+}
+
+bool GetDatabaseName(char[] database, int length)
+{
+	char sFile[PLATFORM_MAX_PATH];
+	BuildPath(Path_SM, sFile, sizeof(sFile), "configs/databases.cfg");
+
+	KeyValues kv = new KeyValues("Databases");
+	if (!kv.ImportFromFile(sFile))
+	{
+		LogError("Can not read \"%s\" correctly or file doesn't exists(!?). Please check your config.", sFile);
+		delete kv;
+		return false;
+	}
+
+	if (!kv.JumpToKey("surftimer", false))
+	{
+		LogError("Can not find the \"surftimer\" entry in your databases.cfg. Please check your config.");
+		delete kv;
+		return false;
+	}
+
+	kv.GetString("database", database, length, "");
+
+	if (strlen(database) < 1)
+	{
+		LogError("Can not find the \"database\" name in your \"surftimer\" databases.cfg entry. Please check your config.");
+		delete kv;
+		return false;
+	}
+
+	delete kv;
+	return true;
 }

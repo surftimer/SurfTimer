@@ -189,18 +189,28 @@ public void CL_OnStartTimerPress(int client)
 	// Play Start Sound
 	PlayButtonSound(client);
 
-	// Start recording for record bot
-	if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) || (!IsFakeClient(client) && GetConVarBool(g_hBonusBot)))
-	{
-		if (IsPlayerAlive(client))
-		{
-			StartRecording(client);
-			if (g_bhasStages)
-			{
-				Stage_StartRecording(client);
-			}
-		}
-	}
+	// Add pre
+	// // Start recording for record bot
+	// if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) || (!IsFakeClient(client) && GetConVarBool(g_hBonusBot)))
+	// {
+	// 	if (IsPlayerAlive(client))
+	// 	{
+	// 		StartRecording(client);
+	// 		if (g_bhasStages)
+	// 		{
+	// 			Stage_StartRecording(client);
+	// 		}
+	// 	}
+	// }
+
+	if (g_iRecordedTicks[client] == 0)
+		g_iStartPressTick[client] = g_iRecordedTicks[client];
+	else if (g_iRecordedTicks[client] >= (g_iTickrate * GetConVarInt(g_hReplayPre)))
+		g_iStartPressTick[client] = g_iRecordedTicks[client] - (g_iTickrate * GetConVarInt(g_hReplayPre));
+	else if (g_iRecordedTicks[client] >= g_iTickrate)
+		g_iStartPressTick[client] = g_iRecordedTicks[client] - g_iTickrate;
+			
+
 }
 
 // End Timer
@@ -263,10 +273,10 @@ public void CL_OnEndTimerPress(int client)
 		// Get CurrentRunTime and format it to a string
 		FormatTimeFloat(client, g_fCurrentRunTime[client], 3, g_szPracticeTime[client], 32);
 
-		if (g_iClientInZone[client][2] > 0)
-			CPrintToChat(client, "%t", "BPress4", g_szChatPrefix, szName, g_szPracticeTime[client]);
+		if (g_iClientInZone[client][2] == 0)
+			db_currentRunRank(client, g_iCurrentStyle[client]);
 		else
-			CPrintToChat(client, "%t", "BPress5", g_szChatPrefix, szName, g_szPracticeTime[client]);
+			db_currentBonusRunRank(client, g_iCurrentStyle[client], g_iClientInZone[client][2]);
 		
 		SendPracticeFinishForward(client);
 
@@ -412,7 +422,7 @@ public void CL_OnEndTimerPress(int client)
 			if (!g_bMapSRVRecord[client] && !g_bMapFirstRecord[client] && !g_bMapPBRecord[client])
 			{
 				// for ck_min_rank_announce
-				db_currentRunRank(client);
+				db_currentRunRank(client, 0);
 			}
 		}
 		else if (style != 0)
@@ -662,7 +672,7 @@ public void CL_OnEndTimerPress(int client)
 
 			if (!g_bBonusSRVRecord[client] && !g_bBonusFirstRecord[client] && !g_bBonusPBRecord[client])
 			{
-				db_currentBonusRunRank(client, zGroup);
+				db_currentBonusRunRank(client, 0, zGroup);
 			}
 		}
 		else if (style != 0)
@@ -803,7 +813,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 			// Enable Trigger Output on Timer Restart
 			g_bTeleByCommand[client] = false;
 			g_WrcpStage[client] = g_Stage[0][client];
-			Stage_StartRecording(client);
+			Stage_StartRecording(client); //Add pre
 		}
 		if (g_Stage[0][client] >= 1 && !g_bPracticeMode[client] && !IsFakeClient(client)) {
 			char szRecordDifference[128];

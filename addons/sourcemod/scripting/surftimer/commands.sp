@@ -179,12 +179,13 @@ void CreateCommands()
 
 	// !Startpos -- Goose
 	RegConsoleCmd("sm_startpos", Command_Startpos, "[surftimer] Saves current location as new !r spawn.");
+	RegConsoleCmd("sm_sp", Command_Startpos, "[surftimer] Saves current location as new !r spawn.");
 	RegConsoleCmd("sm_resetstartpos", Command_ResetStartpos, "[surftimer] Removes custom !r spawn.");
+	RegConsoleCmd("sm_rsp", Command_ResetStartpos, "[surftimer] Removes custom !r spawn.");
 
 	// CPR
 	RegConsoleCmd("sm_cpr", Command_CPR, "[surftimer] Compare clients time to another clients time");
 	RegConsoleCmd("sm_prinfo", Command_PRinfo, "[surftimer] Information about personal info on a map");
-	
 
 	// reload map
 	RegAdminCmd("sm_rm", Command_ReloadMap, ADMFLAG_ROOT, "[surftimer] Reloads the current map");
@@ -440,7 +441,7 @@ public int ShowMainDeleteMenuHandler(Menu menu, MenuAction action, int client, i
 			}
 		}
 		
-		PrintToServer(szQuery);
+		// PrintToServer(szQuery); // Can we please NOT do this?
 		SQL_TQuery(g_hDb, sql_DeleteMenuView, szQuery, GetClientSerial(client));
 	}
 	else if(action == MenuAction_End)
@@ -1139,7 +1140,7 @@ public int MenuHandler_SelectBonusTop(Menu sMenu, MenuAction action, int client,
 			char aID[3];
 			GetMenuItem(sMenu, item, aID, sizeof(aID));
 			int zoneGrp = StringToInt(aID);
-			db_selectBonusTopSurfers(client, g_szMapName, zoneGrp);
+			db_selectBonusTopSurfers(client, g_szMapName, zoneGrp, 0);
 		}
 		case MenuAction_End:
 		{
@@ -1914,7 +1915,7 @@ public Action Client_BonusTop(int client, int args)
 			return Plugin_Handled;
 		}
 	}
-	db_selectBonusTopSurfers(client, szArg, zGrp);
+	db_selectBonusTopSurfers(client, szArg, zGrp, 0);
 	return Plugin_Handled;
 }
 
@@ -1991,7 +1992,7 @@ public Action Client_SWBonusTop(int client, int args)
 			return Plugin_Handled;
 		}
 	}
-	db_selectBonusTopSurfers(client, szArg, zGrp);
+	db_selectBonusTopSurfers(client, szArg, zGrp, 0);
 	return Plugin_Handled;
 }
 
@@ -3097,7 +3098,7 @@ public int TopMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 		{
 			case 0: db_selectTopPlayers(param1, style);
 			case 1: SelectMapTop(param1, style);
-			case 2: BonusTopMenu(param1);
+			case 2: BonusTopMenu(param1, style);
 		}
 	}
 	else if (action == MenuAction_End)
@@ -3117,8 +3118,9 @@ public void SelectMapTop(int client, int style)
 	}
 }
 
-public void BonusTopMenu(int client)
+public void BonusTopMenu(int client, int style)
 {
+	g_iWrcpMenuStyleSelect[client] = style;
 	if (g_mapZoneGroupCount > 2)
 	{
 		char buffer[3];
@@ -3143,7 +3145,7 @@ public void BonusTopMenu(int client)
 		sMenu.Display(client, 60);
 	}
 	else {
-		db_selectBonusTopSurfers(client, g_szMapName, 1);
+		db_selectBonusTopSurfers(client, g_szMapName, 1, g_iWrcpMenuStyleSelect[client]);
 	}
 }
 
@@ -3151,7 +3153,7 @@ public int BonusTopMenuHandler(Menu menu, MenuAction action, int param1, int par
 {
 	if (action == MenuAction_Select)
 	{
-		db_selectBonusTopSurfers(param1, g_szMapName, param2 + 1);
+		db_selectBonusTopSurfers(param1, g_szMapName, param2 + 1, g_iWrcpMenuStyleSelect[param1]);
 	}
 	else if (action == MenuAction_End)
 	{
@@ -5140,7 +5142,13 @@ public Action Command_ResetStartpos(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	g_bStartposUsed[client][g_iClientInZone[client][2]] = false;
+	if(g_iClientInZone[client][0] == 3){
+		if(g_bStageStartposUsed[client][g_iClientInZone[client][1]])
+			g_bStageStartposUsed[client][g_iClientInZone[client][1]] = false;
+	}
+	else
+		g_bStartposUsed[client][g_iClientInZone[client][2]] = false;
+
 	CReplyToCommand(client, "%t", "Commands83", g_szChatPrefix);
 
 	return Plugin_Handled;
@@ -5148,12 +5156,20 @@ public Action Command_ResetStartpos(int client, int args)
 
 public void Startpos(int client)
 {
-	if (IsPlayerAlive(client) && g_iClientInZone[client][0] == 1 && GetEntityFlags(client) & FL_ONGROUND)
+
+	if (IsPlayerAlive(client) && g_bInStartZone[client] && GetEntityFlags(client) & FL_ONGROUND)//MAP START
 	{
 		GetClientAbsOrigin(client, g_fStartposLocation[client][g_iClientInZone[client][2]]);
 		GetClientEyeAngles(client, g_fStartposAngle[client][g_iClientInZone[client][2]]);
 		g_bStartposUsed[client][g_iClientInZone[client][2]] = true;
 		CPrintToChat(client, "%t", "Commands68", g_szChatPrefix);
+	}
+	else if(IsPlayerAlive(client) && g_bInStageZone[client] && GetEntityFlags(client) & FL_ONGROUND)//STAGE START
+	{
+		GetClientAbsOrigin(client, g_fStageStartposLocation[client][g_Stage[0][client]-2]);
+		GetClientEyeAngles(client, g_fStageStartposAngle[client][g_Stage[0][client]-2]);
+		g_bStageStartposUsed[client][g_iClientInZone[client][1]] = true;
+		CPrintToChat(client, "%t", "Commands89", g_szChatPrefix);
 	}
 	else
 	{
@@ -5545,36 +5561,10 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 		bool bSpec = true;
 		// Did the client select a map replay?
 		if ((StrContains(szBuffer, "map", false)) != -1)
-		{
-			if (g_bManualReplayPlayback)
-			{
-				bSpec = false;
-				CPrintToChat(param1, "%t", "BotInUse", g_szChatPrefix, "Map");
-			}
-			else
-			{
-				g_iSelectedReplayType = 0;
-				bot = g_RecordBot;
-
-				// Check for style replay
-				if ((StrContains(szBuffer, "style", false)) != -1)
-				{
-					g_iManualReplayCount = 0;
-					g_bManualReplayPlayback = true;
-					char szBuffer2[2][128];
-					ExplodeString(szBuffer, "style-", szBuffer2, 2, sizeof(szBuffer2));
-					int style = StringToInt(szBuffer2[1]);
-					g_iSelectedReplayStyle = style;
-					PlayRecord(bot, 0, style);
-				}
-				else
-				{
-					g_bManualReplayPlayback = true;
-					g_iManualReplayCount = 99;
-					g_iSelectedReplayStyle = 0;
-					PlayRecord(bot, 0, 0);
-				}
-			}
+		{	
+			bSpec = false;
+			g_iSelectedReplayType = 0;
+			PlayRecordCPMenu(param1, szBuffer);
 		}
 		else if ((StrContains(szBuffer, "bonus", false)) != -1)
 		{
@@ -5603,7 +5593,7 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 					g_iSelectedBonusReplayStyle = style;
 					g_iCurrentBonusReplayIndex = 99;
 					g_iManualBonusToReplay = bonus;
-					PlayRecord(bot, bonus, style);
+					PlayRecord(bot, bonus, style, 0);
 				}
 				else
 				{
@@ -5612,7 +5602,7 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 					g_iSelectedBonusReplayStyle = 0;
 					g_iCurrentBonusReplayIndex = 99;
 					g_iManualBonusToReplay = bonus;
-					PlayRecord(bot, bonus, 0);
+					PlayRecord(bot, bonus, 0, 0);
 				}
 			}
 		}
@@ -5637,7 +5627,7 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 				g_bManualStageReplayPlayback = true;
 				g_iManualStageReplayCount = 0;
 				g_iSelectedReplayStage = stage;
-				PlayRecord(bot, -stage, 0);
+				PlayRecord(bot, -stage, 0, 0);
 			}
 		}
 		if (bSpec)
@@ -5655,6 +5645,140 @@ public int PlayRecordMenuHandler(Handle menu, MenuAction action, int param1, int
 		delete menu;
 
 	return 0;
+}
+
+public void PlayRecordCPMenu(int client, char szBuffer[128])
+{	
+	Menu menu_replay_cp = CreateMenu(PlayRecordCPMenuHandler);
+	char szTitle[128], szItem[128], szBuffer_menu[128];
+	Format(szTitle, sizeof(szTitle), "Play Record: Map Replay");
+
+	int cp_count;
+	if(!g_bhasStages)
+		cp_count = g_iTotalCheckpoints;
+	else
+		cp_count = g_TotalStages - 1;
+
+	//check for style replay
+	if ((StrContains(szBuffer, "style", false)) == -1)
+		for(int i = 0; i <= cp_count; i++)
+		{
+			if(i == 0){
+				Format(szItem, sizeof(szItem), "Map Start");
+				Format(szBuffer_menu, sizeof(szBuffer_menu), "mapstart");
+				AddMenuItem(menu_replay_cp, szBuffer_menu, szItem);
+			}
+			else{
+				if(!g_bhasStages)
+					Format(szItem, sizeof(szItem), "Checkpoint %d ", i);
+				else
+					Format(szItem, sizeof(szItem), "Stage %d ", i + 1);
+				Format(szBuffer_menu, sizeof(szBuffer_menu), "checkpoint-%d", i);
+				AddMenuItem(menu_replay_cp, szBuffer_menu, szItem);
+			}
+		}
+	else{
+		char szBuffer2[2][128];
+		ExplodeString(szBuffer, "style-", szBuffer2, 2, sizeof(szBuffer2));
+		int style = StringToInt(szBuffer2[1]);
+		g_iSelectedReplayStyle = style;
+
+		//PrintToChatAll("style %d", style);
+
+		for (int i = 0; i <= cp_count; i++)
+			if (g_bMapReplay[style]){
+				if(i == 0){
+					Format(szItem, sizeof(szItem), "%s | Map Start", g_szStyleMenuPrint[style]);
+					Format(szBuffer_menu, sizeof(szBuffer_menu), "style-%i-mapstart", style);
+					AddMenuItem(menu_replay_cp, szBuffer_menu, szItem);
+				}
+				else{
+					if(!g_bhasStages)
+						Format(szItem, sizeof(szItem), "%s | Checkpoint %d ", g_szStyleMenuPrint[style], i);
+					else
+						Format(szItem, sizeof(szItem), "%s | Stage %d ", g_szStyleMenuPrint[style], i + 1);
+					Format(szBuffer_menu, sizeof(szBuffer_menu), "style-%i-checkpoint-%d", style, i);
+					AddMenuItem(menu_replay_cp, szBuffer_menu, szItem);
+				}
+			}
+
+	}
+
+	SetMenuTitle(menu_replay_cp, szTitle);
+	SetMenuExitBackButton(menu_replay_cp, true);
+	DisplayMenu(menu_replay_cp, client, MENU_TIME_FOREVER);
+}
+
+public int PlayRecordCPMenuHandler(Handle menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char szBuffer[128];
+		GetMenuItem(menu, param2, szBuffer, sizeof(szBuffer));
+
+		char szBuffer_CP_split[4][128];
+		
+		int selected_CP;
+		int style;
+		if ((StrContains(szBuffer, "style", false)) != -1){
+			
+			if((StrContains(szBuffer, "checkpoint", false)) != -1){
+				ExplodeString(szBuffer, "-", szBuffer_CP_split, 4, 128);
+				selected_CP = StringToInt(szBuffer_CP_split[3]);
+				style = StringToInt(szBuffer_CP_split[1]);
+			}
+			else{
+				ExplodeString(szBuffer, "-", szBuffer_CP_split, 3, 128);
+				selected_CP = 0;
+				style = StringToInt(szBuffer_CP_split[1]);
+			}
+		}
+		else{
+			ExplodeString(szBuffer, "-", szBuffer_CP_split, 2, 128);
+			selected_CP = StringToInt(szBuffer_CP_split[1]);
+		}
+
+		//PrintToChatAll("SELECTED CP NUMBER %d", selected_CP);
+
+		int bot;
+		g_iSelectedReplayType = 0;
+		bot = g_RecordBot;
+		bool bSpec = true;
+		if (g_bManualReplayPlayback)
+		{
+			bSpec = false;
+			CPrintToChat(param1, "%t", "BotInUse", g_szChatPrefix, "Map");
+		}
+		else{
+
+			// Check for style replay
+			if ((StrContains(szBuffer, "style", false)) != -1)
+			{
+				g_iManualReplayCount = 0;
+				g_bManualReplayPlayback = true;
+				g_iSelectedReplayStyle = style;
+				//PrintToChatAll("style value %d", style);
+				PlayRecord(bot, 0, style, selected_CP);
+			}
+			else
+			{
+				g_bManualReplayPlayback = true;
+				g_iManualReplayCount = 99;
+				g_iSelectedReplayStyle = 0;
+				PlayRecord(bot, 0, 0, selected_CP);
+			}
+		}
+		if(bSpec){
+			Handle pack;
+			CreateDataTimer(0.2, SpecBot, pack);
+			WritePackCell(pack, GetClientUserId(param1));
+			WritePackCell(pack, bot);
+		}
+	}
+	else if (action == MenuAction_Cancel)
+		PlayRecordMenu(param1);
+	else if (action == MenuAction_End)
+		delete menu;
 }
 
 public Action Command_previousSaveloc(int client, int args)

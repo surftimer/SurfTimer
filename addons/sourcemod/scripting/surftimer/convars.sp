@@ -31,6 +31,7 @@ ConVar g_hArmModel = null;										// Player arm models
 ConVar g_hcvarRestore = null;									// Restore player's runs?
 ConVar g_hNoClipS = null;										// Allow noclip?
 ConVar g_hReplayBot = null;										// Replay bot?
+ConVar g_hReplayPre = null;										// Seconds for prestrafe recording
 ConVar g_hWrcpBot = null;
 ConVar g_hBackupReplays = null;									// Back up replay bots?
 ConVar g_hReplaceReplayTime = null;								// Replace replay times, even if not SR
@@ -162,6 +163,7 @@ void CreateConVars()
 	g_iHintsInterval = AutoExecConfig_CreateConVar("ck_hints_interval", "240", "Seconds between two hints. Leave empty or set to 0 to disable", _, true, 0.0);
 	g_bHintsRandomOrder = AutoExecConfig_CreateConVar("ck_hints_random_order", "1", "(1 / 0) Enable/Disable hints shown in a random order", _, true, 0.0, true, 1.0);
 	g_hOverrideClantag = AutoExecConfig_CreateConVar("ck_override_clantag", "1", "Override player's clantag", _, true, 0.0, true, 1.0);
+	g_hReplayPre = AutoExecConfig_CreateConVar("ck_replay_pre", "1", "Maximum amount of seconds for prestrafe recording", _, true, 1.0);
 
 	g_hPointSystem = AutoExecConfig_CreateConVar("ck_point_system", "1", "on/off - Player point system", _, true, 0.0, true, 1.0);
 	HookConVarChange(g_hPointSystem, OnSettingChanged);
