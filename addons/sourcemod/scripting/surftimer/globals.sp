@@ -1242,8 +1242,6 @@ int g_iSelectedTrigger[MAXPLAYERS + 1];
 int g_iMapTier;
 bool g_bRankedMap;
 
-// Late Load Linux fix
-Handle g_cvar_sv_hibernate_when_empty = INVALID_HANDLE;
 
 // Fix prehopping in zones
 bool g_bJumpedInZone[MAXPLAYERS + 1];
@@ -1292,7 +1290,6 @@ int g_iPlayerPracLocationSnapIdClient[MAXPLAYERS + 1]; // Stage Index to use whe
 bool g_bSaveLocTele[MAXPLAYERS + 1]; // Has the player teleported to saveloc?
 int g_iSaveLocInBonus[MAXPLAYERS + 1][MAX_LOCS]; // Bonus number if player created saveloc in bonus
 float g_fPlayerPracSrcpTimeSnap[MAXPLAYERS + 1][MAX_LOCS]; // PracticeMode Wrcp saveloc runtime
-int g_iAllowCheckpointRecreation; // Int for allowCheckpointRecreation convar
 
 char g_sServerName[256];
 ConVar g_hHostName = null;
