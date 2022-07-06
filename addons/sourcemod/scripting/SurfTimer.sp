@@ -1143,9 +1143,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 }
 
 public void OnPluginStart()
-{	
-	PrintToServer("\n\n\n\n\n\nLOADING DATA LMAO\n\n\n\n\n\n");
-
+{
 	g_bServerDataLoaded = false;
 
 	// Language File
@@ -1207,8 +1205,6 @@ public void OnPluginStart()
 
 	// Forwards
 	Register_Forwards();
-
-	PrintToServer("ASDASDASD\n\n\n\n\n\n\n\n");
 
 	if (g_bLateLoaded)
 	{
