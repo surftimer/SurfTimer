@@ -180,7 +180,6 @@ public void OnMapStart()
 
 	db_viewMapSettings();
 
-
 	/// Start Loading Server Settings
 	ConVar cvHibernateWhenEmpty = FindConVar("sv_hibernate_when_empty");
 
