@@ -781,7 +781,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 			g_WrcpStage[client] = g_Stage[0][client];
 			Stage_StartRecording(client); //Add pre
 		}
-		if (g_Stage[0][client] > 1 && !g_bPracticeMode[client] && !IsFakeClient(client)) {
+		if (g_Stage[0][client] >= 1 && !g_bPracticeMode[client] && !IsFakeClient(client)) {
 			char szDifference[128], szSpeed[128], preMessage[128];
 			int iDifference;
 			int iPrestrafeRecord = g_iRecordPreStrafe[g_PreSpeedMode[client]][g_Stage[0][client]][g_iCurrentStyle[client]];
