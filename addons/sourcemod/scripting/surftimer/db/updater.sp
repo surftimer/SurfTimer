@@ -63,7 +63,14 @@ void CheckDatabaseForUpdates()
 			db_upgradeDatabase(8);
 			return;
 		}
-		LogMessage("Version 8 looks good.");
+		LogMessage("Version 9 looks good.");
+
+		if (!SQL_FastQuery(g_hDb, "SELECT prespeedmode FROM ck_playeroptions2 LIMIT 1"))
+		{
+			db_upgradeDatabase(9);
+			return;
+		}
+		LogMessage("Version 9 looks good.");
 	}
 
 	SQL_UnlockDatabase(g_hDb);
@@ -132,6 +139,10 @@ public void db_upgradeDatabase(int ver)
 	else if (ver == 8)
 	{
 		SQL_FastQuery(g_hDb, sql_createReplays);
+	}
+	else if (ver == 9)
+	{
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD prespeedmode int(11) NOT NULL DEFAULT '0';");
 	}
 
 	CheckDatabaseForUpdates();
