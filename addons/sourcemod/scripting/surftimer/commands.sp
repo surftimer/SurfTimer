@@ -5781,6 +5781,8 @@ public int PlayRecordCPMenuHandler(Handle menu, MenuAction action, int param1, i
 		PlayRecordMenu(param1);
 	else if (action == MenuAction_End)
 		delete menu;
+
+	return 0;
 }
 
 public Action Command_previousSaveloc(int client, int args)
