@@ -12,7 +12,7 @@ ALTER TABLE `ck_checkpoints` CHANGE `cp3` `cp3` DECIMAL(10,4) NOT NULL DEFAULT '
 ALTER TABLE `ck_checkpoints` CHANGE `cp3` `cp3` DECIMAL(12,6) NOT NULL DEFAULT '-1';
 ALTER TABLE `ck_checkpoints` CHANGE `cp4` `cp4` DECIMAL(10,4) NOT NULL DEFAULT '-1';
 ALTER TABLE `ck_checkpoints` CHANGE `cp4` `cp4` DECIMAL(12,6) NOT NULL DEFAULT '-1';
-ALTER TABLE `ck_checkpoints` CHANGE `cp4` `cp5` DECIMAL(10,4) NOT NULL DEFAULT '-1';
+ALTER TABLE `ck_checkpoints` CHANGE `cp5` `cp5` DECIMAL(10,4) NOT NULL DEFAULT '-1';
 ALTER TABLE `ck_checkpoints` CHANGE `cp5` `cp5` DECIMAL(12,6) NOT NULL DEFAULT '-1';
 ALTER TABLE `ck_checkpoints` CHANGE `cp6` `cp6` DECIMAL(10,4) NOT NULL DEFAULT '-1';
 ALTER TABLE `ck_checkpoints` CHANGE `cp6` `cp6` DECIMAL(12,6) NOT NULL DEFAULT '-1';
