@@ -24,7 +24,7 @@ char sql_updateCheckpoints[] = "UPDATE ck_checkpoints SET cp='%f' WHERE steamid=
 char sql_insertCheckpoints[] = "INSERT INTO ck_checkpoints VALUES ('%s', '%s', '%i', '%f', '%i')";
 char sql_selectCheckpoints[] = "SELECT zonegroup, cp, time FROM ck_checkpoints WHERE mapname='%s' AND steamid = '%s';";
 char sql_selectCheckpointsinZoneGroup[] = "SELECT cp, time FROM ck_checkpoints WHERE mapname='%s' AND steamid = '%s' AND zonegroup = %i;";
-char sql_selectRecordCheckpoints[] = "SELECT zonegroup, cp, `time` FROM ck_checkpoints WHERE steamid = 'STEAM_1:0:46344325' AND mapname='surf_beginner' UNION SELECT a.zonegroup, b.cp, b.time FROM ck_bonus a LEFT JOIN ck_checkpoints b ON a.steamid = b.steamid AND a.zonegroup = b.zonegroup WHERE a.mapname = 'surf_beginner' GROUP BY a.zonegroup;";
+char sql_selectRecordCheckpoints[] = "SELECT zonegroup, cp, `time` FROM ck_checkpoints WHERE steamid = '%s' AND mapname='%s' UNION SELECT a.zonegroup, b.cp, b.time FROM ck_bonus a LEFT JOIN ck_checkpoints b ON a.steamid = b.steamid AND a.zonegroup = b.zonegroup WHERE a.mapname = '%s' GROUP BY a.zonegroup;";
 char sql_deleteCheckpoints[] = "DELETE FROM ck_checkpoints WHERE mapname = '%s'";
 
 // ck_latestrecords
