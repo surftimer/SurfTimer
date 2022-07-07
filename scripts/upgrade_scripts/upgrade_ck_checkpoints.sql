@@ -1,7 +1,7 @@
 CREATE TABLE `ck_checkpointsnew` (
  `steamid` varchar(32) NOT NULL,
  `mapname` varchar(32) NOT NULL,
- `cp` int(11) NOT NULL DEFAULT '0.0',
+ `cp` int(11) NOT NULL DEFAULT '0',
  `time` decimal(12, 6) NOT NULL DEFAULT '0.000000',
  `velStartXY` int(11) NOT NULL DEFAULT '0.0',
  `velStartXYZ` int(11) NOT NULL DEFAULT '0.0',
