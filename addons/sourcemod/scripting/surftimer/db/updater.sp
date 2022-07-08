@@ -148,6 +148,8 @@ public void db_upgradeDatabase(int ver)
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_checkpoints RENAME TO ck_checkpointsold;");
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_checkpointsnew RENAME TO ck_checkpoints;");
 
+		g_swappedtables = true;
+
 		g_bInTransactionChain = false;
 	}
 
@@ -158,6 +160,7 @@ void LoopFloatDecimalTables()
 {
 	for (int i = 0; i < sizeof(g_sDecimalTables); i++)
 	{
+		if( strcmp(g_sDecimalTables[i][0], "ck_checkpoints") != 0 || (strcmp(g_sDecimalTables[i][0], "ck_checkpoints") != 0 && g_swappedtables) )
 		CheckDataType(g_sDecimalTables[i][0], g_sDecimalTables[i][1]);
 	}
 }

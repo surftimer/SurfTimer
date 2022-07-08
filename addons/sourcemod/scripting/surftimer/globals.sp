@@ -1497,3 +1497,5 @@ char g_sDecimalTables[][][] = {
 	{ "ck_prinfo",        "PRtimeinzone", },
 	{ "ck_wrcps",         "runtimepro", }
 };  // Required for the float to decimal conversion
+
+bool g_swappedtables = false;
