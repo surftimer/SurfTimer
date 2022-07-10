@@ -45,6 +45,9 @@ public void db_setupDatabase()
 	g_bRenaming = false;
 	g_bInTransactionChain = false;
 
+	GetDatabaseName(g_sDatabaseName, sizeof(g_sDatabaseName));
+	LoopFloatDecimalTables();
+
 	CheckDatabaseForUpdates();
 
 	for (int i = 0; i < sizeof(g_failedTransactions); i++)

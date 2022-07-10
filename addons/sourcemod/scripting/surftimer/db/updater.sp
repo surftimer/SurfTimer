@@ -67,9 +67,6 @@ void CheckDatabaseForUpdates()
 	}
 
 	SQL_UnlockDatabase(g_hDb);
-
-	GetDatabaseName(g_sDatabaseName, sizeof(g_sDatabaseName));
-	LoopFloatDecimalTables();
 }
 
 public void db_upgradeDatabase(int ver)
