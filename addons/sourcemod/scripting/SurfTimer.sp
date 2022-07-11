@@ -176,14 +176,14 @@ public void OnMapStart()
 
 	// Load spawns
 	if (!g_bRenaming && !g_bInTransactionChain)
-	checkSpawnPoints();
+		checkSpawnPoints();
 
 	db_viewMapSettings();
 
 	/// Start Loading Server Settings
 	ConVar cvHibernateWhenEmpty = FindConVar("sv_hibernate_when_empty");
 
-	if (!g_bRenaming && !g_bInTransactionChain && (IsServerProcessing() || !cvHibernateWhenEmpty.BoolValue) && g_swappedtables)
+	if (!g_bRenaming && !g_bInTransactionChain && (IsServerProcessing() || !cvHibernateWhenEmpty.BoolValue))
 	{
 		LogToFileEx(g_szLogFile, "[surftimer] Starting to load server settings");
 		g_fServerLoading[0] = GetGameTime();
@@ -474,7 +474,7 @@ public void OnClientPutInServer(int client)
 	if (g_bTierFound)
 		AnnounceTimer[client] = CreateTimer(20.0, AnnounceMap, client, TIMER_FLAG_NO_MAPCHANGE);
 
-	if (!g_bRenaming && !g_bInTransactionChain && g_bServerDataLoaded && !g_bSettingsLoaded[client] && !g_bLoadingSettings[client] && g_swappedtables)
+	if (!g_bRenaming && !g_bInTransactionChain && g_bServerDataLoaded && !g_bSettingsLoaded[client] && !g_bLoadingSettings[client])
 	{
 		// Start loading client settings
 		g_bLoadingSettings[client] = true;

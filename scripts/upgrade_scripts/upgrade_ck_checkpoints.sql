@@ -1,3 +1,4 @@
+--IF YOU HAVE ALREADY CONVERTED CK_CHECKPOINTS PRIOR, USE THIS
 CREATE TABLE `ck_checkpointsnew` (
  `steamid` varchar(32) NOT NULL,
  `mapname` varchar(32) NOT NULL,
@@ -11,6 +12,21 @@ CREATE TABLE `ck_checkpointsnew` (
 )
 DEFAULT CHARSET=utf8mb4;
 
+--IF YOU HAVE NOT CONVERTED ALL OF THE TABLES PRIOR USE THIS
+CREATE TABLE `ck_checkpointsnew` (
+ `steamid` varchar(32) NOT NULL,
+ `mapname` varchar(32) NOT NULL,
+ `cp` int(11) NOT NULL DEFAULT '0',
+ `time` float NOT NULL DEFAULT '0.0',
+ `velStartXY` int(11) NOT NULL DEFAULT '0.0',
+ `velStartXYZ` int(11) NOT NULL DEFAULT '0.0',
+ `velStartZ` int(11) NOT NULL DEFAULT '0.0',
+ `zonegroup` int(12) NOT NULL DEFAULT '0.0',
+ PRIMARY KEY (`steamid`,`mapname`,`cp`,`zonegroup`)
+)
+DEFAULT CHARSET=utf8mb4;
+
+--AFTER RUNNING THE CORRECT QUERY FROM ABOVE RUN THE ALL THE FOLLOWING IN DESCENDING ORDER!!!
 REPLACE INTO ck_checkpointsnew (steamid, mapname, cp, time, zonegroup)
 SELECT * FROM (
     SELECT steamid, mapname, 1 AS cp, cp1 AS time, zonegroup FROM ck_checkpoints
