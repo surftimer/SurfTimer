@@ -183,7 +183,7 @@ public void OnMapStart()
 	/// Start Loading Server Settings
 	ConVar cvHibernateWhenEmpty = FindConVar("sv_hibernate_when_empty");
 
-	if(!g_tables_converted){
+	if(g_tables_converted){
 		if (!g_bRenaming && !g_bInTransactionChain && (IsServerProcessing() || !cvHibernateWhenEmpty.BoolValue))
 		{
 			LogToFileEx(g_szLogFile, "[surftimer] Starting to load server settings");
@@ -192,7 +192,7 @@ public void OnMapStart()
 		}
 	}
 	else{
-		PrintToChatAll("Server is still converting tables, pls wait...");
+		CreateTimer(1.0, DatabaseUpgrading, INVALID_HANDLE, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	}
 
 	// Get Map Tag
