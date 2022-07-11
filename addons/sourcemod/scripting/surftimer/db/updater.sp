@@ -236,6 +236,21 @@ public void SQLCheckDataType(Handle owner, Handle hndl, const char[] error, Data
 		{
 			LogError("Unsupported table, column and datatype combination. Please open up an issue. Table: %s, Column: %s, DataType: %s, Precision: %d, Scale: %d", sTable, sColumn, sDataType, iPrecision, iScale);
 		}
+		else if (sDataType[0] == 'd' && iPrecision == 12 && iScale == 6 && (strcmp(g_sDecimalTables[sizeof(g_sDecimalTables)-1][0], sTable) == 0) && !g_tables_converted){
+			g_tables_converted = true;
+
+			/// Start Loading Server Settings
+			ConVar cvHibernateWhenEmpty = FindConVar("sv_hibernate_when_empty");
+
+			cvHibernateWhenEmpty.BoolValue = false;
+
+			if (!g_bRenaming && !g_bInTransactionChain && (IsServerProcessing() || !cvHibernateWhenEmpty.BoolValue))
+			{
+				LogToFileEx(g_szLogFile, "[surftimer] Starting to load server settings");
+				g_fServerLoading[0] = GetGameTime();
+				db_selectMapZones();
+			}
+		}
 	}
 
 	delete pack;
