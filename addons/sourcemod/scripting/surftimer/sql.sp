@@ -52,7 +52,7 @@ public void db_setupDatabase()
 
 	SQL_UnlockDatabase(g_hDb);
 	SQL_UnlockDatabase(g_hDb_Updates);
-	
+  
 	LoopFloatDecimalTables();
 
 	for (int i = 0; i < sizeof(g_failedTransactions); i++)
