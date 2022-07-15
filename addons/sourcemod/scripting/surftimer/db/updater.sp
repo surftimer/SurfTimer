@@ -67,9 +67,6 @@ void CheckDatabaseForUpdates()
 	}
 
 	SQL_UnlockDatabase(g_hDb);
-
-	GetDatabaseName(g_sDatabaseName, sizeof(g_sDatabaseName));
-	LoopFloatDecimalTables();
 }
 
 public void db_upgradeDatabase(int ver)
@@ -174,7 +171,7 @@ void CheckDataType(const char[] table, const char[] column, int cp = 0)
 	pack.WriteString(table);
 	pack.WriteString(sColumn);
 
-	SQL_TQuery(g_hDb, SQLCheckDataType, sQuery, pack);
+	SQL_TQuery(g_hDb_Updates, SQLCheckDataType, sQuery, pack);
 }
 
 public void SQLCheckDataType(Handle owner, Handle hndl, const char[] error, DataPack pack)
@@ -232,6 +229,19 @@ public void SQLCheckDataType(Handle owner, Handle hndl, const char[] error, Data
 		{
 			LogError("Unsupported table, column and datatype combination. Please open up an issue. Table: %s, Column: %s, DataType: %s, Precision: %d, Scale: %d", sTable, sColumn, sDataType, iPrecision, iScale);
 		}
+		else if (sDataType[0] == 'd' && iPrecision == 12 && iScale == 6 && (strcmp(g_sDecimalTables[sizeof(g_sDecimalTables)-1][0], sTable) == 0) && !g_tables_converted){
+			g_tables_converted = true;
+
+			/// Start Loading Server Settings
+			ConVar cvHibernateWhenEmpty = FindConVar("sv_hibernate_when_empty");
+
+			if (!g_bRenaming && !g_bInTransactionChain && (IsServerProcessing() || !cvHibernateWhenEmpty.BoolValue))
+			{
+				LogToFileEx(g_szLogFile, "[surftimer] Starting to load server settings");
+				g_fServerLoading[0] = GetGameTime();
+				db_selectMapZones();
+			}
+		}
 	}
 
 	delete pack;
@@ -248,7 +258,7 @@ void ConvertDataTypeToDecimal(const char[] table, const char[] column, int preci
 	pack.WriteString(table);
 	pack.WriteString(column);
 
-	SQL_TQuery(g_hDb, SQLChangeDataType, sQuery, pack);
+	SQL_TQuery(g_hDb_Updates, SQLChangeDataType, sQuery, pack);
 }
 
 public void SQLChangeDataType(Handle owner, Handle hndl, const char[] error, DataPack pack)
