@@ -7056,10 +7056,7 @@ public void SQL_selectPersonalPrestrafeSpeeds_StagesCallback(Handle owner, Handl
 	else{
 		if (!g_bSettingsLoaded[client])
 		{
-			g_fTick[client][1] = GetGameTime();
-			float tick = g_fTick[client][1] - g_fTick[client][0];
-			LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPersonalPrestrafeSpeeds in %fs", g_szSteamID[client], tick);
-			g_fTick[client][0] = GetGameTime();
+			PrintToServer("[SurfTimer] : %s Finished db_viewPersonalPrestrafeSpeeds", g_szSteamID[client]);
 			LoadClientSetting(client, g_iSettingToLoad[client]);
 		}
 	}
@@ -7117,10 +7114,7 @@ public void SQL_selectPersonalPrestrafeSpeeds_BonusCallback(Handle owner, Handle
 
 	if (!g_bSettingsLoaded[client])
 	{
-		g_fTick[client][1] = GetGameTime();
-		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPersonalPrestrafeSpeeds in %fs", g_szSteamID[client], tick);
-		g_fTick[client][0] = GetGameTime();
+		PrintToServer("[SurfTimer] : %s Finished db_viewPersonalPrestrafeSpeeds", g_szSteamID[client]);
 		LoadClientSetting(client, g_iSettingToLoad[client]);
 	}
 
