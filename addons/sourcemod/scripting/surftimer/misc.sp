@@ -1427,17 +1427,17 @@ public void SetPrestrafe(int client, int zone, int style, bool map, bool bonus, 
 {
 	float fVelocity[3];
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
-	if (bonus){
+	if (bonus) {
 		g_iPreStrafeBonus[0][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
 		g_iPreStrafeBonus[1][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
 		g_iPreStrafeBonus[2][zone][style][client] = RoundToNearest(fVelocity[2]);
 	} 
-	else if(map){
+	else if(map) {
 		g_iPreStrafe[0][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
 		g_iPreStrafe[1][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
 		g_iPreStrafe[2][zone][style][client] = RoundToNearest(fVelocity[2]);
 	}
-	else if(stage){
+	else if(stage) {
 		g_iPreStrafeStage[0][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
 		g_iPreStrafeStage[1][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
 		g_iPreStrafeStage[2][zone][style][client] = RoundToNearest(fVelocity[2]);
@@ -1445,17 +1445,17 @@ public void SetPrestrafe(int client, int zone, int style, bool map, bool bonus, 
 }
 public void SetNewRecordPrestrafe(int client, int zone, int style, bool map, bool bonus, bool stage)
 {
-	if (bonus){
+	if (bonus) {
 		g_iRecordPreStrafeBonus[0][zone][style] = g_iPreStrafeBonus[0][zone][style][client];
 		g_iRecordPreStrafeBonus[1][zone][style] = g_iPreStrafeBonus[1][zone][style][client];
 		g_iRecordPreStrafeBonus[2][zone][style] = g_iPreStrafeBonus[2][zone][style][client];
 	}
-	else if(map){
+	else if(map) {
 		g_iRecordPreStrafe[0][zone][style] = g_iPreStrafe[0][zone][style][client];
 		g_iRecordPreStrafe[1][zone][style] = g_iPreStrafe[1][zone][style][client];
 		g_iRecordPreStrafe[2][zone][style] = g_iPreStrafe[2][zone][style][client];
 	}
-	else if(stage){
+	else if(stage) {
 		g_iRecordPreStrafeStage[0][zone][style] = g_iPreStrafeStage[0][zone][style][client];
 		g_iRecordPreStrafeStage[1][zone][style] = g_iPreStrafeStage[1][zone][style][client];
 		g_iRecordPreStrafeStage[2][zone][style] = g_iPreStrafeStage[2][zone][style][client];
@@ -1464,17 +1464,17 @@ public void SetNewRecordPrestrafe(int client, int zone, int style, bool map, boo
 
 public void SetNewPersonalRecordPrestrafe(int client, int zone, int style, bool map, bool bonus, bool stage)
 {
-	if (bonus){
+	if (bonus) {
 		g_iPersonalRecordPreStrafeBonus[client][0][zone][style] = g_iPreStrafeBonus[0][zone][style][client];
 		g_iPersonalRecordPreStrafeBonus[client][1][zone][style] = g_iPreStrafeBonus[1][zone][style][client];
 		g_iPersonalRecordPreStrafeBonus[client][2][zone][style] = g_iPreStrafeBonus[2][zone][style][client];
 	}
-	else if(map){
+	else if(map) {
 		g_iPersonalRecordPreStrafe[client][0][zone][style] = g_iPreStrafe[0][zone][style][client];
 		g_iPersonalRecordPreStrafe[client][1][zone][style] = g_iPreStrafe[1][zone][style][client];
 		g_iPersonalRecordPreStrafe[client][2][zone][style] = g_iPreStrafe[2][zone][style][client];
 	}
-	else if(stage){
+	else if(stage) {
 		g_iPersonalRecordPreStrafeStage[client][0][zone][style] = g_iPreStrafeStage[0][zone][style][client];
 		g_iPersonalRecordPreStrafeStage[client][1][zone][style] = g_iPreStrafeStage[1][zone][style][client];
 		g_iPersonalRecordPreStrafeStage[client][2][zone][style] = g_iPreStrafeStage[2][zone][style][client];
@@ -2023,8 +2023,9 @@ stock void PrintChatBonus(int client, int zGroup, int rank = 0)
 
 	}
 
-	if (g_bBonusPBRecord[client] || g_bBonusFirstRecord[client])
+	if (g_bBonusPBRecord[client] || g_bBonusFirstRecord[client]) {
 		SetNewPersonalRecordPrestrafe(client, zGroup, 0, false ,true, false);
+	}
 	
 	// Send Announcements
 	if (g_bBonusSRVRecord[client])
@@ -4165,8 +4166,9 @@ stock void StyleFinishedMsgs(int client, int style)
 			}
 		}
 
-		if (g_bStyleMapPBRecord[style][client] || g_bStyleMapFirstRecord[style][client]) // Own record
+		if (g_bStyleMapPBRecord[style][client] || g_bStyleMapFirstRecord[style][client]) { // Own record
 			SetNewPersonalRecordPrestrafe(client, 0, style, true, false, false);
+		}
 
 		if (g_bStyleMapSRVRecord[style][client])
 		{
@@ -4232,8 +4234,9 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 		CPrintToChatAll("%t", "Misc42", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], g_szBonusTimeDifference[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szStyleBonusFastestTime[style][zGroup]);
 	}
 
-	if (g_bBonusPBRecord[client] || g_bBonusFirstRecord[client])
+	if (g_bBonusPBRecord[client] || g_bBonusFirstRecord[client]) {
 		SetNewPersonalRecordPrestrafe(client, zGroup, style, false, true , false);
+	}
 	
 	CheckBonusStyleRanks(client, zGroup, style);
 

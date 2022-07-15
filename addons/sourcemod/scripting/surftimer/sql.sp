@@ -6933,16 +6933,19 @@ public void selectPersonalPrestrafeSpeeds_Map(int client, char szSteamId[32]){
 
 public void SQL_selectPersonalPrestrafeSpeeds_MapCallback(Handle owner, Handle hndl, const char[] error, any client)
 {
-	if (hndl == null)
-	{
+	if (hndl == null) {
 		LogError("[SurfTimer] SQL Error (SQL_selectPersonalPrestrafeSpeeds_MapCallback): %s", error);
-		if(g_bhasStages)
+		if (g_bhasStages) {
 			selectPersonalPrestrafeSpeeds_Stages(client, g_szSteamID[client]);
-		else if(g_bhasBonus)
+		}
+		else if (g_bhasBonus) {
 			selectPersonalPrestrafeSpeeds_Bonus(client, g_szSteamID[client]);
-		else
-			if (!g_bSettingsLoaded[client])
+		}
+		else {
+			if (!g_bSettingsLoaded[client]) {
 				LoadClientSetting(client, g_iSettingToLoad[client]);
+			}
+		}
 		return;
 	}
 
@@ -6952,20 +6955,16 @@ public void SQL_selectPersonalPrestrafeSpeeds_MapCallback(Handle owner, Handle h
 	int style;
 	int velStartXY, velStartXYZ, velStartZ;
 
-	for (int i = 0; i < CPLIMIT; i++)
-	{
-		for (int s = 0; s < MAX_STYLES; s++)
-		{
+	for (int i = 0; i < CPLIMIT; i++) {
+		for (int s = 0; s < MAX_STYLES; s++) {
 			g_iPersonalRecordPreStrafe[client][0][i][s] = 0;
 			g_iPersonalRecordPreStrafe[client][1][i][s] = 0;
 			g_iPersonalRecordPreStrafe[client][2][i][s] = 0;
 		}
 	}
 
-	if (SQL_HasResultSet(hndl))
-	{
-		while (SQL_FetchRow(hndl))
-		{
+	if (SQL_HasResultSet(hndl)) {
+		while (SQL_FetchRow(hndl)) {
 			style = SQL_FetchInt(hndl, 0);
 
 			velStartXY = SQL_FetchInt(hndl, 1);
@@ -6979,11 +6978,13 @@ public void SQL_selectPersonalPrestrafeSpeeds_MapCallback(Handle owner, Handle h
 		}
 	}
 	
-	if(g_bhasStages)
+	if (g_bhasStages) {
 		selectPersonalPrestrafeSpeeds_Stages(client, g_szSteamID[client]);
-	else if(g_bhasBonus)
+	}
+	else if (g_bhasBonus) {
 		selectPersonalPrestrafeSpeeds_Bonus(client, g_szSteamID[client]);
-	else{
+	}
+	else {
 		if (!g_bSettingsLoaded[client])
 		{
 			g_fTick[client][1] = GetGameTime();
