@@ -142,7 +142,7 @@ public void db_upgradeDatabase(int ver)
 	}
 	else if (ver == 9)
 	{
-		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD prespeedmode int(11) NOT NULL DEFAULT '0';");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD prespeedmode int(11) NOT NULL DEFAULT '1';");
 	}
 
 	CheckDatabaseForUpdates();
