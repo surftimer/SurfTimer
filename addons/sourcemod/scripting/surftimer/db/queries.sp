@@ -21,7 +21,7 @@ char sql_selectTopBonusSurfers[] = "SELECT db2.steamid, db1.name, db2.runtime as
 // ck_checkpoints
 char sql_createCheckpoints[] = "CREATE TABLE IF NOT EXISTS ck_checkpoints (steamid VARCHAR(32), mapname VARCHAR(32), cp INT(11) NOT NULL, time decimal(12,6) NOT NULL DEFAULT '-1.000000', zonegroup INT(12) NOT NULL DEFAULT 0, PRIMARY KEY(steamid, mapname, cp, zonegroup)) DEFAULT CHARSET=utf8mb4;";
 char sql_updateCheckpoints[] = "UPDATE ck_checkpoints SET cp='%f' WHERE steamid='%s' AND mapname='%s' AND cp ='%i' AND zonegroup='%i';";
-char sql_insertCheckpoints[] = "INSERT INTO ck_checkpoints VALUES ('%s', '%s', '%i', '%f', '%i')";
+char sql_insertCheckpoints[] = "INSERT INTO ck_checkpoints (steamid, mapname, cp, time, zonegroup) VALUES ('%s', '%s', '%i', '%f', '%i')";
 char sql_selectCheckpoints[] = "SELECT zonegroup, cp, time FROM ck_checkpoints WHERE mapname='%s' AND steamid = '%s';";
 char sql_selectCheckpointsinZoneGroup[] = "SELECT cp, time FROM ck_checkpoints WHERE mapname='%s' AND steamid = '%s' AND zonegroup = %i;";
 char sql_selectRecordCheckpoints[] = "SELECT zonegroup, cp, `time` FROM ck_checkpoints WHERE steamid = '%s' AND mapname='%s' UNION SELECT a.zonegroup, b.cp, b.time FROM ck_bonus a LEFT JOIN ck_checkpoints b ON a.steamid = b.steamid AND a.zonegroup = b.zonegroup WHERE a.mapname = '%s' GROUP BY a.zonegroup;";

@@ -4,9 +4,6 @@ CREATE TABLE `ck_checkpointsnew` (
  `mapname` varchar(32) NOT NULL,
  `cp` int(11) NOT NULL DEFAULT '0',
  `time` decimal(12, 6) NOT NULL DEFAULT '0.000000',
- `velStartXY` int(11) NOT NULL DEFAULT '0.0',
- `velStartXYZ` int(11) NOT NULL DEFAULT '0.0',
- `velStartZ` int(11) NOT NULL DEFAULT '0.0',
  `zonegroup` int(12) NOT NULL DEFAULT '0.0',
  PRIMARY KEY (`steamid`,`mapname`,`cp`,`zonegroup`)
 )
@@ -18,9 +15,6 @@ CREATE TABLE `ck_checkpointsnew` (
  `mapname` varchar(32) NOT NULL,
  `cp` int(11) NOT NULL DEFAULT '0',
  `time` float NOT NULL DEFAULT '0.0',
- `velStartXY` int(11) NOT NULL DEFAULT '0.0',
- `velStartXYZ` int(11) NOT NULL DEFAULT '0.0',
- `velStartZ` int(11) NOT NULL DEFAULT '0.0',
  `zonegroup` int(12) NOT NULL DEFAULT '0.0',
  PRIMARY KEY (`steamid`,`mapname`,`cp`,`zonegroup`)
 )
