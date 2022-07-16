@@ -4806,7 +4806,7 @@ void PrintCSGOHUDText(int client, const char[] format, any ...)
 	EndMessage();
 }
 
-public void PrintPracSrcp(int client, int style, int stage, float fClientPbStageTime)
+public void PrintPracSrcp(int client, int style, int stage, int stage_rank, float fClientPbStageTime)
 {
 	char szName[MAX_NAME_LENGTH];
 	GetClientName(client, szName, MAX_NAME_LENGTH);
@@ -4856,17 +4856,17 @@ public void PrintPracSrcp(int client, int style, int stage, float fClientPbStage
 	{
 		if (g_iWrcpMessages[client])
 		{
-			CPrintToChat(client, "%t", "PracWrcp1", g_szChatPrefix, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff);
+			CPrintToChat(client, "%t", "PracWrcp1", g_szChatPrefix, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff, stage_rank);
 		}
-		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp2", g_szChatPrefix, szName, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff);
+		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp2", g_szChatPrefix, szName, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff, stage_rank);
 	}
 	else if (style != 0) // styles
 	{
 		if (g_iWrcpMessages[client])
 		{
-			CPrintToChat(client, "%t", "PracWrcp3", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
+			CPrintToChat(client, "%t", "PracWrcp3", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage], stage_rank);
 		}
-		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp4", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
+		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp4", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage], stage_rank);
 	}
 
 	CheckpointToSpec(client, szSpecMessage);
@@ -5363,4 +5363,37 @@ stock void EmitSoundToClientNoPreCache(int client, const char[] szPath, bool add
 		strcopy(szBuffer, sizeof szBuffer, szPath);
 	}
 	ClientCommand(client, szBuffer);
+}
+
+bool GetDatabaseName(char[] database, int length)
+{
+	char sFile[PLATFORM_MAX_PATH];
+	BuildPath(Path_SM, sFile, sizeof(sFile), "configs/databases.cfg");
+
+	KeyValues kv = new KeyValues("Databases");
+	if (!kv.ImportFromFile(sFile))
+	{
+		LogError("Can not read \"%s\" correctly or file doesn't exists(!?). Please check your config.", sFile);
+		delete kv;
+		return false;
+	}
+
+	if (!kv.JumpToKey("surftimer", false))
+	{
+		LogError("Can not find the \"surftimer\" entry in your databases.cfg. Please check your config.");
+		delete kv;
+		return false;
+	}
+
+	kv.GetString("database", database, length, "");
+
+	if (strlen(database) < 1)
+	{
+		LogError("Can not find the \"database\" name in your \"surftimer\" databases.cfg entry. Please check your config.");
+		delete kv;
+		return false;
+	}
+
+	delete kv;
+	return true;
 }

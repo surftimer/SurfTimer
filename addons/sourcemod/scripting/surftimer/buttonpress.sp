@@ -239,10 +239,10 @@ public void CL_OnEndTimerPress(int client)
 		// Get CurrentRunTime and format it to a string
 		FormatTimeFloat(client, g_fCurrentRunTime[client], 3, g_szPracticeTime[client], 32);
 
-		if (g_iClientInZone[client][2] > 0)
-			CPrintToChat(client, "%t", "BPress4", g_szChatPrefix, szName, g_szPracticeTime[client]);
+		if (g_iClientInZone[client][2] == 0)
+			db_currentRunRank(client, g_iCurrentStyle[client]);
 		else
-			CPrintToChat(client, "%t", "BPress5", g_szChatPrefix, szName, g_szPracticeTime[client]);
+			db_currentBonusRunRank(client, g_iCurrentStyle[client], g_iClientInZone[client][2]);
 		
 		SendPracticeFinishForward(client);
 
@@ -388,7 +388,7 @@ public void CL_OnEndTimerPress(int client)
 			if (!g_bMapSRVRecord[client] && !g_bMapFirstRecord[client] && !g_bMapPBRecord[client])
 			{
 				// for ck_min_rank_announce
-				db_currentRunRank(client);
+				db_currentRunRank(client, 0);
 			}
 		}
 		else if (style != 0)
@@ -638,7 +638,7 @@ public void CL_OnEndTimerPress(int client)
 
 			if (!g_bBonusSRVRecord[client] && !g_bBonusFirstRecord[client] && !g_bBonusPBRecord[client])
 			{
-				db_currentBonusRunRank(client, zGroup);
+				db_currentBonusRunRank(client, 0, zGroup);
 			}
 		}
 		else if (style != 0)

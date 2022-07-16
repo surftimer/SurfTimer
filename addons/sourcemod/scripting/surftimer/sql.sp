@@ -9,6 +9,7 @@ public void db_setupDatabase()
 	===================================*/
 	char szError[255];
 	g_hDb = SQL_Connect("surftimer", false, szError, 255);
+	g_hDb_Updates = SQL_Connect("surftimer", false, szError, 255);
 
 	if (g_hDb == null)
 	{
@@ -22,7 +23,9 @@ public void db_setupDatabase()
 	if (strcmp(szIdent, "mysql", false) == 0)
 	{
 		// https://github.com/nikooo777/ckSurf/pull/58
+		SQL_LockDatabase(g_hDb);
 		SQL_FastQuery(g_hDb, "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
+		SQL_UnlockDatabase(g_hDb);
 		g_DbType = MYSQL;
 	}
 	else if (strcmp(szIdent, "sqlite", false) == 0)
@@ -45,7 +48,13 @@ public void db_setupDatabase()
 	g_bRenaming = false;
 	g_bInTransactionChain = false;
 
+	GetDatabaseName(g_sDatabaseName, sizeof(g_sDatabaseName));
 	CheckDatabaseForUpdates();
+
+	SQL_UnlockDatabase(g_hDb);
+	SQL_UnlockDatabase(g_hDb_Updates);
+
+	LoopFloatDecimalTables();
 
 	for (int i = 0; i < sizeof(g_failedTransactions); i++)
 		g_failedTransactions[i] = 0;
@@ -84,153 +93,6 @@ public void SQLTxn_CreateDatabaseSuccess(Handle db, any data, int numQueries, Ha
 public void SQLTxn_CreateDatabaseFailed(Handle db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
 {
 	SetFailState("[SurfTimer] Database tables could not be created! Error: %s", error);
-}
-
-void CheckDatabaseForUpdates()
-{
-	// If tables haven't been created yet.
-	if (!SQL_FastQuery(g_hDb, "SELECT steamid FROM ck_playerrank LIMIT 1"))
-	{
-		SQL_UnlockDatabase(g_hDb);
-		db_createTables();
-		return;
-	}
-	else
-	{
-		LogMessage("Tables exists.");
-
-		// Check for db upgrades
-		if (!SQL_FastQuery(g_hDb, "SELECT prespeed FROM ck_zones LIMIT 1"))
-		{
-			db_upgradeDatabase(0);
-			return;
-		}
-		LogMessage("Version 0 looks good.");
-		
-		if(!SQL_FastQuery(g_hDb, "SELECT ranked FROM ck_maptier LIMIT 1") || !SQL_FastQuery(g_hDb, "SELECT style FROM ck_playerrank LIMIT 1;"))
-		{
-			db_upgradeDatabase(1);
-			return;
-		}
-		LogMessage("Version 1 looks good.");
-		
-		if (!SQL_FastQuery(g_hDb, "SELECT wrcppoints FROM ck_playerrank LIMIT 1"))
-		{
-			db_upgradeDatabase(2);
-			return;
-		}
-		LogMessage("Version 2 looks good.");
-		
-		if (!SQL_FastQuery(g_hDb, "SELECT teleside FROM ck_playeroptions2 LIMIT 1"))
-		{
-			db_upgradeDatabase(3);
-			return;
-		}
-		LogMessage("Version 3 looks good.");
-		
-		if (!SQL_FastQuery(g_hDb, "SELECT steamid FROM ck_prinfo  LIMIT 1"))
-		{
-			db_upgradeDatabase(4);
-			return;
-		}
-		LogMessage("Version 4 looks good.");
-		
-		if (!SQL_FastQuery(g_hDb, "SELECT csd_update_rate FROM ck_playeroptions2 LIMIT 1"))
-		{
-			db_upgradeDatabase(5);
-			return;
-		}
-		LogMessage("Version 5 looks good.");
-
-		if (!SQL_FastQuery(g_hDb, "SELECT hints FROM ck_playeroptions2 LIMIT 1"))
-		{
-			db_upgradeDatabase(6);
-			return;
-		}
-		LogMessage("Version 6 looks good.");
-
-		if (!SQL_FastQuery(g_hDb, "SELECT timestamp FROM ck_bonus LIMIT 1"))
-		{
-			db_upgradeDatabase(7);
-			return;
-		}
-		LogMessage("Version 7 looks good.");
-
-		if (!SQL_FastQuery(g_hDb, "SELECT mapname FROM ck_replays LIMIT 1"))
-		{
-			db_upgradeDatabase(8);
-			return;
-		}
-		LogMessage("Version 8 looks good.");
-
-	}
-
-	SQL_UnlockDatabase(g_hDb);
-}
-
-public void db_upgradeDatabase(int ver)
-{
-  if (ver == 0)
-  {
-    // SurfTimer v2.01 -> SurfTimer v2.1
-    char query[128];
-    for (int i = 1; i < 11; i++)
-    {
-      Format(query, sizeof(query), "ALTER TABLE ck_maptier DROP COLUMN btier%i", i);
-      SQL_FastQuery(g_hDb, query);
-    }
-    
-    SQL_FastQuery(g_hDb, "ALTER TABLE ck_maptier ADD COLUMN maxvelocity FLOAT NOT NULL DEFAULT '3500.0';");
-    SQL_FastQuery(g_hDb, "ALTER TABLE ck_maptier ADD COLUMN announcerecord INT(11) NOT NULL DEFAULT '0';");
-    SQL_FastQuery(g_hDb, "ALTER TABLE ck_maptier ADD COLUMN gravityfix INT(11) NOT NULL DEFAULT '1';");
-    SQL_FastQuery(g_hDb, "ALTER TABLE ck_zones ADD COLUMN `prespeed` int(64) NOT NULL DEFAULT '350';");
-    SQL_FastQuery(g_hDb, "CREATE INDEX tier ON ck_maptier (mapname, tier);");
-    SQL_FastQuery(g_hDb, "CREATE INDEX mapsettings ON ck_maptier (mapname, maxvelocity, announcerecord, gravityfix);");
-    SQL_FastQuery(g_hDb, "UPDATE ck_maptier a, ck_mapsettings b SET a.maxvelocity = b.maxvelocity WHERE a.mapname = b.mapname;");
-    SQL_FastQuery(g_hDb, "UPDATE ck_maptier a, ck_mapsettings b SET a.announcerecord = b.announcerecord WHERE a.mapname = b.mapname;");
-    SQL_FastQuery(g_hDb, "UPDATE ck_maptier a, ck_mapsettings b SET a.gravityfix = b.gravityfix WHERE a.mapname = b.mapname;");
-    SQL_FastQuery(g_hDb, "UPDATE ck_zones a, ck_mapsettings b SET a.prespeed = b.startprespeed WHERE a.mapname = b.mapname AND zonetype = 1;");
-    SQL_FastQuery(g_hDb, "DROP TABLE ck_mapsettings;");
-  }
-  else if (ver == 1)
-  {
-	// SurfTimer v2.1 -> v2.2
-	SQL_FastQuery(g_hDb, "ALTER TABLE ck_maptier ADD COLUMN ranked INT(11) NOT NULL DEFAULT '1';");
-	SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank DROP PRIMARY KEY, ADD COLUMN style INT(11) NOT NULL DEFAULT '0', ADD PRIMARY KEY (steamid, style);");
-  }
-  else if (ver == 2)
-  {
-	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN wrcppoints INT(11) NOT NULL DEFAULT 0 AFTER `wrbpoints`;");
-  }
-  else if (ver == 3)
-  {
-	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER centrehud;");
-	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_spawnlocations DROP PRIMARY KEY, ADD COLUMN teleside INT(11) NOT NULL DEFAULT 0 AFTER stage, ADD PRIMARY KEY (mapname, zonegroup, stage, teleside);");
-  }
-  else if (ver == 4)
-  {
-	  SQL_FastQuery(g_hDb, sql_CreatePrinfo);
-  }
-  else if (ver == 5)
-  {
-	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD csd_update_rate int(11) NOT NULL DEFAULT '1', ADD csd_pos_x float(11) NOT NULL DEFAULT '0.5', ADD csd_pos_y float(11) NOT NULL DEFAULT '0.3', ADD csd_r int(11) NOT NULL DEFAULT '255', ADD csd_g int(11) NOT NULL DEFAULT '255', ADD csd_b int(11) NOT NULL DEFAULT '255';");
-  }
-  else if (ver == 6)
-  {
-	  SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD hints int(11) NOT NULL DEFAULT '1';");
-  }
-  else if (ver == 7)
-  {
-	  SQL_FastQuery(g_hDb, "ALTER TABLE `ck_bonus` ADD `timestamp` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;");
-	  SQL_FastQuery(g_hDb, "ALTER TABLE `ck_playertimes` ADD `timestamp` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;");
-	  SQL_FastQuery(g_hDb, "ALTER TABLE `ck_wrcps` ADD `timestamp` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;");
-  }
-  else if (ver == 8)
-  {
-	  SQL_FastQuery(g_hDb, sql_createReplays);
-  }
-  
-  CheckDatabaseForUpdates();
 }
 
 /* Admin Delete Menu */
@@ -2432,7 +2294,7 @@ public int MenuHandler_SelectBonusinMap(Handle sMenu, MenuAction action, int cli
 public void db_selectBonusTopSurfers(int client, char mapname[128], int zGrp, int style)
 {
 	char szQuery[1024];
-	Format(szQuery, 1024, sql_selectTopBonusSurfers, mapname, zGrp, style, style);
+	Format(szQuery, 1024, sql_selectTopBonusSurfers, mapname, style, style, zGrp);
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackString(pack, mapname);
@@ -2506,13 +2368,15 @@ public void sql_selectTopBonusSurfersCallback(Handle owner, Handle hndl, const c
 	topMenu.Display(client, MENU_TIME_FOREVER);
 }
 
-public void db_currentRunRank(int client)
+public void db_currentRunRank(int client, int style)
 {
 	if (!IsValidClient(client))
-	return;
+		return;
+
+	float runtime = g_fCurrentRunTime[client];
 
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT count(runtimepro)+1 FROM `ck_playertimes` WHERE `mapname` = '%s' AND `runtimepro` < %f;", g_szMapName, g_fFinalTime[client]);
+	Format(szQuery, 512, "SELECT count(runtimepro)+1 FROM ck_playertimes WHERE mapname = '%s' AND runtimepro < '%f' AND style = '%i';", g_szMapName, runtime, style);
 	SQL_TQuery(g_hDb, SQL_CurrentRunRankCallback, szQuery, client, DBPrio_Low);
 }
 
@@ -2530,7 +2394,82 @@ public void SQL_CurrentRunRankCallback(Handle owner, Handle hndl, const char[] e
 		rank = SQL_FetchInt(hndl, 0);
 	}
 
-	MapFinishedMsgs(client, rank);
+	if(g_bPracticeMode[client]){
+
+		float runtime = g_fCurrentRunTime[client];
+		float f_srDiff;
+		char sz_srDiff[128];
+
+		if(g_fRecordMapTime != 9999999.0)
+			f_srDiff = (g_fRecordMapTime - runtime);
+		else
+			f_srDiff = runtime;
+
+		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
+
+		if(f_srDiff == runtime)
+			Format(sz_srDiff, 128, "SR: N/A", sz_srDiff);
+		else if (f_srDiff > 0.0)
+			Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
+		else if(f_srDiff <= 0.0)
+			Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
+
+		char szSpecMessage[512];
+
+		CPrintToChat(client, "%t", "BPress5", g_szChatPrefix, g_szPracticeTime[client], sz_srDiff , rank);
+		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "BPress5", g_szChatPrefix, g_szPracticeTime[client], sz_srDiff, rank);
+
+		CheckpointToSpec(client, szSpecMessage);
+	}
+	else
+		MapFinishedMsgs(client, rank);
+}
+
+public void db_currentRunRank_StagePrac(int client, int style, int stage, float fClientPbStageTime)
+{
+
+	if (!IsValidClient(client))
+		return;
+
+	Handle data_srcp = CreateDataPack();
+	WritePackCell(data_srcp, client);
+	WritePackCell(data_srcp, style);
+	WritePackCell(data_srcp, stage);
+	WritePackFloat(data_srcp, fClientPbStageTime);
+
+	char szQuery[1024];
+	Format(szQuery, 1024, "SELECT count(runtimepro)+1 FROM ck_wrcps WHERE mapname = '%s' AND stage = '%i' AND style = '%i' AND runtimepro < '%f';", g_szMapName, stage, style, g_fCurrentRunTime[client]);
+	SQL_TQuery(g_hDb, SQL_CurrentRunRank_StagePracCallback, szQuery, data_srcp, DBPrio_Low);
+
+}
+
+public void SQL_CurrentRunRank_StagePracCallback(Handle owner, Handle hndl, const char[] error, any data_srcp)
+{
+
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (SQL_CurrentRunRank_StagePracCallback): %s", error);
+		delete view_as<DataPack>(data_srcp);
+		return;
+	}
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	{	
+		
+		int stage_rank = SQL_FetchInt(hndl, 0);
+
+		ResetPack(data_srcp);
+		int data = ReadPackCell(data_srcp);
+		int style = ReadPackCell(data_srcp);
+		int stage = ReadPackCell(data_srcp);
+		float stage_time = ReadPackFloat(data_srcp);
+		WritePackCell(data_srcp, stage_rank);
+		delete view_as<DataPack>(data_srcp);
+
+		PrintPracSrcp(data, style, stage, stage_rank, stage_time);
+		
+	}
+
 }
 
 // Get clients record from database
@@ -3489,8 +3428,6 @@ public void db_UpdateReplaysTick(int client, int style){
 	else
 		cp_count = g_TotalStages - 1;
 
-	PrintToServer("cp count : %d", cp_count);
-
 	if(!g_bReplayTickFound[style]){
 		g_bReplayTickFound[style] = true;
 		for(int i = 0; i < cp_count; i++){
@@ -4082,13 +4019,16 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 =             SQL Bonus             =
 ===================================*/
 
-public void db_currentBonusRunRank(int client, int zGroup)
+public void db_currentBonusRunRank(int client, int style, int zGroup)
 {
 	char szQuery[512];
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackCell(pack, zGroup);
-	Format(szQuery, 512, "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '%s' AND zonegroup = '%i' AND runtime < %f", g_szMapName, zGroup, g_fFinalTime[client]);
+
+	float runtime = g_fCurrentRunTime[client];
+
+	Format(szQuery, 512, "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '%s' AND zonegroup = '%i' AND runtime < '%f' AND style = '%i';", g_szMapName, zGroup, runtime, style);
 	SQL_TQuery(g_hDb, db_viewBonusRunRank, szQuery, pack, DBPrio_Low);
 }
 
@@ -4110,7 +4050,34 @@ public void db_viewBonusRunRank(Handle owner, Handle hndl, const char[] error, a
 		rank = SQL_FetchInt(hndl, 0);
 	}
 
-	PrintChatBonus(client, zGroup, rank);
+	if(g_bPracticeMode[client]){
+		float runtime = g_fCurrentRunTime[client];
+		char sz_srDiff[128];
+		float f_srDiff;
+
+		if(g_fBonusFastest[g_iClientInZone[client][2]] != 9999999.0)
+			f_srDiff = (g_fBonusFastest[g_iClientInZone[client][2]] - runtime);
+		else
+			f_srDiff = runtime;
+
+		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
+
+		if(f_srDiff == runtime)
+			Format(sz_srDiff, 128, "SR: N/A", sz_srDiff);
+		else if (f_srDiff > 0.0)
+			Format(sz_srDiff, 128, "%cSR: %c-%s%c", WHITE, LIGHTGREEN, sz_srDiff, WHITE);
+		else if(f_srDiff <= 0.0)
+			Format(sz_srDiff, 128, "%cSR: %c+%s%c", WHITE, RED, sz_srDiff, WHITE);
+
+		char szSpecMessage[512];
+		
+		CPrintToChat(client, "%t", "BPress4", g_szChatPrefix, zGroup, g_szPracticeTime[client], sz_srDiff, rank);
+		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "BPress4", g_szChatPrefix, zGroup, g_szPracticeTime[client], sz_srDiff, rank);
+
+		CheckpointToSpec(client, szSpecMessage);
+	}
+	else
+		PrintChatBonus(client, zGroup, rank);
 }
 
 public void db_viewMapRankBonus(int client, int zgroup, int type)
@@ -9636,8 +9603,13 @@ public void db_insertCustomPlayerTitle(int client, char[] szSteamID, char[] arg)
 	WritePackCell(pack, client);
 	WritePackString(pack, szSteamID);
 
+	// Escape title to prevent mysql injection
+	int buffer_len = strlen(arg) * 2 + 1;
+	char[] new_arg = new char[buffer_len];
+	SQL_EscapeString(g_hDb, arg, new_arg, buffer_len);
+
 	char szQuery[512];
-	Format(szQuery, 512, "INSERT INTO `ck_vipadmins` (steamid, title, inuse) VALUES ('%s', '%s', 1);", szSteamID, arg);
+	Format(szQuery, 512, "INSERT INTO `ck_vipadmins` (steamid, title, inuse) VALUES ('%s', '%s', 1);", szSteamID, new_arg);
 	SQL_TQuery(g_hDb, SQL_insertCustomPlayerTitleCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -10811,5 +10783,6 @@ public void sql_selectPracWrcpRecordCallback(Handle owner, Handle hndl, const ch
 		fClientPbStageTime = 0.0;
 	}
 
-	PrintPracSrcp(data, style, stage, fClientPbStageTime);
+	db_currentRunRank_StagePrac(data, style, stage, fClientPbStageTime);
+	//PrintPracSrcp(data, style, stage, fClientPbStageTime);
 }
