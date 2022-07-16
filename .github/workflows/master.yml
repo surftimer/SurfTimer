@@ -58,6 +58,17 @@ jobs:
           wget https://github.com/rumourA/End-Touch-Fix/raw/master/scripting/EndTouchFix.sp -P $SCRIPTING_PATH
           wget https://github.com/rumourA/End-Touch-Fix/raw/master/gamedata/endtouch.games.txt -P $GAMEDATA_PATH
 
+      - name: Download SurfTimer Mapchooser source and translations file
+        run: |
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/scripting/st-mapchooser.sp -P $SCRIPTING_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/scripting/st-nominations.sp -P $SCRIPTING_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/scripting/st-rockthevote.sp -P $SCRIPTING_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/scripting/st-voteextend.sp -P $SCRIPTING_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/translations/st-mapchooser.phrases.txt -P $TRANSLATIONS_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/translations/st-nominations.phrases.txt -P $TRANSLATIONS_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/translations/st-rockthevote.phrases.txt -P $TRANSLATIONS_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/translations/st-voteextend.phrases.txt -P $TRANSLATIONS_PATH
+
       - name: Compile plugins
         run: |
           mkdir -p $PLUGINS_PATH
