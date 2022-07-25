@@ -327,24 +327,24 @@ public void StartTouch(int client, int action[3])
 					if( g_fPersonalRecord[client] > 0.0 )
 						//IMPROVES COMPLETION
 						if(g_fCurrentRunTime[client] < g_fPersonalRecord[client])
-							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fFinalTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
+							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, fCurrentRunTime); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
 						else
 							db_UpdatePRinfo(client, g_szSteamID[client], zGroup); //UPDATE THE PLAYERS PRINFO EXECPT FOR THE RUNTIME
 					//PLAYER FINISHES FOR THE 1ST TIME
 					else
-						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fFinalTime[client]);
+						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, fCurrentRunTime);
 				//ENDZONE OF BONUS
 				else
 					//PLAYER ALREADY HAS A COMPLETION
 					if(g_fPersonalRecordBonus[zGroup][client] > 0)
 						//IMPROVES COMPLETION
 						if (g_fCurrentRunTime[client] < g_fPersonalRecordBonus[zGroup][client])
-							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fFinalTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
+							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, fCurrentRunTime); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
 						else
 							db_UpdatePRinfo(client, g_szSteamID[client], zGroup); //UPDATE THE PLAYERS PRINFO EXECPT FOR THE RUNTIME
 					//PLAYER FINISHES FOR THE 1ST TIME
 					else
-						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fFinalTime[client]);
+						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, fCurrentRunTime);
 			}
 			//PLAYER JUST DOING STAGES
 			else if(action[0] == 3 && g_bWrcpTimeractivated[client] && !g_bTimerRunning[client]){
