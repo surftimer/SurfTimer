@@ -390,12 +390,6 @@ public void StartTouch(int client, int action[3])
 			// StopRecording(client); //Add pre
 			StartRecording(client); //Add pre
 
-			if (g_bPracticeMode[client])
-			{
-				g_bPracticeMode[client] = false;
-				CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
-			}
-
 			if (g_bhasStages)
 			{
 				g_bWrcpTimeractivated[client] = false;
