@@ -333,7 +333,6 @@ void CreateConVars()
 
 	// SaveLoc
 	g_hAllowCheckpointRecreation = AutoExecConfig_CreateConVar("ck_allow_checkpoint_recreation", "0", "Allow player checkpoint recreation (saveloc). 0 - Disabled | 1 - Print info to player chat | 2 - Print info to player console | 3 - Print info to both chat and console");
-	g_iAllowCheckpointRecreation = GetConVarInt(g_hAllowCheckpointRecreation);
 
 	// WRCP Points
 	g_hWrcpPoints = AutoExecConfig_CreateConVar("ck_wrcp_points", "0", "Sets the amount of points a player should get for a WRCP, 0 to disable");
@@ -423,13 +422,6 @@ void CreateConVars()
 
 	SetConVarBool(g_hAutoBhop, true);
 	SetConVarBool(g_hEnableBhop, true);
-
-	g_cvar_sv_hibernate_when_empty = FindConVar("sv_hibernate_when_empty");
-
-	if (GetConVarInt(g_cvar_sv_hibernate_when_empty) == 1)
-	{
-		SetConVarInt(g_cvar_sv_hibernate_when_empty, 0);
-	}
 
 	// Show Triggers
 	g_Offset_m_fEffects = FindSendPropInfo("CBaseEntity", "m_fEffects");
