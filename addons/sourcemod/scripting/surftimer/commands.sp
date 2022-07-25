@@ -1071,6 +1071,12 @@ public Action Command_Teleport(int client, int args)
 		PauseMethod(client);
 
 	teleportClient(client, g_iClientInZone[client][2], g_Stage[g_iClientInZone[client][2]][client], false);
+
+	if (g_bPracticeMode[client])
+	{
+		g_bPracticeMode[client] = false;
+		CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
+	}
 	return Plugin_Handled;
 }
 
@@ -1216,6 +1222,12 @@ public Action Command_ToBonus(int client, int args)
 	if (g_mapZoneGroupCount > zoneGrp)
 		g_iInBonus[client] = zoneGrp;
 	teleportClient(client, zoneGrp, 1, true);
+
+	if (g_bPracticeMode[client])
+	{
+		g_bPracticeMode[client] = false;
+		CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
+	}
 	return Plugin_Handled;
 }
 
@@ -1336,6 +1348,12 @@ public Action Command_ToStage(int client, int args)
 		teleportClient(client, 0, StageId, true);
 	}
 
+	if (g_bPracticeMode[client])
+	{
+		g_bPracticeMode[client] = false;
+		CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
+	}
+
 	return Plugin_Handled;
 }
 
@@ -1393,6 +1411,11 @@ public Action Command_Restart(int client, int args)
 	g_bInBhop[client] = false;
 
 	teleportClient(client, 0, 1, true);
+	if (g_bPracticeMode[client])
+	{
+		g_bPracticeMode[client] = false;
+		CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
+	}
 	return Plugin_Handled;
 }
 
@@ -5131,7 +5154,7 @@ public Action Command_Startpos(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	if (g_bTimerEnabled[client])
+	if (g_bTimerEnabled[client] && !g_bPracticeMode[client])
 		Startpos(client);
 	else 
 		CReplyToCommand(client, "%t", "Commands82", g_szChatPrefix);
