@@ -661,6 +661,7 @@ GlobalForward g_NewWRCPForward;
 
 // SQL driver
 Handle g_hDb = null;
+Handle g_hDb_Updates = null;
 
 // Database type
 int g_DbType;
@@ -1498,3 +1499,5 @@ char g_sDecimalTables[][][] = {
 	{ "ck_prinfo",        "PRtimeinzone", },
 	{ "ck_wrcps",         "runtimepro", }
 };  // Required for the float to decimal conversion
+
+bool g_tables_converted = false;

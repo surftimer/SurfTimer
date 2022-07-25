@@ -652,3 +652,13 @@ public Action RestartPlayer(Handle timer, any client)
 	
 	return Plugin_Continue;
 }
+
+public Action DatabaseUpgrading(Handle timer)
+{
+	if(!g_tables_converted)
+		for(int client = 1; client <= MaxClients; client++)
+			if(IsValidClient(client))
+				CPrintToChat(client, "Server is still updating database tables, pls wait...");
+
+	return Plugin_Handled;
+}
