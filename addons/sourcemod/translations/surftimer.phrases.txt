@@ -1823,5 +1823,19 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Type new value (0 - 255) in the chat, or {darkred}cancel{default} to cancel"
 	}
-
+	"ctop_wrong_format"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Wrong values entered, corect format should look like this {yellow}sm_ctop <countryname>(no numbers) {default} OR {yellow}sm_ctop <countryname> <style>(0-7)"
+	}
+	"style_not_found"
+	{
+		"#format"	"{1:s},{2:i}"
+		"en"		"{1} Wrong style value, values should be between {yellow}0 {default}and {yellow}{2}"
+	}
+	"country_data_not_found"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} No available data"
+	}
 }

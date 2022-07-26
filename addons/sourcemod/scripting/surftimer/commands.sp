@@ -40,6 +40,7 @@ void CreateCommands()
 	RegConsoleCmd("+noclip", NoClip, "[surftimer] Player noclip on");
 	RegConsoleCmd("-noclip", UnNoClip, "[surftimer] Player noclip off");
 	RegConsoleCmd("sm_nc", Command_ckNoClip, "[surftimer] Player noclip on/off");
+	RegConsoleCmd("sm_ctop", Client_CountryTOP, "[surftimer] displays country top rankings");
 
 	// Teleportation Commands
 	RegConsoleCmd("sm_stages", Command_SelectStage, "[surftimer] Opens up the stage selector");
@@ -1783,6 +1784,175 @@ public Action Command_ckNoClip(int client, int args)
 	}
 
 	return Plugin_Handled;
+}
+
+public Action Client_CountryTOP(int client, int args)
+{
+	char szBuffer[256] = "none-none";
+
+	switch (args) {
+		//sm_ctop
+		case 0: CountryTopMenuStyleSelect(client, szBuffer);
+		//sm_ctop <countryname>
+		case 1: {
+			char sztemp[56];
+			GetCmdArg(1, sztemp, sizeof sztemp);
+
+			//CHECK WEHTER OR NOT THE EXPRESSION HAS A DIGIT
+			//COUNTRY NAMES DONT HAVE DIGITS
+			int hasDigits = SimpleRegexMatch(sztemp, ".*[0-9].*", 0, "", 0);
+
+			if(hasDigits != 0){
+				CPrintToChat(client, "%t", "ctop_wrong_format", g_szChatPrefix);
+				return Plugin_Handled;
+			}
+
+			Format(szBuffer, sizeof szBuffer, "%s-none", sztemp);
+			CountryTopMenuStyleSelect(client, szBuffer);
+		}
+		//sm_ctop <countryname> <style>
+		case 2: {
+
+			char arg2[16];
+
+			char szCountryName[56];
+			int style;
+
+			//READ COUNTRY NAME INPUT AND VALIDATE VALUE
+			GetCmdArg(1, szCountryName, sizeof szCountryName);
+			//CHECK WEHTER OR NOT THE EXPRESSION HAS A DIGIT
+			//COUNTRY NAMES DONT HAVE DIGITS
+			int hasDigits = SimpleRegexMatch(szCountryName, ".*[0-9].*", 0, "", 0);
+
+			if(hasDigits != 0){
+				CPrintToChat(client, "%t", "ctop_wrong_format", g_szChatPrefix);
+				return Plugin_Handled;
+			}
+
+			//READ STYLE INPUT AND VALIDATE VALUE
+			GetCmdArg(2, arg2, sizeof arg2);
+			//CHECK WEHTER OR NOT THE EXPRESSION HAS A LETTER
+			//STYLES CAN ONLY BE NUMBERS
+			hasDigits = SimpleRegexMatch(arg2, ".*[A-Za-z].*", 0, "", 0);
+
+			if(hasDigits != 0){
+				CPrintToChat(client, "%t", "ctop_wrong_format", g_szChatPrefix);
+				return Plugin_Handled;
+			}
+
+			style = StringToInt(arg2);
+			if( MAX_STYLES <= style || style < 0 ){
+				CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+				return Plugin_Handled;
+			}
+
+			Format(szBuffer, sizeof szBuffer, "%s-%d", szCountryName, style);
+			CountryTopMenuStyleSelect(client, szBuffer);
+		}
+	}
+
+	return Plugin_Handled;
+}
+
+public void CountryTopMenuStyleSelect(int client, char szBuffer[256])
+{
+	char szItem[128];
+	char szCountryName[56];
+	int style;
+
+	//IF THE PLAYER INSERTED A COUNTRY OR A STYLE SPLIT THE BUFFER STRING AND STORE THE VALUES INDIVIDUAL VARIABLES
+	//split[0] -> country
+	//split[1] -> style
+	if ( strcmp(szBuffer, "none-none", false) != 0 ) {
+
+		char splits[2][56];
+		ExplodeString(szBuffer, "-", splits, sizeof(splits), sizeof(splits[]));
+
+		//INSERTED COUNTRY
+		if( strcmp(splits[0], "none", false) != 0 ) {
+			szCountryName = splits[0];
+		}
+		
+		//INSERTED STYLE
+		if( strcmp(splits[1], "none", false) != 0 ) {
+			style = StringToInt(splits[1]);
+		}
+
+		//IF PLAYER INPUTS COUNTRY NAME AND STYLE THERE IS NO NEED DISPLAY THIS MENU
+		//CALL 'db_SelectCountryTOP' STRAIGHT AWAY
+		if( strcmp(splits[1], "none", false) != 0 && strcmp(splits[0], "none", false) != 0 ){
+			db_SelectCountryTOP(client, szCountryName, style);
+			return;
+		}
+
+	}
+	//IF PLAYER IS USING SM_CTOP WITHOUT ANY ARGUMENTS
+	//THIS MEANS THE COUNTRY NAME IS NOT BEEN SELECTED YET
+	//SIMPLY SET IT AS "none"
+	else {
+		szCountryName = "none";
+	}
+
+	Menu menu = CreateMenu(CountryTopMenuStyleSelectHandler);
+
+	SetMenuTitle(menu, "Top Menu - Select a style\n \n");
+
+	//EACH MENU ITEM HAS A STRING CONTAINING THE COUNTRY NAME AND THE STYLE SELECTED IN THE FOLLOWING FORMAT -> 'country-style'
+	Format(szItem, sizeof(szItem), "Normal");
+	Format(szBuffer, sizeof(szBuffer), "%s-0", szCountryName);
+	AddMenuItem(menu, szBuffer, szItem);
+
+	Format(szItem, sizeof(szItem), "Sideways");
+	Format(szBuffer, sizeof(szBuffer), "%s-1", szCountryName);
+	AddMenuItem(menu, szBuffer, szItem);
+
+	Format(szItem, sizeof(szItem), "Half-Sideways");
+	Format(szBuffer, sizeof(szBuffer), "%s-2", szCountryName);
+	AddMenuItem(menu, szBuffer, szItem);
+
+	Format(szItem, sizeof(szItem), "Backwards");
+	Format(szBuffer, sizeof(szBuffer), "%s-3", szCountryName);
+	AddMenuItem(menu, szBuffer, szItem);
+
+	Format(szItem, sizeof(szItem), "Low-Gravity");
+	Format(szBuffer, sizeof(szBuffer), "%s-4", szCountryName);
+	AddMenuItem(menu, szBuffer, szItem);
+
+	Format(szItem, sizeof(szItem), "Slow Motion");
+	Format(szBuffer, sizeof(szBuffer), "%s-5", szCountryName);
+	AddMenuItem(menu, szBuffer, szItem);
+
+	Format(szItem, sizeof(szItem), "Fast Forwards");
+	Format(szBuffer, sizeof(szBuffer), "%s-6", szCountryName);
+	AddMenuItem(menu, szBuffer, szItem);
+
+	Format(szItem, sizeof(szItem), "Freestyle");
+	Format(szBuffer, sizeof(szBuffer), "%s-7", szCountryName);
+	AddMenuItem(menu, szBuffer, szItem);
+
+	SetMenuExitButton(menu, true);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+public int CountryTopMenuStyleSelectHandler(Handle menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char szBuffer[256];
+		GetMenuItem(menu, param2, szBuffer, sizeof(szBuffer));
+
+		char splits[2][56];
+		ExplodeString(szBuffer, "-", splits, sizeof(splits), sizeof(splits[]));
+
+		if( strcmp(splits[0], "none", false) == 0 )
+			db_GetClientCountry(param1, StringToInt(splits[1]));
+		else
+			db_SelectCountryTOP(param1, splits[0], StringToInt(splits[1]));
+	}
+	else if (action == MenuAction_End)
+		delete menu;
+
+	return 0;
 }
 
 public Action Client_Top(int client, int args)
