@@ -1800,7 +1800,8 @@ public Action Client_CountryTOP(int client, int args)
 
 			//CHECK WEHTER OR NOT THE EXPRESSION HAS A DIGIT
 			//COUNTRY NAMES DONT HAVE DIGITS
-			int hasDigits = SimpleRegexMatch(sztemp, ".*[0-9].*", 0, "", 0);
+			//int hasDigits = SimpleRegexMatch(sztemp, ".*[0-9].*", 0, "", 0);
+			int hasDigits = MatchRegex(g_RegexhasDigits, sztemp);
 
 			if(hasDigits != 0){
 				CPrintToChat(client, "%t", "ctop_wrong_format", g_szChatPrefix);
@@ -1833,7 +1834,8 @@ public Action Client_CountryTOP(int client, int args)
 			GetCmdArg(2, arg2, sizeof arg2);
 			//CHECK WEHTER OR NOT THE EXPRESSION HAS A LETTER
 			//STYLES CAN ONLY BE NUMBERS
-			hasDigits = SimpleRegexMatch(arg2, ".*[A-Za-z].*", 0, "", 0);
+			//hasDigits = SimpleRegexMatch(arg2, ".*[A-Za-z].*", 0, "", 0);
+			hasDigits = MatchRegex(g_RegexhasChars, arg2);
 
 			if(hasDigits != 0){
 				CPrintToChat(client, "%t", "ctop_wrong_format", g_szChatPrefix);

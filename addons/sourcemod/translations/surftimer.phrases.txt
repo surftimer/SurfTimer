@@ -1826,7 +1826,7 @@
 	"ctop_wrong_format"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} Wrong values entered, corect format should look like this {yellow}sm_ctop <countryname>(no numbers) {default} OR {yellow}sm_ctop <countryname> <style>(0-7)"
+		"en"		"{1} Wrong values entered, corect format should look like this {yellow}sm_ctop <countryname>(no numbers) {default}OR {yellow}sm_ctop <countryname> <style>(0-7)"
 	}
 	"style_not_found"
 	{
