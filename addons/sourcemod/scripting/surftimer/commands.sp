@@ -1835,9 +1835,9 @@ public Action Client_CountryTOP(int client, int args)
 			//CHECK WEHTER OR NOT THE EXPRESSION HAS A LETTER
 			//STYLES CAN ONLY BE NUMBERS
 			//hasDigits = SimpleRegexMatch(arg2, ".*[A-Za-z].*", 0, "", 0);
-			hasDigits = MatchRegex(g_RegexhasChars, arg2);
+			int hasChars = MatchRegex(g_RegexhasChars, arg2);
 
-			if(hasDigits != 0){
+			if(hasChars != 0){
 				CPrintToChat(client, "%t", "ctop_wrong_format", g_szChatPrefix);
 				return Plugin_Handled;
 			}
