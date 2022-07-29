@@ -1792,53 +1792,52 @@ public Action Client_CountryRank(int client, int args)
 	if(!IsValidClient(client))
 		return Plugin_Handled;
 
-	if(args == 0) {
-		char szClientName[MAX_NAME_LENGTH];
-		GetClientName(client, szClientName, sizeof szClientName);
+	switch (args){
+		case 0 : {
+			char szClientName[MAX_NAME_LENGTH];
+			GetClientName(client, szClientName, sizeof szClientName);
 
-		db_SelectCountryRank(client, szClientName, g_szCountry[client], g_iCurrentStyle[client]);
-	}
-	else if (args == 1) {
-		char arg1[MAX_NAME_LENGTH];
-		GetCmdArg(1, arg1, sizeof arg1);
-
-		//sm_crank <style>
-		for (int i = 0; i < MAX_STYLES; i++) {
-			if (strcmp(g_szStyleMenuPrint[i], arg1, false) == 0) {
-				char szClientName[MAX_NAME_LENGTH];
-				GetClientName(client, szClientName, sizeof szClientName);
-
-				db_SelectCountryRank(client, szClientName, g_szCountry[client], i);
-				return Plugin_Handled;
-			}
+			db_SelectCountryRank(client, szClientName, g_szCountry[client], g_iCurrentStyle[client]);
 		}
+		case 1 : {
+			char arg1[MAX_NAME_LENGTH];
+			GetCmdArg(1, arg1, sizeof arg1);
 
-		//sm_crank <playername>
-		db_SelectCustomPlayerCountryRank(client, arg1, g_iCurrentStyle[client]);
+			//sm_crank <style>
+			for (int i = 0; i < MAX_STYLES; i++) {
+				if (strcmp(g_szStyleMenuPrint[i], arg1, false) == 0) {
+					char szClientName[MAX_NAME_LENGTH];
+					GetClientName(client, szClientName, sizeof szClientName);
 
-	}
-	//sm_crank <playername> <style>
-	//sm_crank <style> <playername> 
-	else if (args == 2) {
-		char arg1[MAX_NAME_LENGTH];
-		GetCmdArg(1, arg1, sizeof arg1);
-
-		char arg2[MAX_NAME_LENGTH];
-		GetCmdArg(2, arg2, sizeof arg2);
-
-		//sm_crank <style> <playername>
-		for (int i = 0; i < MAX_STYLES; i++) {
-			if (strcmp(g_szStyleMenuPrint[i], arg1, false) == 0) {
-				db_SelectCustomPlayerCountryRank(client, arg2, i);
-				return Plugin_Handled;
+					db_SelectCountryRank(client, szClientName, g_szCountry[client], i);
+					return Plugin_Handled;
+				}
 			}
-		}
 
-		//sm_crank <playername> <style>
-		for (int i = 0; i < MAX_STYLES; i++) {
-			if (strcmp(g_szStyleMenuPrint[i], arg2, false) == 0) {
-				db_SelectCustomPlayerCountryRank(client, arg1, i);
-				return Plugin_Handled;
+			//sm_crank <playername>
+			db_SelectCustomPlayerCountryRank(client, arg1, g_iCurrentStyle[client]);
+		}
+		case 2 : {
+			char arg1[MAX_NAME_LENGTH];
+			GetCmdArg(1, arg1, sizeof arg1);
+
+			char arg2[MAX_NAME_LENGTH];
+			GetCmdArg(2, arg2, sizeof arg2);
+
+			//sm_crank <style> <playername>
+			for (int i = 0; i < MAX_STYLES; i++) {
+				if (strcmp(g_szStyleMenuPrint[i], arg1, false) == 0) {
+					db_SelectCustomPlayerCountryRank(client, arg2, i);
+					return Plugin_Handled;
+				}
+			}
+
+			//sm_crank <playername> <style>
+			for (int i = 0; i < MAX_STYLES; i++) {
+				if (strcmp(g_szStyleMenuPrint[i], arg2, false) == 0) {
+					db_SelectCustomPlayerCountryRank(client, arg1, i);
+					return Plugin_Handled;
+				}
 			}
 		}
 	}
