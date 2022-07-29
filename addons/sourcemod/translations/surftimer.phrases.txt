@@ -1859,7 +1859,7 @@
 	}
 	"crank_help"
 	{
-		"en"		"FORMATTING OPTIONS FOR COMMAND !crank \n!crank \n!crank <playername> \n!crank <style_acronym> \n!crank <playername> <style_acronym> OR !crank <style_acronym> <playername> \n"
+		"en"		"FORMATTING OPTIONS FOR COMMAND !crank \n!crank \n!crank <playername> \n!crank #<style_acronym> \n!crank <playername> #<style_acronym> OR !crank #<style_acronym> <playername> \n"
 	}
 	"style_acronyms_help_chat"
 	{
