@@ -1500,6 +1500,3 @@ char g_sDecimalTables[][][] = {
 };  // Required for the float to decimal conversion
 
 bool g_tables_converted = false;
-
-Regex g_RegexhasChars;
-Regex g_RegexhasDigits;

@@ -42,6 +42,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_nc", Command_ckNoClip, "[surftimer] Player noclip on/off");
 	RegConsoleCmd("sm_ctop", Client_CountryTOP, "[surftimer] displays country top rankings");
 	RegConsoleCmd("sm_crank", Client_CountryRank, "[surftimer] displays player country rank");
+	RegConsoleCmd("sm_crank_help", Client_CountryRank_Help, "[surftimer] displays information on how to use the command");
 
 	// Teleportation Commands
 	RegConsoleCmd("sm_stages", Command_SelectStage, "[surftimer] Opens up the stage selector");
@@ -155,6 +156,8 @@ void CreateCommands()
 	RegConsoleCmd("sm_knife", Command_GiveKnife, "[surftimer] Give players a knife");
 	RegConsoleCmd("sm_prinfo_help", Command_PRinfo_help, "[surftimer] Show in console how to use the command");
 	RegConsoleCmd("sm_csd", Command_CenterSpeed, "[surftimer] [settings] on/off - toggle center speed display");
+	RegConsoleCmd("sm_acronyms", Client_Acronyms, "[surftimer] shows every style format available");
+
 
 	// New Commands
 	RegConsoleCmd("sm_mrank", Command_SelectMapTime, "[surftimer] prints a players map record in chat.");
@@ -1787,6 +1790,28 @@ public Action Command_ckNoClip(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action Client_CountryRank_Help(int client, int args){
+
+	if(IsValidClient(client)){
+		CPrintToChat(client, "%t", "crank_help_chat", g_szChatPrefix);
+		PrintToConsole(client, "%t", "crank_help");
+	}
+
+	return Plugin_Handled;
+
+}
+
+public Action Client_Acronyms(int client, int args){
+
+	if(IsValidClient(client)){
+		CPrintToChat(client, "%t", "style_acronyms_help_chat", g_szChatPrefix);
+		PrintToConsole(client, "%t", "style_acronyms_help");
+	}
+
+	return Plugin_Handled;
+
+}
+
 public Action Client_CountryRank(int client, int args)
 {
 	if(!IsValidClient(client))
@@ -1800,18 +1825,35 @@ public Action Client_CountryRank(int client, int args)
 			db_SelectCountryRank(client, szClientName, g_szCountry[client], g_iCurrentStyle[client]);
 		}
 		case 1 : {
+
 			char arg1[MAX_NAME_LENGTH];
+
 			GetCmdArg(1, arg1, sizeof arg1);
 
-			//sm_crank <style>
-			for (int i = 0; i < MAX_STYLES; i++) {
-				if (strcmp(g_szStyleMenuPrint[i], arg1, false) == 0) {
-					char szClientName[MAX_NAME_LENGTH];
-					GetClientName(client, szClientName, sizeof szClientName);
+			//sm_ctop #<style_acronym>
+			if (arg1[0] == '#') {
+				ReplaceString(arg1, sizeof arg1, "#", "", false);
 
-					db_SelectCountryRank(client, szClientName, g_szCountry[client], i);
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg1);
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
 					return Plugin_Handled;
 				}
+
+				char szClientName[MAX_NAME_LENGTH];
+				GetClientName(client, szClientName, sizeof szClientName);
+
+				db_SelectCountryRank(client, szClientName, g_szCountry[client], style);
+
+				return Plugin_Handled;
+
 			}
 
 			//sm_crank <playername>
@@ -1824,21 +1866,54 @@ public Action Client_CountryRank(int client, int args)
 			char arg2[MAX_NAME_LENGTH];
 			GetCmdArg(2, arg2, sizeof arg2);
 
-			//sm_crank <style> <playername>
-			for (int i = 0; i < MAX_STYLES; i++) {
-				if (strcmp(g_szStyleMenuPrint[i], arg1, false) == 0) {
-					db_SelectCustomPlayerCountryRank(client, arg2, i);
+			//sm_crank #<style> <playername>
+			if (arg1[0] == '#') {
+				ReplaceString(arg1, sizeof arg1, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg1);
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
 					return Plugin_Handled;
 				}
+
+				db_SelectCustomPlayerCountryRank(client, arg2, style);
+
+				return Plugin_Handled;
 			}
 
-			//sm_crank <playername> <style>
-			for (int i = 0; i < MAX_STYLES; i++) {
-				if (strcmp(g_szStyleMenuPrint[i], arg2, false) == 0) {
-					db_SelectCustomPlayerCountryRank(client, arg1, i);
+			//sm_crank <playername> #<style_acronym>
+			if (arg2[0] == '#') {
+				ReplaceString(arg2, sizeof arg2, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg2);
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
 					return Plugin_Handled;
 				}
+
+				db_SelectCustomPlayerCountryRank(client, arg1, style);
+
+				return Plugin_Handled;
 			}
+
+			CPrintToChat(client, "%t", "crank_help_chat", g_szChatPrefix);
+			PrintToConsole(client, "%t", "crank_help");
+			PrintToConsole(client, "%t", "style_acronyms_help");	
+
 		}
 	}
 
@@ -1853,62 +1928,95 @@ public Action Client_CountryTOP(int client, int args)
 		//sm_ctop
 		case 0: CountryTopMenuStyleSelect(client, szBuffer);
 		//sm_ctop <countryname>
+		//sm_ctop #<style_acronym>
 		case 1: {
-			char sztemp[56];
-			GetCmdArg(1, sztemp, sizeof sztemp);
+			char arg1[100];
+			GetCmdArg(1, arg1, sizeof arg1);
 
-			//CHECK WEHTER OR NOT THE EXPRESSION HAS A DIGIT
-			//COUNTRY NAMES DONT HAVE DIGITS
-			//int hasDigits = SimpleRegexMatch(sztemp, ".*[0-9].*", 0, "", 0);
-			int hasDigits = MatchRegex(g_RegexhasDigits, sztemp);
+			//sm_ctop #<style_acronym>
+			if (arg1[0] == '#') {
+				ReplaceString(arg1, sizeof arg1, "#", "", false);
 
-			if(hasDigits != 0){
-				CPrintToChat(client, "%t", "ctop_wrong_format", g_szChatPrefix);
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg1);
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				db_GetCountriesNames(client, style);
 				return Plugin_Handled;
 			}
 
-			Format(szBuffer, sizeof szBuffer, "%s-none", sztemp);
+			//sm_ctop <countryname>
+			Format(szBuffer, sizeof szBuffer, "%s-none", arg1);
 			CountryTopMenuStyleSelect(client, szBuffer);
 		}
-		//sm_ctop <countryname> <style>
+		//sm_ctop <countryname> #<style_acronym>
+		//sm_ctop #<style_acronym> <countryname>
 		case 2: {
 
-			char arg2[16];
+			char arg1[100];
+			char arg2[100];
 
-			char szCountryName[56];
-			int style;
-
-			//READ COUNTRY NAME INPUT AND VALIDATE VALUE
-			GetCmdArg(1, szCountryName, sizeof szCountryName);
-			//CHECK WEHTER OR NOT THE EXPRESSION HAS A DIGIT
-			//COUNTRY NAMES DONT HAVE DIGITS
-			int hasDigits = SimpleRegexMatch(szCountryName, ".*[0-9].*", 0, "", 0);
-
-			if(hasDigits != 0){
-				CPrintToChat(client, "%t", "ctop_wrong_format", g_szChatPrefix);
-				return Plugin_Handled;
-			}
-
-			//READ STYLE INPUT AND VALIDATE VALUE
+			GetCmdArg(1, arg1, sizeof arg1);
 			GetCmdArg(2, arg2, sizeof arg2);
-			//CHECK WEHTER OR NOT THE EXPRESSION HAS A LETTER
-			//STYLES CAN ONLY BE NUMBERS
-			//hasDigits = SimpleRegexMatch(arg2, ".*[A-Za-z].*", 0, "", 0);
-			int hasChars = MatchRegex(g_RegexhasChars, arg2);
 
-			if(hasChars != 0){
-				CPrintToChat(client, "%t", "ctop_wrong_format", g_szChatPrefix);
+			//sm_ctop #<style_acronym> <countryname>
+			if (arg1[0] == '#') {
+				ReplaceString(arg1, sizeof arg1, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg1);
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				Format(szBuffer, sizeof szBuffer, "%s-%d", arg2, style);
+				CountryTopMenuStyleSelect(client, szBuffer);
+
 				return Plugin_Handled;
 			}
 
-			style = StringToInt(arg2);
-			if( MAX_STYLES <= style || style < 0 ){
-				CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+			//sm_ctop <countryname> #<style_acronym>
+			if (arg2[0] == '#') {
+				ReplaceString(arg2, sizeof arg2, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg2);
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				Format(szBuffer, sizeof szBuffer, "%s-%d", arg1, style);
+				CountryTopMenuStyleSelect(client, szBuffer);
+
 				return Plugin_Handled;
 			}
 
-			Format(szBuffer, sizeof szBuffer, "%s-%d", szCountryName, style);
-			CountryTopMenuStyleSelect(client, szBuffer);
+			CPrintToChat(client, "%t", "ctop_help_chat", g_szChatPrefix);
+			PrintToConsole(client, "%t", "ctop_help");
+			PrintToConsole(client, "%t", "style_acronyms_help");
 		}
 	}
 

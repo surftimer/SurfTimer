@@ -1237,9 +1237,6 @@ public void OnPluginStart()
 	// Server Announcements
 	g_bHasLatestID = false;
 	g_iLastID = 0;
-	
-	g_RegexhasChars = CompileRegex(".*[A-Za-z].*");
-	g_RegexhasDigits = CompileRegex(".*[0-9].*");
 }
 
 /*======  End of Events  ======*/
