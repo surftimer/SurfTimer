@@ -41,8 +41,9 @@ void CreateCommands()
 	RegConsoleCmd("-noclip", UnNoClip, "[surftimer] Player noclip off");
 	RegConsoleCmd("sm_nc", Command_ckNoClip, "[surftimer] Player noclip on/off");
 	RegConsoleCmd("sm_ctop", Client_CountryTOP, "[surftimer] displays country top rankings");
+	RegConsoleCmd("sm_ctop_help", Client_CountryTop_Help, "[surftimer] displays information on how to use the command sm_ctop");
 	RegConsoleCmd("sm_crank", Client_CountryRank, "[surftimer] displays player country rank");
-	RegConsoleCmd("sm_crank_help", Client_CountryRank_Help, "[surftimer] displays information on how to use the command");
+	RegConsoleCmd("sm_crank_help", Client_CountryRank_Help, "[surftimer] displays information on how to use the command sm_crank");
 
 	// Teleportation Commands
 	RegConsoleCmd("sm_stages", Command_SelectStage, "[surftimer] Opens up the stage selector");
@@ -1790,6 +1791,16 @@ public Action Command_ckNoClip(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action Client_CountryTop_Help(int client, int args){
+
+	if(IsValidClient(client)){
+		CPrintToChat(client, "%t", "ctop_help_chat", g_szChatPrefix);
+		PrintToConsole(client, "%t", "ctop_help");
+	}
+
+	return Plugin_Handled;
+
+}
 public Action Client_CountryRank_Help(int client, int args){
 
 	if(IsValidClient(client)){
