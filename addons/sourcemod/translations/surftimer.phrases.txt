@@ -1838,4 +1838,9 @@
 		"#format"	"{1:s}"
 		"en"		"{1} No available data"
 	}
+	"Country_Rank"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:i},{5:i},{6:s},{7:i}"
+		"en"		"{1} {red}{2}{default}{yellow}{3} {default}is ranked {lightgreen}{4}/{5} {default}in {blue}{6}{default} with {lightgreen}{7} {default}points"
+	}
 }

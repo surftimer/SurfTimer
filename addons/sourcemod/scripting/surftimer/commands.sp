@@ -41,6 +41,7 @@ void CreateCommands()
 	RegConsoleCmd("-noclip", UnNoClip, "[surftimer] Player noclip off");
 	RegConsoleCmd("sm_nc", Command_ckNoClip, "[surftimer] Player noclip on/off");
 	RegConsoleCmd("sm_ctop", Client_CountryTOP, "[surftimer] displays country top rankings");
+	RegConsoleCmd("sm_crank", Client_CountryRank, "[surftimer] displays player country rank");
 
 	// Teleportation Commands
 	RegConsoleCmd("sm_stages", Command_SelectStage, "[surftimer] Opens up the stage selector");
@@ -1786,6 +1787,65 @@ public Action Command_ckNoClip(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action Client_CountryRank(int client, int args)
+{
+	if(!IsValidClient(client))
+		return Plugin_Handled;
+
+	if(args == 0) {
+		char szClientName[MAX_NAME_LENGTH];
+		GetClientName(client, szClientName, sizeof szClientName);
+
+		db_SelectCountryRank(client, szClientName, g_szCountry[client], g_iCurrentStyle[client]);
+	}
+	else if (args == 1) {
+		char arg1[MAX_NAME_LENGTH];
+		GetCmdArg(1, arg1, sizeof arg1);
+
+		//sm_crank <style>
+		for (int i = 0; i < MAX_STYLES; i++) {
+			if (strcmp(g_szStyleMenuPrint[i], arg1, false) == 0) {
+				char szClientName[MAX_NAME_LENGTH];
+				GetClientName(client, szClientName, sizeof szClientName);
+
+				db_SelectCountryRank(client, szClientName, g_szCountry[client], i);
+				return Plugin_Handled;
+			}
+		}
+
+		//sm_crank <playername>
+		db_SelectCustomPlayerCountryRank(client, arg1, g_iCurrentStyle[client]);
+
+	}
+	//sm_crank <playername> <style>
+	//sm_crank <style> <playername> 
+	else if (args == 2) {
+		char arg1[MAX_NAME_LENGTH];
+		GetCmdArg(1, arg1, sizeof arg1);
+
+		char arg2[MAX_NAME_LENGTH];
+		GetCmdArg(2, arg2, sizeof arg2);
+
+		//sm_crank <style> <playername>
+		for (int i = 0; i < MAX_STYLES; i++) {
+			if (strcmp(g_szStyleMenuPrint[i], arg1, false) == 0) {
+				db_SelectCustomPlayerCountryRank(client, arg2, i);
+				return Plugin_Handled;
+			}
+		}
+
+		//sm_crank <playername> <style>
+		for (int i = 0; i < MAX_STYLES; i++) {
+			if (strcmp(g_szStyleMenuPrint[i], arg2, false) == 0) {
+				db_SelectCustomPlayerCountryRank(client, arg1, i);
+				return Plugin_Handled;
+			}
+		}
+	}
+
+	return Plugin_Handled;
+}
+
 public Action Client_CountryTOP(int client, int args)
 {
 	char szBuffer[256] = "none-none";
@@ -1947,7 +2007,7 @@ public int CountryTopMenuStyleSelectHandler(Handle menu, MenuAction action, int 
 		ExplodeString(szBuffer, "-", splits, sizeof(splits), sizeof(splits[]));
 
 		if( strcmp(splits[0], "none", false) == 0 )
-			db_GetClientCountry(param1, StringToInt(splits[1]));
+			db_GetCountriesNames(param1, StringToInt(splits[1]));
 		else
 			db_SelectCountryTOP(param1, splits[0], StringToInt(splits[1]));
 	}
