@@ -2037,15 +2037,14 @@ public Action Client_CountryTOP(int client, int args)
 public void CountryTopMenuStyleSelect(int client, char szBuffer[256])
 {
 	char szItem[128];
-	char szCountryName[56];
+	char szCountryName[256];
 	int style;
 
 	//IF THE PLAYER INSERTED A COUNTRY OR A STYLE SPLIT THE BUFFER STRING AND STORE THE VALUES INDIVIDUAL VARIABLES
 	//split[0] -> country
 	//split[1] -> style
 	if ( strcmp(szBuffer, "none-none", false) != 0 ) {
-
-		char splits[2][56];
+		char splits[2][256];
 		ExplodeString(szBuffer, "-", splits, sizeof(splits), sizeof(splits[]));
 
 		//INSERTED COUNTRY
@@ -2060,8 +2059,15 @@ public void CountryTopMenuStyleSelect(int client, char szBuffer[256])
 
 		//IF PLAYER INPUTS COUNTRY NAME AND STYLE THERE IS NO NEED DISPLAY THIS MENU
 		//CALL 'db_SelectCountryTOP' STRAIGHT AWAY
-		if( strcmp(splits[1], "none", false) != 0 && strcmp(splits[0], "none", false) != 0 ){
+		if( strcmp(splits[0], "none", false) != 0 && strcmp(splits[1], "none", false) != 0 ){
 			db_SelectCountryTOP(client, szCountryName, style);
+			return;
+		}
+
+		//IF PLAYER INPUTS STYLE THERE IS NO NEED DISPLAY THIS MENU
+		//CALL 'db_GetCountriesNames' STRAIGHT AWAY
+		if( strcmp(splits[0], "none", false) == 0 && strcmp(splits[1], "none", false) != 0 ){
+			db_GetCountriesNames(client, StringToInt(splits[1]));
 			return;
 		}
 
@@ -2072,6 +2078,7 @@ public void CountryTopMenuStyleSelect(int client, char szBuffer[256])
 	else {
 		szCountryName = "none";
 	}
+
 
 	Menu menu = CreateMenu(CountryTopMenuStyleSelectHandler);
 
@@ -2121,7 +2128,7 @@ public int CountryTopMenuStyleSelectHandler(Handle menu, MenuAction action, int 
 		char szBuffer[256];
 		GetMenuItem(menu, param2, szBuffer, sizeof(szBuffer));
 
-		char splits[2][56];
+		char splits[2][256];
 		ExplodeString(szBuffer, "-", splits, sizeof(splits), sizeof(splits[]));
 
 		if( strcmp(splits[0], "none", false) == 0 )
@@ -2129,8 +2136,9 @@ public int CountryTopMenuStyleSelectHandler(Handle menu, MenuAction action, int 
 		else
 			db_SelectCountryTOP(param1, splits[0], StringToInt(splits[1]));
 	}
-	else if (action == MenuAction_End)
+	else if (action == MenuAction_End) {
 		delete menu;
+	}
 
 	return 0;
 }
@@ -2162,7 +2170,6 @@ public int TopMenuStyleSelectHandler(Handle menu, MenuAction action, int param1,
 {
 	if (action == MenuAction_Select)
 	{
-		g_ProfileStyleSelect[param1] = param2;
 		ckTopMenu(param1, param2);
 	}
 	else if (action == MenuAction_End)

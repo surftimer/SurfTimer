@@ -10999,38 +10999,59 @@ public void db_SelectCustomPlayerCountryRank_GetCountryCallback(Handle owner, Ha
 }
 
 //sm_ctop
-public void db_SelectCountryTOP(int client, char szCountryName[56], int style)
+public void db_SelectCountryTOP(int client, char szCountryName[256], int style)
 {
 	if (!IsValidClient(client))
 		return;
 
+	g_iCountryTopStyleSelected[client] = style;
+
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackString(pack, szCountryName);
+	WritePackCell(pack, style);
+
 	char szQuery[512];
-	Format(szQuery, sizeof szQuery, "SELECT name, country, points, style FROM ck_playerrank WHERE country LIKE '%s' AND style = '%i' ORDER BY points DESC LIMIT 100;", szCountryName, style);
-	SQL_TQuery(g_hDb, db_SelectCountryTOPCallback, szQuery, client, DBPrio_Low);
+	Format(szQuery, sizeof szQuery, "SELECT name, country, points, style FROM ck_playerrank WHERE country = '%s' AND style = '%i' ORDER BY points DESC LIMIT 100;", szCountryName, style);
+	SQL_TQuery(g_hDb, db_SelectCountryTOPCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void db_SelectCountryTOPCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void db_SelectCountryTOPCallback(Handle owner, Handle hndl, const char[] error, any pack)
 {
 	if (hndl == null)
 	{
 		LogError("[SurfTimer] SQL Error (db_SelectCountryTOPCallback): %s ", error);
+		CloseHandle(pack);
 		return;
 	}
 
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	char szCountryName[56];
+	ReadPackString(pack, szCountryName, sizeof szCountryName);
+	int style = ReadPackCell(pack);
+	CloseHandle(pack);
+
 	if (SQL_HasResultSet(hndl)) {
 		
+		Menu menu = CreateMenu(CountryTopMenu);
+		char szItem[256];
+
 		if (SQL_GetRowCount(hndl) == 0) {
 			CPrintToChat(client, "%t", "country_data_not_found", g_szChatPrefix);
+
+			SetMenuTitle(menu, "Country Top for %s | %s\n \n", szCountryName, g_szStyleMenuPrint[style]);
+
+			AddMenuItem(menu, "", "No Players Found", ITEMDRAW_DISABLED);
+
+			SetMenuExitBackButton(menu, true);
+			DisplayMenu(menu, client, MENU_TIME_FOREVER);
+
 			return;
 		}
 
-		Menu menu = CreateMenu(CountryTopMenu);
-
-		char szItem[256];
-
 		char szRank[16];
 		char szPlayerName[MAX_NAME_LENGTH];
-		char szCountryName[56];
 		int PlayerPoints;
 		int Style;
 
@@ -11040,7 +11061,10 @@ public void db_SelectCountryTOPCallback(Handle owner, Handle hndl, const char[] 
 			SQL_FetchString(hndl, 0, szPlayerName, sizeof szPlayerName);
 			SQL_FetchString(hndl, 1, szCountryName, sizeof szCountryName);
 			PlayerPoints = SQL_FetchInt(hndl, 2);
+			
 			Style = SQL_FetchInt(hndl, 3);
+			char szStyle[256];
+			IntToString(Style, szStyle, sizeof szStyle);
 			
 			if (row == 100)
 				Format(szRank, sizeof szRank, "[%i.]", row);
@@ -11051,30 +11075,25 @@ public void db_SelectCountryTOPCallback(Handle owner, Handle hndl, const char[] 
 
 			if (PlayerPoints < 10)
 				Format(szItem, sizeof szItem, "%s      %dp        %s", szRank, PlayerPoints, szPlayerName);
-			else
-			if (PlayerPoints < 100)
+			else if (PlayerPoints < 100)
 				Format(szItem, sizeof szItem, "%s     %dp       %s", szRank, PlayerPoints, szPlayerName);
-			else
-			if (PlayerPoints < 1000)
+			else if (PlayerPoints < 1000)
 				Format(szItem, sizeof szItem, "%s   %dp       %s", szRank, PlayerPoints, szPlayerName);
-			else
-			if (PlayerPoints < 10000)
+			else if (PlayerPoints < 10000)
 				Format(szItem, sizeof szItem, "%s %dp       %s", szRank, PlayerPoints, szPlayerName);
-			else
-			if (PlayerPoints < 100000)
+			else if (PlayerPoints < 100000)
 				Format(szItem, sizeof szItem, "%s %dp     %s", szRank, PlayerPoints, szPlayerName);
 			else
 				Format(szItem, sizeof szItem, "%s %dp   %s", szRank, PlayerPoints, szPlayerName);
 
-			AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
+			AddMenuItem(menu, szStyle, szItem, ITEMDRAW_DISABLED);
 
 			row++;
 		}
 
-		SetMenuTitle(menu, "Country Top for %s | %s\n\n    Rank   Points       Player", szCountryName, g_szStyleMenuPrint[Style]);
-
-		SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
+		SetMenuTitle(menu, "Country Top for %s | %s\n \n    Rank   Points       Player", szCountryName, g_szStyleMenuPrint[Style]);
 		SetMenuPagination(menu, 5);
+		SetMenuExitBackButton(menu, true);
 
 		DisplayMenu(menu, client, MENU_TIME_FOREVER);
 	}
@@ -11082,7 +11101,10 @@ public void db_SelectCountryTOPCallback(Handle owner, Handle hndl, const char[] 
 
 public int CountryTopMenu(Menu menu, MenuAction action, int param1, int param2)
 {
-	if (action == MenuAction_End)
+	if (action == MenuAction_Cancel) {
+		db_GetCountriesNames(param1, g_iCountryTopStyleSelected[param1]);
+	}
+	else if (action == MenuAction_End)
 	{
 		delete menu;
 	}
@@ -11094,6 +11116,8 @@ public void db_GetCountriesNames(int client, int style)
 {
 	if (!IsValidClient(client))
 		return;
+
+	g_iCountryTopStyleSelected[client] = style;
 
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
@@ -11119,13 +11143,19 @@ public void db_GetCountriesNamesCallback(Handle owner, Handle hndl, const char[]
 	CloseHandle(pack);
 
 	if (SQL_HasResultSet(hndl)) {
-		
-		if (SQL_GetRowCount(hndl) == 0) {
-			CPrintToChat(client, "%t", "country_data_not_found", g_szChatPrefix);
-			return;
-		}
 
 		Menu menu = CreateMenu(CountriesMenu);
+
+		if (SQL_GetRowCount(hndl) == 0) {
+			CPrintToChat(client, "%t", "country_data_not_found", g_szChatPrefix);
+
+			SetMenuTitle(menu, "Countries List | %s\n \n", g_szStyleMenuPrint[style]);
+			AddMenuItem(menu, "", "No Countries Found", ITEMDRAW_DISABLED);
+
+			SetMenuExitBackButton(menu, true);
+			DisplayMenu(menu, client, MENU_TIME_FOREVER);
+			return;
+		}
 
 		char szBuffer[256];
 		char szItem[256];
@@ -11144,8 +11174,8 @@ public void db_GetCountriesNamesCallback(Handle owner, Handle hndl, const char[]
 			AddMenuItem(menu, szBuffer, szItem);
 		}
 
-		SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
-		SetMenuTitle(menu, "Countries List\n \n");
+		SetMenuTitle(menu, "Countries List | %s\n \n", g_szStyleMenuPrint[style]);
+		SetMenuExitBackButton(menu, true);
 
 		DisplayMenu(menu, client, MENU_TIME_FOREVER);
 	}
@@ -11154,15 +11184,18 @@ public void db_GetCountriesNamesCallback(Handle owner, Handle hndl, const char[]
 
 public int CountriesMenu(Menu menu, MenuAction action, int param1, int param2)
 {	
-	if(action == MenuAction_Select) {
-
+	if (action == MenuAction_Select) {
 		char szBuffer[256];
 		GetMenuItem(menu, param2, szBuffer, sizeof(szBuffer));
 
-		char splits[2][56];
+		char splits[2][256];
 		ExplodeString(szBuffer, "-", splits, sizeof(splits), sizeof(splits[]));
-		
 		db_SelectCountryTOP(param1, splits[0], StringToInt(splits[1]));
+	}
+	else if (action == MenuAction_Cancel)
+	{
+		char szBuffer[256] = "none-none";
+		CountryTopMenuStyleSelect(param1, szBuffer);
 	}
 	else if (action == MenuAction_End)
 	{
