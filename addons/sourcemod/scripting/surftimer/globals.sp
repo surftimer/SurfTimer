@@ -1500,3 +1500,5 @@ char g_sDecimalTables[][][] = {
 };  // Required for the float to decimal conversion
 
 bool g_tables_converted = false;
+
+char sql_checkDataType[512];
