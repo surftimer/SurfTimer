@@ -3302,8 +3302,8 @@ public void sql_selectRecordCheckpointsCallback(Handle owner, Handle hndl, const
 			zonegroup = SQL_FetchInt(hndl, 0);
 			cp = SQL_FetchInt(hndl, 1);
 
-			g_fCheckpointServerRecord[zonegroup][cp-1] = SQL_FetchFloat(hndl, 2);
-			if (!g_bCheckpointRecordFound[zonegroup] && g_fCheckpointServerRecord[zonegroup][cp-1] > 0.0)
+			g_fCheckpointServerRecord[zonegroup][cp] = SQL_FetchFloat(hndl, 2);
+			if (!g_bCheckpointRecordFound[zonegroup] && g_fCheckpointServerRecord[zonegroup][cp] > 0.0)
 				g_bCheckpointRecordFound[zonegroup] = true;
 		}
 	}
