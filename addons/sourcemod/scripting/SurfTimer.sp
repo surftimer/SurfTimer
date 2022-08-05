@@ -18,6 +18,7 @@
 #include <basecomm>
 #include <colorlib>
 #include <autoexecconfig>
+#include <regex>
 #undef REQUIRE_EXTENSIONS
 #include <clientprefs>
 #undef REQUIRE_PLUGIN

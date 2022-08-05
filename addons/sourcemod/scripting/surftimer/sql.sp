@@ -11019,6 +11019,424 @@ public void sql_selectPracWrcpRecordCallback(Handle owner, Handle hndl, const ch
 	//PrintPracSrcp(data, style, stage, fClientPbStageTime);
 }
 
+//sm_crank
+public void db_SelectCountryRank(int client, char szPlayerName[MAX_NAME_LENGTH], char szCountry[100], int style)
+{
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackString(pack, szPlayerName);
+	WritePackString(pack, szCountry);
+	WritePackCell(pack, style);
+
+	//GET TOTAL AMOUNT OF PLAYERS
+	char szQuery[512];
+	Format(szQuery, sizeof szQuery, "SELECT COUNT(steamid), country FROM ck_playerrank WHERE country = '%s' AND style = '%i';", szCountry, style);
+	SQL_TQuery(g_hDb, db_SelectCountryRankCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_SelectCountryRankCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_SelectCountryRankCallback): %s ", error);
+		CloseHandle(pack);
+		return;
+	}
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+
+	char szPlayerName[MAX_NAME_LENGTH];
+	ReadPackString(pack, szPlayerName, sizeof szPlayerName);
+
+	char szCountry[100];
+	ReadPackString(pack, szCountry, sizeof szCountry);
+
+	int style = ReadPackCell(pack);
+	CloseHandle(pack);
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl)) {
+
+		db_GetPlayerPoints(client, SQL_FetchInt(hndl, 0), szPlayerName, szCountry, style);
+	}
+}
+
+public void db_GetPlayerPoints(int client, int CountryPlayerTotal, char szPlayerName[MAX_NAME_LENGTH], char szCountry[100], int style)
+{	
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackCell(pack, CountryPlayerTotal);
+	WritePackString(pack, szPlayerName);
+	WritePackString(pack, szCountry);
+	WritePackCell(pack, style);
+
+	//GET PLAYER POINTS
+	char szQuery[512];
+	Format(szQuery, sizeof szQuery, "SELECT points FROM ck_playerrank WHERE name = '%s' AND style = '%i';", szPlayerName, style);
+	SQL_TQuery(g_hDb, db_GetPlayerPointsCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_GetPlayerPointsCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_GetPlayerPointsCallback): %s ", error);
+		CloseHandle(pack);
+		return;
+	}
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	int CountryPlayerTotal = ReadPackCell(pack);
+	char szPlayerName[MAX_NAME_LENGTH];
+	ReadPackString(pack, szPlayerName, sizeof szPlayerName);
+	char szCountry[100];
+	ReadPackString(pack, szCountry, sizeof szCountry);
+	int style = ReadPackCell(pack);
+	CloseHandle(pack);
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl)) {
+		db_GetPlayerCountryRank(SQL_FetchInt(hndl, 0), CountryPlayerTotal, szPlayerName, szCountry, style);
+	}
+	else {
+		CPrintToChat(client, "%t", "Player_Data_Not_Found", g_szChatPrefix);
+	}
+}
+
+public void db_GetPlayerCountryRank(int PlayerPoints, int CountryPlayerTotal, char szPlayerName[MAX_NAME_LENGTH], char szCountry[100], int style)
+{	
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, PlayerPoints);
+	WritePackCell(pack, CountryPlayerTotal);
+	WritePackString(pack, szPlayerName);
+	WritePackString(pack, szCountry);
+	WritePackCell(pack, style);
+
+	//GET CLIENT COUNTRY RANK
+	char szQuery[512];
+	Format(szQuery, sizeof szQuery, "SELECT COUNT(steamid) + 1 FROM ck_playerrank WHERE country = '%s' AND style = '%i' AND points > '%i';", szCountry, style, PlayerPoints);
+	SQL_TQuery(g_hDb, db_GetPlayerCountryRankCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_GetPlayerCountryRankCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_GetPlayerCountryRankCallback): %s ", error);
+		CloseHandle(pack);
+		return;
+	}
+
+	ResetPack(pack);
+	int PlayerPoints = ReadPackCell(pack);
+	int CountryPlayerTotal = ReadPackCell(pack);
+	char szPlayerName[MAX_NAME_LENGTH];
+	ReadPackString(pack, szPlayerName, sizeof szPlayerName);
+	char szCountry[100];
+	ReadPackString(pack, szCountry, sizeof szCountry);
+	int style = ReadPackCell(pack);
+	CloseHandle(pack);
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl)) {
+		CPrintToChatAll("%t", "Country_Rank", g_szChatPrefix, g_szStyleRecordPrint[style], szPlayerName, SQL_FetchInt(hndl, 0), CountryPlayerTotal, szCountry, PlayerPoints);
+	}
+}
+
+//sm_crank <playername>
+//sm_crank <playername> <style>
+//sm_crank <style> <playername>
+public void db_SelectCustomPlayerCountryRank(int client, char szPlayerName[MAX_NAME_LENGTH], int style)
+{
+	// Escape name for SQL injection protection
+	char szName[MAX_NAME_LENGTH * 2 + 1];
+	SQL_EscapeString(g_hDb, szPlayerName, szName, MAX_NAME_LENGTH);
+
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackString(pack, szName);
+	WritePackCell(pack, style);
+
+	//CHECK IF PLAYER EXISTS
+	char szQuery[512];
+	Format(szQuery, sizeof szQuery, "SELECT * FROM ck_playerrank WHERE name = '%s';", szName);
+	SQL_TQuery(g_hDb, db_SelectCustomPlayerCountryRankCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_SelectCustomPlayerCountryRankCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_SelectCustomPlayerCountryRankCallback): %s ", error);
+		CloseHandle(pack);
+		return;
+	}
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	char szPlayerName[MAX_NAME_LENGTH];
+	ReadPackString(pack, szPlayerName, sizeof szPlayerName);
+	int style = ReadPackCell(pack);
+	CloseHandle(pack);
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl)) {
+		db_SelectCustomPlayerCountryRank_GetCountry(client, szPlayerName, style);
+	}
+	else {
+		CPrintToChat(client, "%t", "PlayerNotFound", g_szChatPrefix, szPlayerName);
+	}
+}
+
+public void db_SelectCustomPlayerCountryRank_GetCountry(int client, char szPlayerName[MAX_NAME_LENGTH], int style)
+{
+	// Escape name for SQL injection protection
+	char szName[MAX_NAME_LENGTH * 2 + 1];
+	SQL_EscapeString(g_hDb, szPlayerName, szName, MAX_NAME_LENGTH);
+
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackString(pack, szName);
+	WritePackCell(pack, style);
+
+	//GET SELECT PLAYER COUNTRY
+	char szQuery[512];
+	Format(szQuery, sizeof szQuery, "SELECT country FROM ck_playerrank WHERE name = '%s' AND style = '%i';", szName, style);
+	SQL_TQuery(g_hDb, db_SelectCustomPlayerCountryRank_GetCountryCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_SelectCustomPlayerCountryRank_GetCountryCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_SelectCustomPlayerCountryRank_GetCountryCallback): %s ", error);
+		CloseHandle(pack);
+		return;
+	}
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	char szPlayerName[MAX_NAME_LENGTH];
+	ReadPackString(pack, szPlayerName, sizeof szPlayerName);
+	int style = ReadPackCell(pack);
+	CloseHandle(pack);
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl)) {
+		char szCountryName[100];
+		SQL_FetchString(hndl, 0, szCountryName, sizeof szCountryName);
+
+		db_SelectCountryRank(client, szPlayerName, szCountryName, style);
+	}
+	else {
+		CPrintToChat(client, "%t", "Player_Data_Not_Found", g_szChatPrefix);
+	}
+}
+
+//sm_ctop
+public void db_SelectCountryTOP(int client, char szCountryName[256], int style)
+{
+	if (!IsValidClient(client))
+		return;
+
+	g_iCountryTopStyleSelected[client] = style;
+
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackString(pack, szCountryName);
+	WritePackCell(pack, style);
+
+	char szQuery[512];
+	Format(szQuery, sizeof szQuery, "SELECT name, country, points, style FROM ck_playerrank WHERE country = '%s' AND style = '%i' ORDER BY points DESC LIMIT 100;", szCountryName, style);
+	SQL_TQuery(g_hDb, db_SelectCountryTOPCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_SelectCountryTOPCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_SelectCountryTOPCallback): %s ", error);
+		CloseHandle(pack);
+		return;
+	}
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	char szCountryName[56];
+	ReadPackString(pack, szCountryName, sizeof szCountryName);
+	int style = ReadPackCell(pack);
+	CloseHandle(pack);
+
+	if (SQL_HasResultSet(hndl)) {
+		
+		Menu menu = CreateMenu(CountryTopMenu);
+		char szItem[256];
+
+		if (SQL_GetRowCount(hndl) == 0) {
+			CPrintToChat(client, "%t", "country_data_not_found", g_szChatPrefix);
+
+			SetMenuTitle(menu, "Country Top for %s | %s\n \n", szCountryName, g_szStyleMenuPrint[style]);
+
+			AddMenuItem(menu, "", "No Players Found", ITEMDRAW_DISABLED);
+
+			SetMenuExitBackButton(menu, true);
+			DisplayMenu(menu, client, MENU_TIME_FOREVER);
+
+			return;
+		}
+
+		char szRank[16];
+		char szPlayerName[MAX_NAME_LENGTH];
+		int PlayerPoints;
+		int Style;
+
+		int row = 1;
+		while (SQL_FetchRow(hndl)) {
+
+			SQL_FetchString(hndl, 0, szPlayerName, sizeof szPlayerName);
+			SQL_FetchString(hndl, 1, szCountryName, sizeof szCountryName);
+			PlayerPoints = SQL_FetchInt(hndl, 2);
+			
+			Style = SQL_FetchInt(hndl, 3);
+			char szStyle[256];
+			IntToString(Style, szStyle, sizeof szStyle);
+			
+			if (row == 100)
+				Format(szRank, sizeof szRank, "[%i.]", row);
+			else if (row < 10)
+				Format(szRank, sizeof szRank, "[0%i.]  ", row);
+			else
+				Format(szRank, sizeof szRank, "[%i.]  ", row);
+
+			if (PlayerPoints < 10)
+				Format(szItem, sizeof szItem, "%s      %dp        %s", szRank, PlayerPoints, szPlayerName);
+			else if (PlayerPoints < 100)
+				Format(szItem, sizeof szItem, "%s     %dp       %s", szRank, PlayerPoints, szPlayerName);
+			else if (PlayerPoints < 1000)
+				Format(szItem, sizeof szItem, "%s   %dp       %s", szRank, PlayerPoints, szPlayerName);
+			else if (PlayerPoints < 10000)
+				Format(szItem, sizeof szItem, "%s %dp       %s", szRank, PlayerPoints, szPlayerName);
+			else if (PlayerPoints < 100000)
+				Format(szItem, sizeof szItem, "%s %dp     %s", szRank, PlayerPoints, szPlayerName);
+			else
+				Format(szItem, sizeof szItem, "%s %dp   %s", szRank, PlayerPoints, szPlayerName);
+
+			AddMenuItem(menu, szStyle, szItem, ITEMDRAW_DISABLED);
+
+			row++;
+		}
+
+		SetMenuTitle(menu, "Country Top for %s | %s\n \n    Rank   Points       Player", szCountryName, g_szStyleMenuPrint[Style]);
+		SetMenuPagination(menu, 5);
+		SetMenuExitBackButton(menu, true);
+
+		DisplayMenu(menu, client, MENU_TIME_FOREVER);
+	}
+}
+
+public int CountryTopMenu(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Cancel) {
+		db_GetCountriesNames(param1, g_iCountryTopStyleSelected[param1]);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+
+	return 0;
+}
+
+public void db_GetCountriesNames(int client, int style)
+{
+	if (!IsValidClient(client))
+		return;
+
+	g_iCountryTopStyleSelected[client] = style;
+
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackCell(pack, style);
+
+	char szQuery[512];
+	Format(szQuery, sizeof szQuery, "SELECT DISTINCT(country) FROM ck_playerrank WHERE style = '%i' ORDER BY country;", style);
+	SQL_TQuery(g_hDb, db_GetCountriesNamesCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_GetCountriesNamesCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_GetCountriesNamesCallback): %s ", error);
+		CloseHandle(pack);
+		return;
+	}
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	int style = ReadPackCell(pack);
+	CloseHandle(pack);
+
+	if (SQL_HasResultSet(hndl)) {
+
+		Menu menu = CreateMenu(CountriesMenu);
+
+		if (SQL_GetRowCount(hndl) == 0) {
+			CPrintToChat(client, "%t", "country_data_not_found", g_szChatPrefix);
+
+			SetMenuTitle(menu, "Countries List | %s\n \n", g_szStyleMenuPrint[style]);
+			AddMenuItem(menu, "", "No Countries Found", ITEMDRAW_DISABLED);
+
+			SetMenuExitBackButton(menu, true);
+			DisplayMenu(menu, client, MENU_TIME_FOREVER);
+			return;
+		}
+
+		char szBuffer[256];
+		char szItem[256];
+		char szCountryName[56];
+
+		if (strcmp(g_szCountry[client], "", false) != 0) {
+			Format(szItem, sizeof szItem, "My Country\n ");
+			Format(szBuffer, sizeof szBuffer, "%s-%d", g_szCountry[client], style);
+			AddMenuItem(menu, szBuffer, szItem);
+		}
+
+		while (SQL_FetchRow(hndl)) {
+			SQL_FetchString(hndl, 0, szCountryName, sizeof szCountryName);
+			Format(szItem, sizeof szItem, "%s", szCountryName);
+			Format(szBuffer, sizeof szBuffer, "%s-%d", szCountryName, style);
+			AddMenuItem(menu, szBuffer, szItem);
+		}
+
+		SetMenuTitle(menu, "Countries List | %s\n \n", g_szStyleMenuPrint[style]);
+		SetMenuExitBackButton(menu, true);
+
+		DisplayMenu(menu, client, MENU_TIME_FOREVER);
+	}
+
+}
+
+public int CountriesMenu(Menu menu, MenuAction action, int param1, int param2)
+{	
+	if (action == MenuAction_Select) {
+		char szBuffer[256];
+		GetMenuItem(menu, param2, szBuffer, sizeof(szBuffer));
+
+		char splits[2][256];
+		ExplodeString(szBuffer, "-", splits, sizeof(splits), sizeof(splits[]));
+		db_SelectCountryTOP(param1, splits[0], StringToInt(splits[1]));
+	}
+	else if (action == MenuAction_Cancel)
+	{
+		char szBuffer[256] = "none-none";
+		CountryTopMenuStyleSelect(param1, szBuffer);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+
+	return 0;
+}
+
 public void db_ViewPlayerRank(int client)
 {
 	char szQuery[512];

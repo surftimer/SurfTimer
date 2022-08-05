@@ -1838,6 +1838,53 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Type new value (0 - 255) in the chat, or {darkred}cancel{default} to cancel"
 	}
+	"ctop_help_chat"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {red}Wrong values entered, Open console to see the formatting options"
+	}
+	"ctop_help"
+	{
+		"en"		"FORMATTING OPTIONS FOR COMMAND !ctop \n!ctop \n!ctop <countryname> \n!ctop #<style_acronym> \n!ctop <playername> # <style_acronym> OR !ctop #<style_acronym> <playername> \n"
+	}
+	"style_not_found"
+	{
+		"#format"	"{1:s},{2:i}"
+		"en"		"{1} {red}Wrong style value, type {yellow}!acronyms{red} to see all the available styles"
+	}
+	"country_data_not_found"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} No available data"
+	}
+	"Country_Rank"
+	{
+		"#format"	"{1:s},{2:s},{3:s},{4:i},{5:i},{6:s},{7:i}"
+		"en"		"{1} {red}{2}{default}{yellow}{3} {default}is ranked {lightgreen}{4}/{5} {default}in {blue}{6}{default} with {lightgreen}{7} {default}points"
+	}
+	"Player_Data_Not_Found"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} No available data"
+	}
+	"crank_help_chat"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {red}Wrong values entered, Open console to see the formatting options"
+	}
+	"crank_help"
+	{
+		"en"		"FORMATTING OPTIONS FOR COMMAND !crank \n!crank \n!crank <playername> \n!crank #<style_acronym> \n!crank <playername> #<style_acronym> OR !crank #<style_acronym> <playername> \n"
+	}
+	"style_acronyms_help_chat"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Open {yellow}console{default} to see the all the {red}Style Acroynms{default}"
+	}
+	"style_acronyms_help"
+	{
+		"en"		"Style Acronyms are the following : \nNormal - n \nSideways - sw \nHalf-Sideways - hsw \nBackwards - bw \nLow-Gravity - lg \nSlow Motion - sm \nFast Forward - ff \nFreestyle - fs \n"
+	}
 	"NextRankPointRequired"
 	{
 		"#format"	"{1:s},{2:i},{3:s}"

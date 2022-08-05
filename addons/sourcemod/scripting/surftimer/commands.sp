@@ -40,6 +40,10 @@ void CreateCommands()
 	RegConsoleCmd("+noclip", NoClip, "[surftimer] Player noclip on");
 	RegConsoleCmd("-noclip", UnNoClip, "[surftimer] Player noclip off");
 	RegConsoleCmd("sm_nc", Command_ckNoClip, "[surftimer] Player noclip on/off");
+	RegConsoleCmd("sm_ctop", Client_CountryTOP, "[surftimer] displays country top rankings");
+	RegConsoleCmd("sm_ctop_help", Client_CountryTop_Help, "[surftimer] displays information on how to use the command sm_ctop");
+	RegConsoleCmd("sm_crank", Client_CountryRank, "[surftimer] displays player country rank");
+	RegConsoleCmd("sm_crank_help", Client_CountryRank_Help, "[surftimer] displays information on how to use the command sm_crank");
 
 	// Teleportation Commands
 	RegConsoleCmd("sm_stages", Command_SelectStage, "[surftimer] Opens up the stage selector");
@@ -153,6 +157,8 @@ void CreateCommands()
 	RegConsoleCmd("sm_knife", Command_GiveKnife, "[surftimer] Give players a knife");
 	RegConsoleCmd("sm_prinfo_help", Command_PRinfo_help, "[surftimer] Show in console how to use the command");
 	RegConsoleCmd("sm_csd", Command_CenterSpeed, "[surftimer] [settings] on/off - toggle center speed display");
+	RegConsoleCmd("sm_acronyms", Client_Acronyms, "[surftimer] shows every style format available");
+
 
 	// New Commands
 	RegConsoleCmd("sm_mrank", Command_SelectMapTime, "[surftimer] prints a players map record in chat.");
@@ -1796,6 +1802,338 @@ public Action Command_ckNoClip(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action Client_CountryTop_Help(int client, int args){
+
+	if(IsValidClient(client)){
+		CPrintToChat(client, "%t", "ctop_help_chat", g_szChatPrefix);
+		PrintToConsole(client, "%t", "ctop_help");
+	}
+
+	return Plugin_Handled;
+
+}
+public Action Client_CountryRank_Help(int client, int args){
+
+	if(IsValidClient(client)){
+		CPrintToChat(client, "%t", "crank_help_chat", g_szChatPrefix);
+		PrintToConsole(client, "%t", "crank_help");
+	}
+
+	return Plugin_Handled;
+
+}
+
+public Action Client_Acronyms(int client, int args){
+
+	if(IsValidClient(client)){
+		CPrintToChat(client, "%t", "style_acronyms_help_chat", g_szChatPrefix);
+		PrintToConsole(client, "%t", "style_acronyms_help");
+	}
+
+	return Plugin_Handled;
+
+}
+
+public Action Client_CountryRank(int client, int args)
+{
+	if(!IsValidClient(client))
+		return Plugin_Handled;
+
+	switch (args){
+		case 0 : {
+			char szClientName[MAX_NAME_LENGTH];
+			GetClientName(client, szClientName, sizeof szClientName);
+
+			db_SelectCountryRank(client, szClientName, g_szCountry[client], g_iCurrentStyle[client]);
+		}
+		case 1 : {
+
+			char arg1[MAX_NAME_LENGTH];
+
+			GetCmdArg(1, arg1, sizeof arg1);
+
+			//sm_ctop #<style_acronym>
+			if (arg1[0] == '#') {
+				ReplaceString(arg1, sizeof arg1, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg1);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				char szClientName[MAX_NAME_LENGTH];
+				GetClientName(client, szClientName, sizeof szClientName);
+
+				db_SelectCountryRank(client, szClientName, g_szCountry[client], style);
+
+				return Plugin_Handled;
+
+			}
+
+			//sm_crank <playername>
+			db_SelectCustomPlayerCountryRank(client, arg1, g_iCurrentStyle[client]);
+		}
+		case 2 : {
+			char arg1[MAX_NAME_LENGTH];
+			GetCmdArg(1, arg1, sizeof arg1);
+
+			char arg2[MAX_NAME_LENGTH];
+			GetCmdArg(2, arg2, sizeof arg2);
+
+			//sm_crank #<style> <playername>
+			if (arg1[0] == '#') {
+				ReplaceString(arg1, sizeof arg1, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg1);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				db_SelectCustomPlayerCountryRank(client, arg2, style);
+
+				return Plugin_Handled;
+			}
+
+			//sm_crank <playername> #<style_acronym>
+			if (arg2[0] == '#') {
+				ReplaceString(arg2, sizeof arg2, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg2);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				db_SelectCustomPlayerCountryRank(client, arg1, style);
+
+				return Plugin_Handled;
+			}
+
+			CPrintToChat(client, "%t", "crank_help_chat", g_szChatPrefix);
+			PrintToConsole(client, "%t", "crank_help");
+			PrintToConsole(client, "%t", "style_acronyms_help");	
+
+		}
+	}
+
+	return Plugin_Handled;
+}
+
+public Action Client_CountryTOP(int client, int args)
+{
+	char szBuffer[256] = "none-none";
+
+	switch (args) {
+		//sm_ctop
+		case 0: CountryTopMenuStyleSelect(client, szBuffer);
+		//sm_ctop <countryname>
+		//sm_ctop #<style_acronym>
+		case 1: {
+			char arg1[100];
+			GetCmdArg(1, arg1, sizeof arg1);
+
+			//sm_ctop #<style_acronym>
+			if (arg1[0] == '#') {
+				ReplaceString(arg1, sizeof arg1, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg1);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				db_GetCountriesNames(client, style);
+				return Plugin_Handled;
+			}
+
+			//sm_ctop <countryname>
+			Format(szBuffer, sizeof szBuffer, "%s-none", arg1);
+			CountryTopMenuStyleSelect(client, szBuffer);
+		}
+		//sm_ctop <countryname> #<style_acronym>
+		//sm_ctop #<style_acronym> <countryname>
+		case 2: {
+
+			char arg1[100];
+			char arg2[100];
+
+			GetCmdArg(1, arg1, sizeof arg1);
+			GetCmdArg(2, arg2, sizeof arg2);
+
+			//sm_ctop #<style_acronym> <countryname>
+			if (arg1[0] == '#') {
+				ReplaceString(arg1, sizeof arg1, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg1);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				Format(szBuffer, sizeof szBuffer, "%s-%d", arg2, style);
+				CountryTopMenuStyleSelect(client, szBuffer);
+
+				return Plugin_Handled;
+			}
+
+			//sm_ctop <countryname> #<style_acronym>
+			if (arg2[0] == '#') {
+				ReplaceString(arg2, sizeof arg2, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg2);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				Format(szBuffer, sizeof szBuffer, "%s-%d", arg1, style);
+				CountryTopMenuStyleSelect(client, szBuffer);
+
+				return Plugin_Handled;
+			}
+
+			CPrintToChat(client, "%t", "ctop_help_chat", g_szChatPrefix);
+			PrintToConsole(client, "%t", "ctop_help");
+			PrintToConsole(client, "%t", "style_acronyms_help");
+		}
+	}
+
+	return Plugin_Handled;
+}
+
+public void CountryTopMenuStyleSelect(int client, char szBuffer[256])
+{
+	char szCountryName[256];
+	int style;
+
+	//IF THE PLAYER INSERTED A COUNTRY OR A STYLE SPLIT THE BUFFER STRING AND STORE THE VALUES INDIVIDUAL VARIABLES
+	//split[0] -> country
+	//split[1] -> style
+	if ( strcmp(szBuffer, "none-none", false) != 0 ) {
+		char splits[2][256];
+		ExplodeString(szBuffer, "-", splits, sizeof(splits), sizeof(splits[]));
+
+		//INSERTED COUNTRY
+		if( strcmp(splits[0], "none", false) != 0 ) {
+			szCountryName = splits[0];
+		}
+		
+		//INSERTED STYLE
+		if( strcmp(splits[1], "none", false) != 0 ) {
+			style = StringToInt(splits[1]);
+		}
+
+		//IF PLAYER INPUTS COUNTRY NAME AND STYLE THERE IS NO NEED DISPLAY THIS MENU
+		//CALL 'db_SelectCountryTOP' STRAIGHT AWAY
+		if( strcmp(splits[0], "none", false) != 0 && strcmp(splits[1], "none", false) != 0 ){
+			db_SelectCountryTOP(client, szCountryName, style);
+			return;
+		}
+
+		//IF PLAYER INPUTS STYLE THERE IS NO NEED DISPLAY THIS MENU
+		//CALL 'db_GetCountriesNames' STRAIGHT AWAY
+		if( strcmp(splits[0], "none", false) == 0 && strcmp(splits[1], "none", false) != 0 ){
+			db_GetCountriesNames(client, StringToInt(splits[1]));
+			return;
+		}
+
+	}
+	//IF PLAYER IS USING SM_CTOP WITHOUT ANY ARGUMENTS
+	//THIS MEANS THE COUNTRY NAME IS NOT BEEN SELECTED YET
+	//SIMPLY SET IT AS "none"
+	else {
+		szCountryName = "none";
+	}
+
+
+	Menu menu = CreateMenu(CountryTopMenuStyleSelectHandler);
+
+	SetMenuTitle(menu, "Top Menu - Select a style\n \n");
+
+	for (int i = 0; i < sizeof(g_EditStyles); i++)
+	{
+		Format(szBuffer, sizeof(szBuffer), "%s-%d", szCountryName, i);
+
+		//EACH MENU ITEM HAS A STRING CONTAINING THE COUNTRY NAME AND THE STYLE SELECTED IN THE FOLLOWING FORMAT -> 'country-style'
+		AddMenuItem(menu, szBuffer, g_EditStyles[i]);
+	}
+
+	SetMenuExitButton(menu, true);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+public int CountryTopMenuStyleSelectHandler(Handle menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char szBuffer[256];
+		GetMenuItem(menu, param2, szBuffer, sizeof(szBuffer));
+
+		char splits[2][256];
+		ExplodeString(szBuffer, "-", splits, sizeof(splits), sizeof(splits[]));
+
+		if( strcmp(splits[0], "none", false) == 0 )
+			db_GetCountriesNames(param1, StringToInt(splits[1]));
+		else
+			db_SelectCountryTOP(param1, splits[0], StringToInt(splits[1]));
+	}
+	else if (action == MenuAction_End) {
+		delete menu;
+	}
+
+	return 0;
+}
+
 public Action Client_Top(int client, int args)
 {
 	TopMenuStyleSelect(client);
@@ -1823,7 +2161,6 @@ public int TopMenuStyleSelectHandler(Handle menu, MenuAction action, int param1,
 {
 	if (action == MenuAction_Select)
 	{
-		g_ProfileStyleSelect[param1] = param2;
 		ckTopMenu(param1, param2);
 	}
 	else if (action == MenuAction_End)
