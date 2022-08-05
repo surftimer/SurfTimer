@@ -84,30 +84,26 @@ public void CL_OnStartTimerPress(int client)
 			// Set missed record time variables
 			if (g_iClientInZone[client][2] == 0)
 			{
-				if (g_fPersonalRecord[client] > 0.0)
+				if (g_fPersonalRecord[client] > 0.0) {
 					g_bMissedMapBest[client] = false;
+				}
 
-					iPrestrafeRecord = g_iRecordPreStrafe[g_PreSpeedMode[client]][0][g_iCurrentStyle[client]];
-					iPersonalPrestrafeRecord = g_iPersonalRecordPreStrafe[client][1][0][g_iCurrentStyle[client]];
-          
-					SetPrestrafe(client, 0, g_iCurrentStyle[client], true, false, false );
-					SetPrestrafe(client, 1, g_iCurrentStyle[client], true, false, false );
+				iPrestrafeRecord = g_iRecordPreStrafe[g_PreSpeedMode[client]][0][g_iCurrentStyle[client]];
+				iPersonalPrestrafeRecord = g_iPersonalRecordPreStrafe[client][1][0][g_iCurrentStyle[client]];
+
+				SetPrestrafe(client, 0, g_iCurrentStyle[client], true, false, false );
+				SetPrestrafe(client, 1, g_iCurrentStyle[client], true, false, false );
 			}
 			else
 			{
-				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
+				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0) {
 					g_bMissedBonusBest[client] = false;
+				}
 
-					/*
-					 FORCE SHOW XYZ UNITS ON EVERY SPEEDMODE
-					 g_PreSpeedMode[client] == 0 -> XY
-					 g_PreSpeedMode[client] == 1 -> XYZ
-					 g_PreSpeedMode[client] == 2 -> Z
-					*/
-					iPrestrafeRecord = g_iRecordPreStrafeBonus[g_PreSpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
-					iPersonalPrestrafeRecord = g_iPersonalRecordPreStrafeBonus[client][g_PreSpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
+				iPrestrafeRecord = g_iRecordPreStrafeBonus[g_PreSpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
+				iPersonalPrestrafeRecord = g_iPersonalRecordPreStrafeBonus[client][g_PreSpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
 
-					SetPrestrafe(client, g_iClientInZone[client][2], g_iCurrentStyle[client], false, true, false);
+				SetPrestrafe(client, g_iClientInZone[client][2], g_iCurrentStyle[client], false, true, false);
 			}
 		}
 
