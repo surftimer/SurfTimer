@@ -11204,3 +11204,129 @@ public int CountriesMenu(Menu menu, MenuAction action, int param1, int param2)
 
 	return 0;
 }
+
+public void db_ViewPlayerRank(int client)
+{
+	char szQuery[512];
+	Format(szQuery, sizeof szQuery, "SELECT name, points, style FROM ck_playerrank WHERE style = %i AND points >= (SELECT points FROM ck_playerrank WHERE steamid = '%s' AND style = %i) ORDER BY points;", g_iCurrentStyle[client], g_szSteamID[client], g_iCurrentStyle[client]);
+	SQL_TQuery(g_hDb, db_ViewPlayerRankCallback, szQuery, client, DBPrio_Low);
+}
+
+public void db_ViewPlayerRankCallback(Handle owner, Handle hndl, const char[] error, any client)
+{
+	if (hndl == null) {
+		LogError("[SurfTimer] SQL Error (db_ViewPlayerRankCallback): %s", error);
+		return;
+	}
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl)) {
+		int rank = SQL_GetRowCount(hndl);
+		int points = SQL_FetchInt(hndl, 1);
+
+		// Get players skillgroup
+		SkillGroup RankValue;
+		SkillGroup Next_RankValue;
+		int index = GetSkillgroupIndex(rank, points);
+		GetArrayArray(g_hSkillGroups, index, RankValue, sizeof(SkillGroup));
+
+		if (index != 0) {
+			GetArrayArray(g_hSkillGroups, index-1, Next_RankValue, sizeof(Next_RankValue));
+
+			char szSkillGroup[128];
+			Format(szSkillGroup, sizeof(szSkillGroup), Next_RankValue.RankNameColored);
+			ReplaceString(szSkillGroup, sizeof(szSkillGroup), "{style}", "");
+
+			//FOR RANKS THAT USE POINT RANGE
+			//i.e
+			/*
+			"15"	
+			{
+				"rankTitle" "{default}[{gray}ROOKIE{default}]"
+				"nameColour" "{gray}"
+				"points" "1-299"
+			}
+			*/
+			if ( RankValue.PointsBot > -1 && RankValue.PointsTop > -1) {
+				CPrintToChat(client, "%t", "NextRankPointRequired", g_szChatPrefix, Next_RankValue.PointsTop - points, szSkillGroup);
+			}
+			//FOR RANKS WITHOUT POINT RANGE
+			//i.e
+			/*
+			"16"
+			{
+				"rankTitle" "{default}[UNRANKED]"
+				"nameColour" "{default}"
+				"points" "0"
+			}
+			*/
+			else if (RankValue.PointReq > -1) {
+				CPrintToChat(client, "%t", "NextRankPointRequired", g_szChatPrefix, Next_RankValue.PointReq - points, szSkillGroup);
+			}
+			//FOR RANKS THAT DONT USE POINTS, BUT RATHER RANK RANGE
+			//i.e
+			/*
+			"4"
+			{
+				"rankTitle" "{default}[{pink}LEGEND{default}]"
+				"nameColour" "{pink}"
+				"rank" "4-10"
+			}
+			*/
+			else if ( RankValue.RankBot > 0 && RankValue.RankTop > 0) {
+				db_GetNextRankPoints(client, SQL_FetchInt(hndl, 2), points, Next_RankValue.RankTop, szSkillGroup);
+			}
+			//FOR RANKS THAT ARE A FIXED NUMBER
+			//i.e
+			/*
+			"1"
+			{
+				"rankTitle" "{default}[{style}{darkred}GENERAL{default}]"
+				"nameColour" "{darkred}"
+				"rank" "1"
+			}
+			*/
+			else {
+				db_GetNextRankPoints(client, SQL_FetchInt(hndl, 2), points, Next_RankValue.RankReq, szSkillGroup);
+			}
+
+		}
+		else {
+			CPrintToChat(client, "%t", "MAX_RANK", g_szChatPrefix);
+		}
+	}
+
+}
+
+public void db_GetNextRankPoints(int client, int style, int points, int next_rank, char szNextRankName[128])
+{
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackCell(pack, points);
+	WritePackString(pack, szNextRankName);
+
+	char szQuery[512];
+	Format(szQuery, sizeof szQuery, "SELECT points FROM ck_playerrank WHERE style = %d ORDER BY points DESC LIMIT %d,1;", style, next_rank - 1);
+	SQL_TQuery(g_hDb, db_GetNextRankPointsCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_GetNextRankPointsCallback(Handle owner, Handle hndl, const char[] error, DataPack pack)
+{
+	if (hndl == null) {
+		LogError("[SurfTimer] SQL Error (db_GetNextRankPointsCallback): %s", error);
+		delete pack;
+		return;
+	}
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl)) {
+
+		ResetPack(pack);
+		int client = ReadPackCell(pack);
+		int points = ReadPackCell(pack);
+		char szNextRankName[128];
+		ReadPackString(pack, szNextRankName, sizeof szNextRankName);
+		delete pack;
+
+		CPrintToChat(client, "%t", "NextRankPointRequired", g_szChatPrefix, SQL_FetchInt(hndl, 0) - points, szNextRankName);
+	}
+
+}

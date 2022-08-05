@@ -173,6 +173,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_specbotbonus", Command_SpecBonusBot, "[surftimer] Spectate the bonus bot");
 	RegConsoleCmd("sm_specbotb", Command_SpecBonusBot, "[surftimer] Spectate the bonus bot");
 	RegConsoleCmd("sm_showzones", Command_ShowZones, "[surftimer] Clients can toggle whether zones are visible for them");
+	RegConsoleCmd("sm_nextrank", Command_NextRank, "[surftimer] Displays the amount of points required to achieve next rank");
 
 	// Styles
 	RegConsoleCmd("sm_style", Client_SelectStyle, "[surftimer] open style select menu.");
@@ -1078,11 +1079,6 @@ public Action Command_Teleport(int client, int args)
 
 	teleportClient(client, g_iClientInZone[client][2], g_Stage[g_iClientInZone[client][2]][client], false);
 
-	if (g_bPracticeMode[client])
-	{
-		g_bPracticeMode[client] = false;
-		CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
-	}
 	return Plugin_Handled;
 }
 
@@ -6207,6 +6203,16 @@ public Action Command_nextSaveloc(int client, int args)
 	
 	CPrintToChat(client, "%t", "Commands13", g_szChatPrefix, desiredSavelocID);
 	TeleportToSaveloc(client, desiredSavelocID);
+
+	return Plugin_Handled;
+}
+
+public Action Command_NextRank(int client, int args)
+{
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+
+	db_ViewPlayerRank(client);
 
 	return Plugin_Handled;
 }
