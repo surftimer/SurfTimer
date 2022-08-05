@@ -37,10 +37,6 @@ jobs:
           wget https://raw.githubusercontent.com/Impact123/AutoExecConfig/development/autoexecconfig.inc -P $INCLUDE_PATH
           wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/addons/sourcemod/scripting/include/colorlib.inc -P $INCLUDE_PATH
 
-      - name: Download EndTouchFix source and gamedata file
-        run: |
-          wget https://github.com/rumourA/End-Touch-Fix/raw/master/scripting/EndTouchFix.sp -P $SCRIPTING_PATH
-
       - name: Compile plugins
         run: |
           mkdir -p $PLUGINS_PATH
