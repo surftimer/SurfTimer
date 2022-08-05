@@ -10420,7 +10420,7 @@ public void SQL_SelectCPRTimeCallback(Handle owner, Handle hndl, const char[] er
 		g_fClientCPs[client][0] = SQL_FetchFloat(hndl, 3);
 
 		char szQuery[512];
-		Format(szQuery, sizeof(szQuery), "SELECT cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20, cp21, cp22, cp23, cp24, cp25, cp26, cp27, cp28, cp29, cp30, cp31, cp32, cp33, cp34, cp35 FROM ck_checkpoints WHERE steamid = '%s' AND mapname LIKE '%c%s%c' AND zonegroup = 0;", g_szSteamID[client], PERCENT, g_szCPRMapName[client], PERCENT);
+		Format(szQuery, sizeof(szQuery), "SELECT cp, time FROM ck_checkpoints WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = 0;", g_szSteamID[client], g_szCPRMapName[client]);
 		SQL_TQuery(g_hDb, SQL_SelectCPRCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
@@ -10439,14 +10439,15 @@ public void SQL_SelectCPRCallback(Handle owner, Handle hndl, const char[] error,
 		return;
 	}
 
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	if (SQL_HasResultSet(hndl))
 	{
 		ResetPack(pack);
 		int client = ReadPackCell(pack);
 
-		for (int i = 1; i < 36; i++)
+		while(SQL_FetchRow(hndl))
 		{
-			g_fClientCPs[client][i] = SQL_FetchFloat(hndl, i - 1);
+			int cp = SQL_FetchInt(hndl, 0);
+			g_fClientCPs[client][cp] = SQL_FetchFloat(hndl, 1);
 		}
 		db_selectCPRTarget(pack);
 	}
@@ -10499,7 +10500,8 @@ public void db_selectCPRTargetCPs(const char[] szSteamId, any pack)
 	int client = ReadPackCell(pack);
 
 	char szQuery[512];
-	Format(szQuery, sizeof(szQuery), "SELECT cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20, cp21, cp22, cp23, cp24, cp25, cp26, cp27, cp28, cp29, cp30, cp31, cp32, cp33, cp34, cp35 FROM ck_checkpoints WHERE steamid = '%s' AND mapname LIKE '%c%s%c' AND zonegroup = 0;", szSteamId, PERCENT, g_szCPRMapName[client], PERCENT);
+	Format(szQuery, sizeof(szQuery), "SELECT cp, time FROM ck_checkpoints WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = 0;", szSteamId, g_szCPRMapName[client]);
+	PrintToServer(szQuery);
 	SQL_TQuery(g_hDb, SQL_SelectCPRTargetCPsCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -10512,7 +10514,7 @@ public void SQL_SelectCPRTargetCPsCallback(Handle owner, Handle hndl, const char
 		return;
 	}
 
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	if (SQL_HasResultSet(hndl))
 	{
 		ResetPack(pack);
 		int client = ReadPackCell(pack);
@@ -10527,16 +10529,18 @@ public void SQL_SelectCPRTargetCPsCallback(Handle owner, Handle hndl, const char
 		float targetCPs, comparedCPs;
 		char szCPR[32], szCompared[32], szItem[256];
 
-		for (int i = 1; i < 36; i++)
-		{
-			targetCPs = SQL_FetchFloat(hndl, i - 1);
-			comparedCPs = (g_fClientCPs[client][i] - targetCPs);
+		while(SQL_FetchRow(hndl))
+		{	
+			int cp = SQL_FetchInt(hndl, 0);
+			targetCPs = SQL_FetchFloat(hndl, 1);
+			comparedCPs = (g_fClientCPs[client][cp] - targetCPs);
 
-			if (targetCPs == 0.0 || g_fClientCPs[client][i] == 0.0)
+			if (targetCPs == 0.0 || g_fClientCPs[client][cp] == 0.0)
 				continue;
+			
 			FormatTimeFloat(client, targetCPs, 3, szCPR, sizeof(szCPR));
 			FormatTimeFloat(client, comparedCPs, 6, szCompared, sizeof(szCompared));
-			Format(szItem, sizeof(szItem), "CP %i: %s (%s)", i, szCPR, szCompared);
+			Format(szItem, sizeof(szItem), "CP %i: %s (%s)", cp, szCPR, szCompared);
 			AddMenuItem(menu, "", szItem, ITEMDRAW_DISABLED);
 		}
 
