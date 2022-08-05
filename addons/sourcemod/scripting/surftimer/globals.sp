@@ -445,7 +445,13 @@ float g_fSrcpPauseTime[MAXPLAYERS + 1];
 
 // Prestrafe records
 int g_iRecordPreStrafe[3][CPLIMIT][MAX_STYLES];
+int g_iRecordPreStrafeStage[3][CPLIMIT][MAX_STYLES];
 int g_iRecordPreStrafeBonus[3][MAXZONEGROUPS][MAX_STYLES];
+
+//Personal Prestrafe records
+int g_iPersonalRecordPreStrafe[MAXPLAYERS + 1][3][CPLIMIT][MAX_STYLES];
+int g_iPersonalRecordPreStrafeStage[MAXPLAYERS + 1][3][CPLIMIT][MAX_STYLES];
+int g_iPersonalRecordPreStrafeBonus[MAXPLAYERS + 1][3][MAXZONEGROUPS][MAX_STYLES];
 
 /*----------  Map Settings Variables ----------*/
 float g_fMaxVelocity;
@@ -875,6 +881,9 @@ int g_iPreStrafe[3][CPLIMIT][MAX_STYLES][MAXPLAYERS + 1];
 
 // Latest prestrafe speed for bonuses
 int g_iPreStrafeBonus[3][MAXZONEGROUPS][MAX_STYLES][MAXPLAYERS + 1];
+
+// Latest prestrafe speed for stages
+int g_iPreStrafeStage[3][CPLIMIT][MAX_STYLES][MAXPLAYERS + 1];
 
 /*----------  Replay Variables  ----------*/
 

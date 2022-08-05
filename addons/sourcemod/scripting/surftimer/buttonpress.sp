@@ -73,6 +73,7 @@ public void CL_OnStartTimerPress(int client)
 		g_bTeleByCommand[client] = false;
 
 		int iPrestrafeRecord;
+		int iPersonalPrestrafeRecord;
 
 		if (!IsFakeClient(client))
 		{
@@ -85,16 +86,28 @@ public void CL_OnStartTimerPress(int client)
 			{
 				if (g_fPersonalRecord[client] > 0.0)
 					g_bMissedMapBest[client] = false;
-				iPrestrafeRecord = g_iRecordPreStrafe[g_PreSpeedMode[client]][0][g_iCurrentStyle[client]];
-				SetPrestrafe(client, 0, g_iCurrentStyle[client], false);
-				SetPrestrafe(client, 1, g_iCurrentStyle[client], false);
+
+					iPrestrafeRecord = g_iRecordPreStrafe[g_PreSpeedMode[client]][0][g_iCurrentStyle[client]];
+					iPersonalPrestrafeRecord = g_iPersonalRecordPreStrafe[client][1][0][g_iCurrentStyle[client]];
+          
+					SetPrestrafe(client, 0, g_iCurrentStyle[client], true, false, false );
+					SetPrestrafe(client, 1, g_iCurrentStyle[client], true, false, false );
 			}
 			else
 			{
 				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
 					g_bMissedBonusBest[client] = false;
-				iPrestrafeRecord = g_iRecordPreStrafeBonus[g_PreSpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
-				SetPrestrafe(client, g_iClientInZone[client][2], g_iCurrentStyle[client], true);
+
+					/*
+					 FORCE SHOW XYZ UNITS ON EVERY SPEEDMODE
+					 g_PreSpeedMode[client] == 0 -> XY
+					 g_PreSpeedMode[client] == 1 -> XYZ
+					 g_PreSpeedMode[client] == 2 -> Z
+					*/
+					iPrestrafeRecord = g_iRecordPreStrafeBonus[g_PreSpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
+					iPersonalPrestrafeRecord = g_iPersonalRecordPreStrafeBonus[client][g_PreSpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
+
+					SetPrestrafe(client, g_iClientInZone[client][2], g_iCurrentStyle[client], false, true, false);
 			}
 		}
 
@@ -103,30 +116,51 @@ public void CL_OnStartTimerPress(int client)
 			//PRINFO INCREMENT ATTEMPTS
 			g_fAttempts[client][g_iClientInZone[client][2]]++;
 
-			char szDifference[128], szSpeed[128], preMessage[128];
-			int iDifference;
+			char szRecordDifference[128];
+			char szPersonalDifference[128];
+			char szSpeed[128];
+			char preMessage[128];
+			int iRecordDifference;
+			int iPersonalDifference;
+
 			int prestrafe = RoundToNearest(GetPreSpeed(client));
+
 			if (iPrestrafeRecord == 0)
 			{
-				szDifference = "";
+				Format(szRecordDifference, sizeof(szRecordDifference), "%c%s%c", GRAY, "N/A", WHITE);
 			}
 			else if (prestrafe >= iPrestrafeRecord)
 			{
-				iDifference = prestrafe - iPrestrafeRecord;
-				Format(szDifference, sizeof(szDifference), "[%c+%i%c]", GREEN, iDifference, WHITE);
+				iRecordDifference = prestrafe - iPrestrafeRecord;
+				Format(szRecordDifference, sizeof(szRecordDifference), "%c+%i%c", GREEN, iRecordDifference, WHITE);
 			}
 			else
 			{
-				iDifference = iPrestrafeRecord - prestrafe;
-				Format(szDifference, sizeof(szDifference), "[%c-%i%c]", RED, iDifference, WHITE);
+				iRecordDifference = iPrestrafeRecord - prestrafe;
+				Format(szRecordDifference, sizeof(szRecordDifference), "%c-%i%c", RED, iRecordDifference, WHITE);
+			}
+
+			if (iPersonalPrestrafeRecord == 0)
+			{
+				Format(szPersonalDifference, sizeof(szPersonalDifference), "%c%s%c", GRAY, "N/A", WHITE);
+			}
+			else if (prestrafe >= iPersonalPrestrafeRecord)
+			{
+				iPersonalDifference = prestrafe - iPersonalPrestrafeRecord;
+				Format(szPersonalDifference, sizeof(szPersonalDifference), "%c+%i%c", GREEN, iPersonalDifference, WHITE);
+			}
+			else
+			{
+				iPersonalDifference = iPersonalPrestrafeRecord - prestrafe;
+				Format(szPersonalDifference, sizeof(szPersonalDifference), "%c-%i%c", RED, iPersonalDifference, WHITE);
 			}
 
 			Format(szSpeed, sizeof(szSpeed), "%i", prestrafe);
 
 			if (g_iClientInZone[client][2] == 0)
-				Format(preMessage, sizeof(preMessage), "%t", "StartPrestrafe", g_szChatPrefix, szSpeed, szDifference);
+				Format(preMessage, sizeof(preMessage), "%t", "StartPrestrafe", g_szChatPrefix, szSpeed, szPersonalDifference, szRecordDifference);
 			else
-				Format(preMessage, sizeof(preMessage), "%t", "BonusPrestrafe", g_szChatPrefix, g_iClientInZone[client][2], szSpeed, szDifference);
+				Format(preMessage, sizeof(preMessage), "%t", "BonusPrestrafe", g_szChatPrefix, g_iClientInZone[client][2], szSpeed, szPersonalDifference, szRecordDifference);
 
 			if (g_iPrespeedText[client])
 				CPrintToChat(client, preMessage);
@@ -782,30 +816,56 @@ public void CL_OnStartWrcpTimerPress(int client)
 			Stage_StartRecording(client); //Add pre
 		}
 		if (g_Stage[0][client] >= 1 && !g_bPracticeMode[client] && !IsFakeClient(client)) {
-			char szDifference[128], szSpeed[128], preMessage[128];
-			int iDifference;
-			int iPrestrafeRecord = g_iRecordPreStrafe[g_PreSpeedMode[client]][g_Stage[0][client]][g_iCurrentStyle[client]];
+			char szRecordDifference[128];
+			char szPersonalDifference[128];
+			char szSpeed[128];
+			char preMessage[128];
+			int iRecordDifference;
+			int iPersonalDifference;
+			//FORCE XYZ UNITS ON PRESTRAFE
+
+			//STAGE PRESTRAFE RECORD
+			int iPrestrafeRecord = g_iRecordPreStrafeStage[g_PreSpeedMode[client]][g_Stage[0][client]][g_iCurrentStyle[client]];
+
+			//PLAYERS PRESTRAFE
+			int iPersonalPrestrafeRecord = g_iPersonalRecordPreStrafeStage[client][g_PreSpeedMode[client]][g_Stage[0][client]][g_iCurrentStyle[client]];
+
 			int prestrafe = RoundToNearest(GetPreSpeed(client));
 
-			SetPrestrafe(client, g_Stage[0][client], g_iCurrentStyle[client], false);
+			SetPrestrafe(client, g_Stage[0][client], g_iCurrentStyle[client], false, false, true);
 
 			if (iPrestrafeRecord == 0)
 			{
-				szDifference = "";
+				Format(szRecordDifference, sizeof(szRecordDifference), "%c%s%c", GRAY, "N/A", WHITE);	
 			}
 			else if (prestrafe >= iPrestrafeRecord)
 			{
-				iDifference = prestrafe - iPrestrafeRecord;
-				Format(szDifference, sizeof(szDifference), "[%c+%i%c]", GREEN, iDifference, WHITE);
+				iRecordDifference = prestrafe - iPrestrafeRecord;
+				Format(szRecordDifference, sizeof(szRecordDifference), "%c+%i%c", GREEN, iRecordDifference, WHITE);
 			}
 			else
 			{
-				iDifference = iPrestrafeRecord - prestrafe;
-				Format(szDifference, sizeof(szDifference), " [%c-%i%c]", RED, iDifference, WHITE);
+				iRecordDifference = iPrestrafeRecord - prestrafe;
+				Format(szRecordDifference, sizeof(szRecordDifference), " %c-%i%c", RED, iRecordDifference, WHITE);
+			}
+
+			if (iPersonalPrestrafeRecord == 0)
+			{
+				Format(szPersonalDifference, sizeof(szPersonalDifference), "%c%s%c", GRAY, "N/A", WHITE);
+			}
+			else if (prestrafe >= iPersonalPrestrafeRecord)
+			{
+				iPersonalDifference = prestrafe - iPersonalPrestrafeRecord;
+				Format(szPersonalDifference, sizeof(szPersonalDifference), "%c+%i%c", GREEN, iPersonalDifference, WHITE);
+			}
+			else
+			{
+				iPersonalDifference = iPersonalPrestrafeRecord - prestrafe;
+				Format(szPersonalDifference, sizeof(szPersonalDifference), " %c-%i%c", RED, iPersonalDifference, WHITE);
 			}
 
 			Format(szSpeed, sizeof(szSpeed), "%i", prestrafe);
-			Format(preMessage, sizeof(preMessage), "%t", "StagePrestrafe", g_szChatPrefix, g_Stage[0][client], szSpeed, szDifference);
+			Format(preMessage, sizeof(preMessage), "%t", "StagePrestrafe", g_szChatPrefix, g_Stage[0][client], szSpeed, szPersonalDifference, szRecordDifference);
 
 			if (g_iPrespeedText[client])
 				CPrintToChat(client, preMessage);
