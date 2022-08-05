@@ -1930,7 +1930,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		if (g_bMapFirstRecord[client] || g_bMapPBRecord[client] || g_bMapSRVRecord[client])
 			CheckMapRanks(client);
 
-		SendMapFinishForward(client, count);
+		SendMapFinishForward(client, count, 0);
 
 	}
 	// recalc avg
@@ -4197,6 +4197,9 @@ stock void StyleFinishedMsgs(int client, int style)
 			CPrintToChat(client, "%t", "Misc19", g_szChatPrefix);
 
 		CalculatePlayerRank(client, style);
+
+		SendMapFinishForward(client, count, style);
+
 		return;
 	}
 }
