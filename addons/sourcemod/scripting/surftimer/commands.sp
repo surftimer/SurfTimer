@@ -2038,7 +2038,6 @@ public Action Client_CountryTOP(int client, int args)
 
 public void CountryTopMenuStyleSelect(int client, char szBuffer[256])
 {
-	char szItem[128];
 	char szCountryName[256];
 	int style;
 
@@ -2086,38 +2085,13 @@ public void CountryTopMenuStyleSelect(int client, char szBuffer[256])
 
 	SetMenuTitle(menu, "Top Menu - Select a style\n \n");
 
-	//EACH MENU ITEM HAS A STRING CONTAINING THE COUNTRY NAME AND THE STYLE SELECTED IN THE FOLLOWING FORMAT -> 'country-style'
-	Format(szItem, sizeof(szItem), "Normal");
-	Format(szBuffer, sizeof(szBuffer), "%s-0", szCountryName);
-	AddMenuItem(menu, szBuffer, szItem);
+	for (int i = 0; i < sizeof(g_EditStyles); i++)
+	{
+		Format(szBuffer, sizeof(szBuffer), "%s-%d", szCountryName, i);
 
-	Format(szItem, sizeof(szItem), "Sideways");
-	Format(szBuffer, sizeof(szBuffer), "%s-1", szCountryName);
-	AddMenuItem(menu, szBuffer, szItem);
-
-	Format(szItem, sizeof(szItem), "Half-Sideways");
-	Format(szBuffer, sizeof(szBuffer), "%s-2", szCountryName);
-	AddMenuItem(menu, szBuffer, szItem);
-
-	Format(szItem, sizeof(szItem), "Backwards");
-	Format(szBuffer, sizeof(szBuffer), "%s-3", szCountryName);
-	AddMenuItem(menu, szBuffer, szItem);
-
-	Format(szItem, sizeof(szItem), "Low-Gravity");
-	Format(szBuffer, sizeof(szBuffer), "%s-4", szCountryName);
-	AddMenuItem(menu, szBuffer, szItem);
-
-	Format(szItem, sizeof(szItem), "Slow Motion");
-	Format(szBuffer, sizeof(szBuffer), "%s-5", szCountryName);
-	AddMenuItem(menu, szBuffer, szItem);
-
-	Format(szItem, sizeof(szItem), "Fast Forwards");
-	Format(szBuffer, sizeof(szBuffer), "%s-6", szCountryName);
-	AddMenuItem(menu, szBuffer, szItem);
-
-	Format(szItem, sizeof(szItem), "Freestyle");
-	Format(szBuffer, sizeof(szBuffer), "%s-7", szCountryName);
-	AddMenuItem(menu, szBuffer, szItem);
+		//EACH MENU ITEM HAS A STRING CONTAINING THE COUNTRY NAME AND THE STYLE SELECTED IN THE FOLLOWING FORMAT -> 'country-style'
+		AddMenuItem(menu, szBuffer, g_EditStyles[i]);
+	}
 
 	SetMenuExitButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
