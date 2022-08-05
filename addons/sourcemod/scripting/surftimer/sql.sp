@@ -43,7 +43,6 @@ public void db_setupDatabase()
 	SQL_LockDatabase(g_hDb);
 	SQL_FastQuery(g_hDb, "SET NAMES 'utf8mb4'");
 
-
 	// Check if tables need to be Created or database needs to be upgraded
 	g_bRenaming = false;
 	g_bInTransactionChain = false;
@@ -53,7 +52,6 @@ public void db_setupDatabase()
 
 	SQL_UnlockDatabase(g_hDb);
 	SQL_UnlockDatabase(g_hDb_Updates);
-
 	LoopFloatDecimalTables();
 
 	for (int i = 0; i < sizeof(g_failedTransactions); i++)
@@ -554,7 +552,7 @@ public void db_updateStat(int client, int style)
 	WritePackCell(pack, style);
 
 	char szQuery[512];
-	// "UPDATE ck_playerrank SET finishedmaps ='%i', finishedmapspro='%i', multiplier ='%i'  where steamid='%s'";
+	// "UPDATE ck_playerrank SET finishedmaps ='%i', finishedmapspro='%i', multiplier ='%i' where steamid='%s'";
 	Format(szQuery, 512, sql_updatePlayerRank, g_pr_finishedmaps[client], g_pr_finishedmaps[client], g_szSteamID[client], style);
 
 	SQL_TQuery(g_hDb, SQL_UpdateStatCallback, szQuery, pack, DBPrio_Low);
@@ -599,7 +597,7 @@ public void RecalcPlayerRank(int client, char steamid[128])
 }
 
 //
-//  1. Point calculating starts here
+//	1. Point calculating starts here
 // 	There are two ways:
 //	- if client > MAXPLAYERS, his rank is being recalculated by an admin
 //	- else player has increased his rank = recalculate points
@@ -3297,15 +3295,16 @@ public void sql_selectRecordCheckpointsCallback(Handle owner, Handle hndl, const
 	if (SQL_HasResultSet(hndl))
 	{
 		int zonegroup;
+		int cp;
+
 		while (SQL_FetchRow(hndl))
 		{
 			zonegroup = SQL_FetchInt(hndl, 0);
-			for (int i = 0; i < 35; i++)
-			{
-				g_fCheckpointServerRecord[zonegroup][i] = SQL_FetchFloat(hndl, (i + 1));
-				if (!g_bCheckpointRecordFound[zonegroup] && g_fCheckpointServerRecord[zonegroup][i] > 0.0)
+			cp = SQL_FetchInt(hndl, 1);
+
+			g_fCheckpointServerRecord[zonegroup][cp-1] = SQL_FetchFloat(hndl, 2);
+			if (!g_bCheckpointRecordFound[zonegroup] && g_fCheckpointServerRecord[zonegroup][cp-1] > 0.0)
 				g_bCheckpointRecordFound[zonegroup] = true;
-			}
 		}
 	}
 
@@ -3318,8 +3317,7 @@ public void sql_selectRecordCheckpointsCallback(Handle owner, Handle hndl, const
 public void db_viewCheckpoints(int client, char szSteamID[32], char szMapName[128])
 {
 	char szQuery[1024];
-	// "SELECT zonegroup, cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20, cp21, cp22, cp23, cp24, cp25, cp26, cp27, cp28, cp29, cp30, cp31, cp32, cp33, cp34, cp35 FROM ck_checkpoints WHERE mapname='%s' AND steamid = '%s';";
-	Format(szQuery, 1024, sql_selectCheckpoints, szMapName, szSteamID);
+	Format(szQuery, sizeof(szQuery), sql_selectCheckpoints, szMapName, szSteamID);
 	SQL_TQuery(g_hDb, SQL_selectCheckpointsCallback, szQuery, client, DBPrio_Low);
 }
 
@@ -3334,23 +3332,22 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 		return;
 	}
 
-	int zoneGrp;
-
 	if (!IsValidClient(client))
 		return;
 
 	if (SQL_HasResultSet(hndl))
-	{
+	{	
+
+		int zoneGrp;
+		int cp;
+
 		while (SQL_FetchRow(hndl))
 		{
 			zoneGrp = SQL_FetchInt(hndl, 0);
 			g_bCheckpointsFound[zoneGrp][client] = true;
-			int k = 1;
-			for (int i = 0; i < 35; i++)
-			{
-				g_fCheckpointTimesRecord[zoneGrp][client][i] = SQL_FetchFloat(hndl, k);
-				k++;
-			}
+			
+			cp = SQL_FetchInt(hndl, 1);
+			g_fCheckpointTimesRecord[zoneGrp][client][cp-1] = SQL_FetchFloat(hndl, 2);
 		}
 	}
 
@@ -3468,7 +3465,7 @@ public void db_viewCheckpointsinZoneGroupCallback(Handle owner, Handle hndl, con
 {
 	if (hndl == null)
 	{
-		LogError("[SurfTimer] SQL Error (SQL_selectCheckpointsCallback): %s", error);
+		LogError("[SurfTimer] SQL Error (db_viewCheckpointsinZoneGroupCallback): %s", error);
 		return;
 	}
 
@@ -3480,13 +3477,18 @@ public void db_viewCheckpointsinZoneGroupCallback(Handle owner, Handle hndl, con
 	if (!IsValidClient(client))
 		return;
 
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-	{
-		g_bCheckpointsFound[zonegrp][client] = true;
-		for (int i = 0; i < 35; i++)
-		{
-			g_fCheckpointTimesRecord[zonegrp][client][i] = SQL_FetchFloat(hndl, i);
+	if (SQL_HasResultSet(hndl))
+	{	
+		int cp;
+
+		while(SQL_FetchRow(hndl)){
+			g_bCheckpointsFound[zonegrp][client] = true;
+			
+			cp = SQL_FetchInt(hndl, 0);
+
+			g_fCheckpointTimesRecord[zonegrp][client][cp] = SQL_FetchFloat(hndl, 1);
 		}
+		
 	}
 	else
 	{
@@ -3499,33 +3501,48 @@ public void db_UpdateCheckpoints(int client, char szSteamID[32], int zGroup)
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackCell(pack, zGroup);
+
+	int cp_count;
+	if(!g_bhasStages)
+		cp_count = g_iTotalCheckpoints;
+	else
+		cp_count = g_TotalStages - 1;
+
+	char szQuery[102];
+	Transaction tAction = new Transaction();
+
 	if (g_bCheckpointsFound[zGroup][client])
 	{
-		char szQuery[1024];
-		Format(szQuery, 1024, sql_updateCheckpoints, g_fCheckpointTimesNew[zGroup][client][0], g_fCheckpointTimesNew[zGroup][client][1], g_fCheckpointTimesNew[zGroup][client][2], g_fCheckpointTimesNew[zGroup][client][3], g_fCheckpointTimesNew[zGroup][client][4], g_fCheckpointTimesNew[zGroup][client][5], g_fCheckpointTimesNew[zGroup][client][6], g_fCheckpointTimesNew[zGroup][client][7], g_fCheckpointTimesNew[zGroup][client][8], g_fCheckpointTimesNew[zGroup][client][9], g_fCheckpointTimesNew[zGroup][client][10], g_fCheckpointTimesNew[zGroup][client][11], g_fCheckpointTimesNew[zGroup][client][12], g_fCheckpointTimesNew[zGroup][client][13], g_fCheckpointTimesNew[zGroup][client][14], g_fCheckpointTimesNew[zGroup][client][15], g_fCheckpointTimesNew[zGroup][client][16], g_fCheckpointTimesNew[zGroup][client][17], g_fCheckpointTimesNew[zGroup][client][18], g_fCheckpointTimesNew[zGroup][client][19], g_fCheckpointTimesNew[zGroup][client][20], g_fCheckpointTimesNew[zGroup][client][21], g_fCheckpointTimesNew[zGroup][client][22], g_fCheckpointTimesNew[zGroup][client][23], g_fCheckpointTimesNew[zGroup][client][24], g_fCheckpointTimesNew[zGroup][client][25], g_fCheckpointTimesNew[zGroup][client][26], g_fCheckpointTimesNew[zGroup][client][27], g_fCheckpointTimesNew[zGroup][client][28], g_fCheckpointTimesNew[zGroup][client][29], g_fCheckpointTimesNew[zGroup][client][30], g_fCheckpointTimesNew[zGroup][client][31], g_fCheckpointTimesNew[zGroup][client][32], g_fCheckpointTimesNew[zGroup][client][33], g_fCheckpointTimesNew[zGroup][client][34], szSteamID, g_szMapName, zGroup);
-		SQL_TQuery(g_hDb, SQL_updateCheckpointsCallback, szQuery, pack, DBPrio_Low);
+		for(int i = 0; i < cp_count; i++){
+			Format(szQuery, sizeof(szQuery), sql_updateCheckpoints, g_fCheckpointTimesNew[zGroup][client][i], szSteamID, g_szMapName, zGroup);
+			tAction.AddQuery(szQuery);
+		}
 	}
 	else
 	{
-		char szQuery[1024];
-		Format(szQuery, 1024, sql_insertCheckpoints, szSteamID, g_szMapName, g_fCheckpointTimesNew[zGroup][client][0], g_fCheckpointTimesNew[zGroup][client][1], g_fCheckpointTimesNew[zGroup][client][2], g_fCheckpointTimesNew[zGroup][client][3], g_fCheckpointTimesNew[zGroup][client][4], g_fCheckpointTimesNew[zGroup][client][5], g_fCheckpointTimesNew[zGroup][client][6], g_fCheckpointTimesNew[zGroup][client][7], g_fCheckpointTimesNew[zGroup][client][8], g_fCheckpointTimesNew[zGroup][client][9], g_fCheckpointTimesNew[zGroup][client][10], g_fCheckpointTimesNew[zGroup][client][11], g_fCheckpointTimesNew[zGroup][client][12], g_fCheckpointTimesNew[zGroup][client][13], g_fCheckpointTimesNew[zGroup][client][14], g_fCheckpointTimesNew[zGroup][client][15], g_fCheckpointTimesNew[zGroup][client][16], g_fCheckpointTimesNew[zGroup][client][17], g_fCheckpointTimesNew[zGroup][client][18], g_fCheckpointTimesNew[zGroup][client][19], g_fCheckpointTimesNew[zGroup][client][20], g_fCheckpointTimesNew[zGroup][client][21], g_fCheckpointTimesNew[zGroup][client][22], g_fCheckpointTimesNew[zGroup][client][23], g_fCheckpointTimesNew[zGroup][client][24], g_fCheckpointTimesNew[zGroup][client][25], g_fCheckpointTimesNew[zGroup][client][26], g_fCheckpointTimesNew[zGroup][client][27], g_fCheckpointTimesNew[zGroup][client][28], g_fCheckpointTimesNew[zGroup][client][29], g_fCheckpointTimesNew[zGroup][client][30], g_fCheckpointTimesNew[zGroup][client][31], g_fCheckpointTimesNew[zGroup][client][32], g_fCheckpointTimesNew[zGroup][client][33], g_fCheckpointTimesNew[zGroup][client][34], zGroup);
-		SQL_TQuery(g_hDb, SQL_updateCheckpointsCallback, szQuery, pack, DBPrio_Low);
+		for(int i = 0; i < cp_count; i++){
+			Format(szQuery, sizeof(szQuery), sql_insertCheckpoints, szSteamID, g_szMapName, g_fCheckpointTimesNew[zGroup][client][i], zGroup);
+			tAction.AddQuery(szQuery);
+		}
 	}
+
+	SQL_ExecuteTransaction(g_hDb, tAction, db_UpdateCheckpointsOnSuccess, db_UpdateCheckpointsOnFailure, pack, DBPrio_Low);
 }
 
-public void SQL_updateCheckpointsCallback(Handle owner, Handle hndl, const char[] error, any data)
+public void db_UpdateCheckpointsOnSuccess(Handle db, any pack, int numQueries, Handle[] results, any[] queryData)
 {
-	if (hndl == null)
-	{
-		LogError("[SurfTimer] SQL Error (SQL_updateCheckpointsCallback): %s", error);
-		return;
-	}
-	ResetPack(data);
-	int client = ReadPackCell(data);
-	int zonegrp = ReadPackCell(data);
-	CloseHandle(data);
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	int zonegrp = ReadPackCell(pack);
+	CloseHandle(pack);
 
 	db_viewCheckpointsinZoneGroup(client, g_szSteamID[client], g_szMapName, zonegrp);
+}
+
+public void db_UpdateCheckpointsOnFailure(Handle db, any pack, int numQueries, const char[] error, int failIndex, any[] queryData)
+{
+	LogError("[SurfTimer] SQL Error (db_UpdateCheckpointsOnFailure): %s", error);
+	CloseHandle(pack);
 }
 
 public void db_deleteCheckpoints()
@@ -3544,7 +3561,7 @@ public void SQL_deleteCheckpointsCallback(Handle owner, Handle hndl, const char[
 	}
 }
 
-public void db_viewPRinfo(int client,  char szSteamID[32], char szMapName[128])
+public void db_viewPRinfo(int client, char szSteamID[32], char szMapName[128])
 {
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
@@ -3713,7 +3730,7 @@ public void db_prinforuntimecallback(Handle owner, Handle hndl, const char[] err
 	return;
 }
 
-public void db_viewBonusPRinfo(int client,  char szSteamID[32], char szMapName[32])
+public void db_viewBonusPRinfo(int client, char szSteamID[32], char szMapName[32])
 {
 
 	char szQuery[1024];
@@ -4816,7 +4833,7 @@ public checkZoneTypeIds()
 InitZoneVariables();
 
 char szQuery[258];
-Format(szQuery, 258, "SELECT `zonegroup` ,`zonetype`, `zonetypeid`  FROM `ck_zones` WHERE `mapname` = '%s';", g_szMapName);
+Format(szQuery, 258, "SELECT `zonegroup` ,`zonetype`, `zonetypeid` FROM `ck_zones` WHERE `mapname` = '%s';", g_szMapName);
 SQL_TQuery(g_hDb, checkZoneTypeIdsCallback, szQuery, 1, DBPrio_High);
 }
 
@@ -4831,7 +4848,7 @@ if (SQL_HasResultSet(hndl))
 {
 int idChecker[MAXZONEGROUPS][ZONEAMOUNT][MAXZONES], idCount[MAXZONEGROUPS][ZONEAMOUNT];
 char szQuery[258];
-//  Fill array with id's
+// Fill array with id's
 // idChecker = map zones in
 while (SQL_FetchRow(hndl))
 {
@@ -6075,6 +6092,8 @@ public void db_viewPlayerOptionsCallback(Handle owner, Handle hndl, const char[]
 		g_iCSD_R[client] = SQL_FetchInt(hndl, 31);
 		g_iCSD_G[client] = SQL_FetchInt(hndl, 32);
 		g_iCSD_B[client] = SQL_FetchInt(hndl, 33);
+		g_PreSpeedMode[client] = SQL_FetchInt(hndl, 34);
+		
 
 		// Functionality for normal spec list
 		if (g_iSideHudModule[client][0] == 5 && (g_iSideHudModule[client][1] == 0 && g_iSideHudModule[client][2] == 0 && g_iSideHudModule[client][3] == 0 && g_iSideHudModule[client][4] == 0))
@@ -6130,6 +6149,7 @@ public void db_viewPlayerOptionsCallback(Handle owner, Handle hndl, const char[]
 		g_iCSD_R[client] = 255;
 		g_iCSD_G[client] = 255;
 		g_iCSD_B[client] = 255;
+		g_PreSpeedMode[client] = 0;
 	}
 
 	if (!g_bSettingsLoaded[client])
@@ -6150,7 +6170,7 @@ public void db_updatePlayerOptions(int client)
 	// "UPDATE ck_playeroptions2 SET timer = %i, hide = %i, sounds = %i, chat = %i, viewmodel = %i, autobhop = %i, checkpoints = %i, centrehud = %i, module1c = %i, module2c = %i, module3c = %i, module4c = %i, module5c = %i, module6c = %i, sidehud = %i, module1s = %i, module2s = %i, module3s = %i, module4s = %i, module5s = %i where steamid = '%s'";
 	if (g_bSettingsLoaded[client] && g_bServerDataLoaded && g_bLoadedModules[client])
 	{
-		Format(szQuery, sizeof(szQuery), sql_updatePlayerOptions, BooltoInt(g_bTimerEnabled[client]), BooltoInt(g_bHide[client]), BooltoInt(g_bEnableQuakeSounds[client]), BooltoInt(g_bHideChat[client]), BooltoInt(g_bViewModel[client]), BooltoInt(g_bAutoBhopClient[client]), BooltoInt(g_bCheckpointsEnabled[client]), g_SpeedGradient[client], g_SpeedMode[client], BooltoInt(g_bCenterSpeedDisplay[client]), BooltoInt(g_bCentreHud[client]), g_iTeleSide[client], g_iCentreHudModule[client][0], g_iCentreHudModule[client][1], g_iCentreHudModule[client][2], g_iCentreHudModule[client][3], g_iCentreHudModule[client][4], g_iCentreHudModule[client][5], BooltoInt(g_bSideHud[client]), g_iSideHudModule[client][0], g_iSideHudModule[client][1], g_iSideHudModule[client][2], g_iSideHudModule[client][3], g_iSideHudModule[client][4], BooltoInt(g_iPrespeedText[client]), BooltoInt(g_iCpMessages[client]), BooltoInt(g_iWrcpMessages[client]), BooltoInt(g_bAllowHints[client]), g_iCSDUpdateRate[client], g_fCSD_POS_X[client], g_fCSD_POS_Y[client], g_iCSD_R[client], g_iCSD_G[client], g_iCSD_B[client], g_szSteamID[client]);
+		Format(szQuery, sizeof(szQuery), sql_updatePlayerOptions, BooltoInt(g_bTimerEnabled[client]), BooltoInt(g_bHide[client]), BooltoInt(g_bEnableQuakeSounds[client]), BooltoInt(g_bHideChat[client]), BooltoInt(g_bViewModel[client]), BooltoInt(g_bAutoBhopClient[client]), BooltoInt(g_bCheckpointsEnabled[client]), g_SpeedGradient[client], g_SpeedMode[client], BooltoInt(g_bCenterSpeedDisplay[client]), BooltoInt(g_bCentreHud[client]), g_iTeleSide[client], g_iCentreHudModule[client][0], g_iCentreHudModule[client][1], g_iCentreHudModule[client][2], g_iCentreHudModule[client][3], g_iCentreHudModule[client][4], g_iCentreHudModule[client][5], BooltoInt(g_bSideHud[client]), g_iSideHudModule[client][0], g_iSideHudModule[client][1], g_iSideHudModule[client][2], g_iSideHudModule[client][3], g_iSideHudModule[client][4], BooltoInt(g_iPrespeedText[client]), BooltoInt(g_iCpMessages[client]), BooltoInt(g_iWrcpMessages[client]), BooltoInt(g_bAllowHints[client]), g_iCSDUpdateRate[client], g_fCSD_POS_X[client], g_fCSD_POS_Y[client], g_iCSD_R[client], g_iCSD_G[client], g_iCSD_B[client], g_PreSpeedMode[client], g_szSteamID[client]);
 		//Format(szQuery, 1024, sql_updatePlayerOptions, BooltoInt(g_bTimerEnabled[client]), BooltoInt(g_bHide[client]), BooltoInt(g_bEnableQuakeSounds[client]), BooltoInt(g_bHideChat[client]), BooltoInt(g_bViewModel[client]), BooltoInt(g_bAutoBhopClient[client]), BooltoInt(g_bCheckpointsEnabled[client]), g_SpeedGradient[client], g_SpeedMode[client], BooltoInt(g_bCenterSpeedDisplay[client]), BooltoInt(g_bCentreHud[client]), g_iTeleSide[client], g_iCentreHudModule[client][0], g_iCentreHudModule[client][1], g_iCentreHudModule[client][2], g_iCentreHudModule[client][3], g_iCentreHudModule[client][4], g_iCentreHudModule[client][5], BooltoInt(g_bSideHud[client]), g_iSideHudModule[client][0], g_iSideHudModule[client][1], g_iSideHudModule[client][2], g_iSideHudModule[client][3], g_iSideHudModule[client][4], BooltoInt(g_iPrespeedText[client]), BooltoInt(g_iCpMessages[client]), BooltoInt(g_iWrcpMessages[client]), BooltoInt(g_bAllowHints[client]), BooltoInt(g_bTimeleftDisplay[client]), g_szSteamID[client]);
 		SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, client, DBPrio_Low);
 	}
@@ -6514,9 +6534,9 @@ public void sql_selectWrcpRecordCallback(Handle owner, Handle hndl, const char[]
 		WritePackCell(pack, data);
 
 		if (style == 0)
-			Format(szQuery, 512, "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage, velStartXY, velStartXYZ, velStartZ) VALUES ('%s', '%s', '%s', '%f', %i, %i, %i, %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage, g_iPreStrafe[0][stage][0][data], g_iPreStrafe[1][stage][0][data], g_iPreStrafe[2][stage][0][data]);
+			Format(szQuery, sizeof(szQuery), "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage, velStartXY, velStartXYZ, velStartZ) VALUES ('%s', '%s', '%s', '%f', %i, %i, %i, %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage, g_iPreStrafeStage[0][stage][0][data], g_iPreStrafeStage[1][stage][0][data], g_iPreStrafeStage[2][stage][0][data]);
 		else if (style != 0)
-			Format(szQuery, 512, "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage, style, velStartXY, velStartXYZ, velStartZ) VALUES ('%s', '%s', '%s', '%f', %i, %i, %i, %i, %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage, style, g_iPreStrafe[0][stage][style][data], g_iPreStrafe[1][stage][style][data], g_iPreStrafe[2][stage][style][data]);
+			Format(szQuery, sizeof(szQuery), "INSERT INTO ck_wrcps (steamid, name, mapname, runtimepro, stage, style, velStartXY, velStartXYZ, velStartZ) VALUES ('%s', '%s', '%s', '%f', %i, %i, %i, %i, %i);", g_szSteamID[data], szName, g_szMapName, g_fFinalWrcpTime[data], stage, style, g_iPreStrafeStage[0][stage][style][data], g_iPreStrafeStage[1][stage][style][data], g_iPreStrafeStage[2][stage][style][data]);
 
 		SQL_TQuery(g_hDb, SQL_UpdateWrcpRecordCallback, szQuery, pack, DBPrio_Low);
 
@@ -6549,9 +6569,9 @@ public void db_updateWrcpRecord(int client, int style, int stage)
 	char szQuery[1024];
 	// "UPDATE ck_playertimes SET name = '%s', runtimepro = '%f' WHERE steamid = '%s' AND mapname = '%s';";
 	if (style == 0)
-		Format(szQuery, 1024, "UPDATE ck_wrcps SET name = '%s', runtimepro = '%f', velStartXY = %i, velStartXYZ = %i, velStartZ = %i WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = 0;", szName, g_fFinalWrcpTime[client], g_iPreStrafe[0][stage][0][client], g_iPreStrafe[1][stage][0][client], g_iPreStrafe[2][stage][0][client], g_szSteamID[client], g_szMapName, stage);
+		Format(szQuery, sizeof(szQuery), "UPDATE ck_wrcps SET name = '%s', runtimepro = '%f', velStartXY = %i, velStartXYZ = %i, velStartZ = %i WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = 0;", szName, g_fFinalWrcpTime[client], g_iPreStrafeStage[0][stage][0][client], g_iPreStrafeStage[1][stage][0][client], g_iPreStrafeStage[2][stage][0][client], g_szSteamID[client], g_szMapName, stage);
 	if (style > 0)
-		Format(szQuery, 1024, "UPDATE ck_wrcps SET name = '%s', runtimepro = '%f', velStartXY = %i, velStartXYZ = %i, velStartZ = %i WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = %i;", szName, g_fFinalWrcpTime[client], g_iPreStrafe[0][stage][style][client], g_iPreStrafe[1][stage][style][client], g_iPreStrafe[2][stage][style][client], g_szSteamID[client], g_szMapName, stage, style);
+		Format(szQuery, sizeof(szQuery), "UPDATE ck_wrcps SET name = '%s', runtimepro = '%f', velStartXY = %i, velStartXYZ = %i, velStartZ = %i WHERE steamid = '%s' AND mapname = '%s' AND stage = %i AND style = %i;", szName, g_fFinalWrcpTime[client], g_iPreStrafeStage[0][stage][style][client], g_iPreStrafeStage[1][stage][style][client], g_iPreStrafeStage[2][stage][style][client], g_szSteamID[client], g_szMapName, stage, style);
 	SQL_TQuery(g_hDb, SQL_UpdateWrcpRecordCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -6647,6 +6667,15 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 		Format(szDiff, 128, "%cPB: %c%s%c", WHITE, LIMEGREEN, g_szFinalWrcpTime[client], WHITE);
 	}
 
+	if (g_fWrcpRecord[client][stage][style] != -1.0){ // Existing stage time
+		if (fDiff >= 0){
+			SetNewPersonalRecordPrestrafe(client, stage, style, false, false, true);
+		}
+	}
+	else{
+		SetNewPersonalRecordPrestrafe(client, stage, style, false, false, true);
+	}
+
 	// SR
 	float f_srDiff;
 	if (style == 0)
@@ -6689,7 +6718,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 				PlayWRCPRecord();
 				SendNewWRCPForward(client, stage, sz_srRawDiff);
 
-				SetNewRecordPrestrafe(client, stage, 0, false);
+				SetNewRecordPrestrafe(client, stage, 0, false, false, true);
 			}
 			else
 			{
@@ -6715,7 +6744,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			PlayWRCPRecord();
 			SendNewWRCPForward(client, stage, sz_srRawDiff);
 
-			SetNewRecordPrestrafe(client, stage, 0, false);
+			SetNewRecordPrestrafe(client, stage, 0, false, false, true);
 		}
 	}
 	else if (style != 0) // styles
@@ -6738,7 +6767,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 				PlayWRCPRecord();
 				SendNewWRCPForward(client, stage, sz_srRawDiff);
 
-				SetNewRecordPrestrafe(client, stage, style, false);
+				SetNewRecordPrestrafe(client, stage, style, false, false, true);
 			}
 			else
 			{
@@ -6762,7 +6791,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 			PlayWRCPRecord();
 			SendNewWRCPForward(client, stage, sz_srRawDiff);
 
-			SetNewRecordPrestrafe(client, stage, style, false);
+			SetNewRecordPrestrafe(client, stage, style, false, false, true);
 		}
 	}
 
@@ -6915,6 +6944,209 @@ public void sql_viewStageRanksCallback(Handle owner, Handle hndl, const char[] e
 	{
 		g_StageRank[client][stage] = SQL_FetchInt(hndl, 0);
 	}
+}
+
+public void db_viewPersonalPrestrafeSpeeds(int client, char szSteamId[32]){
+
+	selectPersonalPrestrafeSpeeds_Map(client, szSteamId);
+
+}
+
+public void selectPersonalPrestrafeSpeeds_Map(int client, char szSteamId[32]){
+
+	char szQuery[1024];
+	Format(szQuery, sizeof(szQuery), "SELECT style, velStartXY, velStartXYZ, velStartZ FROM ck_playertimes WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > '0.0';", szSteamId, g_szMapName);
+	SQL_TQuery(g_hDb, SQL_selectPersonalPrestrafeSpeeds_MapCallback, szQuery, client, DBPrio_Low);
+
+}
+
+public void SQL_selectPersonalPrestrafeSpeeds_MapCallback(Handle owner, Handle hndl, const char[] error, any client)
+{
+	if (hndl == null) {
+		LogError("[SurfTimer] SQL Error (SQL_selectPersonalPrestrafeSpeeds_MapCallback): %s", error);
+		if (g_bhasStages) {
+			selectPersonalPrestrafeSpeeds_Stages(client, g_szSteamID[client]);
+		}
+		else if (g_bhasBonus) {
+			selectPersonalPrestrafeSpeeds_Bonus(client, g_szSteamID[client]);
+		}
+		else {
+			if (!g_bSettingsLoaded[client]) {
+				LoadClientSetting(client, g_iSettingToLoad[client]);
+			}
+		}
+		return;
+	}
+
+	//MAYBE IN FUTURE ADD CP PRESTRAFES SPEEDS AND USE VALUES FOR EACH CHECKPOINT
+	//FOR NOW JUST USE THE STARTZONE VALUE
+
+	int style;
+	int velStartXY, velStartXYZ, velStartZ;
+
+	for (int i = 0; i < CPLIMIT; i++) {
+		for (int s = 0; s < MAX_STYLES; s++) {
+			g_iPersonalRecordPreStrafe[client][0][i][s] = 0;
+			g_iPersonalRecordPreStrafe[client][1][i][s] = 0;
+			g_iPersonalRecordPreStrafe[client][2][i][s] = 0;
+		}
+	}
+
+	if (SQL_HasResultSet(hndl)) {
+		while (SQL_FetchRow(hndl)) {
+			style = SQL_FetchInt(hndl, 0);
+
+			velStartXY = SQL_FetchInt(hndl, 1);
+			velStartXYZ = SQL_FetchInt(hndl, 2);
+			velStartZ = SQL_FetchInt(hndl, 3);
+
+			g_iPersonalRecordPreStrafe[client][0][0][style] = velStartXY;
+			g_iPersonalRecordPreStrafe[client][1][0][style] = velStartXYZ;
+			g_iPersonalRecordPreStrafe[client][2][0][style] = velStartZ;
+
+		}
+	}
+	
+	if (g_bhasStages) {
+		selectPersonalPrestrafeSpeeds_Stages(client, g_szSteamID[client]);
+	}
+	else if (g_bhasBonus) {
+		selectPersonalPrestrafeSpeeds_Bonus(client, g_szSteamID[client]);
+	}
+	else {
+		if (!g_bSettingsLoaded[client])
+		{
+			g_fTick[client][1] = GetGameTime();
+			float tick = g_fTick[client][1] - g_fTick[client][0];
+			LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPersonalRecords in %fs", g_szSteamID[client], tick);
+			g_fTick[client][0] = GetGameTime();
+			LoadClientSetting(client, g_iSettingToLoad[client]);
+		}
+	}
+
+}
+
+public void selectPersonalPrestrafeSpeeds_Stages(int client, char szSteamId[32]){
+
+	char szQuery[1024];
+	Format(szQuery, sizeof(szQuery), "SELECT stage, style, velStartXY, velStartXYZ, velStartZ FROM ck_wrcps WHERE steamid = '%s' AND mapname = '%s' AND runtimepro > '0.0';", szSteamId, g_szMapName);
+	SQL_TQuery(g_hDb, SQL_selectPersonalPrestrafeSpeeds_StagesCallback, szQuery, client, DBPrio_Low);
+
+}
+
+public void SQL_selectPersonalPrestrafeSpeeds_StagesCallback(Handle owner, Handle hndl, const char[] error, any client)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (SQL_selectPersonalPrestrafeSpeeds_StagesCallback): %s", error);
+		if(g_bhasBonus)
+			selectPersonalPrestrafeSpeeds_Bonus(client, g_szSteamID[client]);
+		else
+			if (!g_bSettingsLoaded[client])
+				LoadClientSetting(client, g_iSettingToLoad[client]);
+		return;
+	}
+
+	int style;
+	int stage;
+	int velStartXY, velStartXYZ, velStartZ;
+
+	for (int i = 0; i < CPLIMIT; i++)
+	{
+		for (int s = 0; s < MAX_STYLES; s++)
+		{
+			g_iPersonalRecordPreStrafeStage[client][0][i][s] = 0;
+			g_iPersonalRecordPreStrafeStage[client][1][i][s] = 0;
+			g_iPersonalRecordPreStrafeStage[client][2][i][s] = 0;
+
+		}
+	}
+
+	if (SQL_HasResultSet(hndl))
+	{
+		while (SQL_FetchRow(hndl))
+		{
+			stage = SQL_FetchInt(hndl, 0);
+			style = SQL_FetchInt(hndl, 1);
+
+			velStartXY = SQL_FetchInt(hndl, 2);
+			velStartXYZ = SQL_FetchInt(hndl, 3);
+			velStartZ = SQL_FetchInt(hndl, 4);
+
+			g_iPersonalRecordPreStrafeStage[client][0][stage][style] = velStartXY;
+			g_iPersonalRecordPreStrafeStage[client][1][stage][style] = velStartXYZ;
+			g_iPersonalRecordPreStrafeStage[client][2][stage][style] = velStartZ;
+
+		}
+	}
+
+	if(g_bhasBonus)
+		selectPersonalPrestrafeSpeeds_Bonus(client, g_szSteamID[client]);
+	else{
+		if (!g_bSettingsLoaded[client])
+		{
+			PrintToServer("[SurfTimer] : %s Finished db_viewPersonalPrestrafeSpeeds", g_szSteamID[client]);
+			LoadClientSetting(client, g_iSettingToLoad[client]);
+		}
+	}
+}
+
+public void selectPersonalPrestrafeSpeeds_Bonus(int client, char szSteamId[32]){
+
+	char szQuery[1024];
+	Format(szQuery, sizeof(szQuery), "SELECT zonegroup, style, velStartXY, velStartXYZ, velStartZ FROM ck_bonus WHERE steamid = '%s' AND mapname = '%s' AND runtime > '0.0';", szSteamId, g_szMapName);
+	SQL_TQuery(g_hDb, SQL_selectPersonalPrestrafeSpeeds_BonusCallback, szQuery, client, DBPrio_Low);
+
+}
+
+public void SQL_selectPersonalPrestrafeSpeeds_BonusCallback(Handle owner, Handle hndl, const char[] error, any client)
+{	
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (SQL_selectPersonalPrestrafeSpeeds_BonusCallback): %s", error);
+		if (!g_bSettingsLoaded[client])
+			LoadClientSetting(client, g_iSettingToLoad[client]);
+		return;
+	}
+
+	int style;
+	int zonegroup;
+	int velStartXY, velStartXYZ, velStartZ;
+
+	for (int i = 0; i < g_mapZoneGroupCount - 1; i++)
+	{
+		for (int s = 0; s < MAX_STYLES; s++)
+		{
+			g_iPersonalRecordPreStrafeBonus[client][0][i][s] = 0;
+			g_iPersonalRecordPreStrafeBonus[client][1][i][s] = 0;
+			g_iPersonalRecordPreStrafeBonus[client][2][i][s] = 0;
+		}
+	}
+
+	if (SQL_HasResultSet(hndl))
+	{
+		while (SQL_FetchRow(hndl))
+		{
+			zonegroup = SQL_FetchInt(hndl, 0);
+			style = SQL_FetchInt(hndl, 1);
+
+			velStartXY = SQL_FetchInt(hndl, 2);
+			velStartXYZ = SQL_FetchInt(hndl, 3);
+			velStartZ = SQL_FetchInt(hndl, 4);
+
+			g_iPersonalRecordPreStrafeBonus[client][0][zonegroup][style] = velStartXY;
+			g_iPersonalRecordPreStrafeBonus[client][1][zonegroup][style] = velStartXYZ;
+			g_iPersonalRecordPreStrafeBonus[client][2][zonegroup][style] = velStartZ;
+
+		}
+	}
+
+	if (!g_bSettingsLoaded[client])
+	{
+		PrintToServer("[SurfTimer] : %s Finished db_viewPersonalPrestrafeSpeeds", g_szSteamID[client]);
+		LoadClientSetting(client, g_iSettingToLoad[client]);
+	}
+
 }
 
 // Get Total Stages
@@ -7183,9 +7415,9 @@ public void sql_viewStageRecordsCallback(Handle owner, Handle hndl, const char[]
 	{
 		for (int s = 0; s < MAX_STYLES; s++)
 		{
-			g_iRecordPreStrafe[0][i][s] = 0;
-			g_iRecordPreStrafe[1][i][s] = 0;
-			g_iRecordPreStrafe[2][i][s] = 0;
+			g_iRecordPreStrafeStage[0][i][s] = 0;
+			g_iRecordPreStrafeStage[1][i][s] = 0;
+			g_iRecordPreStrafeStage[2][i][s] = 0;
 		}
 	}
 
@@ -7231,9 +7463,9 @@ public void sql_viewStageRecordsCallback(Handle owner, Handle hndl, const char[]
 					g_fStyleStageRecord[style][stage] = 9999999.0;
 				}
 			}
-			g_iRecordPreStrafe[0][stage][style] = SQL_FetchInt(hndl, 4);
-			g_iRecordPreStrafe[1][stage][style] = SQL_FetchInt(hndl, 5);
-			g_iRecordPreStrafe[2][stage][style] = SQL_FetchInt(hndl, 6);
+			g_iRecordPreStrafeStage[0][stage][style] = SQL_FetchInt(hndl, 4);
+			g_iRecordPreStrafeStage[1][stage][style] = SQL_FetchInt(hndl, 5);
+			g_iRecordPreStrafeStage[2][stage][style] = SQL_FetchInt(hndl, 6);
 		}
 	}
 	else
@@ -7521,7 +7753,7 @@ public void db_viewStyleMapRankCount(int style)
 {
 	g_StyleMapTimesCount[style] = 0;
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT name FROM ck_playertimes WHERE mapname = '%s' AND style = %i AND runtimepro  > -1.0;", g_szMapName, style);
+	Format(szQuery, 512, "SELECT name FROM ck_playertimes WHERE mapname = '%s' AND style = %i AND runtimepro > -1.0;", g_szMapName, style);
 	SQL_TQuery(g_hDb, sql_selectStylePlayerCountCallback, szQuery, style, DBPrio_Low);
 }
 
@@ -8206,14 +8438,14 @@ public void db_selectMapRankUnknown(int client, char szMapName[128], int rank)
 // sm_mrank @x command without map parameter (current mapname being used)
 public void db_selectMapRankUnknownWithMap(int client, char szMapName[128], int rank)
 {
-    char szQuery[1024];
-    Handle pack = CreateDataPack();
-    WritePackCell(pack, client);
-    WritePackCell(pack, rank);
+	char szQuery[1024];
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackCell(pack, rank);
 
-    rank = Math_Min(rank - 1, 0);
-    Format(szQuery, 1024, sql_selectMapRankUnknownWithMap, szMapName, rank);
-    SQL_TQuery(g_hDb, db_selectMapRankUnknownCallback, szQuery, pack, DBPrio_Low);
+	rank = Math_Min(rank - 1, 0);
+	Format(szQuery, 1024, sql_selectMapRankUnknownWithMap, szMapName, rank);
+	SQL_TQuery(g_hDb, db_selectMapRankUnknownCallback, szQuery, pack, DBPrio_Low);
 }
 
 public void db_selectMapRankUnknownCallback(Handle owner, Handle hndl, const char[] error, any data)
@@ -8435,7 +8667,7 @@ public void db_selectMapRecordTime(int client, char szMapName[128])
 	WritePackCell(pack, client);
 	WritePackString(pack, szMapName);
 
-	Format(szQuery, 1024, "SELECT db1.runtimepro, IFNULL(db1.mapname, 'NULL'),  db2.name, db1.steamid FROM ck_playertimes db1 INNER JOIN ck_playerrank db2 ON db1.steamid = db2.steamid WHERE mapname LIKE '%c%s%c' AND runtimepro > -1.0 AND db1.style = 0 AND db2.style = 0 ORDER BY runtimepro ASC LIMIT 1", PERCENT, szMapName, PERCENT);
+	Format(szQuery, 1024, "SELECT db1.runtimepro, IFNULL(db1.mapname, 'NULL'), db2.name, db1.steamid FROM ck_playertimes db1 INNER JOIN ck_playerrank db2 ON db1.steamid = db2.steamid WHERE mapname LIKE '%c%s%c' AND runtimepro > -1.0 AND db1.style = 0 AND db2.style = 0 ORDER BY runtimepro ASC LIMIT 1", PERCENT, szMapName, PERCENT);
 	SQL_TQuery(g_hDb, db_selectMapRecordTimeCallback, szQuery, pack, DBPrio_Low);
 }
 

@@ -165,7 +165,7 @@ public Action StartTouchTrigger(int caller, int activator)
 	// Ignore dead players
 	if (!IsValidClient(client)) {
 		return Plugin_Continue;
-    }
+	}
 
 	char sTargetName[256];
 	int action[3];
@@ -251,7 +251,7 @@ public Action EndTouchTrigger(int caller, int activator)
 	// Ignore dead players
 	if (!IsValidClient(client)) {
 		return Plugin_Continue;
-    }
+	}
 
 	// For new speed limiter
 	g_bLeftZone[activator] = true;
@@ -846,9 +846,9 @@ public Action BeamBoxAll(Handle timer, any data)
 					if (GetConVarInt(g_hZoneDisplayType) == 0 && !g_bShowZones[p])
 						continue;
 
-					if ( g_mapZones[i].Vis == 2 ||  g_mapZones[i].Vis == 3)
+					if ( g_mapZones[i].Vis == 2 || g_mapZones[i].Vis == 3)
 					{
-						if (GetClientTeam(p) ==  g_mapZones[i].Vis && g_ClientSelectedZone[p] != i)
+						if (GetClientTeam(p) == g_mapZones[i].Vis && g_ClientSelectedZone[p] != i)
 						{
 							float buffer_a[3], buffer_b[3];
 							for (int x = 0; x < 3; x++)
