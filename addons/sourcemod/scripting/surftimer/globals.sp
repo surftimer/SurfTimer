@@ -445,7 +445,13 @@ float g_fSrcpPauseTime[MAXPLAYERS + 1];
 
 // Prestrafe records
 int g_iRecordPreStrafe[3][CPLIMIT][MAX_STYLES];
+int g_iRecordPreStrafeStage[3][CPLIMIT][MAX_STYLES];
 int g_iRecordPreStrafeBonus[3][MAXZONEGROUPS][MAX_STYLES];
+
+//Personal Prestrafe records
+int g_iPersonalRecordPreStrafe[MAXPLAYERS + 1][3][CPLIMIT][MAX_STYLES];
+int g_iPersonalRecordPreStrafeStage[MAXPLAYERS + 1][3][CPLIMIT][MAX_STYLES];
+int g_iPersonalRecordPreStrafeBonus[MAXPLAYERS + 1][3][MAXZONEGROUPS][MAX_STYLES];
 
 /*----------  Map Settings Variables ----------*/
 float g_fMaxVelocity;
@@ -507,6 +513,7 @@ int g_ProfileStyleSelect[MAXPLAYERS + 1];
 bool g_bTimerEnabled[MAXPLAYERS + 1];
 int g_SpeedGradient[MAXPLAYERS + 1];
 int g_SpeedMode[MAXPLAYERS + 1];
+int g_PreSpeedMode[MAXPLAYERS + 1];
 bool g_bCenterSpeedDisplay[MAXPLAYERS + 1];
 int g_iCenterSpeedEnt[MAXPLAYERS + 1];
 int g_iSettingToLoad[MAXPLAYERS + 1];
@@ -874,6 +881,9 @@ int g_iPreStrafe[3][CPLIMIT][MAX_STYLES][MAXPLAYERS + 1];
 
 // Latest prestrafe speed for bonuses
 int g_iPreStrafeBonus[3][MAXZONEGROUPS][MAX_STYLES][MAXPLAYERS + 1];
+
+// Latest prestrafe speed for stages
+int g_iPreStrafeStage[3][CPLIMIT][MAX_STYLES][MAXPLAYERS + 1];
 
 /*----------  Replay Variables  ----------*/
 
@@ -1490,7 +1500,7 @@ char g_sDatabaseName[32]; // Required for the float to decimal conversion
 char g_sDecimalTables[][][] = {
 	// Table,              Column
 	{ "ck_bonus",         "runtime", },
-	{ "ck_checkpoints",   "cp", },
+	{ "ck_checkpoints",   "time", },
 	{ "ck_latestrecords", "runtime", },
 	{ "ck_playertemp",    "runtimeTmp", },
 	{ "ck_playertimes",   "runtimepro", },
@@ -1500,3 +1510,5 @@ char g_sDecimalTables[][][] = {
 };  // Required for the float to decimal conversion
 
 bool g_tables_converted = false;
+
+int g_iCountryTopStyleSelected[MAXPLAYERS + 1];

@@ -149,7 +149,7 @@ native bool surftimer_SafeTeleport(int client, float fDestination[3], float fAng
  * @param client			The client's ID.
  * @return						Plugin_Handled, to stop the client from searching.
  */
-forward Action surftimer_OnMapFinished(int client, float fRunTime, char sRunTime[54], int rank, int total);
+forward Action surftimer_OnMapFinished(int client, float fRunTime, char sRunTime[54], int rank, int total, int style);
 
 /**
  * Called when a player reaches a checkpoint zone or a stage.

@@ -18,6 +18,7 @@
 #include <basecomm>
 #include <colorlib>
 #include <autoexecconfig>
+#include <regex>
 #undef REQUIRE_EXTENSIONS
 #include <clientprefs>
 #undef REQUIRE_PLUGIN
@@ -142,7 +143,7 @@ public void OnLibraryRemoved(const char[] name)
 }
 
 public void OnEntityCreated(int entity, const char[] classname) {
-	if( (classname[0] == 't' ||  classname[0] == 'l') ? (StrEqual(classname, "trigger_teleport", false) ) : false)
+	if( (classname[0] == 't' || classname[0] == 'l') ? (StrEqual(classname, "trigger_teleport", false) ) : false)
 	{
 		SDKHook(entity, SDKHook_Use, IgnoreTriggers);
 		SDKHook(entity, SDKHook_StartTouch, IgnoreTriggers);

@@ -40,6 +40,10 @@ void CreateCommands()
 	RegConsoleCmd("+noclip", NoClip, "[surftimer] Player noclip on");
 	RegConsoleCmd("-noclip", UnNoClip, "[surftimer] Player noclip off");
 	RegConsoleCmd("sm_nc", Command_ckNoClip, "[surftimer] Player noclip on/off");
+	RegConsoleCmd("sm_ctop", Client_CountryTOP, "[surftimer] displays country top rankings");
+	RegConsoleCmd("sm_ctop_help", Client_CountryTop_Help, "[surftimer] displays information on how to use the command sm_ctop");
+	RegConsoleCmd("sm_crank", Client_CountryRank, "[surftimer] displays player country rank");
+	RegConsoleCmd("sm_crank_help", Client_CountryRank_Help, "[surftimer] displays information on how to use the command sm_crank");
 
 	// Teleportation Commands
 	RegConsoleCmd("sm_stages", Command_SelectStage, "[surftimer] Opens up the stage selector");
@@ -153,6 +157,8 @@ void CreateCommands()
 	RegConsoleCmd("sm_knife", Command_GiveKnife, "[surftimer] Give players a knife");
 	RegConsoleCmd("sm_prinfo_help", Command_PRinfo_help, "[surftimer] Show in console how to use the command");
 	RegConsoleCmd("sm_csd", Command_CenterSpeed, "[surftimer] [settings] on/off - toggle center speed display");
+	RegConsoleCmd("sm_acronyms", Client_Acronyms, "[surftimer] shows every style format available");
+
 
 	// New Commands
 	RegConsoleCmd("sm_mrank", Command_SelectMapTime, "[surftimer] prints a players map record in chat.");
@@ -167,6 +173,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_specbotbonus", Command_SpecBonusBot, "[surftimer] Spectate the bonus bot");
 	RegConsoleCmd("sm_specbotb", Command_SpecBonusBot, "[surftimer] Spectate the bonus bot");
 	RegConsoleCmd("sm_showzones", Command_ShowZones, "[surftimer] Clients can toggle whether zones are visible for them");
+	RegConsoleCmd("sm_nextrank", Command_NextRank, "[surftimer] Displays the amount of points required to achieve next rank");
 
 	// Styles
 	RegConsoleCmd("sm_style", Client_SelectStyle, "[surftimer] open style select menu.");
@@ -212,6 +219,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_startside", Command_ChangeStartSide, "[surftimer] [settings] left/right - change start side");
 	RegConsoleCmd("sm_speedgradient", Command_ChangeSpeedGradient, "[surftimer] [settings] white/green/rainbow/momentum - change speed gradient");
 	RegConsoleCmd("sm_speedmode", Command_ChangeSpeedMode, "[surftimer] [settings] xy/xyz/z - change speed mode");
+	RegConsoleCmd("sm_prespeedmode", Command_ChangePreSpeedMode, "[surftimer] [settings] xy/xyz/z - change prestrafe speed mode");
 	RegConsoleCmd("sm_centerspeed", Command_CenterSpeed, "[surftimer] [settings] on/off - toggle center speed display");
 	RegConsoleCmd("sm_nctriggers", Command_ToggleNcTriggers, "[surftimer] [settings] on/off - toggle triggers while noclipping");
 	RegConsoleCmd("sm_autoreset", Command_ToggleAutoReset, "[surftimer] [settings] on/off - toggle auto reset for your current map/bonus run if your above your pb");
@@ -264,6 +272,20 @@ public Action Command_ChangeSpeedMode(int client, int args) {
 	} else {
 		g_SpeedMode[client] = 0;
 		CPrintToChat(client, "%t", "SpeedModeXY", g_szChatPrefix);
+	}
+	return Plugin_Handled;
+}
+
+public Action Command_ChangePreSpeedMode(int client, int args) {
+	if (g_PreSpeedMode[client] == 0) { 
+		g_PreSpeedMode[client]++;
+		CPrintToChat(client, "%t", "PreSpeedModeXYZ", g_szChatPrefix);
+	} else if (g_PreSpeedMode[client] == 1) {
+		g_PreSpeedMode[client]++;
+		CPrintToChat(client, "%t", "PreSpeedModeZ", g_szChatPrefix);
+	} else {
+		g_PreSpeedMode[client] = 0;
+		CPrintToChat(client, "%t", "PreSpeedModeXY", g_szChatPrefix);
 	}
 	return Plugin_Handled;
 }
@@ -709,7 +731,7 @@ public Action Command_createPlayerCheckpoint(int client, int args)
 		{
 			if (!g_bPracticeMode[player])
 			{
-				g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]] = GetClientTickTime(player) -  g_fStartWrcpTime[player] - g_fPauseTime[player];
+				g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]] = GetClientTickTime(player) - g_fStartWrcpTime[player] - g_fPauseTime[player];
 			}
 			else
 			{
@@ -731,17 +753,17 @@ public Action Command_createPlayerCheckpoint(int client, int args)
 		{
 			if (!g_bPracticeMode[player])
 			{
-				g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = GetClientTickTime(player) -  g_fStartPracSrcpTime[player] - g_fPauseTime[player];
+				g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = GetClientTickTime(player) - g_fStartPracSrcpTime[player] - g_fPauseTime[player];
 			}
 			else
 			{
 				if (g_iPreviousSaveLocIdClient[player] == g_iLastSaveLocIdClient[player]) // Did player Tele to earlier saveloc?
 				{	
-					g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = (GetClientTickTime(player) -  g_fStartPracSrcpTime[player] - g_fPauseTime[player]) + g_fPlayerPracSrcpTimeSnap[player][g_iLastSaveLocIdClient[player] - 1];
+					g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = (GetClientTickTime(player) - g_fStartPracSrcpTime[player] - g_fPauseTime[player]) + g_fPlayerPracSrcpTimeSnap[player][g_iLastSaveLocIdClient[player] - 1];
 				}
 				else
 				{
-					g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = (GetClientTickTime(player) -  g_fStartPracSrcpTime[player] - g_fPauseTime[player]) + g_fPlayerPracSrcpTimeSnap[player][g_iPreviousSaveLocIdClient[player]];
+					g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = (GetClientTickTime(player) - g_fStartPracSrcpTime[player] - g_fPauseTime[player]) + g_fPlayerPracSrcpTimeSnap[player][g_iPreviousSaveLocIdClient[player]];
 				}
 			}
 		}
@@ -856,7 +878,7 @@ public Action Command_goToPlayerCheckpoint(int client, int args)
 
 		g_Stage[g_iClientInZone[client][2]][client] = stage;
 
-		g_iCurrentCheckpoint[client] =  g_iPlayerPracLocationSnap[client][g_iLastSaveLocIdClient[client]] -1;
+		g_iCurrentCheckpoint[client] = g_iPlayerPracLocationSnap[client][g_iLastSaveLocIdClient[client]] -1;
 
 		lastCheckpoint[g_iClientInZone[client][2]][client] = g_iCurrentCheckpoint[client] - 1;
 		if (lastCheckpoint[g_iClientInZone[client][2]][client] == -1)
@@ -1071,6 +1093,7 @@ public Action Command_Teleport(int client, int args)
 		PauseMethod(client);
 
 	teleportClient(client, g_iClientInZone[client][2], g_Stage[g_iClientInZone[client][2]][client], false);
+
 	return Plugin_Handled;
 }
 
@@ -1216,6 +1239,12 @@ public Action Command_ToBonus(int client, int args)
 	if (g_mapZoneGroupCount > zoneGrp)
 		g_iInBonus[client] = zoneGrp;
 	teleportClient(client, zoneGrp, 1, true);
+
+	if (g_bPracticeMode[client])
+	{
+		g_bPracticeMode[client] = false;
+		CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
+	}
 	return Plugin_Handled;
 }
 
@@ -1336,6 +1365,12 @@ public Action Command_ToStage(int client, int args)
 		teleportClient(client, 0, StageId, true);
 	}
 
+	if (g_bPracticeMode[client])
+	{
+		g_bPracticeMode[client] = false;
+		CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
+	}
+
 	return Plugin_Handled;
 }
 
@@ -1393,6 +1428,11 @@ public Action Command_Restart(int client, int args)
 	g_bInBhop[client] = false;
 
 	teleportClient(client, 0, 1, true);
+	if (g_bPracticeMode[client])
+	{
+		g_bPracticeMode[client] = false;
+		CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
+	}
 	return Plugin_Handled;
 }
 
@@ -1762,6 +1802,338 @@ public Action Command_ckNoClip(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action Client_CountryTop_Help(int client, int args){
+
+	if(IsValidClient(client)){
+		CPrintToChat(client, "%t", "ctop_help_chat", g_szChatPrefix);
+		PrintToConsole(client, "%t", "ctop_help");
+	}
+
+	return Plugin_Handled;
+
+}
+public Action Client_CountryRank_Help(int client, int args){
+
+	if(IsValidClient(client)){
+		CPrintToChat(client, "%t", "crank_help_chat", g_szChatPrefix);
+		PrintToConsole(client, "%t", "crank_help");
+	}
+
+	return Plugin_Handled;
+
+}
+
+public Action Client_Acronyms(int client, int args){
+
+	if(IsValidClient(client)){
+		CPrintToChat(client, "%t", "style_acronyms_help_chat", g_szChatPrefix);
+		PrintToConsole(client, "%t", "style_acronyms_help");
+	}
+
+	return Plugin_Handled;
+
+}
+
+public Action Client_CountryRank(int client, int args)
+{
+	if(!IsValidClient(client))
+		return Plugin_Handled;
+
+	switch (args){
+		case 0 : {
+			char szClientName[MAX_NAME_LENGTH];
+			GetClientName(client, szClientName, sizeof szClientName);
+
+			db_SelectCountryRank(client, szClientName, g_szCountry[client], g_iCurrentStyle[client]);
+		}
+		case 1 : {
+
+			char arg1[MAX_NAME_LENGTH];
+
+			GetCmdArg(1, arg1, sizeof arg1);
+
+			//sm_ctop #<style_acronym>
+			if (arg1[0] == '#') {
+				ReplaceString(arg1, sizeof arg1, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg1);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				char szClientName[MAX_NAME_LENGTH];
+				GetClientName(client, szClientName, sizeof szClientName);
+
+				db_SelectCountryRank(client, szClientName, g_szCountry[client], style);
+
+				return Plugin_Handled;
+
+			}
+
+			//sm_crank <playername>
+			db_SelectCustomPlayerCountryRank(client, arg1, g_iCurrentStyle[client]);
+		}
+		case 2 : {
+			char arg1[MAX_NAME_LENGTH];
+			GetCmdArg(1, arg1, sizeof arg1);
+
+			char arg2[MAX_NAME_LENGTH];
+			GetCmdArg(2, arg2, sizeof arg2);
+
+			//sm_crank #<style> <playername>
+			if (arg1[0] == '#') {
+				ReplaceString(arg1, sizeof arg1, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg1);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				db_SelectCustomPlayerCountryRank(client, arg2, style);
+
+				return Plugin_Handled;
+			}
+
+			//sm_crank <playername> #<style_acronym>
+			if (arg2[0] == '#') {
+				ReplaceString(arg2, sizeof arg2, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg2);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				db_SelectCustomPlayerCountryRank(client, arg1, style);
+
+				return Plugin_Handled;
+			}
+
+			CPrintToChat(client, "%t", "crank_help_chat", g_szChatPrefix);
+			PrintToConsole(client, "%t", "crank_help");
+			PrintToConsole(client, "%t", "style_acronyms_help");	
+
+		}
+	}
+
+	return Plugin_Handled;
+}
+
+public Action Client_CountryTOP(int client, int args)
+{
+	char szBuffer[256] = "none-none";
+
+	switch (args) {
+		//sm_ctop
+		case 0: CountryTopMenuStyleSelect(client, szBuffer);
+		//sm_ctop <countryname>
+		//sm_ctop #<style_acronym>
+		case 1: {
+			char arg1[100];
+			GetCmdArg(1, arg1, sizeof arg1);
+
+			//sm_ctop #<style_acronym>
+			if (arg1[0] == '#') {
+				ReplaceString(arg1, sizeof arg1, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg1);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				db_GetCountriesNames(client, style);
+				return Plugin_Handled;
+			}
+
+			//sm_ctop <countryname>
+			Format(szBuffer, sizeof szBuffer, "%s-none", arg1);
+			CountryTopMenuStyleSelect(client, szBuffer);
+		}
+		//sm_ctop <countryname> #<style_acronym>
+		//sm_ctop #<style_acronym> <countryname>
+		case 2: {
+
+			char arg1[100];
+			char arg2[100];
+
+			GetCmdArg(1, arg1, sizeof arg1);
+			GetCmdArg(2, arg2, sizeof arg2);
+
+			//sm_ctop #<style_acronym> <countryname>
+			if (arg1[0] == '#') {
+				ReplaceString(arg1, sizeof arg1, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg1);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				Format(szBuffer, sizeof szBuffer, "%s-%d", arg2, style);
+				CountryTopMenuStyleSelect(client, szBuffer);
+
+				return Plugin_Handled;
+			}
+
+			//sm_ctop <countryname> #<style_acronym>
+			if (arg2[0] == '#') {
+				ReplaceString(arg2, sizeof arg2, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg2);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				Format(szBuffer, sizeof szBuffer, "%s-%d", arg1, style);
+				CountryTopMenuStyleSelect(client, szBuffer);
+
+				return Plugin_Handled;
+			}
+
+			CPrintToChat(client, "%t", "ctop_help_chat", g_szChatPrefix);
+			PrintToConsole(client, "%t", "ctop_help");
+			PrintToConsole(client, "%t", "style_acronyms_help");
+		}
+	}
+
+	return Plugin_Handled;
+}
+
+public void CountryTopMenuStyleSelect(int client, char szBuffer[256])
+{
+	char szCountryName[256];
+	int style;
+
+	//IF THE PLAYER INSERTED A COUNTRY OR A STYLE SPLIT THE BUFFER STRING AND STORE THE VALUES INDIVIDUAL VARIABLES
+	//split[0] -> country
+	//split[1] -> style
+	if ( strcmp(szBuffer, "none-none", false) != 0 ) {
+		char splits[2][256];
+		ExplodeString(szBuffer, "-", splits, sizeof(splits), sizeof(splits[]));
+
+		//INSERTED COUNTRY
+		if( strcmp(splits[0], "none", false) != 0 ) {
+			szCountryName = splits[0];
+		}
+		
+		//INSERTED STYLE
+		if( strcmp(splits[1], "none", false) != 0 ) {
+			style = StringToInt(splits[1]);
+		}
+
+		//IF PLAYER INPUTS COUNTRY NAME AND STYLE THERE IS NO NEED DISPLAY THIS MENU
+		//CALL 'db_SelectCountryTOP' STRAIGHT AWAY
+		if( strcmp(splits[0], "none", false) != 0 && strcmp(splits[1], "none", false) != 0 ){
+			db_SelectCountryTOP(client, szCountryName, style);
+			return;
+		}
+
+		//IF PLAYER INPUTS STYLE THERE IS NO NEED DISPLAY THIS MENU
+		//CALL 'db_GetCountriesNames' STRAIGHT AWAY
+		if( strcmp(splits[0], "none", false) == 0 && strcmp(splits[1], "none", false) != 0 ){
+			db_GetCountriesNames(client, StringToInt(splits[1]));
+			return;
+		}
+
+	}
+	//IF PLAYER IS USING SM_CTOP WITHOUT ANY ARGUMENTS
+	//THIS MEANS THE COUNTRY NAME IS NOT BEEN SELECTED YET
+	//SIMPLY SET IT AS "none"
+	else {
+		szCountryName = "none";
+	}
+
+
+	Menu menu = CreateMenu(CountryTopMenuStyleSelectHandler);
+
+	SetMenuTitle(menu, "Top Menu - Select a style\n \n");
+
+	for (int i = 0; i < sizeof(g_EditStyles); i++)
+	{
+		Format(szBuffer, sizeof(szBuffer), "%s-%d", szCountryName, i);
+
+		//EACH MENU ITEM HAS A STRING CONTAINING THE COUNTRY NAME AND THE STYLE SELECTED IN THE FOLLOWING FORMAT -> 'country-style'
+		AddMenuItem(menu, szBuffer, g_EditStyles[i]);
+	}
+
+	SetMenuExitButton(menu, true);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+public int CountryTopMenuStyleSelectHandler(Handle menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char szBuffer[256];
+		GetMenuItem(menu, param2, szBuffer, sizeof(szBuffer));
+
+		char splits[2][256];
+		ExplodeString(szBuffer, "-", splits, sizeof(splits), sizeof(splits[]));
+
+		if( strcmp(splits[0], "none", false) == 0 )
+			db_GetCountriesNames(param1, StringToInt(splits[1]));
+		else
+			db_SelectCountryTOP(param1, splits[0], StringToInt(splits[1]));
+	}
+	else if (action == MenuAction_End) {
+		delete menu;
+	}
+
+	return 0;
+}
+
 public Action Client_Top(int client, int args)
 {
 	TopMenuStyleSelect(client);
@@ -1789,7 +2161,6 @@ public int TopMenuStyleSelectHandler(Handle menu, MenuAction action, int param1,
 {
 	if (action == MenuAction_Select)
 	{
-		g_ProfileStyleSelect[param1] = param2;
 		ckTopMenu(param1, param2);
 	}
 	else if (action == MenuAction_End)
@@ -2304,6 +2675,17 @@ void CSDUpdateRate(int client, bool menu = false)
 
 	if (menu)
 		CSDOptions(client);
+}
+
+void PreSpeedMode(int client, bool menu = false)
+{
+	if (g_PreSpeedMode[client] != 2)
+		g_PreSpeedMode[client]++;
+	else
+		g_PreSpeedMode[client] = 0;
+	
+	if (menu)
+		MiscellaneousOptions(client);
 }
 
 void CenterSpeedDisplay(int client, bool menu = false)
@@ -3577,6 +3959,14 @@ public void MiscellaneousOptions(int client)
 		AddMenuItem(menu, "", "[ON] Hints");
 	else
 		AddMenuItem(menu, "", "[OFF] Hints");
+
+	// Prestrafe Speed Mode
+	if (g_PreSpeedMode[client] == 0)
+		AddMenuItem(menu, "", "[XY] Prestrafe Speed Mode");
+	else if (g_PreSpeedMode[client] == 1)
+		AddMenuItem(menu, "", "[XYZ] Prestrafe Speed Mode");
+	else
+		AddMenuItem(menu, "", "[Z] Prestrafe Speed Mode");
 	
 	SetMenuExitBackButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
@@ -3591,10 +3981,11 @@ public int MiscellaneousOptionsHandler(Menu menu, MenuAction action, int param1,
 			case 0: HideMethod(param1, true);
 			case 1: QuakeSounds(param1, true);
 			case 2: TeleSide(param1, true);
-			case 3: HideChat(param1, true);
-			case 4: HideViewModel(param1, true);
-			case 5: PrespeedText(param1, true);
-			case 6: HintsText(param1, true);
+			case 3: PreSpeedMode(param1, true);
+			case 4: HideChat(param1, true);
+			case 5: HideViewModel(param1, true);
+			case 6: PrespeedText(param1, true);
+			case 7: HintsText(param1, true);
 		}
 	}
 	else if (action == MenuAction_Cancel)
@@ -5131,7 +5522,7 @@ public Action Command_Startpos(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	if (g_bTimerEnabled[client])
+	if (g_bTimerEnabled[client] && !g_bPracticeMode[client])
 		Startpos(client);
 	else 
 		CReplyToCommand(client, "%t", "Commands82", g_szChatPrefix);
@@ -5781,6 +6172,8 @@ public int PlayRecordCPMenuHandler(Handle menu, MenuAction action, int param1, i
 		PlayRecordMenu(param1);
 	else if (action == MenuAction_End)
 		delete menu;
+
+	return 0;
 }
 
 public Action Command_previousSaveloc(int client, int args)
@@ -5827,6 +6220,16 @@ public Action Command_nextSaveloc(int client, int args)
 	
 	CPrintToChat(client, "%t", "Commands13", g_szChatPrefix, desiredSavelocID);
 	TeleportToSaveloc(client, desiredSavelocID);
+
+	return Plugin_Handled;
+}
+
+public Action Command_NextRank(int client, int args)
+{
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+
+	db_ViewPlayerRank(client);
 
 	return Plugin_Handled;
 }
