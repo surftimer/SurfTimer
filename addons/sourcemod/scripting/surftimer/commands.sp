@@ -1073,11 +1073,6 @@ public Action Command_Teleport(int client, int args)
 
 	teleportClient(client, g_iClientInZone[client][2], g_Stage[g_iClientInZone[client][2]][client], false);
 
-	if (g_bPracticeMode[client])
-	{
-		g_bPracticeMode[client] = false;
-		CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
-	}
 	return Plugin_Handled;
 }
 
