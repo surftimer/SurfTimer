@@ -2,10 +2,6 @@
 // PREPARED STATEMENTS //
 ////////////////////////
 
-//check tables data type
-public void Format_CheckDataType_Query(char table_name[64], char column_name[64]){
-    Format(sql_checkDataType, sizeof(sql_checkDataType), "SELECT DATA_TYPE, NUMERIC_PRECISION, NUMERIC_SCALE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='%s' AND COLUMN_NAME='%s' HAVING DATA_TYPE = 'decimal' AND NUMERIC_PRECISION = 12 AND NUMERIC_SCALE = 6;", g_sDatabaseName, table_name, column_name);
-}
 // ck_announcements
 char sql_createAnnouncements[] = "CREATE TABLE IF NOT EXISTS `ck_announcements` (`id` int(11) NOT NULL AUTO_INCREMENT, `server` varchar(256) NOT NULL DEFAULT 'Beginner', `name` varchar(32) NOT NULL, `mapname` varchar(128) NOT NULL, `mode` int(11) NOT NULL DEFAULT '0', `time` varchar(32) NOT NULL, `group` int(12) NOT NULL DEFAULT '0', PRIMARY KEY (`id`))DEFAULT CHARSET=utf8mb4;";
 
@@ -138,3 +134,6 @@ char sql_createReplays[] = "CREATE TABLE IF NOT EXISTS ck_replays (mapname VARCH
 char sql_selectReplayCPTicksAll[] = "SELECT cp, frame, style FROM ck_replays WHERE mapname = '%s' AND style = '%i' ORDER BY cp ASC;";
 char sql_insertReplayCPTicks[] = "INSERT INTO ck_replays (mapname, cp, frame, style) VALUES ('%s', '%i', '%i', '%i')";
 char sql_updateReplayCPTicks[] = "UPDATE ck_replays SET cp='%i', frame='%i' WHERE mapname='%s' AND style='%i';";
+
+//check tables data type
+char sql_checkDataType[] = "SELECT DATA_TYPE, NUMERIC_PRECISION, NUMERIC_SCALE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='%s' AND COLUMN_NAME='%s' HAVING DATA_TYPE = 'decimal' AND NUMERIC_PRECISION = 12 AND NUMERIC_SCALE = 6;";
