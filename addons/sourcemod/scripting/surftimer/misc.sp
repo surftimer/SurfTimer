@@ -94,12 +94,13 @@ public void LoadClientSetting(int client, int setting)
 			case 0: db_viewPersonalRecords(client, g_szSteamID[client], g_szMapName);
 			case 1: db_viewPersonalBonusRecords(client, g_szSteamID[client]);
 			case 2: db_viewPersonalStageRecords(client, g_szSteamID[client]);
-			case 3: db_viewPlayerPoints(client);
-			case 4: db_viewPlayerOptions(client, g_szSteamID[client]);
-			case 5: db_CheckVIPAdmin(client, g_szSteamID[client]);
-			case 6: db_viewCustomTitles(client, g_szSteamID[client]);
-			case 7: db_viewCheckpoints(client, g_szSteamID[client], g_szMapName);
-			case 8: db_viewPRinfo(client, g_szSteamID[client], g_szMapName);
+			case 3: db_viewPersonalPrestrafeSpeeds(client, g_szSteamID[client]);
+			case 4: db_viewPlayerPoints(client);
+			case 5: db_viewPlayerOptions(client, g_szSteamID[client]);
+			case 6: db_CheckVIPAdmin(client, g_szSteamID[client]);
+			case 7: db_viewCustomTitles(client, g_szSteamID[client]);
+			case 8: db_viewCheckpoints(client, g_szSteamID[client], g_szMapName);
+			case 9: db_viewPRinfo(client, g_szSteamID[client], g_szMapName);
 			default: db_viewPersonalRecords(client, g_szSteamID[client], g_szMapName);
 		}
 		g_iSettingToLoad[client]++;
@@ -1422,38 +1423,79 @@ public float GetSpeed(int client)
 	return speed;
 }
 
-public void SetPrestrafe(int client, int zone, int style, bool bonus) 
+public float GetPreSpeed(int client)
 {
 	float fVelocity[3];
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+	float speed;
 
-	if (bonus)
-	{
+	if (g_PreSpeedMode[client] == 0) // XY
+		speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0));
+	else if (g_PreSpeedMode[client] == 1) // XYZ
+		speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0));
+	else if (g_PreSpeedMode[client] == 2) // Z
+		speed = fVelocity[2];
+	else // XY default
+		speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0));
+
+	return speed;
+}
+
+public void SetPrestrafe(int client, int zone, int style, bool map, bool bonus, bool stage)
+{
+	float fVelocity[3];
+	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+	if (bonus) {
 		g_iPreStrafeBonus[0][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
 		g_iPreStrafeBonus[1][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
 		g_iPreStrafeBonus[2][zone][style][client] = RoundToNearest(fVelocity[2]);
 	} 
-	else 
-	{
+	else if(map) {
 		g_iPreStrafe[0][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
 		g_iPreStrafe[1][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
 		g_iPreStrafe[2][zone][style][client] = RoundToNearest(fVelocity[2]);
 	}
+	else if(stage) {
+		g_iPreStrafeStage[0][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
+		g_iPreStrafeStage[1][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
+		g_iPreStrafeStage[2][zone][style][client] = RoundToNearest(fVelocity[2]);
+	}
 }
-
-public void SetNewRecordPrestrafe(int client, int zone, int style, bool bonus)
+public void SetNewRecordPrestrafe(int client, int zone, int style, bool map, bool bonus, bool stage)
 {
-	if (bonus)
-	{
+	if (bonus) {
 		g_iRecordPreStrafeBonus[0][zone][style] = g_iPreStrafeBonus[0][zone][style][client];
 		g_iRecordPreStrafeBonus[1][zone][style] = g_iPreStrafeBonus[1][zone][style][client];
 		g_iRecordPreStrafeBonus[2][zone][style] = g_iPreStrafeBonus[2][zone][style][client];
 	}
-	else
-	{
+	else if(map) {
 		g_iRecordPreStrafe[0][zone][style] = g_iPreStrafe[0][zone][style][client];
 		g_iRecordPreStrafe[1][zone][style] = g_iPreStrafe[1][zone][style][client];
 		g_iRecordPreStrafe[2][zone][style] = g_iPreStrafe[2][zone][style][client];
+	}
+	else if(stage) {
+		g_iRecordPreStrafeStage[0][zone][style] = g_iPreStrafeStage[0][zone][style][client];
+		g_iRecordPreStrafeStage[1][zone][style] = g_iPreStrafeStage[1][zone][style][client];
+		g_iRecordPreStrafeStage[2][zone][style] = g_iPreStrafeStage[2][zone][style][client];
+	}
+}
+
+public void SetNewPersonalRecordPrestrafe(int client, int zone, int style, bool map, bool bonus, bool stage)
+{
+	if (bonus) {
+		g_iPersonalRecordPreStrafeBonus[client][0][zone][style] = g_iPreStrafeBonus[0][zone][style][client];
+		g_iPersonalRecordPreStrafeBonus[client][1][zone][style] = g_iPreStrafeBonus[1][zone][style][client];
+		g_iPersonalRecordPreStrafeBonus[client][2][zone][style] = g_iPreStrafeBonus[2][zone][style][client];
+	}
+	else if(map) {
+		g_iPersonalRecordPreStrafe[client][0][zone][style] = g_iPreStrafe[0][zone][style][client];
+		g_iPersonalRecordPreStrafe[client][1][zone][style] = g_iPreStrafe[1][zone][style][client];
+		g_iPersonalRecordPreStrafe[client][2][zone][style] = g_iPreStrafe[2][zone][style][client];
+	}
+	else if(stage) {
+		g_iPersonalRecordPreStrafeStage[client][0][zone][style] = g_iPreStrafeStage[0][zone][style][client];
+		g_iPersonalRecordPreStrafeStage[client][1][zone][style] = g_iPreStrafeStage[1][zone][style][client];
+		g_iPersonalRecordPreStrafeStage[client][2][zone][style] = g_iPreStrafeStage[2][zone][style][client];
 	}
 }
 
@@ -1854,6 +1896,9 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 			}
 		}
 
+		if (g_bMapPBRecord[client] || g_bMapFirstRecord[client]) // Own record
+			SetNewPersonalRecordPrestrafe(client, 0, 0, true, false, false);
+
 		// Send Announcements
 		if (g_bMapSRVRecord[client])
 		{
@@ -1864,7 +1909,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 
 			SendNewRecordForward(client, szRecordDiff);
 
-			SetNewRecordPrestrafe(client, 0, 0, false);
+			SetNewRecordPrestrafe(client, 0, 0, true, false, false);
 			
 			if (GetConVarBool(g_hRecordAnnounce))
 				db_insertAnnouncement(szName, g_szMapName, 0, g_szFinalTime[client], 0);
@@ -1922,7 +1967,7 @@ stock void PrintChatBonus(int client, int zGroup, int rank = 0)
 			
 			SendNewRecordForward(client, szRecordDiff, zGroup);
 
-			SetNewRecordPrestrafe(client, zGroup, 0, true);
+			SetNewRecordPrestrafe(client, zGroup, 0, false, true, false);
 		}
 		if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 		{
@@ -1964,7 +2009,7 @@ stock void PrintChatBonus(int client, int zGroup, int rank = 0)
 
 			SendNewRecordForward(client, szRecordDiff, zGroup);
 
-			SetNewRecordPrestrafe(client, zGroup, 0, true);
+			SetNewRecordPrestrafe(client, zGroup, 0, false, true, false);
 		}
 		if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 		{
@@ -1996,6 +2041,10 @@ stock void PrintChatBonus(int client, int zGroup, int rank = 0)
 
 	}
 
+	if (g_bBonusPBRecord[client] || g_bBonusFirstRecord[client]) {
+		SetNewPersonalRecordPrestrafe(client, zGroup, 0, false ,true, false);
+	}
+	
 	// Send Announcements
 	if (g_bBonusSRVRecord[client])
 	{
@@ -4135,9 +4184,13 @@ stock void StyleFinishedMsgs(int client, int style)
 			}
 		}
 
+		if (g_bStyleMapPBRecord[style][client] || g_bStyleMapFirstRecord[style][client]) { // Own record
+			SetNewPersonalRecordPrestrafe(client, 0, style, true, false, false);
+		}
+
 		if (g_bStyleMapSRVRecord[style][client])
 		{
-			SetNewRecordPrestrafe(client, 0, style, false);
+			SetNewRecordPrestrafe(client, 0, style, true, false, false);
 		}
 
 		if (g_StyleMapRank[style][client] == 99999 && IsValidClient(client))
@@ -4168,7 +4221,7 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 		FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
 		Format(szRecordDiff, 54, "-%s", szRecordDiff);
 
-		SetNewRecordPrestrafe(client, zGroup, style, true);
+		SetNewRecordPrestrafe(client, zGroup, style, false, true, false);
 	}
 	if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 	{
@@ -4199,6 +4252,10 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 		CPrintToChatAll("%t", "Misc42", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], g_szBonusTimeDifference[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szStyleBonusFastestTime[style][zGroup]);
 	}
 
+	if (g_bBonusPBRecord[client] || g_bBonusFirstRecord[client]) {
+		SetNewPersonalRecordPrestrafe(client, zGroup, style, false, true , false);
+	}
+	
 	CheckBonusStyleRanks(client, zGroup, style);
 
 	if (rank == 9999999 && IsValidClient(client))

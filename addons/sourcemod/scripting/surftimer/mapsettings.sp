@@ -1,7 +1,6 @@
 public void setMapSettings()
 {
 	SetConVarFloat(g_hMaxVelocity, g_fMaxVelocity, true, true);
-	SetConVarFloat(g_hAnnounceRecord, g_fAnnounceRecord, true, true);
 	SetConVarBool(g_hGravityFix, g_bGravityFix, true, true);
 }
 

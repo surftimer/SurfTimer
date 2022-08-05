@@ -563,7 +563,7 @@ public void PlayRecord(int client, int type, int style, int use_CP)
 	g_iReplayVersion[client] = header.BinaryFormatVersion;
 
 	if(use_CP > 0)
-		g_iReplayTick[client] = g_iCPStartFrame[style][use_CP - 1];
+		g_iReplayTick[client] = g_iCPStartFrame[style][use_CP];
 	else
 		g_iReplayTick[client] = 0;
 

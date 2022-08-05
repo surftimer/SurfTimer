@@ -167,6 +167,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_specbotbonus", Command_SpecBonusBot, "[surftimer] Spectate the bonus bot");
 	RegConsoleCmd("sm_specbotb", Command_SpecBonusBot, "[surftimer] Spectate the bonus bot");
 	RegConsoleCmd("sm_showzones", Command_ShowZones, "[surftimer] Clients can toggle whether zones are visible for them");
+	RegConsoleCmd("sm_nextrank", Command_NextRank, "[surftimer] Displays the amount of points required to achieve next rank");
 
 	// Styles
 	RegConsoleCmd("sm_style", Client_SelectStyle, "[surftimer] open style select menu.");
@@ -212,6 +213,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_startside", Command_ChangeStartSide, "[surftimer] [settings] left/right - change start side");
 	RegConsoleCmd("sm_speedgradient", Command_ChangeSpeedGradient, "[surftimer] [settings] white/green/rainbow/momentum - change speed gradient");
 	RegConsoleCmd("sm_speedmode", Command_ChangeSpeedMode, "[surftimer] [settings] xy/xyz/z - change speed mode");
+	RegConsoleCmd("sm_prespeedmode", Command_ChangePreSpeedMode, "[surftimer] [settings] xy/xyz/z - change prestrafe speed mode");
 	RegConsoleCmd("sm_centerspeed", Command_CenterSpeed, "[surftimer] [settings] on/off - toggle center speed display");
 	RegConsoleCmd("sm_nctriggers", Command_ToggleNcTriggers, "[surftimer] [settings] on/off - toggle triggers while noclipping");
 	RegConsoleCmd("sm_autoreset", Command_ToggleAutoReset, "[surftimer] [settings] on/off - toggle auto reset for your current map/bonus run if your above your pb");
@@ -264,6 +266,20 @@ public Action Command_ChangeSpeedMode(int client, int args) {
 	} else {
 		g_SpeedMode[client] = 0;
 		CPrintToChat(client, "%t", "SpeedModeXY", g_szChatPrefix);
+	}
+	return Plugin_Handled;
+}
+
+public Action Command_ChangePreSpeedMode(int client, int args) {
+	if (g_PreSpeedMode[client] == 0) { 
+		g_PreSpeedMode[client]++;
+		CPrintToChat(client, "%t", "PreSpeedModeXYZ", g_szChatPrefix);
+	} else if (g_PreSpeedMode[client] == 1) {
+		g_PreSpeedMode[client]++;
+		CPrintToChat(client, "%t", "PreSpeedModeZ", g_szChatPrefix);
+	} else {
+		g_PreSpeedMode[client] = 0;
+		CPrintToChat(client, "%t", "PreSpeedModeXY", g_szChatPrefix);
 	}
 	return Plugin_Handled;
 }
@@ -1071,6 +1087,7 @@ public Action Command_Teleport(int client, int args)
 		PauseMethod(client);
 
 	teleportClient(client, g_iClientInZone[client][2], g_Stage[g_iClientInZone[client][2]][client], false);
+
 	return Plugin_Handled;
 }
 
@@ -1216,6 +1233,12 @@ public Action Command_ToBonus(int client, int args)
 	if (g_mapZoneGroupCount > zoneGrp)
 		g_iInBonus[client] = zoneGrp;
 	teleportClient(client, zoneGrp, 1, true);
+
+	if (g_bPracticeMode[client])
+	{
+		g_bPracticeMode[client] = false;
+		CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
+	}
 	return Plugin_Handled;
 }
 
@@ -1336,6 +1359,12 @@ public Action Command_ToStage(int client, int args)
 		teleportClient(client, 0, StageId, true);
 	}
 
+	if (g_bPracticeMode[client])
+	{
+		g_bPracticeMode[client] = false;
+		CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
+	}
+
 	return Plugin_Handled;
 }
 
@@ -1393,6 +1422,11 @@ public Action Command_Restart(int client, int args)
 	g_bInBhop[client] = false;
 
 	teleportClient(client, 0, 1, true);
+	if (g_bPracticeMode[client])
+	{
+		g_bPracticeMode[client] = false;
+		CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
+	}
 	return Plugin_Handled;
 }
 
@@ -2306,6 +2340,17 @@ void CSDUpdateRate(int client, bool menu = false)
 		CSDOptions(client);
 }
 
+void PreSpeedMode(int client, bool menu = false)
+{
+	if (g_PreSpeedMode[client] != 2)
+		g_PreSpeedMode[client]++;
+	else
+		g_PreSpeedMode[client] = 0;
+	
+	if (menu)
+		MiscellaneousOptions(client);
+}
+
 void CenterSpeedDisplay(int client, bool menu = false)
 {	
 	//only swap values if the call comes from the "options" menu OR using the "sm_centerspeed" command
@@ -2354,7 +2399,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 					displayColor[2] = g_iCSD_B[client];
 				}
 
-				SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate / g_fTickrate, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+				SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate / g_fTickrate + 0.1, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
 
 				Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[client]));
 			}
@@ -2418,7 +2463,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 								displayColor[2] = g_iCSD_B[client];
 							}
 
-							SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate / g_fTickrate, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+							SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate / g_fTickrate + 0.1, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
 
 							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(fSpeedHUD));
 						}
@@ -2432,7 +2477,7 @@ void CenterSpeedDisplay(int client, bool menu = false)
 								displayColor[2] = g_iCSD_B[client];
 							}
 
-							SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate / g_fTickrate, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
+							SetHudTextParams(fCSD_PosX, fCSD_PosY, update_rate / g_fTickrate + 0.1, displayColor[0], displayColor[1], displayColor[2], 255, 0, 0.0, 0.0, 0.0);
 
 							Format(szSpeed, sizeof(szSpeed), "%i", RoundToNearest(g_fLastSpeed[ObservedUser]));
 						}
@@ -3577,6 +3622,14 @@ public void MiscellaneousOptions(int client)
 		AddMenuItem(menu, "", "[ON] Hints");
 	else
 		AddMenuItem(menu, "", "[OFF] Hints");
+
+	// Prestrafe Speed Mode
+	if (g_PreSpeedMode[client] == 0)
+		AddMenuItem(menu, "", "[XY] Prestrafe Speed Mode");
+	else if (g_PreSpeedMode[client] == 1)
+		AddMenuItem(menu, "", "[XYZ] Prestrafe Speed Mode");
+	else
+		AddMenuItem(menu, "", "[Z] Prestrafe Speed Mode");
 	
 	SetMenuExitBackButton(menu, true);
 	DisplayMenu(menu, client, MENU_TIME_FOREVER);
@@ -3591,10 +3644,11 @@ public int MiscellaneousOptionsHandler(Menu menu, MenuAction action, int param1,
 			case 0: HideMethod(param1, true);
 			case 1: QuakeSounds(param1, true);
 			case 2: TeleSide(param1, true);
-			case 3: HideChat(param1, true);
-			case 4: HideViewModel(param1, true);
-			case 5: PrespeedText(param1, true);
-			case 6: HintsText(param1, true);
+			case 3: PreSpeedMode(param1, true);
+			case 4: HideChat(param1, true);
+			case 5: HideViewModel(param1, true);
+			case 6: PrespeedText(param1, true);
+			case 7: HintsText(param1, true);
 		}
 	}
 	else if (action == MenuAction_Cancel)
@@ -5131,7 +5185,7 @@ public Action Command_Startpos(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	if (g_bTimerEnabled[client])
+	if (g_bTimerEnabled[client] && !g_bPracticeMode[client])
 		Startpos(client);
 	else 
 		CReplyToCommand(client, "%t", "Commands82", g_szChatPrefix);
@@ -5829,6 +5883,16 @@ public Action Command_nextSaveloc(int client, int args)
 	
 	CPrintToChat(client, "%t", "Commands13", g_szChatPrefix, desiredSavelocID);
 	TeleportToSaveloc(client, desiredSavelocID);
+
+	return Plugin_Handled;
+}
+
+public Action Command_NextRank(int client, int args)
+{
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+
+	db_ViewPlayerRank(client);
 
 	return Plugin_Handled;
 }

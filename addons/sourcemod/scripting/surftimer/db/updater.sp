@@ -64,12 +64,18 @@ void CheckDatabaseForUpdates()
 			return;
 		}
 
-		if(!SQL_FastQuery(g_hDb, "SELECT cp FROM ck_checkpoints LIMIT 1"))
+		if (!SQL_FastQuery(g_hDb, "SELECT prespeedmode FROM ck_playeroptions2 LIMIT 1"))
 		{
 			db_upgradeDatabase(9);
 			return;
 		}
-		LogMessage("Version 9 looks good.");
+
+		if (!SQL_FastQuery(g_hDb, "SELECT cp FROM ck_checkpoints LIMIT 1"))
+		{
+			db_upgradeDatabase(10);
+			return;
+		}
+		LogMessage("Version 10 looks good.");
 	}
 }
 
@@ -136,7 +142,11 @@ public void db_upgradeDatabase(int ver)
 	}
 	else if (ver == 9)
 	{
-		//ALREADY CONVERTED
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions2 ADD prespeedmode int(11) NOT NULL DEFAULT '1';");
+	}
+  else if (ver == 10)
+  {
+    //ALREADY CONVERTED
 		char sQuery[512];
 		Format(sQuery, sizeof(sQuery), sql_checkDataType, g_sDatabaseName, "ck_checkpoints", "cp1");
 		if(SQL_FastQuery(g_hDb_Updates, sql_checkDataType)){
@@ -152,7 +162,7 @@ public void db_upgradeDatabase(int ver)
 			SQL_FastQuery(g_hDb_Updates, "ALTER TABLE ck_checkpoints RENAME TO ck_checkpointsold;");
 			SQL_FastQuery(g_hDb_Updates, "ALTER TABLE ck_checkpointsnew RENAME TO ck_checkpoints;");
 		}
-	}
+  }
 
 	CheckDatabaseForUpdates();
 }
