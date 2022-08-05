@@ -7690,7 +7690,6 @@ public void SQL_UpdateStyleRecordCallback2(Handle owner, Handle hndl, const char
 
 	g_StyleMapRank[style][client] = rank;
 	StyleFinishedMsgs(client, style);
-	
 }
 
 public void db_GetStyleMapRecord_Pro(int style)
