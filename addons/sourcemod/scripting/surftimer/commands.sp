@@ -1848,6 +1848,7 @@ public Action Client_CountryRank(int client, int args)
 				}
 
 				int style = styles.FindString(arg1);
+				delete styles;
 
 				if ( style == -1 ) {
 					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
@@ -1884,6 +1885,7 @@ public Action Client_CountryRank(int client, int args)
 				}
 
 				int style = styles.FindString(arg1);
+				delete styles;
 
 				if ( style == -1 ) {
 					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
@@ -1906,6 +1908,7 @@ public Action Client_CountryRank(int client, int args)
 				}
 
 				int style = styles.FindString(arg2);
+				delete styles;
 
 				if ( style == -1 ) {
 					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
@@ -1951,6 +1954,7 @@ public Action Client_CountryTOP(int client, int args)
 				}
 
 				int style = styles.FindString(arg1);
+				delete styles;
 
 				if ( style == -1 ) {
 					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
@@ -1986,6 +1990,7 @@ public Action Client_CountryTOP(int client, int args)
 				}
 
 				int style = styles.FindString(arg1);
+				delete styles;
 
 				if ( style == -1 ) {
 					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
@@ -2009,6 +2014,7 @@ public Action Client_CountryTOP(int client, int args)
 				}
 
 				int style = styles.FindString(arg2);
+				delete styles;
 
 				if ( style == -1 ) {
 					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
