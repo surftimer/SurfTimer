@@ -3509,39 +3509,41 @@ public void db_UpdateCheckpoints(int client, char szSteamID[32], int zGroup)
 	else
 		cp_count = g_TotalStages - 1;
 
+	char szQuery[102];
+	Transaction tAction = new Transaction();
+
 	if (g_bCheckpointsFound[zGroup][client])
 	{
-		char szQuery[1024];
 		for(int i = 0; i < cp_count; i++){
 			Format(szQuery, sizeof(szQuery), sql_updateCheckpoints, g_fCheckpointTimesNew[zGroup][client][i], szSteamID, g_szMapName, zGroup);
-			SQL_TQuery(g_hDb, SQL_updateCheckpointsCallback, szQuery, pack, DBPrio_Low);
+			tAction.AddQuery(szQuery);
 		}
 	}
 	else
 	{
-		char szQuery[1024];
 		for(int i = 0; i < cp_count; i++){
 			Format(szQuery, sizeof(szQuery), sql_insertCheckpoints, szSteamID, g_szMapName, g_fCheckpointTimesNew[zGroup][client][i], zGroup);
-			SQL_TQuery(g_hDb, SQL_updateCheckpointsCallback, szQuery, pack, DBPrio_Low);
+			tAction.AddQuery(szQuery);
 		}
 	}
+
+	SQL_ExecuteTransaction(g_hDb, tAction, db_UpdateCheckpointsOnSuccess, db_UpdateCheckpointsOnFailure, pack, DBPrio_Low);
 }
 
-public void SQL_updateCheckpointsCallback(Handle owner, Handle hndl, const char[] error, any data)
+public void db_UpdateCheckpointsOnSuccess(Handle db, any pack, int numQueries, Handle[] results, any[] queryData)
 {
-	if (hndl == null)
-	{
-		LogError("[SurfTimer] SQL Error (SQL_updateCheckpointsCallback): %s", error);
-		CloseHandle(data);
-		return;
-	}
-
-	ResetPack(data);
-	int client = ReadPackCell(data);
-	int zonegrp = ReadPackCell(data);
-	CloseHandle(data);
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	int zonegrp = ReadPackCell(pack);
+	CloseHandle(pack);
 
 	db_viewCheckpointsinZoneGroup(client, g_szSteamID[client], g_szMapName, zonegrp);
+}
+
+public void db_UpdateCheckpointsOnFailure(Handle db, any pack, int numQueries, const char[] error, int failIndex, any[] queryData)
+{
+	LogError("[SurfTimer] SQL Error (db_UpdateCheckpointsOnFailure): %s", error);
+	CloseHandle(pack);
 }
 
 public void db_deleteCheckpoints()
