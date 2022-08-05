@@ -1869,6 +1869,7 @@
 	"style_acronyms_help"
 	{
 		"en"		"Style Acronyms are the following : \nNormal - n \nSideways - sw \nHalf-Sideways - hsw \nBackwards - bw \nLow-Gravity - lg \nSlow Motion - sm \nFast Forward - ff \nFreestyle - fs \n"
+	}
 	"NextRankPointRequired"
 	{
 		"#format"	"{1:s},{2:i},{3:s}"
