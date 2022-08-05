@@ -223,7 +223,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 void Register_Forwards()
 {
-	g_MapFinishForward = new GlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell);
+	g_MapFinishForward = new GlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell, Param_Cell);
 	g_MapCheckpointForward = new GlobalForward("surftimer_OnCheckpoint", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String);
 	g_BonusFinishForward = new GlobalForward("surftimer_OnBonusFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell, Param_Cell);
 	g_PracticeFinishForward = new GlobalForward("surftimer_OnPracticeFinished", ET_Event, Param_Cell, Param_Float, Param_String);
@@ -237,7 +237,7 @@ void Register_Forwards()
  * @param client           Index of the client who beat the map.
  * @param count            The number of times the map has been beaten.
  */
-void SendMapFinishForward(int client, int count)
+void SendMapFinishForward(int client, int count, int style)
 {
 	/* Start function call */
 	Call_StartForward(g_MapFinishForward);
@@ -248,6 +248,7 @@ void SendMapFinishForward(int client, int count)
 	Call_PushString(g_szFinalTime[client]);
 	Call_PushCell(g_MapRank[client]);
 	Call_PushCell(count);
+	Call_PushCell(style);
 
 	/* Finish the call, get the result */
 	Call_Finish();
