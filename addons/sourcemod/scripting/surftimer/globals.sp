@@ -1500,7 +1500,7 @@ char g_sDatabaseName[32]; // Required for the float to decimal conversion
 char g_sDecimalTables[][][] = {
 	// Table,              Column
 	{ "ck_bonus",         "runtime", },
-	{ "ck_checkpoints",   "cp", },
+	{ "ck_checkpoints",   "time", },
 	{ "ck_latestrecords", "runtime", },
 	{ "ck_playertemp",    "runtimeTmp", },
 	{ "ck_playertimes",   "runtimepro", },

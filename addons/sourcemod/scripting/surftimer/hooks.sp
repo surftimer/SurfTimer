@@ -907,26 +907,26 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		}
 	}
 	else if (g_iCurrentStyle[client] == 2) // Half-sideways
-    {
-        bool bForward = ((buttons & IN_FORWARD) > 0 && vel[0] >= 100.0);
-        bool bMoveLeft = ((buttons & IN_MOVELEFT) > 0 && vel[1] <= -100.0);
-        bool bBack = ((buttons & IN_BACK) > 0 && vel[0] <= -100.0);
-        bool bMoveRight = ((buttons & IN_MOVERIGHT) > 0 && vel[1] >= 100.0);
-        if (!g_bInStartZone[client] && !g_bInStageZone[client])
-        {
-            if((bForward || bBack) && !(bMoveLeft || bMoveRight))
-            {
-                vel[0] = 0.0;
-                buttons &= ~IN_FORWARD;
-                buttons &= ~IN_BACK;
-            }
-            if((bMoveLeft || bMoveRight) && !(bForward || bBack))
-            {
-                vel[1] = 0.0;
-                buttons &= ~IN_MOVELEFT;
-                buttons &= ~IN_MOVERIGHT;
-            }
-        }
+	{
+		bool bForward = ((buttons & IN_FORWARD) > 0 && vel[0] >= 100.0);
+		bool bMoveLeft = ((buttons & IN_MOVELEFT) > 0 && vel[1] <= -100.0);
+		bool bBack = ((buttons & IN_BACK) > 0 && vel[0] <= -100.0);
+		bool bMoveRight = ((buttons & IN_MOVERIGHT) > 0 && vel[1] >= 100.0);
+		if (!g_bInStartZone[client] && !g_bInStageZone[client])
+		{
+			if((bForward || bBack) && !(bMoveLeft || bMoveRight))
+			{
+				vel[0] = 0.0;
+				buttons &= ~IN_FORWARD;
+				buttons &= ~IN_BACK;
+			}
+			if((bMoveLeft || bMoveRight) && !(bForward || bBack))
+			{
+				vel[1] = 0.0;
+				buttons &= ~IN_MOVELEFT;
+				buttons &= ~IN_MOVERIGHT;
+			}
+		}
 	}
 	else if (g_iCurrentStyle[client] == 3)    // Backwards
 	{
@@ -1367,8 +1367,8 @@ public Action Hook_SetTriggerTransmit(int entity, int client)
 public Action Hook_FootstepCheck(int clients[64], int &numClients, char sample[PLATFORM_MAX_PATH], int &entity, int &channel, float &volume, int &level, int &pitch, int &flags) 
 {
 	// Player
-  if (0 < entity <= MaxClients)
-  {
+	if (0 < entity <= MaxClients)
+	{
 		if (StrContains(sample, "land") != -1 || StrContains(sample, "suit_") != -1 || StrContains(sample, "knife") != -1)
 			return Plugin_Handled;
 
@@ -1394,8 +1394,8 @@ public Action Hook_FootstepCheck(int clients[64], int &numClients, char sample[P
 
 			return Plugin_Stop;
 		}
-  }
-  return Plugin_Continue;
+	}
+	return Plugin_Continue;
 }
 
 public Action Hook_ShotgunShot(const char[] te_name, const int[] players, int numClients, float delay) 
