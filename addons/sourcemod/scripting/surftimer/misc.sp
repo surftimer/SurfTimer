@@ -1423,7 +1423,25 @@ public float GetSpeed(int client)
 	return speed;
 }
 
-public void SetPrestrafe(int client, int zone, int style, bool map, bool bonus, bool stage) 
+public float GetPreSpeed(int client)
+{
+	float fVelocity[3];
+	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+	float speed;
+
+	if (g_PreSpeedMode[client] == 0) // XY
+		speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0));
+	else if (g_PreSpeedMode[client] == 1) // XYZ
+		speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0));
+	else if (g_PreSpeedMode[client] == 2) // Z
+		speed = fVelocity[2];
+	else // XY default
+		speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0));
+
+	return speed;
+}
+
+public void SetPrestrafe(int client, int zone, int style, bool map, bool bonus, bool stage)
 {
 	float fVelocity[3];
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);

@@ -1764,6 +1764,21 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Your speed mode is now {red}Z"
 	}
+	"PreSpeedModeXY"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Your prestrafe speed mode is now {yellow}X{orange}Y"
+	}
+	"PreSpeedModeXYZ"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Your prestrafe speed mode is now {yellow}X{orange}Y{red}Z"
+	}
+	"PreSpeedModeZ"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Your pretrafe speed mode is now {red}Z"
+	}
 	"CenterSpeedOn"
 	{
 		"#format"	"{1:s}"
@@ -1823,5 +1838,14 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Type new value (0 - 255) in the chat, or {darkred}cancel{default} to cancel"
 	}
-
+	"NextRankPointRequired"
+	{
+		"#format"	"{1:s},{2:i},{3:s}"
+		"en"		"{1} {yellow}{2}{default} points required to achieve next rank {3}"
+	}
+	"MAX_RANK"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} {yellow}Already Max Rank!"
+	}
 }

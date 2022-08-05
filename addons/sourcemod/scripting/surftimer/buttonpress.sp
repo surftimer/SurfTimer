@@ -86,28 +86,28 @@ public void CL_OnStartTimerPress(int client)
 			{
 				if (g_fPersonalRecord[client] > 0.0)
 					g_bMissedMapBest[client] = false;
-					
-				iPrestrafeRecord = g_iRecordPreStrafe[g_SpeedMode[client]][0][g_iCurrentStyle[client]];
-				iPersonalPrestrafeRecord = g_iPersonalRecordPreStrafe[client][1][0][g_iCurrentStyle[client]];
 
-				SetPrestrafe(client, 0, g_iCurrentStyle[client], true, false, false );
-				SetPrestrafe(client, 1, g_iCurrentStyle[client], true, false, false );
+					iPrestrafeRecord = g_iRecordPreStrafe[g_PreSpeedMode[client]][0][g_iCurrentStyle[client]];
+					iPersonalPrestrafeRecord = g_iPersonalRecordPreStrafe[client][1][0][g_iCurrentStyle[client]];
+          
+					SetPrestrafe(client, 0, g_iCurrentStyle[client], true, false, false );
+					SetPrestrafe(client, 1, g_iCurrentStyle[client], true, false, false );
 			}
 			else
 			{
 				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
 					g_bMissedBonusBest[client] = false;
 
-				/*
-					FORCE SHOW XYZ UNITS ON EVERY SPEEDMODE
-					g_SpeedMode[client] == 0 -> XY
-					g_SpeedMode[client] == 1 -> XYZ
-					g_SpeedMode[client] == 2 -> Z
-				*/
-				iPrestrafeRecord = g_iRecordPreStrafeBonus[g_SpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
-				iPersonalPrestrafeRecord = g_iPersonalRecordPreStrafeBonus[client][g_SpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
+					/*
+					 FORCE SHOW XYZ UNITS ON EVERY SPEEDMODE
+					 g_PreSpeedMode[client] == 0 -> XY
+					 g_PreSpeedMode[client] == 1 -> XYZ
+					 g_PreSpeedMode[client] == 2 -> Z
+					*/
+					iPrestrafeRecord = g_iRecordPreStrafeBonus[g_PreSpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
+					iPersonalPrestrafeRecord = g_iPersonalRecordPreStrafeBonus[client][g_PreSpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
 
-				SetPrestrafe(client, g_iClientInZone[client][2], g_iCurrentStyle[client], false, true, false);
+					SetPrestrafe(client, g_iClientInZone[client][2], g_iCurrentStyle[client], false, true, false);
 			}
 		}
 
@@ -123,7 +123,7 @@ public void CL_OnStartTimerPress(int client)
 			int iRecordDifference;
 			int iPersonalDifference;
 
-			int prestrafe = RoundToNearest(GetSpeed(client));
+			int prestrafe = RoundToNearest(GetPreSpeed(client));
 
 			if (iPrestrafeRecord == 0)
 			{
@@ -825,12 +825,12 @@ public void CL_OnStartWrcpTimerPress(int client)
 			//FORCE XYZ UNITS ON PRESTRAFE
 
 			//STAGE PRESTRAFE RECORD
-			int iPrestrafeRecord = g_iRecordPreStrafeStage[g_SpeedMode[client]][g_Stage[0][client]][g_iCurrentStyle[client]];
+			int iPrestrafeRecord = g_iRecordPreStrafeStage[g_PreSpeedMode[client]][g_Stage[0][client]][g_iCurrentStyle[client]];
 
 			//PLAYERS PRESTRAFE
-			int iPersonalPrestrafeRecord = g_iPersonalRecordPreStrafeStage[client][g_SpeedMode[client]][g_Stage[0][client]][g_iCurrentStyle[client]];
+			int iPersonalPrestrafeRecord = g_iPersonalRecordPreStrafeStage[client][g_PreSpeedMode[client]][g_Stage[0][client]][g_iCurrentStyle[client]];
 
-			int prestrafe = RoundToNearest(GetSpeed(client));
+			int prestrafe = RoundToNearest(GetPreSpeed(client));
 
 			SetPrestrafe(client, g_Stage[0][client], g_iCurrentStyle[client], false, false, true);
 

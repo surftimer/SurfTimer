@@ -513,6 +513,7 @@ int g_ProfileStyleSelect[MAXPLAYERS + 1];
 bool g_bTimerEnabled[MAXPLAYERS + 1];
 int g_SpeedGradient[MAXPLAYERS + 1];
 int g_SpeedMode[MAXPLAYERS + 1];
+int g_PreSpeedMode[MAXPLAYERS + 1];
 bool g_bCenterSpeedDisplay[MAXPLAYERS + 1];
 int g_iCenterSpeedEnt[MAXPLAYERS + 1];
 int g_iSettingToLoad[MAXPLAYERS + 1];
