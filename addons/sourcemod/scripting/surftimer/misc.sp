@@ -351,7 +351,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 
 					if (realZone == 0)
 					{
-						g_bInStartZone[client] =  false;
+						g_bInStartZone[client] = false;
 						g_bInStageZone[client] = false;
 					}
 				}
@@ -380,7 +380,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 
 					if (realZone == 0)
 					{
-						g_bInStartZone[client] =  false;
+						g_bInStartZone[client] = false;
 						g_bInStageZone[client] = false;
 					}
 
@@ -1838,13 +1838,13 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 						{
 							PlayUnstoppableSound(client);
 							CPrintToChat(i, "%t", "MapFinished3", g_szChatPrefix, szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, szGroup, g_szRecordMapTime);
-							PrintToConsole(i, "%s finished the map with a time of (%s). Improving their best time by (%s).  [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
+							PrintToConsole(i, "%s finished the map with a time of (%s). Improving their best time by (%s). [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
 						}
 						else
 							if (!g_bMapSRVRecord[client] && !g_bMapFirstRecord[client] && !g_bMapPBRecord[client])
 							{
 								CPrintToChat(i, "%t", "MapFinished5", g_szChatPrefix, szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, szGroup, g_szRecordMapTime);
-								PrintToConsole(i, "%s finished the map with a time of (%s). Missing their best time by (%s).  [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
+								PrintToConsole(i, "%s finished the map with a time of (%s). Missing their best time by (%s). [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
 							}
 
 					if (g_bMapSRVRecord[client])
@@ -1882,14 +1882,14 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 					{
 						PlayUnstoppableSound(client);
 						CPrintToChat(client, "%t", "MapFinished3", g_szChatPrefix, szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, szGroup, g_szRecordMapTime);
-						PrintToConsole(client, "%s finished the map with a time of (%s). Improving their best time by (%s).  [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
+						PrintToConsole(client, "%s finished the map with a time of (%s). Improving their best time by (%s). [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
 					}
 					else
 					{
 						if (!g_bMapSRVRecord[client] && !g_bMapFirstRecord[client] && !g_bMapPBRecord[client])
 						{
 							CPrintToChat(client, "%t", "MapFinished5", g_szChatPrefix, szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, szGroup, g_szRecordMapTime);
-							PrintToConsole(client, "%s finished the map with a time of (%s). Missing their best time by (%s).  [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
+							PrintToConsole(client, "%s finished the map with a time of (%s). Missing their best time by (%s). [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
 						}
 					}
 				}
@@ -2269,7 +2269,7 @@ public void FormatTimeFloat(int client, float time, int type, char[] string, int
 		else
 			Format(string, length, "Time: %s:%s", szMinutes, szSeconds);
 	}
-	// goes to  00:00
+	// goes to 00:00
 	if (type == 5)
 	{
 		if (imilli < 10)
@@ -3005,7 +3005,7 @@ public void SpecListMenuDead(int client) // What Spectators see
 					{
 						if (!IsFakeClient(ObservedUser))
 						{
-							Format(g_szPlayerPanelText[client], 512, "Specs (%i):\n%s\n  \n%s\n%s\nRecord: %s\n\n%s\n", count, sSpecs, szTime, szPlayerRank, szProBest, szStage);
+							Format(g_szPlayerPanelText[client], 512, "Specs (%i):\n%s\n \n%s\n%s\nRecord: %s\n\n%s\n", count, sSpecs, szTime, szPlayerRank, szProBest, szStage);
 							if (!g_bShowSpecs[client])
 								Format(g_szPlayerPanelText[client], 512, "Specs (%i)\n \n%s\n%s\nRecord: %s\n\nStage: %s\n", count, szTime, szPlayerRank, szProBest, szStage);
 						}
@@ -3053,12 +3053,12 @@ public void SpecListMenuDead(int client) // What Spectators see
 							if (g_bManualStageReplayPlayback)
 							{
 								int stage = g_iSelectedReplayStage;
-								Format(g_szPlayerPanelText[client], 512, "Stage: %i Replay (%i)\n%s (%s)\n \nSpecs (%i):\n%s\n", stage, g_iManualStageReplayCount + 1, g_szWrcpReplayName[stage],  g_szWrcpReplayTime[stage], count, sSpecs);
+								Format(g_szPlayerPanelText[client], 512, "Stage: %i Replay (%i)\n%s (%s)\n \nSpecs (%i):\n%s\n", stage, g_iManualStageReplayCount + 1, g_szWrcpReplayName[stage], g_szWrcpReplayTime[stage], count, sSpecs);
 							}
 							else
 							{
 								int stage = g_StageReplayCurrentStage;
-								Format(g_szPlayerPanelText[client], 512, "Stage: %i Replay (%i)\n%s (%s)\n \nSpecs (%i):\n%s\n", g_StageReplayCurrentStage, g_StageReplaysLoop, g_szWrcpReplayName[stage],  g_szWrcpReplayTime[stage], count, sSpecs);
+								Format(g_szPlayerPanelText[client], 512, "Stage: %i Replay (%i)\n%s (%s)\n \nSpecs (%i):\n%s\n", g_StageReplayCurrentStage, g_StageReplaysLoop, g_szWrcpReplayName[stage], g_szWrcpReplayTime[stage], count, sSpecs);
 							}
 						}
 

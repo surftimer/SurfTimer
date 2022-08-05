@@ -725,7 +725,7 @@ public Action Command_createPlayerCheckpoint(int client, int args)
 		{
 			if (!g_bPracticeMode[player])
 			{
-				g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]] = GetClientTickTime(player) -  g_fStartWrcpTime[player] - g_fPauseTime[player];
+				g_fPlayerPracTimeSnap[client][g_iLastSaveLocIdClient[client]] = GetClientTickTime(player) - g_fStartWrcpTime[player] - g_fPauseTime[player];
 			}
 			else
 			{
@@ -747,17 +747,17 @@ public Action Command_createPlayerCheckpoint(int client, int args)
 		{
 			if (!g_bPracticeMode[player])
 			{
-				g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = GetClientTickTime(player) -  g_fStartPracSrcpTime[player] - g_fPauseTime[player];
+				g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = GetClientTickTime(player) - g_fStartPracSrcpTime[player] - g_fPauseTime[player];
 			}
 			else
 			{
 				if (g_iPreviousSaveLocIdClient[player] == g_iLastSaveLocIdClient[player]) // Did player Tele to earlier saveloc?
 				{	
-					g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = (GetClientTickTime(player) -  g_fStartPracSrcpTime[player] - g_fPauseTime[player]) + g_fPlayerPracSrcpTimeSnap[player][g_iLastSaveLocIdClient[player] - 1];
+					g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = (GetClientTickTime(player) - g_fStartPracSrcpTime[player] - g_fPauseTime[player]) + g_fPlayerPracSrcpTimeSnap[player][g_iLastSaveLocIdClient[player] - 1];
 				}
 				else
 				{
-					g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = (GetClientTickTime(player) -  g_fStartPracSrcpTime[player] - g_fPauseTime[player]) + g_fPlayerPracSrcpTimeSnap[player][g_iPreviousSaveLocIdClient[player]];
+					g_fPlayerPracSrcpTimeSnap[client][g_iLastSaveLocIdClient[client]] = (GetClientTickTime(player) - g_fStartPracSrcpTime[player] - g_fPauseTime[player]) + g_fPlayerPracSrcpTimeSnap[player][g_iPreviousSaveLocIdClient[player]];
 				}
 			}
 		}
@@ -872,7 +872,7 @@ public Action Command_goToPlayerCheckpoint(int client, int args)
 
 		g_Stage[g_iClientInZone[client][2]][client] = stage;
 
-		g_iCurrentCheckpoint[client] =  g_iPlayerPracLocationSnap[client][g_iLastSaveLocIdClient[client]] -1;
+		g_iCurrentCheckpoint[client] = g_iPlayerPracLocationSnap[client][g_iLastSaveLocIdClient[client]] -1;
 
 		lastCheckpoint[g_iClientInZone[client][2]][client] = g_iCurrentCheckpoint[client] - 1;
 		if (lastCheckpoint[g_iClientInZone[client][2]][client] == -1)

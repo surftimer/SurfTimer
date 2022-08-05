@@ -52,7 +52,6 @@ public void db_setupDatabase()
 
 	SQL_UnlockDatabase(g_hDb);
 	SQL_UnlockDatabase(g_hDb_Updates);
-  
 	LoopFloatDecimalTables();
 
 	for (int i = 0; i < sizeof(g_failedTransactions); i++)
@@ -553,7 +552,7 @@ public void db_updateStat(int client, int style)
 	WritePackCell(pack, style);
 
 	char szQuery[512];
-	// "UPDATE ck_playerrank SET finishedmaps ='%i', finishedmapspro='%i', multiplier ='%i'  where steamid='%s'";
+	// "UPDATE ck_playerrank SET finishedmaps ='%i', finishedmapspro='%i', multiplier ='%i' where steamid='%s'";
 	Format(szQuery, 512, sql_updatePlayerRank, g_pr_finishedmaps[client], g_pr_finishedmaps[client], g_szSteamID[client], style);
 
 	SQL_TQuery(g_hDb, SQL_UpdateStatCallback, szQuery, pack, DBPrio_Low);
@@ -598,7 +597,7 @@ public void RecalcPlayerRank(int client, char steamid[128])
 }
 
 //
-//  1. Point calculating starts here
+//	1. Point calculating starts here
 // 	There are two ways:
 //	- if client > MAXPLAYERS, his rank is being recalculated by an admin
 //	- else player has increased his rank = recalculate points
@@ -3562,7 +3561,7 @@ public void SQL_deleteCheckpointsCallback(Handle owner, Handle hndl, const char[
 	}
 }
 
-public void db_viewPRinfo(int client,  char szSteamID[32], char szMapName[128])
+public void db_viewPRinfo(int client, char szSteamID[32], char szMapName[128])
 {
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
@@ -3731,7 +3730,7 @@ public void db_prinforuntimecallback(Handle owner, Handle hndl, const char[] err
 	return;
 }
 
-public void db_viewBonusPRinfo(int client,  char szSteamID[32], char szMapName[32])
+public void db_viewBonusPRinfo(int client, char szSteamID[32], char szMapName[32])
 {
 
 	char szQuery[1024];
@@ -4834,7 +4833,7 @@ public checkZoneTypeIds()
 InitZoneVariables();
 
 char szQuery[258];
-Format(szQuery, 258, "SELECT `zonegroup` ,`zonetype`, `zonetypeid`  FROM `ck_zones` WHERE `mapname` = '%s';", g_szMapName);
+Format(szQuery, 258, "SELECT `zonegroup` ,`zonetype`, `zonetypeid` FROM `ck_zones` WHERE `mapname` = '%s';", g_szMapName);
 SQL_TQuery(g_hDb, checkZoneTypeIdsCallback, szQuery, 1, DBPrio_High);
 }
 
@@ -4849,7 +4848,7 @@ if (SQL_HasResultSet(hndl))
 {
 int idChecker[MAXZONEGROUPS][ZONEAMOUNT][MAXZONES], idCount[MAXZONEGROUPS][ZONEAMOUNT];
 char szQuery[258];
-//  Fill array with id's
+// Fill array with id's
 // idChecker = map zones in
 while (SQL_FetchRow(hndl))
 {
@@ -7754,7 +7753,7 @@ public void db_viewStyleMapRankCount(int style)
 {
 	g_StyleMapTimesCount[style] = 0;
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT name FROM ck_playertimes WHERE mapname = '%s' AND style = %i AND runtimepro  > -1.0;", g_szMapName, style);
+	Format(szQuery, 512, "SELECT name FROM ck_playertimes WHERE mapname = '%s' AND style = %i AND runtimepro > -1.0;", g_szMapName, style);
 	SQL_TQuery(g_hDb, sql_selectStylePlayerCountCallback, szQuery, style, DBPrio_Low);
 }
 
@@ -8439,14 +8438,14 @@ public void db_selectMapRankUnknown(int client, char szMapName[128], int rank)
 // sm_mrank @x command without map parameter (current mapname being used)
 public void db_selectMapRankUnknownWithMap(int client, char szMapName[128], int rank)
 {
-    char szQuery[1024];
-    Handle pack = CreateDataPack();
-    WritePackCell(pack, client);
-    WritePackCell(pack, rank);
+	char szQuery[1024];
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackCell(pack, rank);
 
-    rank = Math_Min(rank - 1, 0);
-    Format(szQuery, 1024, sql_selectMapRankUnknownWithMap, szMapName, rank);
-    SQL_TQuery(g_hDb, db_selectMapRankUnknownCallback, szQuery, pack, DBPrio_Low);
+	rank = Math_Min(rank - 1, 0);
+	Format(szQuery, 1024, sql_selectMapRankUnknownWithMap, szMapName, rank);
+	SQL_TQuery(g_hDb, db_selectMapRankUnknownCallback, szQuery, pack, DBPrio_Low);
 }
 
 public void db_selectMapRankUnknownCallback(Handle owner, Handle hndl, const char[] error, any data)
@@ -8668,7 +8667,7 @@ public void db_selectMapRecordTime(int client, char szMapName[128])
 	WritePackCell(pack, client);
 	WritePackString(pack, szMapName);
 
-	Format(szQuery, 1024, "SELECT db1.runtimepro, IFNULL(db1.mapname, 'NULL'),  db2.name, db1.steamid FROM ck_playertimes db1 INNER JOIN ck_playerrank db2 ON db1.steamid = db2.steamid WHERE mapname LIKE '%c%s%c' AND runtimepro > -1.0 AND db1.style = 0 AND db2.style = 0 ORDER BY runtimepro ASC LIMIT 1", PERCENT, szMapName, PERCENT);
+	Format(szQuery, 1024, "SELECT db1.runtimepro, IFNULL(db1.mapname, 'NULL'), db2.name, db1.steamid FROM ck_playertimes db1 INNER JOIN ck_playerrank db2 ON db1.steamid = db2.steamid WHERE mapname LIKE '%c%s%c' AND runtimepro > -1.0 AND db1.style = 0 AND db2.style = 0 ORDER BY runtimepro ASC LIMIT 1", PERCENT, szMapName, PERCENT);
 	SQL_TQuery(g_hDb, db_selectMapRecordTimeCallback, szQuery, pack, DBPrio_Low);
 }
 
