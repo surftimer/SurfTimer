@@ -137,24 +137,30 @@ public int Native_GetPlayerData(Handle plugin, int numParams)
 	int rank = 99999;
 	if (IsValidClient(client) && !IsFakeClient(client))
 	{
-		char szTime[64], szCountry[16];
+		char szTime[64], szCountry[16], szCountryCode[3], szContinentCode[3];
 
 		GetNativeString(2, szTime, 64);
 		rank = GetNativeCellRef(3);
 		GetNativeString(4, szCountry, 16);
+		GetNativeString(5, szCountryCode, sizeof(szCountryCode));
+		GetNativeString(6, szContinentCode, sizeof(szContinentCode));
 
 		if (g_fPersonalRecord[client] > 0.0)
 			Format(szTime, 64, "%s", g_szPersonalRecord[client]);
 		else
 			Format(szTime, 64, "N/A");
 
-		Format(szCountry, sizeof(szCountry), g_szCountryCode[client]);
+		Format(szCountry, sizeof(szCountry), g_szCountry[client]);
+		Format(szCountryCode, sizeof(szCountryCode), g_szCountryCode[client]);
+		Format(szContinentCode, sizeof(szContinentCode), g_szContinentCode[client]);
 
 		rank = g_MapRank[client];
 
 		SetNativeString(2, szTime, sizeof(szTime), true);
 		SetNativeCellRef(3, rank);
 		SetNativeString(4, szCountry, sizeof(szCountry), true);
+		SetNativeString(4, szCountryCode, sizeof(szCountryCode), true);
+		SetNativeString(4, szContinentCode, sizeof(szContinentCode), true);
 	}
 
 	return rank;
