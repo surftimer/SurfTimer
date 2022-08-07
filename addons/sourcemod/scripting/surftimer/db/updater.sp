@@ -75,6 +75,12 @@ void CheckDatabaseForUpdates()
 			db_upgradeDatabase(10);
 			return;
 		}
+
+		if (!SQL_FastQuery(g_hDb, "SELECT countryCode FROM ck_playerrank LIMIT 1"))
+		{
+			db_upgradeDatabase(11);
+			return;
+		}
 		LogMessage("Version 10 looks good.");
 	}
 }
@@ -162,6 +168,11 @@ public void db_upgradeDatabase(int ver)
 			SQL_FastQuery(g_hDb_Updates, "ALTER TABLE ck_checkpoints RENAME TO ck_checkpointsold;");
 			SQL_FastQuery(g_hDb_Updates, "ALTER TABLE ck_checkpointsnew RENAME TO ck_checkpoints;");
 		}
+	}
+	else if (ver == 11)
+	{
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN countryCode(3) DEFAULT NULL AFTER `country`;");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN continentCode(3) DEFAULT NULL AFTER `countryCode`;");
 	}
 
 	CheckDatabaseForUpdates();
