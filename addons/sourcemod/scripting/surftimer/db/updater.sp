@@ -171,8 +171,8 @@ public void db_upgradeDatabase(int ver)
 	}
 	else if (ver == 11)
 	{
-		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN countryCode(3) DEFAULT NULL AFTER `country`;");
-		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN continentCode(3) DEFAULT NULL AFTER `countryCode`;");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN countryCode varchar(3) DEFAULT NULL AFTER `country`;");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN continentCode varchar(3) DEFAULT NULL AFTER `countryCode`;");
 	}
 
 	CheckDatabaseForUpdates();
