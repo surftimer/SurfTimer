@@ -5451,3 +5451,44 @@ bool GetDatabaseName(char[] database, int length)
 	delete kv;
 	return true;
 }
+
+public bool GetContinentName(char code[3], char[] name, int length)
+{
+	if (code[0] == 'A' && code[1] == 'S')
+	{
+		Format(name, length, "Asia");
+		return true;
+	}
+	else if (code[0] == 'A' && code[1] == 'N')
+	{
+		Format(name, length, "Antarctica");
+		return true;
+	}
+	else if (code[0] == 'A' && code[1] == 'F')
+	{
+		Format(name, length, "Africa");
+		return true;
+	}
+	else if (code[0] == 'S' && code[1] == 'A')
+	{
+		Format(name, length, "South America");
+		return true;
+	}
+	else if (code[0] == 'E' && code[1] == 'U')
+	{
+		Format(name, length, "Europe");
+		return true;
+	}
+	else if (code[0] == 'O' && code[1] == 'C')
+	{
+		Format(name, length, "Oceania");
+		return true;
+	}
+	else if (code[0] == 'N' && code[1] == 'A')
+	{
+		Format(name, length, "North America");
+		return true;
+	}
+
+	return false;
+}
