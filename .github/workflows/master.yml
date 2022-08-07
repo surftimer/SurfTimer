@@ -4,11 +4,9 @@ on:
   push:
     branches:
      - master
-     - dev
-  pull_request:
-    branches:
-     - master
-     - dev
+  workflow_dispatch:
+  schedule:
+    - cron: '53 05 01 */3 *' # Artifacts expire every 3 months
 
 jobs:
   build:
@@ -16,18 +14,29 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        SM_VERSION: [ "1.10", "1.11" ]
-
+        SM_VERSION: [ "1.11", "1.12" ]
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+
+      - name: Get branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: get_branch_name
 
       - name: Set environment variables
         run: |
+          git fetch --unshallow
+          echo "COMMIT=$(git rev-list --count HEAD)" >> $GITHUB_ENV
+          echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
           SOURCEMOD_PATH=$GITHUB_WORKSPACE/addons/sourcemod
           echo "SOURCEMOD_PATH=$SOURCEMOD_PATH" >> $GITHUB_ENV
+          echo "PLUGINS_PATH=$SOURCEMOD_PATH/plugins" >> $GITHUB_ENV
+          echo "GAMEDATA_PATH=$SOURCEMOD_PATH/gamedata" >> $GITHUB_ENV
           echo "SCRIPTING_PATH=$SOURCEMOD_PATH/scripting" >> $GITHUB_ENV
           echo "INCLUDE_PATH=$SOURCEMOD_PATH/scripting/include" >> $GITHUB_ENV
+          echo "TRANSLATIONS_PATH=$SOURCEMOD_PATH/translations" >> $GITHUB_ENV
 
       - name: Setup SourcePawn Compiler ${{ matrix.SM_VERSION }}
         uses: rumblefrog/setup-sp@master
@@ -40,14 +49,44 @@ jobs:
           wget https://raw.githubusercontent.com/Impact123/AutoExecConfig/development/autoexecconfig.inc -P $INCLUDE_PATH
           wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/addons/sourcemod/scripting/include/colorlib.inc -P $INCLUDE_PATH
 
-      - name: Compile SurfTimer
+      - name: Replace version with git commit number
         run: |
-          echo -e "\nCompiling SurfTimer.sp..."
-          spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH SurfTimer.sp
-        working-directory: ${{ env.SCRIPTING_PATH }}/
+          sed -i "s/1.0.dev/1.0.dev${{ env.COMMIT }}-${{ env.SHORT_SHA }}-${{ steps.get_branch_name.outputs.branch }}/g" $SCRIPTING_PATH/SurfTimer.sp
 
-      - name: Compile SurfTimer Telefinder
+      - name: Download EndTouchFix source and gamedata file
         run: |
-          echo -e "\nCompiling SurfTimer-telefinder.sp..."
-          spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH SurfTimer-telefinder.sp
-        working-directory: ${{ env.SCRIPTING_PATH }}/
+          wget https://github.com/rumourA/End-Touch-Fix/raw/master/scripting/EndTouchFix.sp -P $SCRIPTING_PATH
+          wget https://github.com/rumourA/End-Touch-Fix/raw/master/gamedata/endtouch.games.txt -P $GAMEDATA_PATH
+
+      - name: Download SurfTimer Mapchooser source and translations file
+        run: |
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/scripting/st-mapchooser.sp -P $SCRIPTING_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/scripting/st-nominations.sp -P $SCRIPTING_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/scripting/st-rockthevote.sp -P $SCRIPTING_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/scripting/st-voteextend.sp -P $SCRIPTING_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/translations/st-mapchooser.phrases.txt -P $TRANSLATIONS_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/translations/st-nominations.phrases.txt -P $TRANSLATIONS_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/translations/st-rockthevote.phrases.txt -P $TRANSLATIONS_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/translations/st-voteextend.phrases.txt -P $TRANSLATIONS_PATH
+
+      - name: Compile plugins
+        run: |
+          mkdir -p $PLUGINS_PATH
+          for file in *.sp
+          do
+            echo -e "\nCompiling $file..."
+            spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH -o $PLUGINS_PATH/$file $file
+          done
+        working-directory: ${{ env.SCRIPTING_PATH }}
+
+      - name: Prepare package directory
+        run: |
+          rm -R addons/sourcemod/scripting
+          mkdir package
+          mv ./{addons,cfg,maps,scripts,sound,LICENSE,README.md} package
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: SurfTimer.${{ steps.get_branch_name.outputs.branch }}.${{ env.COMMIT }}.${{ env.SHORT_SHA }}.SM${{ matrix.SM_VERSION }}
+          path: package
