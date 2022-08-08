@@ -494,12 +494,12 @@ public void OnClientAuthorized(int client)
 	if (GetConVarBool(g_hConnectMsg) && !IsFakeClient(client))
 	{
 		char s_Country[32], s_clientName[32], s_address[32];
-		GetClientIP(client, s_address, 32);
-		GetClientName(client, s_clientName, 32);
-		Format(s_Country, 100, "Unknown");
-		GeoipCountry(s_address, s_Country, 100);
+		GetClientIP(client, s_address, sizeof(s_address));
+		GetClientName(client, s_clientName, sizeof(s_clientName));
+		Format(s_Country, sizeof(s_Country), "Unknown");
+		GeoipCountry(s_address, s_Country, sizeof(s_Country));
 		if (!strcmp(s_Country, NULL_STRING))
-			Format(s_Country, 100, "Unknown", s_Country);
+			Format(s_Country, sizeof(s_Country), "Unknown", s_Country);
 		else
 			if (StrContains(s_Country, "United", false) != -1 ||
 			StrContains(s_Country, "Republic", false) != -1 ||
@@ -512,7 +512,7 @@ public void OnClientAuthorized(int client)
 			StrContains(s_Country, "Philippines", false) != -1 ||
 			StrContains(s_Country, "Vatican", false) != -1)
 		{
-			Format(s_Country, 100, "The %s", s_Country);
+			Format(s_Country, sizeof(s_Country), "The %s", s_Country);
 		}
 
 		if (StrEqual(s_Country, "Unknown", false) || StrEqual(s_Country, "Localhost", false))

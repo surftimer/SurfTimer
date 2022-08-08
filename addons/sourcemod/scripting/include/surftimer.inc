@@ -114,8 +114,10 @@ native int surftimer_GetMapData(char[] name, char[] time);
  * @param time				String to store the client's map time.
  * @param rank				int to store the client's map rank.
  * @param country			String to store the client's country.
+ * @param countryCode			String to store the client's countryCode.
+ * @param continentCode			String to store the client's continentCode.
  */
-native void surftimer_GetPlayerData(int& client, char[] time, int& rank, char[] country);
+native void surftimer_GetPlayerData(int& client, char[] time, int& rank, char[] country, char countryCode[3], char continentCode[3]);
 
 /**
  * Retrieves the client's current info.

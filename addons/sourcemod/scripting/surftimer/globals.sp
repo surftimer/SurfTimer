@@ -1097,7 +1097,8 @@ char g_szPlayerPanelText[MAXPLAYERS + 1][512];
 
 // Country codes
 char g_szCountry[MAXPLAYERS + 1][100];
-char g_szCountryCode[MAXPLAYERS + 1][16];
+char g_szCountryCode[MAXPLAYERS + 1][3];
+char g_szContinentCode[MAXPLAYERS + 1][3];
 
 // Client's steamID
 char g_szSteamID[MAXPLAYERS + 1][32];

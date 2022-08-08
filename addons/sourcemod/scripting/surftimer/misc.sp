@@ -964,13 +964,14 @@ public void GetCountry(int client)
 		if (!IsFakeClient(client))
 		{
 			char IP[16];
-			char code2[3];
-			GetClientIP(client, IP, 16);
+			GetClientIP(client, IP, sizeof(IP));
 
 			// COUNTRY
-			GeoipCountry(IP, g_szCountry[client], 100);
+			GeoipCountry(IP, g_szCountry[client], sizeof(g_szCountry[]));
+			GeoipCode2(IP, g_szCountryCode[client]);
+			GeoipContinentCode(IP, g_szContinentCode[client]);
 			if (!strcmp(g_szCountry[client], NULL_STRING))
-				Format(g_szCountry[client], 100, "Unknown", g_szCountry[client]);
+				Format(g_szCountry[client], sizeof(g_szCountry[]), "Unknown", g_szCountry[client]);
 			else
 				if (StrContains(g_szCountry[client], "United", false) != -1 ||
 				StrContains(g_szCountry[client], "Republic", false) != -1 ||
@@ -983,15 +984,8 @@ public void GetCountry(int client)
 				StrContains(g_szCountry[client], "Philippines", false) != -1 ||
 				StrContains(g_szCountry[client], "Vatican", false) != -1)
 			{
-				Format(g_szCountry[client], 100, "The %s", g_szCountry[client]);
+				Format(g_szCountry[client], sizeof(g_szCountry[]), "The %s", g_szCountry[client]);
 			}
-			// CODE
-			if (GeoipCode2(IP, code2))
-			{
-				Format(g_szCountryCode[client], 16, "%s", code2);
-			}
-			else
-				Format(g_szCountryCode[client], 16, "??");
 		}
 	}
 }
@@ -5456,4 +5450,45 @@ bool GetDatabaseName(char[] database, int length)
 
 	delete kv;
 	return true;
+}
+
+public bool GetContinentName(char code[3], char[] name, int length)
+{
+	if (code[0] == 'A' && code[1] == 'S')
+	{
+		Format(name, length, "Asia");
+		return true;
+	}
+	else if (code[0] == 'A' && code[1] == 'N')
+	{
+		Format(name, length, "Antarctica");
+		return true;
+	}
+	else if (code[0] == 'A' && code[1] == 'F')
+	{
+		Format(name, length, "Africa");
+		return true;
+	}
+	else if (code[0] == 'S' && code[1] == 'A')
+	{
+		Format(name, length, "South America");
+		return true;
+	}
+	else if (code[0] == 'E' && code[1] == 'U')
+	{
+		Format(name, length, "Europe");
+		return true;
+	}
+	else if (code[0] == 'O' && code[1] == 'C')
+	{
+		Format(name, length, "Oceania");
+		return true;
+	}
+	else if (code[0] == 'N' && code[1] == 'A')
+	{
+		Format(name, length, "North America");
+		return true;
+	}
+
+	return false;
 }
