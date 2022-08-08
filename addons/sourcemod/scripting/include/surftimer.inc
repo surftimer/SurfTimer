@@ -194,9 +194,10 @@ forward void surftimer_OnNewRecord(int client, int style, char[] time, char[] ti
  * @param style				Style index.
  * @param time				Time set by the player.
  * @param timeDif			Time difference with the former record.
- * @param stage			  The id of the stage of the WRCP.
+ * @param stage			  	The id of the stage of the WRCP.
+ * @param fRunTime			Run time for the WRCP in float.
  */
-forward void surftimer_OnNewWRCP(int client, int style, char[] time, char[] timeDif, int stage);
+forward void surftimer_OnNewWRCP(int client, int style, char[] time, char[] timeDif, int stage, float fRunTime);
 
 public SharedPlugin:__pl_surftimer =
 {
