@@ -44,6 +44,10 @@ void CreateCommands()
 	RegConsoleCmd("sm_ctop_help", Client_CountryTop_Help, "[surftimer] displays information on how to use the command sm_ctop");
 	RegConsoleCmd("sm_crank", Client_CountryRank, "[surftimer] displays player country rank");
 	RegConsoleCmd("sm_crank_help", Client_CountryRank_Help, "[surftimer] displays information on how to use the command sm_crank");
+	RegConsoleCmd("sm_continenttop", Client_ContinentTOP, "[surftimer] displays country top rankings");
+	RegConsoleCmd("sm_continenttop_help", Client_ContinentTop_Help, "[surftimer] displays information on how to use the command sm_ctop");
+	RegConsoleCmd("sm_continentrank", Client_ContinentRank, "[surftimer] displays player country rank");
+	RegConsoleCmd("sm_continentrank_help", Client_ContinentRank_Help, "[surftimer] displays information on how to use the command sm_crank");
 
 	// Teleportation Commands
 	RegConsoleCmd("sm_stages", Command_SelectStage, "[surftimer] Opens up the stage selector");
@@ -157,7 +161,8 @@ void CreateCommands()
 	RegConsoleCmd("sm_knife", Command_GiveKnife, "[surftimer] Give players a knife");
 	RegConsoleCmd("sm_prinfo_help", Command_PRinfo_help, "[surftimer] Show in console how to use the command");
 	RegConsoleCmd("sm_csd", Command_CenterSpeed, "[surftimer] [settings] on/off - toggle center speed display");
-	RegConsoleCmd("sm_acronyms", Client_Acronyms, "[surftimer] shows every style format available");
+	RegConsoleCmd("sm_style_acronyms", Client_StyleAcronyms, "[surftimer] shows every style format available");
+	RegConsoleCmd("sm_continent_acronyms", Client_ContinentAcronyms, "[surftimer] shows every continent format available");
 
 
 	// New Commands
@@ -1823,11 +1828,43 @@ public Action Client_CountryRank_Help(int client, int args){
 
 }
 
-public Action Client_Acronyms(int client, int args){
+public Action Client_ContinentTop_Help(int client, int args){
+
+	if(IsValidClient(client)){
+		CPrintToChat(client, "%t", "continenttop_help_chat", g_szChatPrefix);
+		PrintToConsole(client, "%t", "ctop_help");
+	}
+
+	return Plugin_Handled;
+
+}
+public Action Client_ContinentRank_Help(int client, int args){
+
+	if(IsValidClient(client)){
+		CPrintToChat(client, "%t", "continentrank_help_chat", g_szChatPrefix);
+		PrintToConsole(client, "%t", "crank_help");
+	}
+
+	return Plugin_Handled;
+
+}
+
+public Action Client_StyleAcronyms(int client, int args){
 
 	if(IsValidClient(client)){
 		CPrintToChat(client, "%t", "style_acronyms_help_chat", g_szChatPrefix);
 		PrintToConsole(client, "%t", "style_acronyms_help");
+	}
+
+	return Plugin_Handled;
+
+}
+
+public Action Client_ContinentAcronyms(int client, int args){
+
+	if(IsValidClient(client)){
+		CPrintToChat(client, "%t", "continent_acronyms_help_chat", g_szChatPrefix);
+		PrintToConsole(client, "%t", "continent_acronyms_help");
 	}
 
 	return Plugin_Handled;
@@ -2098,7 +2135,7 @@ public void CountryTopMenuStyleSelect(int client, char szBuffer[256])
 
 	Menu menu = CreateMenu(CountryTopMenuStyleSelectHandler);
 
-	SetMenuTitle(menu, "Top Menu - Select a style\n \n");
+	SetMenuTitle(menu, "Country Top Menu - Select a style\n \n");
 
 	for (int i = 0; i < sizeof(g_EditStyles); i++)
 	{
@@ -2133,6 +2170,351 @@ public int CountryTopMenuStyleSelectHandler(Handle menu, MenuAction action, int 
 
 	return 0;
 }
+
+
+public Action Client_ContinentRank(int client, int args)
+{
+	if(!IsValidClient(client))
+		return Plugin_Handled;
+
+	switch (args){
+		case 0 : {
+			char szClientName[MAX_NAME_LENGTH];
+			GetClientName(client, szClientName, sizeof szClientName);
+
+			db_SelectContinentRank(client, szClientName, g_szContinentCode[client], g_iCurrentStyle[client]);
+		}
+		case 1 : {
+
+			char arg1[MAX_NAME_LENGTH];
+
+			GetCmdArg(1, arg1, sizeof arg1);
+
+			//sm_continentrank #<style_acronym>
+			if (arg1[0] == '#') {
+				ReplaceString(arg1, sizeof arg1, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg1);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				char szClientName[MAX_NAME_LENGTH];
+				GetClientName(client, szClientName, sizeof szClientName);
+
+				db_SelectContinentRank(client, szClientName, g_szContinentCode[client], style);
+
+				return Plugin_Handled;
+
+			}
+
+			//sm_continentrank <playername>
+			db_SelectCustomPlayerContinentRank(client, arg1, g_iCurrentStyle[client]);
+		}
+		case 2 : {
+			char arg1[MAX_NAME_LENGTH];
+			GetCmdArg(1, arg1, sizeof arg1);
+
+			char arg2[MAX_NAME_LENGTH];
+			GetCmdArg(2, arg2, sizeof arg2);
+
+			//sm_continentrank #<style_acronym> <playername>
+			if (arg1[0] == '#') {
+				ReplaceString(arg1, sizeof arg1, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg1);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				db_SelectCustomPlayerContinentRank(client, arg2, style);
+
+				return Plugin_Handled;
+			}
+
+			//sm_continentrank <playername> #<style_acronym>
+			if (arg2[0] == '#') {
+				ReplaceString(arg2, sizeof arg2, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg2);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				db_SelectCustomPlayerContinentRank(client, arg1, style);
+
+				return Plugin_Handled;
+			}
+
+			CPrintToChat(client, "%t", "continentrank_help_chat", g_szChatPrefix);
+			PrintToConsole(client, "%t", "continentrank_help");
+			PrintToConsole(client, "%t", "continent_acronyms_help");	
+
+		}
+	}
+
+	return Plugin_Handled;
+}
+
+
+public Action Client_ContinentTOP(int client, int args)
+{
+	char szBuffer[256] = "zz-none";
+
+	switch (args) {
+		//sm_continenttop
+		case 0: ContinentTopMenuStyleSelect(client, szBuffer);
+		//sm_continenttop <continentname>
+		//sm_continenttop #<style_acronym>
+		case 1: {
+			char arg1[100];
+			GetCmdArg(1, arg1, sizeof arg1);
+
+			//sm_ctop #<style_acronym>
+			if (arg1[0] == '#') {
+				ReplaceString(arg1, sizeof arg1, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg1);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				db_GetContinentNames(client, style);
+				return Plugin_Handled;
+			}
+
+			//sm_continenttop <continentname>
+
+			char szContinentName[100];
+			char szContinentCode[3];
+			Format(szContinentCode, sizeof szContinentCode, "%s", arg1);
+			if( !GetContinentName(szContinentCode, szContinentName, sizeof szContinentName) ) {
+				CPrintToChat(client, "%t", "continenttop_help_chat", g_szChatPrefix);
+				PrintToConsole(client, "%t", "continenttop_help" );
+				PrintToConsole(client, "%t", "continent_acronyms_help");
+				PrintToConsole(client, "%t", "style_acronyms_help");
+				return Plugin_Handled;
+			}
+
+			Format(szBuffer, sizeof szBuffer, "%s-none", arg1);
+			ContinentTopMenuStyleSelect(client, szBuffer);
+		}
+		//sm_continenttop <continentname> #<style_acronym>
+		//sm_continenttop #<style_acronym> <continentname>
+		case 2: {
+
+			char arg1[100];
+			char arg2[100];
+
+			GetCmdArg(1, arg1, sizeof arg1);
+			GetCmdArg(2, arg2, sizeof arg2);
+
+			//sm_continenttop #<style_acronym> <continentname>
+			if (arg1[0] == '#') {
+				ReplaceString(arg1, sizeof arg1, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg1);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				char szContinentName[100];
+				char szContinentCode[3];
+				Format(szContinentCode, sizeof szContinentCode, "%s", arg2);
+				if( !GetContinentName(szContinentCode, szContinentName, sizeof szContinentName) ) {
+					CPrintToChat(client, "%t", "continenttop_help_chat", g_szChatPrefix);
+					PrintToConsole(client, "%t", "continenttop_help");
+					PrintToConsole(client, "%t", "continent_acronyms_help");
+					PrintToConsole(client, "%t", "style_acronyms_help");
+					return Plugin_Handled;
+				}
+
+				Format(szBuffer, sizeof szBuffer, "%s-%d", arg2, style);
+				ContinentTopMenuStyleSelect(client, szBuffer);
+
+				return Plugin_Handled;
+			}
+
+			//sm_continenttop <continentname> #<style_acronym>
+			if (arg2[0] == '#') {
+				ReplaceString(arg2, sizeof arg2, "#", "", false);
+
+				ArrayList styles = new ArrayList(32);
+
+				for (int j = 0; j < MAX_STYLES; j++) {
+					styles.PushString(g_szStyleAcronyms[j]);
+				}
+
+				int style = styles.FindString(arg2);
+				delete styles;
+
+				if ( style == -1 ) {
+					CPrintToChat(client, "%t", "style_not_found", g_szChatPrefix, MAX_STYLES - 1);
+					return Plugin_Handled;
+				}
+
+				char szContinentName[100];
+				char szContinentCode[3];
+				Format(szContinentCode, sizeof szContinentCode, "%s", arg1);
+				if( !GetContinentName(szContinentCode, szContinentName, sizeof szContinentName) ) {
+					CPrintToChat(client, "%t", "continenttop_help_chat", g_szChatPrefix);
+					PrintToConsole(client, "%t", "continenttop_help");
+					PrintToConsole(client, "%t", "continent_acronyms_help");
+					PrintToConsole(client, "%t", "style_acronyms_help");
+					return Plugin_Handled;
+				}
+
+				Format(szBuffer, sizeof szBuffer, "%s-%d", arg1, style);
+				ContinentTopMenuStyleSelect(client, szBuffer);
+
+				return Plugin_Handled;
+			}
+
+			CPrintToChat(client, "%t", "continenttop_help_chat", g_szChatPrefix);
+			PrintToConsole(client, "%t", "continenttop_help");
+			PrintToConsole(client, "%t", "style_acronyms_help");
+			PrintToConsole(client, "%t", "continent_acronyms_help");
+		}
+	}
+
+	return Plugin_Handled;
+}
+
+public void ContinentTopMenuStyleSelect(int client, char szBuffer[256])
+{
+	char szContinentCode[3];
+	int style;
+
+	//IF THE PLAYER INSERTED A CONTINENT OR A STYLE SPLIT THE BUFFER STRING AND STORE THE VALUES INDIVIDUAL VARIABLES
+	//split[0] -> Continent
+	//split[1] -> style
+	if ( strcmp(szBuffer, "zz-none", false) != 0 ) {
+		char splits[2][256];
+		ExplodeString(szBuffer, "-", splits, sizeof(splits), sizeof(splits[]));
+
+		//INSERTED CONTINENT
+		if( strcmp(splits[0], "zz", false) != 0 ) {
+			Format(szContinentCode, sizeof szContinentCode, "%s", splits[0]);
+		}
+		
+		//INSERTED STYLE
+		if( strcmp(splits[1], "none", false) != 0 ) {
+			style = StringToInt(splits[1]);
+		}
+
+		//IF PLAYER INPUTS CONTINENT NAME AND STYLE THERE IS NO NEED DISPLAY THIS MENU
+		//CALL 'db_SelectContinentTOP' STRAIGHT AWAY
+		if( strcmp(splits[0], "zz", false) != 0 && strcmp(splits[1], "none", false) != 0 ){
+			db_SelectContinentTOP(client, szContinentCode, style);
+			return;
+		}
+
+		//IF PLAYER INPUTS STYLE THERE IS NO NEED DISPLAY THIS MENU
+		//CALL 'db_GetContinentNames' STRAIGHT AWAY
+		if( strcmp(splits[0], "zz", false) == 0 && strcmp(splits[1], "none", false) != 0 ){
+			db_GetContinentNames(client, StringToInt(splits[1]));
+			return;
+		}
+
+	}
+	//IF PLAYER IS USING SM_CONTINENTTOP WITHOUT ANY ARGUMENTS
+	//THIS MEANS THE CONTINENT NAME IS NOT BEEN SELECTED YET
+	//SIMPLY SET IT AS "zz"
+	else {
+		szContinentCode = "zz";
+	}
+
+
+	Menu menu = CreateMenu(ContinentTopMenuStyleSelectHandler);
+
+	SetMenuTitle(menu, "Continent Top Menu - Select a style\n \n");
+
+	for (int i = 0; i < sizeof(g_EditStyles); i++)
+	{
+		Format(szBuffer, sizeof(szBuffer), "%s-%d", szContinentCode, i);
+
+		//EACH MENU ITEM HAS A STRING CONTAINING THE CONTINENT NAME AND THE STYLE SELECTED IN THE FOLLOWING FORMAT -> 'continent-style'
+		AddMenuItem(menu, szBuffer, g_EditStyles[i]);
+	}
+
+	SetMenuExitButton(menu, true);
+	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+}
+
+public int ContinentTopMenuStyleSelectHandler(Handle menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char szBuffer[256];
+		GetMenuItem(menu, param2, szBuffer, sizeof(szBuffer));
+
+		char splits[2][256];
+		ExplodeString(szBuffer, "-", splits, sizeof(splits), sizeof(splits[]));
+	
+		if( strcmp(splits[0], "zz", false) == 0 )
+			db_GetContinentNames(param1, StringToInt(splits[1]));
+		else {
+			char szContinentCode[3];
+			Format(szContinentCode, sizeof szContinentCode, "%s", splits[0]);
+
+			db_SelectContinentTOP(param1, szContinentCode, StringToInt(splits[1]));
+		}
+	}
+	else if (action == MenuAction_End) {
+		delete menu;
+	}
+
+	return 0;
+}
+
+
+
+
 
 public Action Client_Top(int client, int args)
 {
