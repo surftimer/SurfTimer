@@ -11443,6 +11443,437 @@ public int CountriesMenu(Menu menu, MenuAction action, int param1, int param2)
 	return 0;
 }
 
+
+//sm_continentrank
+public void db_SelectContinentRank(int client, char szPlayerName[MAX_NAME_LENGTH], char szContinentCode[3], int style)
+{
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackString(pack, szPlayerName);
+	WritePackString(pack, szContinentCode);
+	WritePackCell(pack, style);
+
+	//GET TOTAL AMOUNT OF PLAYERS
+	char szQuery[512];
+	Format(szQuery, sizeof szQuery, "SELECT COUNT(steamid) FROM ck_playerrank WHERE continentCode = '%s' AND style = '%i';", szContinentCode, style);
+	SQL_TQuery(g_hDb, db_SelectContinentRankCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_SelectContinentRankCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_SelectContinentRankCallback): %s ", error);
+		CloseHandle(pack);
+		return;
+	}
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+
+	char szPlayerName[MAX_NAME_LENGTH];
+	ReadPackString(pack, szPlayerName, sizeof szPlayerName);
+
+	char szContinentCode[3];
+	ReadPackString(pack, szContinentCode, sizeof szContinentCode);
+
+	int style = ReadPackCell(pack);
+	CloseHandle(pack);
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl)) {
+
+		db_GetPlayerPointsContinent(client, SQL_FetchInt(hndl, 0), szPlayerName, szContinentCode, style);
+	}
+}
+
+public void db_GetPlayerPointsContinent(int client, int ContinentPlayerTotal, char szPlayerName[MAX_NAME_LENGTH], char szContinentCode[3], int style)
+{	
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackCell(pack, ContinentPlayerTotal);
+	WritePackString(pack, szPlayerName);
+	WritePackString(pack, szContinentCode);
+	WritePackCell(pack, style);
+
+	//GET PLAYER POINTS
+	char szQuery[512];
+	Format(szQuery, sizeof szQuery, "SELECT points FROM ck_playerrank WHERE name = '%s' AND style = '%i';", szPlayerName, style);
+	SQL_TQuery(g_hDb, db_GetPlayerPointsContinentCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_GetPlayerPointsContinentCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_GetPlayerPointsCallback): %s ", error);
+		CloseHandle(pack);
+		return;
+	}
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	int ContinentPlayerTotal = ReadPackCell(pack);
+	char szPlayerName[MAX_NAME_LENGTH];
+	ReadPackString(pack, szPlayerName, sizeof szPlayerName);
+	char szContinentCode[3];
+	ReadPackString(pack, szContinentCode, sizeof szContinentCode);
+	int style = ReadPackCell(pack);
+	CloseHandle(pack);
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl)) {
+		db_GetPlayerContinentRank(SQL_FetchInt(hndl, 0), ContinentPlayerTotal, szPlayerName, szContinentCode, style);
+	}
+	else {
+		CPrintToChat(client, "%t", "Player_Data_Not_Found", g_szChatPrefix);
+	}
+}
+
+public void db_GetPlayerContinentRank(int PlayerPoints, int ContinentPlayerTotal, char szPlayerName[MAX_NAME_LENGTH], char szContinentCode[3], int style)
+{	
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, PlayerPoints);
+	WritePackCell(pack, ContinentPlayerTotal);
+	WritePackString(pack, szPlayerName);
+	WritePackString(pack, szContinentCode);
+	WritePackCell(pack, style);
+
+	//GET CLIENT CONTINENT RANK
+	char szQuery[512];
+	Format(szQuery, sizeof szQuery, "SELECT COUNT(steamid) + 1 FROM ck_playerrank WHERE continentCode = '%s' AND style = '%i' AND points > '%i';", szContinentCode, style, PlayerPoints);
+	SQL_TQuery(g_hDb, db_GetPlayerContinentRankCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_GetPlayerContinentRankCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_GetPlayerContinentRankCallback): %s ", error);
+		CloseHandle(pack);
+		return;
+	}
+
+	ResetPack(pack);
+	int PlayerPoints = ReadPackCell(pack);
+	int ContinentPlayerTotal = ReadPackCell(pack);
+	char szPlayerName[MAX_NAME_LENGTH];
+	ReadPackString(pack, szPlayerName, sizeof szPlayerName);
+	char szContinentCode[3];
+	ReadPackString(pack, szContinentCode, sizeof szContinentCode);
+	int style = ReadPackCell(pack);
+	CloseHandle(pack);
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl)) {
+		char szContinentName[100];
+		GetContinentName(szContinentCode, szContinentName, sizeof szContinentName);
+
+		CPrintToChatAll("%t", "Continent_Rank", g_szChatPrefix, g_szStyleRecordPrint[style], szPlayerName, SQL_FetchInt(hndl, 0), ContinentPlayerTotal, szContinentName, PlayerPoints);
+	}
+}
+
+//sm_continent <playername>
+//sm_continentrank <playername> <style>
+//sm_continentnrank <style> <playername>
+public void db_SelectCustomPlayerContinentRank(int client, char szPlayerName[MAX_NAME_LENGTH], int style)
+{
+	// Escape name for SQL injection protection
+	char szName[MAX_NAME_LENGTH * 2 + 1];
+	SQL_EscapeString(g_hDb, szPlayerName, szName, MAX_NAME_LENGTH);
+
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackString(pack, szName);
+	WritePackCell(pack, style);
+
+	//CHECK IF PLAYER EXISTS
+	char szQuery[512];
+	Format(szQuery, sizeof szQuery, "SELECT * FROM ck_playerrank WHERE name = '%s';", szName);
+	SQL_TQuery(g_hDb, db_SelectCustomPlayerContinentRankCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_SelectCustomPlayerContinentRankCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_SelectCustomPlayerContinentRankCallback): %s ", error);
+		CloseHandle(pack);
+		return;
+	}
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	char szPlayerName[MAX_NAME_LENGTH];
+	ReadPackString(pack, szPlayerName, sizeof szPlayerName);
+	int style = ReadPackCell(pack);
+	CloseHandle(pack);
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl)) {
+		db_SelectCustomPlayerContinentRank_GetContinent(client, szPlayerName, style);
+	}
+	else {
+		CPrintToChat(client, "%t", "PlayerNotFound", g_szChatPrefix, szPlayerName);
+	}
+}
+
+public void db_SelectCustomPlayerContinentRank_GetContinent(int client, char szPlayerName[MAX_NAME_LENGTH], int style)
+{
+	// Escape name for SQL injection protection
+	char szName[MAX_NAME_LENGTH * 2 + 1];
+	SQL_EscapeString(g_hDb, szPlayerName, szName, MAX_NAME_LENGTH);
+
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackString(pack, szName);
+	WritePackCell(pack, style);
+
+	//GET SELECT PLAYER CONTINENT
+	char szQuery[512];
+	Format(szQuery, sizeof szQuery, "SELECT continentCode FROM ck_playerrank WHERE name = '%s' AND style = '%i';", szName, style);
+	SQL_TQuery(g_hDb, db_SelectCustomPlayerContinentRank_GetContinentCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_SelectCustomPlayerContinentRank_GetContinentCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_SelectCustomPlayerContinentRank_GetContinentCallback): %s ", error);
+		CloseHandle(pack);
+		return;
+	}
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	char szPlayerName[MAX_NAME_LENGTH];
+	ReadPackString(pack, szPlayerName, sizeof szPlayerName);
+	int style = ReadPackCell(pack);
+	CloseHandle(pack);
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl)) {
+		char szContinentCode[3];
+		SQL_FetchString(hndl, 0, szContinentCode, sizeof szContinentCode);
+
+		db_SelectContinentRank(client, szPlayerName, szContinentCode, style);
+	}
+	else {
+		CPrintToChat(client, "%t", "Player_Data_Not_Found", g_szChatPrefix);
+	}
+}
+
+//sm_continenttop
+public void db_SelectContinentTOP(int client, char szContinentCode[3], int style)
+{
+	if (!IsValidClient(client))
+		return;
+
+	g_iContinentTopStyleSelected[client] = style;
+
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackString(pack, szContinentCode);
+	WritePackCell(pack, style);
+
+	char szQuery[512];
+	Format(szQuery, sizeof szQuery, "SELECT name,  points, style FROM ck_playerrank WHERE continentCode = '%s' AND style = '%i' ORDER BY points DESC LIMIT 100;", szContinentCode, style);
+	SQL_TQuery(g_hDb, db_SelectContinentTOPCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_SelectContinentTOPCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_SelectContinentTOPCallback): %s ", error);
+		CloseHandle(pack);
+		return;
+	}
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	char szContinentCode[3];
+	ReadPackString(pack, szContinentCode, sizeof szContinentCode);
+	int style = ReadPackCell(pack);
+	CloseHandle(pack);
+
+	char szContinentName[100];
+	GetContinentName(szContinentCode, szContinentName, sizeof szContinentName);
+
+	if (SQL_HasResultSet(hndl)) {
+
+		Menu menu = CreateMenu(ContinentTopMenu);
+		char szItem[256];
+
+		if (SQL_GetRowCount(hndl) == 0) {
+			CPrintToChat(client, "%t", "continent_data_not_found", g_szChatPrefix);
+
+			SetMenuTitle(menu, "Continent Top for %s | %s\n \n", szContinentName, g_szStyleMenuPrint[style]);
+
+			AddMenuItem(menu, "", "No Players Found", ITEMDRAW_DISABLED);
+
+			SetMenuExitBackButton(menu, true);
+			DisplayMenu(menu, client, MENU_TIME_FOREVER);
+
+			return;
+		}
+
+		char szRank[16];
+		char szPlayerName[MAX_NAME_LENGTH];
+		int PlayerPoints;
+		int Style;
+
+		int row = 1;
+		while (SQL_FetchRow(hndl)) {
+
+			SQL_FetchString(hndl, 0, szPlayerName, sizeof szPlayerName);
+			PlayerPoints = SQL_FetchInt(hndl, 1);
+			
+			Style = SQL_FetchInt(hndl, 2);
+			char szStyle[256];
+			IntToString(Style, szStyle, sizeof szStyle);
+			
+			if (row == 100)
+				Format(szRank, sizeof szRank, "[%i.]", row);
+			else if (row < 10)
+				Format(szRank, sizeof szRank, "[0%i.]  ", row);
+			else
+				Format(szRank, sizeof szRank, "[%i.]  ", row);
+
+			if (PlayerPoints < 10)
+				Format(szItem, sizeof szItem, "%s      %dp        %s", szRank, PlayerPoints, szPlayerName);
+			else if (PlayerPoints < 100)
+				Format(szItem, sizeof szItem, "%s     %dp       %s", szRank, PlayerPoints, szPlayerName);
+			else if (PlayerPoints < 1000)
+				Format(szItem, sizeof szItem, "%s   %dp       %s", szRank, PlayerPoints, szPlayerName);
+			else if (PlayerPoints < 10000)
+				Format(szItem, sizeof szItem, "%s %dp       %s", szRank, PlayerPoints, szPlayerName);
+			else if (PlayerPoints < 100000)
+				Format(szItem, sizeof szItem, "%s %dp     %s", szRank, PlayerPoints, szPlayerName);
+			else
+				Format(szItem, sizeof szItem, "%s %dp   %s", szRank, PlayerPoints, szPlayerName);
+
+			AddMenuItem(menu, szStyle, szItem, ITEMDRAW_DISABLED);
+
+			row++;
+		}
+
+		SetMenuTitle(menu, "Continent Top for %s | %s\n \n    Rank   Points       Player", szContinentName, g_szStyleMenuPrint[Style]);
+		SetMenuPagination(menu, 5);
+		SetMenuExitBackButton(menu, true);
+
+		DisplayMenu(menu, client, MENU_TIME_FOREVER);
+	}
+}
+
+public int ContinentTopMenu(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Cancel) {
+		db_GetContinentNames(param1, g_iContinentTopStyleSelected[param1]);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+
+	return 0;
+}
+
+public void db_GetContinentNames(int client, int style)
+{
+	if (!IsValidClient(client))
+		return;
+
+	g_iContinentTopStyleSelected[client] = style;
+
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackCell(pack, style);
+
+	char szQuery[512];
+	Format(szQuery, sizeof szQuery, "SELECT DISTINCT(continentCode) FROM ck_playerrank WHERE style = '%i' ORDER BY continentCode;", style);
+	SQL_TQuery(g_hDb, db_GetContinentNamesCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void db_GetContinentNamesCallback(Handle owner, Handle hndl, const char[] error, any pack)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (db_GetContinentNamesCallback): %s ", error);
+		CloseHandle(pack);
+		return;
+	}
+
+	ResetPack(pack);
+	int client = ReadPackCell(pack);
+	int style = ReadPackCell(pack);
+	CloseHandle(pack);
+
+	if (SQL_HasResultSet(hndl)) {
+
+		Menu menu = CreateMenu(ContinentMenu);
+
+		if (SQL_GetRowCount(hndl) == 0) {
+			CPrintToChat(client, "%t", "continent_data_not_found", g_szChatPrefix);
+
+			SetMenuTitle(menu, "Continent's List | %s\n \n", g_szStyleMenuPrint[style]);
+			AddMenuItem(menu, "", "No Continent's Found", ITEMDRAW_DISABLED);
+
+			SetMenuExitBackButton(menu, true);
+			DisplayMenu(menu, client, MENU_TIME_FOREVER);
+			return;
+		}
+
+		char szBuffer[256];
+		char szItem[256];
+		char szContinentCode[3];
+		char szContinentName[100];
+		GetContinentName(szContinentCode, szContinentName, sizeof szContinentName);
+
+		if (strcmp(g_szContinentCode[client], "", false) != 0) {
+			Format(szItem, sizeof szItem, "My Continent\n ");
+			Format(szBuffer, sizeof szBuffer, "%s-%d", g_szContinentCode[client], style);
+			AddMenuItem(menu, szBuffer, szItem);
+		}
+
+		while (SQL_FetchRow(hndl)) {
+			SQL_FetchString(hndl, 0, szContinentCode, sizeof szContinentCode);
+			GetContinentName(szContinentCode, szContinentName, sizeof szContinentName);
+			Format(szItem, sizeof szItem, "%s", szContinentName);
+			Format(szBuffer, sizeof szBuffer, "%s-%d", szContinentCode, style);
+			AddMenuItem(menu, szBuffer, szItem);
+		}
+
+		SetMenuTitle(menu, "Continent's List | %s\n \n", g_szStyleMenuPrint[style]);
+		SetMenuExitBackButton(menu, true);
+
+		DisplayMenu(menu, client, MENU_TIME_FOREVER);
+	}
+
+}
+
+public int ContinentMenu(Menu menu, MenuAction action, int param1, int param2)
+{	
+	if (action == MenuAction_Select) {
+		char szBuffer[256];
+		GetMenuItem(menu, param2, szBuffer, sizeof(szBuffer));
+
+		char splits[2][256];
+		char szContinentCode[3];
+		ExplodeString(szBuffer, "-", splits, sizeof(splits), sizeof(splits[]));
+		Format(szContinentCode, sizeof szContinentCode, "%s", splits[0]);
+		db_SelectContinentTOP(param1, szContinentCode, StringToInt(splits[1]));
+	}
+	else if (action == MenuAction_Cancel)
+	{
+		char szBuffer[256] = "none-none";
+		ContinentTopMenuStyleSelect(param1, szBuffer);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+
+	return 0;
+}
+
+
+
 public void db_ViewPlayerRank(int client)
 {
 	char szQuery[512];

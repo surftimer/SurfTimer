@@ -1513,3 +1513,4 @@ char g_sDecimalTables[][][] = {
 bool g_tables_converted = false;
 
 int g_iCountryTopStyleSelected[MAXPLAYERS + 1];
+int g_iContinentTopStyleSelected[MAXPLAYERS + 1];
