@@ -4703,6 +4703,13 @@ public void TeleportToSaveloc(int client, int id)
 	TeleportEntity(client, g_fSaveLocCoords[client][id], g_fSaveLocAngle[client][id], g_fSaveLocVel[client][id]);
 }
 
+public Action DisablePrac(Handle timer, any data)//saveloc on start > startpos
+{
+	int client = GetClientFromSerial(data);
+	
+	g_bPracticeMode[client] = false;
+}
+
 public void ReadDefaultTitlesWhitelist()
 {
 	ClearArray(g_DefaultTitlesWhitelist);
