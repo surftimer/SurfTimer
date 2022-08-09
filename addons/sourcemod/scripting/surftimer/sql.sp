@@ -3396,7 +3396,7 @@ public void SQL_selectReplayCPTicksCallback(Handle owner, Handle hndl, const cha
 			frame = SQL_FetchInt(hndl, 1);
 			style = SQL_FetchInt(hndl, 2);
 
-			g_iCPStartFrame[style][cp] = frame;
+			g_iCPStartFrame[style][cp-1] = frame;
 
 			if (!g_bReplayTickFound[style] && g_iCPStartFrame[style][cp - 1] > 0)
 				g_bReplayTickFound[style] = true;
