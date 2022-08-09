@@ -4708,6 +4708,8 @@ public Action DisablePrac(Handle timer, any data)//saveloc on start > startpos
 	int client = GetClientFromSerial(data);
 	
 	g_bPracticeMode[client] = false;
+
+	return Plugin_Handled;
 }
 
 public void ReadDefaultTitlesWhitelist()
