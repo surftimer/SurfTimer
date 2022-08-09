@@ -11786,7 +11786,7 @@ public void db_GetContinentNames(int client, int style)
 	WritePackCell(pack, style);
 
 	char szQuery[512];
-	Format(szQuery, sizeof szQuery, "SELECT DISTINCT(continentCode) FROM ck_playerrank WHERE style = '%i' ORDER BY continentCode;", style);
+	Format(szQuery, sizeof szQuery, "SELECT DISTINCT(continentCode) FROM ck_playerrank WHERE style = '%i' AND continentCode IS NOT NULL ORDER BY continentCode;", style);
 	SQL_TQuery(g_hDb, db_GetContinentNamesCallback, szQuery, pack, DBPrio_Low);
 }
 
