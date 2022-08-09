@@ -3427,28 +3427,33 @@ public void db_UpdateReplaysTick(int client, int style){
 	else
 		cp_count = g_TotalStages - 1;
 
+	Transaction TicksTransaction = new Transaction();
+
 	if(!g_bReplayTickFound[style]){
 		g_bReplayTickFound[style] = true;
 		for(int i = 0; i < cp_count; i++){
 			Format(szQuery, sizeof(szQuery), sql_insertReplayCPTicks, g_szMapName, i+1, g_iCPStartFrame[style][i], style);
-			SQL_TQuery(g_hDb, SQL_UpdateReplaysTickCallback, szQuery, _, DBPrio_Low);
+			TicksTransaction.AddQuery(szQuery);
 		}
 	}
 	else{
 		for(int i = 0; i < cp_count; i++){
 			Format(szQuery, sizeof(szQuery), sql_updateReplayCPTicks, g_szMapName, i+1, g_iCPStartFrame[style][i], style);
-			SQL_TQuery(g_hDb, SQL_UpdateReplaysTickCallback, szQuery, _, DBPrio_Low);
+			TicksTransaction.AddQuery(szQuery);
 		}
 	}
+
+	SQL_ExecuteTransaction(g_hDb, TicksTransaction, db_TicksTransactionOnSuccess, db_TicksTransactionOnFailure, DBPrio_Low);
 }
 
-public void SQL_UpdateReplaysTickCallback(Handle owner, Handle hndl, const char[] error, any pack)
+public void db_TicksTransactionOnSuccess(Handle db, any pack, int numQueries, Handle[] results, any[] queryData)
 {
-	if (hndl == null)
-	{
-		LogError("[SurfTimer] SQL Error (SQL_UpdateReplaysTickCallback): %s", error);
-		return;
-	}
+	PrintToServer("[SurfTimer] Transaction Sucessfully Done!");
+}
+
+public void db_TicksTransactionOnFailure(Handle db, any pack, int numQueries, const char[] error, int failIndex, any[] queryData)
+{
+	LogError("[SurfTimer] SQL Error (db_TicksTransactionOnFailure): %s", error);
 }
 
 public void db_viewCheckpointsinZoneGroup(int client, char szSteamID[32], char szMapName[128], int zonegroup)
