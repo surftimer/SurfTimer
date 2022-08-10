@@ -3438,7 +3438,7 @@ public void db_UpdateReplaysTick(int client, int style){
 	}
 	else{
 		for(int i = 0; i < cp_count; i++){
-			Format(szQuery, sizeof(szQuery), sql_updateReplayCPTicks, g_szMapName, i+1, g_iCPStartFrame[style][i], style);
+			Format(szQuery, sizeof(szQuery), sql_updateReplayCPTicks, g_iCPStartFrame[style][i], g_szMapName, i+1, style);
 			TicksTransaction.AddQuery(szQuery);
 		}
 	}
