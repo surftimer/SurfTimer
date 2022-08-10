@@ -3443,7 +3443,8 @@ public void db_UpdateReplaysTick(int client, int style){
 		}
 	}
 
-	SQL_ExecuteTransaction(g_hDb, TicksTransaction, db_TicksTransactionOnSuccess, db_TicksTransactionOnFailure, DBPrio_Low);
+	SQL_ExecuteTransaction(g_hDb, TicksTransaction, db_TicksTransactionOnSuccess, db_TicksTransactionOnFailure, _, DBPrio_Low);
+
 }
 
 public void db_TicksTransactionOnSuccess(Handle db, any pack, int numQueries, Handle[] results, any[] queryData)
