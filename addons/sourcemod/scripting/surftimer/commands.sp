@@ -4363,11 +4363,11 @@ public int MiscellaneousOptionsHandler(Menu menu, MenuAction action, int param1,
 			case 0: HideMethod(param1, true);
 			case 1: QuakeSounds(param1, true);
 			case 2: TeleSide(param1, true);
-			case 3: PreSpeedMode(param1, true);
-			case 4: HideChat(param1, true);
-			case 5: HideViewModel(param1, true);
-			case 6: PrespeedText(param1, true);
-			case 7: HintsText(param1, true);
+			case 3: HideChat(param1, true);
+			case 4: HideViewModel(param1, true);
+			case 5: PrespeedText(param1, true);
+			case 6: HintsText(param1, true);
+			case 7: PreSpeedMode(param1, true);
 		}
 	}
 	else if (action == MenuAction_Cancel)
