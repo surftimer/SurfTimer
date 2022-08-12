@@ -147,14 +147,6 @@ public void SaveRecording(int client, int zgroup, int style)
 	g_bNewReplay[client] = false;
 	g_bNewBonus[client] = false;
 
-	for(int i = 0; i < MAX_STYLES; i++)
-	{
-		for(int j = 0; j < CPLIMIT; j++)
-		{
-			g_iCPStartFrame[i][j] = g_iCPStartFrame_CurrentRun[i][j][client];
-		}
-	}
-
 	// Check if the default record folder exists
 	char sPath2[256];
 	BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s", CK_REPLAY_PATH);
@@ -232,7 +224,15 @@ public void SaveRecording(int client, int zgroup, int style)
 		StopRecording(client);
 	}
 
-	db_UpdateReplaysTick(client, style);
+	if(zgroup == 0) {
+
+		for(int j = 0; j < CPLIMIT; j++)
+		{
+			g_iCPStartFrame[style][j] = g_iCPStartFrame_CurrentRun[style][j][client];
+		}
+
+		db_UpdateReplaysTick(client, style);
+	}
 }
 
 static void ClearFrame(int client)
@@ -563,7 +563,7 @@ public void PlayRecord(int client, int type, int style, int use_CP)
 	g_iReplayVersion[client] = header.BinaryFormatVersion;
 
 	if(use_CP > 0)
-		g_iReplayTick[client] = g_iCPStartFrame[style][use_CP];
+		g_iReplayTick[client] = g_iCPStartFrame[style][use_CP-1];
 	else
 		g_iReplayTick[client] = 0;
 

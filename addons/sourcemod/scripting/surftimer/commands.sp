@@ -6444,12 +6444,14 @@ public void PlayRecordCPMenu(int client, char szBuffer[128])
 				AddMenuItem(menu_replay_cp, szBuffer_menu, szItem);
 			}
 			else{
-				if(!g_bhasStages)
-					Format(szItem, sizeof(szItem), "Checkpoint %d ", i);
-				else
-					Format(szItem, sizeof(szItem), "Stage %d ", i + 1);
-				Format(szBuffer_menu, sizeof(szBuffer_menu), "checkpoint-%d", i);
-				AddMenuItem(menu_replay_cp, szBuffer_menu, szItem);
+				if (g_bReplayTickFound[0]) {
+					if(!g_bhasStages)
+						Format(szItem, sizeof(szItem), "Checkpoint %d ", i);
+					else
+						Format(szItem, sizeof(szItem), "Stage %d ", i + 1);
+					Format(szBuffer_menu, sizeof(szBuffer_menu), "checkpoint-%d", i);
+					AddMenuItem(menu_replay_cp, szBuffer_menu, szItem);
+				}
 			}
 		}
 	else{
@@ -6468,12 +6470,14 @@ public void PlayRecordCPMenu(int client, char szBuffer[128])
 					AddMenuItem(menu_replay_cp, szBuffer_menu, szItem);
 				}
 				else{
-					if(!g_bhasStages)
-						Format(szItem, sizeof(szItem), "%s | Checkpoint %d ", g_szStyleMenuPrint[style], i);
-					else
-						Format(szItem, sizeof(szItem), "%s | Stage %d ", g_szStyleMenuPrint[style], i + 1);
-					Format(szBuffer_menu, sizeof(szBuffer_menu), "style-%i-checkpoint-%d", style, i);
-					AddMenuItem(menu_replay_cp, szBuffer_menu, szItem);
+					if (g_bReplayTickFound[g_iSelectedReplayStyle]){
+						if(!g_bhasStages)
+							Format(szItem, sizeof(szItem), "%s | Checkpoint %d ", g_szStyleMenuPrint[style], i);
+						else
+							Format(szItem, sizeof(szItem), "%s | Stage %d ", g_szStyleMenuPrint[style], i + 1);
+						Format(szBuffer_menu, sizeof(szBuffer_menu), "style-%i-checkpoint-%d", style, i);
+						AddMenuItem(menu_replay_cp, szBuffer_menu, szItem);
+					}
 				}
 			}
 

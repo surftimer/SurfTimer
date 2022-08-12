@@ -133,7 +133,6 @@ char sql_clearPRruntime[] = "UPDATE ck_prinfo SET runtime = '0.0' WHERE steamid 
 char sql_createReplays[] = "CREATE TABLE IF NOT EXISTS ck_replays (mapname VARCHAR(32), cp int(12) NOT NULL DEFAULT '0', frame int(12) NOT NULL DEFAULT '0', style INT(12) NOT NULL DEFAULT '0', PRIMARY KEY(mapname, cp, style)) DEFAULT CHARSET=utf8mb4;";
 char sql_selectReplayCPTicksAll[] = "SELECT cp, frame, style FROM ck_replays WHERE mapname = '%s' AND style = '%i' ORDER BY cp ASC;";
 char sql_insertReplayCPTicks[] = "INSERT INTO ck_replays (mapname, cp, frame, style) VALUES ('%s', '%i', '%i', '%i')";
-char sql_updateReplayCPTicks[] = "UPDATE ck_replays SET cp='%i', frame='%i' WHERE mapname='%s' AND style='%i';";
-
+char sql_updateReplayCPTicks[] = "UPDATE ck_replays SET frame='%i' WHERE mapname='%s' AND cp ='%i' AND style='%i';";
 //check tables data type
 char sql_checkDataType[] = "SELECT DATA_TYPE, NUMERIC_PRECISION, NUMERIC_SCALE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='%s' AND COLUMN_NAME='%s' HAVING DATA_TYPE = 'decimal' AND NUMERIC_PRECISION = 12 AND NUMERIC_SCALE = 6;";
