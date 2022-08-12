@@ -7573,7 +7573,7 @@ public void db_selectStyleRecord(int client, int style)
 	WritePackCell(stylepack, style);
 
 	char szQuery[255];
-	Format(szQuery, 255, "SELECT runtimepro FROM `ck_playertimes` WHERE `steamid` = '%s' AND `mapname` = '%s' AND `style` = %i AND `runtimepro` > -1.0", g_szSteamID[client], g_szMapName, style);
+	Format(szQuery, 255, "SELECT runtimepro FROM ck_playertimes WHERE mapname = '%s' AND style = %i ORDER BY runtimepro LIMIT 1;", g_szMapName, style);
 	SQL_TQuery(g_hDb, sql_selectStyleRecordCallback, szQuery, stylepack, DBPrio_Low);
 }
 
