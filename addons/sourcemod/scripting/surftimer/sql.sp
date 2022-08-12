@@ -3516,20 +3516,20 @@ public void db_UpdateCheckpoints(int client, char szSteamID[32], int zGroup)
 	else
 		cp_count = g_TotalStages - 1;
 
-	char szQuery[102];
+	char szQuery[1024];
 	Transaction tAction = new Transaction();
 
 	if (g_bCheckpointsFound[zGroup][client])
 	{
 		for(int i = 0; i < cp_count; i++){
-			Format(szQuery, sizeof(szQuery), sql_updateCheckpoints, g_fCheckpointTimesNew[zGroup][client][i], szSteamID, g_szMapName, zGroup);
+			Format(szQuery, sizeof(szQuery), sql_updateCheckpoints, g_fCheckpointTimesNew[zGroup][client][i], szSteamID, g_szMapName, i+1, zGroup);
 			tAction.AddQuery(szQuery);
 		}
 	}
 	else
 	{
 		for(int i = 0; i < cp_count; i++){
-			Format(szQuery, sizeof(szQuery), sql_insertCheckpoints, szSteamID, g_szMapName, g_fCheckpointTimesNew[zGroup][client][i], zGroup);
+			Format(szQuery, sizeof(szQuery), sql_insertCheckpoints, szSteamID, g_szMapName, i+1, g_fCheckpointTimesNew[zGroup][client][i], zGroup);
 			tAction.AddQuery(szQuery);
 		}
 	}
