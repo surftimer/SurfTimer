@@ -19,7 +19,7 @@ jobs:
 
       - name: Set environment variables
         run: |
-          SOgit fetch --unshallow
+          git fetch --unshallow
           echo "COMMIT=$(git rev-list --count HEAD)" >> $GITHUB_ENV
           echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
