@@ -6356,7 +6356,7 @@ public int FinishedMapsMenuHandler(Handle menu, MenuAction action, int client, i
 public void db_selectTotalBonusCount()
 {
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT COUNT(DISTINCT `mapname`, `zonetypeid`, `zonegroup`) FROM `ck_zones` WHERE `zonetypeid` = 0 AND `zonegroup` > 0");
+	Format(szQuery, 512, "SELECT COUNT(DISTINCT a.mapname,zonegroup) as count FROM ck_zones a RIGHT JOIN ck_maptier b ON a.mapname = b.mapname WHERE a.zonegroup > 0");
 	SQL_TQuery(g_hDb, sql_selectTotalBonusCountCallback, szQuery, DBPrio_Low);
 }
 
@@ -6383,7 +6383,7 @@ public void sql_selectTotalBonusCountCallback(Handle owner, Handle hndl, const c
 public void db_selectTotalStageCount()
 {
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT COUNT(DISTINCT `mapname`, `zonetypeid`) FROM `ck_zones` WHERE `zonetype` = 3 AND `zonetypeid` = 0 AND `zonegroup` = 0");
+	Format(szQuery, 512, "SELECT SUM(c.stages) FROM (SELECT a.mapname, MAX(zonetypeid)+2 as stages FROM `ck_zones` a RIGHT JOIN `ck_maptier` b ON a.mapname = b.mapname WHERE zonetype = 3 GROUP BY a.mapname)c");
 	SQL_TQuery(g_hDb, sql_selectTotalStageCountCallback, szQuery, DBPrio_Low);
 }
 
@@ -6400,8 +6400,6 @@ public void sql_selectTotalStageCountCallback(Handle owner, Handle hndl, const c
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 		g_pr_StageCount = SQL_FetchInt(hndl, 0);
-
-	g_pr_StageCount = g_pr_StageCount * 2;
 
 	if (!g_bServerDataLoaded)
 		db_selectCurrentMapImprovement();
