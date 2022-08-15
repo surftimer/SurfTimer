@@ -1862,6 +1862,7 @@
 	{
 		"#format"	"{1:s}"
 		"en"		"{1} Old Personal Record, Improve your time"
+	}
 	"style_not_found"
 	{
 		"#format"	"{1:s},{2:i}"
@@ -1876,7 +1877,6 @@
 	{
 		"en"		"\nStyle Acronyms are the following : \nNormal - n \nSideways - sw \nHalf-Sideways - hsw \nBackwards - bw \nLow-Gravity - lg \nSlow Motion - sm \nFast Forward - ff \nFreestyle - fs \n"
 	}
-
 	"ctop_help_chat"
 	{
 		"#format"	"{1:s}"
@@ -1910,7 +1910,6 @@
 	{
 		"en"		"FORMATTING OPTIONS FOR COMMAND !crank \n!crank \n!crank <playername> \n!crank #<style_acronym> \n!crank <playername> #<style_acronym> OR !crank #<style_acronym> <playername> \n"
 	}
-
 	"continenttop_help_chat"
 	{
 		"#format"	"{1:s}"
@@ -1948,7 +1947,6 @@
 	{
 		"en"		"\nContinent Acronyms are the following :\nAS => Asia \nAN => Antarctica \nAF => Africa \nSA => South America \nEU => Europe \nOC => Oceania \nNA => North America"
 	}
-
 	"NextRankPointRequired"
 	{
 		"#format"	"{1:s},{2:i},{3:s}"

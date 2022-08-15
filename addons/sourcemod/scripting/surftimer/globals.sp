@@ -278,6 +278,25 @@ int g_totalBonusCount;
 // Does map have a bonus?
 bool g_bhasBonus;
 
+/*----------  CCP Variables  ----------*/
+
+Menu ccp_menu;
+float g_fCCPRecordCheckpointTimes[CPLIMIT];
+float g_fCCPPlayerCheckpointTimes[CPLIMIT];
+int g_iCCPPlayerCheckpointAttempts[CPLIMIT];
+
+// Clients Stage Times have been found?
+bool g_bStageTimesFound[MAXPLAYERS + 1];
+
+// Clients Stage Attempts have been found?
+bool g_bStageAttemptsFound[MAXPLAYERS + 1];
+
+// Clients current run's stage times
+float g_fStageTimesNew[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
+
+// Clients current run's stage attempts
+int g_iStageAttemptsNew[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
+
 /*----------  Checkpoint Variables  ----------*/
 
 // Clients best run's times

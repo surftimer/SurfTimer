@@ -3396,14 +3396,50 @@ public void SQL_LoadStageTimesCallback(Handle owner, Handle hndl, const char[] e
 		}
 	}
 
+	db_LoadStageAttempts(client);
+
+}
+
+public void db_LoadStageAttempts(int client){
+
+	char szQuery[1024];
+	Format(szQuery, sizeof(szQuery), sql_selectStageAttempts, g_szMapName, g_szSteamID[client]);
+	SQL_TQuery(g_hDb, SQL_LoadStageAttemptsCallback, szQuery, client, DBPrio_Low);
+
+}
+
+public void SQL_LoadStageAttemptsCallback(Handle owner, Handle hndl, const char[] error, any client)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (SQL_LoadStageAttemptsCallback): %s", error);
+		if (!g_bSettingsLoaded[client])
+			LoadClientSetting(client, g_iSettingToLoad[client]);
+		return;
+	}
+
+	if (!IsValidClient(client))
+		return;
+
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	{
+		g_bStageAttemptsFound[client] = true;
+		while (SQL_FetchRow(hndl))
+		{
+			for (int i = 0; i < 35; i++)
+			{
+				g_iCCPPlayerCheckpointAttempts[i] = SQL_FetchInt(hndl, i);
+			}
+		}
+	}
+
 	if (!g_bSettingsLoaded[client])
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewCheckpoints in %fs", g_szSteamID[client], tick);
+		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_LoadStageTimes in %fs", g_szSteamID[client], tick);
 		LoadClientSetting(client, g_iSettingToLoad[client]);
 	}
-
 }
 
 public void db_viewReplayCPTicks(char szMapName[128])
@@ -3501,6 +3537,39 @@ public void db_TicksTransactionOnFailure(Handle db, any pack, int numQueries, co
 	LogError("[SurfTimer] SQL Error (db_TicksTransactionOnFailure): %s", error);
 }
 
+public void db_UpdateStageTimes(int client, char szSteamID[32], char szMapName[128], int zGroup)
+{
+	//UPDATE THE REST OF THE PLAYERS
+	char szUName[MAX_NAME_LENGTH * 2 + 1];
+	GetClientName(client,szUName, MAX_NAME_LENGTH * 2 + 1);
+
+	char szName[MAX_NAME_LENGTH * 2 + 1];
+	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH * 2 + 1);
+
+	if (g_bStageTimesFound[client]){
+		char szQuery[4096];
+
+		Format(szQuery, sizeof(szQuery), sql_updateStageTimes, g_fStageTimesNew[zGroup][client][0], g_fStageTimesNew[zGroup][client][1], g_fStageTimesNew[zGroup][client][2], g_fStageTimesNew[zGroup][client][3], g_fStageTimesNew[zGroup][client][4], g_fStageTimesNew[zGroup][client][5], g_fStageTimesNew[zGroup][client][6], g_fStageTimesNew[zGroup][client][7], g_fStageTimesNew[zGroup][client][8], g_fStageTimesNew[zGroup][client][9], g_fStageTimesNew[zGroup][client][10], g_fStageTimesNew[zGroup][client][11], g_fStageTimesNew[zGroup][client][12], g_fStageTimesNew[zGroup][client][13], g_fStageTimesNew[zGroup][client][14], g_fStageTimesNew[zGroup][client][15], g_fStageTimesNew[zGroup][client][16], g_fStageTimesNew[zGroup][client][17], g_fStageTimesNew[zGroup][client][18], g_fStageTimesNew[zGroup][client][19], g_fStageTimesNew[zGroup][client][20], g_fStageTimesNew[zGroup][client][21], g_fStageTimesNew[zGroup][client][22], g_fStageTimesNew[zGroup][client][23], g_fStageTimesNew[zGroup][client][24], g_fStageTimesNew[zGroup][client][25], g_fStageTimesNew[zGroup][client][26], g_fStageTimesNew[zGroup][client][27], g_fStageTimesNew[zGroup][client][28], g_fStageTimesNew[zGroup][client][29], g_fStageTimesNew[zGroup][client][30], g_fStageTimesNew[zGroup][client][31], g_fStageTimesNew[zGroup][client][32], g_fStageTimesNew[zGroup][client][33], g_fStageTimesNew[zGroup][client][34], g_iStageAttemptsNew[zGroup][client][0], g_iStageAttemptsNew[zGroup][client][1], g_iStageAttemptsNew[zGroup][client][2], g_iStageAttemptsNew[zGroup][client][3], g_iStageAttemptsNew[zGroup][client][4], g_iStageAttemptsNew[zGroup][client][5], g_iStageAttemptsNew[zGroup][client][6], g_iStageAttemptsNew[zGroup][client][7], g_iStageAttemptsNew[zGroup][client][8], g_iStageAttemptsNew[zGroup][client][9], g_iStageAttemptsNew[zGroup][client][10], g_iStageAttemptsNew[zGroup][client][11], g_iStageAttemptsNew[zGroup][client][12], g_iStageAttemptsNew[zGroup][client][13], g_iStageAttemptsNew[zGroup][client][14], g_iStageAttemptsNew[zGroup][client][15], g_iStageAttemptsNew[zGroup][client][16], g_iStageAttemptsNew[zGroup][client][17], g_iStageAttemptsNew[zGroup][client][18], g_iStageAttemptsNew[zGroup][client][19], g_iStageAttemptsNew[zGroup][client][20], g_iStageAttemptsNew[zGroup][client][21], g_iStageAttemptsNew[zGroup][client][22], g_iStageAttemptsNew[zGroup][client][23], g_iStageAttemptsNew[zGroup][client][24], g_iStageAttemptsNew[zGroup][client][25], g_iStageAttemptsNew[zGroup][client][26], g_iStageAttemptsNew[zGroup][client][27], g_iStageAttemptsNew[zGroup][client][28], g_iStageAttemptsNew[zGroup][client][29], g_iStageAttemptsNew[zGroup][client][30], g_iStageAttemptsNew[zGroup][client][31], g_iStageAttemptsNew[zGroup][client][32], g_iStageAttemptsNew[zGroup][client][33], g_iStageAttemptsNew[zGroup][client][34], g_szSteamID[client], g_szMapName);
+		PrintToServer(szQuery);
+		SQL_TQuery(g_hDb, SQL_updateStageTimesCallback, szQuery, client, DBPrio_Low);
+	}
+	else{
+		char szQuery[4096];
+		Format(szQuery, sizeof(szQuery), sql_insertStageTimes, g_szSteamID[client], szName, g_szMapName, g_fStageTimesNew[zGroup][client][0], g_fStageTimesNew[zGroup][client][1], g_fStageTimesNew[zGroup][client][2], g_fStageTimesNew[zGroup][client][3], g_fStageTimesNew[zGroup][client][4], g_fStageTimesNew[zGroup][client][5], g_fStageTimesNew[zGroup][client][6], g_fStageTimesNew[zGroup][client][7], g_fStageTimesNew[zGroup][client][8], g_fStageTimesNew[zGroup][client][9], g_fStageTimesNew[zGroup][client][10], g_fStageTimesNew[zGroup][client][11], g_fStageTimesNew[zGroup][client][12], g_fStageTimesNew[zGroup][client][13], g_fStageTimesNew[zGroup][client][14], g_fStageTimesNew[zGroup][client][15], g_fStageTimesNew[zGroup][client][16], g_fStageTimesNew[zGroup][client][17], g_fStageTimesNew[zGroup][client][18], g_fStageTimesNew[zGroup][client][19], g_fStageTimesNew[zGroup][client][20], g_fStageTimesNew[zGroup][client][21], g_fStageTimesNew[zGroup][client][22], g_fStageTimesNew[zGroup][client][23], g_fStageTimesNew[zGroup][client][24], g_fStageTimesNew[zGroup][client][25], g_fStageTimesNew[zGroup][client][26], g_fStageTimesNew[zGroup][client][27], g_fStageTimesNew[zGroup][client][28], g_fStageTimesNew[zGroup][client][29], g_fStageTimesNew[zGroup][client][30], g_fStageTimesNew[zGroup][client][31], g_fStageTimesNew[zGroup][client][32], g_fStageTimesNew[zGroup][client][33], g_fStageTimesNew[zGroup][client][34], g_iStageAttemptsNew[zGroup][client][0], g_iStageAttemptsNew[zGroup][client][1], g_iStageAttemptsNew[zGroup][client][2], g_iStageAttemptsNew[zGroup][client][3], g_iStageAttemptsNew[zGroup][client][4], g_iStageAttemptsNew[zGroup][client][5], g_iStageAttemptsNew[zGroup][client][6], g_iStageAttemptsNew[zGroup][client][7], g_iStageAttemptsNew[zGroup][client][8], g_iStageAttemptsNew[zGroup][client][9], g_iStageAttemptsNew[zGroup][client][10], g_iStageAttemptsNew[zGroup][client][11], g_iStageAttemptsNew[zGroup][client][12], g_iStageAttemptsNew[zGroup][client][13], g_iStageAttemptsNew[zGroup][client][14], g_iStageAttemptsNew[zGroup][client][15], g_iStageAttemptsNew[zGroup][client][16], g_iStageAttemptsNew[zGroup][client][17], g_iStageAttemptsNew[zGroup][client][18], g_iStageAttemptsNew[zGroup][client][19], g_iStageAttemptsNew[zGroup][client][20], g_iStageAttemptsNew[zGroup][client][21], g_iStageAttemptsNew[zGroup][client][22], g_iStageAttemptsNew[zGroup][client][23], g_iStageAttemptsNew[zGroup][client][24], g_iStageAttemptsNew[zGroup][client][25], g_iStageAttemptsNew[zGroup][client][26], g_iStageAttemptsNew[zGroup][client][27], g_iStageAttemptsNew[zGroup][client][28], g_iStageAttemptsNew[zGroup][client][29], g_iStageAttemptsNew[zGroup][client][30], g_iStageAttemptsNew[zGroup][client][31], g_iStageAttemptsNew[zGroup][client][32], g_iStageAttemptsNew[zGroup][client][33], g_iStageAttemptsNew[zGroup][client][34]);
+		PrintToServer(szQuery);
+		SQL_TQuery(g_hDb, SQL_updateStageTimesCallback, szQuery, client, DBPrio_Low);
+	}
+}
+
+public void SQL_updateStageTimesCallback(Handle owner, Handle hndl, const char[] error, any client)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfTimer] SQL Error (SQL_updateStageTimesCallback): %s", error);
+		return;
+	}
+}
+
 public void db_viewCheckpointsinZoneGroup(int client, char szSteamID[32], char szMapName[128], int zonegroup)
 {
 	char szQuery[1024];
@@ -3541,52 +3610,11 @@ public void db_viewCheckpointsinZoneGroupCallback(Handle owner, Handle hndl, con
 			g_fCheckpointTimesRecord[zonegrp][client][cp] = SQL_FetchFloat(hndl, 1);
 		}
 		
-    db_UpdateStageTimes(client, g_szSteamID[client], g_szMapName, zonegrp);
+		db_UpdateStageTimes(client, g_szSteamID[client], g_szMapName, zonegrp);
 	}
 	else
 	{
 		g_bCheckpointsFound[zonegrp][client] = false;
-	}
-}
-
-public void db_UpdateStageTimes(int client, char szSteamID[32], char szMapName[128], int zonegroup)
-	if (hndl == null)
-	{
-		LogError("[SurfTimer] SQL Error (db_UpdateStageTimesCallback): %s", error);
-		return;
-	}
-	ResetPack(data);
-	int client = ReadPackCell(data);
-	int zGroup = ReadPackCell(data);
-
-	//UPDATE THE REST OF THE PLAYERS
-	char szUName[MAX_NAME_LENGTH * 2 + 1];
-	GetClientName(client,szUName, MAX_NAME_LENGTH * 2 + 1);
-
-	char szName[MAX_NAME_LENGTH * 2 + 1];
-	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH * 2 + 1);
-
-	if (g_bStageTimesFound[client]){
-		char szQuery[4096];
-
-		Format(szQuery, sizeof(szQuery), sql_updateStageTimes, g_fStageTimesNew[zGroup][client][0], g_fStageTimesNew[zGroup][client][1], g_fStageTimesNew[zGroup][client][2], g_fStageTimesNew[zGroup][client][3], g_fStageTimesNew[zGroup][client][4], g_fStageTimesNew[zGroup][client][5], g_fStageTimesNew[zGroup][client][6], g_fStageTimesNew[zGroup][client][7], g_fStageTimesNew[zGroup][client][8], g_fStageTimesNew[zGroup][client][9], g_fStageTimesNew[zGroup][client][10], g_fStageTimesNew[zGroup][client][11], g_fStageTimesNew[zGroup][client][12], g_fStageTimesNew[zGroup][client][13], g_fStageTimesNew[zGroup][client][14], g_fStageTimesNew[zGroup][client][15], g_fStageTimesNew[zGroup][client][16], g_fStageTimesNew[zGroup][client][17], g_fStageTimesNew[zGroup][client][18], g_fStageTimesNew[zGroup][client][19], g_fStageTimesNew[zGroup][client][20], g_fStageTimesNew[zGroup][client][21], g_fStageTimesNew[zGroup][client][22], g_fStageTimesNew[zGroup][client][23], g_fStageTimesNew[zGroup][client][24], g_fStageTimesNew[zGroup][client][25], g_fStageTimesNew[zGroup][client][26], g_fStageTimesNew[zGroup][client][27], g_fStageTimesNew[zGroup][client][28], g_fStageTimesNew[zGroup][client][29], g_fStageTimesNew[zGroup][client][30], g_fStageTimesNew[zGroup][client][31], g_fStageTimesNew[zGroup][client][32], g_fStageTimesNew[zGroup][client][33], g_fStageTimesNew[zGroup][client][34], g_iStageAttemptsNew[zGroup][client][0], g_iStageAttemptsNew[zGroup][client][1], g_iStageAttemptsNew[zGroup][client][2], g_iStageAttemptsNew[zGroup][client][3], g_iStageAttemptsNew[zGroup][client][4], g_iStageAttemptsNew[zGroup][client][5], g_iStageAttemptsNew[zGroup][client][6], g_iStageAttemptsNew[zGroup][client][7], g_iStageAttemptsNew[zGroup][client][8], g_iStageAttemptsNew[zGroup][client][9], g_iStageAttemptsNew[zGroup][client][10], g_iStageAttemptsNew[zGroup][client][11], g_iStageAttemptsNew[zGroup][client][12], g_iStageAttemptsNew[zGroup][client][13], g_iStageAttemptsNew[zGroup][client][14], g_iStageAttemptsNew[zGroup][client][15], g_iStageAttemptsNew[zGroup][client][16], g_iStageAttemptsNew[zGroup][client][17], g_iStageAttemptsNew[zGroup][client][18], g_iStageAttemptsNew[zGroup][client][19], g_iStageAttemptsNew[zGroup][client][20], g_iStageAttemptsNew[zGroup][client][21], g_iStageAttemptsNew[zGroup][client][22], g_iStageAttemptsNew[zGroup][client][23], g_iStageAttemptsNew[zGroup][client][24], g_iStageAttemptsNew[zGroup][client][25], g_iStageAttemptsNew[zGroup][client][26], g_iStageAttemptsNew[zGroup][client][27], g_iStageAttemptsNew[zGroup][client][28], g_iStageAttemptsNew[zGroup][client][29], g_iStageAttemptsNew[zGroup][client][30], g_iStageAttemptsNew[zGroup][client][31], g_iStageAttemptsNew[zGroup][client][32], g_iStageAttemptsNew[zGroup][client][33], g_iStageAttemptsNew[zGroup][client][34], g_szSteamID[client], g_szMapName);
-		PrintToServer(szQuery);
-		SQL_TQuery(g_hDb, SQL_updateStageTimesCallback, szQuery, data, DBPrio_Low);
-	}
-	else{
-		char szQuery[4096];
-		Format(szQuery, sizeof(szQuery), sql_insertStageTimes, g_szSteamID[client], szName, g_szMapName, g_fStageTimesNew[zGroup][client][0], g_fStageTimesNew[zGroup][client][1], g_fStageTimesNew[zGroup][client][2], g_fStageTimesNew[zGroup][client][3], g_fStageTimesNew[zGroup][client][4], g_fStageTimesNew[zGroup][client][5], g_fStageTimesNew[zGroup][client][6], g_fStageTimesNew[zGroup][client][7], g_fStageTimesNew[zGroup][client][8], g_fStageTimesNew[zGroup][client][9], g_fStageTimesNew[zGroup][client][10], g_fStageTimesNew[zGroup][client][11], g_fStageTimesNew[zGroup][client][12], g_fStageTimesNew[zGroup][client][13], g_fStageTimesNew[zGroup][client][14], g_fStageTimesNew[zGroup][client][15], g_fStageTimesNew[zGroup][client][16], g_fStageTimesNew[zGroup][client][17], g_fStageTimesNew[zGroup][client][18], g_fStageTimesNew[zGroup][client][19], g_fStageTimesNew[zGroup][client][20], g_fStageTimesNew[zGroup][client][21], g_fStageTimesNew[zGroup][client][22], g_fStageTimesNew[zGroup][client][23], g_fStageTimesNew[zGroup][client][24], g_fStageTimesNew[zGroup][client][25], g_fStageTimesNew[zGroup][client][26], g_fStageTimesNew[zGroup][client][27], g_fStageTimesNew[zGroup][client][28], g_fStageTimesNew[zGroup][client][29], g_fStageTimesNew[zGroup][client][30], g_fStageTimesNew[zGroup][client][31], g_fStageTimesNew[zGroup][client][32], g_fStageTimesNew[zGroup][client][33], g_fStageTimesNew[zGroup][client][34], g_iStageAttemptsNew[zGroup][client][0], g_iStageAttemptsNew[zGroup][client][1], g_iStageAttemptsNew[zGroup][client][2], g_iStageAttemptsNew[zGroup][client][3], g_iStageAttemptsNew[zGroup][client][4], g_iStageAttemptsNew[zGroup][client][5], g_iStageAttemptsNew[zGroup][client][6], g_iStageAttemptsNew[zGroup][client][7], g_iStageAttemptsNew[zGroup][client][8], g_iStageAttemptsNew[zGroup][client][9], g_iStageAttemptsNew[zGroup][client][10], g_iStageAttemptsNew[zGroup][client][11], g_iStageAttemptsNew[zGroup][client][12], g_iStageAttemptsNew[zGroup][client][13], g_iStageAttemptsNew[zGroup][client][14], g_iStageAttemptsNew[zGroup][client][15], g_iStageAttemptsNew[zGroup][client][16], g_iStageAttemptsNew[zGroup][client][17], g_iStageAttemptsNew[zGroup][client][18], g_iStageAttemptsNew[zGroup][client][19], g_iStageAttemptsNew[zGroup][client][20], g_iStageAttemptsNew[zGroup][client][21], g_iStageAttemptsNew[zGroup][client][22], g_iStageAttemptsNew[zGroup][client][23], g_iStageAttemptsNew[zGroup][client][24], g_iStageAttemptsNew[zGroup][client][25], g_iStageAttemptsNew[zGroup][client][26], g_iStageAttemptsNew[zGroup][client][27], g_iStageAttemptsNew[zGroup][client][28], g_iStageAttemptsNew[zGroup][client][29], g_iStageAttemptsNew[zGroup][client][30], g_iStageAttemptsNew[zGroup][client][31], g_iStageAttemptsNew[zGroup][client][32], g_iStageAttemptsNew[zGroup][client][33], g_iStageAttemptsNew[zGroup][client][34]);
-		PrintToServer(szQuery);
-		SQL_TQuery(g_hDb, SQL_updateStageTimesCallback, szQuery, data, DBPrio_Low);
-	}
-}
-
-public void SQL_updateStageTimesCallback(Handle owner, Handle hndl, const char[] error, any data)
-{
-	if (hndl == null)
-	{
-		LogError("[SurfTimer] SQL Error (SQL_updateStageTimesCallback): %s", error);
-		return;
 	}
 }
 
@@ -3625,12 +3653,12 @@ public void db_UpdateCheckpoints(int client, char szSteamID[32], int zGroup)
 
 public void db_UpdateCheckpointsOnSuccess(Handle db, any pack, int numQueries, Handle[] results, any[] queryData)
 {
-  ResetPack(pack);
+	ResetPack(pack);
 	int client = ReadPackCell(pack);
 	int zonegrp = ReadPackCell(pack);
 	CloseHandle(pack);
   
-  db_viewCheckpointsinZoneGroup(client, g_szSteamID[client], g_szMapName, zonegrp);
+  	db_viewCheckpointsinZoneGroup(client, g_szSteamID[client], g_szMapName, zonegrp);
 }
 
 public void db_UpdateCheckpointsOnFailure(Handle db, any pack, int numQueries, const char[] error, int failIndex, any[] queryData)

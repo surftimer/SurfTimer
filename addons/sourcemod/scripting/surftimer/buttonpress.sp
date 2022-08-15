@@ -821,7 +821,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 			g_WrcpStage[client] = g_Stage[0][client];
 			Stage_StartRecording(client); //Add pre
       
-      if (g_iCurrentStyle[client] == 0 && g_bTimerRunning[client]){
+			if (g_iCurrentStyle[client] == 0 && g_bTimerRunning[client]){
 				g_iStageAttemptsNew[0][client][g_Stage[0][client]-1] += 1;
 			}
 		}
