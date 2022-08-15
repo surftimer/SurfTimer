@@ -100,7 +100,7 @@ public void LoadClientSetting(int client, int setting)
 			case 6: db_CheckVIPAdmin(client, g_szSteamID[client]);
 			case 7: db_viewCustomTitles(client, g_szSteamID[client]);
 			case 8: db_viewCheckpoints(client, g_szSteamID[client], g_szMapName);
-      case 9: db_LoadStageTimes(client);
+	      	case 9: db_LoadCCP(client);
 			case 10: db_viewPRinfo(client, g_szSteamID[client], g_szMapName);
 			default: db_viewPersonalRecords(client, g_szSteamID[client], g_szMapName);
 		}

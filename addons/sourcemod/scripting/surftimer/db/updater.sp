@@ -81,7 +81,14 @@ void CheckDatabaseForUpdates()
 			db_upgradeDatabase(11);
 			return;
 		}
-		LogMessage("Version 10 looks good.");
+
+		if (!SQL_FastQuery(g_hDb, "SELECT cp FROM ck_ccp LIMIT 1"))
+		{
+			db_upgradeDatabase(11);
+			return;
+		}
+
+		LogMessage("Version 11 looks good.");
 	}
 }
 
@@ -173,6 +180,10 @@ public void db_upgradeDatabase(int ver)
 	{
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN countryCode varchar(3) DEFAULT NULL AFTER `country`;");
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN continentCode varchar(3) DEFAULT NULL AFTER `countryCode`;");
+	}
+	else if (ver == 12)
+	{
+		SQL_FastQuery(g_hDb, sql_createCCP);
 	}
 
 	CheckDatabaseForUpdates();
