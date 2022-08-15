@@ -3566,6 +3566,7 @@ public void SQL_updateStageTimesCallback(Handle owner, Handle hndl, const char[]
 	if (hndl == null)
 	{
 		LogError("[SurfTimer] SQL Error (SQL_updateStageTimesCallback): %s", error);
+		CloseHandle(client);
 		return;
 	}
 }
@@ -4107,11 +4108,17 @@ public void SQL_isLinearCallback(Handle owner, Handle hndl, const char[] error, 
 	if (hndl == null)
 	{
 		LogError("[SurfTimer] SQL Error (SQL_selectMapTierCallback): %s", error);
+		CloseHandle(data);
 		return;
 	}
 
 	ResetPack(data);
 	int client = ReadPackCell(data);
+	char szSteamID[32];
+	char szMapName[128];
+	ReadPackString(data, szSteamID, sizeof(szSteamID));
+	ReadPackString(data, szMapName, sizeof(szMapName));
+	CloseHandle(data);
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl)){
 
@@ -4119,11 +4126,6 @@ public void SQL_isLinearCallback(Handle owner, Handle hndl, const char[] error, 
 
 		//IF THE MAP HAS STAGE ZONES
 		if(stages > 0){
-			char szSteamID[32];
-			char szMapName[128];
-			ReadPackString(data, szSteamID, sizeof(szSteamID));
-			ReadPackString(data, szMapName, sizeof(szMapName));
-
 			//GET PLAYERS RANK
 			db_viewCCP_GetMapRank(client, szSteamID, szMapName);
 		}
@@ -12222,6 +12224,7 @@ public void SQL_viewCCP_GetMapRankCallback(Handle owner, Handle hndl, const char
 	char szSteamID[32];
 	ReadPackString(pack, szSteamID, sizeof(szSteamID));
 	ReadPackString(pack, szMapName, sizeof(szMapName));
+	CloseHandle(pack);
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
@@ -12305,6 +12308,7 @@ public void SQL_GetTotalMapCompletionsCallback(Handle owner, Handle hndl, const 
 
 		char szMapTimeFormatted[32];
 		ReadPackString(pack, szMapTimeFormatted, sizeof(szMapTimeFormatted));
+		CloseHandle(pack);
 
 		int total_map_completions = SQL_FetchInt(hndl, 0);
 
@@ -12355,6 +12359,7 @@ public void SQL_getRecordTimeCallback(Handle owner, Handle hndl, const char[] er
 		int total_map_completions = ReadPackCell(pack);
 		char szMapTimeFormatted[32];
 		ReadPackString(pack, szMapTimeFormatted, sizeof(szMapTimeFormatted));
+		CloseHandle(pack);
 
 		char Record_SteamID[32];
 		SQL_FetchString(hndl, 0, Record_SteamID, 32);
@@ -12432,6 +12437,7 @@ public void SQL_viewCCP_GetMapStageTimes_RecordCallback(Handle owner, Handle hnd
 		char szMapTimeDiffFormatted[32];
 		ReadPackString(pack, szMapTimeFormatted, sizeof(szMapTimeFormatted));
 		ReadPackString(pack, szMapTimeDiffFormatted, sizeof(szMapTimeDiffFormatted));
+		CloseHandle(pack);
 
 		//SAVE THE CHECKPOINT TIMES TO A GLOBAL ARRAY
 		for(int i = 0; i < g_TotalStages; i++){
@@ -12495,6 +12501,7 @@ public void SQL_viewCCP_GetMapStageAttempts_PlayerCallback(Handle owner, Handle 
 		char szMapTimeDiffFormatted[32];
 		ReadPackString(pack, szMapTimeFormatted, sizeof(szMapTimeFormatted));
 		ReadPackString(pack, szMapTimeDiffFormatted, sizeof(szMapTimeDiffFormatted));
+		CloseHandle(pack);
 
 		//SAVE THE CHECKPOINT TIMES TO A GLOBAL ARRAY
 		for(int i = 0; i < g_TotalStages; i++){
@@ -12561,6 +12568,7 @@ public void SQL_viewCCP_GetMapStageTimes_PlayerCallback(Handle owner, Handle hnd
 		char szMapTimeDiffFormatted[32];
 		ReadPackString(pack, szMapTimeFormatted, sizeof(szMapTimeFormatted));
 		ReadPackString(pack, szMapTimeDiffFormatted, sizeof(szMapTimeDiffFormatted));
+		CloseHandle(pack);
 
 		//SAVE THE CHECKPOINT TIMES TO A GLOBAL ARRAY
 		for(int i = 0; i < 35; i++){
@@ -12649,6 +12657,7 @@ public void SQL_viewCCP_GetMapStageRankCallback(Handle owner, Handle hndl, const
 
 		char szStageTimeFormatted[32];
 		ReadPackString(stage_pack, szStageTimeFormatted, sizeof(szStageTimeFormatted));
+		CloseHandle(stage_pack);
 
 		int total_stages = ReadPackCell(stage_pack);
 
@@ -12734,6 +12743,7 @@ public void DisplayCCPMenu(DataPack stage_pack)
 	PrintToServer("TOTAL STAGES: %d", total_stages);
 
 	int stage_rank_total = ReadPackCell(stage_pack);
+	CloseHandle(stage_pack);
 
 	//MENU
 	char szItem[256];
