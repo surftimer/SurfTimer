@@ -83,13 +83,11 @@ public void CL_OnStartTimerPress(int client)
 
 			// Reset Stage Times
 			for (int i = 0; i < CPLIMIT; i++)
-				g_fStageTimesNew[g_iClientInZone[client][2]][client][i] = 0.0;
+				g_fStageTimesNew[client][i] = 0.0;
 
 			// Reset Stage Attempts
 			for (int i = 0; i < CPLIMIT; i++)
-				g_iStageAttemptsNew[g_iClientInZone[client][2]][client][i] = 0;
-			
-			g_iStageAttemptsNew[0][client][0] = 1;
+				g_iStageAttemptsNew[client][i] = 0;
 
 			// Set missed record time variables
 			if (g_iClientInZone[client][2] == 0)
@@ -822,7 +820,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 			Stage_StartRecording(client); //Add pre
       
 			if (g_iCurrentStyle[client] == 0 && g_bTimerRunning[client]){
-				g_iStageAttemptsNew[0][client][g_Stage[0][client]-1] += 1;
+				g_iStageAttemptsNew[client][g_Stage[0][client]-1] += 1;
 			}
 		}
 		if (g_Stage[0][client] >= 1 && !g_bPracticeMode[client] && !IsFakeClient(client)) {
@@ -932,7 +930,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		stage = 1;
 
 	if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0 && g_fCurrentRunTime[client] != 0.0 && g_iClientInZone[client][2] == 0)
-			g_fStageTimesNew[0][client][stage-1] = g_fCurrentWrcpRunTime[client];
+			g_fStageTimesNew[client][stage-1] = g_fCurrentWrcpRunTime[client];
 
 	if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0)
 	{

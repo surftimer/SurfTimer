@@ -31,7 +31,7 @@ char sql_deleteCheckpoints[] = "DELETE FROM ck_checkpoints WHERE mapname = '%s'"
 char sql_createCCP[] = "CREATE TABLE IF NOT EXISTS ck_ccp (steamid VARCHAR(32), name VARCHAR(32), mapname VARCHAR(32), cp INT NOT NULL DEFAULT '0', time decimal(12, 6) NOT NULL DEFAULT '-1.000000', attempts_35 INT NOT NULL DEFAULT '0', PRIMARY KEY(steamid, mapname)) DEFAULT CHARSET=utf8mb4;";
 char sql_updateCCP[] = "UPDATE ck_ccp SET time='%f', attempts='%i' WHERE steamid='%s' AND mapname='%s' AND cp='%i';";
 char sql_insertCCP[] = "INSERT INTO ck_ccp VALUES ('%s', '%s', '%s', '%i', '%f', '%i')";
-char sql_selectStageTimes[] = "SELECT cp, time  FROM ck_ccp WHERE mapname = '%s' AND steamid = '%s';";
+char sql_selectStageTimes[] = "SELECT cp, time FROM ck_ccp WHERE mapname = '%s' AND steamid = '%s';";
 char sql_selectStageAttempts[] = "SELECT cp, attempts FROM ck_ccp WHERE mapname = '%s' AND steamid = '%s';";
 
 // ck_latestrecords

@@ -281,9 +281,10 @@ bool g_bhasBonus;
 /*----------  CCP Variables  ----------*/
 
 Menu ccp_menu;
-float g_fCCPRecordCheckpointTimes[CPLIMIT];
-float g_fCCPPlayerCheckpointTimes[CPLIMIT];
-int g_iCCPPlayerCheckpointAttempts[CPLIMIT];
+//THIS VARIABLES ARE USED ON SM_CCP
+float g_fCCPRecordCheckpointTimes[MAXPLAYERS + 1][CPLIMIT];
+float g_fCCPPlayerCheckpointTimes[MAXPLAYERS + 1][CPLIMIT];
+int g_iCCPPlayerCheckpointAttempts[MAXPLAYERS + 1][CPLIMIT];
 
 // Clients Stage Times have been found?
 bool g_bStageTimesFound[MAXPLAYERS + 1];
@@ -292,10 +293,10 @@ bool g_bStageTimesFound[MAXPLAYERS + 1];
 bool g_bStageAttemptsFound[MAXPLAYERS + 1];
 
 // Clients current run's stage times
-float g_fStageTimesNew[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
+float g_fStageTimesNew[MAXPLAYERS + 1][CPLIMIT];
 
 // Clients current run's stage attempts
-int g_iStageAttemptsNew[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT];
+int g_iStageAttemptsNew[MAXPLAYERS + 1][CPLIMIT];
 
 /*----------  Checkpoint Variables  ----------*/
 
