@@ -1,7 +1,6 @@
 public void setMapSettings()
 {
 	SetConVarFloat(g_hMaxVelocity, g_fMaxVelocity, true, true);
-	SetConVarFloat(g_hAnnounceRecord, g_fAnnounceRecord, true, true);
 	SetConVarBool(g_hGravityFix, g_bGravityFix, true, true);
 }
 
@@ -274,7 +273,7 @@ public void db_viewMapSettings()
 {
 	char szQuery[2048];
 	Format(szQuery, 2048, "SELECT `mapname`, `maxvelocity`, `announcerecord`, `gravityfix` FROM `ck_maptier` WHERE `mapname` = '%s'", g_szMapName);
-	SQL_TQuery(g_hDb, sql_viewMapSettingsCallback, szQuery, DBPrio_High);
+	SQL_TQuery(g_hDb, sql_viewMapSettingsCallback, szQuery, _, DBPrio_High);
 }
 
 public void sql_viewMapSettingsCallback(Handle owner, Handle hndl, const char[] error, any pack)
@@ -312,21 +311,21 @@ public void db_updateMapSettings()
 {
 	char szQuery[512];
 	Format(szQuery, 512, "UPDATE `ck_maptier` SET `maxvelocity` = '%f', `announcerecord` = '%f', `gravityfix` = %i WHERE `mapname` = '%s';", g_fMaxVelocity, g_fAnnounceRecord, view_as<int>(g_bGravityFix), g_szMapName);
-	SQL_TQuery(g_hDb, sql_insertMapSettingsCallback, szQuery, DBPrio_Low);
+	SQL_TQuery(g_hDb, sql_insertMapSettingsCallback, szQuery, _, DBPrio_Low);
 }
 
 public void db_unlimitAllStages(char[] szMapName)
 {
 	char szQuery[256];
 	Format(szQuery, 256, "UPDATE ck_zones SET prespeed = 0.0 WHERE mapname = '%s' AND zonetype = 3;", g_szMapName);
-	SQL_TQuery(g_hDb, SQL_UnlimitAllStagesCallback, szQuery, DBPrio_Low);
+	SQL_TQuery(g_hDb, SQL_UnlimitAllStagesCallback, szQuery, _, DBPrio_Low);
 }
 
 public void db_removeOnejumplimit(char[] szMapName)
 {
 	char szQuery[256];
 	Format(szQuery, 256, "UPDATE ck_zones SET onejumplimit = 0 WHERE mapname = '%s';", g_szMapName);
-	SQL_TQuery(g_hDb, SQL_removeOnejumplimitCallback, szQuery, DBPrio_Low);
+	SQL_TQuery(g_hDb, SQL_removeOnejumplimitCallback, szQuery, _, DBPrio_Low);
 }
 
 public void SQL_UnlimitAllStagesCallback(Handle owner, Handle hndl, const char[] error, any data)

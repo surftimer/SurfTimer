@@ -94,13 +94,14 @@ public void LoadClientSetting(int client, int setting)
 			case 0: db_viewPersonalRecords(client, g_szSteamID[client], g_szMapName);
 			case 1: db_viewPersonalBonusRecords(client, g_szSteamID[client]);
 			case 2: db_viewPersonalStageRecords(client, g_szSteamID[client]);
-			case 3: db_viewPlayerPoints(client);
-			case 4: db_viewPlayerOptions(client, g_szSteamID[client]);
-			case 5: db_CheckVIPAdmin(client, g_szSteamID[client]);
-			case 6: db_viewCustomTitles(client, g_szSteamID[client]);
-			case 7: db_viewCheckpoints(client, g_szSteamID[client], g_szMapName);
-			case 8: db_LoadStageTimes(client);
-			case 9: db_viewPRinfo(client, g_szSteamID[client], g_szMapName);
+			case 3: db_viewPersonalPrestrafeSpeeds(client, g_szSteamID[client]);
+			case 4: db_viewPlayerPoints(client);
+			case 5: db_viewPlayerOptions(client, g_szSteamID[client]);
+			case 6: db_CheckVIPAdmin(client, g_szSteamID[client]);
+			case 7: db_viewCustomTitles(client, g_szSteamID[client]);
+			case 8: db_viewCheckpoints(client, g_szSteamID[client], g_szMapName);
+      case 9: db_LoadStageTimes(client);
+			case 10: db_viewPRinfo(client, g_szSteamID[client], g_szMapName);
 			default: db_viewPersonalRecords(client, g_szSteamID[client], g_szMapName);
 		}
 		g_iSettingToLoad[client]++;
@@ -154,10 +155,6 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 
 	if (g_iInitalStyle[client] != 5 && g_iInitalStyle[client] != 6)
 	 	SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
-
-	// Hack fix for b1 of surf_aircontrol_ksf
-	if (StrEqual(g_szMapName, "surf_aircontrol_ksf_123") && zonegroup == 1)
-		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 2.0);
 
 	if (g_bPracticeMode[client])
 		Command_normalMode(client, 1);
@@ -228,7 +225,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 				g_iTeleportingZoneId[client] = zId;
 
 			teleportEntitySafe(client, g_fStartposLocation[client][zonegroup], g_fStartposAngle[client][zonegroup], view_as<float>( { 0.0, 0.0, 0.0 } ), stopTime);
-
+			
 			return;
 		}
 	}
@@ -284,9 +281,11 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	{
 		// Check if the map has zones
 		if (g_mapZonesCount > 0)
-		{
+		{	
 			// Search for the zoneid we're teleporting to:
-			int destinationZoneId = getZoneID(zonegroup, zone);
+			int destinationZoneId;
+			destinationZoneId = getZoneID(zonegroup, zone);
+
 			g_iTeleportingZoneId[client] = destinationZoneId;
 
 			// Check if zone was found
@@ -317,30 +316,11 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 					*	Checks if coordinates are inside a zone
 					*	Return: zone id where location is in, or -1 if not inside a zone
 					**/
-					if (zonegroup > 0 && StrEqual(g_szMapName, "surf_mudkip_fix"))
+					if (IsInsideZone(origin) == destinationZoneId)
 					{
-						char szBuffer[128];
-						char szTargetName[128];
-						GetEntPropString(entity, Prop_Send, "m_iName", szBuffer, sizeof(szBuffer));
-						Format(szTargetName, 128, "bonus%i", zonegroup);
-						if (zonegroup == 5)
-							Format(szTargetName, 128, "%s_1", szTargetName);
-				
-						if (StrEqual(szBuffer, szTargetName))
-						{
-							destinationFound = true;
-							GetEntPropVector(entity, Prop_Send, "m_angRotation", ang);
-							break;
-						}
-					}
-					else
-					{
-						if (IsInsideZone(origin) == destinationZoneId)
-						{
-							destinationFound = true;
-							GetEntPropVector(entity, Prop_Send, "m_angRotation", ang);
-							break;
-						}
+						destinationFound = true;
+						GetEntPropVector(entity, Prop_Send, "m_angRotation", ang);
+						break;
 					}
 				}
 				// Check if client is spectating, or not chosen a team yet
@@ -350,10 +330,18 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 						Client_Stop(client, 0);
 
 					// Set spawn location to the destination zone:
-					if (destinationFound)
-						Array_Copy(origin, g_fTeleLocation[client], 3);
+					//TP TO STAGE
+					if(zone > 1 && zonegroup == 0 && g_bStageStartposUsed[client][zone-2] && g_fCurrentRunTime[client] <= 0.0 && g_bTimerEnabled[client]){
+						Array_Copy(g_fStageStartposLocation[client][zone-2] , g_fTeleLocation[client], 3);
+
+						destinationFound = true;
+					}
+					//TP TO BONUSES
 					else
-						Array_Copy(g_mapZones[destinationZoneId].CenterPoint, g_fTeleLocation[client], 3);
+						if (destinationFound)
+							Array_Copy(origin, g_fTeleLocation[client], 3);
+						else
+							Array_Copy(g_mapZones[destinationZoneId].CenterPoint, g_fTeleLocation[client], 3);
 
 					// Set specToStage flag
 					g_bRespawnPosition[client] = false;
@@ -364,7 +352,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 
 					if (realZone == 0)
 					{
-						g_bInStartZone[client] =  false;
+						g_bInStartZone[client] = false;
 						g_bInStageZone[client] = false;
 					}
 				}
@@ -374,17 +362,26 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 					SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, -100.0 } ));
 
 					float fLocation[3];
-					if (destinationFound)
-						Array_Copy(origin, fLocation, 3);
+					//TP TO STAGE
+					if(zone > 1 && zonegroup == 0 && g_bStageStartposUsed[client][zone-2] && g_fCurrentRunTime[client] <= 0.0 && g_bTimerEnabled[client]){
+						Array_Copy(g_fStageStartposLocation[client][zone-2], fLocation, 3);
+						Array_Copy(g_fStageStartposAngle[client][zone-2], ang, 3);
+
+						destinationFound = true;
+					}
+					//TP TO BONUSES
 					else
-						Array_Copy(g_mapZones[destinationZoneId].CenterPoint, fLocation, 3);
+						if (destinationFound)
+							Array_Copy(origin, fLocation, 3);
+						else
+							Array_Copy(g_mapZones[destinationZoneId].CenterPoint, fLocation, 3);
 
 					// fluffys dont cheat wrcps!
 					g_bWrcpTimeractivated[client] = false;
 
 					if (realZone == 0)
 					{
-						g_bInStartZone[client] =  false;
+						g_bInStartZone[client] = false;
 						g_bInStageZone[client] = false;
 					}
 
@@ -968,13 +965,14 @@ public void GetCountry(int client)
 		if (!IsFakeClient(client))
 		{
 			char IP[16];
-			char code2[3];
-			GetClientIP(client, IP, 16);
+			GetClientIP(client, IP, sizeof(IP));
 
 			// COUNTRY
-			GeoipCountry(IP, g_szCountry[client], 100);
+			GeoipCountry(IP, g_szCountry[client], sizeof(g_szCountry[]));
+			GeoipCode2(IP, g_szCountryCode[client]);
+			GeoipContinentCode(IP, g_szContinentCode[client]);
 			if (!strcmp(g_szCountry[client], NULL_STRING))
-				Format(g_szCountry[client], 100, "Unknown", g_szCountry[client]);
+				Format(g_szCountry[client], sizeof(g_szCountry[]), "Unknown", g_szCountry[client]);
 			else
 				if (StrContains(g_szCountry[client], "United", false) != -1 ||
 				StrContains(g_szCountry[client], "Republic", false) != -1 ||
@@ -987,15 +985,8 @@ public void GetCountry(int client)
 				StrContains(g_szCountry[client], "Philippines", false) != -1 ||
 				StrContains(g_szCountry[client], "Vatican", false) != -1)
 			{
-				Format(g_szCountry[client], 100, "The %s", g_szCountry[client]);
+				Format(g_szCountry[client], sizeof(g_szCountry[]), "The %s", g_szCountry[client]);
 			}
-			// CODE
-			if (GeoipCode2(IP, code2))
-			{
-				Format(g_szCountryCode[client], 16, "%s", code2);
-			}
-			else
-				Format(g_szCountryCode[client], 16, "??");
 		}
 	}
 }
@@ -1339,6 +1330,9 @@ public void SetClientDefaults(int client)
 	// Goose Start Pos
 	for (int i = 0; i < MAXZONEGROUPS; i++)
 		g_bStartposUsed[client][i] = false;
+	
+	for (int i = 0; i < CPLIMIT; i++)
+		g_bStageStartposUsed[client][i] = false;
 
 	// Save loc
 	g_iLastSaveLocIdClient[client] = 0;
@@ -1426,38 +1420,79 @@ public float GetSpeed(int client)
 	return speed;
 }
 
-public void SetPrestrafe(int client, int zone, int style, bool bonus) 
+public float GetPreSpeed(int client)
 {
 	float fVelocity[3];
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+	float speed;
 
-	if (bonus)
-	{
+	if (g_PreSpeedMode[client] == 0) // XY
+		speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0));
+	else if (g_PreSpeedMode[client] == 1) // XYZ
+		speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0));
+	else if (g_PreSpeedMode[client] == 2) // Z
+		speed = fVelocity[2];
+	else // XY default
+		speed = SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0));
+
+	return speed;
+}
+
+public void SetPrestrafe(int client, int zone, int style, bool map, bool bonus, bool stage)
+{
+	float fVelocity[3];
+	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
+	if (bonus) {
 		g_iPreStrafeBonus[0][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
 		g_iPreStrafeBonus[1][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
 		g_iPreStrafeBonus[2][zone][style][client] = RoundToNearest(fVelocity[2]);
 	} 
-	else 
-	{
+	else if(map) {
 		g_iPreStrafe[0][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
 		g_iPreStrafe[1][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
 		g_iPreStrafe[2][zone][style][client] = RoundToNearest(fVelocity[2]);
 	}
+	else if(stage) {
+		g_iPreStrafeStage[0][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
+		g_iPreStrafeStage[1][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
+		g_iPreStrafeStage[2][zone][style][client] = RoundToNearest(fVelocity[2]);
+	}
 }
-
-public void SetNewRecordPrestrafe(int client, int zone, int style, bool bonus)
+public void SetNewRecordPrestrafe(int client, int zone, int style, bool map, bool bonus, bool stage)
 {
-	if (bonus)
-	{
+	if (bonus) {
 		g_iRecordPreStrafeBonus[0][zone][style] = g_iPreStrafeBonus[0][zone][style][client];
 		g_iRecordPreStrafeBonus[1][zone][style] = g_iPreStrafeBonus[1][zone][style][client];
 		g_iRecordPreStrafeBonus[2][zone][style] = g_iPreStrafeBonus[2][zone][style][client];
 	}
-	else
-	{
+	else if(map) {
 		g_iRecordPreStrafe[0][zone][style] = g_iPreStrafe[0][zone][style][client];
 		g_iRecordPreStrafe[1][zone][style] = g_iPreStrafe[1][zone][style][client];
 		g_iRecordPreStrafe[2][zone][style] = g_iPreStrafe[2][zone][style][client];
+	}
+	else if(stage) {
+		g_iRecordPreStrafeStage[0][zone][style] = g_iPreStrafeStage[0][zone][style][client];
+		g_iRecordPreStrafeStage[1][zone][style] = g_iPreStrafeStage[1][zone][style][client];
+		g_iRecordPreStrafeStage[2][zone][style] = g_iPreStrafeStage[2][zone][style][client];
+	}
+}
+
+public void SetNewPersonalRecordPrestrafe(int client, int zone, int style, bool map, bool bonus, bool stage)
+{
+	if (bonus) {
+		g_iPersonalRecordPreStrafeBonus[client][0][zone][style] = g_iPreStrafeBonus[0][zone][style][client];
+		g_iPersonalRecordPreStrafeBonus[client][1][zone][style] = g_iPreStrafeBonus[1][zone][style][client];
+		g_iPersonalRecordPreStrafeBonus[client][2][zone][style] = g_iPreStrafeBonus[2][zone][style][client];
+	}
+	else if(map) {
+		g_iPersonalRecordPreStrafe[client][0][zone][style] = g_iPreStrafe[0][zone][style][client];
+		g_iPersonalRecordPreStrafe[client][1][zone][style] = g_iPreStrafe[1][zone][style][client];
+		g_iPersonalRecordPreStrafe[client][2][zone][style] = g_iPreStrafe[2][zone][style][client];
+	}
+	else if(stage) {
+		g_iPersonalRecordPreStrafeStage[client][0][zone][style] = g_iPreStrafeStage[0][zone][style][client];
+		g_iPersonalRecordPreStrafeStage[client][1][zone][style] = g_iPreStrafeStage[1][zone][style][client];
+		g_iPersonalRecordPreStrafeStage[client][2][zone][style] = g_iPreStrafeStage[2][zone][style][client];
 	}
 }
 
@@ -1800,13 +1835,13 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 						{
 							PlayUnstoppableSound(client);
 							CPrintToChat(i, "%t", "MapFinished3", g_szChatPrefix, szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, szGroup, g_szRecordMapTime);
-							PrintToConsole(i, "%s finished the map with a time of (%s). Improving their best time by (%s).  [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
+							PrintToConsole(i, "%s finished the map with a time of (%s). Improving their best time by (%s). [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
 						}
 						else
 							if (!g_bMapSRVRecord[client] && !g_bMapFirstRecord[client] && !g_bMapPBRecord[client])
 							{
 								CPrintToChat(i, "%t", "MapFinished5", g_szChatPrefix, szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, szGroup, g_szRecordMapTime);
-								PrintToConsole(i, "%s finished the map with a time of (%s). Missing their best time by (%s).  [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
+								PrintToConsole(i, "%s finished the map with a time of (%s). Missing their best time by (%s). [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
 							}
 
 					if (g_bMapSRVRecord[client])
@@ -1844,19 +1879,22 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 					{
 						PlayUnstoppableSound(client);
 						CPrintToChat(client, "%t", "MapFinished3", g_szChatPrefix, szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, szGroup, g_szRecordMapTime);
-						PrintToConsole(client, "%s finished the map with a time of (%s). Improving their best time by (%s).  [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
+						PrintToConsole(client, "%s finished the map with a time of (%s). Improving their best time by (%s). [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
 					}
 					else
 					{
 						if (!g_bMapSRVRecord[client] && !g_bMapFirstRecord[client] && !g_bMapPBRecord[client])
 						{
 							CPrintToChat(client, "%t", "MapFinished5", g_szChatPrefix, szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, szGroup, g_szRecordMapTime);
-							PrintToConsole(client, "%s finished the map with a time of (%s). Missing their best time by (%s).  [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
+							PrintToConsole(client, "%s finished the map with a time of (%s). Missing their best time by (%s). [rank #%i/%i | record %s]", szName, g_szFinalTime[client], g_szTimeDifference[client], g_MapRank[client], count, g_szRecordMapTime);
 						}
 					}
 				}
 			}
 		}
+
+		if (g_bMapPBRecord[client] || g_bMapFirstRecord[client]) // Own record
+			SetNewPersonalRecordPrestrafe(client, 0, 0, true, false, false);
 
 		// Send Announcements
 		if (g_bMapSRVRecord[client])
@@ -1868,7 +1906,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 
 			SendNewRecordForward(client, szRecordDiff);
 
-			SetNewRecordPrestrafe(client, 0, 0, false);
+			SetNewRecordPrestrafe(client, 0, 0, true, false, false);
 			
 			if (GetConVarBool(g_hRecordAnnounce))
 				db_insertAnnouncement(szName, g_szMapName, 0, g_szFinalTime[client], 0);
@@ -1889,7 +1927,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		if (g_bMapFirstRecord[client] || g_bMapPBRecord[client] || g_bMapSRVRecord[client])
 			CheckMapRanks(client);
 
-		SendMapFinishForward(client, count);
+		SendMapFinishForward(client, count, 0);
 
 	}
 	// recalc avg
@@ -1926,7 +1964,7 @@ stock void PrintChatBonus(int client, int zGroup, int rank = 0)
 			
 			SendNewRecordForward(client, szRecordDiff, zGroup);
 
-			SetNewRecordPrestrafe(client, zGroup, 0, true);
+			SetNewRecordPrestrafe(client, zGroup, 0, false, true, false);
 		}
 		if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 		{
@@ -1968,7 +2006,7 @@ stock void PrintChatBonus(int client, int zGroup, int rank = 0)
 
 			SendNewRecordForward(client, szRecordDiff, zGroup);
 
-			SetNewRecordPrestrafe(client, zGroup, 0, true);
+			SetNewRecordPrestrafe(client, zGroup, 0, false, true, false);
 		}
 		if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 		{
@@ -2000,6 +2038,10 @@ stock void PrintChatBonus(int client, int zGroup, int rank = 0)
 
 	}
 
+	if (g_bBonusPBRecord[client] || g_bBonusFirstRecord[client]) {
+		SetNewPersonalRecordPrestrafe(client, zGroup, 0, false ,true, false);
+	}
+	
 	// Send Announcements
 	if (g_bBonusSRVRecord[client])
 	{
@@ -2224,7 +2266,7 @@ public void FormatTimeFloat(int client, float time, int type, char[] string, int
 		else
 			Format(string, length, "Time: %s:%s", szMinutes, szSeconds);
 	}
-	// goes to  00:00
+	// goes to 00:00
 	if (type == 5)
 	{
 		if (imilli < 10)
@@ -2960,7 +3002,7 @@ public void SpecListMenuDead(int client) // What Spectators see
 					{
 						if (!IsFakeClient(ObservedUser))
 						{
-							Format(g_szPlayerPanelText[client], 512, "Specs (%i):\n%s\n  \n%s\n%s\nRecord: %s\n\n%s\n", count, sSpecs, szTime, szPlayerRank, szProBest, szStage);
+							Format(g_szPlayerPanelText[client], 512, "Specs (%i):\n%s\n \n%s\n%s\nRecord: %s\n\n%s\n", count, sSpecs, szTime, szPlayerRank, szProBest, szStage);
 							if (!g_bShowSpecs[client])
 								Format(g_szPlayerPanelText[client], 512, "Specs (%i)\n \n%s\n%s\nRecord: %s\n\nStage: %s\n", count, szTime, szPlayerRank, szProBest, szStage);
 						}
@@ -3000,20 +3042,20 @@ public void SpecListMenuDead(int client) // What Spectators see
 					else
 					{
 						if (ObservedUser == g_RecordBot)
-							Format(g_szPlayerPanelText[client], 512, "Map Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \n%s\n", g_szReplayName, g_szReplayTime, count, sSpecs, szStage);
+							Format(g_szPlayerPanelText[client], 512, "%s | Map Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \n%s\n", g_szStyleMenuPrint[g_iSelectedReplayStyle] ,g_szReplayName, g_szReplayTime, count, sSpecs, szStage);
 						else if (ObservedUser == g_BonusBot)
-							Format(g_szPlayerPanelText[client], 512, "Bonus Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \nBonus\n", g_szBonusName, g_szBonusTime, count, sSpecs);
+							Format(g_szPlayerPanelText[client], 512, "%s | Bonus Replay\n%s (%s)\n \nSpecs (%i):\n%s\n \nBonus\n", g_szStyleMenuPrint[g_iSelectedReplayStyle], g_szBonusName, g_szBonusTime, count, sSpecs);
 						else if (ObservedUser == g_WrcpBot)
 						{
 							if (g_bManualStageReplayPlayback)
 							{
 								int stage = g_iSelectedReplayStage;
-								Format(g_szPlayerPanelText[client], 512, "Stage: %i Replay (%i)\n%s (%s)\n \nSpecs (%i):\n%s\n", stage, g_iManualStageReplayCount + 1, g_szWrcpReplayName[stage],  g_szWrcpReplayTime[stage], count, sSpecs);
+								Format(g_szPlayerPanelText[client], 512, "Stage: %i Replay (%i)\n%s (%s)\n \nSpecs (%i):\n%s\n", stage, g_iManualStageReplayCount + 1, g_szWrcpReplayName[stage], g_szWrcpReplayTime[stage], count, sSpecs);
 							}
 							else
 							{
 								int stage = g_StageReplayCurrentStage;
-								Format(g_szPlayerPanelText[client], 512, "Stage: %i Replay (%i)\n%s (%s)\n \nSpecs (%i):\n%s\n", g_StageReplayCurrentStage, g_StageReplaysLoop, g_szWrcpReplayName[stage],  g_szWrcpReplayTime[stage], count, sSpecs);
+								Format(g_szPlayerPanelText[client], 512, "Stage: %i Replay (%i)\n%s (%s)\n \nSpecs (%i):\n%s\n", g_StageReplayCurrentStage, g_StageReplaysLoop, g_szWrcpReplayName[stage], g_szWrcpReplayTime[stage], count, sSpecs);
 							}
 						}
 
@@ -3680,7 +3722,7 @@ public void SideHudAlive(int client)
 						Format(szWRHolder, 64, g_szRecordPlayer);
 					else
 						Format(szWRHolder, 64, g_szBonusFastest[g_iClientInZone[client][2]]);
-
+					Format(szModule[i], 256, "%s\nby %s", szWR, szWRHolder);
 				}
 				else
 				{
@@ -3688,8 +3730,9 @@ public void SideHudAlive(int client)
 						Format(szWRHolder, 64, g_szRecordPlayer);
 					else
 						Format(szWRHolder, 64, g_szBonusFastest[g_iClientInZone[client][2]]);
+					
+					Format(szModule[i], 256, "%s | %s\nby %s", g_szStyleMenuPrint[g_iSelectedReplayStyle], szWR, szWRHolder);
 				}
-				Format(szModule[i], 256, "%s\nby %s", szWR, szWRHolder);
 
 				if ((i + 1) != moduleCount)
 					Format(szModule[i], 256, "%s\n \n", szModule[i]);
@@ -3892,6 +3935,9 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 {
 	if (!IsValidClient(client) || g_bPositionRestored[client] || IsFakeClient(client) || zone >= CPLIMIT)
 		return;
+
+	//PrintToChatAll("cp %i | %d tick count", zone, g_iRecordedTicks[client]);
+	g_iCPStartFrame_CurrentRun[0][zone][client] = g_iRecordedTicks[client];
 
 	float percent = -1.0;
 	int totalPoints = 0;
@@ -4135,15 +4181,22 @@ stock void StyleFinishedMsgs(int client, int style)
 			}
 		}
 
+		if (g_bStyleMapPBRecord[style][client] || g_bStyleMapFirstRecord[style][client]) { // Own record
+			SetNewPersonalRecordPrestrafe(client, 0, style, true, false, false);
+		}
+
 		if (g_bStyleMapSRVRecord[style][client])
 		{
-			SetNewRecordPrestrafe(client, 0, style, false);
+			SetNewRecordPrestrafe(client, 0, style, true, false, false);
 		}
 
 		if (g_StyleMapRank[style][client] == 99999 && IsValidClient(client))
 			CPrintToChat(client, "%t", "Misc19", g_szChatPrefix);
 
 		CalculatePlayerRank(client, style);
+
+		SendMapFinishForward(client, count, style);
+
 		return;
 	}
 }
@@ -4168,7 +4221,7 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 		FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
 		Format(szRecordDiff, 54, "-%s", szRecordDiff);
 
-		SetNewRecordPrestrafe(client, zGroup, style, true);
+		SetNewRecordPrestrafe(client, zGroup, style, false, true, false);
 	}
 	if (g_bBonusFirstRecord[client] && g_bBonusSRVRecord[client])
 	{
@@ -4199,6 +4252,10 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 		CPrintToChatAll("%t", "Misc42", g_szChatPrefix, szName, g_szZoneGroupName[zGroup], g_szStyleRecordPrint[style], g_szFinalTime[client], g_szBonusTimeDifference[client], g_StyleMapRankBonus[style][zGroup][client], g_iStyleBonusCount[style][zGroup], g_szStyleBonusFastestTime[style][zGroup]);
 	}
 
+	if (g_bBonusPBRecord[client] || g_bBonusFirstRecord[client]) {
+		SetNewPersonalRecordPrestrafe(client, zGroup, style, false, true , false);
+	}
+	
 	CheckBonusStyleRanks(client, zGroup, style);
 
 	if (rank == 9999999 && IsValidClient(client))
@@ -4649,6 +4706,18 @@ public void TeleportToSaveloc(int client, int id)
 	TeleportEntity(client, g_fSaveLocCoords[client][id], g_fSaveLocAngle[client][id], g_fSaveLocVel[client][id]);
 }
 
+public Action DisablePrac(Handle timer, any data)//saveloc on start > startpos
+{
+	int client = GetClientFromSerial(data);
+	
+	if (client > 0)
+	{
+		g_bPracticeMode[client] = false;
+	}
+
+	return Plugin_Handled;
+}
+
 public void ReadDefaultTitlesWhitelist()
 {
 	ClearArray(g_DefaultTitlesWhitelist);
@@ -4806,7 +4875,7 @@ void PrintCSGOHUDText(int client, const char[] format, any ...)
 	EndMessage();
 }
 
-public void PrintPracSrcp(int client, int style, int stage, float fClientPbStageTime)
+public void PrintPracSrcp(int client, int style, int stage, int stage_rank, float fClientPbStageTime)
 {
 	char szName[MAX_NAME_LENGTH];
 	GetClientName(client, szName, MAX_NAME_LENGTH);
@@ -4856,17 +4925,17 @@ public void PrintPracSrcp(int client, int style, int stage, float fClientPbStage
 	{
 		if (g_iWrcpMessages[client])
 		{
-			CPrintToChat(client, "%t", "PracWrcp1", g_szChatPrefix, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff);
+			CPrintToChat(client, "%t", "PracWrcp1", g_szChatPrefix, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff, stage_rank);
 		}
-		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp2", g_szChatPrefix, szName, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff);
+		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp2", g_szChatPrefix, szName, stage, g_szFinalPracSrcpTime[client], szDiff, sz_srDiff, stage_rank);
 	}
 	else if (style != 0) // styles
 	{
 		if (g_iWrcpMessages[client])
 		{
-			CPrintToChat(client, "%t", "PracWrcp3", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
+			CPrintToChat(client, "%t", "PracWrcp3", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage], stage_rank);
 		}
-		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp4", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage]);
+		Format(szSpecMessage, sizeof(szSpecMessage), "%t", "PracWrcp4", g_szChatPrefix, stage, g_szStyleRecordPrint[style], g_szFinalPracSrcpTime[client], sz_srDiff, g_StyleStageRank[style][client][stage], g_TotalStageStyleRecords[style][stage], stage_rank);
 	}
 
 	CheckpointToSpec(client, szSpecMessage);
@@ -5363,4 +5432,78 @@ stock void EmitSoundToClientNoPreCache(int client, const char[] szPath, bool add
 		strcopy(szBuffer, sizeof szBuffer, szPath);
 	}
 	ClientCommand(client, szBuffer);
+}
+
+bool GetDatabaseName(char[] database, int length)
+{
+	char sFile[PLATFORM_MAX_PATH];
+	BuildPath(Path_SM, sFile, sizeof(sFile), "configs/databases.cfg");
+
+	KeyValues kv = new KeyValues("Databases");
+	if (!kv.ImportFromFile(sFile))
+	{
+		LogError("Can not read \"%s\" correctly or file doesn't exists(!?). Please check your config.", sFile);
+		delete kv;
+		return false;
+	}
+
+	if (!kv.JumpToKey("surftimer", false))
+	{
+		LogError("Can not find the \"surftimer\" entry in your databases.cfg. Please check your config.");
+		delete kv;
+		return false;
+	}
+
+	kv.GetString("database", database, length, "");
+
+	if (strlen(database) < 1)
+	{
+		LogError("Can not find the \"database\" name in your \"surftimer\" databases.cfg entry. Please check your config.");
+		delete kv;
+		return false;
+	}
+
+	delete kv;
+	return true;
+}
+
+public bool GetContinentName(char code[3], char[] name, int length)
+{
+	if (code[0] == 'A' && code[1] == 'S')
+	{
+		Format(name, length, "Asia");
+		return true;
+	}
+	else if (code[0] == 'A' && code[1] == 'N')
+	{
+		Format(name, length, "Antarctica");
+		return true;
+	}
+	else if (code[0] == 'A' && code[1] == 'F')
+	{
+		Format(name, length, "Africa");
+		return true;
+	}
+	else if (code[0] == 'S' && code[1] == 'A')
+	{
+		Format(name, length, "South America");
+		return true;
+	}
+	else if (code[0] == 'E' && code[1] == 'U')
+	{
+		Format(name, length, "Europe");
+		return true;
+	}
+	else if (code[0] == 'O' && code[1] == 'C')
+	{
+		Format(name, length, "Oceania");
+		return true;
+	}
+	else if (code[0] == 'N' && code[1] == 'A')
+	{
+		Format(name, length, "North America");
+		return true;
+	}
+
+	return false;
 }

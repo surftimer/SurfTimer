@@ -1,0 +1,16 @@
+ALTER TABLE `ck_wrcps` CHANGE `runtimepro` `runtimepro` DECIMAL(10,4) NOT NULL DEFAULT '-1';
+ALTER TABLE `ck_wrcps` CHANGE `runtimepro` `runtimepro` DECIMAL(12,6) NOT NULL DEFAULT '-1';
+ALTER TABLE `ck_bonus` CHANGE `runtime` `runtime` DECIMAL(10,4) NOT NULL DEFAULT '-1';
+ALTER TABLE `ck_bonus` CHANGE `runtime` `runtime` DECIMAL(12,6) NOT NULL DEFAULT '-1';
+ALTER TABLE `ck_playertimes` CHANGE `runtimepro` `runtimepro` DECIMAL(10,4) NOT NULL DEFAULT '-1';
+ALTER TABLE `ck_playertimes` CHANGE `runtimepro` `runtimepro` DECIMAL(12,6) NOT NULL DEFAULT '-1';
+ALTER TABLE `ck_checkpoints` CHANGE `time` `time` DECIMAL(10,4) NOT NULL DEFAULT '-1';
+ALTER TABLE `ck_checkpoints` CHANGE `time` `time` DECIMAL(12,6) NOT NULL DEFAULT '-1';
+ALTER TABLE `ck_latestrecords` CHANGE `runtime` `runtime` DECIMAL(10,4) NOT NULL DEFAULT '-1';
+ALTER TABLE `ck_latestrecords` CHANGE `runtime` `runtime` DECIMAL(12,6) NOT NULL DEFAULT '-1';
+ALTER TABLE `ck_playertemp` CHANGE `runtimeTmp` `runtimeTmp` DECIMAL(10,4) NOT NULL DEFAULT '-1';
+ALTER TABLE `ck_playertemp` CHANGE `runtimeTmp` `runtimeTmp` DECIMAL(12,6) NOT NULL DEFAULT '-1';
+ALTER TABLE `ck_prinfo` CHANGE `runtime` `runtime` DECIMAL(10,4) NOT NULL DEFAULT '-1';
+ALTER TABLE `ck_prinfo` CHANGE `runtime` `runtime` DECIMAL(12,6) NOT NULL DEFAULT '-1';
+ALTER TABLE `ck_prinfo` CHANGE `PRtimeinzone` `PRtimeinzone` DECIMAL(10,4) NOT NULL DEFAULT '-1';
+ALTER TABLE `ck_prinfo` CHANGE `PRtimeinzone` `PRtimeinzone` DECIMAL(12,6) NOT NULL DEFAULT '-1';

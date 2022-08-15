@@ -10,53 +10,81 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+
+      - name: Get branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: get_branch_name
 
       - name: Set environment variables
         run: |
+          git fetch --unshallow
+          echo "COMMIT=$(git rev-list --count HEAD)" >> $GITHUB_ENV
+          echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
           SOURCEMOD_PATH=$GITHUB_WORKSPACE/addons/sourcemod
           echo "SOURCEMOD_PATH=$SOURCEMOD_PATH" >> $GITHUB_ENV
+          echo "PLUGINS_PATH=$SOURCEMOD_PATH/plugins" >> $GITHUB_ENV
+          echo "GAMEDATA_PATH=$SOURCEMOD_PATH/gamedata" >> $GITHUB_ENV
           echo "SCRIPTING_PATH=$SOURCEMOD_PATH/scripting" >> $GITHUB_ENV
           echo "INCLUDE_PATH=$SOURCEMOD_PATH/scripting/include" >> $GITHUB_ENV
+          echo "TRANSLATIONS_PATH=$SOURCEMOD_PATH/translations" >> $GITHUB_ENV
+
           if [[ ${{ github.ref }} == *"pre"* || ${{ github.ref }} == *"beta"* ]]; then
             echo "PRE_RELEASE=true" >> $GITHUB_ENV
           else
             echo "PRE_RELEASE=false" >> $GITHUB_ENV
           fi
 
-      - name: Setup SourcePawn Compiler 1.10
+      - name: Setup SourcePawn Compiler 1.11
         uses: rumblefrog/setup-sp@master
         with:
-          version: "1.10"
+          version: "1.11"
 
       - name: Fetch plugin dependencies
         run: |
           wget https://raw.githubusercontent.com/peace-maker/DHooks2/dynhooks/sourcemod_files/scripting/include/dhooks.inc -P $INCLUDE_PATH
           wget https://raw.githubusercontent.com/Impact123/AutoExecConfig/development/autoexecconfig.inc -P $INCLUDE_PATH
           wget https://raw.githubusercontent.com/c0rp3n/colorlib-sm/master/addons/sourcemod/scripting/include/colorlib.inc -P $INCLUDE_PATH
+
+      - name: Replace version with git commit number
+        run: |
+          sed -i "s/1.0.dev/1.0.dev${{ env.COMMIT }}-${{ env.SHORT_SHA }}-${{ steps.get_branch_name.outputs.branch }}/g" $SCRIPTING_PATH/SurfTimer.sp
+
+      - name: Download EndTouchFix source and gamedata file
+        run: |
           wget https://github.com/rumourA/End-Touch-Fix/raw/master/scripting/EndTouchFix.sp -P $SCRIPTING_PATH
+          wget https://github.com/rumourA/End-Touch-Fix/raw/master/gamedata/endtouch.games.txt -P $GAMEDATA_PATH
 
-      - name: Replace version with tag name
+      - name: Download SurfTimer Mapchooser source and translations file
         run: |
-          sed -i "s/1.0.dev/${{ github.ref_name }}/g" $SCRIPTING_PATH/SurfTimer.sp
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/scripting/st-mapchooser.sp -P $SCRIPTING_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/scripting/st-nominations.sp -P $SCRIPTING_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/scripting/st-rockthevote.sp -P $SCRIPTING_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/scripting/st-voteextend.sp -P $SCRIPTING_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/translations/st-mapchooser.phrases.txt -P $TRANSLATIONS_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/translations/st-nominations.phrases.txt -P $TRANSLATIONS_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/translations/st-rockthevote.phrases.txt -P $TRANSLATIONS_PATH
+          wget https://github.com/surftimer/SurfTimer-Mapchooser/raw/master/addons/sourcemod/translations/st-voteextend.phrases.txt -P $TRANSLATIONS_PATH
 
-      - name: Compile surftimer.sp
+      - name: Compile plugins
         run: |
-          echo -e "\nCompiling SurfTimer.sp..."
-          spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH -o $GITHUB_WORKSPACE/SurfTimer.smx SurfTimer.sp
-        working-directory: ${{ env.SCRIPTING_PATH }}/
+          mkdir -p $PLUGINS_PATH
+          for file in *.sp
+          do
+            echo -e "\nCompiling $file..."
+            spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH -o $PLUGINS_PATH/$file $file
+          done
+        working-directory: ${{ env.SCRIPTING_PATH }}
 
-      - name: Compile SurfTimer-telefinder.sp
+      - name: Prepare package directory and compress files
         run: |
-          echo -e "\nCompiling SurfTimer-telefinder.sp..."
-          spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH -o $GITHUB_WORKSPACE/SurfTimer-telefinder.smx SurfTimer-telefinder.sp
-        working-directory: ${{ env.SCRIPTING_PATH }}/
-
-      - name: Compile EndTouchFix.sp
-        run: |
-          echo -e "\nCompiling EndTouchFix.sp..."
-          spcomp -w234 -O2 -v2 -i $includePath -i $INCLUDE_PATH -o $GITHUB_WORKSPACE/EndTouchFix.smx EndTouchFix.sp
-        working-directory: ${{ env.SCRIPTING_PATH }}/
+          rm -R addons/sourcemod/scripting
+          mkdir package
+          mv ./{addons,cfg,maps,scripts,sound,LICENSE,README.md} package
+          cd package
+          zip -9r $GITHUB_WORKSPACE/SurfTimer.${{ steps.get_branch_name.outputs.branch }}.${{ env.COMMIT }}.${{ env.SHORT_SHA }}.SM1.11.zip
 
       - name: Create Release
         id: create_release
@@ -76,28 +104,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./SurfTimer.smx
-          asset_name: SurfTimer.smx
-          asset_content_type: application/octet-stream
-
-      - name: Upload SurfTimer-telefinder
-        id: upload-surftimer-telefinder
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./SurfTimer-telefinder.smx
-          asset_name: SurfTimer-telefinder.smx
-          asset_content_type: application/octet-stream
-
-      - name: Upload EndTouchFix
-        id: upload-endtouchfix
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./EndTouchFix.smx
-          asset_name: EndTouchFix.smx
-          asset_content_type: application/octet-stream
+          asset_path: ./SurfTimer.${{ steps.get_branch_name.outputs.branch }}.${{ env.COMMIT }}.${{ env.SHORT_SHA }}.SM1.11.zip
+          asset_name: SurfTimer.${{ steps.get_branch_name.outputs.branch }}.${{ env.COMMIT }}.${{ env.SHORT_SHA }}.SM1.11.zip
+          asset_content_type: aapplication/zip

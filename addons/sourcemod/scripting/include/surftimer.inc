@@ -114,8 +114,10 @@ native int surftimer_GetMapData(char[] name, char[] time);
  * @param time				String to store the client's map time.
  * @param rank				int to store the client's map rank.
  * @param country			String to store the client's country.
+ * @param countryCode			String to store the client's countryCode.
+ * @param continentCode			String to store the client's continentCode.
  */
-native void surftimer_GetPlayerData(int& client, char[] time, int& rank, char[] country);
+native void surftimer_GetPlayerData(int& client, char[] time, int& rank, char[] country, char countryCode[3], char continentCode[3]);
 
 /**
  * Retrieves the client's current info.
@@ -149,7 +151,7 @@ native bool surftimer_SafeTeleport(int client, float fDestination[3], float fAng
  * @param client			The client's ID.
  * @return						Plugin_Handled, to stop the client from searching.
  */
-forward Action surftimer_OnMapFinished(int client, float fRunTime, char sRunTime[54], int rank, int total);
+forward Action surftimer_OnMapFinished(int client, float fRunTime, char sRunTime[54], int rank, int total, int style);
 
 /**
  * Called when a player reaches a checkpoint zone or a stage.
@@ -194,9 +196,10 @@ forward void surftimer_OnNewRecord(int client, int style, char[] time, char[] ti
  * @param style				Style index.
  * @param time				Time set by the player.
  * @param timeDif			Time difference with the former record.
- * @param stage			  The id of the stage of the WRCP.
+ * @param stage			  	The id of the stage of the WRCP.
+ * @param fRunTime			Run time for the WRCP in float.
  */
-forward void surftimer_OnNewWRCP(int client, int style, char[] time, char[] timeDif, int stage);
+forward void surftimer_OnNewWRCP(int client, int style, char[] time, char[] timeDif, int stage, float fRunTime);
 
 public SharedPlugin:__pl_surftimer =
 {

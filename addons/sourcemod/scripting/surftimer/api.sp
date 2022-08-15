@@ -137,24 +137,30 @@ public int Native_GetPlayerData(Handle plugin, int numParams)
 	int rank = 99999;
 	if (IsValidClient(client) && !IsFakeClient(client))
 	{
-		char szTime[64], szCountry[16];
+		char szTime[64], szCountry[16], szCountryCode[3], szContinentCode[3];
 
 		GetNativeString(2, szTime, 64);
 		rank = GetNativeCellRef(3);
 		GetNativeString(4, szCountry, 16);
+		GetNativeString(5, szCountryCode, sizeof(szCountryCode));
+		GetNativeString(6, szContinentCode, sizeof(szContinentCode));
 
 		if (g_fPersonalRecord[client] > 0.0)
 			Format(szTime, 64, "%s", g_szPersonalRecord[client]);
 		else
 			Format(szTime, 64, "N/A");
 
-		Format(szCountry, sizeof(szCountry), g_szCountryCode[client]);
+		Format(szCountry, sizeof(szCountry), g_szCountry[client]);
+		Format(szCountryCode, sizeof(szCountryCode), g_szCountryCode[client]);
+		Format(szContinentCode, sizeof(szContinentCode), g_szContinentCode[client]);
 
 		rank = g_MapRank[client];
 
 		SetNativeString(2, szTime, sizeof(szTime), true);
 		SetNativeCellRef(3, rank);
 		SetNativeString(4, szCountry, sizeof(szCountry), true);
+		SetNativeString(4, szCountryCode, sizeof(szCountryCode), true);
+		SetNativeString(4, szContinentCode, sizeof(szContinentCode), true);
 	}
 
 	return rank;
@@ -223,12 +229,12 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 void Register_Forwards()
 {
-	g_MapFinishForward = new GlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell);
+	g_MapFinishForward = new GlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell, Param_Cell);
 	g_MapCheckpointForward = new GlobalForward("surftimer_OnCheckpoint", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String);
 	g_BonusFinishForward = new GlobalForward("surftimer_OnBonusFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell, Param_Cell);
 	g_PracticeFinishForward = new GlobalForward("surftimer_OnPracticeFinished", ET_Event, Param_Cell, Param_Float, Param_String);
 	g_NewRecordForward = new GlobalForward("surftimer_OnNewRecord", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
-	g_NewWRCPForward = new GlobalForward("surftimer_OnNewWRCP", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
+	g_NewWRCPForward = new GlobalForward("surftimer_OnNewWRCP", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell, Param_Float);
 }
 
 /**
@@ -237,7 +243,7 @@ void Register_Forwards()
  * @param client           Index of the client who beat the map.
  * @param count            The number of times the map has been beaten.
  */
-void SendMapFinishForward(int client, int count)
+void SendMapFinishForward(int client, int count, int style)
 {
 	/* Start function call */
 	Call_StartForward(g_MapFinishForward);
@@ -248,6 +254,7 @@ void SendMapFinishForward(int client, int count)
 	Call_PushString(g_szFinalTime[client]);
 	Call_PushCell(g_MapRank[client]);
 	Call_PushCell(count);
+	Call_PushCell(style);
 
 	/* Finish the call, get the result */
 	Call_Finish();
@@ -361,8 +368,9 @@ void SendNewRecordForward(int client, const char[] szRecordDiff, int bonusGroup 
  * @param client           Index of the client.
  * @param stage            ID of the stage.
  * @param szRecordDiff     String containing the formatted difference with the previous record.
+ * @param fRunTime		   Float value for the record time
  */
-void SendNewWRCPForward(int client, int stage, const char[] szRecordDiff)
+void SendNewWRCPForward(int client, int stage, const char[] szRecordDiff, float fRunTime)
 {
 	/* Start New record function call */
 	Call_StartForward(g_NewWRCPForward);
@@ -373,6 +381,7 @@ void SendNewWRCPForward(int client, int stage, const char[] szRecordDiff)
 	Call_PushString(g_szFinalWrcpTime[client]);
 	Call_PushString(szRecordDiff);
 	Call_PushCell(stage);
+	Call_PushFloat(fRunTime);
 
 	/* Finish the call, get the result */
 	Call_Finish();

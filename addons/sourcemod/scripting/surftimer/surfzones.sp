@@ -165,7 +165,7 @@ public Action StartTouchTrigger(int caller, int activator)
 	// Ignore dead players
 	if (!IsValidClient(client)) {
 		return Plugin_Continue;
-    }
+	}
 
 	char sTargetName[256];
 	int action[3];
@@ -197,15 +197,6 @@ public Action StartTouchTrigger(int caller, int activator)
 			if (!g_bInBonus[activator] && action[2] > 0)
 			{
 				return Plugin_Continue;
-			}
-
-			else if (StrEqual(g_szMapName, "surf_christmas2") && !g_bUsingStageTeleport[activator])
-			{
-				if (action[0] == 3)
-				{
-					if (action[1] > (g_Stage[g_iClientInZone[activator][2]][activator] + 1) || action[1] < (g_Stage[g_iClientInZone[activator][2]][activator] - 1))
-						return Plugin_Continue;
-				}
 			}
 		}
 	}
@@ -260,7 +251,7 @@ public Action EndTouchTrigger(int caller, int activator)
 	// Ignore dead players
 	if (!IsValidClient(client)) {
 		return Plugin_Continue;
-    }
+	}
 
 	// For new speed limiter
 	g_bLeftZone[activator] = true;
@@ -336,24 +327,24 @@ public void StartTouch(int client, int action[3])
 					if( g_fPersonalRecord[client] > 0.0 )
 						//IMPROVES COMPLETION
 						if(g_fCurrentRunTime[client] < g_fPersonalRecord[client])
-							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fFinalTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
+							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fCurrentRunTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
 						else
 							db_UpdatePRinfo(client, g_szSteamID[client], zGroup); //UPDATE THE PLAYERS PRINFO EXECPT FOR THE RUNTIME
 					//PLAYER FINISHES FOR THE 1ST TIME
 					else
-						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fFinalTime[client]);
+						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fCurrentRunTime[client]);
 				//ENDZONE OF BONUS
 				else
 					//PLAYER ALREADY HAS A COMPLETION
 					if(g_fPersonalRecordBonus[zGroup][client] > 0)
 						//IMPROVES COMPLETION
 						if (g_fCurrentRunTime[client] < g_fPersonalRecordBonus[zGroup][client])
-							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fFinalTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
+							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fCurrentRunTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
 						else
 							db_UpdatePRinfo(client, g_szSteamID[client], zGroup); //UPDATE THE PLAYERS PRINFO EXECPT FOR THE RUNTIME
 					//PLAYER FINISHES FOR THE 1ST TIME
 					else
-						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fFinalTime[client]);
+						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fCurrentRunTime[client]);
 			}
 			//PLAYER JUST DOING STAGES
 			else if(action[0] == 3 && g_bWrcpTimeractivated[client] && !g_bTimerRunning[client]){
@@ -396,19 +387,17 @@ public void StartTouch(int client, int action[3])
 			lastCheckpoint[g_iClientInZone[client][2]][client] = 1;
 			g_bSaveLocTele[client] = false;
 
-			if (g_bPracticeMode[client])
-			{
-				g_bPracticeMode[client] = false;
-				CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
-			}
+			// StopRecording(client); //Add pre
+			StartRecording(client); //Add pre
 
 			if (g_bhasStages)
 			{
 				g_bWrcpTimeractivated[client] = false;
 				g_bPracSrcpTimerActivated[client] = false;
 				g_CurrentStage[client] = 0;
-
-				Stage_StartRecording(client);
+        
+				// Prevents the Stage(X) replay from starting before the Stage(X) start zone
+				g_iStageStartTouchTick[client] = g_iRecordedTicks[client]; //Add pre
 			}
 		}
 		else if (action[0] == 2) // End Zone
@@ -477,6 +466,8 @@ public void StartTouch(int client, int action[3])
 			g_bInDuck[client] = false;
 			g_KeyCount[client] = 0;
 
+			// Prevents the Stage(X) replay from starting before the Stage(X) start zone
+			g_iStageStartTouchTick[client] = g_iRecordedTicks[client]; //Add pre
 			// stop bot wrcp timer
 			if (client == g_WrcpBot)
 			{
@@ -522,6 +513,10 @@ public void StartTouch(int client, int action[3])
 				if (g_iCurrentStyle[client] == 0)
 				{
 					Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime);
+				}
+				else{
+					//PrintToChatAll("style %d | cp %i | %d tick count", g_iCurrentStyle[client], action[1], g_iRecordedTicks[client]);
+					g_iCPStartFrame_CurrentRun[g_iCurrentStyle[client]][action[1]][client] = g_iRecordedTicks[client];
 				}
 				
 				if (!g_bSaveLocTele[client])
@@ -593,6 +588,10 @@ public void StartTouch(int client, int action[3])
 						lastCheckpoint[g_iClientInZone[client][2]][client] = g_iPlayerPracLocationSnap[client][g_iLastSaveLocIdClient[client]] - 1;
 					}
 				}
+				else{
+					//PrintToChatAll("style %d | cp %i | %d tick count", g_iCurrentStyle[client], action[1], g_iRecordedTicks[client]);
+					g_iCPStartFrame_CurrentRun[g_iCurrentStyle[client]][action[1]][client] = g_iRecordedTicks[client];
+				}
 			}
 
 		}
@@ -622,6 +621,21 @@ public void StartTouch(int client, int action[3])
 			g_bInMaxSpeed[client] = true;
 			// CPrintToChat(client, "Inside MaxSpeed zone");
 		}
+		
+		//INCASE THE RECORD IS OLD, WHEN THERE IS NOT DATA IN THE DATABASE
+		//WE SIMPLY ADD TO "g_iCPStartFrame" THE CURRENT REPLAY BOT TICK
+		//THIS WAY WHEN THE DATABASE HAS NO VALUES
+		//THE PLAYERS CAN SELECT THE CHECKPOINTS OPTION IN THE REPLAY MENU WITH THE CORRECT VALUES
+		//ONLY PERFOM ACTIONS IF THE CLIENT INDEX IS THE MAP RECORD BOT'S INDEX AND IF THERE ARE NOT REPLAY TICKS FOUND
+		if(IsPlayerAlive(client) && IsFakeClient(client) && !g_bReplayTickFound[g_iCurrentStyle[client]] && client == g_RecordBot){
+			//MAKE BOTS REGISTER TICKS
+			if(action[0] == 3 || action[0] == 4)
+				g_iCPStartFrame[g_iCurrentStyle[client]][action[1]] = g_iReplayTick[client];
+
+			if(action[0] == 2)
+				db_UpdateReplaysTick(client, g_iCurrentStyle[client]);
+		}
+
 	}
 }
 
@@ -630,12 +644,6 @@ public void EndTouch(int client, int action[3])
 	if (IsValidClient(client))
 	{
 		LimitSpeed(client);
-		// Set Client targetName
-		if (StrEqual(g_szMapName, "surf_forgotten"))
-		{
-			if (!StrEqual("player", g_mapZones[g_iClientInZone[client][3]].TargetName))
-				DispatchKeyValue(client, "targetname", g_mapZones[g_iClientInZone[client][3]].TargetName);
-		}
 
 		// float CurVelVec[3];
 		// GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
@@ -689,23 +697,6 @@ public void EndTouch(int client, int action[3])
 		// fluffys
 		else if (action[0] == 3) // fluffys stage
 		{
-			// targetname filters
-			if (StrEqual(g_szMapName, "surf_treespam") && g_Stage[g_iClientInZone[client][2]][client] == 4)
-			{
-				DispatchKeyValue(client, "targetname", "s4neutral");
-			}
-			else if (StrEqual(g_szMapName, "surf_looksmodern"))
-			{	
-				if (g_Stage[g_iClientInZone[client][2]][client] == 2)
-					DispatchKeyValue(client, "classname", "two_1");
-				else if (g_Stage[g_iClientInZone[client][2]][client] == 3)
-					DispatchKeyValue(client, "classname", "threer");
-				else if (g_Stage[g_iClientInZone[client][2]][client] == 4)
-					DispatchKeyValue(client, "classname", "four_1");
-				else if (g_Stage[g_iClientInZone[client][2]][client] == 5)
-					DispatchKeyValue(client, "classname", "five_1");
-			}
-
 			g_bInStageZone[client] = false;
 
 			if (!g_bPracticeMode[client] && g_bTimerEnabled[client])
@@ -856,9 +847,9 @@ public Action BeamBoxAll(Handle timer, any data)
 					if (GetConVarInt(g_hZoneDisplayType) == 0 && !g_bShowZones[p])
 						continue;
 
-					if ( g_mapZones[i].Vis == 2 ||  g_mapZones[i].Vis == 3)
+					if ( g_mapZones[i].Vis == 2 || g_mapZones[i].Vis == 3)
 					{
-						if (GetClientTeam(p) ==  g_mapZones[i].Vis && g_ClientSelectedZone[p] != i)
+						if (GetClientTeam(p) == g_mapZones[i].Vis && g_ClientSelectedZone[p] != i)
 						{
 							float buffer_a[3], buffer_b[3];
 							for (int x = 0; x < 3; x++)
