@@ -6185,9 +6185,6 @@ public Action Command_CCP(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
-	//CCP MENU
-	ccp_menu = new Menu(CCPMenuHandler);
-
 	switch(args){
 		case 0:{
 			if(g_bhasStages)

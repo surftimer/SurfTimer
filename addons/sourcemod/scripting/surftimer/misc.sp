@@ -1278,9 +1278,9 @@ public void SetClientDefaults(int client)
 		for (int i = 0; i < CPLIMIT; i++)
 		{
 			g_fCheckpointTimesNew[x][client][i] = 0.0;
+			g_fCheckpointTimesRecord[x][client][i] = 0.0;
 			g_fStageTimesNew[client][i] = 0.0;
 			g_iStageAttemptsNew[client][i] = 0;
-			g_fCheckpointTimesRecord[x][client][i] = 0.0;
 		}
 	}
 
@@ -5506,4 +5506,17 @@ public bool GetContinentName(char code[3], char[] name, int length)
 	}
 
 	return false;
+}
+
+public void resetCCPDefaults(int client){
+
+	for(int i = 0; i < CPLIMIT; i++)
+	{
+		g_fCCP_StageTimes_ServerRecord[client][i] = 0.0;
+		//g_iCCP_StageAttempts_ServerRecord[client][i] = 0;
+		g_fCCP_StageTimes_Player[client][i] = 0.0;
+		g_iCCP_StageAttempts_Player[client][i] = 0;
+		g_iCCP_StageRank_Player[client][i] = 0;
+		g_iCCP_StageTotal_Player[client][i] = 0;	
+	}
 }

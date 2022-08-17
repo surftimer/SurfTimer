@@ -1851,7 +1851,7 @@
 	"CCP_03"
 	{
 		"#format"	"{1:s}"
-		"en"		"{1} No completion found for that rank"
+		"en"		"{1} No completions found."
 	}
 	"CCP_04"
 	{
@@ -1862,6 +1862,11 @@
 	{
 		"#format"	"{1:s}"
 		"en"		"{1} Old Personal Record, Improve your time"
+	}
+	"CCP_06"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Map Record has no CCP saved, Old Record"
 	}
 	"style_not_found"
 	{

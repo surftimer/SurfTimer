@@ -280,23 +280,40 @@ bool g_bhasBonus;
 
 /*----------  CCP Variables  ----------*/
 
-Menu ccp_menu;
 //THIS VARIABLES ARE USED ON SM_CCP
-float g_fCCPRecordCheckpointTimes[MAXPLAYERS + 1][CPLIMIT];
-float g_fCCPPlayerCheckpointTimes[MAXPLAYERS + 1][CPLIMIT];
-int g_iCCPPlayerCheckpointAttempts[MAXPLAYERS + 1][CPLIMIT];
+float g_fCCP_StageTimes_ServerRecord[MAXPLAYERS + 1][CPLIMIT];
+//int g_iCCP_StageAttempts_ServerRecord[MAXPLAYERS + 1][CPLIMIT]; commented this cause i dont see it being use atm, but in the future its already here
+float g_fCCP_StageTimes_Player[MAXPLAYERS + 1][CPLIMIT];
+int g_iCCP_StageAttempts_Player[MAXPLAYERS + 1][CPLIMIT];
+int g_iCCP_StageRank_Player[MAXPLAYERS + 1][CPLIMIT];
+int g_iCCP_StageTotal_Player[MAXPLAYERS + 1][CPLIMIT];
 
+
+//CLIENT VARIABLES
 // Clients Stage Times have been found?
 bool g_bStageTimesFound[MAXPLAYERS + 1];
 
 // Clients Stage Attempts have been found?
 bool g_bStageAttemptsFound[MAXPLAYERS + 1];
 
+// Clients best run's stage times
+float g_fCCPStageTimesRecord[MAXPLAYERS + 1][CPLIMIT];
+
+// Clients best run's stage attempts
+int g_iCCPStageAttemptsRecord[MAXPLAYERS + 1][CPLIMIT];
+
 // Clients current run's stage times
 float g_fStageTimesNew[MAXPLAYERS + 1][CPLIMIT];
 
 // Clients current run's stage attempts
 int g_iStageAttemptsNew[MAXPLAYERS + 1][CPLIMIT];
+
+//SERVER VARIABLES
+// Server record stage times
+float g_fCCPStageTimesServerRecord[CPLIMIT];
+
+// Server record stage attempts
+int g_iCCPStageAttemptsServerRecord[CPLIMIT];
 
 /*----------  Checkpoint Variables  ----------*/
 

@@ -354,6 +354,10 @@ public void CL_OnEndTimerPress(int client)
 						for (int i = 0; i < CPLIMIT; i++)
 						{
 							g_fCheckpointServerRecord[zGroup][i] = g_fCheckpointTimesNew[zGroup][client][i];
+
+							//UPDATE CCP TIMES AND ATTEMPTS FOR THE RECORD
+							g_fCCPStageTimesServerRecord[i] = g_fStageTimesNew[client][i];
+							g_iCCPStageAttemptsServerRecord[i] = g_iStageAttemptsNew[client][i];
 						}
 						g_bCheckpointRecordFound[zGroup] = true;
 					}
