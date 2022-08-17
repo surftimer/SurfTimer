@@ -3641,7 +3641,7 @@ public void db_UpdateCheckpoints(int client, char szSteamID[32], int zGroup)
 	if(!g_bhasStages)
 		cp_count = g_iTotalCheckpoints;
 	else
-		cp_count = g_TotalStages;
+		cp_count = g_TotalStages - 1;
 
 	char szQuery[1024];
 	Transaction tAction = new Transaction();
