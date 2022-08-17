@@ -120,6 +120,9 @@ public void CL_OnStartTimerPress(int client)
 			//PRINFO INCREMENT ATTEMPTS
 			g_fAttempts[client][g_iClientInZone[client][2]]++;
 
+			//CCP INCREMENT ATTEMPTS
+			g_iStageAttemptsNew[client][0] += 1;
+
 			char szRecordDifference[128];
 			char szPersonalDifference[128];
 			char szSpeed[128];
@@ -819,7 +822,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 			g_WrcpStage[client] = g_Stage[0][client];
 			Stage_StartRecording(client); //Add pre
       
-			if (g_iCurrentStyle[client] == 0 && g_bTimerRunning[client]){
+			if (g_iCurrentStyle[client] == 0 && g_bTimerRunning[client]) {
 				g_iStageAttemptsNew[client][g_Stage[0][client]-1] += 1;
 			}
 		}
@@ -929,8 +932,9 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 	else if (stage < 1)
 		stage = 1;
 
-	if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0 && g_fCurrentRunTime[client] != 0.0 && g_iClientInZone[client][2] == 0)
-			g_fStageTimesNew[client][stage-1] = g_fCurrentWrcpRunTime[client];
+	if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0 && g_fCurrentRunTime[client] != 0.0 && g_iClientInZone[client][2] == 0) {
+		g_fStageTimesNew[client][stage-1] = g_fCurrentWrcpRunTime[client];
+	}
 
 	if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0)
 	{

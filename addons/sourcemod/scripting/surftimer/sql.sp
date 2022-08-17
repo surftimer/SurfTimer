@@ -3424,15 +3424,14 @@ public void SQL_LoadStageAttemptsCallback(Handle owner, Handle hndl, const char[
 	if (!IsValidClient(client))
 		return;
 
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	if (SQL_HasResultSet(hndl) )
 	{
-		g_bStageAttemptsFound[client] = true;
 		while (SQL_FetchRow(hndl))
-		{
-			for (int i = 0; i < 35; i++)
-			{
-				g_iCCPPlayerCheckpointAttempts[client][i] = SQL_FetchInt(hndl, i);
-			}
+		{	
+			g_bStageAttemptsFound[client] = true;
+
+			int cp = SQL_FetchInt(hndl, 0);
+			g_iCCPPlayerCheckpointAttempts[client][cp-1] = SQL_FetchInt(hndl, 1);
 		}
 	}
 
@@ -3548,28 +3547,24 @@ public void db_UpdateStageTimes(int client, char szSteamID[32], char szMapName[1
 
 	char szName[MAX_NAME_LENGTH * 2 + 1];
 	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH * 2 + 1);
-	
-	int cp_count;
-	if(!g_bhasStages)
-		cp_count = g_iTotalCheckpoints;
-	else
-		cp_count = g_TotalStages - 1;
 
 	Transaction CCPTransaction = new Transaction();
 
 	if (g_bStageTimesFound[client]){
 		char szQuery[4096];
 
-		for(int i = 0; i < cp_count; i++){
+		for(int i = 0; i < g_TotalStages; i++){
 			Format(szQuery, sizeof(szQuery), sql_updateCCP, g_fStageTimesNew[client][i], g_iStageAttemptsNew[client][i], g_szSteamID[client], g_szMapName, i+1);
+			PrintToServer(szQuery);
 			CCPTransaction.AddQuery(szQuery);
 		}
 	}
 	else{
 		char szQuery[4096];
 
-		for(int i = 0; i < cp_count; i++){
+		for(int i = 0; i < g_TotalStages; i++){
 			Format(szQuery, sizeof(szQuery), sql_insertCCP, g_szSteamID[client], szName, g_szMapName, i+1, g_fStageTimesNew[client][i], g_iStageAttemptsNew[client][i]);
+			PrintToServer(szQuery);
 			CCPTransaction.AddQuery(szQuery);
 		}
 	}
@@ -3627,8 +3622,8 @@ public void db_viewCheckpointsinZoneGroupCallback(Handle owner, Handle hndl, con
 
 			g_fCheckpointTimesRecord[zonegrp][client][cp] = SQL_FetchFloat(hndl, 1);
 		}
-		
-		db_UpdateStageTimes(client, g_szSteamID[client], g_szMapName);
+		if(g_bhasStages)
+			db_UpdateStageTimes(client, g_szSteamID[client], g_szMapName);
 	}
 	else
 	{
@@ -3646,7 +3641,7 @@ public void db_UpdateCheckpoints(int client, char szSteamID[32], int zGroup)
 	if(!g_bhasStages)
 		cp_count = g_iTotalCheckpoints;
 	else
-		cp_count = g_TotalStages - 1;
+		cp_count = g_TotalStages;
 
 	char szQuery[1024];
 	Transaction tAction = new Transaction();
@@ -3675,7 +3670,7 @@ public void db_UpdateCheckpointsOnSuccess(Handle db, any pack, int numQueries, H
 	int client = ReadPackCell(pack);
 	int zonegrp = ReadPackCell(pack);
 	CloseHandle(pack);
-  
+	
   	db_viewCheckpointsinZoneGroup(client, g_szSteamID[client], g_szMapName, zonegrp);
 }
 
@@ -12674,9 +12669,9 @@ public void SQL_viewCCP_GetMapStageRankCallback(Handle owner, Handle hndl, const
 
 		char szStageTimeFormatted[32];
 		ReadPackString(stage_pack, szStageTimeFormatted, sizeof(szStageTimeFormatted));
-		CloseHandle(stage_pack);
 
 		int total_stages = ReadPackCell(stage_pack);
+		CloseHandle(stage_pack);
 
 		int stage_rank = SQL_FetchInt(hndl, 0);
 

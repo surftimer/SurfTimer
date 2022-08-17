@@ -84,11 +84,11 @@ void CheckDatabaseForUpdates()
 
 		if (!SQL_FastQuery(g_hDb, "SELECT cp FROM ck_ccp LIMIT 1"))
 		{
-			db_upgradeDatabase(11);
+			db_upgradeDatabase(12);
 			return;
 		}
 
-		LogMessage("Version 11 looks good.");
+		LogMessage("Version 12 looks good.");
 	}
 }
 
