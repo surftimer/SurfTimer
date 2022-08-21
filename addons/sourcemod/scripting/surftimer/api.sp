@@ -119,14 +119,21 @@ public int Native_GetPlayerNameColored(Handle plugin, int numParams)
 
 public int Native_GetMapData(Handle plugin, int numParams)
 {
-	char name[MAX_NAME_LENGTH], time[64];
-	GetNativeString(1, name, MAX_NAME_LENGTH);
-	GetNativeString(2, time, 64);
+	char szname[MAX_NAME_LENGTH], sztime[64];
+	GetNativeString(1, szname, MAX_NAME_LENGTH);
+	GetNativeString(2, sztime, 64);
+	float time = GetNativeCellRef(3);
 
-	Format(name, sizeof(name), g_szRecordPlayer);
-	Format(time, sizeof(time), g_szRecordMapTime);
-	SetNativeString(1, name, sizeof(name), true);
-	SetNativeString(2, time, sizeof(time), true);
+	Format(szname, sizeof(szname), g_szRecordPlayer);
+	Format(sztime, sizeof(sztime), g_szRecordMapTime);
+	SetNativeString(1, szname, sizeof(szname), true);
+	SetNativeString(2, sztime, sizeof(sztime), true);
+
+	if(g_fRecordMapTime >= 0)
+		time = g_fRecordMapTime;
+	else
+		time = -1.0;
+	SetNativeCellRef(3, time);
 
 	return g_MapTimesCount;
 }
@@ -137,18 +144,19 @@ public int Native_GetPlayerData(Handle plugin, int numParams)
 	int rank = 99999;
 	if (IsValidClient(client) && !IsFakeClient(client))
 	{
-		char szTime[64], szCountry[16], szCountryCode[3], szContinentCode[3];
+		char szCountry[16], szCountryCode[3], szContinentCode[3];
+		float time;
 
-		GetNativeString(2, szTime, 64);
+		time = GetNativeCellRef(2);
 		rank = GetNativeCellRef(3);
 		GetNativeString(4, szCountry, 16);
 		GetNativeString(5, szCountryCode, sizeof(szCountryCode));
 		GetNativeString(6, szContinentCode, sizeof(szContinentCode));
 
 		if (g_fPersonalRecord[client] > 0.0)
-			Format(szTime, 64, "%s", g_szPersonalRecord[client]);
+			time = g_fPersonalRecord[client];
 		else
-			Format(szTime, 64, "N/A");
+			time = -1.0;
 
 		Format(szCountry, sizeof(szCountry), g_szCountry[client]);
 		Format(szCountryCode, sizeof(szCountryCode), g_szCountryCode[client]);
@@ -156,7 +164,7 @@ public int Native_GetPlayerData(Handle plugin, int numParams)
 
 		rank = g_MapRank[client];
 
-		SetNativeString(2, szTime, sizeof(szTime), true);
+		SetNativeCellRef(2, time);
 		SetNativeCellRef(3, rank);
 		SetNativeString(4, szCountry, sizeof(szCountry), true);
 		SetNativeString(4, szCountryCode, sizeof(szCountryCode), true);
@@ -182,6 +190,26 @@ public int Native_GetPlayerInfo(Handle plugin, int numParams)
 	return iStage;
 }
 
+public int Native_GetClientStyle(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	int style;
+	if (IsValidClient(client))
+	{
+		if(!IsFakeClient(client)) {
+			style = g_iCurrentStyle[client];
+		}
+		else{
+			if (client == g_RecordBot)
+				style = g_iSelectedReplayStyle;
+			else if (client == g_BonusBot)
+				style = g_iSelectedBonusReplayStyle;
+		}
+	}
+
+	return style;
+}
+
 public int Native_GetMapTier(Handle plugin, int numParams)
 {
 	return g_iMapTier;
@@ -193,6 +221,12 @@ public int Native_GetMapStages(Handle plugin, int numParams)
 	if (g_bhasStages)
 		stages = g_mapZonesTypeCount[0][3] + 1;
 	return stages;
+}
+
+public any Native_GetClientSync(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	return GetStrafeSync(client, true);
 }
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
@@ -210,10 +244,12 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	CreateNative("surftimer_GetMapData", Native_GetMapData);
 	CreateNative("surftimer_GetPlayerData", Native_GetPlayerData);
 	CreateNative("surftimer_GetPlayerInfo", Native_GetPlayerInfo);
+	CreateNative("surftimer_GetClientStyle", Native_GetClientStyle);
 	CreateNative("surftimer_GetMapTier", Native_GetMapTier);
 	CreateNative("surftimer_GetMapStages", Native_GetMapStages);
 	CreateNative("surftimer_SafeTeleport", Native_SafeTeleport);
 	CreateNative("surftimer_IsClientVip", Native_IsClientVip);
+	CreateNative("surftimer_GetClientSync", Native_GetClientSync);
 	MarkNativeAsOptional("Store_GetClientCredits");
 	MarkNativeAsOptional("Store_SetClientCredits");
 	g_bLateLoaded = late;
@@ -229,9 +265,9 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 void Register_Forwards()
 {
-	g_MapFinishForward = new GlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell, Param_Cell);
+	g_MapFinishForward = new GlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_Float, Param_Cell, Param_Cell, Param_Cell);
 	g_MapCheckpointForward = new GlobalForward("surftimer_OnCheckpoint", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String);
-	g_BonusFinishForward = new GlobalForward("surftimer_OnBonusFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell, Param_Cell);
+	g_BonusFinishForward = new GlobalForward("surftimer_OnBonusFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_Float, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	g_PracticeFinishForward = new GlobalForward("surftimer_OnPracticeFinished", ET_Event, Param_Cell, Param_Float, Param_String);
 	g_NewRecordForward = new GlobalForward("surftimer_OnNewRecord", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
 	g_NewWRCPForward = new GlobalForward("surftimer_OnNewWRCP", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell, Param_Float);
@@ -252,6 +288,8 @@ void SendMapFinishForward(int client, int count, int style)
 	Call_PushCell(client);
 	Call_PushFloat(g_fFinalTime[client]);
 	Call_PushString(g_szFinalTime[client]);
+	Call_PushFloat(g_fPBDifference[client][style]);
+	Call_PushFloat(g_fWRDifference[client][style]);
 	Call_PushCell(g_MapRank[client]);
 	Call_PushCell(count);
 	Call_PushCell(style);
@@ -303,7 +341,7 @@ void SendMapCheckpointForward(
  * @param rank             Rank of the client.
  * @param zGroup           Zone group of the bonus.
  */
-void SendBonusFinishForward(int client, int rank, int zGroup)
+void SendBonusFinishForward(int client, int rank, int zGroup, int style)
 {
 	/* Start function call */
 	Call_StartForward(g_BonusFinishForward);
@@ -312,9 +350,12 @@ void SendBonusFinishForward(int client, int rank, int zGroup)
 	Call_PushCell(client);
 	Call_PushFloat(g_fFinalTime[client]);
 	Call_PushString(g_szFinalTime[client]);
+	Call_PushFloat(g_fPBDifference_Bonus[client][style][zGroup]);
+	Call_PushFloat(g_fWRDifference_Bonus[client][style][zGroup]);
 	Call_PushCell(rank);
 	Call_PushCell(g_iBonusCount[zGroup]);
 	Call_PushCell(zGroup);
+	Call_PushCell(style);
 
 	/* Finish the call, get the result */
 	Call_Finish();
