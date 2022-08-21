@@ -1,2 +1,0 @@
---CREATE NEW TABLE WITH STAGETIMES
-char sql_createCCP[] = "CREATE TABLE IF NOT EXISTS ck_ccp (steamid VARCHAR(32), name VARCHAR(32), mapname VARCHAR(32), cp INT NOT NULL DEFAULT '0', time decimal(12, 6) NOT NULL DEFAULT '-1.000000', attempts_35 INT NOT NULL DEFAULT '0', PRIMARY KEY(steamid, mapname)) DEFAULT CHARSET=utf8mb4;";

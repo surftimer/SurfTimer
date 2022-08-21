@@ -20,19 +20,14 @@ char sql_selectTopBonusSurfers[] = "SELECT db2.steamid, db1.name, db2.runtime as
 
 // ck_checkpoints
 char sql_createCheckpoints[] = "CREATE TABLE IF NOT EXISTS ck_checkpoints (steamid VARCHAR(32), mapname VARCHAR(32), cp INT(11) NOT NULL, time decimal(12,6) NOT NULL DEFAULT '-1.000000', zonegroup INT(12) NOT NULL DEFAULT 0, PRIMARY KEY(steamid, mapname, cp, zonegroup)) DEFAULT CHARSET=utf8mb4;";
-char sql_updateCheckpoints[] = "UPDATE ck_checkpoints SET time='%f' WHERE steamid='%s' AND mapname='%s' AND cp ='%i' AND zonegroup='%i';";
-char sql_insertCheckpoints[] = "INSERT INTO ck_checkpoints (steamid, mapname, cp, time, zonegroup) VALUES ('%s', '%s', '%i', '%f', '%i')";
+char sql_updateCheckpoints[] = "UPDATE ck_checkpoints SET time='%f', stage_time='%f', stage_attempts='%f' WHERE steamid='%s' AND mapname='%s' AND cp ='%i' AND zonegroup='%i';";
+char sql_insertCheckpoints[] = "INSERT INTO ck_checkpoints (steamid, mapname, cp, time, stage_time, stage_attempts, zonegroup) VALUES ('%s', '%s', '%i', '%f', '%f', '%f', '%i')";
 char sql_selectCheckpoints[] = "SELECT zonegroup, cp, time FROM ck_checkpoints WHERE mapname='%s' AND steamid = '%s';";
 char sql_selectCheckpointsinZoneGroup[] = "SELECT cp, time FROM ck_checkpoints WHERE mapname='%s' AND steamid = '%s' AND zonegroup = %i;";
 char sql_selectRecordCheckpoints[] = "SELECT zonegroup, cp, `time` FROM ck_checkpoints WHERE steamid = '%s' AND mapname='%s' UNION SELECT a.zonegroup, b.cp, b.time FROM ck_bonus a LEFT JOIN ck_checkpoints b ON a.steamid = b.steamid AND a.zonegroup = b.zonegroup WHERE a.mapname = '%s' GROUP BY a.zonegroup;";
 char sql_deleteCheckpoints[] = "DELETE FROM ck_checkpoints WHERE mapname = '%s'";
-
-//ck_ccp
-char sql_createCCP[] = "CREATE TABLE IF NOT EXISTS ck_ccp (steamid VARCHAR(32), name VARCHAR(32), mapname VARCHAR(32), cp INT NOT NULL DEFAULT '0', time decimal(12, 6) NOT NULL DEFAULT '-1.000000', attempts INT NOT NULL DEFAULT '0', PRIMARY KEY(steamid, mapname, cp)) DEFAULT CHARSET=utf8mb4;";
-char sql_updateCCP[] = "UPDATE ck_ccp SET time='%f', attempts='%i' WHERE steamid='%s' AND mapname='%s' AND cp='%i';";
-char sql_insertCCP[] = "INSERT INTO ck_ccp VALUES ('%s', '%s', '%s', '%i', '%f', '%i')";
-char sql_selectStageTimes[] = "SELECT cp, time FROM ck_ccp WHERE mapname = '%s' AND steamid = '%s';";
-char sql_selectStageAttempts[] = "SELECT cp, attempts FROM ck_ccp WHERE mapname = '%s' AND steamid = '%s';";
+char sql_selectStageTimes[] = "SELECT cp, stage_time FROM ck_checkpoints WHERE mapname = '%s' AND steamid = '%s';";
+char sql_selectStageAttempts[] = "SELECT cp, stage_attempts FROM ck_checkpoints WHERE mapname = '%s' AND steamid = '%s';";
 
 // ck_latestrecords
 char sql_createLatestRecords[] = "CREATE TABLE IF NOT EXISTS ck_latestrecords (steamid VARCHAR(32), name VARCHAR(32), runtime decimal(12,6) NOT NULL DEFAULT '-1.000000', map VARCHAR(32), date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(steamid,map,date)) DEFAULT CHARSET=utf8mb4;";

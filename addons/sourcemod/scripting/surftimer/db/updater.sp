@@ -82,7 +82,7 @@ void CheckDatabaseForUpdates()
 			return;
 		}
 
-		if (!SQL_FastQuery(g_hDb, "SELECT cp FROM ck_ccp LIMIT 1"))
+		if (!SQL_FastQuery(g_hDb, "SELECT stage_time FROM ck_checkpoints LIMIT 1"))
 		{
 			db_upgradeDatabase(12);
 			return;
@@ -183,7 +183,7 @@ public void db_upgradeDatabase(int ver)
 	}
 	else if (ver == 12)
 	{
-		SQL_FastQuery(g_hDb, sql_createCCP);
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_checkpoints ADD stage_time decimal(12, 6) NOT NULL DEFAULT '-1.000000', ADD stage_attempts INT NOT NULL DEFAULT '0';");
 	}
 
 	CheckDatabaseForUpdates();

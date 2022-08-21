@@ -3539,50 +3539,6 @@ public void db_TicksTransactionOnFailure(Handle db, any pack, int numQueries, co
 	LogError("[SurfTimer] SQL Error (db_TicksTransactionOnFailure): %s", error);
 }
 
-public void db_UpdateStageTimes(int client, char szSteamID[32], char szMapName[128])
-{
-	//UPDATE THE REST OF THE PLAYERS
-	char szUName[MAX_NAME_LENGTH * 2 + 1];
-	GetClientName(client,szUName, MAX_NAME_LENGTH * 2 + 1);
-
-	char szName[MAX_NAME_LENGTH * 2 + 1];
-	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH * 2 + 1);
-
-	Transaction CCPTransaction = new Transaction();
-
-	if (g_bStageTimesFound[client]){
-		char szQuery[4096];
-
-		for(int i = 0; i < g_TotalStages; i++){
-			Format(szQuery, sizeof(szQuery), sql_updateCCP, g_fStageTimesNew[client][i], g_iStageAttemptsNew[client][i], g_szSteamID[client], g_szMapName, i+1);
-			PrintToServer(szQuery);
-			CCPTransaction.AddQuery(szQuery);
-		}
-	}
-	else{
-		char szQuery[4096];
-
-		for(int i = 0; i < g_TotalStages; i++){
-			Format(szQuery, sizeof(szQuery), sql_insertCCP, g_szSteamID[client], szName, g_szMapName, i+1, g_fStageTimesNew[client][i], g_iStageAttemptsNew[client][i]);
-			PrintToServer(szQuery);
-			CCPTransaction.AddQuery(szQuery);
-		}
-	}
-
-	SQL_ExecuteTransaction(g_hDb, CCPTransaction, db_UpdateCCPOnSuccess, db_UpdateCCPOnFailure, client, DBPrio_Low);
-}
-
-public void db_UpdateCCPOnSuccess(Handle db, any client, int numQueries, Handle[] results, any[] queryData)
-{
-	PrintToServer("[Surftimer] CCP Transaction Successfully Done!");
-	db_LoadCCP(client);
-}
-
-public void db_UpdateCCPOnFailure(Handle db, any pack, int numQueries, const char[] error, int failIndex, any[] queryData)
-{
-	LogError("[SurfTimer] SQL Error (db_UpdateCCPOnFailure): %s", error);
-}
-
 public void db_viewCheckpointsinZoneGroup(int client, char szSteamID[32], char szMapName[128], int zonegroup)
 {
 	char szQuery[1024];
@@ -3623,7 +3579,7 @@ public void db_viewCheckpointsinZoneGroupCallback(Handle owner, Handle hndl, con
 			g_fCheckpointTimesRecord[zonegrp][client][cp] = SQL_FetchFloat(hndl, 1);
 		}
 		if(g_bhasStages)
-			db_UpdateStageTimes(client, g_szSteamID[client], g_szMapName);
+			db_LoadCCP(client);
 	}
 	else
 	{
@@ -3649,14 +3605,21 @@ public void db_UpdateCheckpoints(int client, char szSteamID[32], int zGroup)
 	if (g_bCheckpointsFound[zGroup][client])
 	{
 		for(int i = 0; i < cp_count; i++){
-			Format(szQuery, sizeof(szQuery), sql_updateCheckpoints, g_fCheckpointTimesNew[zGroup][client][i], szSteamID, g_szMapName, i+1, zGroup);
+			if (g_bhasStages)
+				Format(szQuery, sizeof(szQuery), sql_updateCheckpoints, g_fCheckpointTimesNew[zGroup][client][i], g_fStageTimesNew[client][i], g_iStageAttemptsNew[client][i], szSteamID, g_szMapName, i+1, zGroup);
+			else
+				Format(szQuery, sizeof(szQuery), sql_updateCheckpoints, g_fCheckpointTimesNew[zGroup][client][i], -1.0, -1.0, szSteamID, g_szMapName, i+1, zGroup);
+			
 			tAction.AddQuery(szQuery);
 		}
 	}
 	else
 	{
 		for(int i = 0; i < cp_count; i++){
-			Format(szQuery, sizeof(szQuery), sql_insertCheckpoints, szSteamID, g_szMapName, i+1, g_fCheckpointTimesNew[zGroup][client][i], zGroup);
+			if (g_bhasStages)
+				Format(szQuery, sizeof(szQuery), sql_insertCheckpoints, szSteamID, g_szMapName, i+1, g_fCheckpointTimesNew[zGroup][client][i], g_fStageTimesNew[client][i], g_iStageAttemptsNew[client][i], zGroup);
+			else
+				Format(szQuery, sizeof(szQuery), sql_insertCheckpoints, szSteamID, g_szMapName, i+1, -1.0, -1.0, g_iStageAttemptsNew[client][i], zGroup);
 			tAction.AddQuery(szQuery);
 		}
 	}
@@ -12462,7 +12425,7 @@ public void db_viewCCP_GetPlayerPR(int client, char szSteamID[32], char szMapNam
 	WritePackString(pack, szMapName); //MAP USED ON CCP
 
 	char szQuery[2048];
-	Format(szQuery, sizeof szQuery, "SELECT db1.steamid, db1.name, db1.mapname, db1.cp, db1.time, db1.attempts, (SELECT count(name)+1 FROM ck_wrcps WHERE style = 0 AND mapname = db1.mapname AND stage = db1.cp AND time > -1.0 AND runtimepro <= db1.time) AS `rank`, (SELECT count(name) FROM ck_wrcps WHERE style = 0 AND mapname = db1.mapname AND stage = db1.cp AND runtimepro > -1.0) AS total FROM ck_ccp db1 WHERE db1.mapname = '%s' AND db1.steamid = '%s' AND db1.time > -1.0  ORDER BY cp ASC;", szMapName, szSteamID);
+	Format(szQuery, sizeof szQuery, "SELECT db1.steamid, db1.name, db1.mapname, db1.cp, db1.stage_time, db1.stage_attempts, (SELECT count(name)+1 FROM ck_wrcps WHERE style = 0 AND mapname = db1.mapname AND stage = db1.cp AND stage_time > -1.0 AND runtimepro <= db1.stage_time) AS `rank`, (SELECT count(name) FROM ck_wrcps WHERE style = 0 AND mapname = db1.mapname AND stage = db1.cp AND runtimepro > -1.0) AS total FROM ck_checkpoints db1 WHERE db1.mapname = '%s' AND db1.steamid = '%s' AND db1.stage_time > -1.0  ORDER BY cp ASC;", szMapName, szSteamID);
 	SQL_TQuery(g_hDb, SQL_db_viewCCP_GetPlayerPRCallback, szQuery, pack, DBPrio_Low);
 }
 
