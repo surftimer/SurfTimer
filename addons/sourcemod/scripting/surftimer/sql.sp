@@ -12233,6 +12233,8 @@ public void SQL_viewCCP_GetMapRankCallback(Handle owner, Handle hndl, const char
 			CPrintToChat(client, "%t", "CCP_02", g_szChatPrefix);
 	}
 
+	CloseHandle(pack);
+
 }
 
 //GET TOTAL MAP COMPLETIONS
@@ -12474,42 +12476,13 @@ public void SQL_db_viewCCP_GetPlayerPRCallback(Handle owner, Handle hndl, const 
 
 		}
 
-		//CREATE DATAPACK
-		DataPack final_pack = CreateDataPack();
-		WritePackCell(final_pack, client); //CLIENT WHO DID SM_CCP
-		WritePackFloat(final_pack, map_time); //PLAYERS MAP TIME
-		WritePackFloat(final_pack, record_time); //RECORD MAP TIME
-		WritePackCell(final_pack, map_rank); //PLAYERS MAP RANK
-		WritePackCell(final_pack, total_map_completions); // TOTAL COMPLETIONS ON GIVEN MAP
-		WritePackCell(final_pack, total_stages); // TOTAL STAGES ON GIVEN MAP
-		WritePackString(final_pack, szSteamID);  // REQUESTED PLAYER CCP STEAMID
-		WritePackString(final_pack, szMapName); //MAP USED ON CCP
-
-		DisplayCCPMenu(final_pack);
+		DisplayCCPMenu(client, map_time, record_time, map_rank, total_map_completions, total_stages, szSteamID, szMapName);
 	}
 
 }
 
-public void DisplayCCPMenu(DataPack pack)
+public void DisplayCCPMenu(int client, float map_time, float record_time, int map_rank, int total_map_completions, int total_stages, char szSteamID[32], char szMapName[128])
 {
-	ResetPack(pack);
-
-	int client = ReadPackCell(pack);
-
-	//MAP VARIABLES
-	float map_time = ReadPackFloat(pack);
-	float record_time = ReadPackFloat(pack);
-	int map_rank = ReadPackCell(pack);
-	int total_map_completions = ReadPackCell(pack);
-	int total_stages = ReadPackCell(pack);
-
-	char szSteamID[32];
-	char szMapName[128];
-	ReadPackString(pack, szSteamID, sizeof(szSteamID));
-	ReadPackString(pack, szMapName, sizeof(szMapName));
-
-	CloseHandle(pack);
-
 	Menu ccp_menu = new Menu(CCPMenuHandler);
 	
 	char szItem[256];
