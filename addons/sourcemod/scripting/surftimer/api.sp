@@ -167,8 +167,8 @@ public int Native_GetPlayerData(Handle plugin, int numParams)
 		SetNativeCellRef(2, time);
 		SetNativeCellRef(3, rank);
 		SetNativeString(4, szCountry, sizeof(szCountry), true);
-		SetNativeString(4, szCountryCode, sizeof(szCountryCode), true);
-		SetNativeString(4, szContinentCode, sizeof(szContinentCode), true);
+		SetNativeString(5, szCountryCode, sizeof(szCountryCode), true);
+		SetNativeString(6, szContinentCode, sizeof(szContinentCode), true);
 	}
 
 	return rank;
