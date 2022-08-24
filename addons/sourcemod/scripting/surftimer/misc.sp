@@ -3935,8 +3935,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 {
 	if (!IsValidClient(client) || g_bPositionRestored[client] || IsFakeClient(client) || zone >= CPLIMIT)
 		return;
-
-	//PrintToChatAll("cp %i | %d tick count", zone, g_iRecordedTicks[client]);
+	
 	g_iCPStartFrame_CurrentRun[0][zone][client] = g_iRecordedTicks[client];
 
 	float percent = -1.0;

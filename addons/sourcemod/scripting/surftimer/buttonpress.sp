@@ -304,7 +304,10 @@ public void CL_OnEndTimerPress(int client)
 	if (zGroup == 0)
 	{
 		if (style == 0)
-		{	
+		{
+			//ADD
+			g_fCheckpointTimesNew[zGroup][client][g_TotalStages-1] = g_fFinalTime[client];
+			
 			// Make a new record bot?
 			if (GetConVarBool(g_hReplaceReplayTime) && (g_fFinalTime[client] < g_fReplayTimes[0][0] || g_fReplayTimes[0][0] == 0.0))
 			{
@@ -412,7 +415,7 @@ public void CL_OnEndTimerPress(int client)
 
 				g_bMapFirstRecord[client] = true;
 				g_pr_showmsg[client] = true;
-				db_UpdateCheckpoints(client, g_szSteamID[client], zGroup);
+				db_InsertOrUpdateCheckpoints(client, g_szSteamID[client], zGroup);
 
 				db_selectRecord(client);
 
@@ -425,7 +428,7 @@ public void CL_OnEndTimerPress(int client)
 
 				g_bMapPBRecord[client] = true;
 				g_pr_showmsg[client] = true;
-				db_UpdateCheckpoints(client, g_szSteamID[client], zGroup);
+				db_InsertOrUpdateCheckpoints(client, g_szSteamID[client], zGroup);
 
 				db_selectRecord(client);
 
@@ -664,7 +667,7 @@ public void CL_OnEndTimerPress(int client)
 
 				g_bBonusFirstRecord[client] = true;
 				g_pr_showmsg[client] = true;
-				db_UpdateCheckpoints(client, g_szSteamID[client], zGroup);
+				db_InsertOrUpdateCheckpoints(client, g_szSteamID[client], zGroup);
 				db_insertBonus(client, g_szSteamID[client], szName, g_fFinalTime[client], zGroup);
 			}
 
@@ -676,7 +679,7 @@ public void CL_OnEndTimerPress(int client)
 
 				g_bBonusPBRecord[client] = true;
 				g_pr_showmsg[client] = true;
-				db_UpdateCheckpoints(client, g_szSteamID[client], zGroup);
+				db_InsertOrUpdateCheckpoints(client, g_szSteamID[client], zGroup);
 				db_updateBonus(client, g_szSteamID[client], szName, g_fFinalTime[client], zGroup);
 			}
 
@@ -827,6 +830,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 			Stage_StartRecording(client); //Add pre
       
 			if (g_iCurrentStyle[client] == 0 && g_bTimerRunning[client]) {
+				PrintToChatAll("incremented stage %d", g_Stage[0][client]);
 				g_iStageAttemptsNew[client][g_Stage[0][client]-1] += 1;
 			}
 		}
@@ -838,7 +842,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 			int iRecordDifference;
 			int iPersonalDifference;
 			//FORCE XYZ UNITS ON PRESTRAFE
-
+			
 			//STAGE PRESTRAFE RECORD
 			int iPrestrafeRecord = g_iRecordPreStrafeStage[g_PreSpeedMode[client]][g_Stage[0][client]][g_iCurrentStyle[client]];
 

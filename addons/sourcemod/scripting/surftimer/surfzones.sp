@@ -414,6 +414,11 @@ public void StartTouch(int client, int action[3])
 				// fluffys wrcps
 				if (g_bhasStages)
 				{
+					
+					if (!g_bPracticeMode[client] && g_iClientInZone[client][2] == 0 && g_iCurrentStyle[client] == 0) {
+						g_fCheckpointTimesNew[0][client][g_TotalStages-1] = fCurrentRunTime;
+					}
+
 					if (!g_bPracticeMode[client])
 					{
 						g_bWrcpEndZone[client] = true;
