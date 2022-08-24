@@ -830,7 +830,6 @@ public void CL_OnStartWrcpTimerPress(int client)
 			Stage_StartRecording(client); //Add pre
       
 			if (g_iCurrentStyle[client] == 0 && g_bTimerRunning[client]) {
-				PrintToChatAll("incremented stage %d", g_Stage[0][client]);
 				g_iStageAttemptsNew[client][g_Stage[0][client]-1] += 1;
 			}
 		}
