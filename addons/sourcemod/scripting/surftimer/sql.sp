@@ -12211,7 +12211,7 @@ public void SQL_viewCCP_GetMapRankCallback(Handle owner, Handle hndl, const char
 		//WHEN IT HAS A -1 IN IT , IT MEANS THE PLAYER PROVIDED THE RANK
 		if(map_rank != -1) {
 			CloseHandle(pack);
-			db_GetTotalMapCompletions(client, szPlayerSteamID, szMapName, map_time, map_rank);
+			db_GetTotalMapCompletions(client, szSteamID, szMapName, map_time, map_rank);
 		}
 		//IF THE PLAYER PROVIDED THE RANK BEFORE
 		else{
