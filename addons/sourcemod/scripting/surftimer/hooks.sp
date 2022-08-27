@@ -930,6 +930,9 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	}
 	else if (g_iCurrentStyle[client] == 3)    // Backwards
 	{
+		bool bInputs = (buttons & IN_FORWARD) > 0 || (buttons & IN_MOVELEFT) > 0 ||
+						(buttons & IN_BACK) > 0 || (buttons & IN_MOVERIGHT) > 0;
+		
 		float eye[3];
 		float velocity[3];
 
@@ -940,28 +943,36 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		eye[2] = 0.0;
 
 		GetEntPropVector(client, Prop_Data, "m_vecVelocity", velocity);
-
+		float fSpeedSqr = (velocity[0] * velocity[0] + velocity[1] * velocity[1]);
+		float fSpeedThres = 260.0;
+		
 		velocity[2] = 0.0;
 
-		float len = SquareRoot( velocity[0] * velocity[0] + velocity[1] * velocity[1] );
+		float len = SquareRoot(fSpeedSqr);
 
 		velocity[0] /= len;
 		velocity[1] /= len;
 
 		float val = GetVectorDotProduct( eye, velocity );
-
-		if (!g_bInStartZone[client] && !g_bInStageZone[client] && val > -0.75)
+		
+		if (!g_bInStartZone[client] && !g_bInStageZone[client] && val > 0.0)
 		{
-			g_KeyCount[client]++;
-			if (g_KeyCount[client] == 60)
+			if (g_KeyCount[client] < 59)
+				g_KeyCount[client]++;
+			else
 			{
-				g_iCurrentStyle[client] = 0;
-				g_KeyCount[client] = 0;
-				CPrintToChat(client, "%t", "Hooks14", g_szChatPrefix);
+				// don't check if we're below the threshold, or not pressing anything.
+				// this should solve resets happening on wall collisions and ladders
+				if(bInputs && fSpeedSqr > fSpeedThres * fSpeedThres)
+				{
+					g_iCurrentStyle[client] = 0;
+					g_KeyCount[client] = 0;
+					CPrintToChat(client, "%t", "Hooks14", g_szChatPrefix);
+				}
 			}
 		}
-		else if (!g_bInStartZone[client] && !g_bInStageZone[client] && val < -0.75)
-		g_KeyCount[client] = 0;
+		else
+			g_KeyCount[client] = 0;
 	}
 	else if (g_iCurrentStyle[client] == 5) // Slow Motion
 	{
