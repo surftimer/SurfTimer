@@ -813,6 +813,18 @@ float g_fFinalTime[MAXPLAYERS + 1];
 // Total time the run took in 00:00:00 format
 char g_szFinalTime[MAXPLAYERS + 1][32];
 
+// Difference Between run time and WR
+float g_fWRDifference[MAXPLAYERS + 1][MAX_STYLES];
+
+// Difference Between run time and PB
+float g_fPBDifference[MAXPLAYERS + 1][MAX_STYLES];
+
+// Difference Between run time and WR for style
+float g_fWRDifference_Bonus[MAXPLAYERS + 1][MAX_STYLES][MAXZONEGROUPS];
+
+// Difference Between run time and PB for style
+float g_fPBDifference_Bonus[MAXPLAYERS + 1][MAX_STYLES][MAXZONEGROUPS];
+
 // Time spent in !pause this run
 float g_fPauseTime[MAXPLAYERS + 1];
 
