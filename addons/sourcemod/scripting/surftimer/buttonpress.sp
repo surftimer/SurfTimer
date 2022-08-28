@@ -81,6 +81,14 @@ public void CL_OnStartTimerPress(int client)
 			for (int i = 0; i < CPLIMIT; i++)
 			g_fCheckpointTimesNew[g_iClientInZone[client][2]][client][i] = 0.0;
 
+			// Reset Stage Times
+			for (int i = 0; i < CPLIMIT; i++)
+				g_fStageTimesNew[client][i] = 0.0;
+
+			// Reset Stage Attempts
+			for (int i = 0; i < CPLIMIT; i++)
+				g_iStageAttemptsNew[client][i] = 0;
+
 			// Set missed record time variables
 			if (g_iClientInZone[client][2] == 0)
 			{
@@ -111,6 +119,9 @@ public void CL_OnStartTimerPress(int client)
 			
 			//PRINFO INCREMENT ATTEMPTS
 			g_fAttempts[client][g_iClientInZone[client][2]]++;
+
+			//CCP INCREMENT ATTEMPTS
+			g_iStageAttemptsNew[client][0] += 1;
 
 			char szRecordDifference[128];
 			char szPersonalDifference[128];
@@ -294,6 +305,9 @@ public void CL_OnEndTimerPress(int client)
 	{
 		if (style == 0)
 		{
+			//ADD LAST TIME TO CP DATA
+			g_fCheckpointTimesNew[zGroup][client][g_TotalStages-1] = g_fFinalTime[client];
+			
 			g_fPBDifference[client][0] = g_fFinalTime[client] - g_fPersonalRecord[client];
 			g_fWRDifference[client][0] = g_fFinalTime[client] - g_fRecordMapTime;
 			PrintToServer("FINISEF - %f | %f", g_fWRDifference[client][0], g_fRecordMapTime);
@@ -347,6 +361,10 @@ public void CL_OnEndTimerPress(int client)
 						for (int i = 0; i < CPLIMIT; i++)
 						{
 							g_fCheckpointServerRecord[zGroup][i] = g_fCheckpointTimesNew[zGroup][client][i];
+
+							//UPDATE CCP TIMES AND ATTEMPTS FOR THE RECORD
+							g_fCCPStageTimesServerRecord[i] = g_fStageTimesNew[client][i];
+							g_iCCPStageAttemptsServerRecord[i] = g_iStageAttemptsNew[client][i];
 						}
 						g_bCheckpointRecordFound[zGroup] = true;
 					}
@@ -401,7 +419,7 @@ public void CL_OnEndTimerPress(int client)
 
 				g_bMapFirstRecord[client] = true;
 				g_pr_showmsg[client] = true;
-				db_UpdateCheckpoints(client, g_szSteamID[client], zGroup);
+				db_InsertOrUpdateCheckpoints(client, g_szSteamID[client], zGroup);
 
 				db_selectRecord(client);
 
@@ -414,7 +432,7 @@ public void CL_OnEndTimerPress(int client)
 
 				g_bMapPBRecord[client] = true;
 				g_pr_showmsg[client] = true;
-				db_UpdateCheckpoints(client, g_szSteamID[client], zGroup);
+				db_InsertOrUpdateCheckpoints(client, g_szSteamID[client], zGroup);
 
 				db_selectRecord(client);
 
@@ -659,7 +677,7 @@ public void CL_OnEndTimerPress(int client)
 
 				g_bBonusFirstRecord[client] = true;
 				g_pr_showmsg[client] = true;
-				db_UpdateCheckpoints(client, g_szSteamID[client], zGroup);
+				db_InsertOrUpdateCheckpoints(client, g_szSteamID[client], zGroup);
 				db_insertBonus(client, g_szSteamID[client], szName, g_fFinalTime[client], zGroup);
 			}
 
@@ -671,7 +689,7 @@ public void CL_OnEndTimerPress(int client)
 
 				g_bBonusPBRecord[client] = true;
 				g_pr_showmsg[client] = true;
-				db_UpdateCheckpoints(client, g_szSteamID[client], zGroup);
+				db_InsertOrUpdateCheckpoints(client, g_szSteamID[client], zGroup);
 				db_updateBonus(client, g_szSteamID[client], szName, g_fFinalTime[client], zGroup);
 			}
 
@@ -823,6 +841,10 @@ public void CL_OnStartWrcpTimerPress(int client)
 			g_bTeleByCommand[client] = false;
 			g_WrcpStage[client] = g_Stage[0][client];
 			Stage_StartRecording(client); //Add pre
+      
+			if (g_iCurrentStyle[client] == 0 && g_bTimerRunning[client]) {
+				g_iStageAttemptsNew[client][g_Stage[0][client]-1] += 1;
+			}
 		}
 		if (g_Stage[0][client] >= 1 && !g_bPracticeMode[client] && !IsFakeClient(client)) {
 			char szRecordDifference[128];
@@ -832,7 +854,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 			int iRecordDifference;
 			int iPersonalDifference;
 			//FORCE XYZ UNITS ON PRESTRAFE
-
+			
 			//STAGE PRESTRAFE RECORD
 			int iPrestrafeRecord = g_iRecordPreStrafeStage[g_PreSpeedMode[client]][g_Stage[0][client]][g_iCurrentStyle[client]];
 
@@ -929,6 +951,10 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		stage = g_TotalStages;
 	else if (stage < 1)
 		stage = 1;
+
+	if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0 && g_fCurrentRunTime[client] != 0.0 && g_iClientInZone[client][2] == 0) {
+		g_fStageTimesNew[client][stage-1] = g_fCurrentWrcpRunTime[client];
+	}
 
 	if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] == 0)
 	{

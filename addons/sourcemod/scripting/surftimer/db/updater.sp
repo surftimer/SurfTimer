@@ -81,7 +81,14 @@ void CheckDatabaseForUpdates()
 			db_upgradeDatabase(11);
 			return;
 		}
-		LogMessage("Version 10 looks good.");
+
+		if (!SQL_FastQuery(g_hDb, "SELECT stage_time FROM ck_checkpoints LIMIT 1"))
+		{
+			db_upgradeDatabase(12);
+			return;
+		}
+
+		LogMessage("Version 12 looks good.");
 	}
 }
 
@@ -173,6 +180,10 @@ public void db_upgradeDatabase(int ver)
 	{
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN countryCode varchar(3) DEFAULT NULL AFTER `country`;");
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank ADD COLUMN continentCode varchar(3) DEFAULT NULL AFTER `countryCode`;");
+	}
+	else if (ver == 12)
+	{
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_checkpoints ADD stage_time decimal(12, 6) NOT NULL DEFAULT '-1.000000', ADD stage_attempts INT NOT NULL DEFAULT '0';");
 	}
 
 	CheckDatabaseForUpdates();

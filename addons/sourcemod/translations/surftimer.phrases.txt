@@ -1838,7 +1838,36 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Type new value (0 - 255) in the chat, or {darkred}cancel{default} to cancel"
 	}
-
+	"CCP_01"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} sm_ccp only works on staged maps"
+	}
+	"CCP_02"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Map not completed"
+	}
+	"CCP_03"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} No completions found."
+	}
+	"CCP_04"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} No map record found"
+	}
+	"CCP_05"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Old Personal Record, Improve your time"
+	}
+	"CCP_06"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Map Record has no CCP saved, Old Record"
+	}
 	"style_not_found"
 	{
 		"#format"	"{1:s},{2:i}"
@@ -1853,7 +1882,6 @@
 	{
 		"en"		"\nStyle Acronyms are the following : \nNormal - n \nSideways - sw \nHalf-Sideways - hsw \nBackwards - bw \nLow-Gravity - lg \nSlow Motion - sm \nFast Forward - ff \nFreestyle - fs \n"
 	}
-
 	"ctop_help_chat"
 	{
 		"#format"	"{1:s}"
@@ -1887,7 +1915,6 @@
 	{
 		"en"		"FORMATTING OPTIONS FOR COMMAND !crank \n!crank \n!crank <playername> \n!crank #<style_acronym> \n!crank <playername> #<style_acronym> OR !crank #<style_acronym> <playername> \n"
 	}
-
 	"continenttop_help_chat"
 	{
 		"#format"	"{1:s}"
@@ -1925,7 +1952,6 @@
 	{
 		"en"		"\nContinent Acronyms are the following :\nAS => Asia \nAN => Antarctica \nAF => Africa \nSA => South America \nEU => Europe \nOC => Oceania \nNA => North America"
 	}
-
 	"NextRankPointRequired"
 	{
 		"#format"	"{1:s},{2:i},{3:s}"

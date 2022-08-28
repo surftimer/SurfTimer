@@ -100,7 +100,8 @@ public void LoadClientSetting(int client, int setting)
 			case 6: db_CheckVIPAdmin(client, g_szSteamID[client]);
 			case 7: db_viewCustomTitles(client, g_szSteamID[client]);
 			case 8: db_viewCheckpoints(client, g_szSteamID[client], g_szMapName);
-			case 9: db_viewPRinfo(client, g_szSteamID[client], g_szMapName);
+			case 9: db_LoadCCP(client);
+			case 10: db_viewPRinfo(client, g_szSteamID[client], g_szMapName);
 			default: db_viewPersonalRecords(client, g_szSteamID[client], g_szMapName);
 		}
 		g_iSettingToLoad[client]++;
@@ -1278,6 +1279,8 @@ public void SetClientDefaults(int client)
 		{
 			g_fCheckpointTimesNew[x][client][i] = 0.0;
 			g_fCheckpointTimesRecord[x][client][i] = 0.0;
+			g_fStageTimesNew[client][i] = 0.0;
+			g_iStageAttemptsNew[client][i] = 0;
 		}
 	}
 
@@ -3932,8 +3935,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 {
 	if (!IsValidClient(client) || g_bPositionRestored[client] || IsFakeClient(client) || zone >= CPLIMIT)
 		return;
-
-	//PrintToChatAll("cp %i | %d tick count", zone, g_iRecordedTicks[client]);
+	
 	g_iCPStartFrame_CurrentRun[0][zone][client] = g_iRecordedTicks[client];
 
 	float percent = -1.0;
@@ -5505,4 +5507,17 @@ public bool GetContinentName(char code[3], char[] name, int length)
 	}
 
 	return false;
+}
+
+public void resetCCPDefaults(int client){
+
+	for(int i = 0; i < CPLIMIT; i++)
+	{
+		g_fCCP_StageTimes_ServerRecord[client][i] = 0.0;
+		//g_iCCP_StageAttempts_ServerRecord[client][i] = 0;
+		g_fCCP_StageTimes_Player[client][i] = 0.0;
+		g_iCCP_StageAttempts_Player[client][i] = 0;
+		g_iCCP_StageRank_Player[client][i] = 0;
+		g_iCCP_StageTotal_Player[client][i] = 0;	
+	}
 }

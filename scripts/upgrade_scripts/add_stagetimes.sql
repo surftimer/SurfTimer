@@ -1,0 +1,2 @@
+--ADD CCP COLUMNS TO CK_CHECKPOINTS
+ALTER TABLE ck_checkpoints ADD stage_time decimal(12, 6) NOT NULL DEFAULT '-1.000000', ADD stage_attempts INT NOT NULL DEFAULT '0';
