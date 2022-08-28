@@ -306,11 +306,13 @@ public void CL_OnEndTimerPress(int client)
 		if (style == 0)
 		{
 			//ADD LAST TIME TO CP DATA
-			g_fCheckpointTimesNew[zGroup][client][g_TotalStages-1] = g_fFinalTime[client];
-			
+			if(g_bhasStages)
+				g_fCheckpointTimesNew[zGroup][client][g_TotalStages-1] = g_fFinalTime[client];
+			else
+				g_fCheckpointTimesNew[zGroup][client][g_iTotalCheckpoints] = g_fFinalTime[client];
+
 			g_fPBDifference[client][0] = g_fFinalTime[client] - g_fPersonalRecord[client];
 			g_fWRDifference[client][0] = g_fFinalTime[client] - g_fRecordMapTime;
-			PrintToServer("FINISEF - %f | %f", g_fWRDifference[client][0], g_fRecordMapTime);
 
 			// Make a new record bot?
 			if (GetConVarBool(g_hReplaceReplayTime) && (g_fFinalTime[client] < g_fReplayTimes[0][0] || g_fReplayTimes[0][0] == 0.0))

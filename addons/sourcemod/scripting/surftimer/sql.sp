@@ -3608,8 +3608,9 @@ public void db_InsertOrUpdateCheckpoints(int client, char szSteamID[32], int zGr
 		if(g_bhasStages)
 			Format(szQuery, sizeof(szQuery), sql_InsertOrUpdateCheckpoints, szSteamID, g_szMapName, i+1, g_fCheckpointTimesNew[zGroup][client][i], g_fStageTimesNew[client][i], g_iStageAttemptsNew[client][i], zGroup, g_fCheckpointTimesNew[zGroup][client][i], g_fStageTimesNew[client][i], g_iStageAttemptsNew[client][i]);
 		else
-			Format(szQuery, sizeof(szQuery), sql_InsertOrUpdateCheckpoints, szSteamID, g_szMapName, i+1, -1.0, -1.0, g_iStageAttemptsNew[client][i], zGroup, g_fCheckpointTimesNew[zGroup][client][i], g_fStageTimesNew[client][i], g_iStageAttemptsNew[client][i]);
+			Format(szQuery, sizeof(szQuery), sql_InsertOrUpdateCheckpoints, szSteamID, g_szMapName, i+1, g_fCheckpointTimesNew[zGroup][client][i], -1.0, -1, zGroup, g_fCheckpointTimesNew[zGroup][client][i], -1.0, -1);
 		
+		PrintToServer(szQuery);
 		tAction.AddQuery(szQuery);
 	}
 
