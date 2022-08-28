@@ -71,7 +71,11 @@ public void db_createTables()
 	SQL_AddQuery(createTableTnx, sql_createBonus);
 	SQL_AddQuery(createTableTnx, sql_createBonusIndex);
 	SQL_AddQuery(createTableTnx, sql_createCheckpoints);
-	SQL_AddQuery(createTableTnx, sql_createZones);
+
+	char sBuffer[1024];
+	FormatEx(sBuffer, sizeof(sBuffer), sql_createZones, g_hDefaultPreSpeed.FloatValue);
+	SQL_AddQuery(createTableTnx, sBuffer);
+
 	SQL_AddQuery(createTableTnx, sql_createMapTier);
 	SQL_AddQuery(createTableTnx, sql_createSpawnLocations);
 	SQL_AddQuery(createTableTnx, sql_createAnnouncements);
@@ -5129,7 +5133,7 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 			g_mapZones[i].ZoneGroup = 0;
 			Format(g_mapZones[i].TargetName, sizeof(MapZone::TargetName), "");
 			g_mapZones[i].OneJumpLimit = 1;
-			g_mapZones[i].PreSpeed = 350.0;
+			g_mapZones[i].PreSpeed = g_hDefaultPreSpeed.FloatValue;
 		}
 
 		for (int x = 0; x < MAXZONEGROUPS; x++)

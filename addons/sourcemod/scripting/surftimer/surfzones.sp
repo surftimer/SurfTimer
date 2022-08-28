@@ -2288,6 +2288,8 @@ public void PrespeedMenu(int client)
 		Format(szTitle, sizeof(szTitle), "Zone Prespeed (%f)", g_mapZones[g_ClientSelectedZone[client]].PreSpeed);
 	SetMenuTitle(menu, szTitle);
 
+	AddMenuItem(menu, "250.0", "250.0");
+	AddMenuItem(menu, "260.0", "260.0");
 	AddMenuItem(menu, "285.0", "285.0");
 	AddMenuItem(menu, "300.0", "300.0");
 	AddMenuItem(menu, "350.0", "350.0");
