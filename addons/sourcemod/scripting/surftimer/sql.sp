@@ -3608,7 +3608,7 @@ public void db_InsertOrUpdateCheckpoints(int client, char szSteamID[32], int zGr
 		if(g_bhasStages)
 			Format(szQuery, sizeof(szQuery), sql_InsertOrUpdateCheckpoints, szSteamID, g_szMapName, i+1, g_fCheckpointTimesNew[zGroup][client][i], g_fStageTimesNew[client][i], g_iStageAttemptsNew[client][i], zGroup, g_fCheckpointTimesNew[zGroup][client][i], g_fStageTimesNew[client][i], g_iStageAttemptsNew[client][i]);
 		else
-			Format(szQuery, sizeof(szQuery), sql_InsertOrUpdateCheckpoints, szSteamID, g_szMapName, i+1, -1.0, -1.0, g_iStageAttemptsNew[client][i], zGroup, g_fCheckpointTimesNew[zGroup][client][i], g_fStageTimesNew[client][i], g_iStageAttemptsNew[client][i]);
+			Format(szQuery, sizeof(szQuery), sql_InsertOrUpdateCheckpoints, szSteamID, g_szMapName, i+1, g_fCheckpointTimesNew[zGroup][client][i], -1.0, -1, zGroup, g_fCheckpointTimesNew[zGroup][client][i], -1.0, -1);
 		
 		tAction.AddQuery(szQuery);
 	}
@@ -4145,7 +4145,7 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 				default:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, GRAY, tier, WHITE);
 			}
 			if (g_bhasStages)
-				Format(g_sTierString, 512, "%s%c%i Stages", g_sTierString, LIGHTGREEN, (g_mapZonesTypeCount[0][3] + 1));
+				Format(g_sTierString, 512, "%s%c%i Stages", g_sTierString, LIGHTGREEN, g_TotalStages);
 			else
 				Format(g_sTierString, 512, "%s%cLinear", g_sTierString, LIMEGREEN);
 
@@ -5117,6 +5117,9 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 		g_bhasBonus = false;
 		g_mapZoneGroupCount = 0; // 1 = No Bonus, 2 = Bonus, >2 = Multiple bonuses
 		g_iTotalCheckpoints = 0;
+		g_TotalStages = 0;
+		int g_iTotalCheckpoints_Same = 0;
+		int g_iTotalStages_Same = 0;
 
 		for (int i = 0; i < MAXZONES; i++)
 		{
@@ -5140,10 +5143,12 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 		{
 			g_mapZoneCountinGroup[x] = 0;
 			for (int k = 0; k < ZONEAMOUNT; k++)
-			g_mapZonesTypeCount[x][k] = 0;
+			g_mapZonesTypeCount[x][k] = 1;
 		}
 
 		int zoneIdChecker[MAXZONES], zoneTypeIdChecker[MAXZONEGROUPS][ZONEAMOUNT][MAXZONES], zoneTypeIdCheckerCount[MAXZONEGROUPS][ZONEAMOUNT], zoneGroupChecker[MAXZONEGROUPS];
+
+		ArrayList temp_zonetypeID = new ArrayList();
 
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 		while (SQL_FetchRow(hndl))
@@ -5161,12 +5166,31 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 			g_mapZones[g_mapZonesCount].Team = SQL_FetchInt(hndl, 10);
 			g_mapZones[g_mapZonesCount].ZoneGroup = SQL_FetchInt(hndl, 11);
 
-			// Total amount of checkpoints
+			//COUNT CHECKPOINTS AND STAGES
 			if (g_mapZones[g_mapZonesCount].ZoneGroup == 0)
 			{
-				if (g_mapZones[g_mapZonesCount].ZoneType == 4)
+				PrintToServer("===ID FOUND : %d===", g_mapZones[g_mapZonesCount].ZoneId)
+				PrintToServer("===IS CHECKPOINT : %s===", g_mapZones[g_mapZonesCount].ZoneType == 4 ? "true" : "false");
+				if (g_mapZones[g_mapZonesCount].ZoneType == 4 && temp_zonetypeID.FindValue(g_mapZones[g_mapZonesCount].ZoneTypeId) == -1)
 				{
+					PrintToServer("===INCREMENTING g_iTotalCheckpoints===");
+					temp_zonetypeID.Push(g_mapZones[g_mapZonesCount].ZoneTypeId);
 					g_iTotalCheckpoints++;
+				}
+				else if (g_mapZones[g_mapZonesCount].ZoneType == 4 && temp_zonetypeID.FindValue(g_mapZones[g_mapZonesCount].ZoneTypeId) != -1)
+				{
+					g_iTotalCheckpoints_Same++;
+				}
+
+				if (g_mapZones[g_mapZonesCount].ZoneType == 3 && temp_zonetypeID.FindValue(g_mapZones[g_mapZonesCount].ZoneTypeId) == -1)
+				{
+					PrintToServer("===INCREMENTING g_TotalStages===");
+					temp_zonetypeID.Push(g_mapZones[g_mapZonesCount].ZoneTypeId);
+					g_TotalStages++;
+				}
+				else if (g_mapZones[g_mapZonesCount].ZoneType == 3 && temp_zonetypeID.FindValue(g_mapZones[g_mapZonesCount].ZoneTypeId) != -1)
+				{
+					g_iTotalStages_Same++;
 				}
 			}
 
@@ -5290,10 +5314,20 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 				g_fZoneCorners[g_mapZonesCount][7][i] = g_mapZones[g_mapZonesCount].PointB[i];
 			}
 
-			// Zone counts:
+
 			g_mapZonesTypeCount[g_mapZones[g_mapZonesCount].ZoneGroup][g_mapZones[g_mapZonesCount].ZoneType]++;
 			g_mapZonesCount++;
 		}
+
+		g_TotalStages++;
+		delete temp_zonetypeID;
+
+		PrintToServer("===TOTAL CHECKPOINTS %d===", g_iTotalCheckpoints);
+		PrintToServer("===TOTAL STAGES %d===", g_TotalStages);
+		PrintToServer("===TOTAL ZONES %d===", g_mapZonesCount);
+		PrintToServer("===TOTAL ZONEGROUPS %d===", g_mapZoneGroupCount);
+		PrintToServer("===TOTAL CHECKPOINTS REPEATED %d===", g_iTotalCheckpoints_Same);
+
 		// Count zone corners
 		// https://forums.alliedmods.net/showpost.php?p=2006539&postcount=8
 		for (int x = 0; x < g_mapZonesCount; x++)
@@ -5334,7 +5368,7 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 		}
 
 		// 3rd ZoneTypeId
-		for (int i = 0; i < g_mapZoneGroupCount; i++)
+		/*for (int i = 0; i < g_mapZoneGroupCount; i++)
 		for (int k = 0; k < ZONEAMOUNT; k++)
 		for (int x = 0; x < zoneTypeIdCheckerCount[i][k]; x++)
 		if (zoneTypeIdChecker[i][k][x] != 1 && (k == 3) || (k == 4))
@@ -5352,7 +5386,7 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 				Format(szerror, 258, "[SurfTimer] Duplicate Stage Zone ID's on %s [ZoneGroup: %i, ZoneType: 3, ZoneTypeId: %i]", g_szMapName, k, x);
 				LogError(szerror);
 			}
-		}
+		}*/
 
 		RefreshZones();
 
@@ -7314,13 +7348,13 @@ public void db_GetTotalStagesCallback(Handle owner, Handle hndl, const char[] er
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-		g_TotalStages = SQL_FetchInt(hndl, 0) + 1;
+		//g_TotalStages = SQL_FetchInt(hndl, 0) + 1;
 
-		for(int i = 1;i <= g_TotalStages;i++)
-		{
-			g_fStageRecord[i] = 0.0;
+		//for(int i = 1;i <= g_TotalStages;i++)
+		//{
+		//	g_fStageRecord[i] = 0.0;
 			// fluffys comeback yo
-		}
+		//}
 	}
 
 	if (!g_bServerDataLoaded)

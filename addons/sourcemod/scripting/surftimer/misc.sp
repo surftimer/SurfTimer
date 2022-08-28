@@ -2982,7 +2982,7 @@ public void SpecListMenuDead(int client) // What Spectators see
 				Format(szProBest, 32, "None");
 
 			if (g_bhasStages) // There are stages
-				Format(szStage, 32, "Stage: %i / %i", g_Stage[g_iClientInZone[ObservedUser][2]][ObservedUser], (g_mapZonesTypeCount[g_iClientInZone[ObservedUser][2]][3] + 1));
+				Format(szStage, 32, "Stage: %i / %i", g_Stage[g_iClientInZone[ObservedUser][2]][ObservedUser], g_TotalStages);
 			else
 				Format(szStage, 32, "Linear map");
 
@@ -3614,16 +3614,16 @@ public void CenterHudAlive(int client)
 						{
 							if (g_bSaveLocTele[client]) // Has the player teleported to saveloc?
 							{
-								Format(module[i], 128, "Stage: %i/%i", g_iPlayerPracLocationSnap[client][g_iPlayerPracLocationSnapIdClient[client]], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+								Format(module[i], 128, "Stage: %i/%i", g_iPlayerPracLocationSnap[client][g_iPlayerPracLocationSnapIdClient[client]], g_TotalStages);
 							}
 							else
 							{
-								Format(module[i], 128, "Stage: %i/%i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+								Format(module[i], 128, "Stage: %i/%i", g_Stage[g_iClientInZone[client][2]][client], g_TotalStages);
 							}
 						}
 						else
 						{
-							Format(module[i], 128, "Stage: %i/%i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1)); // less \t's to make lines align
+							Format(module[i], 128, "Stage: %i/%i", g_Stage[g_iClientInZone[client][2]][client], g_TotalStages); // less \t's to make lines align
 						}
 					}
 				}
@@ -3816,7 +3816,7 @@ public void SideHudAlive(int client)
 						// Format(szStage, 64, "Linear Map");
 						char szCP[64];
 						char szCurrentCP[64];
-						if (g_iCurrentCheckpoint[client] == g_mapZonesTypeCount[g_iClientInZone[client][2]][4])
+						if (g_iCurrentCheckpoint[client] == g_iTotalCheckpoints)
 						{
 							FormatTimeFloat(0, g_fRecordMapTime, 3, szCP, 64);
 							Format(szCurrentCP, 64, "End Zone");
@@ -3853,16 +3853,16 @@ public void SideHudAlive(int client)
 						{
 							if (g_bSaveLocTele[client]) // Has the player teleported to saveloc?
 							{
-								Format(szStage, 64, "Stage: %i / %i", g_iPlayerPracLocationSnap[client][g_iLastSaveLocIdClient[client]], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+								Format(szStage, 64, "Stage: %i / %i", g_iPlayerPracLocationSnap[client][g_iLastSaveLocIdClient[client]], g_TotalStages);
 							}
 							else
 							{
-								Format(szStage, 64, "Stage: %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+								Format(szStage, 64, "Stage: %i / %i", g_Stage[g_iClientInZone[client][2]][client], g_TotalStages);
 							}
 						}
 						else
 						{
-							Format(szStage, 64, "Stage: %i / %i", g_Stage[g_iClientInZone[client][2]][client], (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1));
+							Format(szStage, 64, "Stage: %i / %i", g_Stage[g_iClientInZone[client][2]][client], g_TotalStages);
 						}
 						
 						char szWrcpTime[64];
@@ -3936,6 +3936,8 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 	if (!IsValidClient(client) || g_bPositionRestored[client] || IsFakeClient(client) || zone >= CPLIMIT)
 		return;
 	
+	PrintToServer("===CHECKPOINT %d===", zone);
+
 	g_iCPStartFrame_CurrentRun[0][zone][client] = g_iRecordedTicks[client];
 
 	float percent = -1.0;
@@ -3944,10 +3946,10 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 	char szSpecMessage[512];
 
 	if (g_bhasStages) // If staged map
-		totalPoints = g_mapZonesTypeCount[zonegroup][3];
+		totalPoints = g_TotalStages;
 	else
-		if (g_mapZonesTypeCount[zonegroup][4] > 0) // If Linear Map and checkpoints
-		totalPoints = g_mapZonesTypeCount[zonegroup][4];
+		if (g_iTotalCheckpoints > 0) // If Linear Map and checkpoints
+			totalPoints = g_iTotalCheckpoints;
 
 	// Count percent of completion
 	percent = (float(zone + 1) / float(totalPoints + 1));

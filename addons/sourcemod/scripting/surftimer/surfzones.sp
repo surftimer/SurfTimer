@@ -1666,16 +1666,16 @@ public void SelectNormalZoneType(int client)
 	SelectNormalZoneMenu.SetTitle("Select Zone Type");
 	SelectNormalZoneMenu.AddItem("1", "Start");
 	SelectNormalZoneMenu.AddItem("2", "End");
-	if (g_mapZonesTypeCount[g_CurrentSelectedZoneGroup[client]][3] == 0 && g_mapZonesTypeCount[g_CurrentSelectedZoneGroup[client]][4] == 0)
+	if (g_TotalStages == 0 && g_iTotalCheckpoints == 0)
 	{
 		SelectNormalZoneMenu.AddItem("3", "Stage");
 		SelectNormalZoneMenu.AddItem("4", "Checkpoint");
 	}
-	else if (g_mapZonesTypeCount[g_CurrentSelectedZoneGroup[client]][3] > 0 && g_mapZonesTypeCount[g_CurrentSelectedZoneGroup[client]][4] == 0)
+	else if (g_TotalStages > 0 && g_iTotalCheckpoints == 0)
 	{
 		SelectNormalZoneMenu.AddItem("3", "Stage");
 	}
-	else if (g_mapZonesTypeCount[g_CurrentSelectedZoneGroup[client]][3] == 0 && g_mapZonesTypeCount[g_CurrentSelectedZoneGroup[client]][4] > 0)
+	else if (g_TotalStages == 0 && g_iTotalCheckpoints > 0)
 		SelectNormalZoneMenu.AddItem("4", "Checkpoint");
 
 	SelectNormalZoneMenu.AddItem("hook", "Hook Zone");

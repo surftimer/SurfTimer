@@ -1410,7 +1410,7 @@ public Action Command_Restart(int client, int args)
 			g_bClientRestarting[client] = false;
 
 		// Check that the client has a timer running, the zonegroup he is in has stages and that this is the first click
-		if (IsValidClient(client) && g_bTimerRunning[client] && g_mapZonesTypeCount[g_iClientInZone[client][2]][3] > 0 && !g_bClientRestarting[client] && g_Stage[g_iClientInZone[client][2]][client] > 1)
+		if (IsValidClient(client) && g_bTimerRunning[client] && g_TotalStages > 0 && !g_bClientRestarting[client] && g_Stage[g_iClientInZone[client][2]][client] > 1)
 		{
 			g_fClientRestarting[client] = GetGameTime();
 			g_bClientRestarting[client] = true;
