@@ -944,7 +944,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 
 		GetEntPropVector(client, Prop_Data, "m_vecVelocity", velocity);
 		float fSpeedSqr = (velocity[0] * velocity[0] + velocity[1] * velocity[1]);
-		float fSpeedThres = 260.0;
+		float fSpeedThres = g_hDefaultPreSpeed.FloatValue;
 		
 		velocity[2] = 0.0;
 
