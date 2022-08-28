@@ -305,9 +305,13 @@ public void CL_OnEndTimerPress(int client)
 	{
 		if (style == 0)
 		{
-			//ADD
+			//ADD LAST TIME TO CP DATA
 			g_fCheckpointTimesNew[zGroup][client][g_TotalStages-1] = g_fFinalTime[client];
 			
+			g_fPBDifference[client][0] = g_fFinalTime[client] - g_fPersonalRecord[client];
+			g_fWRDifference[client][0] = g_fFinalTime[client] - g_fRecordMapTime;
+			PrintToServer("FINISEF - %f | %f", g_fWRDifference[client][0], g_fRecordMapTime);
+
 			// Make a new record bot?
 			if (GetConVarBool(g_hReplaceReplayTime) && (g_fFinalTime[client] < g_fReplayTimes[0][0] || g_fReplayTimes[0][0] == 0.0))
 			{
@@ -440,7 +444,10 @@ public void CL_OnEndTimerPress(int client)
 			}
 		}
 		else if (style != 0)
-		{
+		{	
+			g_fPBDifference[client][style] = g_fPersonalStyleRecord[style][client] - g_fFinalTime[client];
+			g_fWRDifference[client][style] = g_fRecordStyleMapTime[style] - g_fFinalTime[client];
+
 			// Make a new record bot?
 			if (GetConVarBool(g_hReplaceReplayTime) && (g_fFinalTime[client] < g_fReplayTimes[0][style] || g_fReplayTimes[0][style] == 0.0))
 			{
@@ -561,6 +568,9 @@ public void CL_OnEndTimerPress(int client)
 		====================================*/
 		if (style == 0)
 		{
+			g_fPBDifference_Bonus[client][0][zGroup] = g_fFinalTime[client] - g_fPersonalRecordBonus[zGroup][client];
+			g_fWRDifference_Bonus[client][0][zGroup] = g_fFinalTime[client] - g_fBonusFastest[zGroup];
+
 			if (GetConVarBool(g_hReplaceReplayTime) && (g_fFinalTime[client] < g_fReplayTimes[zGroup][0] || g_fReplayTimes[zGroup][0] == 0.0))
 			{
 				if (GetConVarBool(g_hBonusBot) && !g_bPositionRestored[client])
@@ -691,6 +701,9 @@ public void CL_OnEndTimerPress(int client)
 		}
 		else if (style != 0)
 		{
+			g_fPBDifference_Bonus[client][style][zGroup] = g_fStylePersonalRecordBonus[style][zGroup][client] - g_fFinalTime[client];
+			g_fWRDifference_Bonus[client][style][zGroup] = g_fStyleBonusFastest[style][zGroup] - g_fFinalTime[client];
+
 			if (GetConVarBool(g_hReplaceReplayTime) && (g_fFinalTime[client] < g_fReplayTimes[zGroup][style] || g_fReplayTimes[zGroup][style] == 0.0))
 			{
 				if (GetConVarBool(g_hBonusBot) && !g_bPositionRestored[client])

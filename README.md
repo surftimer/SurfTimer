@@ -4,6 +4,9 @@ This is an open source timer plugin made for CS:GO.
 
 [SurfTimer Discord](https://discord.surftimer.dev)
 
+SurfTimer Test Servers:
+ - North America: `connect na-test-server.surftimer.dev`
+
 ## Project Goals
 
 Since the vast majority of CS:GO surf communties use this plugin, our main goal with the project has been to fix the major bugs/issues that exist. Since we now believe the vast majority to be fixed, we have now started looking into adding some new features! 

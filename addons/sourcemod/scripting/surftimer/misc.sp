@@ -2049,7 +2049,7 @@ stock void PrintChatBonus(int client, int zGroup, int rank = 0)
 			db_insertAnnouncement(szName, g_szMapName, 1, g_szFinalTime[client], zGroup);
 	}
 
-	SendBonusFinishForward(client, rank, zGroup);
+	SendBonusFinishForward(client, rank, zGroup, 0);
 
 	CheckBonusRanks(client, zGroup);
 	db_CalcAvgRunTimeBonus();
@@ -4255,6 +4255,8 @@ stock void PrintChatBonusStyle (int client, int zGroup, int style, int rank = 0)
 		SetNewPersonalRecordPrestrafe(client, zGroup, style, false, true , false);
 	}
 	
+	SendBonusFinishForward(client, rank, zGroup, style);
+
 	CheckBonusStyleRanks(client, zGroup, style);
 
 	if (rank == 9999999 && IsValidClient(client))
