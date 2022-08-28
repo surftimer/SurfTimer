@@ -3572,7 +3572,7 @@ public void db_viewCheckpointsinZoneGroupCallback(Handle owner, Handle hndl, con
 			
 			cp = SQL_FetchInt(hndl, 0);
 
-			g_fCheckpointTimesRecord[zonegrp][client][cp] = SQL_FetchFloat(hndl, 1);
+			g_fCheckpointTimesRecord[zonegrp][client][cp-1] = SQL_FetchFloat(hndl, 1);
 		}
 		if(g_bhasStages)
 			db_LoadCCP(client);
