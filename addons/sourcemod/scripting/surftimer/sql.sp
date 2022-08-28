@@ -12210,22 +12210,20 @@ public void SQL_viewCCP_GetMapRankCallback(Handle owner, Handle hndl, const char
 		//THIS -1 IS A COLUMN FROM THE SQL QUERY
 		//WHEN IT HAS A -1 IN IT , IT MEANS THE PLAYER PROVIDED THE RANK
 		if(map_rank != -1) {
-			CloseHandle(pack);
 			db_GetTotalMapCompletions(client, szSteamID, szMapName, map_time, map_rank);
 		}
 		//IF THE PLAYER PROVIDED THE RANK BEFORE
 		else{
 			//SINCE THE PLAYER PROVIDED THE RANK WE READ FROM THE PACK GENERATED WITH THE RANK
 			map_rank = ReadPackCell(pack);
-			CloseHandle(pack);
 			db_GetTotalMapCompletions(client, szPlayerSteamID, szMapName, map_time, map_rank);
 		}
 	}
 	else {
-		CloseHandle(pack);
 		CPrintToChat(client, "%t", "CCP_02", g_szChatPrefix);
 	}
-
+	
+	CloseHandle(pack);
 }
 
 //GET TOTAL MAP COMPLETIONS
