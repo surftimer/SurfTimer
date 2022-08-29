@@ -3935,8 +3935,6 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 {
 	if (!IsValidClient(client) || g_bPositionRestored[client] || IsFakeClient(client) || zone >= CPLIMIT)
 		return;
-	
-	PrintToServer("===CHECKPOINT %d===", zone);
 
 	g_iCPStartFrame_CurrentRun[0][zone][client] = g_iRecordedTicks[client];
 
