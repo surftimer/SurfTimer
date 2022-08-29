@@ -306,7 +306,7 @@ public void CL_OnEndTimerPress(int client)
 		if (style == 0)
 		{
 			//ADD LAST TIME TO CP DATA
-			if (g_bhasStages)
+			if(g_bhasStages)
 				g_fCheckpointTimesNew[zGroup][client][g_TotalStages-1] = g_fFinalTime[client];
 			else
 				g_fCheckpointTimesNew[zGroup][client][g_iTotalCheckpoints] = g_fFinalTime[client];
