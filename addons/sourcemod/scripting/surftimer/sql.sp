@@ -4908,64 +4908,39 @@ public void SQLTxn_ZoneGroupRemovalFailed(Handle db, any client, int numQueries,
 
 public void db_selectzoneTypeIds(int zonetype, int client, int zonegrp)
 {
-	char szQuery[258];
-	Format(szQuery, 258, sql_selectzoneTypeIds, g_szMapName, zonetype, zonegrp);
-	SQL_TQuery(g_hDb, SQL_selectzoneTypeIdsCallback, szQuery, client, DBPrio_Low);
-}
+	Menu TypeMenu = new Menu(Handle_EditZoneTypeId);
+	char MenuNum[24], MenuInfo[6], MenuItemName[24];
+	int x = 0;
 
-public void SQL_selectzoneTypeIdsCallback(Handle owner, Handle hndl, const char[] error, any data)
-{
-	if (hndl == null)
-	{
-		LogError("[SurfTimer] SQL Error (SQL_selectzoneTypeIdsCallback): %s", error);
-		return;
+	// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0) //fluffys AntiJump(9), AntiDuck(10)
+	switch (g_CurrentZoneType[client]) {
+		case 0:Format(MenuItemName, 24, "Stop");
+		case 1:Format(MenuItemName, 24, "Start");
+		case 2:Format(MenuItemName, 24, "End");
+		case 3: {
+			Format(MenuItemName, 24, "Stage");
+			x = 2;
+		}
+		case 4:Format(MenuItemName, 24, "Checkpoint");
+		case 5:Format(MenuItemName, 24, "Speed");
+		case 6:Format(MenuItemName, 24, "TeleToStart");
+		case 7:Format(MenuItemName, 24, "Validator");
+		case 8:Format(MenuItemName, 24, "Checker");
+		// fluffys
+		case 9:Format(MenuItemName, 24, "AntiJump");
+		case 10:Format(MenuItemName, 24, "AntiDuck");
+		case 11:Format(MenuItemName, 24, "MaxSpeed");
+		default:Format(MenuItemName, 24, "Unknown");
 	}
 
-	if (SQL_HasResultSet(hndl))
-	{
-		int availableids[MAXZONES] = { 0, ... }, i;
-		while (SQL_FetchRow(hndl))
-		{
-			i = SQL_FetchInt(hndl, 0);
-			if (i < MAXZONES)
-			availableids[i] = 1;
-		}
-		Menu TypeMenu = new Menu(Handle_EditZoneTypeId);
-		char MenuNum[24], MenuInfo[6], MenuItemName[24];
-		int x = 0;
-		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0) //fluffys AntiJump(9), AntiDuck(10)
-		switch (g_CurrentZoneType[data]) {
-			case 0:Format(MenuItemName, 24, "Stop");
-			case 1:Format(MenuItemName, 24, "Start");
-			case 2:Format(MenuItemName, 24, "End");
-			case 3: {
-				Format(MenuItemName, 24, "Stage");
-				x = 2;
-			}
-			case 4:Format(MenuItemName, 24, "Checkpoint");
-			case 5:Format(MenuItemName, 24, "Speed");
-			case 6:Format(MenuItemName, 24, "TeleToStart");
-			case 7:Format(MenuItemName, 24, "Validator");
-			case 8:Format(MenuItemName, 24, "Checker");
-			// fluffys
-			case 9:Format(MenuItemName, 24, "AntiJump");
-			case 10:Format(MenuItemName, 24, "AntiDuck");
-			case 11:Format(MenuItemName, 24, "MaxSpeed");
-			default:Format(MenuItemName, 24, "Unknown");
-		}
-
-		for (int k = 0; k < 35; k++)
-		{
-			if (availableids[k] == 0)
-			{
-				Format(MenuNum, sizeof(MenuNum), "%s-%i", MenuItemName, (k + x));
-				Format(MenuInfo, sizeof(MenuInfo), "%i", k);
-				TypeMenu.AddItem(MenuInfo, MenuNum);
-			}
-		}
-		TypeMenu.ExitButton = true;
-		TypeMenu.Display(data, MENU_TIME_FOREVER);
+	for (int k = 0; k < 35; k++) {
+		Format(MenuNum, sizeof(MenuNum), "%s-%i", MenuItemName, (k + x));
+		Format(MenuInfo, sizeof(MenuInfo), "%i", k);
+		TypeMenu.AddItem(MenuInfo, MenuNum);
 	}
+	
+	TypeMenu.ExitButton = true;
+	TypeMenu.Display(client, MENU_TIME_FOREVER);
 }
 /*
 public checkZoneTypeIds()
