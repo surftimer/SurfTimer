@@ -94,6 +94,8 @@ void CheckDatabaseForUpdates()
 
 public void db_upgradeDatabase(int ver)
 {
+	LogUpgradeError(ver);
+
 	if (ver == 0)
 	{
 		// SurfTimer v2.01 -> SurfTimer v2.1
@@ -187,6 +189,14 @@ public void db_upgradeDatabase(int ver)
 	}
 
 	CheckDatabaseForUpdates();
+}
+
+void LogUpgradeError(int version)
+{
+	char sError[256];
+	SQL_GetError(g_hDb, sError, sizeof(sError));
+
+	LogMessage("SQL Error for Version %s. Error: %s", version, sError);
 }
 
 void LoopFloatDecimalTables()
