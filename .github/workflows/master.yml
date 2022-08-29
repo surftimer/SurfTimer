@@ -51,7 +51,7 @@ jobs:
 
       - name: Replace version with git commit number
         run: |
-          sed -i "s/1.0.dev/1.0.dev${{ env.COMMIT }}-${{ env.SHORT_SHA }}-${{ steps.get_branch_name.outputs.branch }}/g" $SCRIPTING_PATH/SurfTimer.sp
+          sed -i "s/1.0.dev/1.0.dev${{ env.COMMIT }}-${{ env.SHORT_SHA }}-${{ steps.get_branch_name.outputs.branch }}/g" $SCRIPTING_PATH/surftimer/globals.sp
 
       - name: Download EndTouchFix source and gamedata file
         run: |
