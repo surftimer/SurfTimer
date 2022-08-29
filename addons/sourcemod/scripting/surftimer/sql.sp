@@ -5169,11 +5169,8 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 			//COUNT CHECKPOINTS AND STAGES
 			if (g_mapZones[g_mapZonesCount].ZoneGroup == 0)
 			{
-				PrintToServer("===ID FOUND : %d===", g_mapZones[g_mapZonesCount].ZoneId)
-				PrintToServer("===IS CHECKPOINT : %s===", g_mapZones[g_mapZonesCount].ZoneType == 4 ? "true" : "false");
 				if (g_mapZones[g_mapZonesCount].ZoneType == 4 && temp_zonetypeID.FindValue(g_mapZones[g_mapZonesCount].ZoneTypeId) == -1)
 				{
-					PrintToServer("===INCREMENTING g_iTotalCheckpoints===");
 					temp_zonetypeID.Push(g_mapZones[g_mapZonesCount].ZoneTypeId);
 					g_iTotalCheckpoints++;
 				}
@@ -5184,7 +5181,6 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 
 				if (g_mapZones[g_mapZonesCount].ZoneType == 3 && temp_zonetypeID.FindValue(g_mapZones[g_mapZonesCount].ZoneTypeId) == -1)
 				{
-					PrintToServer("===INCREMENTING g_TotalStages===");
 					temp_zonetypeID.Push(g_mapZones[g_mapZonesCount].ZoneTypeId);
 					g_TotalStages++;
 				}
@@ -5321,12 +5317,6 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 
 		g_TotalStages++;
 		delete temp_zonetypeID;
-
-		PrintToServer("===TOTAL CHECKPOINTS %d===", g_iTotalCheckpoints);
-		PrintToServer("===TOTAL STAGES %d===", g_TotalStages);
-		PrintToServer("===TOTAL ZONES %d===", g_mapZonesCount);
-		PrintToServer("===TOTAL ZONEGROUPS %d===", g_mapZoneGroupCount);
-		PrintToServer("===TOTAL CHECKPOINTS REPEATED %d===", g_iTotalCheckpoints_Same);
 
 		// Count zone corners
 		// https://forums.alliedmods.net/showpost.php?p=2006539&postcount=8
