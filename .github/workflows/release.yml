@@ -84,7 +84,7 @@ jobs:
           mkdir package
           mv ./{addons,cfg,maps,scripts,sound,LICENSE,README.md} package
           cd package
-          zip -9r $GITHUB_WORKSPACE/SurfTimer.${{ steps.get_branch_name.outputs.branch }}.${{ env.COMMIT }}.${{ env.SHORT_SHA }}.SM1.11.zip
+          zip -9r $GITHUB_WORKSPACE/SurfTimer.${{ steps.get_branch_name.outputs.branch }}.${{ env.COMMIT }}.${{ env.SHORT_SHA }}.SM1.11.zip *
 
       - name: Create Release
         id: create_release
