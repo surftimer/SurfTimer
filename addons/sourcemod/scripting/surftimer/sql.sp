@@ -7169,37 +7169,13 @@ public void SQL_selectPersonalPrestrafeSpeeds_BonusCallback(Handle owner, Handle
 public void db_GetTotalStages()
 {
 	// Check if map has stages, if not don't bother loading this
-	if (!g_bhasStages)
-	{
+	if (!g_bhasStages) {
 		db_selectTotalBonusCount();
 		return;
 	}
 
-	char szQuery[512];
-
-	Format(szQuery, 512, "SELECT COUNT(`zonetype`) AS stages FROM `ck_zones` WHERE `zonetype` = '3' AND `mapname` = '%s'", g_szMapName);
-	SQL_TQuery(g_hDb, db_GetTotalStagesCallback, szQuery, _, DBPrio_Low);
-}
-
-public void db_GetTotalStagesCallback(Handle owner, Handle hndl, const char[] error, any data)
-{
-	if (hndl == null)
-	{
-		LogError("[SurfTimer] SQL Error (db_GetTotalStagesCallback): %s ", error);
-		db_viewStageRecords();
-		return;
-	}
-
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-	{
-		//g_TotalStages = SQL_FetchInt(hndl, 0) + 1;
-
-		//for(int i = 1;i <= g_TotalStages;i++)
-		//{
-		//	g_fStageRecord[i] = 0.0;
-			// fluffys comeback yo
-		//}
-	}
+	for (int i = 1; i <= g_TotalStages ;i++)
+		g_fStageRecord[i] = 0.0;
 
 	if (!g_bServerDataLoaded)
 		db_viewStageRecords();
