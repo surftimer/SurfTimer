@@ -138,6 +138,64 @@ public int Native_GetMapData(Handle plugin, int numParams)
 	return g_MapTimesCount;
 }
 
+public int Native_GetBonusData(Handle plugin, int numParams)
+{	
+	int client = GetNativeCell(1);
+
+	char szname[MAX_NAME_LENGTH];
+	GetNativeString(2, szname, MAX_NAME_LENGTH);
+	float WRtime = GetNativeCellRef(3);
+	float PBtime = GetNativeCellRef(4);
+
+	int zonegroup = g_iClientInZone[client][2];
+
+	Format(szname, sizeof(szname), g_szBonusFastest[zonegroup]);
+	SetNativeString(2, szname, sizeof(szname), true);
+
+	if(g_fBonusFastest[zonegroup] > 0)
+		WRtime = g_fBonusFastest[zonegroup];
+	else
+		WRtime = -1.0;
+	SetNativeCellRef(3, WRtime);
+
+	if(g_fPersonalRecordBonus[zonegroup][client] > 0)
+		PBtime = g_fPersonalRecordBonus[zonegroup][client];
+	else
+		PBtime = -1.0;
+	SetNativeCellRef(4, PBtime);
+
+	return g_iBonusCount[zonegroup];
+}
+
+public int Native_GetStageData(Handle plugin, int numParams)
+{	
+	int client = GetNativeCell(1);
+
+	char szname[MAX_NAME_LENGTH];
+	GetNativeString(2, szname, MAX_NAME_LENGTH);
+	float WRtime = GetNativeCellRef(3);
+	float PBtime = GetNativeCellRef(4);
+
+	int stage = g_Stage[0][client];
+
+	Format(szname, sizeof(szname), g_szStageRecordPlayer[stage]);
+	SetNativeString(2, szname, sizeof(szname), true);
+
+	if(g_fStageRecord[stage] > 0)
+		WRtime = g_fStageRecord[stage];
+	else
+		WRtime = -1.0;
+	SetNativeCellRef(3, WRtime);
+
+	if(g_fWrcpRecord[client][stage][g_iCurrentStyle[client]] > 0)
+		PBtime = g_fWrcpRecord[client][stage][g_iCurrentStyle[client]];
+	else
+		PBtime = -1.0;
+	SetNativeCellRef(4, PBtime);
+
+	return g_TotalStageRecords[stage];
+}
+
 public int Native_GetPlayerData(Handle plugin, int numParams)
 {
 	int client = GetNativeCellRef(1);
@@ -242,6 +300,8 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	CreateNative("surftimer_GetPlayerSkillgroup", Native_GetPlayerSkillgroup);
 	CreateNative("surftimer_GetPlayerNameColored", Native_GetPlayerNameColored);
 	CreateNative("surftimer_GetMapData", Native_GetMapData);
+	CreateNative("surftimer_GetBonusData", Native_GetBonusData);
+	CreateNative("surftimer_GetStageData", Native_GetStageData);
 	CreateNative("surftimer_GetPlayerData", Native_GetPlayerData);
 	CreateNative("surftimer_GetPlayerInfo", Native_GetPlayerInfo);
 	CreateNative("surftimer_GetClientStyle", Native_GetClientStyle);
