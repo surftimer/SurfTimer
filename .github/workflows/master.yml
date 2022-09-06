@@ -4,6 +4,7 @@ on:
   push:
     branches:
      - master
+     - dev
   workflow_dispatch:
   schedule:
     - cron: '53 05 01 */3 *' # Artifacts expire every 3 months
