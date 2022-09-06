@@ -3,7 +3,7 @@ name: Compile test and upload
 on:
   push:
     branches:
-      - master
+      - dev
 
 jobs:
   workflow:
