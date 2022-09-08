@@ -1158,10 +1158,6 @@ char g_BlockedChatText[256][256];
 // Last time an overlay was displayed
 float g_fLastOverlay[MAXPLAYERS + 1];
 
-// Is client trying to teleport inside a trigger_multiple
-//bool g_TeleInTriggerMultiple[MAXPLAYERS + 1];
-bool g_bTeleByCommand[MAXPLAYERS + 1];
-
 /*----------  Player location restoring  ----------*/
 
 // Clients location was restored this run
