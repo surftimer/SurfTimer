@@ -751,38 +751,6 @@ public Action OnMultipleTrigger1(int entity, int client)
 	return Plugin_Continue;
 }
 
-/* public Action OnMultipleTrigger2(int entity, int client)
-{
-	if (g_iClientInZone[client][0] > 0) {
-		g_TeleInTriggerMultiple[client] = false;
-	}
-	else {
-		g_TeleInTriggerMultiple[client] = true;
-	}
-	
-	return Plugin_Continue;
-}
-
-public Action OnMultipleTrigger3(int entity, int client)
-{
-	g_TeleInTriggerMultiple[client] = false;
-
-	return Plugin_Continue;
-} */
-
-public Action OnTriggerOutput(const char[] output, int caller, int activator, float delay)
-{
-	if (!IsValidClient(activator)) return Plugin_Continue;
-	
-	// Block Output when player use a teleport command
-	if(g_bTeleByCommand[activator])
-	{
-		return Plugin_Handled;
-	}
-
-	return Plugin_Continue;
-}
-
 public Action OnTouchAllTriggers(int entity, int other)
 {
 	if (other >= 1 && other <= MaxClients && IsFakeClient(other))
