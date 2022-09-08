@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS ck_bonus (
     `velEndZ` SMALLINT(6) NOT NULL DEFAULT 0, 
     `zonegroup` INT(12) NOT NULL DEFAULT 1, 
     `style` INT(11) NOT NULL DEFAULT 0,
-    `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,- 
+    `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(`steamid`, `mapname`, `zonegroup`, `style`)) 
     DEFAULT CHARSET=utf8mb4;
 
@@ -35,11 +35,10 @@ CREATE TABLE IF NOT EXISTS ck_checkpoints (
     `mapname` VARCHAR(32), 
     `cp` int NOT NULL DEFAULT '0',
     `time` decimal(12,6) NOT NULL DEFAULT '0.000000',
-    `zonegroup` int NOT NULL DEFAULT '0',
     `stage_time` decimal(12,6) NOT NULL DEFAULT '-1.000000',
     `stage_attempts` int NOT NULL DEFAULT '0',
     `zonegroup` INT(12) NOT NULL DEFAULT 0, 
-    PRIMARY KEY(`steamid`, `mapname`, `cp`, `zonegroup`)) 
+    PRIMARY KEY(`steamid`, `mapname`, `cp`, `zonegroup`))
     DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS ck_latestrecords (
@@ -48,7 +47,7 @@ CREATE TABLE IF NOT EXISTS ck_latestrecords (
     `runtime` decimal(12,6) NOT NULL DEFAULT '-1.000000', 
     `map` VARCHAR(32), 
     `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
-    PRIMARY KEY(`steamid`, `map`, `date`)) 
+    PRIMARY KEY(`steamid`, `map`, `date`))
     DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS ck_maptier (
