@@ -167,16 +167,6 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	g_iTicksOnGround[client] = 0;
 	g_bNewStage[client] = false;
 
-	// dpexx's hack fix for those startzone inside a trigger
-	if (g_iClientInZone[client][0] > 0)
-	{
-		g_bTeleByCommand[client] = false;
-	}
-	else
-	{
-		g_bTeleByCommand[client] = true;
-	}
-
 	// Check for spawn locations
 	int realZone;
 	if (zone < 0)
@@ -217,7 +207,8 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 		}
 		else
 		{
-			SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, 0.0 } ));
+			// set client speed to 
+			RequestFrame(RequestFrame_StopVelocity, client);
 
 			// Hack fix for zoneid not being set with hooked zones
 			int zId = getZoneID(zonegroup, zone);
@@ -258,8 +249,9 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 			return;
 		}
 		else
-		{
-			SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, 0.0 } ));
+		{	
+			// set client speed to 0
+			RequestFrame(RequestFrame_StopVelocity, client);
 
 			// Hack fix for zoneid not being set with hooked zones
 			int zId = getZoneID(zonegroup, zone);
@@ -401,6 +393,17 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	g_bNotTeleporting[client] = true;
 	return;
 }
+
+public void RequestFrame_StopVelocity(int client)
+{	
+	RequestFrame(RequestFrame_StopVelocity2, client);
+}
+
+public void RequestFrame_StopVelocity2(int client)
+{
+	TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, view_as<float>( { 0.0, 0.0, 0.0 } ));
+}
+
 
 void teleportEntitySafe(int client, float fDestination[3], float fAngles[3], float fVelocity[3], bool stopTimer)
 {

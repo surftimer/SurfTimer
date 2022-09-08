@@ -254,8 +254,8 @@ public void OnMapStart()
 		SDKHook(iEnt, SDKHook_EndTouch, OnMultipleTrigger1);
 		SDKHook(iEnt, SDKHook_StartTouch, OnMultipleTrigger1);
 		/* SDKHook(iEnt, SDKHook_StartTouch, OnMultipleTrigger2);
-		SDKHook(iEnt, SDKHook_EndTouch, OnMultipleTrigger3); */
-		HookSingleEntityOutput(iEnt, "OnEndTouch", OnTriggerOutput);
+		SDKHook(iEnt, SDKHook_EndTouch, OnMultipleTrigger3);
+		HookSingleEntityOutput(iEnt, "OnEndTouch", OnTriggerOutput); */
 		PushArrayCell(g_hTriggerMultiple, iEnt);
 	}
 
@@ -445,7 +445,6 @@ public void OnClientPutInServer(int client)
 	}
 
 	g_bReportSuccess[client] = false;
-	g_bTeleByCommand[client] = false;
 	g_fCommandLastUsed[client] = 0.0;
 
 	// fluffys set bools

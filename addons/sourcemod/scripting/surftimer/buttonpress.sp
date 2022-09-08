@@ -69,9 +69,7 @@ public void CL_OnStartTimerPress(int client)
 		g_iCurrentCheckpoint[client] = 0;
 		g_iCheckpointsPassed[client] = 0;
 		g_bIsValidRun[client] = false;
-		// Enable Trigger Output on Timer Restart
-		g_bTeleByCommand[client] = false;
-
+	
 		int iPrestrafeRecord;
 		int iPersonalPrestrafeRecord;
 
@@ -839,8 +837,6 @@ public void CL_OnStartWrcpTimerPress(int client)
 			g_fCurrentWrcpRunTime[client] = 0.0;
 			g_bWrcpTimeractivated[client] = true;
 			g_bNotTeleporting[client] = true;
-			// Enable Trigger Output on Timer Restart
-			g_bTeleByCommand[client] = false;
 			g_WrcpStage[client] = g_Stage[0][client];
 			Stage_StartRecording(client); //Add pre
       
