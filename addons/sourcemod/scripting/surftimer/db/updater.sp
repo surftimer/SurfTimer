@@ -196,7 +196,7 @@ void LogUpgradeError(int version)
 	char sError[256];
 	SQL_GetError(g_hDb, sError, sizeof(sError));
 
-	LogMessage("SQL Error for Version %s. Error: %s", version, sError);
+	LogMessage("SQL Error for Version %d. Error: %s", version, sError);
 }
 
 void LoopFloatDecimalTables()
