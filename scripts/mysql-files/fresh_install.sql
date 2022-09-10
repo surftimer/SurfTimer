@@ -248,3 +248,11 @@ CREATE TABLE IF NOT EXISTS ck_prinfo (
     `PRstcomplete` FLOAT NOT NULL DEFAULT '0.0', 
     PRIMARY KEY(`steamid`, `mapname`, `zonegroup`)) 
     DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS ck_replays (
+    `mapname` VARCHAR(32),
+    `cp` int(12) NOT NULL DEFAULT '0',
+    `frame` int(12) NOT NULL DEFAULT '0',
+    `style` INT(12) NOT NULL DEFAULT '0',
+    PRIMARY KEY(`mapname`, `cp`, `style`))
+    DEFAULT CHARSET=utf8mb4;
