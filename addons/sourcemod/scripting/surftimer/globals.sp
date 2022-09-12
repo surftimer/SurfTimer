@@ -895,6 +895,9 @@ float g_fRecordMapTime;
 // Old map record time in seconds
 float g_fOldRecordMapTime;
 
+// Old map style record time in seconds
+float g_fOldStyleRecordMapTime[MAX_STYLES];
+
 // Record map time in 00:00:00 format
 char g_szRecordMapTime[64];
 

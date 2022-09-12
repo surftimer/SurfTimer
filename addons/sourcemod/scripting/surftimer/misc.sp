@@ -4163,9 +4163,15 @@ stock void StyleFinishedMsgs(int client, int style)
 
 					if (g_bStyleMapSRVRecord[style][client])
 					{
-						// int r = GetRandomInt(1, 2);
+						float fRecordDiff;
+						char szRecordDiff[64] = "";
+
+						fRecordDiff = g_fOldStyleRecordMapTime[style] - g_fFinalTime[client];
+						FormatTimeFloat(client, fRecordDiff, 3, szRecordDiff, sizeof szRecordDiff);
+						Format(szRecordDiff, sizeof szRecordDiff, "[%c-%s%c]", LIGHTGREEN, szRecordDiff, WHITE);
+
 						PlayRecordSound(2);
-						CPrintToChat(i, "%t", "Misc36", g_szChatPrefix, szName, g_szStyleRecordPrint[style]);
+						CPrintToChat(i, "%t", "Misc36", g_szChatPrefix, szName, g_szStyleRecordPrint[style], szRecordDiff);
 					}
 				}
 			}
@@ -4176,9 +4182,15 @@ stock void StyleFinishedMsgs(int client, int style)
 			{
 				if (g_bStyleMapSRVRecord[style][client])
 				{
-					// int r = GetRandomInt(1, 2);
+					float fRecordDiff;
+					char szRecordDiff[64] = "";
+
+					fRecordDiff = g_fOldStyleRecordMapTime[style] - g_fFinalTime[client];
+					FormatTimeFloat(client, fRecordDiff, 3, szRecordDiff, sizeof szRecordDiff);
+					Format(szRecordDiff, sizeof szRecordDiff, "[%c-%s%c]", LIGHTGREEN, szRecordDiff, WHITE);
+
 					PlayRecordSound(2);
-					CPrintToChat(i, "%t", "Misc36", g_szChatPrefix, szName, g_szStyleRecordPrint[style]);
+					CPrintToChat(i, "%t", "Misc36", g_szChatPrefix, szName, g_szStyleRecordPrint[style], szRecordDiff);
 				}
 			}
 		}
@@ -4189,6 +4201,13 @@ stock void StyleFinishedMsgs(int client, int style)
 
 		if (g_bStyleMapSRVRecord[style][client])
 		{
+			float fRecordDiff = g_fOldStyleRecordMapTime[style] - g_fFinalTime[client];
+			char szRecordDiff[64];
+			FormatTimeFloat(client, fRecordDiff, 3, szRecordDiff, sizeof szRecordDiff);
+			Format(szRecordDiff, sizeof szRecordDiff, "-%s", szRecordDiff);
+
+			SendNewRecordForward(client, szRecordDiff);
+
 			SetNewRecordPrestrafe(client, 0, style, true, false, false);
 		}
 
