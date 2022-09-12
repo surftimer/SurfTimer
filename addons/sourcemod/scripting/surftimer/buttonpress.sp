@@ -487,7 +487,7 @@ public void CL_OnEndTimerPress(int client)
 				{
 					// New fastest time in map
 					g_bStyleMapSRVRecord[style][client] = true;
-					g_fOldStyleRecordMapTime = g_fRecordStyleMapTime[style];
+					g_fOldStyleRecordMapTime[style] = g_fRecordStyleMapTime[style];
 					g_fRecordStyleMapTime[style] = g_fFinalTime[client];
 					Format(g_szRecordStylePlayer[style], 128, "%s", szName);
 					FormatTimeFloat(1, g_fRecordStyleMapTime[style], 3, g_szRecordStyleMapTime[style], 64);
