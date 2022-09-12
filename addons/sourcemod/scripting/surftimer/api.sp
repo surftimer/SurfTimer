@@ -181,13 +181,13 @@ public int Native_GetStageData(Handle plugin, int numParams)
 	Format(szname, sizeof(szname), g_szStageRecordPlayer[stage]);
 	SetNativeString(2, szname, sizeof(szname), true);
 
-	if(g_fStageRecord[stage] > 0)
+	if(g_fStageRecord[stage] != 0.0)
 		WRtime = g_fStageRecord[stage];
 	else
 		WRtime = -1.0;
 	SetNativeCellRef(3, WRtime);
 
-	if(g_fWrcpRecord[client][stage][g_iCurrentStyle[client]] > 0)
+	if(g_fWrcpRecord[client][stage][g_iCurrentStyle[client]] != -1.0)
 		PBtime = g_fWrcpRecord[client][stage][g_iCurrentStyle[client]];
 	else
 		PBtime = -1.0;
