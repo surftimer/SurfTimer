@@ -1366,8 +1366,8 @@
 	}
 	"Misc36"
 	{
-		"#format"	"{1:s},{2:s},{3:s}"
-		"en"		"{1} {yellow}{2}{default} beat the {red}{3} {default}map record!"
+		"#format"	"{1:s},{2:s},{3:s},{4:s}"
+		"en"		"{1} {yellow}{2}{default} beat the {red}{3} {default}map record! {4}"
 	}
 	"Misc37"
 	{
