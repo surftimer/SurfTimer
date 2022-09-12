@@ -487,6 +487,7 @@ public void CL_OnEndTimerPress(int client)
 				{
 					// New fastest time in map
 					g_bStyleMapSRVRecord[style][client] = true;
+					g_fOldStyleRecordMapTime = g_fRecordStyleMapTime[style];
 					g_fRecordStyleMapTime[style] = g_fFinalTime[client];
 					Format(g_szRecordStylePlayer[style], 128, "%s", szName);
 					FormatTimeFloat(1, g_fRecordStyleMapTime[style], 3, g_szRecordStyleMapTime[style], 64);
@@ -516,6 +517,7 @@ public void CL_OnEndTimerPress(int client)
 
 				// Has to be the new record, since it is the first completion
 				g_bStyleMapSRVRecord[style][client] = true;
+				g_fOldStyleRecordMapTime[style] = g_fFinalTime[client];
 				g_fRecordStyleMapTime[style] = g_fFinalTime[client];
 				Format(g_szRecordStylePlayer[style], 128, "%s", szName);
 				FormatTimeFloat(1, g_fRecordStyleMapTime[style], 3, g_szRecordStyleMapTime[style], 128);
