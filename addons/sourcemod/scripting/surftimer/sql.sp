@@ -7699,7 +7699,7 @@ public void sql_viewTotalStageRecordsCallback(Handle owner, Handle hndl, const c
 }
 
 // Styles for maps
-public void db_selectStyleRecord(int client, int style)
+public void db_selectPersonalStyleRecord(int client, int style)
 {
 	if (!IsValidClient(client))
 	return;
@@ -7709,15 +7709,15 @@ public void db_selectStyleRecord(int client, int style)
 	WritePackCell(stylepack, style);
 
 	char szQuery[255];
-	Format(szQuery, 255, "SELECT runtimepro FROM ck_playertimes WHERE mapname = '%s' AND style = %i ORDER BY runtimepro LIMIT 1;", g_szMapName, style);
-	SQL_TQuery(g_hDb, sql_selectStyleRecordCallback, szQuery, stylepack, DBPrio_Low);
+	Format(szQuery, 255, "SELECT runtimepro FROM `ck_playertimes` WHERE `steamid` = '%s' AND `mapname` = '%s' AND `style` = %i AND `runtimepro` > -1.0", g_szSteamID[client], g_szMapName, style);
+	SQL_TQuery(g_hDb, sql_selectPersonalStyleRecordCallback, szQuery, stylepack, DBPrio_Low);
 }
 
-public void sql_selectStyleRecordCallback(Handle owner, Handle hndl, const char[] error, any stylepack)
+public void sql_selectPersonalStyleRecordCallback(Handle owner, Handle hndl, const char[] error, any stylepack)
 {
 	if (hndl == null)
 	{
-		LogError("[SurfTimer] SQL Error (sql_selectStyleRecordCallback): %s", error);
+		LogError("[SurfTimer] SQL Error (sql_selectPersonalStyleRecordCallback): %s", error);
 		return;
 	}
 
@@ -7731,51 +7731,40 @@ public void sql_selectStyleRecordCallback(Handle owner, Handle hndl, const char[
 
 
 	char szQuery[512];
-	char szRecordDiff[54];
-	float RecordDiff;
 	// Found old time from database
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
 		float time = SQL_FetchFloat(hndl, 0);
 
-		// If old time was slower than the new time, update record
+		// If old time was slower than the new time, update personal record
 		if ((g_fFinalTime[data] <= time || time <= 0.0))
 		{
-			RecordDiff = time - g_fFinalTime[data];
-			FormatTimeFloat(data, RecordDiff, 3, szRecordDiff, 54);
-			Format(szRecordDiff, 54, "-%s", szRecordDiff);
-			SendNewRecordForward(data, szRecordDiff);
-			db_updateStyleRecord(data, style);
+			db_updatePersonalStyleRecord(data, style);
 		}
 	}
+	// No PERSONAL record found from database - Let's insert
 	else
-	{ // No record found from database - Let's insert
+	{ 
+		// Escape name for SQL injection protection
+		char szName[MAX_NAME_LENGTH * 2 + 1], szUName[MAX_NAME_LENGTH];
+		GetClientName(data, szUName, MAX_NAME_LENGTH);
+		SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH);
 
-	// Anounce the record
-	FormatTimeFloat(data, 0.0, 3, szRecordDiff, 54);
-	Format(szRecordDiff, 54, "-%s", szRecordDiff);
-	SendNewRecordForward(data, szRecordDiff);
+		// Move required information in datapack
+		Handle pack = CreateDataPack();
+		WritePackFloat(pack, g_fFinalTime[data]);
+		WritePackCell(pack, data);
+		WritePackCell(pack, style);
 
-	// Escape name for SQL injection protection
-	char szName[MAX_NAME_LENGTH * 2 + 1], szUName[MAX_NAME_LENGTH];
-	GetClientName(data, szUName, MAX_NAME_LENGTH);
-	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH);
+		g_StyleMapTimesCount[style]++;
 
-	// Move required information in datapack
-	Handle pack = CreateDataPack();
-	WritePackFloat(pack, g_fFinalTime[data]);
-	WritePackCell(pack, data);
-	WritePackCell(pack, style);
-
-	g_StyleMapTimesCount[style]++;
-
-	Format(szQuery, 512, "INSERT INTO ck_playertimes (steamid, mapname, name, runtimepro, style, velStartXY, velStartXYZ, velStartZ) VALUES ('%s', '%s', '%s', '%f', %i, %i, %i, %i)", g_szSteamID[data], g_szMapName, szName, g_fFinalTime[data], style, g_iPreStrafe[0][0][style], g_iPreStrafe[1][0][style], g_iPreStrafe[2][0][style]);
-	SQL_TQuery(g_hDb, SQL_UpdateStyleRecordCallback, szQuery, pack, DBPrio_Low);
-}
+		Format(szQuery, 512, "INSERT INTO ck_playertimes (steamid, mapname, name, runtimepro, style, velStartXY, velStartXYZ, velStartZ) VALUES ('%s', '%s', '%s', '%f', %i, %i, %i, %i)", g_szSteamID[data], g_szMapName, szName, g_fFinalTime[data], style, g_iPreStrafe[0][0][style], g_iPreStrafe[1][0][style], g_iPreStrafe[2][0][style]);
+		SQL_TQuery(g_hDb, SQL_UpdatePersonalStyleRecordCallback, szQuery, pack, DBPrio_Low);
+	}
 }
 
 // If latest record was faster than old - Update time
-public void db_updateStyleRecord(int client, int style)
+public void db_updatePersonalStyleRecord(int client, int style)
 {
 	char szUName[MAX_NAME_LENGTH];
 
@@ -7797,14 +7786,14 @@ public void db_updateStyleRecord(int client, int style)
 	char szQuery[1024];
 	// "UPDATE ck_playertimes SET name = '%s', runtimepro = '%f' WHERE steamid = '%s' AND mapname = '%s';";
 	Format(szQuery, 1024, "UPDATE `ck_playertimes` SET `name` = '%s', runtimepro = '%f', `velStartXY` = %i, `velStartXYZ` = %i, `velStartZ` = %i WHERE `steamid` = '%s' AND `mapname` = '%s' AND `style` = %i;", szName, g_fFinalTime[client], g_iPreStrafe[0][0][style], g_iPreStrafe[1][0][style], g_iPreStrafe[2][0][style], g_szSteamID[client], g_szMapName, style);
-	SQL_TQuery(g_hDb, SQL_UpdateStyleRecordCallback, szQuery, pack, DBPrio_Low);
+	SQL_TQuery(g_hDb, SQL_UpdatePersonalStyleRecordCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void SQL_UpdateStyleRecordCallback(Handle owner, Handle hndl, const char[] error, any pack)
+public void SQL_UpdatePersonalStyleRecordCallback(Handle owner, Handle hndl, const char[] error, any pack)
 {
 	if (hndl == null)
 	{
-		LogError("[SurfTimer] SQL Error (SQL_UpdateStyleRecordCallback): %s", error);
+		LogError("[SurfTimer] SQL Error (SQL_UpdatePersonalStyleRecordCallback): %s", error);
 		return;
 	}
 
@@ -7821,14 +7810,14 @@ public void SQL_UpdateStyleRecordCallback(Handle owner, Handle hndl, const char[
 	// Find out how many times are are faster than the players time
 	char szQuery[512];
 	Format(szQuery, 512, "SELECT count(runtimepro) FROM `ck_playertimes` WHERE `mapname` = '%s' AND `style` = %i AND `runtimepro` < %f;", g_szMapName, style, time);
-	SQL_TQuery(g_hDb, SQL_UpdateStyleRecordCallback2, szQuery, data, DBPrio_Low);
+	SQL_TQuery(g_hDb, SQL_UpdatePersonalStyleRecordCallback2, szQuery, data, DBPrio_Low);
 }
 
-public void SQL_UpdateStyleRecordCallback2(Handle owner, Handle hndl, const char[] error, any pack)
+public void SQL_UpdatePersonalStyleRecordCallback2(Handle owner, Handle hndl, const char[] error, any pack)
 {
 	if (hndl == null)
 	{
-		LogError("[SurfTimer] SQL Error (SQL_UpdateStyleRecordProCallback2): %s", error);
+		LogError("[SurfTimer] SQL Error (SQL_UpdatePersonalStyleRecordCallback2): %s", error);
 		return;
 	}
 	// Get players rank, 9999999 = error

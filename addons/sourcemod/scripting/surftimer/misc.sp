@@ -4189,6 +4189,7 @@ stock void StyleFinishedMsgs(int client, int style)
 
 		if (g_bStyleMapSRVRecord[style][client])
 		{
+			SendNewRecordForward(client, g_szTimeDifference[client]);
 			SetNewRecordPrestrafe(client, 0, style, true, false, false);
 		}
 

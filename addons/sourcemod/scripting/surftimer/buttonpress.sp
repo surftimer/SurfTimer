@@ -532,7 +532,7 @@ public void CL_OnEndTimerPress(int client)
 				g_bStyleMapFirstRecord[style][client] = true;
 				g_pr_showmsg[client] = true;
 				
-				db_selectStyleRecord(client, style);
+				db_selectPersonalStyleRecord(client, style);
 			}
 			else if (diff > 0.0)
 			{
@@ -543,7 +543,7 @@ public void CL_OnEndTimerPress(int client)
 				g_bStyleMapPBRecord[style][client] = true;
 				g_pr_showmsg[client] = true;
 
-				db_selectStyleRecord(client, style);
+				db_selectPersonalStyleRecord(client, style);
 			}
 
 			if (!g_bStyleMapSRVRecord[style][client] && !g_bStyleMapFirstRecord[style][client] && !g_bStyleMapPBRecord[style][client])
