@@ -12504,7 +12504,7 @@ public void DisplayCCPMenu(int client, float map_time, float record_time, int ma
 	AddMenuItem(ccp_menu, "", szItem, ITEMDRAW_DEFAULT);
 
 	//MENU TITLE
-	SetMenuTitle(ccp_menu, "%s CCP Times for Rank %i\nTime: %s (+%s)\n \n", szMapName, map_rank, szMapTimeFormatted, szMapTimeDiffFormatted)
+	SetMenuTitle(ccp_menu, "%s CCP Times for Rank %i\nTime: %s (+%s)\n \n", szMapName, map_rank, szMapTimeFormatted, szMapTimeDiffFormatted);
 	SetMenuPagination(ccp_menu, 3);
 	DisplayMenu(ccp_menu, client, MENU_TIME_FOREVER);
 
