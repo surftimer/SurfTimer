@@ -96,6 +96,7 @@ Run the following queries on your database:
 * *(recommended)* [Stripper:Source](http://www.bailopan.net/stripper/) - Allows adding/modifying/removing entities from a map before it loads (config files included)
 * *(optional)* [Surftimer-Web-Stats](https://github.com/KristianP26/Surftimer-Web-Stats) - Web statistics
 * *(optional)* [Surftimer-Discord-Bot](https://github.com/Sarrus1/SurfTimer-Discord-Bot) - Discord BOT
+* *(optional)* [CSGO-Surf-Load-Screens](https://github.com/Sayt123/CSGO-Surf-Load-Screens) - Map loading images for surf maps
 
 ## Upgrading
 
