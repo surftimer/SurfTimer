@@ -46,7 +46,7 @@ Less bugs = better experience = more players for surf!
 <details>
   <summary>[SurfTimer] Database tables could not be created! Error: Lost connection to MySQL server during query</summary>
 
-Run the following [queries](https://github.com/surftimer/SurfTimer/blob/master/scripts/mysql-files/fresh_install.sql) on your database:
+Run the following [queries](https://github.com/surftimer/SurfTimer/blob/master/scripts/mysql-files/fresh_install.sql) on your database
 
 </details>
 
