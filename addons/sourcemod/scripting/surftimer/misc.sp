@@ -1588,6 +1588,18 @@ public void PlayWRCPRecord()
 	}
 }
 
+public void AddRadarImages()
+{
+	char szRadarImage[PLATFORM_MAX_PATH];
+
+	Format(szRadarImage, sizeof(szRadarImage), "resource/overviews/%s_radar.dds", g_szMapName);
+	
+	if (FileExists(szRadarImage))
+		AddFileToDownloadsTable(szRadarImage);
+	else
+		PrintToServer("[SurfTimer] No radar image found: %s", szRadarImage);
+}
+
 public void InitPrecache()
 {
 	char szBuffer[256];

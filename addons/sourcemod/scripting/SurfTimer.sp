@@ -159,6 +159,9 @@ public void OnMapStart()
 	// Get mapname
 	GetCurrentMap(g_szMapName, 128);
 
+	// Download map radar image if existing
+	AddRadarImages();
+	
 	// Create nav file
 	CreateNavFile();
 
