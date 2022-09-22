@@ -308,7 +308,7 @@ public void CL_OnEndTimerPress(int client)
 				g_fCheckpointTimesNew[zGroup][client][g_TotalStages-1] = g_fFinalTime[client];
 			else
 				g_fCheckpointTimesNew[zGroup][client][g_iTotalCheckpoints] = g_fFinalTime[client];
-
+			
 			g_fPBDifference[client][0] = g_fFinalTime[client] - g_fPersonalRecord[client];
 			g_fWRDifference[client][0] = g_fFinalTime[client] - g_fRecordMapTime;
 

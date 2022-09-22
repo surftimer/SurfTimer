@@ -4143,7 +4143,7 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 				default:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, GRAY, tier, WHITE);
 			}
 			if (g_bhasStages)
-				Format(g_sTierString, 512, "%s%c%i Stages", g_sTierString, LIGHTGREEN, (g_mapZonesTypeCount[0][3] + 1));
+				Format(g_sTierString, 512, "%s%c%i Stages", g_sTierString, LIGHTGREEN, g_TotalStages);
 			else
 				Format(g_sTierString, 512, "%s%cLinear", g_sTierString, LIMEGREEN);
 
@@ -4906,186 +4906,40 @@ public void SQLTxn_ZoneGroupRemovalFailed(Handle db, any client, int numQueries,
 
 public void db_selectzoneTypeIds(int zonetype, int client, int zonegrp)
 {
-	char szQuery[258];
-	Format(szQuery, 258, sql_selectzoneTypeIds, g_szMapName, zonetype, zonegrp);
-	SQL_TQuery(g_hDb, SQL_selectzoneTypeIdsCallback, szQuery, client, DBPrio_Low);
-}
+	Menu TypeMenu = new Menu(Handle_EditZoneTypeId);
+	char MenuNum[24], MenuInfo[6], MenuItemName[24];
+	int x = 0;
 
-public void SQL_selectzoneTypeIdsCallback(Handle owner, Handle hndl, const char[] error, any data)
-{
-	if (hndl == null)
-	{
-		LogError("[SurfTimer] SQL Error (SQL_selectzoneTypeIdsCallback): %s", error);
-		return;
+	// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0) //fluffys AntiJump(9), AntiDuck(10)
+	switch (g_CurrentZoneType[client]) {
+		case 0:Format(MenuItemName, 24, "Stop");
+		case 1:Format(MenuItemName, 24, "Start");
+		case 2:Format(MenuItemName, 24, "End");
+		case 3: {
+			Format(MenuItemName, 24, "Stage");
+			x = 2;
+		}
+		case 4:Format(MenuItemName, 24, "Checkpoint");
+		case 5:Format(MenuItemName, 24, "Speed");
+		case 6:Format(MenuItemName, 24, "TeleToStart");
+		case 7:Format(MenuItemName, 24, "Validator");
+		case 8:Format(MenuItemName, 24, "Checker");
+		// fluffys
+		case 9:Format(MenuItemName, 24, "AntiJump");
+		case 10:Format(MenuItemName, 24, "AntiDuck");
+		case 11:Format(MenuItemName, 24, "MaxSpeed");
+		default:Format(MenuItemName, 24, "Unknown");
 	}
 
-	if (SQL_HasResultSet(hndl))
-	{
-		int availableids[MAXZONES] = { 0, ... }, i;
-		while (SQL_FetchRow(hndl))
-		{
-			i = SQL_FetchInt(hndl, 0);
-			if (i < MAXZONES)
-			availableids[i] = 1;
-		}
-		Menu TypeMenu = new Menu(Handle_EditZoneTypeId);
-		char MenuNum[24], MenuInfo[6], MenuItemName[24];
-		int x = 0;
-		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0) //fluffys AntiJump(9), AntiDuck(10)
-		switch (g_CurrentZoneType[data]) {
-			case 0:Format(MenuItemName, 24, "Stop");
-			case 1:Format(MenuItemName, 24, "Start");
-			case 2:Format(MenuItemName, 24, "End");
-			case 3: {
-				Format(MenuItemName, 24, "Stage");
-				x = 2;
-			}
-			case 4:Format(MenuItemName, 24, "Checkpoint");
-			case 5:Format(MenuItemName, 24, "Speed");
-			case 6:Format(MenuItemName, 24, "TeleToStart");
-			case 7:Format(MenuItemName, 24, "Validator");
-			case 8:Format(MenuItemName, 24, "Checker");
-			// fluffys
-			case 9:Format(MenuItemName, 24, "AntiJump");
-			case 10:Format(MenuItemName, 24, "AntiDuck");
-			case 11:Format(MenuItemName, 24, "MaxSpeed");
-			default:Format(MenuItemName, 24, "Unknown");
-		}
-
-		for (int k = 0; k < 35; k++)
-		{
-			if (availableids[k] == 0)
-			{
-				Format(MenuNum, sizeof(MenuNum), "%s-%i", MenuItemName, (k + x));
-				Format(MenuInfo, sizeof(MenuInfo), "%i", k);
-				TypeMenu.AddItem(MenuInfo, MenuNum);
-			}
-		}
-		TypeMenu.ExitButton = true;
-		TypeMenu.Display(data, MENU_TIME_FOREVER);
+	for (int k = 0; k < 35; k++) {
+		Format(MenuNum, sizeof(MenuNum), "%s-%i", MenuItemName, (k + x));
+		Format(MenuInfo, sizeof(MenuInfo), "%i", k);
+		TypeMenu.AddItem(MenuInfo, MenuNum);
 	}
-}
-/*
-public checkZoneTypeIds()
-{
-InitZoneVariables();
 
-char szQuery[258];
-Format(szQuery, 258, "SELECT `zonegroup` ,`zonetype`, `zonetypeid` FROM `ck_zones` WHERE `mapname` = '%s';", g_szMapName);
-SQL_TQuery(g_hDb, checkZoneTypeIdsCallback, szQuery, 1, DBPrio_High);
+	TypeMenu.ExitButton = true;
+	TypeMenu.Display(client, MENU_TIME_FOREVER);
 }
-
-public checkZoneTypeIdsCallback(Handle owner, Handle hndl, const char[] error, any:data)
-{
-if (hndl == null)
-{
-LogError("[SurfTimer] SQL Error (checkZoneTypeIds): %s", error);
-return;
-}
-if (SQL_HasResultSet(hndl))
-{
-int idChecker[MAXZONEGROUPS][ZONEAMOUNT][MAXZONES], idCount[MAXZONEGROUPS][ZONEAMOUNT];
-char szQuery[258];
-// Fill array with id's
-// idChecker = map zones in
-while (SQL_FetchRow(hndl))
-{
-idChecker[SQL_FetchInt(hndl, 0)][SQL_FetchInt(hndl, 1)][SQL_FetchInt(hndl, 2)] = 1;
-idCount[SQL_FetchInt(hndl, 0)][SQL_FetchInt(hndl, 1)]++;
-}
-for (int i = 0; i < MAXZONEGROUPS; i++)
-{
-for (int j = 0; j < ZONEAMOUNT; j++)
-{
-for (int k = 0; k < idCount[i][j]; k++)
-{
-if (idChecker[i][j][k] == 1)
-continue;
-else
-{
-PrintToServer("[SurfTimer] Error on zonetype: %i, zonetypeid: %i", i, idChecker[i][k]);
-Format(szQuery, 258, "UPDATE `ck_zones` SET zonetypeid = zonetypeid-1 WHERE mapname = '%s' AND zonetype = %i AND zonetypeid > %i AND zonegroup = %i;", g_szMapName, j, k, i);
-SQL_LockDatabase(g_hDb);
-SQL_FastQuery(g_hDb, szQuery);
-SQL_UnlockDatabase(g_hDb);
-}
-}
-}
-}
-
-Format(szQuery, 258, "SELECT `zoneid` FROM `ck_zones` WHERE mapname = '%s' ORDER BY zoneid ASC;", g_szMapName);
-SQL_TQuery(g_hDb, checkZoneIdsCallback, szQuery, 1, DBPrio_High);
-}
-}
-
-public checkZoneIdsCallback(Handle owner, Handle hndl, const char[] error, any:data)
-{
-if (hndl == null)
-{
-LogError("[SurfTimer] SQL Error (checkZoneIdsCallback): %s", error);
-return;
-}
-
-if (SQL_HasResultSet(hndl))
-{
-int i = 0;
-char szQuery[258];
-while (SQL_FetchRow(hndl))
-{
-if (SQL_FetchInt(hndl, 0) == i)
-{
-i++;
-continue;
-}
-else
-{
-PrintToServer("[SurfTimer] Found an error in ZoneID's. Fixing...");
-Format(szQuery, 258, "UPDATE `ck_zones` SET zoneid = %i WHERE mapname = '%s' AND zoneid = %i", i, g_szMapName, SQL_FetchInt(hndl, 0));
-SQL_LockDatabase(g_hDb);
-SQL_FastQuery(g_hDb, szQuery);
-SQL_UnlockDatabase(g_hDb);
-i++;
-}
-}
-
-char szQuery2[258];
-Format(szQuery2, 258, "SELECT `zonegroup` FROM `ck_zones` WHERE `mapname` = '%s' ORDER BY `zonegroup` ASC;", g_szMapName);
-SQL_TQuery(g_hDb, checkZoneGroupIds, szQuery2, 1, DBPrio_Low);
-}
-}
-
-public checkZoneGroupIds(Handle owner, Handle hndl, const char[] error, any:data)
-{
-if (hndl == null)
-{
-LogError("[SurfTimer] SQL Error (checkZoneGroupIds): %s", error);
-return;
-}
-
-if (SQL_HasResultSet(hndl))
-{
-int i = 0;
-char szQuery[258];
-while (SQL_FetchRow(hndl))
-{
-if (SQL_FetchInt(hndl, 0) == i)
-continue;
-else if (SQL_FetchInt(hndl, 0) == (i+1))
-i++;
-else
-{
-i++;
-PrintToServer("[SurfTimer] Found an error in zoneGroupID's. Fixing...");
-Format(szQuery, 258, "UPDATE `ck_zones` SET `zonegroup` = %i WHERE `mapname` = '%s' AND `zonegroup` = %i", i, g_szMapName, SQL_FetchInt(hndl, 0));
-SQL_LockDatabase(g_hDb);
-SQL_FastQuery(g_hDb, szQuery);
-SQL_UnlockDatabase(g_hDb);
-}
-}
-db_selectMapZones();
-}
-}
-*/
 
 public void db_selectMapZones()
 {
@@ -5115,6 +4969,9 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 		g_bhasBonus = false;
 		g_mapZoneGroupCount = 0; // 1 = No Bonus, 2 = Bonus, >2 = Multiple bonuses
 		g_iTotalCheckpoints = 0;
+		g_TotalStages = 0;
+		int g_iTotalCheckpoints_Same = 0;
+		int g_iTotalStages_Same = 0;
 
 		for (int i = 0; i < MAXZONES; i++)
 		{
@@ -5138,10 +4995,12 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 		{
 			g_mapZoneCountinGroup[x] = 0;
 			for (int k = 0; k < ZONEAMOUNT; k++)
-			g_mapZonesTypeCount[x][k] = 0;
+			g_mapZonesTypeCount[x][k] = 1;
 		}
 
 		int zoneIdChecker[MAXZONES], zoneTypeIdChecker[MAXZONEGROUPS][ZONEAMOUNT][MAXZONES], zoneTypeIdCheckerCount[MAXZONEGROUPS][ZONEAMOUNT], zoneGroupChecker[MAXZONEGROUPS];
+
+		ArrayList temp_zonetypeID = new ArrayList();
 
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 		while (SQL_FetchRow(hndl))
@@ -5159,12 +5018,27 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 			g_mapZones[g_mapZonesCount].Team = SQL_FetchInt(hndl, 10);
 			g_mapZones[g_mapZonesCount].ZoneGroup = SQL_FetchInt(hndl, 11);
 
-			// Total amount of checkpoints
+			//COUNT CHECKPOINTS AND STAGES
 			if (g_mapZones[g_mapZonesCount].ZoneGroup == 0)
 			{
-				if (g_mapZones[g_mapZonesCount].ZoneType == 4)
+				if (g_mapZones[g_mapZonesCount].ZoneType == 4 && temp_zonetypeID.FindValue(g_mapZones[g_mapZonesCount].ZoneTypeId) == -1)
 				{
+					temp_zonetypeID.Push(g_mapZones[g_mapZonesCount].ZoneTypeId);
 					g_iTotalCheckpoints++;
+				}
+				else if (g_mapZones[g_mapZonesCount].ZoneType == 4 && temp_zonetypeID.FindValue(g_mapZones[g_mapZonesCount].ZoneTypeId) != -1)
+				{
+					g_iTotalCheckpoints_Same++;
+				}
+
+				if (g_mapZones[g_mapZonesCount].ZoneType == 3 && temp_zonetypeID.FindValue(g_mapZones[g_mapZonesCount].ZoneTypeId) == -1)
+				{
+					temp_zonetypeID.Push(g_mapZones[g_mapZonesCount].ZoneTypeId);
+					g_TotalStages++;
+				}
+				else if (g_mapZones[g_mapZonesCount].ZoneType == 3 && temp_zonetypeID.FindValue(g_mapZones[g_mapZonesCount].ZoneTypeId) != -1)
+				{
+					g_iTotalStages_Same++;
 				}
 			}
 
@@ -5288,10 +5162,14 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 				g_fZoneCorners[g_mapZonesCount][7][i] = g_mapZones[g_mapZonesCount].PointB[i];
 			}
 
-			// Zone counts:
+
 			g_mapZonesTypeCount[g_mapZones[g_mapZonesCount].ZoneGroup][g_mapZones[g_mapZonesCount].ZoneType]++;
 			g_mapZonesCount++;
 		}
+
+		g_TotalStages++;
+		delete temp_zonetypeID;
+
 		// Count zone corners
 		// https://forums.alliedmods.net/showpost.php?p=2006539&postcount=8
 		for (int x = 0; x < g_mapZonesCount; x++)
@@ -5332,7 +5210,7 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 		}
 
 		// 3rd ZoneTypeId
-		for (int i = 0; i < g_mapZoneGroupCount; i++)
+		/*for (int i = 0; i < g_mapZoneGroupCount; i++)
 		for (int k = 0; k < ZONEAMOUNT; k++)
 		for (int x = 0; x < zoneTypeIdCheckerCount[i][k]; x++)
 		if (zoneTypeIdChecker[i][k][x] != 1 && (k == 3) || (k == 4))
@@ -5350,7 +5228,7 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 				Format(szerror, 258, "[SurfTimer] Duplicate Stage Zone ID's on %s [ZoneGroup: %i, ZoneType: 3, ZoneTypeId: %i]", g_szMapName, k, x);
 				LogError(szerror);
 			}
-		}
+		}*/
 
 		RefreshZones();
 
@@ -7238,37 +7116,13 @@ public void SQL_selectPersonalPrestrafeSpeeds_BonusCallback(Handle owner, Handle
 public void db_GetTotalStages()
 {
 	// Check if map has stages, if not don't bother loading this
-	if (!g_bhasStages)
-	{
+	if (!g_bhasStages) {
 		db_selectTotalBonusCount();
 		return;
 	}
 
-	char szQuery[512];
-
-	Format(szQuery, 512, "SELECT COUNT(`zonetype`) AS stages FROM `ck_zones` WHERE `zonetype` = '3' AND `mapname` = '%s'", g_szMapName);
-	SQL_TQuery(g_hDb, db_GetTotalStagesCallback, szQuery, _, DBPrio_Low);
-}
-
-public void db_GetTotalStagesCallback(Handle owner, Handle hndl, const char[] error, any data)
-{
-	if (hndl == null)
-	{
-		LogError("[SurfTimer] SQL Error (db_GetTotalStagesCallback): %s ", error);
-		db_viewStageRecords();
-		return;
-	}
-
-	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
-	{
-		g_TotalStages = SQL_FetchInt(hndl, 0) + 1;
-
-		for(int i = 1;i <= g_TotalStages;i++)
-		{
-			g_fStageRecord[i] = 0.0;
-			// fluffys comeback yo
-		}
-	}
+	for (int i = 1; i <= g_TotalStages ;i++)
+		g_fStageRecord[i] = 0.0;
 
 	if (!g_bServerDataLoaded)
 		db_viewStageRecords();

@@ -277,7 +277,7 @@ public int Native_GetMapStages(Handle plugin, int numParams)
 {
 	int stages = 0;
 	if (g_bhasStages)
-		stages = g_mapZonesTypeCount[0][3] + 1;
+		stages = g_TotalStages;
 	return stages;
 }
 
