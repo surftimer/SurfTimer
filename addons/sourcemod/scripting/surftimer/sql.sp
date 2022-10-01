@@ -6689,7 +6689,7 @@ public void SQL_UpdateWrcpRecordCallback2(Handle owner, Handle hndl, const char[
 {
 	if (hndl == null)
 	{
-		LogError("[SurfTimer] SQL Error (SQL_UpdateRecordProCallback2): %s", error);
+		LogError("[SurfTimer] SQL Error (SQL_UpdateWrcpRecordCallback2): %s", error);
 		CloseHandle(data);
 		return;
 	}
@@ -7332,7 +7332,7 @@ public void sql_viewWrcpMapCallback(Handle owner, Handle hndl, const char[] erro
 			/*// Find out how many times are are faster than the players time
 			char szQuery[512];
 			Format(szQuery, 512, "", g_szMapName, g_CurrentStage[data], stagetime);
-			SQL_TQuery(g_hDb, SQL_UpdateRecordProCallback2, szQuery, client, DBPrio_Low);*/
+			SQL_TQuery(g_hDb, sql_viewWrcpMapCallback, szQuery, client, DBPrio_Low);*/
 		}
 	}
 }
