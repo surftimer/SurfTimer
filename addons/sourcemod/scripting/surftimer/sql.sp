@@ -6470,7 +6470,7 @@ public void sql_selectTotalStageCountCallback(Handle owner, Handle hndl, const c
 {
 	if (hndl == null)
 	{
-		LogError("[SurfTimer] SQL Error (sql_selectTotalBonusCountCallback): %s", error);
+		LogError("[SurfTimer] SQL Error (sql_selectTotalStageCountCallback): %s", error);
 
 		if (!g_bServerDataLoaded)
 			db_selectCurrentMapImprovement();
