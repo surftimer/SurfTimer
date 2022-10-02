@@ -284,7 +284,7 @@ public void SQLCheckDataType(Handle owner, Handle hndl, const char[] error, Data
 
 			if (!g_bRenaming && !g_bInTransactionChain && (IsServerProcessing() || !cvHibernateWhenEmpty.BoolValue))
 			{
-				LogToFileEx(g_szLogFile, "[surftimer] Starting to load server settings");
+				LogQueryTime("[surftimer] Starting to load server settings");
 				g_fServerLoading[0] = GetGameTime();
 				db_selectMapZones();
 			}

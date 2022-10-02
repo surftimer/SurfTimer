@@ -433,7 +433,7 @@ public void db_selectSpawnLocations()
 
 public void db_selectSpawnLocationsCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
-	PrintToServer("[SurfTimer] : Finished db_selectSpawnLocationsCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished db_selectSpawnLocationsCallback in: %f", GetGameTime() - time);
 	
 	if (hndl == null)
 	{
@@ -482,7 +482,7 @@ public void db_viewMapProRankCount()
 
 public void sql_selectPlayerProCountCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
-	PrintToServer("[SurfTimer] : Finished sql_selectPlayerProCountCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished sql_selectPlayerProCountCallback in: %f", GetGameTime() - time);
 	
 	if (hndl == null)
 	{
@@ -1505,7 +1505,7 @@ public void db_viewPlayerPointsCallback(Handle owner, Handle hndl, const char[] 
 		// Debug
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPlayerPoints in %fs", g_szSteamID[client], tick);
+		LogQueryTime("[SurfTimer] %s: Finished db_viewPlayerPoints in %fs", g_szSteamID[client], tick);
 		g_fTick[client][0] = GetGameTime();
 		
 		// Count players rank
@@ -1543,7 +1543,7 @@ public void db_viewPlayerPointsCallback(Handle owner, Handle hndl, const char[] 
 			// Debug
 			g_fTick[client][1] = GetGameTime();
 			float tick = g_fTick[client][1] - g_fTick[client][0];
-			LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPlayerPoints in %fs", g_szSteamID[client], tick);
+			LogQueryTime("[SurfTimer] %s: Finished db_viewPlayerPoints in %fs", g_szSteamID[client], tick);
 			g_fTick[client][0] = GetGameTime();
 
 			// Count players rank
@@ -1630,7 +1630,7 @@ public void sql_selectRankedPlayersRankCallback(Handle owner, Handle hndl, const
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_GetPlayerRank in %fs", g_szSteamID[client], tick);
+		LogQueryTime("[SurfTimer] %s: Finished db_GetPlayerRank in %fs", g_szSteamID[client], tick);
 		g_fTick[client][0] = GetGameTime();
 
 		LoadClientSetting(client, g_iSettingToLoad[client]);
@@ -2011,7 +2011,7 @@ public void db_GetMapRecord_Pro()
 
 public void sql_selectMapRecordCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
-	PrintToServer("[SurfTimer] : Finished sql_selectMapRecordCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished sql_selectMapRecordCallback in: %f", GetGameTime() - time);
 	
 	if (hndl == null)
 	{
@@ -3094,7 +3094,7 @@ public void db_viewPersonalRecords(int client, char szSteamId[32], char szMapNam
 	char szName[32];
 	GetClientName(client, szName, sizeof(szName));
 	g_fClientsLoading[client][0] = GetGameTime();
-	LogToFileEx(g_szLogFile, "[SurfTimer] Loading %s - %s settings", szSteamId, szName);
+	LogQueryTime("[SurfTimer] Loading %s - %s settings", szSteamId, szName);
 
 	g_fTick[client][0] = GetGameTime();
 
@@ -3168,7 +3168,7 @@ public void SQL_selectPersonalRecordsCallback(Handle owner, Handle hndl, const c
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPersonalRecords in %fs", g_szSteamID[client], tick);
+		LogQueryTime("[SurfTimer] %s: Finished db_viewPersonalRecords in %fs", g_szSteamID[client], tick);
 		g_fTick[client][0] = GetGameTime();
 		LoadClientSetting(client, g_iSettingToLoad[client]);
 	}
@@ -3287,7 +3287,7 @@ public void db_viewRecordCheckpointInMap()
 
 public void sql_selectRecordCheckpointsCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
-	PrintToServer("[SurfTimer] : Finished sql_selectRecordCheckpointsCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished sql_selectRecordCheckpointsCallback in: %f", GetGameTime() - time);
 	
 	if (hndl == null)
 	{
@@ -3362,7 +3362,7 @@ public void SQL_selectCheckpointsCallback(Handle owner, Handle hndl, const char[
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewCheckpoints in %fs", g_szSteamID[client], tick);
+		LogQueryTime("[SurfTimer] %s: Finished db_viewCheckpoints in %fs", g_szSteamID[client], tick);
 		LoadClientSetting(client, g_iSettingToLoad[client]);
 	}
 
@@ -3444,7 +3444,7 @@ public void SQL_LoadStageAttemptsCallback(Handle owner, Handle hndl, const char[
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_LoadCCP in %fs", g_szSteamID[client], tick);
+		LogQueryTime("[SurfTimer] %s: Finished db_LoadCCP in %fs", g_szSteamID[client], tick);
 		LoadClientSetting(client, g_iSettingToLoad[client]);
 	}
 }
@@ -3471,7 +3471,7 @@ public void SQL_selectReplayCPTicksCallback(Handle owner, Handle hndl, const cha
 	float fTime = pack.ReadFloat();
 	delete pack;
 
-	PrintToServer("[SurfTimer] : Finished SQL_selectReplayCPTicksCallback for %s in: %f", g_EditStyles[iStyle], GetGameTime() - fTime);
+	LogQueryTime("[SurfTimer] : Finished SQL_selectReplayCPTicksCallback for %s in: %f", g_EditStyles[iStyle], GetGameTime() - fTime);
 
 	// fluffys come back
 	if (hndl == null)
@@ -3510,7 +3510,7 @@ public void SQL_selectReplayCPTicksCallback(Handle owner, Handle hndl, const cha
 		g_fServerLoading[1] = GetGameTime();
 		g_bHasLatestID = true;
 		float time = g_fServerLoading[1] - g_fServerLoading[0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] Finished loading server settings in %fs", time);
+		LogQueryTime("[SurfTimer] Finished loading server settings in %fs", time);
 		loadAllClientSettings();
 	} 
 }
@@ -3735,7 +3735,7 @@ public void db_viewPRinfoCallback(Handle owner, Handle hndl, const char[] error,
 		{
 			g_fTick[client][1] = GetGameTime();
 			float tick = g_fTick[client][1] - g_fTick[client][0];
-			LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPRinfo in %fs", g_szSteamID[client], tick);
+			LogQueryTime("[SurfTimer] %s: Finished db_viewPRinfo in %fs", g_szSteamID[client], tick);
 			g_fTick[client][0] = GetGameTime();
 
 			// Print a VIP's custom join msg to all
@@ -3771,7 +3771,7 @@ public void db_viewPRinfoCallback(Handle owner, Handle hndl, const char[] error,
 			float time = g_fTick[client][1] - g_fClientsLoading[client][0];
 			char szName[32];
 			GetClientName(client, szName, sizeof(szName));
-			LogToFileEx(g_szLogFile, "[SurfTimer] Finished loading %s - %s settings in %fs", g_szSteamID[client], szName, time);
+			LogQueryTime("[SurfTimer] Finished loading %s - %s settings in %fs", g_szSteamID[client], szName, time);
 		}
 	}
 
@@ -3908,7 +3908,7 @@ public void db_viewBonusPRinfoCallback(Handle owner, Handle hndl, const char[] e
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPRinfo in %fs", g_szSteamID[client], tick);
+		LogQueryTime("[SurfTimer] %s: Finished db_viewPRinfo in %fs", g_szSteamID[client], tick);
 		g_fTick[client][0] = GetGameTime();
 
 		// Print a VIP's custom join msg to all
@@ -3944,7 +3944,7 @@ public void db_viewBonusPRinfoCallback(Handle owner, Handle hndl, const char[] e
 		float time = g_fTick[client][1] - g_fClientsLoading[client][0];
 		char szName[32];
 		GetClientName(client, szName, sizeof(szName));
-		LogToFileEx(g_szLogFile, "[SurfTimer] Finished loading %s - %s settings in %fs", g_szSteamID[client], szName, time);
+		LogQueryTime("[SurfTimer] Finished loading %s - %s settings in %fs", g_szSteamID[client], szName, time);
 	}
 
 	return;
@@ -4123,7 +4123,7 @@ public void db_selectMapTier()
 
 public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
-	PrintToServer("[SurfTimer] : Finished SQL_selectMapTierCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished SQL_selectMapTierCallback in: %f", GetGameTime() - time);
 	
 	if (hndl == null)
 	{
@@ -4376,7 +4376,7 @@ public void SQL_selectPersonalBonusRecordsCallback(Handle owner, Handle hndl, co
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPersonalBonusRecords in %fs", g_szSteamID[client], tick);
+		LogQueryTime("[SurfTimer] %s: Finished db_viewPersonalBonusRecords in %fs", g_szSteamID[client], tick);
 		g_fTick[client][0] = GetGameTime();
 
 		LoadClientSetting(client, g_iSettingToLoad[client]);
@@ -4394,7 +4394,7 @@ public void db_viewFastestBonus()
 
 public void SQL_selectFastestBonusCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
-	PrintToServer("[SurfTimer] : Finished SQL_selectFastestBonusCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished SQL_selectFastestBonusCallback in: %f", GetGameTime() - time);
 	
 	if (hndl == null)
 	{
@@ -4489,7 +4489,7 @@ public void db_viewBonusTotalCount()
 
 public void SQL_selectBonusTotalCountCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
-	PrintToServer("[SurfTimer] : Finished SQL_selectBonusTotalCountCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished SQL_selectBonusTotalCountCallback in: %f", GetGameTime() - time);
 	
 	if (hndl == null)
 	{
@@ -5117,7 +5117,7 @@ public void db_selectMapZones()
 
 public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
-	PrintToServer("[SurfTimer] : Finished SQL_selectMapZonesCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished SQL_selectMapZonesCallback in: %f", GetGameTime() - time);
 	
 	if (hndl == null)
 	{
@@ -5608,7 +5608,7 @@ public void db_CalcAvgRunTime()
 
 public void SQL_db_CalcAvgRunTimeCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
-	PrintToServer("[SurfTimer] : Finished SQL_db_CalcAvgRunTimeCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished SQL_db_CalcAvgRunTimeCallback in: %f", GetGameTime() - time);
 	
 	if (hndl == null)
 	{
@@ -5659,7 +5659,7 @@ public void db_CalcAvgRunTimeBonus()
 
 public void SQL_db_CalcAvgRunBonusTimeCallback(Handle owner, Handle hndl, const char[] error, float fTime)
 {
-	PrintToServer("[SurfTimer] : Finished SQL_db_CalcAvgRunBonusTimeCallback in: %f", GetGameTime() - fTime);
+	LogQueryTime("[SurfTimer] : Finished SQL_db_CalcAvgRunBonusTimeCallback in: %f", GetGameTime() - fTime);
 	
 	if (hndl == null)
 	{
@@ -5712,7 +5712,7 @@ public void db_GetDynamicTimelimit()
 
 public void SQL_db_GetDynamicTimelimitCallback(Handle owner, Handle hndl, const char[] error, float fTime)
 {
-	PrintToServer("[SurfTimer] : Finished SQL_db_GetDynamicTimelimitCallback in: %f", GetGameTime() - fTime);
+	LogQueryTime("[SurfTimer] : Finished SQL_db_GetDynamicTimelimitCallback in: %f", GetGameTime() - fTime);
 	
 	if (hndl == null)
 	{
@@ -5804,7 +5804,7 @@ public void sql_CountRankedPlayersCallback(Handle owner, Handle hndl, const char
 	float time = pack.ReadFloat();
 	delete pack;
 
-	PrintToServer("[SurfTimer] : Finished sql_CountRankedPlayersCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished sql_CountRankedPlayersCallback in: %f", GetGameTime() - time);
 
 	if (hndl == null)
 	{
@@ -5832,7 +5832,7 @@ public void sql_CountRankedPlayers2Callback(Handle owner, Handle hndl, const cha
 	float time = pack.ReadFloat();
 	delete pack;
 
-	PrintToServer("[SurfTimer] : Finished sql_CountRankedPlayers2Callback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished sql_CountRankedPlayers2Callback in: %f", GetGameTime() - time);
 	
 	if (hndl == null)
 	{
@@ -6291,7 +6291,7 @@ public void db_viewPlayerOptionsCallback(Handle owner, Handle hndl, const char[]
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPlayerOptions in %fs", g_szSteamID[client], tick);
+		LogQueryTime("[SurfTimer] %s: Finished db_viewPlayerOptions in %fs", g_szSteamID[client], tick);
 		g_fTick[client][0] = GetGameTime();
 
 		LoadClientSetting(client, g_iSettingToLoad[client]);
@@ -6489,7 +6489,7 @@ public void db_selectTotalBonusCount()
 
 public void sql_selectTotalBonusCountCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
-	PrintToServer("[SurfTimer] : Finished sql_selectTotalBonusCountCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished sql_selectTotalBonusCountCallback in: %f", GetGameTime() - time);
 	
 	if (hndl == null)
 	{
@@ -6518,7 +6518,7 @@ public void db_selectTotalStageCount()
 
 public void sql_selectTotalStageCountCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
-	PrintToServer("[SurfTimer] : Finished sql_selectTotalStageCountCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished sql_selectTotalStageCountCallback in: %f", GetGameTime() - time);
 
 	if (hndl == null)
 	{
@@ -6983,7 +6983,7 @@ public void db_viewPersonalStageRecords(int client, char szSteamId[32])
 {
 	if (!g_bSettingsLoaded[client] && !g_bhasStages)
 	{
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Skipping db_viewPersonalStageRecords (linear map)", g_szSteamID[client]);
+		LogQueryTime("[SurfTimer] %s: Skipping db_viewPersonalStageRecords (linear map)", g_szSteamID[client]);
 		LoadClientSetting(client, 3);
 		return;
 	}
@@ -7040,7 +7040,7 @@ public void SQL_selectPersonalStageRecordsCallback(Handle owner, Handle hndl, co
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPersonalStageRecords in %fs", g_szSteamID[client], tick);
+		LogQueryTime("[SurfTimer] %s: Finished db_viewPersonalStageRecords in %fs", g_szSteamID[client], tick);
 		g_fTick[client][0] = GetGameTime();
 
 		LoadClientSetting(client, g_iSettingToLoad[client]);
@@ -7155,7 +7155,7 @@ public void SQL_selectPersonalPrestrafeSpeeds_MapCallback(Handle owner, Handle h
 		{
 			g_fTick[client][1] = GetGameTime();
 			float tick = g_fTick[client][1] - g_fTick[client][0];
-			LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewPersonalRecords in %fs", g_szSteamID[client], tick);
+			LogQueryTime("[SurfTimer] %s: Finished db_viewPersonalRecords in %fs", g_szSteamID[client], tick);
 			g_fTick[client][0] = GetGameTime();
 			LoadClientSetting(client, g_iSettingToLoad[client]);
 		}
@@ -7304,7 +7304,7 @@ public void db_GetTotalStages()
 
 public void db_GetTotalStagesCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
-	PrintToServer("[SurfTimer] : Finished db_GetTotalStagesCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished db_GetTotalStagesCallback in: %f", GetGameTime() - time);
 	
 	if (hndl == null)
 	{
@@ -7540,7 +7540,7 @@ public void db_viewStageRecords()
 
 public void sql_viewStageRecordsCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
-	PrintToServer("[SurfTimer] : Finished sql_viewStageRecordsCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished sql_viewStageRecordsCallback in: %f", GetGameTime() - time);
 	
 	if (hndl == null)
 	{
@@ -7636,7 +7636,7 @@ public void db_viewTotalStageRecords()
 
 public void sql_viewTotalStageRecordsCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
-	PrintToServer("[SurfTimer] : Finished sql_viewTotalStageRecordsCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished sql_viewTotalStageRecordsCallback in: %f", GetGameTime() - time);
 	
 	if (hndl == null)
 	{
@@ -9269,7 +9269,7 @@ public void db_selectCurrentMapImprovement()
 
 public void db_selectMapCurrentImprovementCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
-	PrintToServer("[SurfTimer] : Finished db_selectMapCurrentImprovementCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished db_selectMapCurrentImprovementCallback in: %f", GetGameTime() - time);
 
 	if (hndl == null)
 	{
@@ -9831,7 +9831,7 @@ public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] er
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_CheckVIPAdmin in %fs", g_szSteamID[client], tick);
+		LogQueryTime("[SurfTimer] %s: Finished db_CheckVIPAdmin in %fs", g_szSteamID[client], tick);
 		g_fTick[client][0] = GetGameTime();
 
 
@@ -10181,7 +10181,7 @@ public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[]
 	{
 		g_fTick[client][1] = GetGameTime();
 		float tick = g_fTick[client][1] - g_fTick[client][0];
-		LogToFileEx(g_szLogFile, "[SurfTimer] %s: Finished db_viewCustomTitles in %fs", g_szSteamID[client], tick);
+		LogQueryTime("[SurfTimer] %s: Finished db_viewCustomTitles in %fs", g_szSteamID[client], tick);
 
 		g_fTick[client][0] = GetGameTime();
 		LoadClientSetting(client, g_iSettingToLoad[client]);
@@ -10337,7 +10337,7 @@ public void db_selectAnnouncements()
 
 public void SQL_SelectAnnouncementsCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
-	PrintToServer("[SurfTimer] : Finished SQL_SelectAnnouncementsCallback in: %f", GetGameTime() - time);
+	LogQueryTime("[SurfTimer] : Finished SQL_SelectAnnouncementsCallback in: %f", GetGameTime() - time);
 
 	if (hndl == null)
 	{
