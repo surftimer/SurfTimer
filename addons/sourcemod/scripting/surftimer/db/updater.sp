@@ -93,29 +93,25 @@ void CheckDatabaseForUpdates()
 		FormatEx(sQuery, sizeof(sQuery), "SELECT CHARACTER_MAXIMUM_LENGTH FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='ck_playertimes' AND COLUMN_NAME='name';", g_sDatabaseName);
 		DBResultSet results = SQL_Query(g_hDb, sQuery);
 
-		if (results != null)
+		if (results != null && results.HasResults && results.FetchRow() && results.FetchInt(0) < 128)
 		{
-			if (results.HasResults && results.FetchRow())
-			{
-				if (results.FetchInt(0) < 128)
-				{
-					db_upgradeDatabase(13);
-					delete results;
-					return;
-				}
-			}
-
+			db_upgradeDatabase(13, true);
 			delete results;
+			return;
 		}
+		
 		// Version 13 - End
 
-		LogMessage("Version 12 looks good.");
+		LogMessage("Version 13 looks good.");
 	}
 }
 
-public void db_upgradeDatabase(int ver)
+void db_upgradeDatabase(int ver, bool skipErrorCheck = false)
 {
-	LogUpgradeError(ver);
+	if (!skipErrorCheck)
+	{
+		LogUpgradeError(ver);
+	}
 
 	if (ver == 0)
 	{
