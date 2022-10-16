@@ -6,6 +6,7 @@ This is an open source timer plugin made for CS:GO.
 
 SurfTimer Test Servers:
  - North America: `connect na-test-server.surftimer.dev`
+ - Europe: `connect eu-test-server.surftimer.dev:27045`
 
 ## Project Goals
 
