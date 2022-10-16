@@ -273,11 +273,13 @@ public void db_viewMapSettings()
 {
 	char szQuery[2048];
 	Format(szQuery, 2048, "SELECT `mapname`, `maxvelocity`, `announcerecord`, `gravityfix` FROM `ck_maptier` WHERE `mapname` = '%s'", g_szMapName);
-	SQL_TQuery(g_hDb, sql_viewMapSettingsCallback, szQuery, _, DBPrio_High);
+	SQL_TQuery(g_hDb, sql_viewMapSettingsCallback, szQuery, GetGameTime(), DBPrio_High);
 }
 
-public void sql_viewMapSettingsCallback(Handle owner, Handle hndl, const char[] error, any pack)
+public void sql_viewMapSettingsCallback(Handle owner, Handle hndl, const char[] error, float time)
 {
+	LogQueryTime("[SurfTimer] : Finished sql_viewMapSettingsCallback in: %f", GetGameTime() - time);
+	
 	if (hndl == null)
 	{
 		LogError("[SurfTimer] SQL Error (sql_viewMapSettingsCallback): %s", error);

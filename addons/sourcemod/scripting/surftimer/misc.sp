@@ -5555,3 +5555,18 @@ public void resetCCPDefaults(int client){
 		g_iCCP_StageTotal_Player[client][i] = 0;	
 	}
 }
+
+void LogQueryTime(const char[] format, any ...)
+{
+	char sMessage[512];
+	VFormat(sMessage, sizeof(sMessage), format, 2);
+
+	if (g_hLogQueryTimes.BoolValue)
+	{
+		LogToFileEx(g_szLogFile, sMessage);
+	}
+	else
+	{
+		PrintToServer(sMessage);
+	}
+}

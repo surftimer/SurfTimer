@@ -115,6 +115,7 @@ ConVar g_iHintsInterval = null;									// Time between two hints. 0 = off
 ConVar g_bHintsRandomOrder = null;								// If hints are in random order
 ConVar g_hOverrideClantag = null;
 ConVar g_hDefaultPreSpeed = null;
+ConVar g_hLogQueryTimes = null;
 
 void CreateConVars()
 {
@@ -408,6 +409,7 @@ void CreateConVars()
 	g_hSlayOnRoundEnd = AutoExecConfig_CreateConVar("ck_slay_on_round_end", "1", "If enabled, all players will be slain on round end. If disabled all players timers will be stopped on round end");
 
 	g_hLimitSpeedType = AutoExecConfig_CreateConVar("ck_limit_speed_type", "1", "1 Use new style of limiting speed, 0 use old/cksurf way");
+	g_hLogQueryTimes = AutoExecConfig_CreateConVar("ck_log_query_times", "1", "Log query times or just print in server console. Default \"0\", it'll just print into servers console.", _, true, 0.0, true, 1.0);
 
 	// Server Name
 	g_hHostName = FindConVar("hostname");
