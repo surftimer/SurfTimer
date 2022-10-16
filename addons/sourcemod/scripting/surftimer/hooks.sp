@@ -270,245 +270,246 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 
 public Action Say_Hook(int client, const char[] command, int argc)
 {
-	if (!GetConVarBool(g_henableChatProcessing))
+	if (!IsValidClient(client))
 		return Plugin_Continue;
 
-	if (IsValidClient(client))
+	// Get message text
+	char sText[1024];
+	GetCmdArgString(sText, sizeof(sText));
+
+	StripQuotes(sText);
+	TrimString(sText);
+
+	// Call Admin - Own Reason
+	if (g_bClientOwnReason[client])
 	{
-		// Get message text
-		char sText[1024];
-		GetCmdArgString(sText, sizeof(sText));
+		g_bClientOwnReason[client] = false;
+		return Plugin_Continue;
+	}
 
-		StripQuotes(sText);
-		TrimString(sText);
+	// Renaming zone
+	if (g_ClientRenamingZone[client])
+	{
+		Admin_renameZone(client, sText);
+		return Plugin_Handled;
+	}
 
-		// Call Admin - Own Reason
-		if (g_bClientOwnReason[client])
-		{
-			g_bClientOwnReason[client] = false;
-			return Plugin_Continue;
-		}
+	// Client is muted
+	if (BaseComm_IsClientGagged(client))
+		return Plugin_Handled;
 
-		// Renaming zone
-		if (g_ClientRenamingZone[client])
-		{
-			Admin_renameZone(client, sText);
+	// Blocked Commands
+	for (int i = 0; i < sizeof(g_BlockedChatText); i++)
+	{
+		if (StrEqual(g_BlockedChatText[i], sText, true))
 			return Plugin_Handled;
-		}
+	}
 
-		// Client is muted
-		if (BaseComm_IsClientGagged(client))
-			return Plugin_Handled;
-
-		// Blocked Commands
-		for (int i = 0; i < sizeof(g_BlockedChatText); i++)
+	// Functions that require the client to input something via the chat box
+	if (g_iWaitingForResponse[client] > None)
+	{
+		// Check if client is cancelling
+		if (StrEqual(sText, "cancel"))
 		{
-			if (StrEqual(g_BlockedChatText[i], sText, true))
-				return Plugin_Handled;
-		}
-
-		// Functions that require the client to input something via the chat box
-		if (g_iWaitingForResponse[client] > None)
-		{
-			// Check if client is cancelling
-			if (StrEqual(sText, "cancel"))
-			{
-				CPrintToChat(client, "%t", "Hooks1", g_szChatPrefix);
-				g_iWaitingForResponse[client] = None;
-				return Plugin_Handled;
-			}
-
-			// Check which function we're waiting for
-			switch (g_iWaitingForResponse[client])
-			{
-				case PreSpeed: 
-				{
-					// Set zone Prespeed
-					float prespeed = StringToFloat(sText);
-					if (prespeed < 0.0)
-						prespeed = 0.0;
-					g_mapZones[g_ClientSelectedZone[client]].PreSpeed = prespeed;
-					PrespeedMenu(client);
-				}
-				case ZoneGroup:
-				{
-					// Hook zone zonegroup
-					int zgrp = StringToInt(sText);
-					if (zgrp < 1 || zgrp > 35)
-					{
-						CPrintToChat(client, "%t", "Hooks2", g_szChatPrefix);
-						return Plugin_Handled;
-					}
-					g_iZonegroupHook[client] = zgrp;
-					CPrintToChat(client, "%t", "Hooks3", g_szChatPrefix, zgrp);
-				}
-				case MaxVelocity:
-				{
-					// Maxvelocity for map
-					float maxvelocity = StringToFloat(sText);
-					if (maxvelocity < 1.0)
-						maxvelocity = 10000.0;
-					g_fMaxVelocity = maxvelocity;
-					db_updateMapSettings();
-					MaxVelocityMenu(client);
-					CPrintToChat(client, "%t", "Hooks4", g_szChatPrefix, g_szMapName, maxvelocity);
-				}
-				case TargetName:
-				{
-					// Zone set clients Target Name
-					if (StrEqual(sText, "reset"))
-						Format(sText, sizeof(sText), "player");
-
-					Format(g_mapZones[g_ClientSelectedZone[client]].TargetName, sizeof(MapZone::TargetName), "%s", sText);
-
-					CPrintToChat(client, "%t", "Hooks5", g_szChatPrefix, g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]].ZoneTypeId, sText);
-
-					EditorMenu(client);
-				}
-				case ClientEdit:
-				{
-					// Deleting records
-					g_SelectedType[client] = StringToInt(sText);
-					char szQuery[512];
-
-					switch(g_SelectedEditOption[client])
-					{
-						case 0:
-						{
-							FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_playertimes", g_EditingMap[client], g_SelectedStyle[client], "", "runtimepro");
-						}
-						case 1:
-						{
-							char stageQuery[32];
-							FormatEx(stageQuery, 32, "AND stage='%i' ", g_SelectedType[client]);
-							FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_wrcps", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtimepro");
-						}
-						case 2:
-						{
-							char stageQuery[32];
-							FormatEx(stageQuery, 32, "AND zonegroup='%i' ", g_SelectedType[client]);
-							FormatEx(szQuery, 512, sql_MainEditQuery, "runtime", "ck_bonus", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtime");
-						}
-					}
-
-					SQL_TQuery(g_hDb, sql_DeleteMenuView, szQuery, GetClientSerial(client));
-				}
-				case ColorValue:
-				{
-					//COLOR VALUE FOR CENTER SPEED
-					int color_value = StringToInt(sText);
-
-					//KEEP VALUES BETWEEN 0-255
-					if(color_value > 255)
-						color_value = 255;
-					else if(color_value < 0)
-						color_value = 0;
-
-					switch(g_iColorChangeIndex[client]){
-						case 0: g_iCSD_R[client] = color_value;
-						case 1: g_iCSD_G[client] = color_value;
-						case 2: g_iCSD_B[client] = color_value;
-					}
-					CSDOptions(client);
-				}
-			}
-
+			CPrintToChat(client, "%t", "Hooks1", g_szChatPrefix);
 			g_iWaitingForResponse[client] = None;
 			return Plugin_Handled;
 		}
 
-		// !s & !stage Commands
-		if (StrContains(sText, "!s", false) == 0 || StrContains(sText, "!stage", false) == 0)
-			return Plugin_Handled;
-
-		// !b & !bonus Commands
-		if (StrContains(sText, "!b", false) == 0 || StrContains(sText, "!bonus", false) == 0)
-			return Plugin_Handled;
-
-		// Empty Message
-		if (StrEqual(sText, " ") || !sText[0])
-			return Plugin_Handled;
-
-		// Spam check
-		if (checkSpam(client))
-			return Plugin_Handled;
-
-		parseColorsFromString(sText, 1024);
-
-		// Lowercase
-		if ((sText[0] == '/') || (sText[0] == '!'))
+		// Check which function we're waiting for
+		switch (g_iWaitingForResponse[client])
 		{
-			if (IsCharUpper(sText[1]))
+			case PreSpeed: 
 			{
-				for (int i = 0; i <= strlen(sText); ++i)
-					sText[i] = CharToLower(sText[i]);
-				FakeClientCommand(client, "say %s", sText);
+				// Set zone Prespeed
+				float prespeed = StringToFloat(sText);
+				if (prespeed < 0.0)
+					prespeed = 0.0;
+				g_mapZones[g_ClientSelectedZone[client]].PreSpeed = prespeed;
+				PrespeedMenu(client);
+			}
+			case ZoneGroup:
+			{
+				// Hook zone zonegroup
+				int zgrp = StringToInt(sText);
+				if (zgrp < 1 || zgrp > 35)
+				{
+					CPrintToChat(client, "%t", "Hooks2", g_szChatPrefix);
+					return Plugin_Handled;
+				}
+				g_iZonegroupHook[client] = zgrp;
+				CPrintToChat(client, "%t", "Hooks3", g_szChatPrefix, zgrp);
+			}
+			case MaxVelocity:
+			{
+				// Maxvelocity for map
+				float maxvelocity = StringToFloat(sText);
+				if (maxvelocity < 1.0)
+					maxvelocity = 10000.0;
+				g_fMaxVelocity = maxvelocity;
+				db_updateMapSettings();
+				MaxVelocityMenu(client);
+				CPrintToChat(client, "%t", "Hooks4", g_szChatPrefix, g_szMapName, maxvelocity);
+			}
+			case TargetName:
+			{
+				// Zone set clients Target Name
+				if (StrEqual(sText, "reset"))
+					Format(sText, sizeof(sText), "player");
+
+				Format(g_mapZones[g_ClientSelectedZone[client]].TargetName, sizeof(MapZone::TargetName), "%s", sText);
+
+				CPrintToChat(client, "%t", "Hooks5", g_szChatPrefix, g_szZoneDefaultNames[g_CurrentZoneType[client]], g_mapZones[g_ClientSelectedZone[client]].ZoneTypeId, sText);
+
+				EditorMenu(client);
+			}
+			case ClientEdit:
+			{
+				// Deleting records
+				g_SelectedType[client] = StringToInt(sText);
+				char szQuery[512];
+
+				switch(g_SelectedEditOption[client])
+				{
+					case 0:
+					{
+						FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_playertimes", g_EditingMap[client], g_SelectedStyle[client], "", "runtimepro");
+					}
+					case 1:
+					{
+						char stageQuery[32];
+						FormatEx(stageQuery, 32, "AND stage='%i' ", g_SelectedType[client]);
+						FormatEx(szQuery, 512, sql_MainEditQuery, "runtimepro", "ck_wrcps", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtimepro");
+					}
+					case 2:
+					{
+						char stageQuery[32];
+						FormatEx(stageQuery, 32, "AND zonegroup='%i' ", g_SelectedType[client]);
+						FormatEx(szQuery, 512, sql_MainEditQuery, "runtime", "ck_bonus", g_EditingMap[client], g_SelectedStyle[client], stageQuery, "runtime");
+					}
+				}
+
+				SQL_TQuery(g_hDb, sql_DeleteMenuView, szQuery, GetClientSerial(client));
+			}
+			case ColorValue:
+			{
+				//COLOR VALUE FOR CENTER SPEED
+				int color_value = StringToInt(sText);
+
+				//KEEP VALUES BETWEEN 0-255
+				if(color_value > 255)
+					color_value = 255;
+				else if(color_value < 0)
+					color_value = 0;
+
+				switch(g_iColorChangeIndex[client]){
+					case 0: g_iCSD_R[client] = color_value;
+					case 1: g_iCSD_G[client] = color_value;
+					case 2: g_iCSD_B[client] = color_value;
+				}
+				CSDOptions(client);
+			}
+		}
+
+		g_iWaitingForResponse[client] = None;
+		return Plugin_Handled;
+	}
+
+	if (!GetConVarBool(g_henableChatProcessing))
+		return Plugin_Continue;
+
+	// !s & !stage Commands
+	if (StrContains(sText, "!s", false) == 0 || StrContains(sText, "!stage", false) == 0)
+		return Plugin_Handled;
+
+	// !b & !bonus Commands
+	if (StrContains(sText, "!b", false) == 0 || StrContains(sText, "!bonus", false) == 0)
+		return Plugin_Handled;
+
+	// Empty Message
+	if (StrEqual(sText, " ") || !sText[0])
+		return Plugin_Handled;
+
+	// Spam check
+	if (checkSpam(client))
+		return Plugin_Handled;
+
+	parseColorsFromString(sText, 1024);
+
+	// Lowercase
+	if ((sText[0] == '/') || (sText[0] == '!'))
+	{
+		if (IsCharUpper(sText[1]))
+		{
+			for (int i = 0; i <= strlen(sText); ++i)
+				sText[i] = CharToLower(sText[i]);
+			FakeClientCommand(client, "say %s", sText);
+			return Plugin_Handled;
+		}
+	}
+
+	// Hide ! commands
+	if (StrContains(sText, "!", false) == 0)
+		return Plugin_Handled;
+
+	if ((IsChatTrigger() && sText[0] == '/') || (sText[0] == '@' && (GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)))
+		return Plugin_Continue;
+
+	char szName[64];
+	GetClientName(client, szName, 64);
+	RemoveColors(szName, 64);
+
+	// log the chat of the player to the server so that tools such as HLSW/HLSTATX see it and also it remains logged in the log file
+	WriteChatLog(client, "say", sText);
+	PrintToServer("%s: %s", szName, sText);
+
+	// Name colors
+	if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
+		setNameColor(szName, g_iCustomColours[client][0], 64);
+
+	// Text colors
+	if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client] && g_bHasCustomTextColour[client])
+		setTextColor(sText, g_iCustomColours[client][1], 1024);
+
+	if (GetClientTeam(client) == 1)
+	{
+		// Client is a spectator
+		PrintSpecMessageAll(client);
+		return Plugin_Handled;
+	}
+	else
+	{
+		if (GetConVarBool(g_hPointSystem))
+		{
+			// Constructing the message
+			char szChatRank[1024];
+			Format(szChatRank, sizeof(szChatRank), "%s", g_pr_chat_coloredrank[client]);
+
+			char szChatRankColor[1024];
+			Format(szChatRankColor, sizeof(szChatRankColor), "%s", g_pr_chat_coloredrank[client]);
+			CGetRankColor(szChatRankColor, sizeof(szChatRankColor));
+
+			if (GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
+				Format(szName, sizeof(szName), "{%s}%s", szChatRankColor, szName);
+
+			if (GetConVarBool(g_hCountry)) {	// With country code
+				if (IsPlayerAlive(client))
+					CPrintToChatAll("%t", "Hooks6", g_szCountryCode[client], szChatRank, szName, sText);
+				else
+					CPrintToChatAll("%t", "Hooks7", g_szCountryCode[client], szChatRank, szName, sText);
+				return Plugin_Handled;
+			} 
+			else								// Without country code
+			{
+				if (IsPlayerAlive(client))
+					CPrintToChatAll("%t", "Hooks8", szChatRank, szName, sText);
+				else
+					CPrintToChatAll("%t", "Hooks9", szChatRank, szName, sText);
 				return Plugin_Handled;
 			}
 		}
-
-		// Hide ! commands
-		if (StrContains(sText, "!", false) == 0)
-			return Plugin_Handled;
-
-		if ((IsChatTrigger() && sText[0] == '/') || (sText[0] == '@' && (GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)))
-			return Plugin_Continue;
-
-		char szName[64];
-		GetClientName(client, szName, 64);
-		RemoveColors(szName, 64);
-
-		// log the chat of the player to the server so that tools such as HLSW/HLSTATX see it and also it remains logged in the log file
-		WriteChatLog(client, "say", sText);
-		PrintToServer("%s: %s", szName, sText);
-
-		// Name colors
-		if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
-			setNameColor(szName, g_iCustomColours[client][0], 64);
-
-		// Text colors
-		if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client] && g_bHasCustomTextColour[client])
-			setTextColor(sText, g_iCustomColours[client][1], 1024);
-
-		if (GetClientTeam(client) == 1)
-		{
-			// Client is a spectator
-			PrintSpecMessageAll(client);
-			return Plugin_Handled;
-		}
-		else
-		{
-			if (GetConVarBool(g_hPointSystem))
-			{
-				// Constructing the message
-				char szChatRank[1024];
-				Format(szChatRank, sizeof(szChatRank), "%s", g_pr_chat_coloredrank[client]);
-
-				char szChatRankColor[1024];
-				Format(szChatRankColor, sizeof(szChatRankColor), "%s", g_pr_chat_coloredrank[client]);
-				CGetRankColor(szChatRankColor, sizeof(szChatRankColor));
-
-				if (GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
-					Format(szName, sizeof(szName), "{%s}%s", szChatRankColor, szName);
-
-				if (GetConVarBool(g_hCountry)) {	// With country code
-					if (IsPlayerAlive(client))
-						CPrintToChatAll("%t", "Hooks6", g_szCountryCode[client], szChatRank, szName, sText);
-					else
-						CPrintToChatAll("%t", "Hooks7", g_szCountryCode[client], szChatRank, szName, sText);
-					return Plugin_Handled;
-				} 
-				else								// Without country code
-				{
-					if (IsPlayerAlive(client))
-						CPrintToChatAll("%t", "Hooks8", szChatRank, szName, sText);
-					else
-						CPrintToChatAll("%t", "Hooks9", szChatRank, szName, sText);
-					return Plugin_Handled;
-				}
-			}
-		}
 	}
+
 	return Plugin_Continue;
 }
 
