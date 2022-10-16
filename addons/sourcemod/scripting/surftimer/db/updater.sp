@@ -88,6 +88,27 @@ void CheckDatabaseForUpdates()
 			return;
 		}
 
+		// Version 13 - Start
+		char sQuery[512];
+		FormatEx(sQuery, sizeof(sQuery), "SELECT CHARACTER_MAXIMUM_LENGTH FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='ck_playertimes' AND COLUMN_NAME='name';", g_sDatabaseName);
+		DBResultSet results = SQL_Query(g_hDb, sQuery);
+
+		if (results != null)
+		{
+			if (results.HasResults && results.FetchRow())
+			{
+				if (results.FetchInt(0) < 128)
+				{
+					db_upgradeDatabase(13);
+					delete results;
+					return;
+				}
+			}
+
+			delete results;
+		}
+		// Version 13 - End
+
 		LogMessage("Version 12 looks good.");
 	}
 }
@@ -186,6 +207,13 @@ public void db_upgradeDatabase(int ver)
 	else if (ver == 12)
 	{
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_checkpoints ADD stage_time decimal(12, 6) NOT NULL DEFAULT '-1.000000', ADD stage_attempts INT NOT NULL DEFAULT '0';");
+	}
+	else if (ver == 13)
+	{
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_bonus MODIFY name VARCHAR(128);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_latestrecords MODIFY name VARCHAR(128);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playertimes MODIFY name VARCHAR(128);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_prinfo MODIFY name VARCHAR(128);");
 	}
 
 	CheckDatabaseForUpdates();
