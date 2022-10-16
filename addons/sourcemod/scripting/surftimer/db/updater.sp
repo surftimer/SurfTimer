@@ -210,9 +210,12 @@ public void db_upgradeDatabase(int ver)
 	}
 	else if (ver == 13)
 	{
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_announcements MODIFY name VARCHAR(128);");
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_bonus MODIFY name VARCHAR(128);");
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_latestrecords MODIFY name VARCHAR(128);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank MODIFY name VARCHAR(128);");
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playertimes MODIFY name VARCHAR(128);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_wrcps MODIFY name VARCHAR(128);");
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_prinfo MODIFY name VARCHAR(128);");
 	}
 
