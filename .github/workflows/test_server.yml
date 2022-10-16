@@ -89,7 +89,18 @@ jobs:
           done
         working-directory: ${{ env.SCRIPTING_PATH }}
 
-      - name: Upload files
+      - name: Upload files to EU
+        uses: SamKirkland/FTP-Deploy-Action@2.0.0
+        env:
+          FTP_SERVER: ${{ secrets.SFTP_HOST_EU }}
+          FTP_USERNAME: ${{ secrets.SFTP_USER_EU }}
+          FTP_PASSWORD: ${{ secrets.SFTP_PASS_EU }}
+          LOCAL_DIR: upload
+          METHOD: sftp
+          PORT: ${{ secrets.SFTP_PORT_EU }}
+          ARGS: --no-empty-dirs
+
+      - name: Upload files to NA
         uses: SamKirkland/FTP-Deploy-Action@2.0.0
         env:
           FTP_SERVER: ${{ secrets.SFTP_HOST }}
@@ -100,7 +111,17 @@ jobs:
           PORT: ${{ secrets.SFTP_PORT }}
           ARGS: --no-empty-dirs
 
-      - name: Restart test server
+      - name: Restart EU test server
+        shell: bash
+        run: |
+          curl --request POST \
+            --url ${{ secrets.BASE_URL_EU }}api/client/servers/${{ secrets.SERVER_ID_EU }}/power \
+            --header 'Accept: application/json' \
+            --header 'Authorization: Bearer ${{ secrets.API_KEY_EU }}' \
+            --header 'Content-Type: application/json' \
+            --data '{ "signal": "restart" }'
+
+      - name: Restart NA test server
         shell: bash
         run: |
           curl --request POST \
