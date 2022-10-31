@@ -93,7 +93,7 @@ void CheckDatabaseForUpdates()
 		FormatEx(sQuery, sizeof(sQuery), "SELECT CHARACTER_MAXIMUM_LENGTH FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='ck_playertimes' AND COLUMN_NAME='name';", g_sDatabaseName);
 		DBResultSet results = SQL_Query(g_hDb, sQuery);
 
-		if (results != null && results.HasResults && results.FetchRow() && results.FetchInt(0) < 128)
+		if (results != null && results.HasResults && results.FetchRow() && results.FetchInt(0) < 64)
 		{
 			db_upgradeDatabase(13, true);
 			delete results;
@@ -206,13 +206,13 @@ void db_upgradeDatabase(int ver, bool skipErrorCheck = false)
 	}
 	else if (ver == 13)
 	{
-		SQL_FastQuery(g_hDb, "ALTER TABLE ck_announcements MODIFY name VARCHAR(128);");
-		SQL_FastQuery(g_hDb, "ALTER TABLE ck_bonus MODIFY name VARCHAR(128);");
-		SQL_FastQuery(g_hDb, "ALTER TABLE ck_latestrecords MODIFY name VARCHAR(128);");
-		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank MODIFY name VARCHAR(128);");
-		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playertimes MODIFY name VARCHAR(128);");
-		SQL_FastQuery(g_hDb, "ALTER TABLE ck_wrcps MODIFY name VARCHAR(128);");
-		SQL_FastQuery(g_hDb, "ALTER TABLE ck_prinfo MODIFY name VARCHAR(128);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_announcements MODIFY name VARCHAR(64);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_bonus MODIFY name VARCHAR(64);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_latestrecords MODIFY name VARCHAR(64);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank MODIFY name VARCHAR(64);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playertimes MODIFY name VARCHAR(64);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_wrcps MODIFY name VARCHAR(64);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_prinfo MODIFY name VARCHAR(64);");
 	}
 
 	CheckDatabaseForUpdates();
