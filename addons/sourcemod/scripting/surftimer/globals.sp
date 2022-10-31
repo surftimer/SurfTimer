@@ -1545,7 +1545,7 @@ char RadioCMDS[][] =  // Disable radio commands
 	"go_b", "sorry", "needrop", "playerradio", "playerchatwheel", "chatwheel_ping", "player_ping"
 };
 
-char g_sDatabaseName[32]; // Required for the float to decimal conversion
+char g_sDatabaseName[64]; // Required for the float to decimal conversion
 char g_sDecimalTables[][][] = {
 	// Table,              Column
 	{ "ck_bonus",         "runtime", },
