@@ -40,7 +40,7 @@ Less bugs = better experience = more players for surf!
 * Download latest [release](https://github.com/surftimer/SurfTimer/releases/latest) and upload all the files to your csgo server directory
 * Set up A MySQL Database (MySQL 5.7, MySQL 8+, MariaDB supported) and [initialise a schema for surftimer](https://github.com/surftimer/SurfTimer/blob/master/scripts/mysql-files/fresh_install.sql)
 * Add a MySQL database called surftimer to csgo/addons/sourcemod/configs/databases.cfg
-* Ensure [End-Touch-Fix](https://github.com/rumourA/End-Touch-Fix) is loaded, this is required to ensure times are always accurate (note: this should be included and loaded by SurfTimer automatically without installing separately)
+* Ensure [End-Touch-Fix](https://github.com/rumourA/End-Touch-Fix) is loaded, this is required to ensure times are always accurate (note: this is included in the official SurfTimer release build and loaded automatically without installing separately unless you are building SurfTimer yourself)
 * Ensure you have added all the requirements below
 
 ## Installation common errors
