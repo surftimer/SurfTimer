@@ -4559,7 +4559,10 @@ public void SQL_insertBonusCallback(Handle owner, Handle hndl, const char[] erro
 }
 
 public void db_updateBonus(int client, char szSteamId[32], char szUName[128], float FinalTime, int zoneGrp)
-{
+{	
+	if (g_bPracticeMode[client])
+		return;
+	
 	char szQuery[1024];
 	char szName[MAX_NAME_LENGTH * 2 + 1];
 	Handle datapack = CreateDataPack();
@@ -8044,7 +8047,10 @@ public void db_viewMapRankBonusStyleCallback(Handle owner, Handle hndl, const ch
 }
 
 public void db_updateBonusStyle(int client, char szSteamId[32], char szUName[128], float FinalTime, int zoneGrp, int style)
-{
+{	
+	if (g_bPracticeMode[client])
+		return;
+	
 	char szQuery[1024];
 	char szName[MAX_NAME_LENGTH * 2 + 1];
 	Handle datapack = CreateDataPack();
