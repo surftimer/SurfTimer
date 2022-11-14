@@ -625,7 +625,10 @@ public Action Command_normalMode(int client, int args)
 		return Plugin_Handled;
 
 	Client_Stop(client, 1);
-	CreateTimer(0.1, DisablePrac, GetClientSerial(client));
+
+	if (g_bPracticeMode[client])
+		g_bPracticeMode[client] = false;
+
 	Command_Restart(client, 1);
 
 	CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
@@ -1250,7 +1253,7 @@ public Action Command_ToBonus(int client, int args)
 
 	if (g_bPracticeMode[client])
 	{
-		CreateTimer(0.1, DisablePrac, GetClientSerial(client));
+		g_bPracticeMode[client] = false;
 		CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
 	}
 	return Plugin_Handled;
@@ -1375,7 +1378,7 @@ public Action Command_ToStage(int client, int args)
 
 	if (g_bPracticeMode[client])
 	{
-		CreateTimer(0.1, DisablePrac, GetClientSerial(client));
+		g_bPracticeMode[client] = false;
 		CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
 	}
 
@@ -1438,7 +1441,7 @@ public Action Command_Restart(int client, int args)
 	teleportClient(client, 0, 1, true);
 	if (g_bPracticeMode[client])
 	{
-		CreateTimer(0.1, DisablePrac, GetClientSerial(client));
+		g_bPracticeMode[client] = false;
 		CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
 	}
 	return Plugin_Handled;

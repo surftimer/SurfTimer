@@ -1219,6 +1219,8 @@ public void SetClientDefaults(int client)
 
 	g_ClientRenamingZone[client] = false;
 
+	g_bPracticeModeRun[client] = false;
+
 	g_bNewReplay[client] = false;
 	g_bNewBonus[client] = false;
 

@@ -2398,7 +2398,8 @@ public void SQL_CurrentRunRankCallback(Handle owner, Handle hndl, const char[] e
 		rank = SQL_FetchInt(hndl, 0);
 	}
 
-	if(g_bPracticeMode[client]){
+	if(g_bPracticeModeRun[client])
+	{
 
 		float runtime = g_fCurrentRunTime[client];
 		float f_srDiff;
@@ -2480,7 +2481,7 @@ public void SQL_CurrentRunRank_StagePracCallback(Handle owner, Handle hndl, cons
 // Called when a player finishes a map
 public void db_selectRecord(int client)
 {
-	if (!IsValidClient(client))
+	if (!IsValidClient(client) || g_bPracticeMode[client])
 		return;
 
 	char szQuery[255];
@@ -4215,7 +4216,8 @@ public void db_viewBonusRunRank(Handle owner, Handle hndl, const char[] error, a
 		rank = SQL_FetchInt(hndl, 0);
 	}
 
-	if(g_bPracticeMode[client]){
+	if(g_bPracticeModeRun[client])
+	{
 		float runtime = g_fCurrentRunTime[client];
 		char sz_srDiff[128];
 		float f_srDiff;
@@ -4524,7 +4526,10 @@ public void SQL_selectBonusTotalCountCallback(Handle owner, Handle hndl, const c
 }
 
 public void db_insertBonus(int client, char szSteamId[32], char szUName[128], float FinalTime, int zoneGrp)
-{
+{	
+	if (g_bPracticeMode[client])
+		return;
+	
 	char szQuery[1024];
 	char szName[MAX_NAME_LENGTH * 2 + 1];
 	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH * 2 + 1);
@@ -6540,7 +6545,7 @@ public void sql_selectTotalStageCountCallback(Handle owner, Handle hndl, const c
 
 public void db_selectWrcpRecord(int client, int style, int stage)
 {
-	if (!IsValidClient(client) || IsFakeClient(client) || g_bUsingStageTeleport[client])
+	if (!IsValidClient(client) || IsFakeClient(client) || g_bUsingStageTeleport[client] || g_bPracticeMode[client])
 		return;
 
 	if (stage > g_TotalStages) // Hack fix for multiple end zones
@@ -7953,7 +7958,10 @@ public void db_selectStyleMapTopSurfers(int client, char mapname[128], int style
 
 // Styles for bonuses
 public void db_insertBonusStyle(int client, char szSteamId[32], char szUName[128], float FinalTime, int zoneGrp, int style)
-{
+{	
+	if (g_bPracticeMode[client])
+		return;
+	
 	char szQuery[1024];
 	char szName[MAX_NAME_LENGTH * 2 + 1];
 	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH * 2 + 1);
