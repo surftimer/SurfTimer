@@ -88,13 +88,30 @@ void CheckDatabaseForUpdates()
 			return;
 		}
 
-		LogMessage("Version 12 looks good.");
+		// Version 13 - Start
+		char sQuery[512];
+		FormatEx(sQuery, sizeof(sQuery), "SELECT CHARACTER_MAXIMUM_LENGTH FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='ck_playertimes' AND COLUMN_NAME='name';", g_sDatabaseName);
+		DBResultSet results = SQL_Query(g_hDb, sQuery);
+
+		if (results != null && results.HasResults && results.FetchRow() && results.FetchInt(0) < 64)
+		{
+			db_upgradeDatabase(13, true);
+			delete results;
+			return;
+		}
+		
+		// Version 13 - End
+
+		LogMessage("Version 13 looks good.");
 	}
 }
 
-public void db_upgradeDatabase(int ver)
+void db_upgradeDatabase(int ver, bool skipErrorCheck = false)
 {
-	LogUpgradeError(ver);
+	if (!skipErrorCheck)
+	{
+		LogUpgradeError(ver);
+	}
 
 	if (ver == 0)
 	{
@@ -186,6 +203,16 @@ public void db_upgradeDatabase(int ver)
 	else if (ver == 12)
 	{
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_checkpoints ADD stage_time decimal(12, 6) NOT NULL DEFAULT '-1.000000', ADD stage_attempts INT NOT NULL DEFAULT '0';");
+	}
+	else if (ver == 13)
+	{
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_announcements MODIFY name VARCHAR(64);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_bonus MODIFY name VARCHAR(64);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_latestrecords MODIFY name VARCHAR(64);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank MODIFY name VARCHAR(64);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playertimes MODIFY name VARCHAR(64);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_wrcps MODIFY name VARCHAR(64);");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_prinfo MODIFY name VARCHAR(64);");
 	}
 
 	CheckDatabaseForUpdates();
@@ -284,7 +311,7 @@ public void SQLCheckDataType(Handle owner, Handle hndl, const char[] error, Data
 
 			if (!g_bRenaming && !g_bInTransactionChain && (IsServerProcessing() || !cvHibernateWhenEmpty.BoolValue))
 			{
-				LogToFileEx(g_szLogFile, "[surftimer] Starting to load server settings");
+				LogQueryTime("[surftimer] Starting to load server settings");
 				g_fServerLoading[0] = GetGameTime();
 				db_selectMapZones();
 			}

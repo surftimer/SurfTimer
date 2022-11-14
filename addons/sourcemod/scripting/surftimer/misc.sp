@@ -1219,6 +1219,8 @@ public void SetClientDefaults(int client)
 
 	g_ClientRenamingZone[client] = false;
 
+	g_bPracticeModeRun[client] = false;
+
 	g_bNewReplay[client] = false;
 	g_bNewBonus[client] = false;
 
@@ -1586,6 +1588,18 @@ public void PlayWRCPRecord()
 			EmitSoundToClientNoPreCache(i, g_szRelativeSoundPathWRCP);
 		}
 	}
+}
+
+public void AddRadarImages()
+{
+	char szRadarImage[PLATFORM_MAX_PATH];
+
+	Format(szRadarImage, sizeof(szRadarImage), "resource/overviews/%s_radar.dds", g_szMapName);
+	
+	if (FileExists(szRadarImage))
+		AddFileToDownloadsTable(szRadarImage);
+	else
+		PrintToServer("[SurfTimer] No radar image found: %s", szRadarImage);
 }
 
 public void InitPrecache()
@@ -4729,18 +4743,6 @@ public void TeleportToSaveloc(int client, int id)
 	TeleportEntity(client, g_fSaveLocCoords[client][id], g_fSaveLocAngle[client][id], g_fSaveLocVel[client][id]);
 }
 
-public Action DisablePrac(Handle timer, any data)//saveloc on start > startpos
-{
-	int client = GetClientFromSerial(data);
-	
-	if (client > 0)
-	{
-		g_bPracticeMode[client] = false;
-	}
-
-	return Plugin_Handled;
-}
-
 public void ReadDefaultTitlesWhitelist()
 {
 	ClearArray(g_DefaultTitlesWhitelist);
@@ -5541,5 +5543,20 @@ public void resetCCPDefaults(int client){
 		g_iCCP_StageAttempts_Player[client][i] = 0;
 		g_iCCP_StageRank_Player[client][i] = 0;
 		g_iCCP_StageTotal_Player[client][i] = 0;	
+	}
+}
+
+void LogQueryTime(const char[] format, any ...)
+{
+	char sMessage[512];
+	VFormat(sMessage, sizeof(sMessage), format, 2);
+
+	if (g_hLogQueryTimes.BoolValue)
+	{
+		LogToFileEx(g_szLogFile, sMessage);
+	}
+	else
+	{
+		PrintToServer(sMessage);
 	}
 }

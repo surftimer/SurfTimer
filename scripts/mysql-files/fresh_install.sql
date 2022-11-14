@@ -4,7 +4,7 @@ USE surftimer;
 CREATE TABLE IF NOT EXISTS ck_announcements (
     `id` int(11) NOT NULL AUTO_INCREMENT, 
     `server` varchar(256) NOT NULL DEFAULT 'Beginner', 
-    `name` varchar(32) NOT NULL, 
+    `name` varchar(64) NOT NULL, 
     `mapname` varchar(128) NOT NULL, 
     `mode` int(11) NOT NULL DEFAULT '0', 
     `time` varchar(32) NOT NULL, 
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS ck_announcements (
 
 CREATE TABLE IF NOT EXISTS ck_bonus (
     `steamid` VARCHAR(32), 
-    `name` VARCHAR(32), 
+    `name` VARCHAR(64), 
     `mapname` VARCHAR(32), 
     `runtime` decimal(12,6) NOT NULL DEFAULT '-1.000000', 
     `velStartXY` SMALLINT(6) NOT NULL DEFAULT 0, 
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS ck_checkpoints (
 
 CREATE TABLE IF NOT EXISTS ck_latestrecords (
     `steamid` VARCHAR(32), 
-    `name` VARCHAR(32), 
+    `name` VARCHAR(64), 
     `runtime` decimal(12,6) NOT NULL DEFAULT '-1.000000', 
     `map` VARCHAR(32), 
     `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS ck_playeroptions2 (
 CREATE TABLE IF NOT EXISTS ck_playerrank (
     `steamid` varchar(32) NOT NULL DEFAULT '', 
     `steamid64` varchar(64) DEFAULT NULL, 
-    `name` varchar(32) DEFAULT NULL, 
+    `name` varchar(64) DEFAULT NULL, 
     `country` varchar(32) DEFAULT NULL, 
     `countryCode` varchar(3) DEFAULT NULL, 
     `continentCode` varchar(3) DEFAULT NULL, 
@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS ck_playertemp (
 CREATE TABLE IF NOT EXISTS ck_playertimes (
     `steamid` VARCHAR(32), 
     `mapname` VARCHAR(32), 
-    `name` VARCHAR(32), 
+    `name` VARCHAR(64), 
     `runtimepro` decimal(12,6) NOT NULL DEFAULT '-1.000000', 
     `velStartXY` SMALLINT(6) NOT NULL DEFAULT 0, 
     `velStartXYZ` SMALLINT(6) NOT NULL DEFAULT 0, 
@@ -200,7 +200,7 @@ CREATE TABLE IF NOT EXISTS ck_vipadmins (
 
 CREATE TABLE IF NOT EXISTS ck_wrcps (
     `steamid` varchar(32) NOT NULL DEFAULT '', 
-    `name` varchar(32) DEFAULT NULL, 
+    `name` varchar(64) DEFAULT NULL, 
     `mapname` varchar(32) NOT NULL DEFAULT '', 
     `runtimepro` decimal(12,6) NOT NULL DEFAULT '-1.000000', 
     `velStartXY` smallint(6) NOT NULL DEFAULT 0, 
@@ -238,7 +238,7 @@ CREATE TABLE IF NOT EXISTS ck_zones (
 
 CREATE TABLE IF NOT EXISTS ck_prinfo (
     `steamid` VARCHAR(32), 
-    `name` VARCHAR(32), 
+    `name` VARCHAR(64), 
     `mapname` VARCHAR(32), 
     `runtime` decimal(12,6) NOT NULL DEFAULT '-1.000000', 
     `zonegroup` INT(12) NOT NULL DEFAULT '0', 

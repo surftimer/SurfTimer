@@ -411,6 +411,15 @@ public void StartTouch(int client, int action[3])
 				g_bInJump[client] = false;
 				g_bInDuck[client] = false;
 
+				if (g_bPracticeMode[client])
+				{
+					g_bPracticeModeRun[client] = true;
+				}
+				else
+				{
+					g_bPracticeModeRun[client] = false;
+				}
+
 				// fluffys wrcps
 				if (g_bhasStages)
 				{

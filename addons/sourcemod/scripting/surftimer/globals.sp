@@ -1152,6 +1152,12 @@ char g_szCountry[MAXPLAYERS + 1][100];
 char g_szCountryCode[MAXPLAYERS + 1][3];
 char g_szContinentCode[MAXPLAYERS + 1][3];
 
+// mappers name
+char g_szMapperName[32];
+
+// mapper name null?
+bool g_bMapperNameFound;
+
 // Client's steamID
 char g_szSteamID[MAXPLAYERS + 1][32];
 
@@ -1282,6 +1288,9 @@ bool g_bCreatedTeleport[MAXPLAYERS + 1];
 
 // Client is in the practice mode
 bool g_bPracticeMode[MAXPLAYERS + 1];
+
+//did client finish run in practice mode or not?
+bool g_bPracticeModeRun[MAXPLAYERS +1];
 
 /*----------  Reports  ----------*/
 bool g_bReportSuccess[MAXPLAYERS + 1];
@@ -1545,7 +1554,7 @@ char RadioCMDS[][] =  // Disable radio commands
 	"go_b", "sorry", "needrop", "playerradio", "playerchatwheel", "chatwheel_ping", "player_ping"
 };
 
-char g_sDatabaseName[32]; // Required for the float to decimal conversion
+char g_sDatabaseName[64]; // Required for the float to decimal conversion
 char g_sDecimalTables[][][] = {
 	// Table,              Column
 	{ "ck_bonus",         "runtime", },

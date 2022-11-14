@@ -159,6 +159,9 @@ public void OnMapStart()
 	// Get mapname
 	GetCurrentMap(g_szMapName, 128);
 
+	// Download map radar image if existing
+	AddRadarImages();
+	
 	// Create nav file
 	CreateNavFile();
 
@@ -177,22 +180,26 @@ public void OnMapStart()
 
 	// Load spawns
 	if (!g_bRenaming && !g_bInTransactionChain)
+	{
 		checkSpawnPoints();
+	}
 
 	db_viewMapSettings();
 
 	/// Start Loading Server Settings
 	ConVar cvHibernateWhenEmpty = FindConVar("sv_hibernate_when_empty");
 	
-	if(g_tables_converted){
+	if(g_tables_converted)
+	{
 		if (!g_bRenaming && !g_bInTransactionChain && (IsServerProcessing() || !cvHibernateWhenEmpty.BoolValue))
 		{
-			LogToFileEx(g_szLogFile, "[surftimer] Starting to load server settings");
+			LogQueryTime("[surftimer] Starting to load server settings");
 			g_fServerLoading[0] = GetGameTime();
 			db_selectMapZones();
 		}
 	}
-	else{
+	else
+	{
 		CreateTimer(1.0, DatabaseUpgrading, INVALID_HANDLE, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	}
 
@@ -214,7 +221,9 @@ public void OnMapStart()
 	}
 
 	for (int i = 0; i < MAX_STYLES; i++)
+	{
 		g_bReplayTickFound[i] = false;
+	}
 
 	// Precache
 	InitPrecache();
@@ -246,7 +255,9 @@ public void OnMapStart()
 	// Hook Zones
 	iEnt = -1;
 	if (g_hTriggerMultiple != null)
+	{
 		CloseHandle(g_hTriggerMultiple);
+	}
 
 	g_hTriggerMultiple = CreateArray(256);
 	while ((iEnt = FindEntityByClassname(iEnt, "trigger_multiple")) != -1)

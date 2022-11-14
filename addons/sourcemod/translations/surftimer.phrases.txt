@@ -1014,6 +1014,26 @@
 		"#format"	"{1:s}"
 		"en"		"{1} Usage: sm_addmaptier <Tier>"
 	}
+	"NoTierEntry"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Tier entry not found. Use sm_addmaptier <Tier> to add a tier first."
+	}
+	"UpdateMapperName"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"{1} Mapper name already exists, updating to: {2}"
+	}
+	"InsertMapperName"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"{1} Setting mapper name to: {2}"
+	}
+	"MapperNameUsage"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Usage: sm_addmappername <String>"
+	}
 	"Admin6"
 	{
 		"#format"	"{1:s}"

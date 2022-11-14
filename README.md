@@ -6,6 +6,7 @@ This is an open source timer plugin made for CS:GO.
 
 SurfTimer Test Servers:
  - North America: `connect na-test-server.surftimer.dev`
+ - Europe: `connect eu-test-server.surftimer.dev:27045`
 
 ## Project Goals
 
@@ -37,16 +38,16 @@ Less bugs = better experience = more players for surf!
 * Download and install [Metamod 1.11](https://www.sourcemm.net/downloads.php/?branch=stable)
 * Download and install [SourceMod 1.10](https://www.sourcemod.net/downloads.php?branch=stable) (latest stable) or [SourceMod 1.11](https://www.sourcemod.net/downloads.php?branch=master&all=1) (required for some recommended plugins)
 * Download latest [release](https://github.com/surftimer/SurfTimer/releases/latest) and upload all the files to your csgo server directory
-* Set up A MySQL Database (MySQL 5.7, MySQL 8+, MariaDB supported)
+* Set up A MySQL Database (MySQL 5.7, MySQL 8+, MariaDB supported) and [initialise a schema for surftimer](https://github.com/surftimer/SurfTimer/blob/master/scripts/mysql-files/fresh_install.sql)
 * Add a MySQL database called surftimer to csgo/addons/sourcemod/configs/databases.cfg
-* Ensure [End-Touch-Fix](https://github.com/rumourA/End-Touch-Fix) is loaded, this is required to ensure times are always accurate
+* Ensure [End-Touch-Fix](https://github.com/rumourA/End-Touch-Fix) is loaded, this is required to ensure times are always accurate (note: this is included in the official SurfTimer release build and loaded automatically without installing separately unless you are compiling SurfTimer yourself)
 * Ensure you have added all the requirements below
 
 ## Installation common errors
 <details>
   <summary>[SurfTimer] Database tables could not be created! Error: Lost connection to MySQL server during query</summary>
 
-Run the following [queries](https://github.com/surftimer/SurfTimer/blob/master/scripts/mysql-files/fresh_install.sql) on your database:
+Run the following [queries](https://github.com/surftimer/SurfTimer/blob/master/scripts/mysql-files/fresh_install.sql) on your database
 
 </details>
 
@@ -73,10 +74,15 @@ Run the following queries on your database:
 ## Requirements
 
 **SourceMod Extensions**
-* [DHooks](https://github.com/peace-maker/DHooks2)
+* (\*) [DHooks](https://github.com/peace-maker/DHooks2)
 * *(recommended)* [Cleaner](https://github.com/Accelerator74/Cleaner) - Suppresses server console warnings
 
+(\*) *Already included with SourceMod 1.11.6820 and newer*
+
 **SourceMod Libraries**
+
+ℹ️ SourceMod Libraries are only required if you are compiling SurfTimer yourself
+
 * [SMLib](https://github.com/bcserv/smlib/tree/transitional_syntax)
 * [ColorLib](https://github.com/c0rp3n/colorlib-sm)
 * [AutoExecConfig](https://github.com/Impact123/AutoExecConfig)
@@ -96,6 +102,7 @@ Run the following queries on your database:
 * *(recommended)* [Stripper:Source](http://www.bailopan.net/stripper/) - Allows adding/modifying/removing entities from a map before it loads (config files included)
 * *(optional)* [Surftimer-Web-Stats](https://github.com/KristianP26/Surftimer-Web-Stats) - Web statistics
 * *(optional)* [Surftimer-Discord-Bot](https://github.com/Sarrus1/SurfTimer-Discord-Bot) - Discord BOT
+* *(optional)* [CSGO-Surf-Load-Screens](https://github.com/Sayt123/CSGO-Surf-Load-Screens) - Map loading images for surf maps
 
 ## Upgrading
 
