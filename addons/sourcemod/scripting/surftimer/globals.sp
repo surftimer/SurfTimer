@@ -1283,6 +1283,9 @@ bool g_bCreatedTeleport[MAXPLAYERS + 1];
 // Client is in the practice mode
 bool g_bPracticeMode[MAXPLAYERS + 1];
 
+//did client finish run in practice mode or not?
+bool g_bPracticeModeRun[MAXPLAYERS +1];
+
 /*----------  Reports  ----------*/
 bool g_bReportSuccess[MAXPLAYERS + 1];
 

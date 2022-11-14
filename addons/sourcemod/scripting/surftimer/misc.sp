@@ -1219,6 +1219,8 @@ public void SetClientDefaults(int client)
 
 	g_ClientRenamingZone[client] = false;
 
+	g_bPracticeModeRun[client] = false;
+
 	g_bNewReplay[client] = false;
 	g_bNewBonus[client] = false;
 
@@ -4739,18 +4741,6 @@ public void TeleportToSaveloc(int client, int id)
 	DispatchKeyValue(client, "targetname", g_szSaveLocTargetname[id]);
 	SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, 0.0 } ));
 	TeleportEntity(client, g_fSaveLocCoords[client][id], g_fSaveLocAngle[client][id], g_fSaveLocVel[client][id]);
-}
-
-public Action DisablePrac(Handle timer, any data)//saveloc on start > startpos
-{
-	int client = GetClientFromSerial(data);
-	
-	if (client > 0)
-	{
-		g_bPracticeMode[client] = false;
-	}
-
-	return Plugin_Handled;
 }
 
 public void ReadDefaultTitlesWhitelist()
