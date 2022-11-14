@@ -64,7 +64,7 @@ public Action Admin_insertMapperName(int client, int args)
 
 	if (args == 0)
 	{
-		CReplyToCommand(client, "\x05GF \x01| Usage: sm_addmappername <String>");
+		CReplyToCommand(client, "%t", "MapperNameUsage", g_szChatPrefix);
 		return Plugin_Handled;
 	}
 	else
