@@ -1152,6 +1152,12 @@ char g_szCountry[MAXPLAYERS + 1][100];
 char g_szCountryCode[MAXPLAYERS + 1][3];
 char g_szContinentCode[MAXPLAYERS + 1][3];
 
+// mappers name
+char g_szMapperName[32];
+
+// mapper name null?
+bool g_bMapperNameFound;
+
 // Client's steamID
 char g_szSteamID[MAXPLAYERS + 1][32];
 

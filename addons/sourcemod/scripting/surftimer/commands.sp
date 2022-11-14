@@ -108,6 +108,8 @@ void CreateCommands()
 	RegConsoleCmd("sm_hookzone", Command_HookZones, "[surftimer] [zoner] Opens up zone hook creation menu.");
 	RegConsoleCmd("sm_addmaptier", Admin_insertMapTier, "[surftimer] [zoner] Changes maps tier");
 	RegConsoleCmd("sm_amt", Admin_insertMapTier, "[surftimer] [zoner] Changes maps tier");
+	RegConsoleCmd("sm_amn", Admin_insertMapperName, "[surftimer] [zoner] Adds mapper name to DB.");
+	RegConsoleCmd("sm_addmappername", Admin_insertMapperName, "[surftimer] [zoner] Adds mapper name to DB.");
 	RegConsoleCmd("sm_addspawn", Admin_insertSpawnLocation, "[surftimer] [zoner] Changes the position !r takes players to");
 	RegConsoleCmd("sm_delspawn", Admin_deleteSpawnLocation, "[surftimer] [zoner] Removes custom !r position");
 	RegConsoleCmd("sm_mapsettings", Admin_MapSettings, "[surftimer] [zoner] Displays menu containing various options to change map settings");

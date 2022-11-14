@@ -51,6 +51,33 @@ public int TopMenuHandler2(Handle topmenu, TopMenuAction action, TopMenuObject o
 	return 0;
 }
 
+public Action Admin_insertMapperName(int client, int args)
+{
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+
+	if (!IsPlayerZoner(client))
+	{
+		CReplyToCommand(client, "%t", "AdminMapperName", g_szChatPrefix);
+		return Plugin_Handled;
+	}
+
+	if (args == 0)
+	{
+		CReplyToCommand(client, "%t", "MapperNameUsage", g_szChatPrefix);
+		return Plugin_Handled;
+	}
+	else
+	{
+		char arg1[64];
+		//char sMapperName[64];
+		GetCmdArgString(arg1, sizeof(arg1));
+
+		db_insertMapperName(client, arg1);
+	}
+	return Plugin_Handled;
+}
+
 public Action Admin_insertMapTier(int client, int args)
 {
 	if (!IsValidClient(client))
