@@ -4040,6 +4040,40 @@ public void db_UpdatePRinfo(int client, char szSteamID[32], int zGroup)
 =              MAPTIER              =
 ===================================*/
 
+public void db_insertMapperName(int client, char arg1[64])
+{	
+	char szQuery[256];
+
+	if (!g_bTierEntryFound)
+	{
+		CReplyToCommand(client, "%t", "NoTierEntry", g_szChatPrefix);
+		return;
+	}
+	if (g_bMapperNameFound)
+	{
+		CReplyToCommand(client, "%t", "UpdateMapperName", g_szChatPrefix, arg1);
+		Format(szQuery, sizeof(szQuery), sql_updateMapperName, arg1, g_szMapName);
+		SQL_TQuery(g_hDb, db_insertMapperNameCallback, szQuery, 1, DBPrio_Low);
+	}
+	else
+	{	
+		CReplyToCommand(client, "%t", "InsertMapperName", g_szChatPrefix, arg1);
+		Format(szQuery, sizeof(szQuery), sql_updateMapperName, arg1, g_szMapName);
+		SQL_TQuery(g_hDb, db_insertMapperNameCallback, szQuery, 1, DBPrio_Low);
+	}
+}
+
+public void db_insertMapperNameCallback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogError("[Surftimer] SQL Error (db_insertMapperNameCallback): %s", error);
+		return;
+	}
+
+	db_selectMapTier();
+}
+
 public void db_insertMapTier(int tier)
 {
 	char szQuery[256];
@@ -4142,11 +4176,31 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 		// Format tier string
 		tier = SQL_FetchInt(hndl, 0);
 		g_bRankedMap = view_as<bool>(SQL_FetchInt(hndl, 1));
+
+		if (SQL_IsFieldNull(hndl, 2))
+		{
+			g_szMapperName = "N/A";
+			g_bMapperNameFound = false;
+		}
+		else
+		{
+			SQL_FetchString(hndl, 2, g_szMapperName, sizeof(g_szMapperName));
+			g_bMapperNameFound = true;
+		}
+
 		if (0 < tier < 9)
 		{
 			g_bTierFound = true;
 			g_iMapTier = tier;
-			Format(g_sTierString, 512, "%c%s %c- ", BLUE, g_szMapName, WHITE);
+			if (g_bMapperNameFound)
+			{	
+				Format(g_sTierString, 512, "%c%s \x01by \x03%s %c- ", BLUE, g_szMapName, g_szMapperName, WHITE);
+			}
+			else
+			{
+				Format(g_sTierString, 512, "%c%s %c- ", BLUE, g_szMapName, WHITE);
+			}
+
 			switch (tier)
 			{
 				case 1:Format(g_sTierString, 512, "%s%cTier %i %c- ", g_sTierString, GRAY, tier, WHITE);
@@ -9209,7 +9263,7 @@ public void db_selectMapImprovementCallback(Handle owner, Handle hndl, const cha
 		if (type == 0)
 		{
 			Menu mi = CreateMenu(MapImprovementMenuHandler);
-			SetMenuTitle(mi, "[Point Reward: %s]\n------------------------------\nTier: %i\n \n[Completion Points]\n \nMap Finish Points: %i\n \n[Map Improvement Groups]\n \n[Group 1] Ranks 11-%i ~ %i Pts\n[Group 2] Ranks %i-%i ~ %i Pts\n[Group 3] Ranks %i-%i ~ %i Pts\n[Group 4] Ranks %i-%i ~ %i Pts\n[Group 5] Ranks %i-%i ~ %i Pts\n \nSR Pts: %i\n \nTotal Completions: %i\n \n",szMapName, tier, mapcompletion, g1top, RoundFloat(g1points), g2bot, g2top, RoundFloat(g2points), g3bot, g3top, RoundFloat(g3points), g4bot, g4top, RoundFloat(g4points), g5bot, g5top, RoundFloat(g5points), iwrpoints, totalplayers);
+			SetMenuTitle(mi, "[Point Reward: %s]\n------------------------------\nTier: %i\n \nMapper: %s\n \n[Completion Points]\n \nMap Finish Points: %i\n \n[Map Improvement Groups]\n \n[Group 1] Ranks 11-%i ~ %i Pts\n[Group 2] Ranks %i-%i ~ %i Pts\n[Group 3] Ranks %i-%i ~ %i Pts\n[Group 4] Ranks %i-%i ~ %i Pts\n[Group 5] Ranks %i-%i ~ %i Pts\n \nSR Pts: %i\n \nTotal Completions: %i\n \n",szMapName, tier, mapcompletion, g1top, RoundFloat(g1points), g2bot, g2top, RoundFloat(g2points), g3bot, g3top, RoundFloat(g3points), g4bot, g4top, RoundFloat(g4points), g5bot, g5top, RoundFloat(g5points), iwrpoints, totalplayers);
 			// AddMenuItem(mi, "", "", ITEMDRAW_SPACER);
 			AddMenuItem(mi, szMapName, "Top 10 Points");
 			SetMenuOptionFlags(mi, MENUFLAG_BUTTON_EXIT);
