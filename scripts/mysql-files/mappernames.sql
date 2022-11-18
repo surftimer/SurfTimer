@@ -5,7 +5,7 @@ CREATE TABLE `ck_maptiermappers` (
   `announcerecord` int(11) NOT NULL DEFAULT '0',
   `gravityfix` int(11) NOT NULL DEFAULT '1',
   `ranked` int(11) NOT NULL DEFAULT '1',
-  `mapper` varchar(255) DEFAULT NULL,
+  `mapper` varchar(255) DEFAULT NULL
 ) DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `ck_maptiermappers` (`mapname`, `tier`, `maxvelocity`, `announcerecord`, `gravityfix`, `ranked`, `mapper`) VALUES
