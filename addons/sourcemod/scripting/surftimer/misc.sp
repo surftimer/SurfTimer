@@ -4804,7 +4804,7 @@ public void LoadDefaultTitle(int client)
 					// Does the user has permissions over the flag?
 					int bit = ReadFlagString(szBuffer);
 					if (CheckCommandAccess(client, "", bit))
-					{;
+					{
 						KvGetString(kv, "title", szBuffer, sizeof(szBuffer));
 						SetDefaultTitle(client, szBuffer);
 						g_iHasEnforcedTitle[client] = true;
