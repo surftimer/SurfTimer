@@ -4791,7 +4791,6 @@ public void LoadDefaultTitle(int client)
 					// Does the steamid match the clients?
 					if (StrEqual(g_szSteamID[client], szBuffer))
 					{
-						PrintToServer("Yes, SteamID.");
 						KvGetString(kv, "title", szBuffer, sizeof(szBuffer));
 						SetDefaultTitle(client, szBuffer);
 						g_iHasEnforcedTitle[client] = true;
