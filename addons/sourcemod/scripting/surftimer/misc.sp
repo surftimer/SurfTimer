@@ -4819,6 +4819,8 @@ public void LoadDefaultTitle(int client)
 						g_iEnforceTitleType[client] = 0;
 					else
 						g_iEnforceTitleType[client] = 2;
+					// If the title is enforced, break the loop
+					break;
 				}
 			} while (KvGotoNextKey(kv));
 		}
