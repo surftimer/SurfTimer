@@ -9036,7 +9036,7 @@ public void db_selectMapImprovement(int client, char szMapName[128])
 {
 	char szQuery[1024];
 
-	Format(szQuery, 1024, "SELECT mapname, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname AND b.style = 0) as total, (SELECT tier FROM ck_maptier b WHERE a.mapname = b.mapname) as tier, (SELECT mapper FROM ck_maptier b WHERE a.mapname = b.mapname) as mapper FROM ck_playertimes a where mapname LIKE '%c%s%c' AND style = 0 LIMIT 1;", PERCENT, szMapName, PERCENT);
+	Format(szQuery, 1024, "SELECT mapname, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname AND b.style = 0) as total, (SELECT tier FROM ck_maptier b WHERE a.mapname = b.mapname) as tier FROM ck_playertimes a where mapname LIKE '%c%s%c' AND style = 0 LIMIT 1;", PERCENT, szMapName, PERCENT);
 	SQL_TQuery(g_hDb, db_selectMapImprovementCallback, szQuery, client, DBPrio_Low);
 }
 
@@ -9050,14 +9050,13 @@ public void db_selectMapImprovementCallback(Handle owner, Handle hndl, const cha
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-		char szMapName[32], szMapper[MAX_NAME_LENGTH];
+		char szMapName[32];
 		int totalplayers;
 		int tier;
 
 		SQL_FetchString(hndl, 0, szMapName, sizeof(szMapName));
 		totalplayers = SQL_FetchInt(hndl, 1);
 		tier = SQL_FetchInt(hndl, 2);
-		SQL_FetchString(hndl, 3, szMapper, sizeof(szMapper));
 
 		g_szMiMapName[client] = szMapName;
 		int type;
@@ -9278,7 +9277,7 @@ public void db_selectMapImprovementCallback(Handle owner, Handle hndl, const cha
 		if (type == 0)
 		{
 			Menu mi = CreateMenu(MapImprovementMenuHandler);
-			SetMenuTitle(mi, "[Point Reward: %s]\n------------------------------\nTier: %i\n \nMapper: %s\n \n[Completion Points]\n \nMap Finish Points: %i\n \n[Map Improvement Groups]\n \n[Group 1] Ranks 11-%i ~ %i Pts\n[Group 2] Ranks %i-%i ~ %i Pts\n[Group 3] Ranks %i-%i ~ %i Pts\n[Group 4] Ranks %i-%i ~ %i Pts\n[Group 5] Ranks %i-%i ~ %i Pts\n \nSR Pts: %i\n \nTotal Completions: %i\n \n",szMapName, tier, szMapper, mapcompletion, g1top, RoundFloat(g1points), g2bot, g2top, RoundFloat(g2points), g3bot, g3top, RoundFloat(g3points), g4bot, g4top, RoundFloat(g4points), g5bot, g5top, RoundFloat(g5points), iwrpoints, totalplayers);
+			SetMenuTitle(mi, "[Point Reward: %s]\n------------------------------\nTier: %i\n \nMapper: %s\n \n[Completion Points]\n \nMap Finish Points: %i\n \n[Map Improvement Groups]\n \n[Group 1] Ranks 11-%i ~ %i Pts\n[Group 2] Ranks %i-%i ~ %i Pts\n[Group 3] Ranks %i-%i ~ %i Pts\n[Group 4] Ranks %i-%i ~ %i Pts\n[Group 5] Ranks %i-%i ~ %i Pts\n \nSR Pts: %i\n \nTotal Completions: %i\n \n",szMapName, tier, g_szMapperName, mapcompletion, g1top, RoundFloat(g1points), g2bot, g2top, RoundFloat(g2points), g3bot, g3top, RoundFloat(g3points), g4bot, g4top, RoundFloat(g4points), g5bot, g5top, RoundFloat(g5points), iwrpoints, totalplayers);
 			// AddMenuItem(mi, "", "", ITEMDRAW_SPACER);
 			AddMenuItem(mi, szMapName, "Top 10 Points");
 			SetMenuOptionFlags(mi, MENUFLAG_BUTTON_EXIT);
