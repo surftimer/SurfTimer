@@ -36,9 +36,7 @@ public void SetBotQuota()
 
 bool IsValidZonegroup(int zGrp)
 {
-	if (-1 < zGrp < g_mapZoneGroupCount)
-		return true;
-	return false;
+	return -1 < zGrp < g_mapZoneGroupCount;
 }
 
 /**
