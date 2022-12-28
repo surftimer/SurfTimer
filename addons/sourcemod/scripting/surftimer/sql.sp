@@ -1623,7 +1623,7 @@ public void sql_selectRankedPlayersRankCallback(Handle owner, Handle hndl, const
 				CS_SetClientContributionScore(client, -g_PlayerRank[client][style]);
 		}
 	}
-	else if (style == 0 && GetConVarInt(g_hPrestigeRank) >= 0 && !g_bPrestigeCheck[client])
+	else if (style == 0 && GetConVarInt(g_hPrestigeRank) > 0 && !g_bPrestigeCheck[client])
 		KickClient(client, "You must be at least rank %i to join this server", GetConVarInt(g_hPrestigeRank));
 
 	if (!g_bSettingsLoaded[client] && style == (MAX_STYLES - 1))
