@@ -6545,7 +6545,7 @@ public int FinishedMapsMenuHandler(Handle menu, MenuAction action, int client, i
 public void db_selectTotalBonusCount()
 {
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT COUNT(DISTINCT a.mapname,zonegroup) as count FROM ck_zones a RIGHT JOIN ck_maptier b ON a.mapname = b.mapname WHERE a.zonegroup > 0");
+	Format(szQuery, 512, "SELECT COUNT(DISTINCT `a`.`mapname`, `a`.`zonegroup`) AS `count` FROM `ck_zones` `a` INNER JOIN `ck_maptier` `b` ON `b`.`mapname` = `a`.`mapname` WHERE `a`.`zonetype` = 1 AND `a`.`zonegroup` > 0");
 	SQL_TQuery(g_hDb, sql_selectTotalBonusCountCallback, szQuery, GetGameTime(), DBPrio_Low);
 }
 
@@ -6574,7 +6574,7 @@ public void sql_selectTotalBonusCountCallback(Handle owner, Handle hndl, const c
 public void db_selectTotalStageCount()
 {
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT SUM(c.stages) FROM (SELECT a.mapname, MAX(zonetypeid)+2 as stages FROM `ck_zones` a RIGHT JOIN `ck_maptier` b ON a.mapname = b.mapname WHERE zonetype = 3 GROUP BY a.mapname)c");
+	Format(szQuery, 512, "SELECT COUNT(DISTINCT `a`.`mapname`) + COUNT(1) AS `count` FROM `ck_zones` `a` INNER JOIN `ck_maptier` `b` ON `b`.`mapname` = `a`.`mapname` WHERE `a`.`zonetype` = 3 AND `a`.`zonegroup` = 0;");
 	SQL_TQuery(g_hDb, sql_selectTotalStageCountCallback, szQuery, GetGameTime(), DBPrio_Low);
 }
 
