@@ -36,9 +36,7 @@ public void SetBotQuota()
 
 bool IsValidZonegroup(int zGrp)
 {
-	if (-1 < zGrp < g_mapZoneGroupCount)
-		return true;
-	return false;
+	return -1 < zGrp < g_mapZoneGroupCount;
 }
 
 /**
@@ -4794,38 +4792,34 @@ public void LoadDefaultTitle(int client)
 						KvGetString(kv, "title", szBuffer, sizeof(szBuffer));
 						SetDefaultTitle(client, szBuffer);
 						g_iHasEnforcedTitle[client] = true;
-						break;
-					} else {
-						g_iHasEnforcedTitle[client] = false;
-						continue;
 					}
-
 				}
-
 				KvGetString(kv, "flag", szBuffer, sizeof(szBuffer), "none");
-				// Has to be a flag since no steamid was found, otherwise invalid entry
-				if (StrEqual(szBuffer, "none"))
-					continue;
-
-				// Check if client has access to this flag
-				int bit = ReadFlagString(szBuffer);
-				if (!CheckCommandAccess(client, "", bit))
-					continue;
-
-				// "type"
-				g_iEnforceTitleType[client] = 2;
-				KvGetString(kv, "type", szBuffer, sizeof(szBuffer), "both");
-				if (StrEqual(szBuffer, "scoreboard"))
-					g_iEnforceTitleType[client] = 1;
-				else if (StrEqual(szBuffer, "chat"))
-					g_iEnforceTitleType[client] = 0;
-				else
-					g_iEnforceTitleType[client] = 2;
-
-				KvGetString(kv, "title", szBuffer, sizeof(szBuffer));
-				SetDefaultTitle(client, szBuffer);
-				break;
-
+				// Check if this keyvalue has a flag
+				if (!StrEqual(szBuffer, "none"))
+				{
+					// Does the user has permissions over the flag?
+					int bit = ReadFlagString(szBuffer);
+					if (CheckCommandAccess(client, "", bit))
+					{
+						KvGetString(kv, "title", szBuffer, sizeof(szBuffer));
+						SetDefaultTitle(client, szBuffer);
+						g_iHasEnforcedTitle[client] = true;
+					}
+				}
+				// If user has enforced title, check and set the type
+				if (g_iHasEnforcedTitle[client] == true)
+				{
+					KvGetString(kv, "type", szBuffer, sizeof(szBuffer), "both");
+					if (StrEqual(szBuffer, "scoreboard"))
+						g_iEnforceTitleType[client] = 1;
+					else if (StrEqual(szBuffer, "chat"))
+						g_iEnforceTitleType[client] = 0;
+					else
+						g_iEnforceTitleType[client] = 2;
+					// If the title is enforced, break the loop
+					break;
+				}
 			} while (KvGotoNextKey(kv));
 		}
 		delete kv;
