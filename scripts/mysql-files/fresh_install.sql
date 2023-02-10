@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS ck_maptier (
     `announcerecord` INT(11) NOT NULL DEFAULT '0', 
     `gravityfix` INT(11) NOT NULL DEFAULT '1', 
     `ranked` INT(11) NOT NULL DEFAULT '1', 
+    `mapper` VARCHAR(255) DEFAULT NULL, 
     PRIMARY KEY(`mapname`)) 
     DEFAULT CHARSET=utf8mb4;
 
