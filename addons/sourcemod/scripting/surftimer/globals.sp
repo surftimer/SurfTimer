@@ -50,7 +50,7 @@
 
 // Checkpoint Definitions
 // Maximum amount of checkpoints in a map
-#define CPLIMIT 37
+#define CPLIMIT 100
 
 // Zone Definitions
 #define ZONE_MODEL "models/props/de_train/barrel.mdl"
@@ -1367,7 +1367,7 @@ ConVar g_hHostName = null;
 Handle g_hDestinations;
 
 // CPR command
-float g_fClientCPs[MAXPLAYERS + 1][36];
+float g_fClientCPs[MAXPLAYERS + 1][CPLIMIT];
 
 float g_fTargetTime[MAXPLAYERS + 1];
 char g_szTargetCPR[MAXPLAYERS + 1][MAX_NAME_LENGTH];
