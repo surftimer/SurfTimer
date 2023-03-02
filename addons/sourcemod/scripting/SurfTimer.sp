@@ -432,6 +432,13 @@ public void OnClientPutInServer(int client)
 		return;
 	}
 
+	// Get SteamID
+	if (!GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], sizeof(g_szSteamID[]), true))
+	{
+		RequestFrame(OnClientPutInServer, client);
+		return;
+	}
+
 	// Defaults
 	SetClientDefaults(client);
 	Command_Restart(client, 1);
@@ -469,9 +476,6 @@ public void OnClientPutInServer(int client)
 
 	if (LibraryExists("dhooks"))
 		DHookEntity(g_hTeleport, false, client);
-
-	// Get SteamID
-	GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], MAX_NAME_LENGTH, true);
 
 	// char fix
 	FixPlayerName(client);
