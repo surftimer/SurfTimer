@@ -163,7 +163,7 @@ public Action StartTouchTrigger(int caller, int activator)
 	int client = activator;
 
 	// Ignore dead players
-	if (!IsValidClient(client)) {
+	if (!IsValidClient(client) || !IsPlayerAlive(client)) {
 		return Plugin_Continue;
 	}
 
@@ -249,7 +249,7 @@ public Action EndTouchTrigger(int caller, int activator)
 	int client = activator;
 
 	// Ignore dead players
-	if (!IsValidClient(client)) {
+	if (!IsValidClient(client) || !IsPlayerAlive(client)) {
 		return Plugin_Continue;
 	}
 
