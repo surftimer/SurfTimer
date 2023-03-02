@@ -757,7 +757,9 @@ public Action OnEndTouchGravityTrigger(int entity, int other)
 	if (IsValidClient(other) && !IsFakeClient(other))
 	{
 		if (!g_bNoClip[other] && GetConVarBool(g_hGravityFix))
+		{
 			return Plugin_Handled;
+		}
 	}
 	return Plugin_Continue;
 }

@@ -563,15 +563,6 @@ public void OnClientDisconnect(int client)
 		}
 	}
 
-	SDKUnhook(client, SDKHook_SetTransmit, Hook_SetTransmit);
-	SDKUnhook(client, SDKHook_PostThinkPost, Hook_PostThinkPost);
-	SDKUnhook(client, SDKHook_OnTakeDamage, Hook_OnTakeDamage);
-	SDKUnhook(client, SDKHook_PreThink, OnPlayerThink);
-	SDKUnhook(client, SDKHook_PreThinkPost, OnPlayerThink);
-	SDKUnhook(client, SDKHook_Think, OnPlayerThink);
-	SDKUnhook(client, SDKHook_PostThink, OnPlayerThink);
-	SDKUnhook(client, SDKHook_PostThinkPost, OnPlayerThink);
-
 	if (client == g_RecordBot)
 	{
 		StopPlayerMimic(client);
