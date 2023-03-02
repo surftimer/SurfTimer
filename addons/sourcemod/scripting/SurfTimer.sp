@@ -1053,7 +1053,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 			if (IsValidClient(i) && !IsFakeClient(i))
 			{
 				if (!GetConVarBool(g_hEnforceDefaultTitles))
-					db_viewCustomTitles(i, g_szSteamID[i]);
+					db_viewCustomTitles(i);
 				else
 					LoadDefaultTitle(i);
 			}
