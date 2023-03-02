@@ -731,8 +731,10 @@ public Action Event_OnRoundStart(Handle event, const char[] name, bool dontBroad
 	return Plugin_Continue;
 }
 
-public Action ApplyStyles(Handle timer, int client)
+public Action ApplyStyles(Handle timer, int userid)
 {
+	int client = GetClientOfUserId(userid);
+
 	if (IsValidClient(client)) {
 		if (g_iCurrentStyle[client] == 5)// 5 slowmo
 			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 0.5);
@@ -745,24 +747,8 @@ public Action ApplyStyles(Handle timer, int client)
 
 public Action OnMultipleTrigger1(int entity, int client)
 {
-	if (IsValidClient(client)) {
-		CreateTimer(0.1, ApplyStyles, client);
-	}
+	CreateTimer(0.1, ApplyStyles, GetClientUserId(client));
 
-	return Plugin_Continue;
-}
-
-public Action OnTouchAllTriggers(int entity, int other)
-{
-	if (other >= 1 && other <= MaxClients && IsFakeClient(other))
-		return Plugin_Handled;
-	return Plugin_Continue;
-}
-
-public Action OnEndTouchAllTriggers(int entity, int other)
-{
-	if (other >= 1 && other <= MaxClients && IsFakeClient(other))
-		return Plugin_Handled;
 	return Plugin_Continue;
 }
 
