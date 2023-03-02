@@ -620,10 +620,13 @@ public Action Hook_SetTransmit(int entity, int client)
 	if (client != entity && (0 < entity <= MaxClients) && IsValidClient(client))
 	{
 		if (g_bHide[client] && entity != g_SpecTarget[client])
+		{
 			return Plugin_Handled;
-		else
-			if (entity == g_InfoBot && entity != g_SpecTarget[client])
-				return Plugin_Handled;
+		}
+		else if (entity == g_InfoBot && entity != g_SpecTarget[client])
+		{
+			return Plugin_Handled;
+		}
 	}
 	return Plugin_Continue;
 }
