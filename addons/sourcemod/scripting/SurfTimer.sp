@@ -230,10 +230,12 @@ public void OnMapStart()
 	SetCashState();
 
 	// Timers
-	CreateTimer(0.1, CKTimer1, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
-	CreateTimer(1.0, CKTimer2, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
-	CreateTimer(60.0, AttackTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+	CreateTimer(0.1, Timer_01Sec, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+	CreateTimer(1.0, Timer_1Sec, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+	CreateTimer(60.0, Timer_1Min, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 	CreateTimer(600.0, PlayerRanksTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+
+	delete g_hZoneTimer;
 	g_hZoneTimer = CreateTimer(GetConVarFloat(g_hChecker), BeamBoxAll, _, TIMER_REPEAT);
 
 	// AutoBhop
@@ -301,13 +303,8 @@ public void OnMapStart()
 	g_fMapStartTime = GetGameTime();
 	g_bRoundEnd = false;
 
-	// Playtime
-	CreateTimer(1.0, PlayTimeTimer, INVALID_HANDLE, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
-
 	// Server Announcements
 	g_iServerID = GetConVarInt(g_hServerID);
-	if (GetConVarBool(g_hRecordAnnounce))
-		CreateTimer(45.0, AnnouncementTimer, INVALID_HANDLE, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 
 	// Show Triggers
 	g_iTriggerTransmitCount = 0;
@@ -1155,6 +1152,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 		g_hZoneTimer = INVALID_HANDLE;
 	}
 
+	delete g_hZoneTimer;
 	g_hZoneTimer = CreateTimer(GetConVarFloat(g_hChecker), BeamBoxAll, _, TIMER_REPEAT);
 }
 

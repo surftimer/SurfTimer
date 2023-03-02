@@ -84,8 +84,13 @@ public Action StartTimer(Handle timer, any client)
 	return Plugin_Handled;
 }
 
-public Action AttackTimer(Handle timer)
+public Action Timer_1Min(Handle timer)
 {
+	if (GetConVarBool(g_hRecordAnnounce) && g_bHasLatestID)
+	{
+			db_checkAnnouncements();
+	}
+
 	for (int i = 1; i <= MaxClients; i++)
 	{
 		if (!IsValidClient(i) || IsFakeClient(i))
@@ -99,10 +104,11 @@ public Action AttackTimer(Handle timer)
 				g_AttackCounter[i] = g_AttackCounter[i] - 5;
 		}
 	}
+
 	return Plugin_Continue;
 }
 
-public Action CKTimer1(Handle timer)
+public Action Timer_01Sec(Handle timer)
 {
 	if (g_bRoundEnd)
 		return Plugin_Continue;
@@ -148,19 +154,23 @@ public Action LoadReplaysTimer (Handle timer)
 	return Plugin_Handled;
 }
 
-public Action CKTimer2(Handle timer)
+public Action Timer_1Sec(Handle timer)
 {
 	if (g_bRoundEnd)
 		return Plugin_Continue;
 
 	if (GetConVarBool(g_hMapEnd))
 	{
-		Handle hTmp;
-		hTmp = FindConVar("mp_timelimit");
-		int iTimeLimit;
-		iTimeLimit = GetConVarInt(hTmp);
+		Handle hTmp = FindConVar("mp_timelimit");
+		int iTimeLimit = -1;
+
 		if (hTmp != null)
-			CloseHandle(hTmp);
+		{
+			iTimeLimit = GetConVarInt(hTmp);
+		}
+
+		delete hTmp;
+
 		if (iTimeLimit > 0)
 		{
 			int timeleft;
@@ -209,6 +219,18 @@ public Action CKTimer2(Handle timer)
 	{
 		if (!IsValidClient(i) || i == g_InfoBot)
 			continue;
+		
+		int team = GetClientTeam(i);
+
+		// Playtime
+		if (team == CS_TEAM_T || team == CS_TEAM_CT)
+		{
+			g_iPlayTimeAliveSession[i]++;
+		}
+		else
+		{
+			g_iPlayTimeSpecSession[i]++;
+		}
 
 		// overlay check
 		if (g_bOverlay[i] && GetGameTime() - g_fLastOverlay[i] > 5.0)
@@ -580,36 +602,6 @@ public Action FixBot_On(Handle timer)
 	ServerCommand("ck_bonus_bot 1");
 	ServerCommand("ck_wrcp_bot 1");
 	return Plugin_Handled;
-}
-
-public Action PlayTimeTimer(Handle timer)
-{
-	for(int i = 1; i <= MaxClients; i++)
-	{
-		if (IsValidClient(i) && !IsFakeClient(i) && IsClientInGame(i))
-		{
-			int team = GetClientTeam(i);
-
-			if (team == 2 || team == 3)
-			{
-				g_iPlayTimeAliveSession[i]++;
-			}
-			else
-			{
-				g_iPlayTimeSpecSession[i]++;
-			}
-		}
-	}
-
-	return Plugin_Continue;
-}
-
-public Action AnnouncementTimer(Handle timer)
-{
-	if (g_bHasLatestID)
-		db_checkAnnouncements();
-
-	return Plugin_Continue;
 }
 
 public Action EnableJoinMsgs(Handle timer)
