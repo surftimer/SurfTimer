@@ -107,13 +107,13 @@ public void db_selectVipStatus(char szSteamId[128], int iVip, int type)
 	}
 }
 
-public void db_selectVipStatusCallback(Handle owner, Handle hndl, const char[] error, any pack)
+public void db_selectVipStatusCallback(Handle owner, Handle hndl, const char[] error, DataPack pack)
 {
 	char szSteamId[128];
-	ResetPack(pack);
-	ReadPackString(pack, szSteamId, sizeof(szSteamId));
-	int iVip = ReadPackCell(pack);
-	CloseHandle(pack);
+	pack.Reset()
+	pack.ReadString(szSteamId, sizeof(szSteamId));
+	int iVip = pack.ReadCell()
+	delete pack;
 
 	if (hndl == null)
 	{
@@ -194,7 +194,7 @@ public void db_insertVip(char szSteamId[128], int iVip)
 	SQL_TQuery(g_hDb, db_insertVipCallback, szQuery, pack, DBPrio_Low);
 }
 
-public void db_insertVipCallback(Handle owner, Handle hndl, const char[] error, any pack)
+public void db_insertVipCallback(Handle owner, Handle hndl, const char[] error, DataPack pack)
 {
 	if (hndl == null)
 	{
@@ -204,10 +204,10 @@ public void db_insertVipCallback(Handle owner, Handle hndl, const char[] error, 
 
 	char szSteamId[128];
 	// int iVip;
-	ResetPack(pack);
-	ReadPackString(pack, szSteamId, 128);
-	// iVip = ReadPackCell(pack);
-	CloseHandle(pack);
+	pack.Reset()
+	pack.ReadString(szSteamId, 128);
+	// iVip = pack.ReadCell()
+	delete pack;
 
 	// Find Client
 	int client = -1;

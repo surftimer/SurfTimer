@@ -642,8 +642,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 		}
 
 		g_AdminMenuLastPage[param1] = param2;
-		if (menu != null)
-			CloseHandle(menu);
+		delete menu;
 
 		if (refresh)
 			CreateTimer(0.1, RefreshAdminMenu, param1, TIMER_FLAG_NO_MAPCHANGE);
@@ -651,11 +650,7 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 
 	if (action == MenuAction_End)
 	{
-		if (IsValidClient(param1))
-		{
-			if (menu != null)
-				CloseHandle(menu);
-		}
+		delete menu;
 	}
 
 	return 0;
