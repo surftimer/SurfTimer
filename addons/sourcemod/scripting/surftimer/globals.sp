@@ -1567,6 +1567,18 @@ char g_sDecimalTables[][][] = {
 	{ "ck_wrcps",         "runtimepro", }
 };  // Required for the float to decimal conversion
 
+char g_sSteamIdTablesCleanup[][] = {
+	"ck_bonus", 
+	"ck_checkpoints", 
+	"ck_latestrecords", 
+	"ck_playeroptions2", 
+	"ck_playerrank", 
+	"ck_playertemp", 
+	"ck_playertimes", 
+	"ck_prinfo", 
+	"ck_vipadmins"
+};
+
 bool g_tables_converted = false;
 
 int g_iCountryTopStyleSelected[MAXPLAYERS + 1];
