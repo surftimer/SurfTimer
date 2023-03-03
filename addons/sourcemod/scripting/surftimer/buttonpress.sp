@@ -304,7 +304,7 @@ public void CL_OnEndTimerPress(int client)
 		if (style == 0)
 		{
 			//ADD LAST TIME TO CP DATA
-			if(g_bhasStages)
+			if (g_bhasStages)
 				g_fCheckpointTimesNew[zGroup][client][g_TotalStages-1] = g_fFinalTime[client];
 			else
 				g_fCheckpointTimesNew[zGroup][client][g_iTotalCheckpoints] = g_fFinalTime[client];
@@ -829,7 +829,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 	if (!g_bSpectate[client] && !g_bNoClip[client] && ((GetGameTime() - g_fLastTimeNoClipUsed[client]) > 2.0))
 	{
 		int zGroup = g_iClientInZone[client][2];
-		if(zGroup != 0)
+		if (zGroup != 0)
 		{
 			return;
 		}
@@ -909,7 +909,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 					continue;
 
 				int ObserverMode = GetEntProp(i, Prop_Send, "m_iObserverMode");
-				if(ObserverMode != 4 && ObserverMode != 5)
+				if (ObserverMode != 4 && ObserverMode != 5)
 					continue;
 
 				int ObserverTarget = GetEntPropEnt(i, Prop_Send, "m_hObserverTarget");
@@ -1044,7 +1044,7 @@ public void CL_OnStartPracSrcpTimerPress(int client)
 		int zGroup = g_iClientInZone[client][2];
 		
 		
-		if(zGroup != 0)
+		if (zGroup != 0)
 		{
 			return;
 		}

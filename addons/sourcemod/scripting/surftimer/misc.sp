@@ -135,7 +135,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 		return;
 	
 	// dpexx stop teleporting if in trigger_multiple
-	/* if (g_TeleInTriggerMultiple[client]){
+	/* if (g_TeleInTriggerMultiple[client]) {
 		PrintToChat(client, "Teleport blocked");
 		return;
 	} */
@@ -183,7 +183,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 	int zoneID = getZoneID(zonegroup, zone);
 
 	// Check if requested zone teleport is valid (non-linear map)
-	if(zoneID == -1) {
+	if (zoneID == -1) {
 		CPrintToChat(client, "%T", "InvalidMapNoStages", client, g_szChatPrefix);
 		return;
 	}
@@ -321,7 +321,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 
 					// Set spawn location to the destination zone:
 					//TP TO STAGE
-					if(zone > 1 && zonegroup == 0 && g_bStageStartposUsed[client][zone-2] && g_fCurrentRunTime[client] <= 0.0 && g_bTimerEnabled[client]){
+					if (zone > 1 && zonegroup == 0 && g_bStageStartposUsed[client][zone-2] && g_fCurrentRunTime[client] <= 0.0 && g_bTimerEnabled[client]) {
 						Array_Copy(g_fStageStartposLocation[client][zone-2] , g_fTeleLocation[client], 3);
 
 						destinationFound = true;
@@ -353,7 +353,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 
 					float fLocation[3];
 					//TP TO STAGE
-					if(zone > 1 && zonegroup == 0 && g_bStageStartposUsed[client][zone-2] && g_fCurrentRunTime[client] <= 0.0 && g_bTimerEnabled[client]){
+					if (zone > 1 && zonegroup == 0 && g_bStageStartposUsed[client][zone-2] && g_fCurrentRunTime[client] <= 0.0 && g_bTimerEnabled[client]) {
 						Array_Copy(g_fStageStartposLocation[client][zone-2], fLocation, 3);
 						Array_Copy(g_fStageStartposAngle[client][zone-2], ang, 3);
 
@@ -1448,12 +1448,12 @@ public void SetPrestrafe(int client, int zone, int style, bool map, bool bonus, 
 		g_iPreStrafeBonus[1][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
 		g_iPreStrafeBonus[2][zone][style][client] = RoundToNearest(fVelocity[2]);
 	} 
-	else if(map) {
+	else if (map) {
 		g_iPreStrafe[0][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
 		g_iPreStrafe[1][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
 		g_iPreStrafe[2][zone][style][client] = RoundToNearest(fVelocity[2]);
 	}
-	else if(stage) {
+	else if (stage) {
 		g_iPreStrafeStage[0][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0)));
 		g_iPreStrafeStage[1][zone][style][client] = RoundToNearest(SquareRoot(Pow(fVelocity[0], 2.0) + Pow(fVelocity[1], 2.0) + Pow(fVelocity[2], 2.0)));
 		g_iPreStrafeStage[2][zone][style][client] = RoundToNearest(fVelocity[2]);
@@ -1466,12 +1466,12 @@ public void SetNewRecordPrestrafe(int client, int zone, int style, bool map, boo
 		g_iRecordPreStrafeBonus[1][zone][style] = g_iPreStrafeBonus[1][zone][style][client];
 		g_iRecordPreStrafeBonus[2][zone][style] = g_iPreStrafeBonus[2][zone][style][client];
 	}
-	else if(map) {
+	else if (map) {
 		g_iRecordPreStrafe[0][zone][style] = g_iPreStrafe[0][zone][style][client];
 		g_iRecordPreStrafe[1][zone][style] = g_iPreStrafe[1][zone][style][client];
 		g_iRecordPreStrafe[2][zone][style] = g_iPreStrafe[2][zone][style][client];
 	}
-	else if(stage) {
+	else if (stage) {
 		g_iRecordPreStrafeStage[0][zone][style] = g_iPreStrafeStage[0][zone][style][client];
 		g_iRecordPreStrafeStage[1][zone][style] = g_iPreStrafeStage[1][zone][style][client];
 		g_iRecordPreStrafeStage[2][zone][style] = g_iPreStrafeStage[2][zone][style][client];
@@ -1485,12 +1485,12 @@ public void SetNewPersonalRecordPrestrafe(int client, int zone, int style, bool 
 		g_iPersonalRecordPreStrafeBonus[client][1][zone][style] = g_iPreStrafeBonus[1][zone][style][client];
 		g_iPersonalRecordPreStrafeBonus[client][2][zone][style] = g_iPreStrafeBonus[2][zone][style][client];
 	}
-	else if(map) {
+	else if (map) {
 		g_iPersonalRecordPreStrafe[client][0][zone][style] = g_iPreStrafe[0][zone][style][client];
 		g_iPersonalRecordPreStrafe[client][1][zone][style] = g_iPreStrafe[1][zone][style][client];
 		g_iPersonalRecordPreStrafe[client][2][zone][style] = g_iPreStrafe[2][zone][style][client];
 	}
-	else if(stage) {
+	else if (stage) {
 		g_iPersonalRecordPreStrafeStage[client][0][zone][style] = g_iPreStrafeStage[0][zone][style][client];
 		g_iPersonalRecordPreStrafeStage[client][1][zone][style] = g_iPreStrafeStage[1][zone][style][client];
 		g_iPersonalRecordPreStrafeStage[client][2][zone][style] = g_iPreStrafeStage[2][zone][style][client];
@@ -2349,11 +2349,11 @@ public void FormatTimeFloat(int client, float time, int type, char[] string, int
 			else
 				Format(szMilli, 16, "%dms", imilli);
 
-		if(idays > 0){
+		if (idays > 0) {
 			Format(szDays, 16, "%dd", idays);
 			Format(string, 32, "%s %s %s %s %s", szDays, szHours, szMinutes, szSeconds, szMilli);
 		}
-		else{
+		else {
 			Format(string, 32, "%s %s %s %s", szHours, szMinutes, szSeconds, szMilli);
 		}
 		
@@ -2917,7 +2917,7 @@ public void AutoBhopFunction(int client, int &buttons)
 
 public void SpecListMenuDead(int client) // What Spectators see
 {
-	if(!g_bSideHud[client])
+	if (!g_bSideHud[client])
 	{
 		return;
 	}
@@ -3234,7 +3234,7 @@ public void SetInfoBotName(int ent)
 
 public void CenterHudDead(int client)
 {
-	if(!g_bCentreHud[client])
+	if (!g_bCentreHud[client])
 	{
 		return;
 	}
@@ -3295,22 +3295,22 @@ public void CenterHudDead(int client)
 				float fSpeed[3];
 				GetEntPropVector(ObservedUser, Prop_Data, "m_vecVelocity", fSpeed);
 				float fSpeedHUD;
-				if(g_SpeedMode[client] == 0) //XY
+				if (g_SpeedMode[client] == 0) //XY
 					fSpeedHUD = SquareRoot(Pow(fSpeed[0], 2.0) + Pow(fSpeed[1], 2.0));
-				else if(g_SpeedMode[client] == 1) //XYZ
+				else if (g_SpeedMode[client] == 1) //XYZ
 					fSpeedHUD = SquareRoot(Pow(fSpeed[0], 2.0) + Pow(fSpeed[1], 2.0) + Pow(fSpeed[2], 2.0));
-				else if(g_SpeedMode[client] == 2) //Z
+				else if (g_SpeedMode[client] == 2) //Z
 					fSpeedHUD = SquareRoot(Pow(fSpeed[2], 2.0));
 
 				if (ObservedUser == g_RecordBot)
 				{
 					Format(obsAika, sizeof(obsAika), "<font color='#ec8'>%s</font>", g_szReplayTime);
 
-					if(g_iSelectedReplayStyle == 5)
+					if (g_iSelectedReplayStyle == 5)
 					{
 						fSpeedHUD /= 0.5;
 					}
-					else if(g_iSelectedReplayStyle == 6)
+					else if (g_iSelectedReplayStyle == 6)
 					{
 						fSpeedHUD /= 1.5;
 					}
@@ -3319,11 +3319,11 @@ public void CenterHudDead(int client)
 				{
 					Format(obsAika, sizeof(obsAika), "<font color='#ec8'>%s</font>", g_szBonusTime);
 
-					if(g_iSelectedBonusReplayStyle == 5)
+					if (g_iSelectedBonusReplayStyle == 5)
 					{
 						fSpeedHUD /= 0.5;
 					}
-					else if(g_iSelectedBonusReplayStyle == 6)
+					else if (g_iSelectedBonusReplayStyle == 6)
 					{
 						fSpeedHUD /= 1.5;
 					}
@@ -4718,7 +4718,7 @@ public void TeleportToSaveloc(int client, int id)
 	g_bPracSrcpTimerActivated[client] = true;
 	
 	// Allows you to go from saveloc in map to bonus and visa-versa and use correct times/hud
-	if(g_iSaveLocInBonus[client][id] > 0)
+	if (g_iSaveLocInBonus[client][id] > 0)
 	{
 		g_bInBonus[client] = true;
 		g_iInBonus[client] = g_iSaveLocInBonus[client][id];
@@ -5359,7 +5359,7 @@ stock bool Entity_Kill(int kenny, bool killChildren=false)
 		return true;
 	}
 
-	if(killChildren){
+	if (killChildren) {
 		return AcceptEntityInput(kenny, "KillHierarchy");
 	}
 	else {
@@ -5439,7 +5439,7 @@ void RemoveColors(char[] message, int maxlength)
 stock void EmitSoundToClientNoPreCache(int client, const char[] szPath, bool addPlay = true)
 {
 	char szBuffer[256];
-	if(addPlay)
+	if (addPlay)
 	{
 		Format(szBuffer, sizeof szBuffer, "play %s", szPath);
 	}
@@ -5524,7 +5524,7 @@ public bool GetContinentName(char code[3], char[] name, int length)
 	return false;
 }
 
-public void resetCCPDefaults(int client){
+public void resetCCPDefaults(int client) {
 
 	for(int i = 0; i < CPLIMIT; i++)
 	{

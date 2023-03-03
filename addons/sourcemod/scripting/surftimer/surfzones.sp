@@ -112,14 +112,14 @@ public void CreateZoneEntity(int zoneIndex)
 				TeleportEntity(iEnt, fMiddle, NULL_VECTOR, NULL_VECTOR);
 
 				// Have the mins always be negative
-				for(int i = 0; i < 3; i++){
+				for(int i = 0; i < 3; i++) {
 					fMins[i] = fMins[i] - fMiddle[i];
 					if (fMins[i] > 0.0)
 						fMins[i] *= -1.0;
 				}
 
 				// And the maxs always be positive
-				for(int i = 0; i < 3; i++){
+				for(int i = 0; i < 3; i++) {
 					fMaxs[i] = fMaxs[i] - fMiddle[i];
 					if (fMaxs[i] < 0.0)
 						fMaxs[i] *= -1.0;
@@ -307,7 +307,7 @@ public Action EndTouchTrigger(int caller, int activator)
 
 public void StartTouch(int client, int action[3])
 {
-	/* if (g_iClientInZone[client][0] > 0){
+	/* if (g_iClientInZone[client][0] > 0) {
 		g_TeleInTriggerMultiple[client] = false;
 	} */
 
@@ -321,24 +321,24 @@ public void StartTouch(int client, int action[3])
 
 		//PRINFO
 		int zGroup = g_iClientInZone[client][2]; //ease of use 
-		if ((action[0] == 1 || action[0] == 2 || action[0] == 3) && (!g_bPracticeMode[client] && !IsFakeClient(client) && g_iCurrentStyle[client] == 0)){
+		if ((action[0] == 1 || action[0] == 2 || action[0] == 3) && (!g_bPracticeMode[client] && !IsFakeClient(client) && g_iCurrentStyle[client] == 0)) {
 
 			//PLAYER ON A RUN
-			if(action[0] == 2 && g_bTimerRunning[client]){
+			if (action[0] == 2 && g_bTimerRunning[client]) {
 				g_fCompletes[client][zGroup]++;
 
 				g_fTimeinZone[client][zGroup] += fCurrentRunTime;
 				g_fTimeIncrement[client][zGroup] = 0.0;
 
-				if(g_fstComplete[client][zGroup] == 0.0)
+				if (g_fstComplete[client][zGroup] == 0.0)
 					g_fstComplete[client][zGroup] = g_fTimeinZone[client][zGroup];
 
 				//END ZONE OF MAP
-				if(zGroup == 0)
+				if (zGroup == 0)
 					//PLAYER ALREADY HAS A COMPLETION
-					if( g_fPersonalRecord[client] > 0.0 )
+					if ( g_fPersonalRecord[client] > 0.0 )
 						//IMPROVES COMPLETION
-						if(g_fCurrentRunTime[client] < g_fPersonalRecord[client])
+						if (g_fCurrentRunTime[client] < g_fPersonalRecord[client])
 							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fCurrentRunTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
 						else
 							db_UpdatePRinfo(client, g_szSteamID[client], zGroup); //UPDATE THE PLAYERS PRINFO EXECPT FOR THE RUNTIME
@@ -348,7 +348,7 @@ public void StartTouch(int client, int action[3])
 				//ENDZONE OF BONUS
 				else
 					//PLAYER ALREADY HAS A COMPLETION
-					if(g_fPersonalRecordBonus[zGroup][client] > 0)
+					if (g_fPersonalRecordBonus[zGroup][client] > 0)
 						//IMPROVES COMPLETION
 						if (g_fCurrentRunTime[client] < g_fPersonalRecordBonus[zGroup][client])
 							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fCurrentRunTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
@@ -359,9 +359,9 @@ public void StartTouch(int client, int action[3])
 						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fCurrentRunTime[client]);
 			}
 			//PLAYER JUST DOING STAGES
-			else if(action[0] == 3 && g_bWrcpTimeractivated[client] && !g_bTimerRunning[client]){
+			else if (action[0] == 3 && g_bWrcpTimeractivated[client] && !g_bTimerRunning[client]) {
 				//CHECK IF THERE IS TIME NOT ADDED TO TIMEINZONE
-				if(g_fTimeIncrement[client][zGroup] != 0.0){
+				if (g_fTimeIncrement[client][zGroup] != 0.0) {
 					g_fTimeinZone[client][zGroup] += g_fTimeIncrement[client][zGroup];
 					g_fTimeIncrement[client][zGroup] = 0.0;
 				}
@@ -369,9 +369,9 @@ public void StartTouch(int client, int action[3])
 			//CASE WHERE PLAYER IS RUNNING THE MAP BUT MID RUN SWAP TO LETS SAY /B 1, THE VALUE CONTINUES STORES IN THE g_fTimeIncrement[ZONEGROUP 0], WHEN PLAYER GOES BACK
 			//TO MAP STARTZONE THE PREVIOUSLY INCREMENTED VALUE IS NOW ADDED TO THE TIMEINZONE
 			//MAP OR BONUS STARTZONE
-			else if(action[0] == 1){
+			else if (action[0] == 1) {
 				//CHECK IF THERE IS TIME NOT ADDED TO TIMEINZONE
-				if(g_fTimeIncrement[client][zGroup] != 0.0){
+				if (g_fTimeIncrement[client][zGroup] != 0.0) {
 					g_fTimeinZone[client][zGroup] += g_fTimeIncrement[client][zGroup];
 					g_fTimeIncrement[client][zGroup] = 0.0;
 				}
@@ -540,7 +540,7 @@ public void StartTouch(int client, int action[3])
 				{
 					Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime);
 				}
-				else{
+				else {
 					//PrintToChatAll("style %d | cp %i | %d tick count", g_iCurrentStyle[client], action[1], g_iRecordedTicks[client]);
 					g_iCPStartFrame_CurrentRun[g_iCurrentStyle[client]][action[1]][client] = g_iRecordedTicks[client];
 				}
@@ -564,7 +564,7 @@ public void StartTouch(int client, int action[3])
 				g_bWrcpTimeractivated[client] = false;
 			}
 
-			if(g_bPracSrcpTimerActivated[client])
+			if (g_bPracSrcpTimerActivated[client])
 			{
 				g_bPracSrcpTimerActivated[client] = false;
 			}
@@ -614,7 +614,7 @@ public void StartTouch(int client, int action[3])
 						lastCheckpoint[g_iClientInZone[client][2]][client] = g_iPlayerPracLocationSnap[client][g_iLastSaveLocIdClient[client]] - 1;
 					}
 				}
-				else{
+				else {
 					//PrintToChatAll("style %d | cp %i | %d tick count", g_iCurrentStyle[client], action[1], g_iRecordedTicks[client]);
 					g_iCPStartFrame_CurrentRun[g_iCurrentStyle[client]][action[1]][client] = g_iRecordedTicks[client];
 				}
@@ -653,12 +653,12 @@ public void StartTouch(int client, int action[3])
 		//THIS WAY WHEN THE DATABASE HAS NO VALUES
 		//THE PLAYERS CAN SELECT THE CHECKPOINTS OPTION IN THE REPLAY MENU WITH THE CORRECT VALUES
 		//ONLY PERFOM ACTIONS IF THE CLIENT INDEX IS THE MAP RECORD BOT'S INDEX AND IF THERE ARE NOT REPLAY TICKS FOUND
-		if(IsPlayerAlive(client) && IsFakeClient(client) && !g_bReplayTickFound[g_iCurrentStyle[client]] && client == g_RecordBot){
+		if (IsPlayerAlive(client) && IsFakeClient(client) && !g_bReplayTickFound[g_iCurrentStyle[client]] && client == g_RecordBot) {
 			//MAKE BOTS REGISTER TICKS
-			if(action[0] == 3 || action[0] == 4)
+			if (action[0] == 3 || action[0] == 4)
 				g_iCPStartFrame[g_iCurrentStyle[client]][action[1]] = g_iReplayTick[client];
 
-			if(action[0] == 2)
+			if (action[0] == 2)
 				db_UpdateReplaysTick(client, g_iCurrentStyle[client]);
 		}
 

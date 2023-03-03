@@ -154,7 +154,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 
 			return Plugin_Continue;
 		}
-		else{
+		else {
 			//PRINFO TIME INCREMENT
 			for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++)
 				g_fTimeIncrement[client][zonegroup] = 0.0;
@@ -189,9 +189,9 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 			CreateTimer(1.5, CenterMsgTimer, client, TIMER_FLAG_NO_MAPCHANGE);
 
 			//THIS "FIXES" A BUG WHERE THE TIMEINCREMENT WOULD BE CHANGED IN THE BEGINNING FOR FUCK ALL REASON...
-			if(!IsFakeClient(client)){
-				for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++){
-					if(g_fTimeIncrement[client][zonegroup] != 0.0)
+			if (!IsFakeClient(client)) {
+				for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++) {
+					if (g_fTimeIncrement[client][zonegroup] != 0.0)
 						g_fTimeIncrement[client][zonegroup] = 0.0;
 				}
 			}
@@ -397,12 +397,12 @@ public Action Say_Hook(int client, const char[] command, int argc)
 				int color_value = StringToInt(sText);
 
 				//KEEP VALUES BETWEEN 0-255
-				if(color_value > 255)
+				if (color_value > 255)
 					color_value = 255;
-				else if(color_value < 0)
+				else if (color_value < 0)
 					color_value = 0;
 
-				switch(g_iColorChangeIndex[client]){
+				switch(g_iColorChangeIndex[client]) {
 					case 0: g_iCSD_R[client] = color_value;
 					case 1: g_iCSD_G[client] = color_value;
 					case 2: g_iCSD_B[client] = color_value;
@@ -537,7 +537,7 @@ public void CGetRankColor(char[] sMsg, int iSize) // edit from CProcessVariables
 				String_ToLower(sCode, sCode, iSize);
 
 				if (CGetColor(sCode, sColor, iSize)) {
-					if(dev == 1) {
+					if (dev == 1) {
 						break;
 					}
 					dev++;
@@ -666,7 +666,7 @@ static void RemoveRagdoll(int client)
 {
 	int iEntity = GetEntPropEnt(client, Prop_Send, "m_hRagdoll");
 
-	if(iEntity != INVALID_ENT_REFERENCE)
+	if (iEntity != INVALID_ENT_REFERENCE)
 	{
 		AcceptEntityInput(iEntity, "Kill");
 	}
@@ -874,13 +874,13 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		bool bMoveRight = ((buttons & IN_MOVERIGHT) > 0 && vel[1] >= 100.0);
 		if (!g_bInStartZone[client] && !g_bInStageZone[client])
 		{
-			if((bForward || bBack) && !(bMoveLeft || bMoveRight))
+			if ((bForward || bBack) && !(bMoveLeft || bMoveRight))
 			{
 				vel[0] = 0.0;
 				buttons &= ~IN_FORWARD;
 				buttons &= ~IN_BACK;
 			}
-			if((bMoveLeft || bMoveRight) && !(bForward || bBack))
+			if ((bMoveLeft || bMoveRight) && !(bForward || bBack))
 			{
 				vel[1] = 0.0;
 				buttons &= ~IN_MOVELEFT;
@@ -923,7 +923,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 			{
 				// don't check if we're below the threshold, or not pressing anything.
 				// this should solve resets happening on wall collisions and ladders
-				if(bInputs && fSpeedSqr > fSpeedThres * fSpeedThres)
+				if (bInputs && fSpeedSqr > fSpeedThres * fSpeedThres)
 				{
 					g_iCurrentStyle[client] = 0;
 					g_KeyCount[client] = 0;
@@ -997,12 +997,12 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		}
 
 		//PRINFO
-		if (!IsFakeClient(client) && g_iCurrentStyle[client] == 0 && !g_bPracticeMode[client] && (g_bTimerRunning[client] || g_bWrcpTimeractivated[client])){
+		if (!IsFakeClient(client) && g_iCurrentStyle[client] == 0 && !g_bPracticeMode[client] && (g_bTimerRunning[client] || g_bWrcpTimeractivated[client])) {
 			//PLAYER IS IN A RUN
-			if(g_bTimerRunning[client])
+			if (g_bTimerRunning[client])
 				g_fTimeIncrement[client][g_iClientInZone[client][2]] = g_fCurrentRunTime[client];
 			//PLAYER IS JUST DOING STAGES
-			else if(g_bWrcpTimeractivated[client])
+			else if (g_bWrcpTimeractivated[client])
 				g_fTimeIncrement[client][g_iClientInZone[client][2]] = g_fCurrentWrcpRunTime[client];
 		}
 

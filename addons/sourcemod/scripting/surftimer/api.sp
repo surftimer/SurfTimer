@@ -129,7 +129,7 @@ public int Native_GetMapData(Handle plugin, int numParams)
 	SetNativeString(1, szname, sizeof(szname), true);
 	SetNativeString(2, sztime, sizeof(sztime), true);
 
-	if(g_fRecordMapTime >= 0)
+	if (g_fRecordMapTime >= 0)
 		time = g_fRecordMapTime;
 	else
 		time = -1.0;
@@ -152,13 +152,13 @@ public int Native_GetBonusData(Handle plugin, int numParams)
 	Format(szname, sizeof(szname), g_szBonusFastest[zonegroup]);
 	SetNativeString(2, szname, sizeof(szname), true);
 
-	if(g_fBonusFastest[zonegroup] > 0)
+	if (g_fBonusFastest[zonegroup] > 0)
 		WRtime = g_fBonusFastest[zonegroup];
 	else
 		WRtime = -1.0;
 	SetNativeCellRef(3, WRtime);
 
-	if(g_fPersonalRecordBonus[zonegroup][client] > 0)
+	if (g_fPersonalRecordBonus[zonegroup][client] > 0)
 		PBtime = g_fPersonalRecordBonus[zonegroup][client];
 	else
 		PBtime = -1.0;
@@ -181,13 +181,13 @@ public int Native_GetStageData(Handle plugin, int numParams)
 	Format(szname, sizeof(szname), g_szStageRecordPlayer[stage]);
 	SetNativeString(2, szname, sizeof(szname), true);
 
-	if(g_fStageRecord[stage] != 0.0)
+	if (g_fStageRecord[stage] != 0.0)
 		WRtime = g_fStageRecord[stage];
 	else
 		WRtime = -1.0;
 	SetNativeCellRef(3, WRtime);
 
-	if(g_fWrcpRecord[client][stage][g_iCurrentStyle[client]] != -1.0)
+	if (g_fWrcpRecord[client][stage][g_iCurrentStyle[client]] != -1.0)
 		PBtime = g_fWrcpRecord[client][stage][g_iCurrentStyle[client]];
 	else
 		PBtime = -1.0;
@@ -254,10 +254,10 @@ public int Native_GetClientStyle(Handle plugin, int numParams)
 	int style;
 	if (IsValidClient(client))
 	{
-		if(!IsFakeClient(client)) {
+		if (!IsFakeClient(client)) {
 			style = g_iCurrentStyle[client];
 		}
-		else{
+		else {
 			if (client == g_RecordBot)
 				style = g_iSelectedReplayStyle;
 			else if (client == g_BonusBot)
