@@ -121,15 +121,11 @@ char sql_MainDeleteQeury[] = "DELETE From %s where mapname='%s' and style='%i' a
 
 //ck_prinfo 
 char sql_CreatePrinfo[] = "CREATE TABLE IF NOT EXISTS ck_prinfo (steamid VARCHAR(32), name VARCHAR(64), mapname VARCHAR(32), runtime decimal(12,6) NOT NULL DEFAULT '-1.000000', zonegroup INT(12) NOT NULL DEFAULT '0', PRtimeinzone decimal(12,6) NOT NULL DEFAULT '-1.000000', PRcomplete FLOAT NOT NULL DEFAULT '0.0', PRattempts FLOAT NOT NULL DEFAULT '0.0', PRstcomplete FLOAT NOT NULL DEFAULT '0.0', PRIMARY KEY(steamid, mapname, zonegroup)) DEFAULT CHARSET=utf8mb4;";
-
 char sql_selectPR[] = "SELECT steamid, name, mapname, zonegroup, PRtimeinzone, PRcomplete, PRattempts, PRstcomplete FROM ck_prinfo WHERE steamid = '%s' AND mapname = '%s' AND zonegroup= '%i';";
 char sql_insertPR[] = "INSERT INTO ck_prinfo (steamid, name, mapname, runtime, zonegroup, PRtimeinzone, PRcomplete, PRattempts, PRstcomplete) VALUES('%s', '%s', '%s', '%f', '%i', '%f', '%f', '%f', '%f');";
-
 char sql_selectBonusPR[] = "SELECT steamid, name, mapname, zonegroup, PRtimeinzone, PRcomplete, PRattempts, PRstcomplete FROM ck_prinfo WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = '%i';";
-
 char sql_updatePrinfo[] = "UPDATE ck_prinfo SET PRtimeinzone = '%f', PRcomplete = '%f', PRattempts = '%f', PRstcomplete = '%f' WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = '%i';";
 char sql_updatePrinfo_withruntime[] = "UPDATE ck_prinfo SET PRtimeinzone = '%f', PRcomplete = '%f', PRattempts = '%f', PRstcomplete = '%f', runtime = '%f' WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = '%i';";
-
 char sql_clearPRruntime[] = "UPDATE ck_prinfo SET runtime = '0.0' WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = '%i';";
 
 //ck_replays
@@ -137,5 +133,12 @@ char sql_createReplays[] = "CREATE TABLE IF NOT EXISTS ck_replays (mapname VARCH
 char sql_selectReplayCPTicksAll[] = "SELECT cp, frame, style FROM ck_replays WHERE mapname = '%s' AND style = '%i' ORDER BY cp ASC;";
 char sql_insertReplayCPTicks[] = "INSERT INTO ck_replays (mapname, cp, frame, style) VALUES ('%s', '%i', '%i', '%i')";
 char sql_updateReplayCPTicks[] = "UPDATE ck_replays SET frame='%i' WHERE mapname='%s' AND cp ='%i' AND style='%i';";
+
 //check tables data type
 char sql_checkDataType[] = "SELECT DATA_TYPE, NUMERIC_PRECISION, NUMERIC_SCALE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='%s' AND COLUMN_NAME='%s' HAVING DATA_TYPE = 'decimal' AND NUMERIC_PRECISION = 12 AND NUMERIC_SCALE = 6;";
+
+// ck_players
+char sql_createPlayers[] = "CREATE TABLE IF NOT EXISTS ck_players (accountid INT NOT NULL, steamid2 VARCHAR(32) NULL, steamid64 VARCHAR(64) NULL, name VARCHAR(64) NULL, PRIMARY KEY(accountid)) DEFAULT CHARSET=utf8mb4;";
+// char sql_insertPlayersAS2[] = "INSERT IGNORE INTO ck_players (accountid, steamid2) VALUES ('%d', '%s');";
+// char sql_insertPlayersAN[] = "INSERT IGNORE INTO ck_players (accountid, name) VALUES ('%d', '%s');";
+// char sql_insertPlayersAS64[] = "INSERT IGNORE INTO ck_players (accountid, steamid64) VALUES ('%d', '%s');";

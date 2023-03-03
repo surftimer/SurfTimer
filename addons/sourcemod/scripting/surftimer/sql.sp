@@ -83,6 +83,7 @@ public void db_createTables()
 	SQL_AddQuery(createTableTnx, sql_createVipAdmins);
 	SQL_AddQuery(createTableTnx, sql_createWrcps);
 	SQL_AddQuery(createTableTnx, sql_CreatePrinfo);
+	SQL_AddQuery(createTableTnx, sql_createPlayers);
 
 	SQL_ExecuteTransaction(g_hDb, createTableTnx, SQLTxn_CreateDatabaseSuccess, SQLTxn_CreateDatabaseFailed);
 

@@ -102,7 +102,13 @@ void CheckDatabaseForUpdates()
 		
 		// Version 13 - End
 
-		LogMessage("Version 13 looks good.");
+		if (!SQL_FastQuery(g_hDb, "SELECT accountid FROM ck_players LIMIT 1"))
+		{
+			db_upgradeDatabase(14);
+			return;
+		}
+
+		LogMessage("Version 14 looks good.");
 	}
 }
 
@@ -213,6 +219,10 @@ void db_upgradeDatabase(int ver, bool skipErrorCheck = false)
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playertimes MODIFY name VARCHAR(64);");
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_wrcps MODIFY name VARCHAR(64);");
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_prinfo MODIFY name VARCHAR(64);");
+	}
+	else if (ver == 14)
+	{
+		SQL_FastQuery(g_hDb, sql_createPlayers);
 	}
 
 	CheckDatabaseForUpdates();
