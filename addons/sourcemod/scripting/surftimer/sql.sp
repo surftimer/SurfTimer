@@ -53,6 +53,7 @@ public void db_setupDatabase()
 	SQL_UnlockDatabase(g_hDb);
 	SQL_UnlockDatabase(g_hDb_Updates);
 	LoopFloatDecimalTables();
+	CleanUpTablesRetvalsSteamId();
 
 	for (int i = 0; i < sizeof(g_failedTransactions); i++)
 		g_failedTransactions[i] = 0;
@@ -9858,9 +9859,6 @@ public void db_CheckVIPAdmin(int client, char[] szSteamID)
 
 public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] error, any client)
 {
-	char szSteamId[32];
-	getSteamIDFromClient(client, szSteamId, 32);
-
 	if (hndl == null)
 	{
 		LogError("[surftimer] SQL Error (SQL_CheckVIPAdminCallback): %s", error);
@@ -9891,7 +9889,7 @@ public void SQL_CheckVIPAdminCallback(Handle owner, Handle hndl, const char[] er
 
 	if (g_bCheckCustomTitle[client])
 	{
-		db_viewCustomTitles(client, szSteamId);
+		db_viewCustomTitles(client);
 		g_bCheckCustomTitle[client] = false;
 	}
 
@@ -9920,15 +9918,14 @@ public void SQL_InsertVipFromSourcebansCallback(Handle owner, Handle hndl, const
 	db_CheckVIPAdmin(client, szSteamId);
 }
 
-public void db_checkCustomPlayerTitle(int client, char[] szSteamID, char[] arg)
+public void db_checkCustomPlayerTitle(int client, char[] arg)
 {
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
-	WritePackString(pack, szSteamID);
 	WritePackString(pack, arg);
 
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT `steamid` FROM `ck_vipadmins` WHERE `steamid` = '%s';", szSteamID);
+	Format(szQuery, 512, "SELECT `steamid` FROM `ck_vipadmins` WHERE `steamid` = '%s';", g_szSteamID[client]);
 	SQL_TQuery(g_hDb, SQL_checkCustomPlayerTitleCallback, szQuery, pack, DBPrio_Low);
 
 }
@@ -9937,36 +9934,33 @@ public void SQL_checkCustomPlayerTitleCallback(Handle owner, Handle hndl, const 
 {
 	ResetPack(pack);
 	int client = ReadPackCell(pack);
-	char szSteamID[32];
 	char arg[128];
-	ReadPackString(pack, szSteamID, 32);
 	ReadPackString(pack, arg, 128);
 	CloseHandle(pack);
 	
 	if (hndl == INVALID_HANDLE)
 	{
 		LogError("[surftimer] SQL Error (SQL_checkCustomPlayerTitleCallback): %s", error);
-		db_insertCustomPlayerTitle(client, szSteamID, arg);
+		db_insertCustomPlayerTitle(client, arg);
 		return;
 	}
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-		db_updateCustomPlayerTitle(client, szSteamID, arg);
+		db_updateCustomPlayerTitle(client, arg);
 	} else {
-		db_insertCustomPlayerTitle(client, szSteamID, arg);
+		db_insertCustomPlayerTitle(client, arg);
 	}
 }
 
-public void db_checkCustomPlayerNameColour(int client, char[] szSteamID, char[] arg)
+public void db_checkCustomPlayerNameColour(int client, char[] arg)
 {
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
-	WritePackString(pack, szSteamID);
 	WritePackString(pack, arg);
 
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT `steamid` FROM `ck_vipadmins` WHERE `steamid` = '%s';", szSteamID);
+	Format(szQuery, 512, "SELECT `steamid` FROM `ck_vipadmins` WHERE `steamid` = '%s';", g_szSteamID[client]);
 	SQL_TQuery(g_hDb, SQL_checkCustomPlayerNameColourCallback, szQuery, pack, DBPrio_Low);
 
 }
@@ -9975,9 +9969,7 @@ public void SQL_checkCustomPlayerNameColourCallback(Handle owner, Handle hndl, c
 {
 	ResetPack(pack);
 	int client = ReadPackCell(pack);
-	char szSteamID[32];
 	char arg[128];
-	ReadPackString(pack, szSteamID, 32);
 	ReadPackString(pack, arg, 128);
 	CloseHandle(pack);
 
@@ -9990,19 +9982,18 @@ public void SQL_checkCustomPlayerNameColourCallback(Handle owner, Handle hndl, c
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-		db_updateCustomPlayerNameColour(client, szSteamID, arg);
+		db_updateCustomPlayerNameColour(client, arg);
 	}
 }
 
-public void db_checkCustomPlayerTextColour(int client, char[] szSteamID, char[] arg)
+public void db_checkCustomPlayerTextColour(int client, char[] arg)
 {
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
-	WritePackString(pack, szSteamID);
 	WritePackString(pack, arg);
 
 	char szQuery[512];
-	Format(szQuery, 512, "SELECT `steamid` FROM `ck_vipadmins` WHERE `steamid` = '%s';", szSteamID);
+	Format(szQuery, 512, "SELECT `steamid` FROM `ck_vipadmins` WHERE `steamid` = '%s';", g_szSteamID[client]);
 	SQL_TQuery(g_hDb, SQL_checkCustomPlayerTextColourCallback, szQuery, pack, DBPrio_Low);
 
 }
@@ -10011,9 +10002,7 @@ public void SQL_checkCustomPlayerTextColourCallback(Handle owner, Handle hndl, c
 {
 	ResetPack(pack);
 	int client = ReadPackCell(pack);
-	char szSteamID[32];
 	char arg[128];
-	ReadPackString(pack, szSteamID, 32);
 	ReadPackString(pack, arg, 128);
 	CloseHandle(pack);
 
@@ -10026,159 +10015,132 @@ public void SQL_checkCustomPlayerTextColourCallback(Handle owner, Handle hndl, c
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
-		db_updateCustomPlayerTextColour(client, szSteamID, arg);
+		db_updateCustomPlayerTextColour(client, arg);
 	}
 }
 
 
-public void db_insertCustomPlayerTitle(int client, char[] szSteamID, char[] arg)
+public void db_insertCustomPlayerTitle(int client, char[] arg)
 {
-	Handle pack = CreateDataPack();
-	WritePackCell(pack, client);
-	WritePackString(pack, szSteamID);
-
 	// Escape title to prevent mysql injection
 	int buffer_len = strlen(arg) * 2 + 1;
 	char[] new_arg = new char[buffer_len];
 	SQL_EscapeString(g_hDb, arg, new_arg, buffer_len);
 
 	char szQuery[512];
-	Format(szQuery, 512, "INSERT INTO `ck_vipadmins` (steamid, title, inuse) VALUES ('%s', '%s', 1);", szSteamID, new_arg);
-	SQL_TQuery(g_hDb, SQL_insertCustomPlayerTitleCallback, szQuery, pack, DBPrio_Low);
+	Format(szQuery, 512, "INSERT INTO `ck_vipadmins` (steamid, title, inuse) VALUES ('%s', '%s', 1);", g_szSteamID[client], new_arg);
+	SQL_TQuery(g_hDb, SQL_insertCustomPlayerTitleCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_insertCustomPlayerTitleCallback(Handle owner, Handle hndl, const char[] error, any pack)
+public void SQL_insertCustomPlayerTitleCallback(Handle owner, Handle hndl, const char[] error, int userid)
 {
-	ResetPack(pack);
-	int client = ReadPackCell(pack);
-	char szSteamID[32];
-	ReadPackString(pack, szSteamID, 32);
-	CloseHandle(pack);
-
 	PrintToServer("Successfully inserted custom title.");
 
-	db_viewCustomTitles(client, szSteamID);
+	int client = GetClientOfUserId(userid);
+
+	if (client)
+	{
+		db_viewCustomTitles(client);
+	}
 }
 
-public void db_updateCustomPlayerTitle(int client, char[] szSteamID, char[] arg)
+public void db_updateCustomPlayerTitle(int client, char[] arg)
 {
-	Handle pack = CreateDataPack();
-	WritePackCell(pack, client);
-	WritePackString(pack, szSteamID);
-
 	char szQuery[512];
-	Format(szQuery, 512, "UPDATE `ck_vipadmins` SET `title` = '%s' WHERE `steamid` = '%s';", arg, szSteamID);
-	SQL_TQuery(g_hDb, SQL_updateCustomPlayerTitleCallback, szQuery, pack, DBPrio_Low);
+	Format(szQuery, 512, "UPDATE `ck_vipadmins` SET `title` = '%s' WHERE `steamid` = '%s';", arg, g_szSteamID[client]);
+	SQL_TQuery(g_hDb, SQL_updateCustomPlayerTitleCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_updateCustomPlayerTitleCallback(Handle owner, Handle hndl, const char[] error, any pack)
+public void SQL_updateCustomPlayerTitleCallback(Handle owner, Handle hndl, const char[] error, int userid)
 {
-	ResetPack(pack);
-	int client = ReadPackCell(pack);
-	char szSteamID[32];
-	ReadPackString(pack, szSteamID, 32);
-	CloseHandle(pack);
+	int client = GetClientOfUserId(userid);
 
 	PrintToServer("Successfully updated custom title.");
-	db_viewCustomTitles(client, szSteamID);
+	
+	if (client)
+	{
+		db_viewCustomTitles(client);
+	}
 }
 
-public void db_updateCustomPlayerNameColour(int client, char[] szSteamID, char[] arg)
+public void db_updateCustomPlayerNameColour(int client, char[] arg)
 {
-	Handle pack = CreateDataPack();
-	WritePackCell(pack, client);
-	WritePackString(pack, szSteamID);
-
 	char szQuery[512];
-	Format(szQuery, 512, "UPDATE `ck_vipadmins` SET `namecolour` = '%s' WHERE `steamid` = '%s';", arg, szSteamID);
-	SQL_TQuery(g_hDb, SQL_updateCustomPlayerNameColourCallback, szQuery, pack, DBPrio_Low);
+	Format(szQuery, 512, "UPDATE `ck_vipadmins` SET `namecolour` = '%s' WHERE `steamid` = '%s';", arg, g_szSteamID[client]);
+	SQL_TQuery(g_hDb, SQL_updateCustomPlayerNameColourCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_updateCustomPlayerNameColourCallback(Handle owner, Handle hndl, const char[] error, any pack)
+public void SQL_updateCustomPlayerNameColourCallback(Handle owner, Handle hndl, const char[] error, int userid)
 {
-	ResetPack(pack);
-	int client = ReadPackCell(pack);
-	char szSteamID[32];
-	ReadPackString(pack, szSteamID, 32);
-	CloseHandle(pack);
-
 	PrintToServer("Successfully updated custom player colour");
-	db_viewCustomTitles(client, szSteamID);
+
+	int client = GetClientOfUserId(userid);
+	
+	if (client)
+	{
+		db_viewCustomTitles(client);
+	}
 }
 
-public void db_updateCustomPlayerTextColour(int client, char[] szSteamID, char[] arg)
+public void db_updateCustomPlayerTextColour(int client, char[] arg)
 {
-	Handle pack = CreateDataPack();
-	WritePackCell(pack, client);
-	WritePackString(pack, szSteamID);
-
 	char szQuery[512];
-	Format(szQuery, 512, "UPDATE `ck_vipadmins` SET `textcolour` = '%s' WHERE `steamid` = '%s';", arg, szSteamID);
-	SQL_TQuery(g_hDb, SQL_updateCustomPlayerTextColourCallback, szQuery, pack, DBPrio_Low);
+	Format(szQuery, 512, "UPDATE `ck_vipadmins` SET `textcolour` = '%s' WHERE `steamid` = '%s';", arg, g_szSteamID[client]);
+	SQL_TQuery(g_hDb, SQL_updateCustomPlayerTextColourCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_updateCustomPlayerTextColourCallback(Handle owner, Handle hndl, const char[] error, any pack)
+public void SQL_updateCustomPlayerTextColourCallback(Handle owner, Handle hndl, const char[] error, int userid)
 {
-	ResetPack(pack);
-	int client = ReadPackCell(pack);
-	char szSteamID[32];
-	ReadPackString(pack, szSteamID, 32);
-	CloseHandle(pack);
-
 	PrintToServer("Successfully updated custom player text colour");
-	db_viewCustomTitles(client, szSteamID);
+
+	int client = GetClientOfUserId(userid);
+
+	if (client)
+	{
+		db_viewCustomTitles(client);
+	}
 }
 
-public void db_toggleCustomPlayerTitle(int client, char[] szSteamID)
+public void db_toggleCustomPlayerTitle(int client)
 {
-	Handle pack = CreateDataPack();
-	WritePackCell(pack, client);
-	WritePackString(pack, szSteamID);
-
 	char szQuery[512];
 	if (g_bDbCustomTitleInUse[client])
 	{
-		Format(szQuery, 512, "UPDATE `ck_vipadmins` SET `inuse` = '0' WHERE `steamid` = '%s';", szSteamID);
+		Format(szQuery, 512, "UPDATE `ck_vipadmins` SET `inuse` = '0' WHERE `steamid` = '%s';", g_szSteamID[client]);
 	}
 	else
 	{
-		Format(szQuery, 512, "UPDATE `ck_vipadmins` SET `inuse` = '1' WHERE `steamid` = '%s';", szSteamID);
+		Format(szQuery, 512, "UPDATE `ck_vipadmins` SET `inuse` = '1' WHERE `steamid` = '%s';", g_szSteamID[client]);
 	}
 
-	SQL_TQuery(g_hDb, SQL_insertCustomPlayerTitleCallback, szQuery, pack, DBPrio_Low);
+	SQL_TQuery(g_hDb, SQL_insertCustomPlayerTitleCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_toggleCustomPlayerTitleCallback(Handle owner, Handle hndl, const char[] error, any pack)
+public void SQL_toggleCustomPlayerTitleCallback(Handle owner, Handle hndl, const char[] error, int userid)
 {
-	ResetPack(pack);
-	int client = ReadPackCell(pack);
-	char szSteamID[32];
-	ReadPackString(pack, szSteamID, 32);
-	CloseHandle(pack);
+	int client = GetClientOfUserId(userid);
 
-	/*PrintToServer("Successfully updated custom title.");
-	db_viewCustomTitles(client, szSteamID);*/
-	SetPlayerRank(client);
+	if (client)
+	{
+		SetPlayerRank(client);
+	}
 }
 
-public void db_viewCustomTitles(int client, char[] szSteamID)
+public void db_viewCustomTitles(int client)
 {
 	char szQuery[728];
-
-	Handle pack = CreateDataPack();
-	WritePackCell(pack, client);
-	WritePackString(pack, szSteamID);
-	Format(szQuery, 728, "SELECT `title`, `namecolour`, `textcolour`, `inuse`, `vip`, `zoner`, `joinmsg` FROM `ck_vipadmins` WHERE `steamid` = '%s'", szSteamID);
-	SQL_TQuery(g_hDb, SQL_viewCustomTitlesCallback, szQuery, pack, DBPrio_Low);
+	Format(szQuery, 728, "SELECT `title`, `namecolour`, `textcolour`, `inuse`, `vip`, `zoner`, `joinmsg` FROM `ck_vipadmins` WHERE `steamid` = '%s'", g_szSteamID[client]);
+	SQL_TQuery(g_hDb, SQL_viewCustomTitlesCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[] error, any pack) 
+public void SQL_viewCustomTitlesCallback(Handle owner, Handle hndl, const char[] error, int userid) 
 {
-	ResetPack(pack);
-	int client = ReadPackCell(pack);
-	char szSteamID[32];
-	ReadPackString(pack, szSteamID, 32);
-	CloseHandle(pack);
+	int client = GetClientOfUserId(userid);
+
+	if (!client)
+	{
+		return;
+	}
 
 	if (hndl == null)
 	{
@@ -10388,7 +10350,7 @@ public void SQL_UpdatePlayerColoursCallback(Handle owner, Handle hndl, const cha
 	}
 
 	g_bUpdatingColours[client] = true;
-	db_viewCustomTitles(client, g_szSteamID[client]);
+	db_viewCustomTitles(client);
 }
 
 // fluffys end custom titles

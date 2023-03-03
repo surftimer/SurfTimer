@@ -230,10 +230,12 @@ public void OnMapStart()
 	SetCashState();
 
 	// Timers
-	CreateTimer(0.1, CKTimer1, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
-	CreateTimer(1.0, CKTimer2, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
-	CreateTimer(60.0, AttackTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+	CreateTimer(0.1, Timer_100ms, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+	CreateTimer(1.0, Timer_1s, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+	CreateTimer(60.0, Timer_1m, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 	CreateTimer(600.0, PlayerRanksTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+
+	delete g_hZoneTimer;
 	g_hZoneTimer = CreateTimer(GetConVarFloat(g_hChecker), BeamBoxAll, _, TIMER_REPEAT);
 
 	// AutoBhop
@@ -301,13 +303,8 @@ public void OnMapStart()
 	g_fMapStartTime = GetGameTime();
 	g_bRoundEnd = false;
 
-	// Playtime
-	CreateTimer(1.0, PlayTimeTimer, INVALID_HANDLE, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
-
 	// Server Announcements
 	g_iServerID = GetConVarInt(g_hServerID);
-	if (GetConVarBool(g_hRecordAnnounce))
-		CreateTimer(45.0, AnnouncementTimer, INVALID_HANDLE, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 
 	// Show Triggers
 	g_iTriggerTransmitCount = 0;
@@ -435,6 +432,21 @@ public void OnClientPutInServer(int client)
 		return;
 	}
 
+	// Get SteamID
+	if (!GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], sizeof(g_szSteamID[]), true))
+	{
+		RequestFrame(OnClientPutInServer, client);
+		return;
+	}
+
+	// Check if steamid has the value of "STEAM_ID_STOP_IGNORING_RETVALS"
+	// Reported here: https://github.com/surftimer/SurfTimer/issues/549
+	if (g_szSteamID[client][6] == 'I' && g_szSteamID[client][7] == 'D')
+	{
+		RequestFrame(OnClientPutInServer, client);
+		return;
+	}
+
 	// Defaults
 	SetClientDefaults(client);
 	Command_Restart(client, 1);
@@ -444,10 +456,6 @@ public void OnClientPutInServer(int client)
 	SDKHook(client, SDKHook_PostThinkPost, Hook_PostThinkPost);
 	SDKHook(client, SDKHook_OnTakeDamage, Hook_OnTakeDamage);
 	SDKHook(client, SDKHook_PreThink, OnPlayerThink);
-	SDKHook(client, SDKHook_PreThinkPost, OnPlayerThink);
-	SDKHook(client, SDKHook_Think, OnPlayerThink);
-	SDKHook(client, SDKHook_PostThink, OnPlayerThink);
-	SDKHook(client, SDKHook_PostThinkPost, OnPlayerThink);
 
 	if (!IsFakeClient(client))
 	{
@@ -476,9 +484,6 @@ public void OnClientPutInServer(int client)
 
 	if (LibraryExists("dhooks"))
 		DHookEntity(g_hTeleport, false, client);
-
-	// Get SteamID
-	GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], MAX_NAME_LENGTH, true);
 
 	// char fix
 	FixPlayerName(client);
@@ -565,15 +570,6 @@ public void OnClientDisconnect(int client)
 			g_fPlayerLastTime[client] = g_fCurrentRunTime[client];
 		}
 	}
-
-	SDKUnhook(client, SDKHook_SetTransmit, Hook_SetTransmit);
-	SDKUnhook(client, SDKHook_PostThinkPost, Hook_PostThinkPost);
-	SDKUnhook(client, SDKHook_OnTakeDamage, Hook_OnTakeDamage);
-	SDKUnhook(client, SDKHook_PreThink, OnPlayerThink);
-	SDKUnhook(client, SDKHook_PreThinkPost, OnPlayerThink);
-	SDKUnhook(client, SDKHook_Think, OnPlayerThink);
-	SDKUnhook(client, SDKHook_PostThink, OnPlayerThink);
-	SDKUnhook(client, SDKHook_PostThinkPost, OnPlayerThink);
 
 	if (client == g_RecordBot)
 	{
@@ -1069,7 +1065,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 			if (IsValidClient(i) && !IsFakeClient(i))
 			{
 				if (!GetConVarBool(g_hEnforceDefaultTitles))
-					db_viewCustomTitles(i, g_szSteamID[i]);
+					db_viewCustomTitles(i);
 				else
 					LoadDefaultTitle(i);
 			}
@@ -1155,6 +1151,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 		g_hZoneTimer = INVALID_HANDLE;
 	}
 
+	delete g_hZoneTimer;
 	g_hZoneTimer = CreateTimer(GetConVarFloat(g_hChecker), BeamBoxAll, _, TIMER_REPEAT);
 }
 
