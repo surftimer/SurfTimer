@@ -2,6 +2,7 @@
 .vs/
 .idea/
 *.smx
+*test.sp
 addons/sourcemod/scripting/surftimer-api.sp
 .DS_Store
 addons/sourcemod/scripting/compile.exe

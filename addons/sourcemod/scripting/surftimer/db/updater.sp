@@ -234,6 +234,7 @@ void LoopFloatDecimalTables()
 	}
 }
 
+
 void CheckDataType(const char[] table, const char[] column)
 {
 	char sColumn[32];
@@ -354,4 +355,23 @@ public void SQLChangeDataType(Handle owner, Handle hndl, const char[] error, Dat
 	}
 
 	CheckDataType(sTable, sColumn);
+}
+
+void CleanUpTablesRetvalsSteamId()
+{
+	char sQuery[512];
+	for (int i = 0; i < sizeof(g_sSteamIdTablesCleanup); i++)
+	{
+		FormatEx(sQuery, sizeof(sQuery), "DELETE FROM %s WHERE steamid = \"STEAM_ID_STOP_IGNORING_RETVALS\";", g_sSteamIdTablesCleanup[i]);
+		SQL_TQuery(g_hDb_Updates, SQLCleanUpTables, sQuery);
+	}
+}
+
+public void SQLCleanUpTables(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (owner == null || strlen(error) > 0)
+	{
+		SetFailState("[SQLCleanUpTables] Error while cleaning up tables... Error: %s", error);
+		return;
+	}
 }

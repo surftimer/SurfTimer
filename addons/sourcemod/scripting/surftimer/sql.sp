@@ -53,6 +53,7 @@ public void db_setupDatabase()
 	SQL_UnlockDatabase(g_hDb);
 	SQL_UnlockDatabase(g_hDb_Updates);
 	LoopFloatDecimalTables();
+	CleanUpTablesRetvalsSteamId();
 
 	for (int i = 0; i < sizeof(g_failedTransactions); i++)
 		g_failedTransactions[i] = 0;
