@@ -84,7 +84,7 @@ public Action StartTimer(Handle timer, any client)
 	return Plugin_Handled;
 }
 
-public Action Timer_1Min(Handle timer)
+public Action Timer_1m(Handle timer)
 {
 	if (GetConVarBool(g_hRecordAnnounce) && g_bHasLatestID)
 	{
@@ -108,7 +108,7 @@ public Action Timer_1Min(Handle timer)
 	return Plugin_Continue;
 }
 
-public Action Timer_01Sec(Handle timer)
+public Action Timer_100ms(Handle timer)
 {
 	if (g_bRoundEnd)
 		return Plugin_Continue;
@@ -154,7 +154,7 @@ public Action LoadReplaysTimer (Handle timer)
 	return Plugin_Handled;
 }
 
-public Action Timer_1Sec(Handle timer)
+public Action Timer_1s(Handle timer)
 {
 	if (g_bRoundEnd)
 		return Plugin_Continue;
@@ -276,13 +276,10 @@ public Action Timer_1Sec(Handle timer)
 	}
 
 	// clean weapons on ground
-	int maxEntities;
-	maxEntities = GetMaxEntities();
 	char classx[20];
 	if (GetConVarBool(g_hCleanWeapons))
 	{
-		int j;
-		for (j = MaxClients + 1; j < maxEntities; j++)
+		for (int j = MaxClients + 1; j < GetMaxEntities(); j++)
 		{
 			if (IsValidEdict(j) && (GetEntDataEnt2(j, g_ownerOffset) == -1))
 			{

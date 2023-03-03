@@ -240,6 +240,14 @@ forward void surftimer_OnNewRecord(int client, int style, char[] time, char[] ti
  */
 forward void surftimer_OnNewWRCP(int client, int style, char[] time, char[] timeDif, int stage, float fRunTime);
 
+/**
+ * Converts steamid2 (STEAM_X:Y:Z) to the accountid which will returned.
+ */
+int SteamId2ToAccountId(const char[] steamid)
+{
+    return (StringToInt(steamid[10]) * 2) + (steamid[8] == '1' ? 1 : 0);
+}
+
 public SharedPlugin:__pl_surftimer =
 {
 	name = "surftimer",
