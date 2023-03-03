@@ -77,7 +77,7 @@ public void db_InsertNewestMaps()
 	char sql_insertNewestMaps[] = "INSERT INTO ck_newmaps (mapname) VALUES('%s');";
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), sql_insertNewestMaps, g_szMapName);
-	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, _, DBPrio_Low);
+	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, __LINE__, DBPrio_Low);
 }
 
 //update Database just incase
