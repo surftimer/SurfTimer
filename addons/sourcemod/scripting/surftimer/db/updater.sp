@@ -107,7 +107,13 @@ void CheckDatabaseForUpdates()
 			return;
 		}
 
-		LogMessage("Version 14 looks good.");
+		if (!SQL_FastQuery(g_hDb, "SELECT accountid FROM ck_vipadmins LIMIT 1")) // TODO: Check for name/steamid64 column if exists or no more
+		{
+			db_upgradeDatabase(15);
+			return;
+		} 
+
+		LogMessage("Version 15 looks good.");
 	}
 }
 
@@ -228,6 +234,15 @@ void db_upgradeDatabase(int ver, bool skipErrorCheck = false)
 			RequestFrame(StartLoadingPlayerStuff);
 			return;
 		}
+	}
+	else if (ver == 15)
+	{
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_bonus DROP COLUMN name;");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_latestrecords DROP COLUMN name;");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playertimes DROP COLUMN name;");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_prinfo DROP COLUMN name;");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank DROP COLUMN steamid64;");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_wrcps DROP COLUMN name;");
 	}
 
 	CheckDatabaseForUpdates();
