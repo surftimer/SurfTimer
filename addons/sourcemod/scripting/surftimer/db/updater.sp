@@ -574,7 +574,7 @@ public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, D
 
 public void SQLTxn_InsertToPlayersSuccess(Database db, any data, int numQueries, DBResultSet[] results, any[] queryData)
 {
-	// TODO: Call upgrade again?
+	CheckDatabaseForUpdates();
 }
 
 public void SQLTxn_InsertToPlayersFailed(Database db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
