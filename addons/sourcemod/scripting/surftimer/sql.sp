@@ -49,7 +49,6 @@ public void db_setupDatabase()
 	GetDatabaseName(g_sDatabaseName, sizeof(g_sDatabaseName));
 	CheckDatabaseForUpdates();
 	LoopFloatDecimalTables();
-	CleanUpTablesRetvalsSteamId();
 
 	for (int i = 0; i < sizeof(g_failedTransactions); i++)
 		g_failedTransactions[i] = 0;

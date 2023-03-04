@@ -227,6 +227,14 @@ void db_upgradeDatabase(int ver, bool skipErrorCheck = false)
 	}
 	else if (ver == 14)
 	{
+		// Cleanup tables with invalid steamids
+		char sQuery[512];
+		for (int i = 0; i < sizeof(g_sSteamIdTablesCleanup); i++)
+		{
+			FormatEx(sQuery, sizeof(sQuery), "DELETE FROM %s WHERE steamid = \"STEAM_ID_STOP_IGNORING_RETVALS\";", g_sSteamIdTablesCleanup[i]);
+			SQL_FastQuery(g_hDb, sQuery);
+		}
+		
 		if (SQL_FastQuery(g_hDb, sql_createPlayers))
 		{
 			// Waiting a frame fixed "Lost connection" error for me...
@@ -385,16 +393,6 @@ public void SQLChangeDataType(Handle owner, Handle hndl, const char[] error, Dat
 	}
 
 	CheckDataType(sTable, sColumn);
-}
-
-void CleanUpTablesRetvalsSteamId()
-{
-	char sQuery[512];
-	for (int i = 0; i < sizeof(g_sSteamIdTablesCleanup); i++)
-	{
-		FormatEx(sQuery, sizeof(sQuery), "DELETE FROM %s WHERE steamid = \"STEAM_ID_STOP_IGNORING_RETVALS\";", g_sSteamIdTablesCleanup[i]);
-		g_hDb.Query(SQLCleanUpTables, sQuery);
-	}
 }
 
 public void SQLCleanUpTables(Handle owner, Handle hndl, const char[] error, any data)
