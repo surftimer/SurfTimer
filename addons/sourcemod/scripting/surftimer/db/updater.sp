@@ -334,7 +334,7 @@ public void SQLCheckDataType(Handle owner, Handle hndl, const char[] error, Data
 
 void ConvertDataTypeToDecimal(const char[] table, const char[] column, int precision, int scale)
 {
-	PrintToServer("Converting %s-%s to decimal(%d, %d)...", table, column, precision, scale);
+	LogMessage("Converting %s-%s to decimal(%d, %d)...", table, column, precision, scale);
 	
 	char sQuery[128];
 	Format(sQuery, sizeof(sQuery), "ALTER TABLE %s MODIFY %s DECIMAL(%d, %d);", table, column, precision, scale);
@@ -384,4 +384,206 @@ public void SQLCleanUpTables(Handle owner, Handle hndl, const char[] error, any 
 		SetFailState("[SQLCleanUpTables] Error while cleaning up tables... Error: %s", error);
 		return;
 	}
+}
+
+void SelectPlayersStuff()
+{
+	Transaction tTransaction = new Transaction();
+
+	char sQuery[256];
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid, name FROM ck_bonus GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 0);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid FROM ck_checkpoints GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 1);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid, name FROM ck_latestrecords GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 2);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid FROM ck_playeroptions2 GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 3);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid, steamid64 FROM ck_playerrank GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 4);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid FROM ck_playertemp GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 5);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid, name FROM ck_playertimes GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 6);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid, name FROM ck_prinfo GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 7);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid FROM ck_vipadmins GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 8);
+
+	SQL_ExecuteTransaction(g_hDb, tTransaction, SQLTxn_GetPlayerDataSuccess, SQLTxn_GetPlayerDataFailed, .priority=DBPrio_High);
+}
+
+public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, DBResultSet[] results, any[] queryData)
+{
+	for (int i = 0; i < numQueries; i++)
+	{
+		int iQueries = 0;
+		Transaction tTransaction = new Transaction();
+		char sSteamId2[32], sName[64], sSteamId64[128], sQuery[1024];
+		// ck_bonus
+		if (g_sSteamIdTablesCleanup[i][3] == 'b')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				results[i].FetchString(1, sName, sizeof(sName));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2N, iAccountId, sSteamId2, sName, sSteamId2, sName);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_checkpoints
+		else if (g_sSteamIdTablesCleanup[i][3] == 'c')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2, iAccountId, sSteamId2, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_latestrecords
+		else if (g_sSteamIdTablesCleanup[i][3] == 'l')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				results[i].FetchString(1, sName, sizeof(sName));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2N, iAccountId, sSteamId2, sName, sSteamId2, sName);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_playeroptions2
+		else if (g_sSteamIdTablesCleanup[i][3] == 'p' && g_sSteamIdTablesCleanup[i][10] == 'p')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2, iAccountId, sSteamId2, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_playerrank
+		else if (g_sSteamIdTablesCleanup[i][3] == 'p' && g_sSteamIdTablesCleanup[i][10] == 'a')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				results[i].FetchString(1, sSteamId64, sizeof(sSteamId64));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2S64, iAccountId, sSteamId2, sSteamId64, sSteamId2, sSteamId64);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_playertemp
+		else if (g_sSteamIdTablesCleanup[i][3] == 'p' && g_sSteamIdTablesCleanup[i][10] == 'e')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2, iAccountId, sSteamId2, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_playertimes
+		else if (g_sSteamIdTablesCleanup[i][3] == 'p' && g_sSteamIdTablesCleanup[i][10] == 'i')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				results[i].FetchString(1, sName, sizeof(sName));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2N, iAccountId, sSteamId2, sName, sSteamId2, sName);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_prinfo
+		else if (g_sSteamIdTablesCleanup[i][3] == 'p' && g_sSteamIdTablesCleanup[i][4] == 'r')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				results[i].FetchString(1, sName, sizeof(sName));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2N, iAccountId, sSteamId2, sName, sSteamId2, sName);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_vipadmins
+		else if (g_sSteamIdTablesCleanup[i][3] == 'v')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2, iAccountId, sSteamId2, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+
+		if (iQueries == 0)
+		{
+			delete tTransaction;
+
+			// TODO: Call upgrade again?
+			continue;
+		}
+
+		PrintToServer("Transaction for %s with %d queries started...", g_sSteamIdTablesCleanup[i], iQueries);
+		SQL_ExecuteTransaction(g_hDb, tTransaction, SQLTxn_InsertToPlayersSuccess, SQLTxn_InsertToPlayersFailed, .priority=DBPrio_High);
+	}
+}
+
+public void SQLTxn_InsertToPlayersSuccess(Database db, any data, int numQueries, DBResultSet[] results, any[] queryData)
+{
+	// TODO: Call upgrade again?
+}
+
+public void SQLTxn_InsertToPlayersFailed(Database db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
+{
+	SetFailState("[SurfTimer] Failed while adding data to table ck_players! Error: %s", error);
+}
+
+public void SQLTxn_GetPlayerDataFailed(Database db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
+{
+	SetFailState("[SurfTimer] Failed while getting data from table %s! Error: %s", g_sSteamIdTablesCleanup[failIndex], error);
 }

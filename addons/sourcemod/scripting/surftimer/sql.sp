@@ -54,6 +54,7 @@ public void db_setupDatabase()
 	SQL_UnlockDatabase(g_hDb_Updates);
 	LoopFloatDecimalTables();
 	CleanUpTablesRetvalsSteamId();
+	SelectPlayersStuff(); // TODO: Remove this, is just for testing
 
 	for (int i = 0; i < sizeof(g_failedTransactions); i++)
 		g_failedTransactions[i] = 0;
@@ -5515,14 +5516,14 @@ public void db_deleteZone(int client, int zoneid)
 public void SQLTxn_ZoneRemovalSuccess(Handle db, any client, int numQueries, Handle[] results, any[] queryData)
 {
 	if (IsValidClient(client))
-	CPrintToChat(client, "%t", "SQL9", g_szChatPrefix);
+		CPrintToChat(client, "%t", "SQL9", g_szChatPrefix);
 	PrintToServer("[SurfTimer] Zone Removed Succesfully");
 }
 
 public void SQLTxn_ZoneRemovalFailed(Handle db, any client, int numQueries, const char[] error, int failIndex, any[] queryData)
 {
 	if (IsValidClient(client))
-	CPrintToChat(client, "%t", "SQL10", g_szChatPrefix, error);
+		CPrintToChat(client, "%t", "SQL10", g_szChatPrefix, error);
 	PrintToServer("[SurfTimer] Zone Removal Failed. Error: %s", error);
 	return;
 }
