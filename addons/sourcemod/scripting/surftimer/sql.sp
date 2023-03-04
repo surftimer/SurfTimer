@@ -54,7 +54,6 @@ public void db_setupDatabase()
 	SQL_UnlockDatabase(g_hDb_Updates);
 	LoopFloatDecimalTables();
 	CleanUpTablesRetvalsSteamId();
-	SelectPlayersStuff(); // TODO: Remove this, is just for testing
 
 	for (int i = 0; i < sizeof(g_failedTransactions); i++)
 		g_failedTransactions[i] = 0;

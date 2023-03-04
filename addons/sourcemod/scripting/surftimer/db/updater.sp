@@ -223,6 +223,7 @@ void db_upgradeDatabase(int ver, bool skipErrorCheck = false)
 	else if (ver == 14)
 	{
 		SQL_FastQuery(g_hDb, sql_createPlayers);
+		SelectPlayersStuff();
 	}
 
 	CheckDatabaseForUpdates();
@@ -563,8 +564,6 @@ public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, D
 		if (iQueries == 0)
 		{
 			delete tTransaction;
-
-			// TODO: Call upgrade again?
 			continue;
 		}
 
