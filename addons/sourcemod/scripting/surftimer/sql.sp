@@ -42,6 +42,7 @@ public void db_setupDatabase()
 	// If updating from a previous version
 	SQL_LockDatabase(g_hDb);
 	SQL_FastQuery(g_hDb, "SET NAMES 'utf8mb4'");
+	SQL_UnlockDatabase(g_hDb);
 
 	// Check if tables need to be Created or database needs to be upgraded
 	g_bRenaming = false;
@@ -49,9 +50,6 @@ public void db_setupDatabase()
 
 	GetDatabaseName(g_sDatabaseName, sizeof(g_sDatabaseName));
 	CheckDatabaseForUpdates();
-
-	SQL_UnlockDatabase(g_hDb);
-	SQL_UnlockDatabase(g_hDb_Updates);
 	LoopFloatDecimalTables();
 	CleanUpTablesRetvalsSteamId();
 

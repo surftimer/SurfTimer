@@ -99,12 +99,11 @@ void CheckDatabaseForUpdates()
 			delete results;
 			return;
 		}
-		
 		// Version 13 - End
 
 		if (!SQL_FastQuery(g_hDb, "SELECT accountid FROM ck_players LIMIT 1"))
 		{
-			db_upgradeDatabase(14);
+			db_upgradeDatabase(14, true);
 			return;
 		}
 
@@ -222,8 +221,13 @@ void db_upgradeDatabase(int ver, bool skipErrorCheck = false)
 	}
 	else if (ver == 14)
 	{
-		SQL_FastQuery(g_hDb, sql_createPlayers);
-		SelectPlayersStuff();
+		if (SQL_FastQuery(g_hDb, sql_createPlayers))
+		{
+			// Waiting a frame fixed "Lost connection" error for me...
+			// maybe it was a random thing, but I'll keep it for now.
+			RequestFrame(StartLoadingPlayerStuff);
+			return;
+		}
 	}
 
 	CheckDatabaseForUpdates();
@@ -387,6 +391,11 @@ public void SQLCleanUpTables(Handle owner, Handle hndl, const char[] error, any 
 	}
 }
 
+public void StartLoadingPlayerStuff()
+{
+	SelectPlayersStuff();
+}
+
 void SelectPlayersStuff()
 {
 	Transaction tTransaction = new Transaction();
@@ -424,10 +433,11 @@ void SelectPlayersStuff()
 
 public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, DBResultSet[] results, any[] queryData)
 {
+	int iQueries = 0;
+	Transaction tTransaction = new Transaction();
+
 	for (int i = 0; i < numQueries; i++)
 	{
-		int iQueries = 0;
-		Transaction tTransaction = new Transaction();
 		char sSteamId2[32], sName[64], sSteamId64[128], sQuery[1024];
 		// ck_bonus
 		if (g_sSteamIdTablesCleanup[i][3] == 'b')
@@ -561,15 +571,17 @@ public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, D
 			}
 		}
 
-		if (iQueries == 0)
-		{
-			delete tTransaction;
-			continue;
-		}
-
-		PrintToServer("Transaction for %s with %d queries started...", g_sSteamIdTablesCleanup[i], iQueries);
-		SQL_ExecuteTransaction(g_hDb, tTransaction, SQLTxn_InsertToPlayersSuccess, SQLTxn_InsertToPlayersFailed, .priority=DBPrio_High);
+		PrintToServer("Added %d Queries to Transaction for table %s", iQueries, g_sSteamIdTablesCleanup[i]);
 	}
+
+	if (iQueries == 0)
+	{
+		CheckDatabaseForUpdates();
+		return;
+	}
+
+	PrintToServer("Transaction started with %d queries started...", iQueries);
+	SQL_ExecuteTransaction(g_hDb, tTransaction, SQLTxn_InsertToPlayersSuccess, SQLTxn_InsertToPlayersFailed, .priority=DBPrio_High);
 }
 
 public void SQLTxn_InsertToPlayersSuccess(Database db, any data, int numQueries, DBResultSet[] results, any[] queryData)
@@ -580,13 +592,19 @@ public void SQLTxn_InsertToPlayersSuccess(Database db, any data, int numQueries,
 public void SQLTxn_InsertToPlayersFailed(Database db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
 {
 	SQL_FastQuery(g_hDb, "DROP TABLE IF EXISTS ck_players;");
-	
+
 	SetFailState("[SurfTimer] Failed while adding data to table ck_players! Error: %s", error);
 }
 
 public void SQLTxn_GetPlayerDataFailed(Database db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
 {
 	SQL_FastQuery(g_hDb, "DROP TABLE IF EXISTS ck_players;");
-	
+
+	if (failIndex == -1)
+	{
+		SetFailState("[SurfTimer] Failed while getting data! Error: %s", error);
+		return;
+	}
+
 	SetFailState("[SurfTimer] Failed while getting data from table %s! Error: %s", g_sSteamIdTablesCleanup[failIndex], error);
 }
