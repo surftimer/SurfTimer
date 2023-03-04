@@ -485,6 +485,7 @@ public void OnClientPutInServer(int client)
 		g_bLoadingSettings[client] = true;
 		g_iSettingToLoad[client] = 0;
 		LoadClientSetting(client, g_iSettingToLoad[client]);
+		db_InsertUpdatePlayersTable(client);
 	}
 }
 

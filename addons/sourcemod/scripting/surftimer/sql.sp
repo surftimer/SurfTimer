@@ -12557,3 +12557,19 @@ public int CCPMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 
 	return 0;
 }
+
+void db_InsertUpdatePlayersTable(int client)
+{
+	char sSteamId2[32];
+	GetClientAuthId(client, AuthId_Steam2, sSteamId2, sizeof(sSteamId2));
+
+	char sSteamId64[64];
+	GetClientAuthId(client, AuthId_SteamID64, sSteamId64, sizeof(sSteamId64));
+
+	char sName[MAX_NAME_LENGTH];
+	GetClientName(client, sName, sizeof(sName));
+	
+	char sQuery[1024];
+	g_hDb.Format(sQuery, sizeof(sQuery), sql_insertUpdatePlayersAll, GetSteamAccountID(client), sSteamId2, sSteamId64, sName, sSteamId2, sSteamId64, sName);
+	g_hDb.Query(SQL_CheckCallback, sQuery, __LINE__, DBPrio_Low);
+}

@@ -261,7 +261,7 @@ void CheckDataType(const char[] table, const char[] column)
 	pack.WriteString(table);
 	pack.WriteString(sColumn);
 
-	g_hDb.Query(SQLCheckDataType, sQuery, pack);
+	g_hDb_Updates.Query(SQLCheckDataType, sQuery, pack);
 }
 
 public void SQLCheckDataType(Handle owner, Handle hndl, const char[] error, DataPack pack)
@@ -348,7 +348,7 @@ void ConvertDataTypeToDecimal(const char[] table, const char[] column, int preci
 	pack.WriteString(table);
 	pack.WriteString(column);
 
-	g_hDb.Query(SQLChangeDataType, sQuery, pack);
+	g_hDb_Updates.Query(SQLChangeDataType, sQuery, pack);
 }
 
 public void SQLChangeDataType(Handle owner, Handle hndl, const char[] error, DataPack pack)

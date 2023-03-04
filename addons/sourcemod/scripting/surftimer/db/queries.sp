@@ -142,3 +142,4 @@ char sql_createPlayers[] = "CREATE TABLE IF NOT EXISTS ck_players (accountid INT
 char sql_insertPlayersAS2[] = "INSERT ck_players (accountid, steamid2) VALUES ('%d', '%s') ON DUPLICATE KEY UPDATE steamid2 = '%s'";
 char sql_insertPlayersAS2N[] = "INSERT ck_players (accountid, steamid2, name) VALUES ('%d', '%s', '%s') ON DUPLICATE KEY UPDATE steamid2 = '%s', name = '%s'";
 char sql_insertPlayersAS2S64[] = "INSERT ck_players (accountid, steamid2, steamid64) VALUES ('%d', '%s', '%s') ON DUPLICATE KEY UPDATE steamid2 = '%s', steamid64 = '%s'";
+char sql_insertUpdatePlayersAll[] = "INSERT ck_players (accountid, steamid2, steamid64, name) VALUES ('%d', '%s', '%s', '%s') ON DUPLICATE KEY UPDATE steamid2 = '%s', steamid64 = '%s', name = '%s'";
