@@ -579,10 +579,14 @@ public void SQLTxn_InsertToPlayersSuccess(Database db, any data, int numQueries,
 
 public void SQLTxn_InsertToPlayersFailed(Database db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
 {
+	SQL_FastQuery(g_hDb, "DROP TABLE IF EXISTS ck_players;");
+	
 	SetFailState("[SurfTimer] Failed while adding data to table ck_players! Error: %s", error);
 }
 
 public void SQLTxn_GetPlayerDataFailed(Database db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
 {
+	SQL_FastQuery(g_hDb, "DROP TABLE IF EXISTS ck_players;");
+	
 	SetFailState("[SurfTimer] Failed while getting data from table %s! Error: %s", g_sSteamIdTablesCleanup[failIndex], error);
 }
