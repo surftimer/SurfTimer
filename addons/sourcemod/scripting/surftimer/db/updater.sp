@@ -261,7 +261,7 @@ void CheckDataType(const char[] table, const char[] column)
 	pack.WriteString(table);
 	pack.WriteString(sColumn);
 
-	SQL_TQuery(g_hDb_Updates, SQLCheckDataType, sQuery, pack);
+	g_hDb.Query(SQLCheckDataType, sQuery, pack);
 }
 
 public void SQLCheckDataType(Handle owner, Handle hndl, const char[] error, DataPack pack)
@@ -348,7 +348,7 @@ void ConvertDataTypeToDecimal(const char[] table, const char[] column, int preci
 	pack.WriteString(table);
 	pack.WriteString(column);
 
-	SQL_TQuery(g_hDb_Updates, SQLChangeDataType, sQuery, pack);
+	g_hDb.Query(SQLChangeDataType, sQuery, pack);
 }
 
 public void SQLChangeDataType(Handle owner, Handle hndl, const char[] error, DataPack pack)
@@ -378,7 +378,7 @@ void CleanUpTablesRetvalsSteamId()
 	for (int i = 0; i < sizeof(g_sSteamIdTablesCleanup); i++)
 	{
 		FormatEx(sQuery, sizeof(sQuery), "DELETE FROM %s WHERE steamid = \"STEAM_ID_STOP_IGNORING_RETVALS\";", g_sSteamIdTablesCleanup[i]);
-		SQL_TQuery(g_hDb_Updates, SQLCleanUpTables, sQuery);
+		g_hDb.Query(SQLCleanUpTables, sQuery);
 	}
 }
 

@@ -703,8 +703,8 @@ GlobalForward g_NewWRCPForward;
 /*----------  SQL Variables  ----------*/
 
 // SQL driver
-Handle g_hDb = null;
-Handle g_hDb_Updates = null;
+Database g_hDb = null;
+Database g_hDb_Updates = null;
 
 // Database type
 int g_DbType;

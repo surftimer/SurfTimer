@@ -389,7 +389,7 @@ public Action Say_Hook(int client, const char[] command, int argc)
 					}
 				}
 
-				SQL_TQuery(g_hDb, sql_DeleteMenuView, szQuery, GetClientSerial(client));
+				g_hDb.Query(sql_DeleteMenuView, szQuery, GetClientSerial(client));
 			}
 			case ColorValue:
 			{
