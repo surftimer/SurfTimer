@@ -1575,7 +1575,8 @@ char g_sSteamIdTablesCleanup[][] = {
 	"ck_playerrank", 
 	"ck_playertemp", 
 	"ck_playertimes", 
-	"ck_prinfo", 
+	"ck_prinfo",
+	"ck_wrcps",
 	"ck_vipadmins"
 };
 

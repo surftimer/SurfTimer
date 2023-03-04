@@ -425,8 +425,11 @@ void SelectPlayersStuff()
 	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid, name FROM ck_prinfo GROUP BY steamid;");
 	tTransaction.AddQuery(sQuery, 7);
 
-	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid FROM ck_vipadmins GROUP BY steamid;");
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid, name FROM ck_wrcps GROUP BY steamid;");
 	tTransaction.AddQuery(sQuery, 8);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid FROM ck_vipadmins GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 9);
 
 	SQL_ExecuteTransaction(g_hDb, tTransaction, SQLTxn_GetPlayerDataSuccess, SQLTxn_GetPlayerDataFailed, .priority=DBPrio_High);
 }
@@ -543,6 +546,21 @@ public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, D
 		}
 		// ck_prinfo
 		else if (g_sSteamIdTablesCleanup[i][3] == 'p' && g_sSteamIdTablesCleanup[i][4] == 'r')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				results[i].FetchString(1, sName, sizeof(sName));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2N, iAccountId, sSteamId2, sName, sSteamId2, sName);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_wrcps
+		else if (g_sSteamIdTablesCleanup[i][3] == 'w')
 		{
 			while (results[i].FetchRow())
 			{
