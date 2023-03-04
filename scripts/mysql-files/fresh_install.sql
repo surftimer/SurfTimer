@@ -257,3 +257,11 @@ CREATE TABLE IF NOT EXISTS ck_replays (
     `style` INT(12) NOT NULL DEFAULT '0',
     PRIMARY KEY(`mapname`, `cp`, `style`))
     DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS ck_players (
+    accountid INT NOT NULL,
+    steamid2 VARCHAR(32) NULL,
+    steamid64 VARCHAR(64) NULL,
+    name VARCHAR(64) NULL,
+    PRIMARY KEY(accountid)) 
+    EFAULT CHARSET=utf8mb4;
