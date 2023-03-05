@@ -237,7 +237,14 @@ void db_upgradeDatabase(int ver, bool skipErrorCheck = false)
 		
 		if (SQL_FastQuery(g_hDb, sql_createPlayers))
 		{
-			// Waiting a frame fixed "Lost connection" error for me...
+			// Add accountid column to tables, because we can use the next SELECT queries for adding accountid to all 10 tables too...
+			for (int i = 0; i < sizeof(g_sSteamIdTablesCleanup); i++)
+			{
+				FormatEx(sQuery, sizeof(sQuery), "ALTER TABLE %s ADD COLUMN accountid INT NOT NULL AFTER steamid;", g_sSteamIdTablesCleanup[i]);
+				SQL_FastQuery(g_hDb, sQuery);
+			}
+
+			// Wait a frame fixed for me the "Lost Connection" error...
 			// maybe it was a random thing, but I'll keep it for now.
 			RequestFrame(StartLoadingPlayerStuff);
 			return;
@@ -245,12 +252,56 @@ void db_upgradeDatabase(int ver, bool skipErrorCheck = false)
 	}
 	else if (ver == 15)
 	{
+		// Drop table keys and steamid columns...
+		char sQuery[512];
+		for (int i = 0; i < sizeof(g_sSteamIdTablesCleanup); i++)
+		{
+			FormatEx(sQuery, sizeof(sQuery), "ALTER TABLE %s DROP PRIMARY KEY;", g_sSteamIdTablesCleanup[i]);
+			SQL_FastQuery(g_hDb, sQuery);
+
+			FormatEx(sQuery, sizeof(sQuery), "ALTER TABLE %s DROP COLUMN steamid;", g_sSteamIdTablesCleanup[i]);
+			SQL_FastQuery(g_hDb, sQuery);
+
+			if (g_sSteamIdTablesCleanup[i][3] == 'v')
+			{
+				SQL_FastQuery(g_hDb, "DROP INDEX vip ON ck_vipadmins;");
+			}
+		}
+
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_bonus DROP COLUMN name;");
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_latestrecords DROP COLUMN name;");
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playertimes DROP COLUMN name;");
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_prinfo DROP COLUMN name;");
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank DROP COLUMN steamid64;");
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_wrcps DROP COLUMN name;");
+		/*
+			Steps left (maybe more):
+				- add (primary) keys back
+			
+
+			Keys:
+				ck_bonus
+					PRIMARY KEY(`steamid`, `mapname`, `zonegroup`, `style`)
+				ck_checkpoints
+					PRIMARY KEY(`steamid`, `mapname`, `cp`, `zonegroup`)
+				ck_latestrecords
+					PRIMARY KEY(`steamid`, `map`, `date`)
+				ck_playeroptions2
+					PRIMARY KEY (`steamid`)
+				ck_playerrank
+					PRIMARY KEY (`steamid`, `style`)
+				ck_playertemp
+					PRIMARY KEY(`steamid`,`mapname`)
+				ck_playertimes
+					PRIMARY KEY(`steamid`, `mapname`, `style`)
+				ck_prinfo
+					PRIMARY KEY(`steamid`, `mapname`, `zonegroup`)
+				ck_wrcps
+					PRIMARY KEY (`steamid`,`mapname`,`stage`,`style`)
+				ck_vipadmins
+					PRIMARY KEY (`steamid`)
+					KEY `vip` (`steamid`,`vip`,`admin`,`zoner`)
+		*/
 	}
 
 	CheckDatabaseForUpdates();
@@ -465,7 +516,13 @@ public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, D
 				
 				int iAccountId = SteamId2ToAccountId(sSteamId2);
 
+				// Insert into ck_players
 				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2N, iAccountId, sSteamId2, sName, sSteamId2, sName);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
 				tTransaction.AddQuery(sQuery);
 				iQueries++;
 			}
@@ -479,7 +536,13 @@ public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, D
 				
 				int iAccountId = SteamId2ToAccountId(sSteamId2);
 
+				// Insert into ck_players
 				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2, iAccountId, sSteamId2, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
 				tTransaction.AddQuery(sQuery);
 				iQueries++;
 			}
@@ -494,7 +557,13 @@ public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, D
 				
 				int iAccountId = SteamId2ToAccountId(sSteamId2);
 
+				// Insert into ck_players
 				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2N, iAccountId, sSteamId2, sName, sSteamId2, sName);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
 				tTransaction.AddQuery(sQuery);
 				iQueries++;
 			}
@@ -508,7 +577,13 @@ public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, D
 				
 				int iAccountId = SteamId2ToAccountId(sSteamId2);
 
+				// Insert into ck_players
 				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2, iAccountId, sSteamId2, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
 				tTransaction.AddQuery(sQuery);
 				iQueries++;
 			}
@@ -523,7 +598,13 @@ public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, D
 				
 				int iAccountId = SteamId2ToAccountId(sSteamId2);
 
+				// Insert into ck_players
 				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2S64, iAccountId, sSteamId2, sSteamId64, sSteamId2, sSteamId64);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
 				tTransaction.AddQuery(sQuery);
 				iQueries++;
 			}
@@ -537,7 +618,13 @@ public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, D
 				
 				int iAccountId = SteamId2ToAccountId(sSteamId2);
 
+				// Insert into ck_players
 				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2, iAccountId, sSteamId2, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
 				tTransaction.AddQuery(sQuery);
 				iQueries++;
 			}
@@ -552,7 +639,13 @@ public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, D
 				
 				int iAccountId = SteamId2ToAccountId(sSteamId2);
 
+				// Insert into ck_players
 				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2N, iAccountId, sSteamId2, sName, sSteamId2, sName);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
 				tTransaction.AddQuery(sQuery);
 				iQueries++;
 			}
@@ -567,7 +660,13 @@ public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, D
 				
 				int iAccountId = SteamId2ToAccountId(sSteamId2);
 
+				// Insert into ck_players
 				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2N, iAccountId, sSteamId2, sName, sSteamId2, sName);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
 				tTransaction.AddQuery(sQuery);
 				iQueries++;
 			}
@@ -582,7 +681,13 @@ public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, D
 				
 				int iAccountId = SteamId2ToAccountId(sSteamId2);
 
+				// Insert into ck_players
 				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2N, iAccountId, sSteamId2, sName, sSteamId2, sName);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
 				tTransaction.AddQuery(sQuery);
 				iQueries++;
 			}
@@ -596,7 +701,13 @@ public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, D
 				
 				int iAccountId = SteamId2ToAccountId(sSteamId2);
 
+				// Insert into ck_players
 				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2, iAccountId, sSteamId2, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
 				tTransaction.AddQuery(sQuery);
 				iQueries++;
 			}
