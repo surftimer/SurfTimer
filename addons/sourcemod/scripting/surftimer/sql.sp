@@ -10511,51 +10511,6 @@ public void SQL_SetJoinMsgCallback(Handle owner, Handle hndl, const char[] error
 		CPrintToChat(client, "%t", "SQLTwo6", g_szChatPrefix, g_szCustomJoinMsg[client]);
 }
 
-// public void db_precacheCustomSounds()
-// {
-// 	char szQuery[512];
-// 	Format(szQuery, sizeof(szQuery), "SELECT pbsound, topsound, wrsound FROM ck_vipadmins");
-// 	SQL_TQuery(g_hDb, SQL_PrecacheCustomSoundsCallback szQuery, 1, DBPrio_Low);
-// }
-
-// public void SQL_SetJoinMsgCallback(Handle owner, Handle hndl, const char[] error, any data)
-// {
-// 	if (hndl == null)
-// 	{
-// 		LogError("[surftimer] SQL Error (SQL_PrecacheCustomSoundsCallback): %s", error);
-// 		return;
-// 	}
-
-// 	if (SQL_HasResultSet(hndl))
-// 	{
-// 		char pbsound[256], topsound[256], wrsound[256];
-// 		while (SQL_FetchRow(hndl))
-// 		{
-// 			SQL_FetchString(hndl, 0, pbsound, sizeof(pbsound));
-// 			SQL_FetchString(hndl, 1, topsound, sizeof(topsound));
-// 			SQL_FetchString(hndl, 2, wrsound, sizeof(wrsound));
-
-// 			if (!StrEqual(pbsound, "none"))
-// 			{
-// 				AddFileToDownloadsTable(pbsound);
-// 				FakePrecacheSound(pbsound);
-// 			}
-
-// 			if (!StrEqual(topsound, "none"))
-// 			{
-// 				AddFileToDownloadsTable(topsound);
-// 				FakePrecacheSound(topsound);
-// 			}
-
-// 			if (!StrEqual(wrsound, "none"))
-// 			{
-// 				AddFileToDownloadsTable(wrsound);
-// 				FakePrecacheSound(wrsound);
-// 			}
-// 		}
-// 	}
-// }
-
 /*
  * CPR Command Info
  * 
