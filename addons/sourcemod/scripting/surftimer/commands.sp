@@ -5958,57 +5958,118 @@ public Action Command_CPR(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 
+	// Display client vs rank 1 if client has completion
 	if (args == 0)
 	{
-		if (g_fPersonalRecord[client] < 1.0)
+		if (g_fPersonalRecord[client] > 0.0)
 		{
-			CReplyToCommand(client, "%t", "Commands84", g_szChatPrefix);
-			return Plugin_Handled;
-		}
-		db_selectCPR(client, 1, g_szMapName, "");
-	}
-	else
-	{
-		char arg[128];
-		GetCmdArg(1, arg, sizeof(arg));
-		if (StrContains(arg, "surf_") != -1)
-		{
-			db_selectCPR(client, 1, arg, "");
-		}
-		else if (StrContains(arg, "@") != -1)
-		{
-			ReplaceString(arg, 128, "@", "");
-			char arg2[128];
-			int rank = StringToInt(arg);
-			GetCmdArg(2, arg2, sizeof(arg2));
-			if (!arg2[0])
-				db_selectCPR(client, rank, g_szMapName, "");
-			else
-				db_selectCPR(client, rank, arg2, "");
+			db_selectCPR(client, g_MapRank[client], g_szMapName, 1);
 		}
 		else
 		{
-			char szPlayerName[MAX_NAME_LENGTH];
-			bool found = false;
-			for (int i = 1; i <= MaxClients; i++)
+			CReplyToCommand(client, "%s{default}You {darkred}do not{default} have a personal best yet, use:", g_szChatPrefix);
+			CReplyToCommand(client, "%s{yellow}!cpr {green}@<rank> @<rank> {blue}<mapname> {default}(mapname is optional)", g_szChatPrefix);
+		}
+		return Plugin_Handled;
+	}
+	char arg[128];
+	int rank1, rank2;
+	bool rank1_name = false;
+	bool rank2_name = false;
+	
+	// Get the first rank to compare -> rank1
+	GetCmdArg(1, arg, sizeof(arg));
+	if (StrContains(arg, "@") != -1)
+	{
+		ReplaceString(arg, 128, "@", "");
+		rank1 = StringToInt(arg);
+	}
+	else if(arg[0]) // Look for in-game player with argument for comparing with -> rank1
+	{
+		// CReplyToCommand(client, "arg = %s", arg);
+		StringToUpper(arg);
+		char szPlayerName[MAX_NAME_LENGTH];
+		bool found = false;
+		for (int i = 1; i <= MaxClients; i++)
+		{
+			if (IsValidClient(i) && !IsClientSourceTV(i))
 			{
-				if (IsValidClient(i) && i != client)
+				GetClientName(i, szPlayerName, sizeof(szPlayerName));
+				StringToUpper(szPlayerName);
+				
+				if ((StrContains(szPlayerName, arg) != -1))
 				{
-					GetClientName(i, szPlayerName, MAX_NAME_LENGTH);
-					StringToUpper(szPlayerName);
-					if ((StrContains(szPlayerName, arg) != -1))
-					{
-						found = true;
-						db_selectCPR(client, 0, g_szMapName, g_szSteamID[i]);
-						break;
-					}
+					found = true;
+					rank1_name = true;
+					rank1 = g_MapRank[i];
+					break;
 				}
 			}
-			if (!found)
-				CReplyToCommand(client, "%t", "Commands85", g_szChatPrefix);
+		}
+		if (!found)
+		{
+			CReplyToCommand(client, "%t", "Commands85", g_szChatPrefix);
+			return Plugin_Handled;
 		}
 	}
+	else return Plugin_Handled;
 
+	if (args == 1) // compare client argument (rank1) with record for current map
+	{
+		db_selectCPR(client, rank1, g_szMapName, 1);
+	}
+
+	// Get the second rank to compare -> rank2
+	GetCmdArg(2, arg, sizeof(arg));
+	if (StrContains(arg, "@") != -1)
+	{
+		ReplaceString(arg, 128, "@", "");
+		rank2 = StringToInt(arg);
+	}
+	else if(arg[0]) // Look for in-game player with argument for comparing with -> rank2
+	{
+		// CReplyToCommand(client, "arg = %s", arg);
+		StringToUpper(arg);
+		char szPlayerName[MAX_NAME_LENGTH];
+		bool found = false;
+		for (int i = 1; i <= MaxClients; i++)
+		{
+			if (IsValidClient(i) && !IsClientSourceTV(i))
+			{
+				GetClientName(i, szPlayerName, MAX_NAME_LENGTH);
+				StringToUpper(szPlayerName);
+				
+				if ((StrContains(szPlayerName, arg) != -1))
+				{
+					found = true;
+					rank2_name = true;
+					rank2 = g_MapRank[i];
+					break;
+				}
+			}
+		}
+		if (!found)
+		{
+			CReplyToCommand(client, "%t", "Commands85", g_szChatPrefix);
+			return Plugin_Handled;
+		}
+	}
+	else return Plugin_Handled;
+	
+	// If comparing 2 in-game players we only compare current map
+	if (!rank1_name && !rank2_name)
+	{
+		// Use current map or client asked for a specific one
+		GetCmdArg(3, arg, sizeof(arg));
+		if (arg[0])
+			db_selectCPR(client, rank1, arg, rank2);
+		else	
+			db_selectCPR(client, rank1, g_szMapName, rank2);
+	}
+	else
+	{
+		db_selectCPR(client, rank1, g_szMapName, rank2);
+	}
 	return Plugin_Handled;
 }
 
