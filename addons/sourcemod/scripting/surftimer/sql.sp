@@ -10572,6 +10572,9 @@ public void SQL_SelectCPRTimeCallback(Handle owner, Handle hndl, const char[] er
 	int client = ReadPackCell(pack);
 	int rank1 = ReadPackCell(pack);
 	int rank2 = ReadPackCell(pack);
+	// stop warning messages for unused variables, thanks @Bara
+	if (rank1) {}
+	if (rank2) {}
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
@@ -10631,6 +10634,10 @@ public void db_selectCPRTarget(any pack)
 	int rank2 = ReadPackCell(pack);
 	char firstTargetName[MAX_NAME_LENGTH];
 	ReadPackString(pack, firstTargetName, sizeof(firstTargetName));
+
+	// stop warning messages for unused variables, thanks @Bara
+	if (rank1) {}
+	if (rank2) {}
 
 	// Find CPR target rank SteamID
 	char szQuery[512];
