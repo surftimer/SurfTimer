@@ -5981,7 +5981,7 @@ public Action Command_CPR(int client, int args)
 	GetCmdArg(1, arg, sizeof(arg));
 	if (StrContains(arg, "@") != -1)
 	{
-		ReplaceString(arg, 128, "@", "");
+		ReplaceString(arg, sizeof(arg), "@", "");
 		rank1 = StringToInt(arg);
 	}
 	else if(arg[0]) // Look for in-game player with argument for comparing with -> rank1
@@ -6030,7 +6030,7 @@ public Action Command_CPR(int client, int args)
 	GetCmdArg(2, arg, sizeof(arg));
 	if (StrContains(arg, "@") != -1)
 	{
-		ReplaceString(arg, 128, "@", "");
+		ReplaceString(arg, sizeof(arg), "@", "");
 		rank2 = StringToInt(arg);
 	}
 	else if(arg[0]) // Look for in-game player with argument for comparing with -> rank2
@@ -6043,7 +6043,7 @@ public Action Command_CPR(int client, int args)
 		{
 			if (IsValidClient(i) && !IsClientSourceTV(i))
 			{
-				GetClientName(i, szPlayerName, MAX_NAME_LENGTH);
+				GetClientName(i, szPlayerName, sizeof(szPlayerName));
 				StringToUpper(szPlayerName);
 				
 				if ((StrContains(szPlayerName, arg) != -1))
