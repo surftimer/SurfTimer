@@ -10698,6 +10698,9 @@ public void SQL_SelectCPRTargetCPsCallback(Handle owner, Handle hndl, const char
 		char firstTargetName[MAX_NAME_LENGTH];
 		ReadPackString(pack, firstTargetName, sizeof(firstTargetName));
 
+		// stop warning messages for unused variables, thanks @Bara
+		if (rank2) {}
+
 		Menu menu = CreateMenu(CPRMenuHandler);
 		char szTitle[256], szName[MAX_NAME_LENGTH];
 		GetClientName(client, szName, sizeof(szName));
