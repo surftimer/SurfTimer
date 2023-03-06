@@ -10518,8 +10518,9 @@ public void SQL_SetJoinMsgCallback(Handle owner, Handle hndl, const char[] error
  * @param rank				First rank targeted by the client
  * @param szMapName			Mapname for the queries
  * @param rank2				Second rank targeted by the client
+ * @param queryCase			Use 1 when using the current map name (does NOT contain LIKE in query)
  */
-public void db_selectCPR(int client, int rank, const char szMapName[128], int rank2)
+public void db_selectCPR(int client, int rank, const char szMapName[128], int rank2, int queryCase)
 {
 	/*
 	* Info on the DataPack used for the !cpr command
@@ -10543,7 +10544,17 @@ public void db_selectCPR(int client, int rank, const char szMapName[128], int ra
 
 	char szQuery[512];
 	// Query to get SteamID for first CPR target
-	Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `mapname` LIKE '%c%s%c' AND style = 0 ORDER BY `runtimepro` ASC LIMIT %i, 1", PERCENT, szMapName, PERCENT, rank-1);
+	switch(queryCase)
+	{
+		case 0:
+		{
+			Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `mapname` LIKE '%c%s%c' AND style = 0 ORDER BY `runtimepro` ASC LIMIT %i, 1", PERCENT, szMapName, PERCENT, rank-1);
+		}
+		case 1:
+		{
+			Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `mapname`='%s' AND style = 0 ORDER BY `runtimepro` ASC LIMIT %i, 1", szMapName, rank-1);
+		}
+	}
 
 	SQL_TQuery(g_hDb, SQL_SelectCPRTimeCallback, szQuery, pack, DBPrio_Low);
 }

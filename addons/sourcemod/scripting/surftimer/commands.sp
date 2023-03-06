@@ -5963,7 +5963,7 @@ public Action Command_CPR(int client, int args)
 	{
 		if (g_fPersonalRecord[client] > 0.0)
 		{
-			db_selectCPR(client, g_MapRank[client], g_szMapName, 1);
+			db_selectCPR(client, g_MapRank[client], g_szMapName, 1, 1);
 		}
 		else
 		{
@@ -6016,7 +6016,7 @@ public Action Command_CPR(int client, int args)
 
 	if (args == 1) // compare client argument (rank1) with record for current map
 	{
-		db_selectCPR(client, rank1, g_szMapName, 1);
+		db_selectCPR(client, rank1, g_szMapName, 1, 1);
 	}
 
 	// Get the second rank to compare -> rank2
@@ -6062,13 +6062,13 @@ public Action Command_CPR(int client, int args)
 		// Use current map or client asked for a specific one
 		GetCmdArg(3, arg, sizeof(arg));
 		if (arg[0])
-			db_selectCPR(client, rank1, arg, rank2);
+			db_selectCPR(client, rank1, arg, rank2, 0);
 		else	
-			db_selectCPR(client, rank1, g_szMapName, rank2);
+			db_selectCPR(client, rank1, g_szMapName, rank2, 1);
 	}
 	else
 	{
-		db_selectCPR(client, rank1, g_szMapName, rank2);
+		db_selectCPR(client, rank1, g_szMapName, rank2, 1);
 	}
 	return Plugin_Handled;
 }
