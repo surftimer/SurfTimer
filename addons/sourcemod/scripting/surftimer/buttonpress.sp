@@ -1006,6 +1006,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		}
 
 		db_selectWrcpRecord(client, 0, stage);
+
 		SendStageFinishedForward(client, g_Stage[0][client]-1, sz_srRawDiff, g_fStageRecord[g_Stage[0][client]]);
 		g_bWrcpTimeractivated[client] = false;
 	}
@@ -1038,6 +1039,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		FormatTimeFloat(client, g_fFinalWrcpTime[client], 3, g_szFinalWrcpTime[client], 32);
 		
 		db_selectWrcpRecord(client, style, stage);
+
 		SendStageFinishedForward(client, g_Stage[0][client]-1, sz_srRawDiff, g_fStyleStageRecord[g_iCurrentStyle[client]][g_Stage[0][client]]);
 		g_bWrcpTimeractivated[client] = false;
 	}
