@@ -1007,7 +1007,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 
 		db_selectWrcpRecord(client, 0, stage);
 
-		SendStageFinishedForward(client, g_Stage[0][client]-1, sz_srRawDiff, g_fStageRecord[g_Stage[0][client]]);
+		SendStageFinishedForward(client, stage, sz_srRawDiff, g_fStageRecord[g_Stage[0][client]]);
 		g_bWrcpTimeractivated[client] = false;
 	}
 	else if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] != 0) // styles
@@ -1040,7 +1040,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		
 		db_selectWrcpRecord(client, style, stage);
 
-		SendStageFinishedForward(client, g_Stage[0][client]-1, sz_srRawDiff, g_fStyleStageRecord[g_iCurrentStyle[client]][g_Stage[0][client]]);
+		SendStageFinishedForward(client, stage, sz_srRawDiff, g_fStyleStageRecord[g_iCurrentStyle[client]][g_Stage[0][client]]);
 		g_bWrcpTimeractivated[client] = false;
 	}
 }
