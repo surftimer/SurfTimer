@@ -968,7 +968,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 			return;
 		}
 
-		char sz_srDiff[128];
+		char sz_srDiff[128], sz_srRawDiff[128];
 		float time = g_fFinalWrcpTime[client];
 		float f_srDiff = (g_fStageRecord[stage] - time);
 		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
@@ -1003,7 +1003,8 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		}
 
 		db_selectWrcpRecord(client, 0, stage);
-		
+		FormatTimeFloat(client, f_srDiff, 3, sz_srRawDiff, sizeof(sz_srRawDiff));
+		SendStageFinishedForward(client, g_Stage[0][client], sz_srRawDiff, g_fStageRecord[g_Stage[0][client]]);
 		g_bWrcpTimeractivated[client] = false;
 	}
 	else if (g_bWrcpTimeractivated[client] && g_iCurrentStyle[client] != 0) // styles
@@ -1016,7 +1017,7 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 			return;
 		}
 
-		char sz_srDiff[128];
+		char sz_srDiff[128], sz_srRawDiff[128];
 		float time = g_fFinalWrcpTime[client];
 		float f_srDiff = (g_fStyleStageRecord[style][stage] - time);
 		FormatTimeFloat(client, f_srDiff, 3, sz_srDiff, 128);
@@ -1032,7 +1033,8 @@ public void CL_OnEndWrcpTimerPress(int client, float time2)
 		FormatTimeFloat(client, g_fFinalWrcpTime[client], 3, g_szFinalWrcpTime[client], 32);
 		
 		db_selectWrcpRecord(client, style, stage);
-		
+		FormatTimeFloat(client, f_srDiff, 3, sz_srRawDiff, sizeof(sz_srRawDiff));
+		SendStageFinishedForward(client, g_Stage[0][client], sz_srRawDiff, g_fStyleStageRecord[g_iCurrentStyle[client]][g_Stage[0][client]]);
 		g_bWrcpTimeractivated[client] = false;
 	}
 }
