@@ -5967,8 +5967,7 @@ public Action Command_CPR(int client, int args)
 		}
 		else
 		{
-			CReplyToCommand(client, "%s{default}You {darkred}do not{default} have a personal best yet, use:", g_szChatPrefix);
-			CReplyToCommand(client, "%s{yellow}!cpr {green}@<rank> @<rank> {blue}<mapname> {default}(mapname is optional)", g_szChatPrefix);
+			CReplyToCommand(client, "%t", "Commands90", g_szChatPrefix);
 		}
 		return Plugin_Handled;
 	}

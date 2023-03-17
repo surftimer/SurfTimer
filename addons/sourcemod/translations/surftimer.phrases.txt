@@ -856,6 +856,11 @@
 		"#format"	"{1:s}"
 		"en"		"{1} New stage start position saved"
 	}
+	"Commands90"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} You {darkred}do not{default} have a personal best yet, use:\n{1} !cpr {green}@<rank> @<rank> {blue}<mapname> {default}(mapname is optional)"
+	}
 	"BotInUse"
 	{
 		"#format"	"{1:s},{2:s}"
@@ -1982,4 +1987,5 @@
 		"#format"	"{1:s}"
 		"en"		"{1} {yellow}Already Max Rank!"
 	}
+	""
 }
