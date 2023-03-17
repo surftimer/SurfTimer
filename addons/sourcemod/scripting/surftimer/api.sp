@@ -331,6 +331,7 @@ void Register_Forwards()
 	g_PracticeFinishForward = new GlobalForward("surftimer_OnPracticeFinished", ET_Event, Param_Cell, Param_Float, Param_String);
 	g_NewRecordForward = new GlobalForward("surftimer_OnNewRecord", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
 	g_NewWRCPForward = new GlobalForward("surftimer_OnNewWRCP", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell, Param_Float);
+	g_StageFinishForward = new GlobalForward("surftimer_OnStageFinished", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell, Param_Float, Param_Float);
 }
 
 /**
@@ -488,4 +489,32 @@ void SendNewWRCPForward(int client, int stage, const char[] szRecordDiff, float 
 	Call_Finish();
 }
 
+/**
+ * Sends a new stage forward on surftimer_OnStageFinished.
+ * 
+ * @param client           Index of the client.
+ * @param stage            ID of the stage.
+ * @param szRecordDiff     String containing the formatted difference with the previous record.
+ * @param fRunTime		   Float value for the record time
+ */
+void SendStageFinishedForward(int client, int stage, const char[] szRecordDiff, float fRunTime)
+{
+	char szStageTime[64];
+	FormatTimeFloat(client, g_fCurrentWrcpRunTime[client], 3, szStageTime, sizeof(szStageTime));
+	
+	/* Start stage finished function call */
+	Call_StartForward(g_StageFinishForward);
+
+	/* Push parameters one at a time */
+	Call_PushCell(client);
+	Call_PushCell(g_iCurrentStyle[client]);
+	Call_PushString(szStageTime);
+	Call_PushString(szRecordDiff);
+	Call_PushCell(stage);
+	Call_PushFloat(fRunTime);
+	Call_PushFloat(g_fCurrentWrcpRunTime[client]);
+
+	/* Finish the call, get the result */
+	Call_Finish();
+}
 /*======  End of Forwards  ======*/

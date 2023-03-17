@@ -241,6 +241,19 @@ forward void surftimer_OnNewRecord(int client, int style, char[] time, char[] ti
 forward void surftimer_OnNewWRCP(int client, int style, char[] time, char[] timeDif, int stage, float fRunTime);
 
 /**
+ * Called when a client sets a new WRCP
+ *
+ * @param client			The client's ID.
+ * @param style				Style index.
+ * @param time				Time set by the player.
+ * @param timeDif			Time difference with the former record.
+ * @param stage			  	The id of the stage of the WRCP.
+ * @param fRunTime			Run time for the WRCP in float.
+ * @param fClientRunTime	Run time for the client of the current stage in float.
+ */
+forward void surftimer_OnStageFinished(int client, int style, char[] time, char[] timeDif, int stage, float fRunTime, float fClientRunTime);
+
+/**
  * Converts steamid2 (STEAM_X:Y:Z) to the accountid which will returned.
  */
 stock int SteamId2ToAccountId(const char[] steamid)
@@ -270,4 +283,5 @@ public __pl_surftimer_SetNTVOptional()
 	MarkNativeAsOptional("surftimer_GetServerRank");
 	MarkNativeAsOptional("surftimer_SafeTeleport");
 	MarkNativeAsOptional("surftimer_OnNewRecord");
+	MarkNativeAsOptional("surftimer_OnStageFinished");
 }
