@@ -503,7 +503,7 @@ public void StartTouch(int client, int action[3])
 			else if (g_iCurrentStyle[client] != 0)
 				f_srDiff = (g_fStyleStageRecord[g_iCurrentStyle[client]][g_Stage[0][client]] - g_fCurrentWrcpRunTime[client]);
 			
-			FormatTimeFloat(client, f_srDiff, 3, sz_srRawDiff, 128);
+			FormatTimeFloat(client, f_srDiff, 3, sz_srRawDiff, sizeof(sz_srRawDiff));
 
 			if (f_srDiff > 0)
 				Format(sz_srRawDiff, sizeof sz_srRawDiff, "-%s", sz_srRawDiff);
