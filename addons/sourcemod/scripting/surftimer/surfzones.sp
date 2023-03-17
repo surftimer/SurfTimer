@@ -495,26 +495,28 @@ public void StartTouch(int client, int action[3])
 			// Prevents the Stage(X) replay from starting before the Stage(X) start zone
 			g_iStageStartTouchTick[client] = g_iRecordedTicks[client]; //Add pre
 			
-			char sz_srRawDiff[128];
-			float f_srDiff;
+			if (client != g_WrcpBot && client != g_BonusBot && client != g_RecordBot && !g_bPracticeMode[client])
+			{
+				char sz_srRawDiff[128];
+				float f_srDiff;
 
-			if (g_iCurrentStyle[client] == 0)
-				f_srDiff = (g_fStageRecord[g_Stage[0][client]] - g_fCurrentWrcpRunTime[client]);
-			else if (g_iCurrentStyle[client] != 0)
-				f_srDiff = (g_fStyleStageRecord[g_iCurrentStyle[client]][g_Stage[0][client]] - g_fCurrentWrcpRunTime[client]);
-			
-			FormatTimeFloat(client, f_srDiff, 3, sz_srRawDiff, sizeof(sz_srRawDiff));
+				if (g_iCurrentStyle[client] == 0)
+					f_srDiff = (g_fStageRecord[g_Stage[0][client]] - g_fCurrentWrcpRunTime[client]);
+				else if (g_iCurrentStyle[client] != 0)
+					f_srDiff = (g_fStyleStageRecord[g_iCurrentStyle[client]][g_Stage[0][client]] - g_fCurrentWrcpRunTime[client]);
+				
+				FormatTimeFloat(client, f_srDiff, 3, sz_srRawDiff, sizeof(sz_srRawDiff));
 
-			if (f_srDiff > 0)
-				Format(sz_srRawDiff, sizeof sz_srRawDiff, "-%s", sz_srRawDiff);
-			else
-				Format(sz_srRawDiff, sizeof sz_srRawDiff, "+%s", sz_srRawDiff);
-			
-			if (g_iCurrentStyle[client] == 0)
-				SendStageFinishedForward(client, g_Stage[0][client], sz_srRawDiff, g_fStageRecord[g_Stage[0][client]]);
-			else if (g_iCurrentStyle[client] != 0)
-				SendStageFinishedForward(client, g_Stage[0][client], sz_srRawDiff, g_fStyleStageRecord[g_iCurrentStyle[client]][g_Stage[0][client]]);
-
+				if (f_srDiff > 0)
+					Format(sz_srRawDiff, sizeof sz_srRawDiff, "-%s", sz_srRawDiff);
+				else
+					Format(sz_srRawDiff, sizeof sz_srRawDiff, "+%s", sz_srRawDiff);
+				
+				if (g_iCurrentStyle[client] == 0)
+					SendStageFinishedForward(client, g_Stage[0][client], sz_srRawDiff, g_fStageRecord[g_Stage[0][client]]);
+				else if (g_iCurrentStyle[client] != 0)
+					SendStageFinishedForward(client, g_Stage[0][client], sz_srRawDiff, g_fStyleStageRecord[g_iCurrentStyle[client]][g_Stage[0][client]]);
+			}
 			// stop bot wrcp timer
 			if (client == g_WrcpBot)
 			{

@@ -514,6 +514,8 @@ void SendStageFinishedForward(int client, int stage, const char[] szRecordDiff, 
 	Call_PushFloat(fRunTime);
 	Call_PushFloat(g_fCurrentWrcpRunTime[client]);
 
+	PrintToServer("client %i | g_iCurrentStyle[client] %i | szStageTime %s | szRecordDiff %s | stage %i | fRunTime %f | fCurrentWrcpRunTime[client] %f", client, g_iCurrentStyle[client], szStageTime, szRecordDiff, stage, fRunTime, g_fCurrentWrcpRunTime[client]);
+
 	/* Finish the call, get the result */
 	Call_Finish();
 }
