@@ -326,7 +326,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 void Register_Forwards()
 {
 	g_MapFinishForward = new GlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_Float, Param_Cell, Param_Cell, Param_Cell);
-	g_MapCheckpointForward = new GlobalForward("surftimer_OnCheckpoint", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String);
+	g_MapCheckpointForward = new GlobalForward("surftimer_OnCheckpoint", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String, Param_Cell);
 	g_BonusFinishForward = new GlobalForward("surftimer_OnBonusFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_Float, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	g_PracticeFinishForward = new GlobalForward("surftimer_OnPracticeFinished", ET_Event, Param_Cell, Param_Float, Param_String);
 	g_NewRecordForward = new GlobalForward("surftimer_OnNewRecord", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
@@ -390,6 +390,7 @@ void SendMapCheckpointForward(
 	Call_PushString(szDiff_colorless);
 	Call_PushFloat(g_fCheckpointServerRecord[zonegroup][zone]);
 	Call_PushString(sz_srDiff_colorless);
+	Call_PushCell(zone);
 
 	/* Finish the call, get the result */
 	Call_Finish();
