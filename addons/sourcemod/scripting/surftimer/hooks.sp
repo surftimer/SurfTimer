@@ -1106,8 +1106,8 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 
 		g_fLastSpeed[client] = speed;
 		g_LastButton[client] = buttons;
-
-		BeamBox_OnPlayerRunCmd(client);
+		if (!IsFakeClient(client))
+			BeamBox_OnPlayerRunCmd(client);
 	}
 
 	// Strafe Sync taken from shavit's bhop timer
