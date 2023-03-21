@@ -1168,6 +1168,9 @@ char g_BlockedChatText[256][256];
 // Last time an overlay was displayed
 float g_fLastOverlay[MAXPLAYERS + 1];
 
+// Track player SDKHooks
+bool g_bClientHooksCalled[MAXPLAYERS + 1] = { false };
+
 /*----------  Player location restoring  ----------*/
 
 // Clients location was restored this run
