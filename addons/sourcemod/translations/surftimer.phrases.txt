@@ -1987,5 +1987,4 @@
 		"#format"	"{1:s}"
 		"en"		"{1} {yellow}Already Max Rank!"
 	}
-	""
 }
