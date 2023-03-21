@@ -416,6 +416,16 @@ public void OnClientPutInServer(int client)
 		return;
 	}
 
+	// SDKHooks
+	if (g_bClientHooksCalled[client] == false)
+	{
+		SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
+		SDKHook(client, SDKHook_PostThinkPost, Hook_PostThinkPost);
+		SDKHook(client, SDKHook_OnTakeDamage, Hook_OnTakeDamage);
+		SDKHook(client, SDKHook_PreThink, OnPlayerThink);
+		g_bClientHooksCalled[client] = true;
+	}
+
 	// Get SteamID
 	if (!GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], sizeof(g_szSteamID[]), true))
 	{
@@ -434,12 +444,6 @@ public void OnClientPutInServer(int client)
 	// Defaults
 	SetClientDefaults(client);
 	Command_Restart(client, 1);
-
-	// SDKHooks
-	SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
-	SDKHook(client, SDKHook_PostThinkPost, Hook_PostThinkPost);
-	SDKHook(client, SDKHook_OnTakeDamage, Hook_OnTakeDamage);
-	SDKHook(client, SDKHook_PreThink, OnPlayerThink);
 
 	if (!IsFakeClient(client))
 	{
