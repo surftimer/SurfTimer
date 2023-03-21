@@ -952,6 +952,9 @@ public void getZoneDisplayColor(int type, int zColor[4], int zGrp)
 
 public void BeamBox_OnPlayerRunCmd(int client)
 {
+	if (client == 0 || client == g_WrcpBot || client == g_BonusBot || client == g_RecordBot)
+  		return;
+
 	if (g_Editing[client] == 1 || g_Editing[client] == 3 || g_Editing[client] == 10 || g_Editing[client] == 11)
 	{
 		float pos[3], ang[3];
