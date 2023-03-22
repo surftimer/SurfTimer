@@ -390,7 +390,7 @@ void SendMapCheckpointForward(
 	Call_PushString(szDiff_colorless);
 	Call_PushFloat(g_fCheckpointServerRecord[zonegroup][zone]);
 	Call_PushString(sz_srDiff_colorless);
-	Call_PushCell(zone);
+	Call_PushCell(zone + 1);
 
 	/* Finish the call, get the result */
 	Call_Finish();
