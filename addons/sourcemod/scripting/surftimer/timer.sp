@@ -353,7 +353,7 @@ public Action StyleBonusReplayTimer(Handle timer, Handle pack)
 
 public Action SetClanTag(Handle timer, any client)
 {
-	if (!IsValidClient(client) || IsFakeClient(client))
+	if (!IsValidClient(client) || IsFakeClient(client) || g_pr_Calculating[client])
 		return Plugin_Handled;
 
 	if (!g_hOverrideClantag.BoolValue)
