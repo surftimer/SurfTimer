@@ -356,6 +356,9 @@ public Action SetClanTag(Handle timer, any client)
 	if (!IsValidClient(client) || IsFakeClient(client))
 		return Plugin_Handled;
 
+	if (!g_hOverrideClantag.BoolValue)
+		return Plugin_Handled;
+
 	/*char buffer[MAX_NAME_LENGTH];
 	if (CS_GetClientClanTag(client, buffer,MAX_NAME_LENGTH) > 0)
 		return Plugin_Handled;
