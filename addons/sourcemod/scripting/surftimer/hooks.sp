@@ -477,40 +477,50 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		PrintSpecMessageAll(client);
 		return Plugin_Handled;
 	}
-	else
+	
+	char szChatRank[1024];
+	Format(szChatRank, 1024, "%s", g_pr_chat_coloredrank[client]);
+
+	// apply style prefix if necessary
+	if (g_iCurrentStyle[client] > 0)
 	{
-		if (GetConVarBool(g_hPointSystem))
-		{
-			// Constructing the message
-			char szChatRank[1024];
-			Format(szChatRank, sizeof(szChatRank), "%s", g_pr_chat_coloredrank[client]);
+		char szStyle[128], szChatRank2[1024];
+		Format(szChatRank2, 1024, "%s", g_pr_chat_coloredrank_style[client]);
+		Format(szStyle, sizeof(szStyle), g_szStyleAcronyms[g_iCurrentStyle[client]]);
+		StringToUpper(szStyle);
+		Format(szStyle, sizeof(szStyle), "%s-", szStyle);
+		ReplaceString(szChatRank2, sizeof(szChatRank2), "{style}", szStyle);
+		Format(szChatRank, sizeof(szChatRank), "%s", szChatRank2);
+	}
+	else
+		ReplaceString(szChatRank, sizeof(szChatRank), "{style}", "");
 
-			char szChatRankColor[1024];
-			Format(szChatRankColor, sizeof(szChatRankColor), "%s", g_pr_chat_coloredrank[client]);
-			CGetRankColor(szChatRankColor, sizeof(szChatRankColor));
+	// if point system off, do not print anything (why?)
+	if (!GetConVarBool(g_hPointSystem))
+		return Plugin_Continue;
 
-			if (GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
-				Format(szName, sizeof(szName), "{%s}%s", szChatRankColor, szName);
-
-			if (GetConVarBool(g_hCountry)) {	// With country code
-				if (IsPlayerAlive(client))
-					CPrintToChatAll("%t", "Hooks6", g_szCountryCode[client], szChatRank, szName, sText);
-				else
-					CPrintToChatAll("%t", "Hooks7", g_szCountryCode[client], szChatRank, szName, sText);
-				return Plugin_Handled;
-			} 
-			else								// Without country code
-			{
-				if (IsPlayerAlive(client))
-					CPrintToChatAll("%t", "Hooks8", szChatRank, szName, sText);
-				else
-					CPrintToChatAll("%t", "Hooks9", szChatRank, szName, sText);
-				return Plugin_Handled;
-			}
+	// displaying countries enabled?
+	if (GetConVarBool(g_hCountry))
+	{
+		if (IsPlayerAlive(client))
+			CPrintToChatAll("%t", "Hooks6", g_szCountryCode[client], szChatRank, szName, sText);
+		else {
+			// how can a player be dead? spec is handled in stock Action PrintSpecMessageAll(int client)
+			LogError("dead  player trying to chat: hooks7");
+			CPrintToChatAll("%t", "Hooks7", g_szCountryCode[client], szChatRank, szName, sText);
 		}
+		return Plugin_Handled;
 	}
 
-	return Plugin_Continue;
+	// displaying countries disabled
+	if (IsPlayerAlive(client))
+		CPrintToChatAll("%t", "Hooks8", szChatRank, szName, sText);
+	else {
+		// how can a player be dead? spec is handled in stock Action PrintSpecMessageAll(int client)
+		CPrintToChatAll("%t", "Hooks9", szChatRank, szName, sText);
+	}
+
+	return Plugin_Handled;
 }
 
 public void CGetRankColor(char[] sMsg, int iSize) // edit from CProcessVariables - colorvars
