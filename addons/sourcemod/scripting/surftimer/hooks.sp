@@ -463,11 +463,11 @@ public Action Say_Hook(int client, const char[] command, int argc)
 	WriteChatLog(client, "say", sText);
 	PrintToServer("%s: %s", szName, sText);
 
-	// Name colors
-	if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
+	if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
+		Format(szName, sizeof(szName), "%s%s", g_pr_namecolour[client], szName);
+	else if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
 		setNameColor(szName, g_iCustomColours[client][0], 64);
 
-	// Text colors
 	if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client] && g_bHasCustomTextColour[client])
 		setTextColor(sText, g_iCustomColours[client][1], 1024);
 

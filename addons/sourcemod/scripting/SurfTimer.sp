@@ -120,8 +120,7 @@ public void OnPluginEnd()
 			SetEntPropEnt(x, Prop_Send, "m_bSpotted", 1);
 			SetEntProp(x, Prop_Send, "m_iHideHUD", 0);
 			SetEntProp(x, Prop_Send, "m_iAccount", 1);
-			if (g_hOverrideClantag.BoolValue)
-				CS_SetClientClanTag(x, "");
+			CS_SetClientClanTag(x, "");
 			OnClientDisconnect(x);
 		}
 	}
