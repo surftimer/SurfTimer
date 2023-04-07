@@ -2477,7 +2477,7 @@ public void SetSkillGroups()
 				RankValue.RankReq = rank;
 
 				// Remove colors from rank name
-				RemoveColors(sRankName, 128);
+				CRemoveColors(sRankName, 128);
 
 				Format(RankValue.RankName, sizeof(SkillGroup::RankName), "%s", sRankName);
 				Format(RankValue.RankNameColored, sizeof(SkillGroup::RankNameColored), "%s", sRankNameColored);
@@ -2531,7 +2531,7 @@ public void SetPlayerRank(int client)
 		{
 			char szTitle[256];
 			Format(szTitle, 256, g_szEnforcedTitle[client]);
-			RemoveColors(szTitle, 256);
+			CRemoveColors(szTitle, 256);
 			Format(g_pr_rankname[client], 256, szTitle);
 		}
 	}
@@ -2542,7 +2542,7 @@ public void SetPlayerRank(int client)
 		{
 			char szName[MAX_NAME_LENGTH];
 			GetClientName(client, szName, sizeof(szName));
-			RemoveColors(szName, sizeof(szName));
+			CRemoveColors(szName, sizeof(szName));
 
 			Format(g_pr_chat_coloredrank[client], sizeof(SkillGroup::RankNameColored), RankValue.RankNameColored);
 			Format(g_pr_chat_coloredrank_style[client], sizeof(SkillGroup::RankNameColored), RankValue.RankNameColored);
@@ -5033,65 +5033,6 @@ stock bool IsStringNumeric(const char[] str)
 	return true;
 }
 
-bool CGetColor(const char[] sName, char[] sColor, int iColorSize)
-{
-	if (sName[0] == '\0')
-		return false;
-
-	if (sName[0] == '@') {
-		int iSpace;
-		char sData[64];
-		char m_sName[64];
-		strcopy(m_sName, sizeof(m_sName), sName[1]);
-
-		if ((iSpace = FindCharInString(m_sName, ' ')) != -1 && (iSpace + 1 < strlen(m_sName))) {
-			strcopy(m_sName, iSpace + 1, m_sName);
-			strcopy(sData, sizeof(sData), m_sName[iSpace + 1]);
-		}
-
-		if (sColor[0] != '\0') {
-			return true;
-		}
-
-	} else if (sName[0] == '#') {
-		if (strlen(sName) == 7) {
-			Format(sColor, iColorSize, "\x07%s", sName[1]);
-			return true;
-		}
-		if (strlen(sName) == 9) {
-			Format(sColor, iColorSize, "\x08%s", sName[1]);
-			return true;
-		}
-	} else if (StrContains(sName, "player ", false) == 0 && strlen(sName) > 7) {
-		int iClient = StringToInt(sName[7]);
-
-		if (iClient < 1 || iClient > MaxClients || !IsClientInGame(iClient)) {
-			strcopy(sColor, iColorSize, "\x01");
-			LogError("Invalid client index %d", iClient);
-			return false;
-		}
-
-		strcopy(sColor, iColorSize, "\x01");
-		switch (GetClientTeam(iClient)) {
-			case 1: {
-				Format(sColor, iColorSize, "team 0");
-			}
-			case 2: {
-				Format(sColor, iColorSize, "team 1");
-			}
-			case 3: {
-				Format(sColor, iColorSize, "team 2");
-			}
-		}
-		return true;
-	} else {
-		Format(sColor, iColorSize, sName);
-		return true;
-	}
-
-	return false;
-}
-
 /* Credits to SMLib for the following stocks */
 
 /**
@@ -5423,12 +5364,6 @@ stock bool Entity_IsPlayer(int entity)
 	}
 
 	return true;
-}
-
-void RemoveColors(char[] message, int maxlength)
-{
-	CRemoveTags(message, maxlength);
-	CRemoveColors(message, maxlength);
 }
 
 

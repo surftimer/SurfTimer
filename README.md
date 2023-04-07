@@ -84,7 +84,6 @@ Run the following queries on your database:
 ℹ️ SourceMod Libraries are only required if you are compiling SurfTimer yourself
 
 * [SMLib](https://github.com/bcserv/smlib/tree/transitional_syntax)
-* [ColorLib](https://github.com/c0rp3n/colorlib-sm)
 * [AutoExecConfig](https://github.com/Impact123/AutoExecConfig)
 
 **SourceMod Plugins**
