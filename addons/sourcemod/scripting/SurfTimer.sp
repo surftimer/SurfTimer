@@ -433,9 +433,9 @@ public void OnClientPutInServer(int client)
 		return;
 	}
 
-    // Check if steamid has the value of "STEAM_ID_STOP_IGNORING_RETVALS"
-    // Reported here: https://github.com/surftimer/SurfTimer/issues/549
-    // This was being triggered by replay bots
+	// Check if steamid has the value of "STEAM_ID_STOP_IGNORING_RETVALS"
+	// Reported here: https://github.com/surftimer/SurfTimer/issues/549
+	// This was being triggered by replay bots
 	if (g_szSteamID[client][6] == 'I' && g_szSteamID[client][7] == 'D' && !IsFakeClient(client))
 	{
 		RequestFrame(OnClientPutInServer, client);
