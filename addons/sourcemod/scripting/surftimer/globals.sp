@@ -264,7 +264,7 @@ int g_MapRankBonus[MAXZONEGROUPS][MAXPLAYERS + 1];
 int g_OldMapRankBonus[MAXZONEGROUPS][MAXPLAYERS + 1];
 
 // Has the client missed his best bonus time
-int g_bMissedBonusBest[MAXPLAYERS + 1];
+bool g_bMissedBonusBest[MAXPLAYERS + 1];
 
 // Used to make sure bonus finished prints are correct
 int g_tmpBonusCount[MAXZONEGROUPS];
