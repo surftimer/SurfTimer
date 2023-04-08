@@ -196,9 +196,16 @@ forward Action surftimer_OnMapFinished(int client, float fRunTime, char sRunTime
  * Called when a player reaches a checkpoint zone or a stage.
  *
  * @param client			The client's ID.
- * @return						Plugin_Handled, to stop the client from searching.
+ * @param fRunTime			Run time of the client to the checkpoint in float
+ * @param sRunTime			Run time of the client to the checkpoint
+ * @param fPbCp				Personal best of the client to the checkpoint in float
+ * @param sPbDiff			Personal best difference of the client with current run time
+ * @param fSrCp				Record checkpoint time in float
+ * @param sSrDiff			Record checkpoint time difference of the client with current run time
+ * @param iCheckpoint		Checkpoint number that was just passed
+ * @return					Plugin_Handled, to stop the client from searching.
  */
-forward Action surftimer_OnCheckpoint(int client, float fRunTime, char sRunTime[54], float fPbCp, char sPbDiff[16], float fSrCp, char sSrDiff[16]);
+forward Action surftimer_OnCheckpoint(int client, float fRunTime, char sRunTime[54], float fPbCp, char sPbDiff[16], float fSrCp, char sSrDiff[16], int iCheckpoint);
 
 
 /**
