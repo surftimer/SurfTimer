@@ -494,6 +494,7 @@ public void StartTouch(int client, int action[3])
 
 			// Prevents the Stage(X) replay from starting before the Stage(X) start zone
 			g_iStageStartTouchTick[client] = g_iRecordedTicks[client]; //Add pre
+			
 			// stop bot wrcp timer
 			if (client == g_WrcpBot)
 			{
