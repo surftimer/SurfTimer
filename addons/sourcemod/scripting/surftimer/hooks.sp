@@ -457,17 +457,17 @@ public Action Say_Hook(int client, const char[] command, int argc)
 
 	char szName[64];
 	GetClientName(client, szName, 64);
-	RemoveColors(szName, 64);
+	CRemoveColors(szName, 64);
 
 	// log the chat of the player to the server so that tools such as HLSW/HLSTATX see it and also it remains logged in the log file
 	WriteChatLog(client, "say", sText);
 	PrintToServer("%s: %s", szName, sText);
 
-	// Name colors
-	if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
+	if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
+		Format(szName, sizeof(szName), "%s%s", g_pr_namecolour[client], szName);
+	else if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
 		setNameColor(szName, g_iCustomColours[client][0], 64);
 
-	// Text colors
 	if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client] && g_bHasCustomTextColour[client])
 		setTextColor(sText, g_iCustomColours[client][1], 1024);
 
@@ -477,40 +477,50 @@ public Action Say_Hook(int client, const char[] command, int argc)
 		PrintSpecMessageAll(client);
 		return Plugin_Handled;
 	}
-	else
+	
+	char szChatRank[1024];
+	Format(szChatRank, 1024, "%s", g_pr_chat_coloredrank[client]);
+
+	// apply style prefix if necessary
+	if (g_iCurrentStyle[client] > 0)
 	{
-		if (GetConVarBool(g_hPointSystem))
-		{
-			// Constructing the message
-			char szChatRank[1024];
-			Format(szChatRank, sizeof(szChatRank), "%s", g_pr_chat_coloredrank[client]);
+		char szStyle[128], szChatRank2[1024];
+		Format(szChatRank2, 1024, "%s", g_pr_chat_coloredrank_style[client]);
+		Format(szStyle, sizeof(szStyle), g_szStyleAcronyms[g_iCurrentStyle[client]]);
+		StringToUpper(szStyle);
+		Format(szStyle, sizeof(szStyle), "%s-", szStyle);
+		ReplaceString(szChatRank2, sizeof(szChatRank2), "{style}", szStyle);
+		Format(szChatRank, sizeof(szChatRank), "%s", szChatRank2);
+	}
+	else
+		ReplaceString(szChatRank, sizeof(szChatRank), "{style}", "");
 
-			char szChatRankColor[1024];
-			Format(szChatRankColor, sizeof(szChatRankColor), "%s", g_pr_chat_coloredrank[client]);
-			CGetRankColor(szChatRankColor, sizeof(szChatRankColor));
+	// if point system off, do not print anything (why?)
+	if (!GetConVarBool(g_hPointSystem))
+		return Plugin_Continue;
 
-			if (GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
-				Format(szName, sizeof(szName), "{%s}%s", szChatRankColor, szName);
-
-			if (GetConVarBool(g_hCountry)) {	// With country code
-				if (IsPlayerAlive(client))
-					CPrintToChatAll("%t", "Hooks6", g_szCountryCode[client], szChatRank, szName, sText);
-				else
-					CPrintToChatAll("%t", "Hooks7", g_szCountryCode[client], szChatRank, szName, sText);
-				return Plugin_Handled;
-			} 
-			else								// Without country code
-			{
-				if (IsPlayerAlive(client))
-					CPrintToChatAll("%t", "Hooks8", szChatRank, szName, sText);
-				else
-					CPrintToChatAll("%t", "Hooks9", szChatRank, szName, sText);
-				return Plugin_Handled;
-			}
+	// displaying countries enabled?
+	if (GetConVarBool(g_hCountry))
+	{
+		if (IsPlayerAlive(client))
+			CPrintToChatAll("%t", "Hooks6", g_szCountryCode[client], szChatRank, szName, sText);
+		else {
+			// how can a player be dead? spec is handled in stock Action PrintSpecMessageAll(int client)
+			LogError("dead  player trying to chat: hooks7");
+			CPrintToChatAll("%t", "Hooks7", g_szCountryCode[client], szChatRank, szName, sText);
 		}
+		return Plugin_Handled;
 	}
 
-	return Plugin_Continue;
+	// displaying countries disabled
+	if (IsPlayerAlive(client))
+		CPrintToChatAll("%t", "Hooks8", szChatRank, szName, sText);
+	else {
+		// how can a player be dead? spec is handled in stock Action PrintSpecMessageAll(int client)
+		CPrintToChatAll("%t", "Hooks9", szChatRank, szName, sText);
+	}
+
+	return Plugin_Handled;
 }
 
 public void CGetRankColor(char[] sMsg, int iSize) // edit from CProcessVariables - colorvars
@@ -1199,58 +1209,14 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 		{
 			if (!g_bInStartZone[client] && !g_bInStageZone[client])
 				return Plugin_Continue;
-
-			// This logic for detecting bhops is pretty terrible and should be reworked -sneaK
-			g_iTicksOnGround[client] = 0;
-			float diff = GetClientTickTime(client) - g_iLastJump[client];
-			if (!g_bInBhop[client])
-			{
-				if (g_bFirstJump[client])
-				{
-					if (diff > 0.8 && g_iCurrentStyle[client] != 4 && g_iCurrentStyle[client] != 5) // diff Normal Threshold + Exclude LG/SM
-					{
-						g_bFirstJump[client] = true;
-						g_iLastJump[client] = GetClientTickTime(client);
-					}
-
-					else if (diff > 1.6 && (g_iCurrentStyle[client] == 4 || g_iCurrentStyle[client] == 5)) // LG/SM jump time threshold
-					{
-						g_bFirstJump[client] = true;
-						g_iLastJump[client] = GetClientTickTime(client);
-					}
-					
-					else
-					{
-						g_iLastJump[client] = GetClientTickTime(client);
-						g_bInBhop[client] = true;
-					}
-				}
-				else
-				{
-					g_iLastJump[client] = GetClientTickTime(client);
-					g_bFirstJump[client] = true;
-				}
-			}
-			else
-			{
-				// 0.2s no-jump buffer (diff + 0.2) to register as no longer in bhop.
-				if (diff > 1 && g_iCurrentStyle[client] != 4 && g_iCurrentStyle[client] != 5) // Not LG/SM
-				{
-					g_bInBhop[client] = false;
-					g_iLastJump[client] = GetClientTickTime(client);
-				}
-
-				else if (diff > 1.8 && (g_iCurrentStyle[client] == 4 || g_iCurrentStyle[client] == 5)) // LG/SM
-				{
-					g_bInBhop[client] = false;
-					g_iLastJump[client] = GetClientTickTime(client);
-				}
-
-				else
-				{
-					g_iLastJump[client] = GetClientTickTime(client);
-				}
-			}
+		
+			if (g_iTicksOnGround[client] > 60)
+				return Plugin_Continue;
+				
+			float speedCap = g_mapZones[zoneid].PreSpeed;
+			if (speedCap <= 0.0)
+				return Plugin_Continue;
+			g_tickSpeedCap[client] = speedCap;
 		}
 
 		if (GetConVarBool(g_hOneJumpLimit) && GetConVarInt(g_hLimitSpeedType) == 1)
@@ -1289,6 +1255,31 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 	}
 
 	return Plugin_Continue;
+}
+
+void ApplySpeedCapXY(int client, float speedCap)
+{
+    float fVel[3];
+    GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
+    
+    // Determine how much each vector must be scaled for the magnitude to equal the limit
+    // scale = limit / (vx^2 + vy^2)^0.5)
+    // Derived from Pythagorean theorem, where the hypotenuse represents the magnitude of velocity,
+    // and the two legs represent the x and y velocity components.
+    // As a side effect, velocity component signs are also handled.
+    float scale = speedCap / SquareRoot( Pow(fVel[0], 2.0) + Pow(fVel[1], 2.0) );
+
+    // A scale < 1 indicates a magnitude > limit
+    if (scale < 1.0)
+    {
+        // Reduce each vector by the appropriate amount
+        // never used anywhere: float speed = SquareRoot(Pow(fVel[0], 2.0) + Pow(fVel[1], 2.0));
+        fVel[0] = fVel[0] * scale;
+        fVel[1] = fVel[1] * scale;
+
+        // Impart new velocity onto player
+        TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fVel);
+    }
 }
 
 public Action ResetOneJump(Handle timer, any client)

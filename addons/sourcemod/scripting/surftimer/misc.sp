@@ -1103,56 +1103,24 @@ public void LimitSpeed(int client)
 }
 
 public void LimitSpeedNew(int client)
-{
-	if (!IsValidClient(client) || !IsPlayerAlive(client) || IsFakeClient(client) || g_mapZonesCount <= 0 || g_bPracticeMode[client] || g_mapZonesTypeCount[g_iClientInZone[client][2]][2] == 0 || g_iClientInZone[client][3] < 0 || g_iClientInZone[client][0] == 2 || g_iClientInZone[client][0] == 4 || g_iClientInZone[client][0] >= 6 || GetConVarInt(g_hLimitSpeedType) == 0 || g_iCurrentStyle[client] == 7)
-		return;
+{	
+    if (!IsValidClient(client) || !IsPlayerAlive(client) || IsFakeClient(client) || g_mapZonesCount <= 0 || g_bPracticeMode[client] || g_mapZonesTypeCount[g_iClientInZone[client][2]][2] == 0 || g_iClientInZone[client][0] == 2 || g_iClientInZone[client][0] == 4 || g_iClientInZone[client][0] >= 6 || GetConVarInt(g_hLimitSpeedType) == 0 || g_iCurrentStyle[client] == 7)
+        return;
 
-	if (GetConVarInt(g_hLimitSpeedType) == 0 || !g_bInStartZone[client] && !g_bInStageZone[client])
-		return;
-
-	float speedCap = 0.0;
-	speedCap = g_mapZones[g_iClientInZone[client][3]].PreSpeed;
-
-	if (speedCap <= 0.0)
-		return;
-
-	float fVel[3];
-	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
-
-	if (g_bInStartZone[client] || g_bInStageZone[client])
+    if (GetEntityFlags(client) & FL_ONGROUND)
+    {
+        g_iTicksOnGround[client]++;
+    }
+    else
+    {
+        g_iTicksOnGround[client] = 0;
+    }
+    
+    if (g_tickSpeedCap[client] > 0.0) 
 	{
-		if (GetEntityFlags(client) & FL_ONGROUND)
-		{
-			g_iTicksOnGround[client]++;
-			if (g_iTicksOnGround[client] > 60)
-			{
-				g_bNewStage[client] = false;
-				g_bLeftZone[client] = false;
-				return;
-			}
-		}
-	}
-
-	// Determine how much each vector must be scaled for the magnitude to equal the limit
-	// Derived from Pythagorean theorem, where the hypotenuse represents the magnitude of velocity,
-	// and the two legs represent the x and y velocity components.
-  // As a side effect, velocity component signs are also handled.
-	float scale = speedCap / SquareRoot( Pow(fVel[0], 2.0) + Pow(fVel[1], 2.0) );
-
-	// A scale < 1 indicates a magnitude > limit
-	if (scale < 1.0)
-	{
-
-		// Reduce each vector by the appropriate amount
-		fVel[0] = fVel[0] * scale;
-		fVel[1] = fVel[1] * scale;
-
-		// Impart new velocity onto player
-		if (g_bInBhop[client] || g_bLeftZone[client])
-		{
-			TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fVel);
-		}
-	}
+        ApplySpeedCapXY(client, g_tickSpeedCap[client]);
+        g_tickSpeedCap[client] = 0.0;
+    }
 }
 
 public void LimitMaxSpeed(int client, float fMaxSpeed)
@@ -2477,7 +2445,7 @@ public void SetSkillGroups()
 				RankValue.RankReq = rank;
 
 				// Remove colors from rank name
-				RemoveColors(sRankName, 128);
+				CRemoveColors(sRankName, 128);
 
 				Format(RankValue.RankName, sizeof(SkillGroup::RankName), "%s", sRankName);
 				Format(RankValue.RankNameColored, sizeof(SkillGroup::RankNameColored), "%s", sRankNameColored);
@@ -2531,7 +2499,7 @@ public void SetPlayerRank(int client)
 		{
 			char szTitle[256];
 			Format(szTitle, 256, g_szEnforcedTitle[client]);
-			RemoveColors(szTitle, 256);
+			CRemoveColors(szTitle, 256);
 			Format(g_pr_rankname[client], 256, szTitle);
 		}
 	}
@@ -2542,7 +2510,7 @@ public void SetPlayerRank(int client)
 		{
 			char szName[MAX_NAME_LENGTH];
 			GetClientName(client, szName, sizeof(szName));
-			RemoveColors(szName, sizeof(szName));
+			CRemoveColors(szName, sizeof(szName));
 
 			Format(g_pr_chat_coloredrank[client], sizeof(SkillGroup::RankNameColored), RankValue.RankNameColored);
 			Format(g_pr_chat_coloredrank_style[client], sizeof(SkillGroup::RankNameColored), RankValue.RankNameColored);
@@ -2638,7 +2606,9 @@ stock Action PrintSpecMessageAll(int client)
 	char szChatRank[64];
 	Format(szChatRank, 64, "%s", g_pr_chat_coloredrank[client]);
 
-	if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
+	if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && !g_bDbCustomTitleInUse[client])
+		Format(szName, sizeof(szName), "%s%s", g_pr_namecolour[client], szName);
+	else if (GetConVarBool(g_hPointSystem) && GetConVarBool(g_hColoredNames) && g_bDbCustomTitleInUse[client])
 		setNameColor(szName, g_iCustomColours[client][0], 64);
 	// fluffys
 
@@ -2848,39 +2818,71 @@ public void CheckRun(int client)
 
 	if (g_bTimerRunning[client])
 	{
-		if (g_fCurrentRunTime[client] > g_fPersonalRecord[client] && !g_bMissedMapBest[client] && !g_bPause[client] && g_iClientInZone[client][2] == 0)
-		{
-			g_bMissedMapBest[client] = true;
-			if (g_fPersonalRecord[client] > 0.0) {
-				CPrintToChat(client, "%t", "MissedMapBest", g_szChatPrefix, g_szPersonalRecord[client]);
-				if (g_iAutoReset[client] && g_iCurrentStyle[client] == 0) {
-					Command_Restart(client, 1);
-					CPrintToChat(client, "%t", "AutoResetMessage1", g_szChatPrefix);
-					CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
-				} else if (g_iAutoReset[client] && g_iCurrentStyle[client] != 0) {
-					CPrintToChat(client, "%t", "AutoResetMessageStyle", g_szChatPrefix, g_szStyleMenuPrint[g_iCurrentStyle[client]]);
-					CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
-				}
-			}
-			EmitSoundToClient(client, "buttons/button18.wav", client);
-		}
-		else
-		{
-			if (g_fCurrentRunTime[client] > g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] > 0 && !g_bPause[client] && !g_bMissedBonusBest[client])
+		if (g_iClientInZone[client][2] == 0) // main map
+		{	
+			if (g_iCurrentStyle[client] == 0 && g_fPersonalRecord[client] > 0.0 && !g_bMissedMapBest[client] && !g_bPause[client]) // normal style
 			{
-				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
-				{
-					g_bMissedBonusBest[client] = true;
-					CPrintToChat(client, "%t", "Misc29", g_szChatPrefix, g_szPersonalRecordBonus[g_iClientInZone[client][2]][client]);
-					if (g_iAutoReset[client] && g_iCurrentStyle[client] == 0) {
-						Command_Teleport(client, 0);
+				if (g_fCurrentRunTime[client] > g_fPersonalRecord[client])
+				{	
+					g_bMissedMapBest[client] = true;
+					CPrintToChat(client, "%t", "MissedMapBest", g_szChatPrefix, g_szPersonalRecord[client]);
+					EmitSoundToClient(client, "buttons/button18.wav", client);
+
+					if (g_iAutoReset[client]) 
+					{
+						Command_Restart(client, 1);
 						CPrintToChat(client, "%t", "AutoResetMessage1", g_szChatPrefix);
 						CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
-					} else if (g_iAutoReset[client] && g_iCurrentStyle[client] != 0) {
+					} 	
+				}
+			}
+			else if (g_iCurrentStyle[client] > 0 && g_fPersonalStyleRecord[g_iCurrentStyle[client]][client] > 0.0 && !g_bMissedMapBest[client] && !g_bPause[client]) // other styles
+			{
+				if (g_fCurrentRunTime[client] > g_fPersonalStyleRecord[g_iCurrentStyle[client]][client])
+				{
+					g_bMissedMapBest[client] = true;
+					CPrintToChat(client, "%t", "MissedMapBest", g_szChatPrefix, g_szPersonalStyleRecord[g_iCurrentStyle[client]][client]);
+					EmitSoundToClient(client, "buttons/button18.wav", client);
+	
+					if (g_iAutoReset[client]) 
+					{
 						CPrintToChat(client, "%t", "AutoResetMessageStyle", g_szChatPrefix, g_szStyleMenuPrint[g_iCurrentStyle[client]]);
 						CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
 					}
+				}
+			}
+		}
+		else if (g_iClientInZone[client][2] > 0) // bonus
+		{	
+			if (g_iCurrentStyle[client] == 0 && g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0 && g_iClientInZone[client][2] > 0 && !g_bMissedBonusBest[client] && !g_bPause[client]) // normal style
+			{
+				if (g_fCurrentRunTime[client] > g_fPersonalRecordBonus[g_iClientInZone[client][2]][client])
+				{
+					g_bMissedBonusBest[client] = true;
+					CPrintToChat(client, "%t", "Misc29", g_szChatPrefix, g_szPersonalRecordBonus[g_iClientInZone[client][2]][client]);
 					EmitSoundToClient(client, "buttons/button18.wav", client);
+
+					if (g_iAutoReset[client]) 
+					{
+						Command_Teleport(client, 0);
+						CPrintToChat(client, "%t", "AutoResetMessage1", g_szChatPrefix);
+						CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
+					} 
+				}
+			}
+			else if (g_iCurrentStyle[client] > 0 && g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client] > 0.0 && !g_bMissedBonusBest[client] && !g_bPause[client]) // other styles
+			{
+				if (g_fCurrentRunTime[client] > g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client])
+				{
+					g_bMissedBonusBest[client] = true;
+					CPrintToChat(client, "%t", "Misc29", g_szChatPrefix, g_szStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client]);
+					EmitSoundToClient(client, "buttons/button18.wav", client);
+ 
+					if (g_iAutoReset[client])
+					{
+						CPrintToChat(client, "%t", "AutoResetMessageStyle", g_szChatPrefix, g_szStyleMenuPrint[g_iCurrentStyle[client]]);
+						CPrintToChat(client, "%t", "AutoResetMessage2", g_szChatPrefix);
+					}
 				}
 			}
 		}
@@ -3416,15 +3418,15 @@ public void CenterHudAlive(int client)
 						// Prac mode
 						Format(module[i], 128, "<font color='#8cd'>[P]: %s	</font>", pAika);
 					}
+					else if (g_bMissedBonusBest[client] || g_bMissedMapBest[client])
+					{
+						// Timer running, Missed Bonus Best time (red)
+						Format(module[i], 128, "<font color='#f32'>%s 	</font>", pAika);
+					}
 					else if (g_bInBonus[client])
 					{
 						// In Bonus
 						Format(module[i], 128, "<font color='#5e5'>%s 	</font>", pAika);
-					}
-					else if (g_bMissedMapBest[client] && g_fPersonalRecord[client] > 0.0)
-					{
-						// Missed Personal Best time
-						Format(module[i], 128, "<font color='#f32'>%s 	</font>", pAika);
 					}
 					else if (g_fPersonalRecord[client] < 0.1)
 					{
@@ -5031,65 +5033,6 @@ stock bool IsStringNumeric(const char[] str)
 	return true;
 }
 
-bool CGetColor(const char[] sName, char[] sColor, int iColorSize)
-{
-	if (sName[0] == '\0')
-		return false;
-
-	if (sName[0] == '@') {
-		int iSpace;
-		char sData[64];
-		char m_sName[64];
-		strcopy(m_sName, sizeof(m_sName), sName[1]);
-
-		if ((iSpace = FindCharInString(m_sName, ' ')) != -1 && (iSpace + 1 < strlen(m_sName))) {
-			strcopy(m_sName, iSpace + 1, m_sName);
-			strcopy(sData, sizeof(sData), m_sName[iSpace + 1]);
-		}
-
-		if (sColor[0] != '\0') {
-			return true;
-		}
-
-	} else if (sName[0] == '#') {
-		if (strlen(sName) == 7) {
-			Format(sColor, iColorSize, "\x07%s", sName[1]);
-			return true;
-		}
-		if (strlen(sName) == 9) {
-			Format(sColor, iColorSize, "\x08%s", sName[1]);
-			return true;
-		}
-	} else if (StrContains(sName, "player ", false) == 0 && strlen(sName) > 7) {
-		int iClient = StringToInt(sName[7]);
-
-		if (iClient < 1 || iClient > MaxClients || !IsClientInGame(iClient)) {
-			strcopy(sColor, iColorSize, "\x01");
-			LogError("Invalid client index %d", iClient);
-			return false;
-		}
-
-		strcopy(sColor, iColorSize, "\x01");
-		switch (GetClientTeam(iClient)) {
-			case 1: {
-				Format(sColor, iColorSize, "team 0");
-			}
-			case 2: {
-				Format(sColor, iColorSize, "team 1");
-			}
-			case 3: {
-				Format(sColor, iColorSize, "team 2");
-			}
-		}
-		return true;
-	} else {
-		Format(sColor, iColorSize, sName);
-		return true;
-	}
-
-	return false;
-}
-
 /* Credits to SMLib for the following stocks */
 
 /**
@@ -5421,12 +5364,6 @@ stock bool Entity_IsPlayer(int entity)
 	}
 
 	return true;
-}
-
-void RemoveColors(char[] message, int maxlength)
-{
-	CRemoveTags(message, maxlength);
-	CRemoveColors(message, maxlength);
 }
 
 

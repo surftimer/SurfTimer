@@ -108,12 +108,10 @@ ConVar g_hMustPassCheckpoints = null;
 ConVar g_hSlayOnRoundEnd = null;
 ConVar g_hLimitSpeedType = null;
 ConVar g_drDeleteSecurity = null;
-ConVar g_iAdminCountryTags = null;
 ConVar g_replayBotDelay = null;
 ConVar g_hAllowCheckpointRecreation = null;						// Allows players to recreate checkpoints along with where to display info
 ConVar g_iHintsInterval = null;									// Time between two hints. 0 = off
 ConVar g_bHintsRandomOrder = null;								// If hints are in random order
-ConVar g_hOverrideClantag = null;
 ConVar g_hDefaultPreSpeed = null;
 ConVar g_hLogQueryTimes = null;
 
@@ -160,11 +158,9 @@ void CreateConVars()
 	g_hReplaceReplayTime = 	AutoExecConfig_CreateConVar("ck_replay_replace_faster", "1", "(1 / 0) Replace record bots if a players time is faster than the bot, even if the time is not a server record.", _, true, 0.0, true, 1.0);
 	g_hTeleToStartWhenSettingsLoaded = AutoExecConfig_CreateConVar("ck_teleportclientstostart", "1", "(1 / 0) Teleport players automatically back to the start zone, when their settings have been loaded.", _, true, 0.0, true, 1.0);
 	g_drDeleteSecurity = AutoExecConfig_CreateConVar("ck_dr_delete_security", "1", "(1 / 0) Enable/Disable delete security for !dr command", _, true, 0.0, true, 1.0);
-	g_iAdminCountryTags = AutoExecConfig_CreateConVar("ck_admin_country_tags", "0", "(1 / 0) Enable/Disable country tags for admins", _, true, 0.0, true, 1.0);
 	g_replayBotDelay = AutoExecConfig_CreateConVar("ck_replay_bot_delay", "10", "Delay in seconds after initial mapstart after the bots join the server", _, true, 10.0);
 	g_iHintsInterval = AutoExecConfig_CreateConVar("ck_hints_interval", "240", "Seconds between two hints. Leave empty or set to 0 to disable", _, true, 0.0);
 	g_bHintsRandomOrder = AutoExecConfig_CreateConVar("ck_hints_random_order", "1", "(1 / 0) Enable/Disable hints shown in a random order", _, true, 0.0, true, 1.0);
-	g_hOverrideClantag = AutoExecConfig_CreateConVar("ck_override_clantag", "1", "Override player's clantag", _, true, 0.0, true, 1.0);
 	g_hReplayPre = AutoExecConfig_CreateConVar("ck_replay_pre", "1", "Maximum amount of seconds for prestrafe recording", _, true, 1.0);
 	g_hDefaultPreSpeed = AutoExecConfig_CreateConVar("ck_default_prespeed", "260", "Set the default prespeed value.");
 
