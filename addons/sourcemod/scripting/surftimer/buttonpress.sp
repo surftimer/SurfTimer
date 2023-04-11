@@ -58,8 +58,6 @@ public void CL_OnStartTimerPress(int client)
 		g_fCurrentRunTime[client] = 0.0;
 		g_fPracModeStartTime[client] = GetClientTickTime(client);
 		g_bPositionRestored[client] = false;
-		g_bMissedMapBest[client] = true;
-		g_bMissedBonusBest[client] = true;
 		g_bTimerRunning[client] = true;
 		g_bTop10Time[client] = false;
 		

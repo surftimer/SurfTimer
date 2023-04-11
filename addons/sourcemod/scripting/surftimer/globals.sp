@@ -1457,6 +1457,9 @@ int g_iTicksOnGround[MAXPLAYERS + 1];
 bool g_bNewStage[MAXPLAYERS + 1];
 bool g_bLeftZone[MAXPLAYERS + 1];
 
+// new speed/bhop detection
+float g_tickSpeedCap[MAXPLAYERS + 1];
+
 int g_iClientTick[MAXPLAYERS + 1];
 
 int g_iCurrentTick[MAXPLAYERS + 1];

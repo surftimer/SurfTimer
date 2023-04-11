@@ -1209,58 +1209,14 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 		{
 			if (!g_bInStartZone[client] && !g_bInStageZone[client])
 				return Plugin_Continue;
-
-			// This logic for detecting bhops is pretty terrible and should be reworked -sneaK
-			g_iTicksOnGround[client] = 0;
-			float diff = GetClientTickTime(client) - g_iLastJump[client];
-			if (!g_bInBhop[client])
-			{
-				if (g_bFirstJump[client])
-				{
-					if (diff > 0.8 && g_iCurrentStyle[client] != 4 && g_iCurrentStyle[client] != 5) // diff Normal Threshold + Exclude LG/SM
-					{
-						g_bFirstJump[client] = true;
-						g_iLastJump[client] = GetClientTickTime(client);
-					}
-
-					else if (diff > 1.6 && (g_iCurrentStyle[client] == 4 || g_iCurrentStyle[client] == 5)) // LG/SM jump time threshold
-					{
-						g_bFirstJump[client] = true;
-						g_iLastJump[client] = GetClientTickTime(client);
-					}
-					
-					else
-					{
-						g_iLastJump[client] = GetClientTickTime(client);
-						g_bInBhop[client] = true;
-					}
-				}
-				else
-				{
-					g_iLastJump[client] = GetClientTickTime(client);
-					g_bFirstJump[client] = true;
-				}
-			}
-			else
-			{
-				// 0.2s no-jump buffer (diff + 0.2) to register as no longer in bhop.
-				if (diff > 1 && g_iCurrentStyle[client] != 4 && g_iCurrentStyle[client] != 5) // Not LG/SM
-				{
-					g_bInBhop[client] = false;
-					g_iLastJump[client] = GetClientTickTime(client);
-				}
-
-				else if (diff > 1.8 && (g_iCurrentStyle[client] == 4 || g_iCurrentStyle[client] == 5)) // LG/SM
-				{
-					g_bInBhop[client] = false;
-					g_iLastJump[client] = GetClientTickTime(client);
-				}
-
-				else
-				{
-					g_iLastJump[client] = GetClientTickTime(client);
-				}
-			}
+		
+			if (g_iTicksOnGround[client] > 60)
+				return Plugin_Continue;
+				
+			float speedCap = g_mapZones[zoneid][preSpeed];
+			if (speedCap <= 0.0)
+				return Plugin_Continue;
+			g_tickSpeedCap[client] = speedCap;
 		}
 
 		if (GetConVarBool(g_hOneJumpLimit) && GetConVarInt(g_hLimitSpeedType) == 1)
@@ -1299,6 +1255,31 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 	}
 
 	return Plugin_Continue;
+}
+
+void ApplySpeedCapXY(int client, float speedCap)
+{
+    float fVel[3];
+    GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
+    
+    // Determine how much each vector must be scaled for the magnitude to equal the limit
+    // scale = limit / (vx^2 + vy^2)^0.5)
+    // Derived from Pythagorean theorem, where the hypotenuse represents the magnitude of velocity,
+    // and the two legs represent the x and y velocity components.
+    // As a side effect, velocity component signs are also handled.
+    float scale = speedCap / SquareRoot( Pow(fVel[0], 2.0) + Pow(fVel[1], 2.0) );
+
+    // A scale < 1 indicates a magnitude > limit
+    if (scale < 1.0)
+    {
+        // Reduce each vector by the appropriate amount
+        // never used anywhere: float speed = SquareRoot(Pow(fVel[0], 2.0) + Pow(fVel[1], 2.0));
+        fVel[0] = fVel[0] * scale;
+        fVel[1] = fVel[1] * scale;
+
+        // Impart new velocity onto player
+        TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fVel);
+    }
 }
 
 public Action ResetOneJump(Handle timer, any client)

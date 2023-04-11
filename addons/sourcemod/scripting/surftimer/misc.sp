@@ -1103,56 +1103,24 @@ public void LimitSpeed(int client)
 }
 
 public void LimitSpeedNew(int client)
-{
-	if (!IsValidClient(client) || !IsPlayerAlive(client) || IsFakeClient(client) || g_mapZonesCount <= 0 || g_bPracticeMode[client] || g_mapZonesTypeCount[g_iClientInZone[client][2]][2] == 0 || g_iClientInZone[client][3] < 0 || g_iClientInZone[client][0] == 2 || g_iClientInZone[client][0] == 4 || g_iClientInZone[client][0] >= 6 || GetConVarInt(g_hLimitSpeedType) == 0 || g_iCurrentStyle[client] == 7)
-		return;
+{	
+    if (!IsValidClient(client) || !IsPlayerAlive(client) || IsFakeClient(client) || g_mapZonesCount <= 0 || g_bPracticeMode[client] || g_mapZonesTypeCount[g_iClientInZone[client][2]][2] == 0 || g_iClientInZone[client][0] == 2 || g_iClientInZone[client][0] == 4 || g_iClientInZone[client][0] >= 6 || GetConVarInt(g_hLimitSpeedType) == 0 || g_iCurrentStyle[client] == 7)
+        return;
 
-	if (GetConVarInt(g_hLimitSpeedType) == 0 || !g_bInStartZone[client] && !g_bInStageZone[client])
-		return;
-
-	float speedCap = 0.0;
-	speedCap = g_mapZones[g_iClientInZone[client][3]].PreSpeed;
-
-	if (speedCap <= 0.0)
-		return;
-
-	float fVel[3];
-	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
-
-	if (g_bInStartZone[client] || g_bInStageZone[client])
+    if (GetEntityFlags(client) & FL_ONGROUND)
+    {
+        g_iTicksOnGround[client]++;
+    }
+    else
+    {
+        g_iTicksOnGround[client] = 0;
+    }
+    
+    if (g_tickSpeedCap[client] > 0.0) 
 	{
-		if (GetEntityFlags(client) & FL_ONGROUND)
-		{
-			g_iTicksOnGround[client]++;
-			if (g_iTicksOnGround[client] > 60)
-			{
-				g_bNewStage[client] = false;
-				g_bLeftZone[client] = false;
-				return;
-			}
-		}
-	}
-
-	// Determine how much each vector must be scaled for the magnitude to equal the limit
-	// Derived from Pythagorean theorem, where the hypotenuse represents the magnitude of velocity,
-	// and the two legs represent the x and y velocity components.
-  // As a side effect, velocity component signs are also handled.
-	float scale = speedCap / SquareRoot( Pow(fVel[0], 2.0) + Pow(fVel[1], 2.0) );
-
-	// A scale < 1 indicates a magnitude > limit
-	if (scale < 1.0)
-	{
-
-		// Reduce each vector by the appropriate amount
-		fVel[0] = fVel[0] * scale;
-		fVel[1] = fVel[1] * scale;
-
-		// Impart new velocity onto player
-		if (g_bInBhop[client] || g_bLeftZone[client])
-		{
-			TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fVel);
-		}
-	}
+        ApplySpeedCapXY(client, g_tickSpeedCap[client]);
+        g_tickSpeedCap[client] = 0.0;
+    }
 }
 
 public void LimitMaxSpeed(int client, float fMaxSpeed)
