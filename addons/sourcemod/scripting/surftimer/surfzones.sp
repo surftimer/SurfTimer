@@ -311,7 +311,7 @@ public void StartTouch(int client, int action[3])
 		g_TeleInTriggerMultiple[client] = false;
 	} */
 
-	float speedCap = g_mapZones[zoneid][preSpeed];
+	float speedCap = g_mapZones[g_iClientInZone[client][3]].PreSpeed;
 
 	if (IsValidClient(client))
 	{
@@ -403,7 +403,7 @@ public void StartTouch(int client, int action[3])
 
 			if (speedCap > 0.0)
 			{
-				ApplySpeedCapXY(client, g_mapZones[g_iClientInZone[client][3]][preSpeed]);
+				ApplySpeedCapXY(client, g_mapZones[g_iClientInZone[client][3]].PreSpeed);
 			}
 
 			// StopRecording(client); //Add pre
@@ -501,7 +501,7 @@ public void StartTouch(int client, int action[3])
 
 			if (speedCap > 0.0)
 			{
-				ApplySpeedCapXY(client, g_mapZones[g_iClientInZone[client][3]][preSpeed]);
+				ApplySpeedCapXY(client, g_mapZones[g_iClientInZone[client][3]].PreSpeed);
 			}
 
 			// Prevents the Stage(X) replay from starting before the Stage(X) start zone

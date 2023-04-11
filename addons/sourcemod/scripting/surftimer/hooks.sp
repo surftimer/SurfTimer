@@ -1213,7 +1213,7 @@ public Action Event_PlayerJump(Handle event, char[] name, bool dontBroadcast)
 			if (g_iTicksOnGround[client] > 60)
 				return Plugin_Continue;
 				
-			float speedCap = g_mapZones[zoneid][preSpeed];
+			float speedCap = g_mapZones[zoneid].PreSpeed;
 			if (speedCap <= 0.0)
 				return Plugin_Continue;
 			g_tickSpeedCap[client] = speedCap;
