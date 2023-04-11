@@ -416,6 +416,24 @@ public void OnClientPutInServer(int client)
 		return;
 	}
 
+	if (IsFakeClient(client))
+	{
+		CS_SetMVPCount(client, 1);
+		return;
+	}
+	else
+	{
+		// Check if steamid has the value of "STEAM_ID_STOP_IGNORING_RETVALS"
+		// Reported here: https://github.com/surftimer/SurfTimer/issues/549
+		// This was being triggered by replay bots
+		if (g_szSteamID[client][6] == 'I' && g_szSteamID[client][7] == 'D')
+		{
+			RequestFrame(OnClientPutInServer, client);
+			return;
+		}
+		g_MVPStars[client] = 0;
+	}
+
 	// SDKHooks
 	if (g_bClientHooksCalled[client] == false)
 	{
@@ -428,15 +446,6 @@ public void OnClientPutInServer(int client)
 
 	// Get SteamID
 	if (!GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], sizeof(g_szSteamID[]), true))
-	{
-		RequestFrame(OnClientPutInServer, client);
-		return;
-	}
-
-	// Check if steamid has the value of "STEAM_ID_STOP_IGNORING_RETVALS"
-	// Reported here: https://github.com/surftimer/SurfTimer/issues/549
-	// This was being triggered by replay bots
-	if (g_szSteamID[client][6] == 'I' && g_szSteamID[client][7] == 'D' && !IsFakeClient(client))
 	{
 		RequestFrame(OnClientPutInServer, client);
 		return;
@@ -459,14 +468,6 @@ public void OnClientPutInServer(int client)
 	g_bToggleMapFinish[client] = true;
 	g_bRepeat[client] = false;
 	g_bNotTeleporting[client] = false;
-
-	if (IsFakeClient(client))
-	{
-		CS_SetMVPCount(client, 1);
-		return;
-	}
-	else
-		g_MVPStars[client] = 0;
 
 	// Client Country
 	GetCountry(client);
