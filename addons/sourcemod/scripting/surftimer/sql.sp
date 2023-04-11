@@ -3231,6 +3231,7 @@ public void SQL_LastRunCallback(Handle owner, Handle hndl, const char[] error, a
 		// Set new start time
 		float fl_time = SQL_FetchFloat(hndl, 6);
 		int tickrate = RoundFloat(float(SQL_FetchInt(hndl, 7)) / 5.0 / 11.0);
+		// PrintToServer("tickrate: %i (%i) | g_iTickrate %i | fl_time %f | g_specToStage[data] %b | g_bLateLoaded %b", tickrate, SQL_FetchInt(hndl, 7), g_iTickrate, fl_time, g_specToStage[data], g_bLateLoaded);
 		if (tickrate == g_iTickrate)
 		{
 			if (fl_time > 0.0)
@@ -3257,13 +3258,11 @@ public void SQL_LastRunCallback(Handle owner, Handle hndl, const char[] error, a
 					g_bRestorePosition[data] = true;
 					g_bRestorePositionMsg[data] = true;
 				}
-
 			}
 		}
 	}
 	else
 	{
-
 		g_bTimerRunning[data] = false;
 	}
 }
@@ -3750,9 +3749,10 @@ public void db_viewPRinfoCallback(Handle owner, Handle hndl, const char[] error,
 
 			db_UpdateLastSeen(client);
 
-			if (GetConVarBool(g_hTeleToStartWhenSettingsLoaded))
+			if (GetConVarBool(g_hTeleToStartWhenSettingsLoaded) && !g_bPositionRestored[client])
 			{
-				Command_Restart(client, 1);
+				// Why do we restart twice?
+				// Command_Restart(client, 1); 
 				CreateTimer(0.1, RestartPlayer, client);
 			}
 
@@ -3923,9 +3923,10 @@ public void db_viewBonusPRinfoCallback(Handle owner, Handle hndl, const char[] e
 
 		db_UpdateLastSeen(client);
 
-		if (GetConVarBool(g_hTeleToStartWhenSettingsLoaded))
+		if (GetConVarBool(g_hTeleToStartWhenSettingsLoaded) && !g_bPositionRestored[client])
 		{
-			Command_Restart(client, 1);
+			// Why do we restart twice?
+			// Command_Restart(client, 1); 
 			CreateTimer(0.1, RestartPlayer, client);
 		}
 

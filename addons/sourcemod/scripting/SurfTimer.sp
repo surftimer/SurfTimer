@@ -478,10 +478,6 @@ public void OnClientPutInServer(int client)
 	// char fix
 	FixPlayerName(client);
 
-	// Position Restoring
-	if (GetConVarBool(g_hcvarRestore) && !g_bRenaming && !g_bInTransactionChain)
-		db_selectLastRun(client);
-
 	if (g_bTierFound)
 		AnnounceTimer[client] = CreateTimer(20.0, AnnounceMap, client, TIMER_FLAG_NO_MAPCHANGE);
 
@@ -491,6 +487,12 @@ public void OnClientPutInServer(int client)
 		g_bLoadingSettings[client] = true;
 		g_iSettingToLoad[client] = 0;
 		LoadClientSetting(client, g_iSettingToLoad[client]);
+	}
+
+	// Position Restoring
+	if (GetConVarBool(g_hcvarRestore) && !g_bRenaming && !g_bInTransactionChain)
+	{
+		db_selectLastRun(client);
 	}
 }
 
