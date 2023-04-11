@@ -423,6 +423,13 @@ public void OnClientPutInServer(int client)
 	}
 	else
 	{
+		// Get SteamID
+		if (!GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], sizeof(g_szSteamID[]), true))
+		{
+			RequestFrame(OnClientPutInServer, client);
+			return;
+		}
+		
 		// Check if steamid has the value of "STEAM_ID_STOP_IGNORING_RETVALS"
 		// Reported here: https://github.com/surftimer/SurfTimer/issues/549
 		// This was being triggered by replay bots
@@ -442,13 +449,6 @@ public void OnClientPutInServer(int client)
 		SDKHook(client, SDKHook_OnTakeDamage, Hook_OnTakeDamage);
 		SDKHook(client, SDKHook_PreThink, OnPlayerThink);
 		g_bClientHooksCalled[client] = true;
-	}
-
-	// Get SteamID
-	if (!GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], sizeof(g_szSteamID[]), true))
-	{
-		RequestFrame(OnClientPutInServer, client);
-		return;
 	}
 
 	// Defaults
