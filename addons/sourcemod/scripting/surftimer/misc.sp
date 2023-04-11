@@ -3450,30 +3450,15 @@ public void CenterHudAlive(int client)
 						// Prac mode
 						Format(module[i], 128, "<font color='#8cd'>[P]: %s	</font>", pAika);
 					}
-					else if (g_bMissedBonusBest[client] && g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0 && g_iCurrentStyle[client] == 0)
+					else if (g_bMissedBonusBest[client] || g_bMissedMapBest[client])
 					{
-						// Timer running, Missed Bonus Best time (red) [normal style]
-						Format(module[i], 128, "<font color='#f32'>%s 	</font>", pAika);
-					}
-					else if (g_bMissedBonusBest[client] && g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client] > 0.0 && g_iCurrentStyle[client] > 0)
-					{
-						// Timer running, Missed Bonus Best time (red) [other styles]
+						// Timer running, Missed Bonus Best time (red)
 						Format(module[i], 128, "<font color='#f32'>%s 	</font>", pAika);
 					}
 					else if (g_bInBonus[client])
 					{
 						// In Bonus
 						Format(module[i], 128, "<font color='#5e5'>%s 	</font>", pAika);
-					}
-					else if (g_bMissedMapBest[client] && g_fPersonalRecord[client] > 0.0)
-					{
-						// Missed Personal Best time red) [normal style]
-						Format(module[i], 128, "<font color='#f32'>%s 	</font>", pAika);
-					}
-					else if (g_bMissedMapBest[client] && g_fPersonalStyleRecord[g_iCurrentStyle[client]][client] > 0.0 && g_iCurrentStyle[client] > 0)
-					{
-						// Timer running, Missed Personal Best time (red) [other styles]
-						Format(module[i], 128, "<font color='#f32'>%s 	</font>", pAika);
 					}
 					else if (g_fPersonalRecord[client] < 0.1)
 					{
