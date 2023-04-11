@@ -10511,60 +10511,51 @@ public void SQL_SetJoinMsgCallback(Handle owner, Handle hndl, const char[] error
 		CPrintToChat(client, "%t", "SQLTwo6", g_szChatPrefix, g_szCustomJoinMsg[client]);
 }
 
-// public void db_precacheCustomSounds()
-// {
-// 	char szQuery[512];
-// 	Format(szQuery, sizeof(szQuery), "SELECT pbsound, topsound, wrsound FROM ck_vipadmins");
-// 	SQL_TQuery(g_hDb, SQL_PrecacheCustomSoundsCallback szQuery, 1, DBPrio_Low);
-// }
-
-// public void SQL_SetJoinMsgCallback(Handle owner, Handle hndl, const char[] error, any data)
-// {
-// 	if (hndl == null)
-// 	{
-// 		LogError("[surftimer] SQL Error (SQL_PrecacheCustomSoundsCallback): %s", error);
-// 		return;
-// 	}
-
-// 	if (SQL_HasResultSet(hndl))
-// 	{
-// 		char pbsound[256], topsound[256], wrsound[256];
-// 		while (SQL_FetchRow(hndl))
-// 		{
-// 			SQL_FetchString(hndl, 0, pbsound, sizeof(pbsound));
-// 			SQL_FetchString(hndl, 1, topsound, sizeof(topsound));
-// 			SQL_FetchString(hndl, 2, wrsound, sizeof(wrsound));
-
-// 			if (!StrEqual(pbsound, "none"))
-// 			{
-// 				AddFileToDownloadsTable(pbsound);
-// 				FakePrecacheSound(pbsound);
-// 			}
-
-// 			if (!StrEqual(topsound, "none"))
-// 			{
-// 				AddFileToDownloadsTable(topsound);
-// 				FakePrecacheSound(topsound);
-// 			}
-
-// 			if (!StrEqual(wrsound, "none"))
-// 			{
-// 				AddFileToDownloadsTable(wrsound);
-// 				FakePrecacheSound(wrsound);
-// 			}
-// 		}
-// 	}
-// }
-
-public void db_selectCPR(int client, int rank, const char szMapName[128], const char szSteamId[32])
+/*
+ * CPR Command Info
+ * 
+ * @param client			Client who initiated
+ * @param rank				First rank targeted by the client
+ * @param szMapName			Mapname for the queries
+ * @param rank2				Second rank targeted by the client
+ * @param queryCase			Use 1 when using the current map name (does NOT contain LIKE in query)
+ */
+public void db_selectCPR(int client, int rank, const char szMapName[128], int rank2, int queryCase)
 {
+	/*
+	* Info on the DataPack used for the !cpr command
+	* 
+	* @param client			Client who initiated 0
+	* @param rank1			First rank targeted by the client 1
+	* @param rank2			Second rank targeted by the client 2
+	* @param rank1_name		Name retrieved from DB for the first rank targeted -> Added at a later stage 3
+	*/
 	Handle pack = CreateDataPack();
 	WritePackCell(pack, client);
 	WritePackCell(pack, rank);
-	WritePackString(pack, szSteamId);
+	WritePackCell(pack, rank2);
+
+	if (rank - 1 == -1 || rank2 - 1 == -1)
+	{
+		CPrintToChat(client, "%s{default}Rank for comparing {red}cannot{default} be below {green}1", g_szChatPrefix);
+		CloseHandle(pack);
+		return;
+	}
 
 	char szQuery[512];
-	Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `steamid` = '%s' AND `mapname` LIKE '%c%s%c' AND style = 0", g_szSteamID[client], PERCENT, szMapName, PERCENT);
+	// Query to get SteamID for first CPR target
+	switch(queryCase)
+	{
+		case 0:
+		{
+			Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `mapname` LIKE '%c%s%c' AND style = 0 ORDER BY `runtimepro` ASC LIMIT %i, 1", PERCENT, szMapName, PERCENT, rank-1);
+		}
+		case 1:
+		{
+			Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `mapname`='%s' AND style = 0 ORDER BY `runtimepro` ASC LIMIT %i, 1", szMapName, rank-1);
+		}
+	}
+
 	SQL_TQuery(g_hDb, SQL_SelectCPRTimeCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -10579,14 +10570,28 @@ public void SQL_SelectCPRTimeCallback(Handle owner, Handle hndl, const char[] er
 
 	ResetPack(pack);
 	int client = ReadPackCell(pack);
+	int rank1 = ReadPackCell(pack);
+	int rank2 = ReadPackCell(pack);
+	// stop warning messages for unused variables, thanks @Bara
+	if (rank1) {}
+	if (rank2) {}
 
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
 		SQL_FetchString(hndl, 2, g_szCPRMapName[client], 128);
 		g_fClientCPs[client][0] = SQL_FetchFloat(hndl, 3);
 
-		char szQuery[512];
-		Format(szQuery, sizeof(szQuery), "SELECT cp, time FROM ck_checkpoints WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = 0;", g_szSteamID[client], g_szCPRMapName[client]);
+		char szQuery[512], firstTargetName[MAX_NAME_LENGTH], cprFirstTarget[64];
+		SQL_FetchString(hndl, 1, firstTargetName, sizeof(firstTargetName));
+		
+		// Use the SteamID of the first CPR target
+		SQL_FetchString(hndl, 0, cprFirstTarget, sizeof(cprFirstTarget));
+		Format(szQuery, sizeof(szQuery), "SELECT cp, time FROM ck_checkpoints WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = 0;", cprFirstTarget, g_szCPRMapName[client]);
+
+		// DataPackPos position = view_as<DataPackPos>(3);
+		// SetPackPosition(pack, position); // jump to targetName
+		WritePackString(pack, firstTargetName);
+
 		SQL_TQuery(g_hDb, SQL_SelectCPRCallback, szQuery, pack, DBPrio_Low);
 	}
 	else
@@ -10623,18 +10628,21 @@ public void db_selectCPRTarget(any pack)
 {
 	ResetPack(pack);
 	int client = ReadPackCell(pack);
-	int rank = ReadPackCell(pack);
-	rank = rank - 1;
+	// DataPackPos position = view_as<DataPackPos>(2);
+	// SetPackPosition(pack, position); // jump to rank2
+	int rank1 = ReadPackCell(pack);
+	int rank2 = ReadPackCell(pack);
+	char firstTargetName[MAX_NAME_LENGTH];
+	ReadPackString(pack, firstTargetName, sizeof(firstTargetName));
 
+	// stop warning messages for unused variables, thanks @Bara
+	if (rank1) {}
+	if (rank2) {}
+
+	// Find CPR target rank SteamID
 	char szQuery[512];
-	if (rank == -1)
-	{
-		char szSteamId[32];
-		ReadPackString(pack, szSteamId, 32);
-		Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `mapname` LIKE '%c%s%c' AND steamid = '%s' AND style = 0", PERCENT, g_szCPRMapName[client], PERCENT, szSteamId);
-	}
-	else
-		Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `mapname` LIKE '%c%s%c' AND style = 0 ORDER BY `runtimepro` ASC LIMIT %i, 1;", PERCENT, g_szCPRMapName[client], PERCENT, rank);
+	Format(szQuery, sizeof(szQuery), "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `mapname` LIKE '%c%s%c' AND style = 0 ORDER BY `runtimepro` ASC LIMIT %i, 1;", PERCENT, g_szCPRMapName[client], PERCENT, rank2-1);
+
 	SQL_TQuery(g_hDb, SQL_SelectCPRTargetCallback, szQuery, pack, DBPrio_Low);
 }
 
@@ -10684,11 +10692,19 @@ public void SQL_SelectCPRTargetCPsCallback(Handle owner, Handle hndl, const char
 		ResetPack(pack);
 		int client = ReadPackCell(pack);
 		int rank = ReadPackCell(pack);
+		// DataPackPos position = view_as<DataPackPos>(3);
+		// SetPackPosition(pack, position); // jump to targetName
+		int rank2 = ReadPackCell(pack);
+		char firstTargetName[MAX_NAME_LENGTH];
+		ReadPackString(pack, firstTargetName, sizeof(firstTargetName));
+
+		// stop warning messages for unused variables, thanks @Bara
+		if (rank2) {}
 
 		Menu menu = CreateMenu(CPRMenuHandler);
 		char szTitle[256], szName[MAX_NAME_LENGTH];
 		GetClientName(client, szName, sizeof(szName));
-		Format(szTitle, sizeof(szTitle), "%s VS %s on %s\n \n", szName, g_szTargetCPR[client], g_szCPRMapName[client], rank);
+		Format(szTitle, sizeof(szTitle), "%s VS %s on %s\n \n", firstTargetName, g_szTargetCPR[client], g_szCPRMapName[client], rank);
 		SetMenuTitle(menu, szTitle);
 
 		float targetCPs, comparedCPs;
