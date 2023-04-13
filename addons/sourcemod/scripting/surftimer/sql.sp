@@ -5539,7 +5539,7 @@ public void SQLTxn_ZoneRemovalFailed(Handle db, any client, int numQueries, cons
 
 public void db_insertLastPosition(int client, char szMapName[128], int stage, int zgroup)
 {
-	if (GetConVarBool(g_hcvarRestore) && !g_bRoundEnd && (StrContains(g_szSteamID[client], "STEAM_") != -1) && g_bTimerRunning[client])
+	if (GetConVarBool(g_hcvarRestore) && !g_bRoundEnd && (StrContains(g_szSteamID[client], "STEAM_") != -1) && g_bTimerRunning[client] && g_bhasStages)
 	{
 		Handle pack = CreateDataPack();
 		WritePackCell(pack, client);
@@ -5576,7 +5576,9 @@ public void db_insertLastPositionCallback(Handle owner, Handle hndl, const char[
 	if (1 <= client <= MaxClients)
 	{
 		if (!g_bTimerRunning[client])
-		g_fPlayerLastTime[client] = -1.0;
+		{
+			g_fPlayerLastTime[client] = -1.0;
+		}
 		int tickrate = g_iTickrate * 5 * 11;
 		if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 		{
