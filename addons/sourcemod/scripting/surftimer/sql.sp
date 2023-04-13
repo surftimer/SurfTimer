@@ -3193,7 +3193,9 @@ public void db_selectLastRun(int client)
 {
 	char szQuery[512];
 	if (!IsValidClient(client))
-	return;
+	{
+		return;
+	}
 	Format(szQuery, 512, sql_selectPlayerTmp, g_szSteamID[client], g_szMapName);
 	SQL_TQuery(g_hDb, SQL_LastRunCallback, szQuery, client, DBPrio_Low);
 }
@@ -3209,37 +3211,34 @@ public void SQL_LastRunCallback(Handle owner, Handle hndl, const char[] error, a
 	g_bTimerRunning[data] = false;
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl) && IsValidClient(data))
 	{
-
 		// "SELECT cords1,cords2,cords3, angle1, angle2, angle3,runtimeTmp, EncTickrate, Stage, zonegroup FROM ck_playertemp WHERE steamid = '%s' AND mapname = '%s';";
+		// Get last position coordinates and angles
+		g_fRestoreCoords[data][0] = SQL_FetchFloat(hndl, 0);
+		g_fRestoreCoords[data][1] = SQL_FetchFloat(hndl, 1);
+		g_fRestoreCoords[data][2] = SQL_FetchFloat(hndl, 2);
+		g_fRestoreAngles[data][0] = SQL_FetchFloat(hndl, 3);
+		g_fRestoreAngles[data][1] = SQL_FetchFloat(hndl, 4);
+		g_fRestoreAngles[data][2] = SQL_FetchFloat(hndl, 5);
 
-		// Get last psition
-		g_fPlayerCordsRestore[data][0] = SQL_FetchFloat(hndl, 0);
-		g_fPlayerCordsRestore[data][1] = SQL_FetchFloat(hndl, 1);
-		g_fPlayerCordsRestore[data][2] = SQL_FetchFloat(hndl, 2);
-		g_fPlayerAnglesRestore[data][0] = SQL_FetchFloat(hndl, 3);
-		g_fPlayerAnglesRestore[data][1] = SQL_FetchFloat(hndl, 4);
-		g_fPlayerAnglesRestore[data][2] = SQL_FetchFloat(hndl, 5);
-
-
+		// Get zonegroup for location restoring
 		int zGroup;
 		zGroup = SQL_FetchInt(hndl, 9);
+		
+		// New variables used for the restore menu
+		g_iRestoreZoneStage[data][0] = zGroup;
+		g_iRestoreZoneStage[data][1] = SQL_FetchInt(hndl, 8);
 
-		g_iClientInZone[data][2] = zGroup;
-
-		g_Stage[zGroup][data] = SQL_FetchInt(hndl, 8);
+		// Check the tickrate for the saved location with the current tickrate of the server
+		int tickrate = RoundFloat(float(SQL_FetchInt(hndl, 7)) / 5.0 / 11.0);
 
 		// Set new start time
-		float fl_time = SQL_FetchFloat(hndl, 6);
-		int tickrate = RoundFloat(float(SQL_FetchInt(hndl, 7)) / 5.0 / 11.0);
-		// PrintToServer("tickrate: %i (%i) | g_iTickrate %i | fl_time %f | g_specToStage[data] %b | g_bLateLoaded %b", tickrate, SQL_FetchInt(hndl, 7), g_iTickrate, fl_time, g_specToStage[data], g_bLateLoaded);
+		char runTime[32];
+		g_fRestoreRunTime[data] = SQL_FetchFloat(hndl, 6);
+		FormatTimeFloat(data, g_fRestoreRunTime[data], 3, runTime, sizeof(runTime));
+
+		PrintToServer("tickrate: %i (%i) | g_iTickrate %i | g_fRestoreRunTime[data] %f | g_specToStage[data] %b | g_bLateLoaded %b", tickrate, SQL_FetchInt(hndl, 7), g_iTickrate, g_fRestoreRunTime[data], g_specToStage[data], g_bLateLoaded);
 		if (tickrate == g_iTickrate)
 		{
-			if (fl_time > 0.0)
-			{
-				g_fStartTime[data] = GetClientTickTime(data) - fl_time;
-				g_bTimerRunning[data] = true;
-			}
-
 			if (SQL_FetchFloat(hndl, 0) == -1.0 && SQL_FetchFloat(hndl, 1) == -1.0 && SQL_FetchFloat(hndl, 2) == -1.0)
 			{
 				g_bRestorePosition[data] = false;
@@ -3247,11 +3246,18 @@ public void SQL_LastRunCallback(Handle owner, Handle hndl, const char[] error, a
 			}
 			else
 			{
-				if (g_bLateLoaded && IsPlayerAlive(data) && !g_specToStage[data])
+				if (IsPlayerAlive(data) && !g_specToStage[data])
 				{
-					g_bPositionRestored[data] = true;
-					TeleportEntity(data, g_fPlayerCordsRestore[data], g_fPlayerAnglesRestore[data], NULL_VECTOR);
-					g_bRestorePosition[data] = false;
+					g_bRestorePositionMsg[data] = true;
+					// Show the menu AFTER client settings are fully loaded
+					if (g_bSettingsLoaded[data])
+					{
+						Restore_Menu(data, 0);
+					}
+					else
+					{
+						CPrintToChat(data, "%t", "Commands91", g_szChatPrefix, runTime);
+					}
 				}
 				else
 				{

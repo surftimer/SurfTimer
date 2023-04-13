@@ -861,6 +861,11 @@
 		"#format"	"{1:s}"
 		"en"		"{1} You {darkred}do not{default} have a personal best yet, use:\n{1} !cpr {green}@<rank> @<rank> {blue}<mapname> {default}(mapname is optional)"
 	}
+	"Commands91"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"{1} You have a run with time {green}{2}{default} saved, type {yellow}/restore{default} to resume it"
+	}
 	"BotInUse"
 	{
 		"#format"	"{1:s},{2:s}"
