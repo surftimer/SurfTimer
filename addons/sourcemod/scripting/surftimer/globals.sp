@@ -1182,13 +1182,25 @@ bool g_bRestorePositionMsg[MAXPLAYERS + 1];
 // Clients position is being restored
 bool g_bRestorePosition[MAXPLAYERS + 1];
 
-// Client's last location, used on recovering run and coming back from spectate
+// Clients runtime for location restoring
+float g_fRestoreRunTime[MAXPLAYERS + 1]
+
+// Clients zonegroup (0) and stage (1) used for restoring
+int g_iRestoreZoneStage[MAXPLAYERS + 1][2];
+
+// Client's last location, used on recovering run
+float g_fRestoreCoords[MAXPLAYERS + 1][3];
+
+// Client's last angles, used on recovering run
+float g_fRestoreAngles[MAXPLAYERS + 1][3];
+
+// Client's last location, used on coming back from spectate
 float g_fPlayerCordsLastPosition[MAXPLAYERS + 1][3];
 
-// Client's last time, used on recovering run and coming back from spec
+// Client's last time, used on coming back from spec
 float g_fPlayerLastTime[MAXPLAYERS + 1];
 
-// Client's last angles, used on recovering run and coming back from spec
+// Client's last angles, used on coming back from spec
 float g_fPlayerAnglesLastPosition[MAXPLAYERS + 1][3];
 
 // Used in restoring players location

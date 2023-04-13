@@ -165,6 +165,7 @@ void CreateCommands()
 	RegConsoleCmd("sm_csd", Command_CenterSpeed, "[surftimer] [settings] on/off - toggle center speed display");
 	RegConsoleCmd("sm_style_acronyms", Client_StyleAcronyms, "[surftimer] shows every style format available");
 	RegConsoleCmd("sm_continent_acronyms", Client_ContinentAcronyms, "[surftimer] shows every continent format available");
+	RegConsoleCmd("sm_restore", Restore_Menu, "[surftimer] Restore last known location for client");
 
 
 	// New Commands
@@ -6726,3 +6727,91 @@ public Action Command_NextRank(int client, int args)
 
 	return Plugin_Handled;
 }
+
+// Restore menu start
+public Action Restore_Menu(int client, int args)
+{
+	if (IsFakeClient(client) || !IsValidClient(client))
+	{
+		return Plugin_Handled;
+	}
+
+	if (g_fRestoreRunTime[client] <= 0.0)
+	{
+		CPrintToChat(client, "{yellow}No previous times found.");
+		return Plugin_Handled;
+	}
+
+	if (IsClientObserver(client))
+	{
+		CPrintToChat(client, "{darkred}You cannot use this feature while spectating");
+		return Plugin_Handled;
+	}
+
+	char runTime[32];
+	FormatTimeFloat(client, g_fRestoreRunTime[client], 3, runTime, sizeof(runTime));
+	Menu menu_restore = new Menu(Restore_Menu_Callback);
+	menu_restore.SetTitle("Restore your last run? (%s)", runTime);
+	
+	menu_restore.AddItem("item_yes", "Yes", ITEMDRAW_DEFAULT);
+	menu_restore.AddItem("item_no", "No", ITEMDRAW_DEFAULT);
+
+	menu_restore.ExitButton = true;
+	menu_restore.Display(client, 30);
+
+	return Plugin_Handled;
+}
+
+public int Restore_Menu_Callback(Menu menu, MenuAction action, int client, int param2)
+{
+	switch (action)
+	{
+		case MenuAction_DisplayItem:
+		{
+			char info[32];
+			menu.GetItem(param2, info, sizeof(info));
+			
+			return RedrawMenuItem(info);
+		}
+		case MenuAction_Select:
+		{
+			char info[32];
+			// PrintToServer("Coords[0]: %f | Coords[1]: %f | Coords[2]: %f | Angles[0]: %f | Angles[1]: %f | Angles[2]: %f", g_fRestoreCoords[client][0], g_fRestoreCoords[client][1], g_fRestoreCoords[client][2], g_fRestoreAngles[client][0], g_fRestoreAngles[client][1], g_fRestoreAngles[client][2]);
+			// CPrintToChatAll("Coords[0]: %f | Coords[1]: %f | Coords[2]: %f | Angles[0]: %f | Angles[1]: %f | Angles[2]: %f", g_fRestoreCoords[client][0], g_fRestoreCoords[client][1], g_fRestoreCoords[client][2], g_fRestoreAngles[client][0], g_fRestoreAngles[client][1], g_fRestoreAngles[client][2]);
+			menu.GetItem(param2, info, sizeof(info));
+			if (StrContains(info, "yes") != -1)
+			{
+				// Set the correct zonegroup and stage upon restoring
+				g_iClientInZone[client][2] = g_iRestoreZoneStage[client][0];
+				g_Stage[g_iRestoreZoneStage[client][0]][client] = g_iRestoreZoneStage[client][1];
+
+				// Indicate that the client has had their location restored this game - guessing this deals with checkpoints not been passed if enforced
+				g_bPositionRestored[client] = true;
+
+				// Set the correct RunTime upon restoring
+				g_fStartTime[client] = GetClientTickTime(client) - g_fRestoreRunTime[client];
+
+				// Teleport client to last known location
+				TeleportEntity(client, g_fRestoreCoords[client], g_fRestoreAngles[client], NULL_VECTOR);
+				CPrintToChatAll("Teleported client {yellow}%i{default} to Stage {yellow}%i{default} ({yellow}%i{default}), Zonegroup {yellow}%i{default} ({yellow}%i{default}), RunTime {green}%f{default}", client, g_Stage[g_iRestoreZoneStage[client][0]][client], g_iRestoreZoneStage[client][1], g_iClientInZone[client][2], g_iRestoreZoneStage[client][0], g_fRestoreRunTime[client]);
+
+				// Start the timer after client has been teleported
+				g_bTimerRunning[client] = true;
+				// Indicate that we have finished with location restoring?
+				g_bRestorePosition[client] = false;
+			}
+			else
+			{
+				// Client's timer is NOT running
+				g_bPositionRestored[client] = false;
+				g_bTimerRunning[client] = false;
+			}
+		}
+		case MenuAction_End:
+		{
+			delete menu;
+		}
+	}
+	return client;
+}
+// Restore menu end
