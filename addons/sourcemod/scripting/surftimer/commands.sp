@@ -6738,13 +6738,13 @@ public Action Restore_Menu(int client, int args)
 
 	if (g_fRestoreRunTime[client] <= 0.0)
 	{
-		CPrintToChat(client, "{yellow}No previous times found.");
+		// CPrintToChat(client, "{yellow}No previous times found.");
 		return Plugin_Handled;
 	}
 
 	if (IsClientObserver(client))
 	{
-		CPrintToChat(client, "{darkred}You cannot use this feature while spectating");
+		// CPrintToChat(client, "{darkred}You cannot use this feature while spectating");
 		return Plugin_Handled;
 	}
 
@@ -6793,7 +6793,7 @@ public int Restore_Menu_Callback(Menu menu, MenuAction action, int client, int p
 
 				// Teleport client to last known location
 				TeleportEntity(client, g_fRestoreCoords[client], g_fRestoreAngles[client], NULL_VECTOR);
-				CPrintToChatAll("Teleported client {yellow}%i{default} to Stage {yellow}%i{default} ({yellow}%i{default}), Zonegroup {yellow}%i{default} ({yellow}%i{default}), RunTime {green}%f{default}", client, g_Stage[g_iRestoreZoneStage[client][0]][client], g_iRestoreZoneStage[client][1], g_iClientInZone[client][2], g_iRestoreZoneStage[client][0], g_fRestoreRunTime[client]);
+				// CPrintToChatAll("Teleported client {yellow}%i{default} to Stage {yellow}%i{default} ({yellow}%i{default}), Zonegroup {yellow}%i{default} ({yellow}%i{default}), RunTime {green}%f{default}", client, g_Stage[g_iRestoreZoneStage[client][0]][client], g_iRestoreZoneStage[client][1], g_iClientInZone[client][2], g_iRestoreZoneStage[client][0], g_fRestoreRunTime[client]);
 
 				// Start the timer after client has been teleported
 				g_bTimerRunning[client] = true;

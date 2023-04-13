@@ -3236,7 +3236,7 @@ public void SQL_LastRunCallback(Handle owner, Handle hndl, const char[] error, a
 		g_fRestoreRunTime[data] = SQL_FetchFloat(hndl, 6);
 		FormatTimeFloat(data, g_fRestoreRunTime[data], 3, runTime, sizeof(runTime));
 
-		PrintToServer("tickrate: %i (%i) | g_iTickrate %i | g_fRestoreRunTime[data] %f | g_specToStage[data] %b | g_bLateLoaded %b", tickrate, SQL_FetchInt(hndl, 7), g_iTickrate, g_fRestoreRunTime[data], g_specToStage[data], g_bLateLoaded);
+		// PrintToServer("tickrate: %i (%i) | g_iTickrate %i | g_fRestoreRunTime[data] %f | g_specToStage[data] %b | g_bLateLoaded %b", tickrate, SQL_FetchInt(hndl, 7), g_iTickrate, g_fRestoreRunTime[data], g_specToStage[data], g_bLateLoaded);
 		if (tickrate == g_iTickrate)
 		{
 			if (SQL_FetchFloat(hndl, 0) == -1.0 && SQL_FetchFloat(hndl, 1) == -1.0 && SQL_FetchFloat(hndl, 2) == -1.0)
