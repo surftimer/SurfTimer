@@ -356,9 +356,6 @@ public Action SetClanTag(Handle timer, any client)
 	if (!IsValidClient(client) || IsFakeClient(client) || g_pr_Calculating[client])
 		return Plugin_Handled;
 
-	if (!g_hOverrideClantag.BoolValue)
-		return Plugin_Handled;
-
 	/*char buffer[MAX_NAME_LENGTH];
 	if (CS_GetClientClanTag(client, buffer,MAX_NAME_LENGTH) > 0)
 		return Plugin_Handled;
@@ -381,35 +378,41 @@ public Action SetClanTag(Handle timer, any client)
 
 	if (GetConVarBool(g_hCountry))
 	{
-		char szTabRank[1024], szTabClanTag[1024];
-		Format(szTabRank, 1024, "%s", g_pr_chat_coloredrank[client]);
-		RemoveColors(szTabRank, 1024);
-		Format(szTabClanTag, 1024, "%s | %s", g_szCountryCode[client], szTabRank);
-		
-		if ((GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) {
-			if (GetConVarBool(g_iAdminCountryTags))
-				CS_SetClientClanTag(client, szTabRank);
-			else 
-				CS_SetClientClanTag(client, szTabClanTag);
-		} 
-		else CS_SetClientClanTag(client, szTabClanTag);
+		char tag[154];
+		Format(tag, 154, "%s | %s", g_szCountryCode[client], g_pr_rankname_style[client]);
+		if (g_iCurrentStyle[client] > 0)
+		{
+			char szStyle[128];
+			Format(szStyle, sizeof(szStyle), g_szStyleAcronyms[g_iCurrentStyle[client]]);
+			StringToUpper(szStyle);
+			Format(szStyle, sizeof(szStyle), "%s-", szStyle);
+			ReplaceString(tag, sizeof(tag), "{style}", szStyle);
+		}
+		else
+			ReplaceString(tag, sizeof(tag), "{style}", "");
+
+		CS_SetClientClanTag(client, tag);
 	}
 	else
 	{
 		if (GetConVarBool(g_hPointSystem))
 		{
-			char szTabRank[1024], szTabClanTag[1024];
-			Format(szTabRank, 1024, "%s", g_pr_chat_coloredrank[client]);
-			RemoveColors(szTabRank, 1024);
-			Format(szTabClanTag, 1024, "%s", szTabRank);
+			char tag[154];
+			Format(tag, 154, "%s", g_pr_rankname_style[client]);
 			
-			if ((GetUserFlagBits(client) & ADMFLAG_ROOT || GetUserFlagBits(client) & ADMFLAG_GENERIC)) {
-				if (GetConVarBool(g_iAdminCountryTags))
-					CS_SetClientClanTag(client, szTabRank);
-				else 
-					CS_SetClientClanTag(client, szTabClanTag);
-			} 
-			else CS_SetClientClanTag(client, szTabClanTag);
+			// Replace {style} with style
+			if (g_iCurrentStyle[client] > 0)
+			{
+				char szStyle[128];
+				Format(szStyle, sizeof(szStyle), g_szStyleAcronyms[g_iCurrentStyle[client]]);
+				StringToUpper(szStyle);
+				Format(szStyle, sizeof(szStyle), "%s-", szStyle);
+				ReplaceString(tag, sizeof(tag), "{style}", szStyle);
+			}
+			else
+				ReplaceString(tag, sizeof(tag), "{style}", "");
+
+			CS_SetClientClanTag(client, tag);
 		}
 	}
 
@@ -417,7 +420,7 @@ public Action SetClanTag(Handle timer, any client)
 	if (oldrank && GetConVarBool(g_hPointSystem))
 		if (!StrEqual(g_pr_rankname[client], old_pr_rankname, false) && IsValidClient(client))
 			CPrintToChat(client, "%t", "SkillGroup", g_szChatPrefix, g_pr_chat_coloredrank[client]);
-
+			
 	return Plugin_Handled;
 }
 

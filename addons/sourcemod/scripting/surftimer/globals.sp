@@ -264,7 +264,7 @@ int g_MapRankBonus[MAXZONEGROUPS][MAXPLAYERS + 1];
 int g_OldMapRankBonus[MAXZONEGROUPS][MAXPLAYERS + 1];
 
 // Has the client missed his best bonus time
-int g_bMissedBonusBest[MAXPLAYERS + 1];
+bool g_bMissedBonusBest[MAXPLAYERS + 1];
 
 // Used to make sure bonus finished prints are correct
 int g_tmpBonusCount[MAXZONEGROUPS];
@@ -1452,10 +1452,12 @@ float g_iNoclipSpeed[MAXPLAYERS + 1];
 // New speed limit variables
 bool g_bInBhop[MAXPLAYERS + 1];
 bool g_bFirstJump[MAXPLAYERS + 1];
-float g_iLastJump[MAXPLAYERS + 1];
 int g_iTicksOnGround[MAXPLAYERS + 1];
 bool g_bNewStage[MAXPLAYERS + 1];
 bool g_bLeftZone[MAXPLAYERS + 1];
+
+// new speed/bhop detection
+float g_tickSpeedCap[MAXPLAYERS + 1];
 
 int g_iClientTick[MAXPLAYERS + 1];
 

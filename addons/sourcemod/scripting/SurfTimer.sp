@@ -16,7 +16,7 @@
 #include <cstrike>
 #include <geoip>
 #include <basecomm>
-#include <colorlib>
+#include <colorvariables>
 #include <autoexecconfig>
 #include <regex>
 #undef REQUIRE_EXTENSIONS
@@ -120,8 +120,7 @@ public void OnPluginEnd()
 			SetEntPropEnt(x, Prop_Send, "m_bSpotted", 1);
 			SetEntProp(x, Prop_Send, "m_iHideHUD", 0);
 			SetEntProp(x, Prop_Send, "m_iAccount", 1);
-			if (g_hOverrideClantag.BoolValue)
-				CS_SetClientClanTag(x, "");
+			CS_SetClientClanTag(x, "");
 			OnClientDisconnect(x);
 		}
 	}
@@ -359,7 +358,7 @@ public void OnConfigsExecuted()
 	// Get Chat Prefix
 	GetConVarString(g_hChatPrefix, g_szChatPrefix, sizeof(g_szChatPrefix));
 	GetConVarString(g_hChatPrefix, g_szMenuPrefix, sizeof(g_szMenuPrefix));
-	RemoveColors(g_szMenuPrefix, sizeof(g_szMenuPrefix));
+	CRemoveColors(g_szMenuPrefix, sizeof(g_szMenuPrefix));
 
 	if (GetConVarBool(g_hDBMapcycle))
 		db_selectMapCycle();
@@ -619,7 +618,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 	{
 		GetConVarString(g_hChatPrefix, g_szChatPrefix, sizeof(g_szChatPrefix));
 		GetConVarString(g_hChatPrefix, g_szMenuPrefix, sizeof(g_szMenuPrefix));
-		RemoveColors(g_szMenuPrefix, sizeof(g_szMenuPrefix));
+		CRemoveColors(g_szMenuPrefix, sizeof(g_szMenuPrefix));
 	}
 	if (convar == g_hReplayBot)
 	{
