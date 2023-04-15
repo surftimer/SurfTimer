@@ -623,18 +623,25 @@ public void VoteExtend(int client)
 
 public Action Command_normalMode(int client, int args)
 {
-	if (!IsValidClient(client))
-		return Plugin_Handled;
-
-	Client_Stop(client, 1);
-
-	if (g_bPracticeMode[client])
-		g_bPracticeMode[client] = false;
-
-	Command_Restart(client, 1);
-
-	CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
+if (!IsValidClient(client))
 	return Plugin_Handled;
+
+Client_Stop(client, 1);
+
+if (g_bPracticeMode[client])
+	g_bPracticeMode[client] = false;
+
+	g_iCurrentStyle[client] = 0;
+   	g_iInitalStyle[client] = 0;
+    	Format(g_szInitalStyle[client], 128, "Normal");
+    	Format(g_szStyleHud[client], 32, "");
+    	g_bRankedStyle[client] = true;
+    	g_bFunStyle[client] = false;
+
+   	 Command_Restart(client, 1);
+
+   	 CPrintToChat(client, "%t", "PracticeNormal", g_szChatPrefix);
+    	return Plugin_Handled;
 }
 
 public Action Command_createPlayerCheckpoint(int client, int args)
