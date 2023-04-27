@@ -16,7 +16,7 @@ void CheckDatabaseForUpdates()
 			return;
 		}
 		
-		if(!SQL_FastQuery(g_hDb, "SELECT ranked FROM ck_maptier LIMIT 1") || !SQL_FastQuery(g_hDb, "SELECT style FROM ck_playerrank LIMIT 1;"))
+		if (!SQL_FastQuery(g_hDb, "SELECT ranked FROM ck_maptier LIMIT 1") || !SQL_FastQuery(g_hDb, "SELECT style FROM ck_playerrank LIMIT 1;"))
 		{
 			db_upgradeDatabase(1);
 			return;
@@ -99,10 +99,21 @@ void CheckDatabaseForUpdates()
 			delete results;
 			return;
 		}
-		
 		// Version 13 - End
 
-		LogMessage("Version 13 looks good.");
+		if (!SQL_FastQuery(g_hDb, "SELECT accountid FROM ck_players LIMIT 1"))
+		{
+			db_upgradeDatabase(14, true);
+			return;
+		}
+
+		if (!SQL_FastQuery(g_hDb, "SELECT accountid FROM ck_vipadmins LIMIT 1")) // TODO: Check for name/steamid64 column if exists or no more
+		{
+			db_upgradeDatabase(15);
+			return;
+		} 
+
+		LogMessage("Version 15 looks good.");
 	}
 }
 
@@ -181,14 +192,14 @@ void db_upgradeDatabase(int ver, bool skipErrorCheck = false)
 	//ALREADY CONVERTED
 		char sQuery[512];
 		Format(sQuery, sizeof(sQuery), sql_checkDataType, g_sDatabaseName, "ck_checkpoints", "cp1");
-		if(SQL_FastQuery(g_hDb_Updates, sql_checkDataType)){
+		if (SQL_FastQuery(g_hDb_Updates, sql_checkDataType)) {
 			SQL_FastQuery(g_hDb_Updates, "CREATE TABLE IF NOT EXISTS `ck_checkpointsnew` (`steamid` varchar(32) NOT NULL, `mapname` varchar(32) NOT NULL, `cp` int(11) NOT NULL DEFAULT '0', `time` decimal(12, 6) NOT NULL DEFAULT '0.000000', `zonegroup` int(12) NOT NULL DEFAULT '0.0', PRIMARY KEY (`steamid`,`mapname`,`cp`,`zonegroup`)) DEFAULT CHARSET=utf8mb4;");
 			SQL_FastQuery(g_hDb_Updates, "REPLACE INTO ck_checkpointsnew (steamid, mapname, cp, time, zonegroup) SELECT * FROM ( SELECT steamid, mapname, 1 AS cp, cp1 AS time, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 2 AS cp, cp2, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 3 AS cp, cp3, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 4 AS cp, cp4, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 5 AS cp, cp5, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 6 AS cp, cp6, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 7 AS cp, cp7, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 8 AS cp, cp8, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 9 AS cp, cp9, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 10 AS cp, cp10, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 11 AS cp, cp11, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 12 AS cp, cp12, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 13 AS cp, cp13, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 14 AS cp, cp14, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 15 AS cp, cp15, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 16 AS cp, cp16, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 17 AS cp, cp17, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 18 AS cp, cp18, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 19 AS cp, cp19, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 20 AS cp, cp20, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 21 AS cp, cp21, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 22 AS cp, cp22, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 23 AS cp, cp23, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 24 AS cp, cp24, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 25 AS cp, cp25, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 26 AS cp, cp26, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 27 AS cp, cp27, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 28 AS cp, cp28, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 29 AS cp, cp29, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 30 AS cp, cp30, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 31 AS cp, cp31, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 32 AS cp, cp32, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 33 AS cp, cp33, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 34 AS cp, cp34, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 35 AS cp, cp35, zonegroup FROM ck_checkpoints) v HAVING time > 0;");
 			SQL_FastQuery(g_hDb_Updates, "ALTER TABLE ck_checkpoints RENAME TO ck_checkpointsold;");
 			SQL_FastQuery(g_hDb_Updates, "ALTER TABLE ck_checkpointsnew RENAME TO ck_checkpoints;");
 		}
 		//NOT CONVERTED
-		else{
+		else {
 			SQL_FastQuery(g_hDb_Updates, "CREATE TABLE IF NOT EXISTS `ck_checkpointsnew` (`steamid` varchar(32) NOT NULL, `mapname` varchar(32) NOT NULL, `cp` int(11) NOT NULL DEFAULT '0', `time` FLOAT NOT NULL DEFAULT '0.0', `zonegroup` int(12) NOT NULL DEFAULT '0.0', PRIMARY KEY (`steamid`,`mapname`,`cp`,`zonegroup`)) DEFAULT CHARSET=utf8mb4;");
 			SQL_FastQuery(g_hDb_Updates, "REPLACE INTO ck_checkpointsnew (steamid, mapname, cp, time, zonegroup) SELECT * FROM ( SELECT steamid, mapname, 1 AS cp, cp1 AS time, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 2 AS cp, cp2, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 3 AS cp, cp3, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 4 AS cp, cp4, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 5 AS cp, cp5, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 6 AS cp, cp6, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 7 AS cp, cp7, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 8 AS cp, cp8, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 9 AS cp, cp9, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 10 AS cp, cp10, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 11 AS cp, cp11, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 12 AS cp, cp12, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 13 AS cp, cp13, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 14 AS cp, cp14, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 15 AS cp, cp15, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 16 AS cp, cp16, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 17 AS cp, cp17, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 18 AS cp, cp18, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 19 AS cp, cp19, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 20 AS cp, cp20, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 21 AS cp, cp21, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 22 AS cp, cp22, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 23 AS cp, cp23, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 24 AS cp, cp24, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 25 AS cp, cp25, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 26 AS cp, cp26, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 27 AS cp, cp27, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 28 AS cp, cp28, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 29 AS cp, cp29, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 30 AS cp, cp30, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 31 AS cp, cp31, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 32 AS cp, cp32, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 33 AS cp, cp33, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 34 AS cp, cp34, zonegroup FROM ck_checkpoints UNION ALL SELECT steamid, mapname, 35 AS cp, cp35, zonegroup FROM ck_checkpoints) v HAVING time > 0;");
 			SQL_FastQuery(g_hDb_Updates, "ALTER TABLE ck_checkpoints RENAME TO ck_checkpointsold;");
@@ -213,6 +224,84 @@ void db_upgradeDatabase(int ver, bool skipErrorCheck = false)
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playertimes MODIFY name VARCHAR(64);");
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_wrcps MODIFY name VARCHAR(64);");
 		SQL_FastQuery(g_hDb, "ALTER TABLE ck_prinfo MODIFY name VARCHAR(64);");
+	}
+	else if (ver == 14)
+	{
+		// Cleanup tables with invalid steamids
+		char sQuery[512];
+		for (int i = 0; i < sizeof(g_sSteamIdTablesCleanup); i++)
+		{
+			FormatEx(sQuery, sizeof(sQuery), "DELETE FROM %s WHERE steamid = \"STEAM_ID_STOP_IGNORING_RETVALS\";", g_sSteamIdTablesCleanup[i]);
+			SQL_FastQuery(g_hDb, sQuery);
+		}
+		
+		if (SQL_FastQuery(g_hDb, sql_createPlayers))
+		{
+			// Add accountid column to tables, because we can use the next SELECT queries for adding accountid to all 10 tables too...
+			for (int i = 0; i < sizeof(g_sSteamIdTablesCleanup); i++)
+			{
+				FormatEx(sQuery, sizeof(sQuery), "ALTER TABLE %s ADD COLUMN accountid INT NOT NULL AFTER steamid;", g_sSteamIdTablesCleanup[i]);
+				SQL_FastQuery(g_hDb, sQuery);
+			}
+
+			// Wait a frame fixed for me the "Lost Connection" error...
+			// maybe it was a random thing, but I'll keep it for now.
+			RequestFrame(StartLoadingPlayerStuff);
+			return;
+		}
+	}
+	else if (ver == 15)
+	{
+		// Drop table keys and steamid columns...
+		char sQuery[512];
+		for (int i = 0; i < sizeof(g_sSteamIdTablesCleanup); i++)
+		{
+			FormatEx(sQuery, sizeof(sQuery), "ALTER TABLE %s DROP PRIMARY KEY;", g_sSteamIdTablesCleanup[i]);
+			SQL_FastQuery(g_hDb, sQuery);
+
+			FormatEx(sQuery, sizeof(sQuery), "ALTER TABLE %s DROP COLUMN steamid;", g_sSteamIdTablesCleanup[i]);
+			SQL_FastQuery(g_hDb, sQuery);
+
+			if (g_sSteamIdTablesCleanup[i][3] == 'v')
+			{
+				SQL_FastQuery(g_hDb, "DROP INDEX vip ON ck_vipadmins;");
+			}
+		}
+
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_bonus DROP COLUMN name;");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_latestrecords DROP COLUMN name;");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playertimes DROP COLUMN name;");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_prinfo DROP COLUMN name;");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_playerrank DROP COLUMN steamid64;");
+		SQL_FastQuery(g_hDb, "ALTER TABLE ck_wrcps DROP COLUMN name;");
+		/*
+			Steps left (maybe more):
+				- add (primary) keys back
+			
+
+			Keys:
+				ck_bonus
+					PRIMARY KEY(`steamid`, `mapname`, `zonegroup`, `style`)
+				ck_checkpoints
+					PRIMARY KEY(`steamid`, `mapname`, `cp`, `zonegroup`)
+				ck_latestrecords
+					PRIMARY KEY(`steamid`, `map`, `date`)
+				ck_playeroptions2
+					PRIMARY KEY (`steamid`)
+				ck_playerrank
+					PRIMARY KEY (`steamid`, `style`)
+				ck_playertemp
+					PRIMARY KEY(`steamid`,`mapname`)
+				ck_playertimes
+					PRIMARY KEY(`steamid`, `mapname`, `style`)
+				ck_prinfo
+					PRIMARY KEY(`steamid`, `mapname`, `zonegroup`)
+				ck_wrcps
+					PRIMARY KEY (`steamid`,`mapname`,`stage`,`style`)
+				ck_vipadmins
+					PRIMARY KEY (`steamid`)
+					KEY `vip` (`steamid`,`vip`,`admin`,`zoner`)
+		*/
 	}
 
 	CheckDatabaseForUpdates();
@@ -246,7 +335,7 @@ void CheckDataType(const char[] table, const char[] column)
 	pack.WriteString(table);
 	pack.WriteString(sColumn);
 
-	SQL_TQuery(g_hDb_Updates, SQLCheckDataType, sQuery, pack);
+	g_hDb_Updates.Query(SQLCheckDataType, sQuery, pack);
 }
 
 public void SQLCheckDataType(Handle owner, Handle hndl, const char[] error, DataPack pack)
@@ -304,7 +393,7 @@ public void SQLCheckDataType(Handle owner, Handle hndl, const char[] error, Data
 		{
 			LogError("Unsupported table, column and datatype combination. Please open up an issue. Table: %s, Column: %s, DataType: %s, Precision: %d, Scale: %d", sTable, sColumn, sDataType, iPrecision, iScale);
 		}
-		else if (sDataType[0] == 'd' && iPrecision == 12 && iScale == 6 && (strcmp(g_sDecimalTables[sizeof(g_sDecimalTables)-1][0], sTable) == 0) && !g_tables_converted){
+		else if (sDataType[0] == 'd' && iPrecision == 12 && iScale == 6 && (strcmp(g_sDecimalTables[sizeof(g_sDecimalTables)-1][0], sTable) == 0) && !g_tables_converted) {
 			g_tables_converted = true;
 
 			/// Start Loading Server Settings
@@ -324,7 +413,7 @@ public void SQLCheckDataType(Handle owner, Handle hndl, const char[] error, Data
 
 void ConvertDataTypeToDecimal(const char[] table, const char[] column, int precision, int scale)
 {
-	PrintToServer("Converting %s-%s to decimal(%d, %d)...", table, column, precision, scale);
+	LogMessage("Converting %s-%s to decimal(%d, %d)...", table, column, precision, scale);
 	
 	char sQuery[128];
 	Format(sQuery, sizeof(sQuery), "ALTER TABLE %s MODIFY %s DECIMAL(%d, %d);", table, column, precision, scale);
@@ -333,7 +422,7 @@ void ConvertDataTypeToDecimal(const char[] table, const char[] column, int preci
 	pack.WriteString(table);
 	pack.WriteString(column);
 
-	SQL_TQuery(g_hDb_Updates, SQLChangeDataType, sQuery, pack);
+	g_hDb_Updates.Query(SQLChangeDataType, sQuery, pack);
 }
 
 public void SQLChangeDataType(Handle owner, Handle hndl, const char[] error, DataPack pack)
@@ -357,16 +446,6 @@ public void SQLChangeDataType(Handle owner, Handle hndl, const char[] error, Dat
 	CheckDataType(sTable, sColumn);
 }
 
-void CleanUpTablesRetvalsSteamId()
-{
-	char sQuery[512];
-	for (int i = 0; i < sizeof(g_sSteamIdTablesCleanup); i++)
-	{
-		FormatEx(sQuery, sizeof(sQuery), "DELETE FROM %s WHERE steamid = \"STEAM_ID_STOP_IGNORING_RETVALS\";", g_sSteamIdTablesCleanup[i]);
-		SQL_TQuery(g_hDb_Updates, SQLCleanUpTables, sQuery);
-	}
-}
-
 public void SQLCleanUpTables(Handle owner, Handle hndl, const char[] error, any data)
 {
 	if (owner == null || strlen(error) > 0)
@@ -374,4 +453,300 @@ public void SQLCleanUpTables(Handle owner, Handle hndl, const char[] error, any 
 		SetFailState("[SQLCleanUpTables] Error while cleaning up tables... Error: %s", error);
 		return;
 	}
+}
+
+public void StartLoadingPlayerStuff()
+{
+	SelectPlayersStuff();
+}
+
+void SelectPlayersStuff()
+{
+	Transaction tTransaction = new Transaction();
+
+	char sQuery[256];
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid, name FROM ck_bonus GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 0);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid FROM ck_checkpoints GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 1);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid, name FROM ck_latestrecords GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 2);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid FROM ck_playeroptions2 GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 3);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid, steamid64 FROM ck_playerrank GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 4);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid FROM ck_playertemp GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 5);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid, name FROM ck_playertimes GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 6);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid, name FROM ck_prinfo GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 7);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid, name FROM ck_wrcps GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 8);
+
+	FormatEx(sQuery, sizeof(sQuery), "SELECT steamid FROM ck_vipadmins GROUP BY steamid;");
+	tTransaction.AddQuery(sQuery, 9);
+
+	SQL_ExecuteTransaction(g_hDb, tTransaction, SQLTxn_GetPlayerDataSuccess, SQLTxn_GetPlayerDataFailed, .priority=DBPrio_High);
+}
+
+public void SQLTxn_GetPlayerDataSuccess(Database db, any data, int numQueries, DBResultSet[] results, any[] queryData)
+{
+	int iQueries = 0;
+	Transaction tTransaction = new Transaction();
+
+	for (int i = 0; i < numQueries; i++)
+	{
+		char sSteamId2[32], sName[64], sSteamId64[128], sQuery[1024];
+		// ck_bonus
+		if (g_sSteamIdTablesCleanup[i][3] == 'b')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				results[i].FetchString(1, sName, sizeof(sName));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				// Insert into ck_players
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2N, iAccountId, sSteamId2, sName, sSteamId2, sName);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_checkpoints
+		else if (g_sSteamIdTablesCleanup[i][3] == 'c')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				// Insert into ck_players
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2, iAccountId, sSteamId2, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_latestrecords
+		else if (g_sSteamIdTablesCleanup[i][3] == 'l')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				results[i].FetchString(1, sName, sizeof(sName));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				// Insert into ck_players
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2N, iAccountId, sSteamId2, sName, sSteamId2, sName);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_playeroptions2
+		else if (g_sSteamIdTablesCleanup[i][3] == 'p' && g_sSteamIdTablesCleanup[i][10] == 'p')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				// Insert into ck_players
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2, iAccountId, sSteamId2, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_playerrank
+		else if (g_sSteamIdTablesCleanup[i][3] == 'p' && g_sSteamIdTablesCleanup[i][10] == 'a')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				results[i].FetchString(1, sSteamId64, sizeof(sSteamId64));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				// Insert into ck_players
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2S64, iAccountId, sSteamId2, sSteamId64, sSteamId2, sSteamId64);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_playertemp
+		else if (g_sSteamIdTablesCleanup[i][3] == 'p' && g_sSteamIdTablesCleanup[i][10] == 'e')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				// Insert into ck_players
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2, iAccountId, sSteamId2, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_playertimes
+		else if (g_sSteamIdTablesCleanup[i][3] == 'p' && g_sSteamIdTablesCleanup[i][10] == 'i')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				results[i].FetchString(1, sName, sizeof(sName));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				// Insert into ck_players
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2N, iAccountId, sSteamId2, sName, sSteamId2, sName);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_prinfo
+		else if (g_sSteamIdTablesCleanup[i][3] == 'p' && g_sSteamIdTablesCleanup[i][4] == 'r')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				results[i].FetchString(1, sName, sizeof(sName));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				// Insert into ck_players
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2N, iAccountId, sSteamId2, sName, sSteamId2, sName);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_wrcps
+		else if (g_sSteamIdTablesCleanup[i][3] == 'w')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				results[i].FetchString(1, sName, sizeof(sName));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				// Insert into ck_players
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2N, iAccountId, sSteamId2, sName, sSteamId2, sName);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+		// ck_vipadmins
+		else if (g_sSteamIdTablesCleanup[i][3] == 'v')
+		{
+			while (results[i].FetchRow())
+			{
+				results[i].FetchString(0, sSteamId2, sizeof(sSteamId2));
+				
+				int iAccountId = SteamId2ToAccountId(sSteamId2);
+
+				// Insert into ck_players
+				FormatEx(sQuery, sizeof(sQuery), sql_insertPlayersAS2, iAccountId, sSteamId2, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+
+				// Update table and adding account
+				FormatEx(sQuery, sizeof(sQuery), "UPDATE %s SET accountid = %d WHERE steamid = '%s';", g_sSteamIdTablesCleanup[i], iAccountId, sSteamId2);
+				tTransaction.AddQuery(sQuery);
+				iQueries++;
+			}
+		}
+
+		PrintToServer("Added %d Queries to Transaction for table %s", iQueries, g_sSteamIdTablesCleanup[i]);
+	}
+
+	if (iQueries == 0)
+	{
+		CheckDatabaseForUpdates();
+		return;
+	}
+
+	PrintToServer("Transaction started with %d queries started...", iQueries);
+	SQL_ExecuteTransaction(g_hDb, tTransaction, SQLTxn_InsertToPlayersSuccess, SQLTxn_InsertToPlayersFailed, .priority=DBPrio_High);
+}
+
+public void SQLTxn_InsertToPlayersSuccess(Database db, any data, int numQueries, DBResultSet[] results, any[] queryData)
+{
+	CheckDatabaseForUpdates();
+}
+
+public void SQLTxn_InsertToPlayersFailed(Database db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
+{
+	SQL_FastQuery(g_hDb, "DROP TABLE IF EXISTS ck_players;");
+
+	SetFailState("[SurfTimer] Failed while adding data to table ck_players! Error: %s", error);
+}
+
+public void SQLTxn_GetPlayerDataFailed(Database db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
+{
+	SQL_FastQuery(g_hDb, "DROP TABLE IF EXISTS ck_players;");
+
+	if (failIndex == -1)
+	{
+		SetFailState("[SurfTimer] Failed while getting data! Error: %s", error);
+		return;
+	}
+
+	SetFailState("[SurfTimer] Failed while getting data from table %s! Error: %s", g_sSteamIdTablesCleanup[failIndex], error);
 }

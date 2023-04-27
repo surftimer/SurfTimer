@@ -224,7 +224,7 @@ public void SaveRecording(int client, int zgroup, int style)
 		StopRecording(client);
 	}
 
-	if(zgroup == 0) {
+	if (zgroup == 0) {
 
 		for(int j = 0; j < CPLIMIT; j++)
 		{
@@ -562,7 +562,7 @@ public void PlayRecord(int client, int type, int style, int use_CP)
 	g_aReplayFrame[client] = header.Frames;
 	g_iReplayVersion[client] = header.BinaryFormatVersion;
 
-	if(use_CP > 0)
+	if (use_CP > 0)
 		g_iReplayTick[client] = g_iCPStartFrame[style][use_CP-1];
 	else
 		g_iReplayTick[client] = 0;
@@ -625,7 +625,7 @@ public bool WriteRecordToDisk(const char[] sPath, FileHeader header)
 			aWriteData[(sizeof(frame_t) * iFramesWritten) + j] = aFrameData[j];
 		}
 
-		if(++iFramesWritten == 100 || i == header.Frames.Length - 1)
+		if (++iFramesWritten == 100 || i == header.Frames.Length - 1)
 		{
 			fFile.Write(aWriteData, sizeof(frame_t) * iFramesWritten, 4);
 
@@ -687,7 +687,7 @@ public bool LoadRecordFromFile(const char[] path, FileHeader header, bool header
 		strcopy(sNewPath, FindCharInString(path, '.', true) + 1, path);
 		StrCat(sNewPath, sizeof(sNewPath), "_broken.rec");
 
-		if(FileExists(sNewPath))
+		if (FileExists(sNewPath))
 		{
 			DeleteFile(sNewPath);
 		}
@@ -713,7 +713,7 @@ public bool LoadRecordFromFile(const char[] path, FileHeader header, bool header
 
 		for(int i = 0; i < header.TickCount; i++)
 		{
-			if(fFile.Read(aReplayData, sizeof(frame_t), 4) >= 0)
+			if (fFile.Read(aReplayData, sizeof(frame_t), 4) >= 0)
 			{
 				header.Frames.SetArray(i, aReplayData, sizeof(frame_t));
 			}
@@ -1024,7 +1024,7 @@ public void Replay_Playback(int client, int &buttons, int &subtype, int &seed, i
 		return;
 	}
 
-	if(g_iReplayVersion[client] >= BINARY_FORMAT_VERSION)
+	if (g_iReplayVersion[client] >= BINARY_FORMAT_VERSION)
 	{
 		// origin[3], angles[2], buttons, flags, movetype
 		frame_t aFrame;
@@ -1047,13 +1047,13 @@ public void Replay_Playback(int client, int &buttons, int &subtype, int &seed, i
 
 		bool bWalk = true;
 
-		if(aFrame.flags & FL_ONGROUND)
+		if (aFrame.flags & FL_ONGROUND)
 		{
 			MoveType mt = MOVETYPE_WALK;
-			if(GetVectorLength(vecVelocity) > 300.0)
+			if (GetVectorLength(vecVelocity) > 300.0)
 			{
 				TR_TraceRay(aFrame.pos, vecCurrentPosition, MASK_PLAYERSOLID, RayType_EndPoint);
-				if(TR_DidHit())
+				if (TR_DidHit())
 				{
 					bWalk = false;
 					mt = MOVETYPE_NOCLIP;
@@ -1073,7 +1073,7 @@ public void Replay_Playback(int client, int &buttons, int &subtype, int &seed, i
 		// bot is on ground.. 
 		// if the distance between the previous position is much bigger (1.5x) than the expected according to the bot's velocity, 
 		// teleport to avoid sync issues
-		if((GetVectorLength(vecVelocity) > 15000.0 ||
+		if ((GetVectorLength(vecVelocity) > 15000.0 ||
 			(bWalk && GetVectorDistance(vecCurrentPosition, aFrame.pos) > GetVectorLength(vecVelocity) / g_fTickrate * 1.5)))
 		{
 			TeleportEntity(client, aFrame.pos, ang, NULL_VECTOR);

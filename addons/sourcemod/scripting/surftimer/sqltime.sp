@@ -2,7 +2,7 @@ public void db_viewPlayerInfo(int client, char szSteamId[32])
 {
 	char szQuery[512];
 	Format(szQuery, 512, "SELECT steamid, steamid64, name, country, lastseen, joined, connections, timealive, timespec FROM ck_playerrank WHERE steamid = '%s';", szSteamId);
-	SQL_TQuery(g_hDb, SQL_ViewPlayerInfoCallback, szQuery, client, DBPrio_Low);
+	g_hDb.Query(SQL_ViewPlayerInfoCallback, szQuery, client, DBPrio_Low);
 }
 
 
@@ -82,7 +82,7 @@ public void db_savePlayTime(int client)
 {
 	char szQuery[512];
 	Format(szQuery, 512, "UPDATE ck_playerrank SET timealive = timealive + %i, timespec = timespec + %i WHERE steamid = '%s';", g_iPlayTimeAliveSession[client], g_iPlayTimeSpecSession[client], g_szSteamID[client]);
-	SQL_TQuery(g_hDb, SQL_SavePlayTimeCallback, szQuery, client, DBPrio_Low);
+	g_hDb.Query(SQL_SavePlayTimeCallback, szQuery, client, DBPrio_Low);
 }
 
 public void SQL_SavePlayTimeCallback(Handle owner, Handle hndl, const char[] error, any client)

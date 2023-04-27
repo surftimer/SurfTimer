@@ -32,7 +32,7 @@ public int NewMapMenuHandler(Menu menu, MenuAction action, int param1, int param
 public void db_ViewNewestMaps(int client)
 {
 	char sql_selectNewestMaps[] = "SELECT mapname, date FROM ck_newmaps ORDER BY date DESC LIMIT 50";
-	SQL_TQuery(g_hDb, sql_selectNewestMapsCallback, sql_selectNewestMaps, client, DBPrio_Low);
+	g_hDb.Query(sql_selectNewestMapsCallback, sql_selectNewestMaps, client, DBPrio_Low);
 }
 
 public void sql_selectNewestMapsCallback(Handle owner, Handle hndl, const char[] error, any data)
@@ -77,7 +77,7 @@ public void db_InsertNewestMaps()
 	char sql_insertNewestMaps[] = "INSERT INTO ck_newmaps (mapname) VALUES('%s');";
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), sql_insertNewestMaps, g_szMapName);
-	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, _, DBPrio_Low);
+	g_hDb.Query(SQL_CheckCallback, szQuery, __LINE__, DBPrio_Low);
 }
 
 //update Database just incase

@@ -78,7 +78,7 @@ public void OnLibraryAdded(const char[] name)
 			return;
 		int iOffset = GameConfGetOffset(hGameData, "Teleport");
 		delete hGameData;
-		
+
 		if (iOffset == -1)
 			return;
 
@@ -143,7 +143,7 @@ public void OnLibraryRemoved(const char[] name)
 }
 
 public void OnEntityCreated(int entity, const char[] classname) {
-	if( (classname[0] == 't' || classname[0] == 'l') ? (StrEqual(classname, "trigger_teleport", false) ) : false)
+	if ( (classname[0] == 't' || classname[0] == 'l') ? (StrEqual(classname, "trigger_teleport", false) ) : false)
 	{
 		SDKHook(entity, SDKHook_Use, IgnoreTriggers);
 		SDKHook(entity, SDKHook_StartTouch, IgnoreTriggers);
@@ -189,7 +189,7 @@ public void OnMapStart()
 	/// Start Loading Server Settings
 	ConVar cvHibernateWhenEmpty = FindConVar("sv_hibernate_when_empty");
 	
-	if(g_tables_converted)
+	if (g_tables_converted)
 	{
 		if (!g_bRenaming && !g_bInTransactionChain && (IsServerProcessing() || !cvHibernateWhenEmpty.BoolValue))
 		{
@@ -492,6 +492,7 @@ public void OnClientPutInServer(int client)
 		g_bLoadingSettings[client] = true;
 		g_iSettingToLoad[client] = 0;
 		LoadClientSetting(client, g_iSettingToLoad[client]);
+		db_InsertUpdatePlayersTable(client);
 	}
 }
 
@@ -606,9 +607,9 @@ public void OnClientDisconnect(int client)
 	sv_noclipspeed.FloatValue = g_iDefaultNoclipSpeed;
 
 	//PRINFO
-	if(IsValidClient(client) && !IsFakeClient(client)){
-		for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++){
-			if(g_fTimeIncrement[client][zonegroup] != 0.0)
+	if (IsValidClient(client) && !IsFakeClient(client)) {
+		for(int zonegroup = 0; zonegroup < MAXZONEGROUPS; zonegroup++) {
+			if (g_fTimeIncrement[client][zonegroup] != 0.0)
 				g_fTimeinZone[client][zonegroup] += g_fTimeIncrement[client][zonegroup];
 			db_UpdatePRinfo(client, g_szSteamID[client], zonegroup);
 		}

@@ -704,8 +704,8 @@ GlobalForward g_StageFinishForward;
 /*----------  SQL Variables  ----------*/
 
 // SQL driver
-Handle g_hDb = null;
-Handle g_hDb_Updates = null;
+Database g_hDb = null;
+Database g_hDb_Updates = null;
 
 // Database type
 int g_DbType;
@@ -1581,7 +1581,8 @@ char g_sSteamIdTablesCleanup[][] = {
 	"ck_playerrank", 
 	"ck_playertemp", 
 	"ck_playertimes", 
-	"ck_prinfo", 
+	"ck_prinfo",
+	"ck_wrcps",
 	"ck_vipadmins"
 };
 
