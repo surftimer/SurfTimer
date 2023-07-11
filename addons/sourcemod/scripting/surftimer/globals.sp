@@ -703,6 +703,7 @@ GlobalForward g_StageFinishForward;
 GlobalForward g_OnClientTimerStart;
 GlobalForward g_OnClientWRCPTimerStart;
 GlobalForward g_OnClientBonusTimerStart;
+GlobalForward g_OnClientPracTimerStart;
 
 /*----------  SQL Variables  ----------*/
 
