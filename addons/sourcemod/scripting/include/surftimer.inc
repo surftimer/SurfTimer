@@ -193,7 +193,7 @@ native bool surftimer_SafeTeleport(int client, float fDestination[3], float fAng
 forward void surftimer_OnClientTimerStart(int client, int style);
 
 /**
- * Called when a client map timer starts
+ * Called when a client WRCP timer starts
  *
  * @param client           Index of the client.
  * @param style			   Style the client is currently in
@@ -202,7 +202,7 @@ forward void surftimer_OnClientTimerStart(int client, int style);
 forward void surftimer_OnClientWRCPTimerStart(int client, int style, int stage);
 
 /**
- * Called when a client map timer starts
+ * Called when a client Bonus timer starts
  *
  * @param client           Index of the client.
  * @param style			   Style the client is currently in
