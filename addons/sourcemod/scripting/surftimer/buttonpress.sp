@@ -96,6 +96,8 @@ public void CL_OnStartTimerPress(int client)
 
 				SetPrestrafe(client, 0, g_iCurrentStyle[client], true, false, false );
 				SetPrestrafe(client, 1, g_iCurrentStyle[client], true, false, false );
+
+				OnClientTimerStartForward(client);
 			}
 			else // bonus
 			{
@@ -106,6 +108,8 @@ public void CL_OnStartTimerPress(int client)
 				iPersonalPrestrafeRecord = g_iPersonalRecordPreStrafeBonus[client][g_PreSpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
 
 				SetPrestrafe(client, g_iClientInZone[client][2], g_iCurrentStyle[client], false, true, false);
+				
+				OnClientBonusTimerStartForward(client);
 			}
 		}
 
@@ -159,10 +163,13 @@ public void CL_OnStartTimerPress(int client)
 			Format(szSpeed, sizeof(szSpeed), "%i", prestrafe);
 
 			if (g_iClientInZone[client][2] == 0)
+			{
 				Format(preMessage, sizeof(preMessage), "%t", "StartPrestrafe", g_szChatPrefix, szSpeed, szPersonalDifference, szRecordDifference);
+			}
 			else
+			{
 				Format(preMessage, sizeof(preMessage), "%t", "BonusPrestrafe", g_szChatPrefix, g_iClientInZone[client][2], szSpeed, szPersonalDifference, szRecordDifference);
-
+			}
 			if (g_iPrespeedText[client])
 				CPrintToChat(client, preMessage);
 		
@@ -189,6 +196,7 @@ public void CL_OnStartTimerPress(int client)
 
 	// Play Start Sound
 	PlayButtonSound(client);
+	
 
 	// Add pre
 	// // Start recording for record bot
@@ -916,6 +924,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 					CPrintToChat(i, preMessage);
 			}
 		}
+		OnClientWRCPTimerStartForward(client);
 	}
 }
 
@@ -1067,6 +1076,7 @@ public void CL_OnStartPracSrcpTimerPress(int client)
 				g_iPracSrcpStage[client] = g_Stage[g_iClientInZone[client][2]][client];
 			}
 		}
+		// OnClientTimerStartForward(client);
 	}
 }
 
