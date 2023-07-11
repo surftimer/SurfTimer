@@ -4067,6 +4067,17 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		FormatTimeFloat(client, time, 3, szTime, 32);
 
 		SendMapCheckpointForward(client, zonegroup, zone, time, szTime, szDiff_colorless, sz_srDiff_colorless);
+		
+		/* Add the Checkpoint data to current run list newrecord-cp-list*/
+		RunCheckpoints tempArr;
+		tempArr.cpNumber = g_iClientInZone[client][1] + 1;
+		tempArr.runtime = szTime;
+		StrCat(tempArr.pbDifference, sizeof(tempArr.pbDifference), szDiff_colorless);
+		tempArr.style = g_iCurrentStyle[client];
+		StrCat(tempArr.wrDifference, sizeof(tempArr.wrDifference), sz_srDiff_colorless);
+		
+		g_aCheckpointsDifference[client].PushArray(tempArr, sizeof(RunCheckpoints));
+		CPrintToChat(client, "{blue}tempArr{default} CP %i | runTime %s | pbDifference %s | wrDifference %s | style %i", tempArr.cpNumber, tempArr.runtime, tempArr.pbDifference, tempArr.wrDifference, tempArr.style);
 
 		if (g_bCheckpointsEnabled[client] && g_iCpMessages[client])
 		{
@@ -4104,6 +4115,17 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 
 			/* Finish the call, get the result */
 			Call_Finish();
+
+			/* Add the Checkpoint data to current run list newrecord-cp-list*/
+			RunCheckpoints tempArr;
+			tempArr.cpNumber = g_iClientInZone[client][1] + 1;
+			tempArr.runtime = szTime;
+			tempArr.pbDifference = "";
+			StrCat(tempArr.wrDifference, sizeof(tempArr.wrDifference), sz_srDiff_colorless);
+			tempArr.style = g_iCurrentStyle[client];
+
+			g_aCheckpointsDifference[client].PushArray(tempArr, sizeof(RunCheckpoints));
+			CPrintToChat(client, "{blue}tempArr{default} CP %i | runTime %s | pbDifference %s | wrDifference %s | style %i", tempArr.cpNumber, tempArr.runtime, tempArr.pbDifference, tempArr.wrDifference, tempArr.style);
 
 			if (percent > -1.0)
 			{

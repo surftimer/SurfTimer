@@ -190,7 +190,7 @@ native bool surftimer_SafeTeleport(int client, float fDestination[3], float fAng
  * @param client			The client's ID.
  * @return						Plugin_Handled, to stop the client from searching.
  */
-forward Action surftimer_OnMapFinished(int client, float fRunTime, char sRunTime[54], float PBDiff, float WRDiff, int rank, int total, int style);
+forward Action surftimer_OnMapFinished(int client, float fRunTime, char sRunTime[54], float PBDiff, float WRDiff, int rank, int total, int style, ArrayList cps);
 
 /**
  * Called when a player reaches a checkpoint zone or a stage.
@@ -231,9 +231,10 @@ forward Action surftimer_OnPracticeFinished(int client, float fRunTime, char sRu
  * @param style				Style index.
  * @param time				Time set by the player.
  * @param timeDif			Time difference with the former record.
- * @param bonusGroup	Group of the bonus. -1 if the record isn't a bonus.
+ * @param bonusGroup	    Group of the bonus. -1 if the record isn't a bonus.
+ * @param checkpoints       Array with checkpoint differences for the run.
  */
-forward void surftimer_OnNewRecord(int client, int style, char[] time, char[] timeDif, int bonusGroup);
+forward void surftimer_OnNewRecord(int client, int style, char[] time, char[] timeDif, int bonusGroup, ArrayList checkpoints);
 
 /**
  * Called when a client sets a new WRCP

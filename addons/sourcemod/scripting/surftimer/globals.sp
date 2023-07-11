@@ -938,6 +938,19 @@ int g_iPreStrafeBonus[3][MAXZONEGROUPS][MAX_STYLES][MAXPLAYERS + 1];
 // Latest prestrafe speed for stages
 int g_iPreStrafeStage[3][CPLIMIT][MAX_STYLES][MAXPLAYERS + 1];
 
+/* newrecord-cp-list */
+// Current run checkpoints differences
+ArrayList g_aCheckpointsDifference[MAXPLAYERS + 1];
+
+enum struct RunCheckpoints
+{
+	int cpNumber;
+	int style;
+	char runtime[32];
+	char wrDifference[32];
+	char pbDifference[32];
+}
+
 /*----------  Replay Variables  ----------*/
 
 // Checks if the bot is new, if so, set weapon
