@@ -498,59 +498,6 @@ public void OnClientPutInServer(int client)
 	}
 }
 
-public Action Command_Test(int client, int args)
-{
-	RunCheckpoints cpEnum;
-	cpEnum.cpNumber = 69;
-	cpEnum.runtime = "69:69:69";
-	cpEnum.pbDifference = "dddd";
-	cpEnum.wrDifference = "xxxx";
-	cpEnum.style = g_iCurrentStyle[client];
-	g_aCheckpointsDifference[client].PushArray(cpEnum, sizeof(RunCheckpoints));
-
-	cpEnum.cpNumber = 420;
-	cpEnum.runtime = "420:420:420";
-	cpEnum.pbDifference = "ssss";
-	cpEnum.wrDifference = "zzzz";
-	cpEnum.style = g_iCurrentStyle[client];
-	g_aCheckpointsDifference[client].PushArray(cpEnum, sizeof(RunCheckpoints));
-	
-	/* Start function call */
-	Call_StartForward(g_MapFinishForward);
-
-	/* Push parameters one at a time */
-	Call_PushCell(client);
-	Call_PushFloat(66.666);
-	Call_PushString("00:66.00");
-	Call_PushFloat(-1.5);
-	Call_PushFloat(-2.5);
-	Call_PushCell(420);
-	Call_PushCell(69);
-	Call_PushCell(0);
-	Call_PushCell(g_aCheckpointsDifference[client]);
-
-	/* Finish the call, get the result */
-	Call_Finish();
-	
-	
-	if(g_aCheckpointsDifference[client].Length > 0)
-	{
-		for(int i = 0; i <= g_aCheckpointsDifference[client].Length-1; i++)
-		{
-			g_aCheckpointsDifference[client].GetArray(i, cpEnum);
-
-			CPrintToChat(client, "{blue}cpEnum{default} CP %i | runTime %s | pbDifference %s | wrDifference %s | style %i", cpEnum.cpNumber, cpEnum.runtime, cpEnum.pbDifference, cpEnum.wrDifference, cpEnum.style);
-		}
-	}
-	else
-	{
-		CPrintToChat(client, "{red}Empty list {yellow}g_aCheckpointsDifference[client]");
-	}
-
-	g_aCheckpointsDifference[client].Clear();
-	return Plugin_Handled;
-}
-
 public void OnClientAuthorized(int client)
 {
 	if (GetConVarBool(g_hConnectMsg) && !IsFakeClient(client))
@@ -1202,9 +1149,6 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 public void OnPluginStart()
 {
 	g_bServerDataLoaded = false;
-
-	// testcmd
-	RegConsoleCmd("sm_testcmd", Command_Test, "test", ADMFLAG_ROOT);
 
 	// Language File
 	LoadTranslations("surftimer.phrases");
