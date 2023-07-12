@@ -482,7 +482,7 @@ public void OnClientPutInServer(int client)
 		g_MVPStars[client] = 0;
 	}
 
-	/* Init the list with the enum we've made for it  newrecord-cp-list*/
+	/* Init the cp list with the enum we've made for it  newrecord-cp-list*/
 	g_aCheckpointsDifference[client] = new ArrayList(sizeof(RunCheckpoints));
 
 	// Position Restoring
@@ -500,28 +500,21 @@ public void OnClientPutInServer(int client)
 
 public Action Command_Test(int client, int args)
 {
-	RunCheckpoints tempArr;
-	tempArr.cpNumber = 69;
-	tempArr.runtime = "69:69:69";
-	tempArr.pbDifference = "dddd";
-	tempArr.wrDifference = "xxxx";
-	tempArr.style = g_iCurrentStyle[client];
-	g_aCheckpointsDifference[client].PushArray(tempArr, sizeof(RunCheckpoints));
+	RunCheckpoints cpEnum;
+	cpEnum.cpNumber = 69;
+	cpEnum.runtime = "69:69:69";
+	cpEnum.pbDifference = "dddd";
+	cpEnum.wrDifference = "xxxx";
+	cpEnum.style = g_iCurrentStyle[client];
+	g_aCheckpointsDifference[client].PushArray(cpEnum, sizeof(RunCheckpoints));
 
-	tempArr.cpNumber = 420;
-	tempArr.runtime = "420:420:420";
-	tempArr.pbDifference = "ssss";
-	tempArr.wrDifference = "zzzz";
-	tempArr.style = g_iCurrentStyle[client];
-	g_aCheckpointsDifference[client].PushArray(tempArr, sizeof(RunCheckpoints));
+	cpEnum.cpNumber = 420;
+	cpEnum.runtime = "420:420:420";
+	cpEnum.pbDifference = "ssss";
+	cpEnum.wrDifference = "zzzz";
+	cpEnum.style = g_iCurrentStyle[client];
+	g_aCheckpointsDifference[client].PushArray(cpEnum, sizeof(RunCheckpoints));
 	
-	// g_aCheckpointsDifference[client].PushString("CP 1 | 00:02.37 (+00:00.28)");
-	// g_aCheckpointsDifference[client].PushString("CP 2 | 00:07.08 (+00:01.03)");
-	// g_aCheckpointsDifference[client].PushString("CP 3 | 00:12.73 (+00:01.75)");
-	// g_aCheckpointsDifference[client].PushString("CP 4 | 00:20.19 (+00:02.93)");
-	// g_aCheckpointsDifference[client].PushString("CP 5 | 00:28.22 (+00:03.90)");
-	// g_aCheckpointsDifference[client].PushString("CP 6 | 00:37.45 (+00:04.85)");
-
 	/* Start function call */
 	Call_StartForward(g_MapFinishForward);
 
@@ -534,9 +527,7 @@ public Action Command_Test(int client, int args)
 	Call_PushCell(420);
 	Call_PushCell(69);
 	Call_PushCell(0);
-	// Call_PushArray(g_aCheckpointsDifference[client], g_aCheckpointsDifference[client].Length);
 	Call_PushCell(g_aCheckpointsDifference[client]);
-	// Call_PushArray(cps, GetArraySize(cps));
 
 	/* Finish the call, get the result */
 	Call_Finish();
@@ -546,11 +537,9 @@ public Action Command_Test(int client, int args)
 	{
 		for(int i = 0; i <= g_aCheckpointsDifference[client].Length-1; i++)
 		{
-			// RunCheckpoints tempArr;
-			g_aCheckpointsDifference[client].GetArray(i, tempArr);
+			g_aCheckpointsDifference[client].GetArray(i, cpEnum);
 
-			// CPrintToChat(client, "%s", temp.cpNumber);
-			CPrintToChat(client, "{blue}tempArr{default} CP %i | runTime %s | pbDifference %s | wrDifference %s | style %i", tempArr.cpNumber, tempArr.runtime, tempArr.pbDifference, tempArr.wrDifference, tempArr.style);
+			CPrintToChat(client, "{blue}cpEnum{default} CP %i | runTime %s | pbDifference %s | wrDifference %s | style %i", cpEnum.cpNumber, cpEnum.runtime, cpEnum.pbDifference, cpEnum.wrDifference, cpEnum.style);
 		}
 	}
 	else
@@ -679,6 +668,7 @@ public void OnClientDisconnect(int client)
 				g_fTimeinZone[client][zonegroup] += g_fTimeIncrement[client][zonegroup];
 			db_UpdatePRinfo(client, g_szSteamID[client], zonegroup);
 		}
+		delete g_aCheckpointsDifference[client];
 	}
 }
 

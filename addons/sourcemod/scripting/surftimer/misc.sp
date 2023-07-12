@@ -4069,15 +4069,14 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		SendMapCheckpointForward(client, zonegroup, zone, time, szTime, szDiff_colorless, sz_srDiff_colorless);
 		
 		/* Add the Checkpoint data to current run list newrecord-cp-list*/
-		RunCheckpoints tempArr;
-		tempArr.cpNumber = g_iClientInZone[client][1] + 1;
-		tempArr.runtime = szTime;
-		StrCat(tempArr.pbDifference, sizeof(tempArr.pbDifference), szDiff_colorless);
-		tempArr.style = g_iCurrentStyle[client];
-		StrCat(tempArr.wrDifference, sizeof(tempArr.wrDifference), sz_srDiff_colorless);
+		RunCheckpoints cpEnum;
+		cpEnum.cpNumber = g_iClientInZone[client][1] + 1;
+		cpEnum.runtime = szTime;
+		StrCat(cpEnum.pbDifference, sizeof(cpEnum.pbDifference), szDiff_colorless);
+		cpEnum.style = g_iCurrentStyle[client];
+		StrCat(cpEnum.wrDifference, sizeof(cpEnum.wrDifference), sz_srDiff_colorless);
 		
-		g_aCheckpointsDifference[client].PushArray(tempArr, sizeof(RunCheckpoints));
-		CPrintToChat(client, "{blue}tempArr{default} CP %i | runTime %s | pbDifference %s | wrDifference %s | style %i", tempArr.cpNumber, tempArr.runtime, tempArr.pbDifference, tempArr.wrDifference, tempArr.style);
+		g_aCheckpointsDifference[client].PushArray(cpEnum, sizeof(RunCheckpoints));
 
 		if (g_bCheckpointsEnabled[client] && g_iCpMessages[client])
 		{
@@ -4117,15 +4116,14 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 			Call_Finish();
 
 			/* Add the Checkpoint data to current run list newrecord-cp-list*/
-			RunCheckpoints tempArr;
-			tempArr.cpNumber = g_iClientInZone[client][1] + 1;
-			tempArr.runtime = szTime;
-			tempArr.pbDifference = "";
-			StrCat(tempArr.wrDifference, sizeof(tempArr.wrDifference), sz_srDiff_colorless);
-			tempArr.style = g_iCurrentStyle[client];
+			RunCheckpoints cpEnum;
+			cpEnum.cpNumber = g_iClientInZone[client][1] + 1;
+			cpEnum.runtime = szTime;
+			cpEnum.pbDifference = "";
+			StrCat(cpEnum.wrDifference, sizeof(cpEnum.wrDifference), sz_srDiff_colorless);
+			cpEnum.style = g_iCurrentStyle[client];
 
-			g_aCheckpointsDifference[client].PushArray(tempArr, sizeof(RunCheckpoints));
-			CPrintToChat(client, "{blue}tempArr{default} CP %i | runTime %s | pbDifference %s | wrDifference %s | style %i", tempArr.cpNumber, tempArr.runtime, tempArr.pbDifference, tempArr.wrDifference, tempArr.style);
+			g_aCheckpointsDifference[client].PushArray(cpEnum, sizeof(RunCheckpoints));
 
 			if (percent > -1.0)
 			{
