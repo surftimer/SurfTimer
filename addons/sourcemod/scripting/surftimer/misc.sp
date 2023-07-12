@@ -4119,7 +4119,7 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 			RunCheckpoints cpEnum;
 			cpEnum.cpNumber = g_iClientInZone[client][1] + 1;
 			cpEnum.runtime = szTime;
-			cpEnum.pbDifference = "";
+			cpEnum.pbDifference = "N/A";
 			StrCat(cpEnum.wrDifference, sizeof(cpEnum.wrDifference), sz_srDiff_colorless);
 			cpEnum.style = g_iCurrentStyle[client];
 
