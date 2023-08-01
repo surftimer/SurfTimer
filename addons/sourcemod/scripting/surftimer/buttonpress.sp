@@ -895,7 +895,13 @@ public void CL_OnStartWrcpTimerPress(int client)
 			Format(preMessage, sizeof(preMessage), "%t", "StagePrestrafe", g_szChatPrefix, g_Stage[0][client], szSpeed, szPersonalDifference, szRecordDifference);
 
 			if (g_iPrespeedText[client])
+			{
 				CPrintToChat(client, preMessage);
+
+				// Add Prestrafe to global VAR
+				FormatEx(g_szPrespeedValue[client], sizeof(g_szPrespeedValue), "\n(%i)", prestrafe);
+				CreateTimer(2.0, hudPrestrafe, client);
+			}
 		
 			for (int i = 1; i <= MaxClients; i++) {
 				if (!IsClientInGame(i)) 

@@ -654,3 +654,14 @@ public Action DatabaseUpgrading(Handle timer)
 
 	return Plugin_Handled;
 }
+
+// Clear global prestrafe var for the client
+public Action hudPrestrafe(Handle timer, any client)
+{
+	if(IsValidClient(client) && IsClientInGame(client))
+	{
+		FormatEx(g_szPrespeedValue[client], sizeof(g_szPrespeedValue), "");
+	}
+
+	return Plugin_Handled;
+}
