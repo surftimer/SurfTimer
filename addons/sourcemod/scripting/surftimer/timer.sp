@@ -656,8 +656,10 @@ public Action DatabaseUpgrading(Handle timer)
 }
 
 // Clear global prestrafe var for the client
-public Action hudPrestrafe(Handle timer, any client)
+public Action hudPrestrafe(Handle timer, any userid)
 {
+	int client = GetClientOfUserId(userid);
+	
 	if(IsValidClient(client) && IsClientInGame(client))
 	{
 		g_szPrespeedValue[client][0] = '\0';

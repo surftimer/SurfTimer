@@ -900,7 +900,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 
 				// Add Prestrafe to global VAR
 				FormatEx(g_szPrespeedValue[client], sizeof(g_szPrespeedValue), "\n(%i)", prestrafe);
-				CreateTimer(2.0, hudPrestrafe, client);
+				CreateTimer(2.0, hudPrestrafe, GetClientUserId(client));
 			}
 		
 			for (int i = 1; i <= MaxClients; i++) {
