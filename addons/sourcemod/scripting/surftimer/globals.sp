@@ -700,6 +700,10 @@ GlobalForward g_PracticeFinishForward;
 GlobalForward g_NewRecordForward;
 GlobalForward g_NewWRCPForward;
 GlobalForward g_StageFinishForward;
+GlobalForward g_OnClientTimerStart;
+GlobalForward g_OnClientWRCPTimerStart;
+GlobalForward g_OnClientBonusTimerStart;
+GlobalForward g_OnClientPracTimerStart;
 
 /*----------  SQL Variables  ----------*/
 

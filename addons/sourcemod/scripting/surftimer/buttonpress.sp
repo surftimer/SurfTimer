@@ -159,10 +159,15 @@ public void CL_OnStartTimerPress(int client)
 			Format(szSpeed, sizeof(szSpeed), "%i", prestrafe);
 
 			if (g_iClientInZone[client][2] == 0)
+			{
 				Format(preMessage, sizeof(preMessage), "%t", "StartPrestrafe", g_szChatPrefix, szSpeed, szPersonalDifference, szRecordDifference);
+				OnClientTimerStartForward(client);
+			}
 			else
+			{
 				Format(preMessage, sizeof(preMessage), "%t", "BonusPrestrafe", g_szChatPrefix, g_iClientInZone[client][2], szSpeed, szPersonalDifference, szRecordDifference);
-
+				OnClientBonusTimerStartForward(client);
+			}
 			if (g_iPrespeedText[client])
 				CPrintToChat(client, preMessage);
 		
@@ -191,27 +196,12 @@ public void CL_OnStartTimerPress(int client)
 	PlayButtonSound(client);
 
 	// Add pre
-	// // Start recording for record bot
-	// if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) || (!IsFakeClient(client) && GetConVarBool(g_hBonusBot)))
-	// {
-	// 	if (IsPlayerAlive(client))
-	// 	{
-	// 		StartRecording(client);
-	// 		if (g_bhasStages)
-	// 		{
-	// 			Stage_StartRecording(client);
-	// 		}
-	// 	}
-	// }
-
 	if (g_iRecordedTicks[client] == 0)
 		g_iStartPressTick[client] = g_iRecordedTicks[client];
 	else if (g_iRecordedTicks[client] >= (g_iTickrate * GetConVarInt(g_hReplayPre)))
 		g_iStartPressTick[client] = g_iRecordedTicks[client] - (g_iTickrate * GetConVarInt(g_hReplayPre));
 	else if (g_iRecordedTicks[client] >= g_iTickrate)
 		g_iStartPressTick[client] = g_iRecordedTicks[client] - g_iTickrate;
-			
-
 }
 
 // End Timer
@@ -916,6 +906,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 					CPrintToChat(i, preMessage);
 			}
 		}
+		OnClientWRCPTimerStartForward(client);
 	}
 }
 
