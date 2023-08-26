@@ -582,10 +582,7 @@ public void OnClientDisconnect(int client)
 	}
 
 	// Clear hudPrestrafe value
-	if (strlen(g_szPrespeedValue[client]) != 0)
-	{
-		FormatEx(g_szPrespeedValue[client], sizeof(g_szPrespeedValue), "");
-	}
+	g_szPrespeedValue[client][0] = '\0';
 
 	// Database
 	if (IsValidClient(client) && !g_bRenaming)

@@ -660,7 +660,7 @@ public Action hudPrestrafe(Handle timer, any client)
 {
 	if(IsValidClient(client) && IsClientInGame(client))
 	{
-		FormatEx(g_szPrespeedValue[client], sizeof(g_szPrespeedValue), "");
+		g_szPrespeedValue[client][0] = '\0';
 	}
 
 	return Plugin_Handled;
