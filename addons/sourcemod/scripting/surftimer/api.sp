@@ -325,11 +325,11 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 void Register_Forwards()
 {
-	g_MapFinishForward = new GlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_Float, Param_Cell, Param_Cell, Param_Cell);
+	g_MapFinishForward = new GlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_Float, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	g_MapCheckpointForward = new GlobalForward("surftimer_OnCheckpoint", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String, Param_Cell);
 	g_BonusFinishForward = new GlobalForward("surftimer_OnBonusFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_Float, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	g_PracticeFinishForward = new GlobalForward("surftimer_OnPracticeFinished", ET_Event, Param_Cell, Param_Float, Param_String);
-	g_NewRecordForward = new GlobalForward("surftimer_OnNewRecord", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
+	g_NewRecordForward = new GlobalForward("surftimer_OnNewRecord", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell, Param_Cell);
 	g_NewWRCPForward = new GlobalForward("surftimer_OnNewWRCP", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell, Param_Float);
 	g_StageFinishForward = new GlobalForward("surftimer_OnStageFinished", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell, Param_Float, Param_Float);
 
@@ -445,6 +445,7 @@ void SendMapFinishForward(int client, int count, int style)
 	Call_PushCell(g_MapRank[client]);
 	Call_PushCell(count);
 	Call_PushCell(style);
+	Call_PushCell(g_aCheckpointsDifference[client]);
 
 	/* Finish the call, get the result */
 	Call_Finish();
@@ -551,6 +552,7 @@ void SendNewRecordForward(int client, const char[] szRecordDiff, int bonusGroup 
 	Call_PushString(g_szFinalTime[client]);
 	Call_PushString(szRecordDiff);
 	Call_PushCell(bonusGroup);
+	Call_PushCell(g_aCheckpointsDifference[client]);
 
 	/* Finish the call, get the result */
 	Call_Finish();

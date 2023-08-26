@@ -4067,6 +4067,16 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 		FormatTimeFloat(client, time, 3, szTime, 32);
 
 		SendMapCheckpointForward(client, zonegroup, zone, time, szTime, szDiff_colorless, sz_srDiff_colorless);
+		
+		/* Add the Checkpoint data to current run list newrecord-cp-list*/
+		RunCheckpoints cpEnum;
+		cpEnum.cpNumber = g_iClientInZone[client][1] + 1;
+		cpEnum.runtime = szTime;
+		StrCat(cpEnum.pbDifference, sizeof(cpEnum.pbDifference), szDiff_colorless);
+		cpEnum.style = g_iCurrentStyle[client];
+		StrCat(cpEnum.wrDifference, sizeof(cpEnum.wrDifference), sz_srDiff_colorless);
+		
+		g_aCheckpointsDifference[client].PushArray(cpEnum, sizeof(RunCheckpoints));
 
 		if (g_bCheckpointsEnabled[client] && g_iCpMessages[client])
 		{
@@ -4104,6 +4114,16 @@ public void Checkpoint(int client, int zone, int zonegroup, float time)
 
 			/* Finish the call, get the result */
 			Call_Finish();
+
+			/* Add the Checkpoint data to current run list newrecord-cp-list*/
+			RunCheckpoints cpEnum;
+			cpEnum.cpNumber = g_iClientInZone[client][1] + 1;
+			cpEnum.runtime = szTime;
+			cpEnum.pbDifference = "N/A";
+			StrCat(cpEnum.wrDifference, sizeof(cpEnum.wrDifference), sz_srDiff_colorless);
+			cpEnum.style = g_iCurrentStyle[client];
+
+			g_aCheckpointsDifference[client].PushArray(cpEnum, sizeof(RunCheckpoints));
 
 			if (percent > -1.0)
 			{

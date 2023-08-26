@@ -482,6 +482,9 @@ public void OnClientPutInServer(int client)
 		g_MVPStars[client] = 0;
 	}
 
+	/* Init the cp list with the enum we've made for it  newrecord-cp-list*/
+	g_aCheckpointsDifference[client] = new ArrayList(sizeof(RunCheckpoints));
+
 	// Position Restoring
 	if (GetConVarBool(g_hcvarRestore) && !g_bRenaming && !g_bInTransactionChain)
 	db_selectLastRun(client);
@@ -547,6 +550,7 @@ public void OnClientAuthorized(int client)
 public void OnClientDisconnect(int client)
 {
 	db_savePlayTime(client);
+	delete g_aCheckpointsDifference[client];
 
 	g_fPlayerLastTime[client] = -1.0;
 	if (g_fStartTime[client] != -1.0 && g_bTimerRunning[client])

@@ -408,6 +408,9 @@ public void StartTouch(int client, int action[3])
 
 			// StopRecording(client); //Add pre
 			StartRecording(client); //Add pre
+			/* Reset List newrecord-cp-list*/
+			if(g_aCheckpointsDifference[client] != null)
+				g_aCheckpointsDifference[client].Clear();
 
 			if (g_bhasStages)
 			{
