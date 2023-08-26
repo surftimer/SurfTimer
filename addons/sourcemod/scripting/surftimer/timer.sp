@@ -654,3 +654,16 @@ public Action DatabaseUpgrading(Handle timer)
 
 	return Plugin_Handled;
 }
+
+// Clear global prestrafe var for the client
+public Action hudPrestrafe(Handle timer, any userid)
+{
+	int client = GetClientOfUserId(userid);
+	
+	if(IsValidClient(client) && IsClientInGame(client))
+	{
+		g_szPrespeedValue[client][0] = '\0';
+	}
+
+	return Plugin_Handled;
+}
