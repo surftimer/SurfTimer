@@ -550,6 +550,7 @@ public void OnClientAuthorized(int client)
 public void OnClientDisconnect(int client)
 {
 	db_savePlayTime(client);
+	delete g_aCheckpointsDifference[client];
 
 	g_fPlayerLastTime[client] = -1.0;
 	if (g_fStartTime[client] != -1.0 && g_bTimerRunning[client])
@@ -615,7 +616,6 @@ public void OnClientDisconnect(int client)
 				g_fTimeinZone[client][zonegroup] += g_fTimeIncrement[client][zonegroup];
 			db_UpdatePRinfo(client, g_szSteamID[client], zonegroup);
 		}
-		delete g_aCheckpointsDifference[client];
 	}
 }
 
