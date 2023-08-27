@@ -4905,7 +4905,7 @@ void PrintCSGOHUDText(int client, const char[] format, any ...)
 	VFormat(buff, sizeof(buff), format, 3);
 	Format(buff, sizeof(buff), "</font>%s<script>", buff);
 
-	Protobuf pb = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_RELIABLE | USERMSG_BLOCKHOOKS));
+	Protobuf pb = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_BLOCKHOOKS));
 	pb.SetInt("msg_dst", 4);
 	pb.AddString("params", "#SFUI_ContractKillStart");
 	pb.AddString("params", buff);
