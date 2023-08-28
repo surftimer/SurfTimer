@@ -419,27 +419,26 @@ public void OnClientPutInServer(int client)
 	if (IsFakeClient(client))
 	{
 		CS_SetMVPCount(client, 1);
+		SetClientDefaults(client);
+		// SDKHooks
+		if (g_bClientHooksCalled[client] == false)
+		{
+			SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
+			SDKHook(client, SDKHook_PostThinkPost, Hook_PostThinkPost);
+			SDKHook(client, SDKHook_OnTakeDamage, Hook_OnTakeDamage);
+			SDKHook(client, SDKHook_PreThink, OnPlayerThink);
+			g_bClientHooksCalled[client] = true;
+		}
 		return;
 	}
 	else
 	{
-		// Get SteamID
-		if (!GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], sizeof(g_szSteamID[]), true))
-		{
-			RequestFrame(OnClientPutInServer, client);
-			return;
-		}
-		
-		// Check if steamid has the value of "STEAM_ID_STOP_IGNORING_RETVALS"
-		// Reported here: https://github.com/surftimer/SurfTimer/issues/549
-		// This was being triggered by replay bots
-		if (g_szSteamID[client][6] == 'I' && g_szSteamID[client][7] == 'D')
-		{
-			RequestFrame(OnClientPutInServer, client);
-			return;
-		}
 		g_MVPStars[client] = 0;
 	}
+
+	// Defaults
+	SetClientDefaults(client);
+	Command_Restart(client, 1);
 
 	// SDKHooks
 	if (g_bClientHooksCalled[client] == false)
@@ -451,9 +450,21 @@ public void OnClientPutInServer(int client)
 		g_bClientHooksCalled[client] = true;
 	}
 
-	// Defaults
-	SetClientDefaults(client);
-	Command_Restart(client, 1);
+	// Get SteamID
+	if (!GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], sizeof(g_szSteamID[]), true))
+	{
+		RequestFrame(OnClientPutInServer, client);
+		return;
+	}
+
+	// Check if steamid has the value of "STEAM_ID_STOP_IGNORING_RETVALS"
+	// Reported here: https://github.com/surftimer/SurfTimer/issues/549
+	// This was being triggered by replay bots
+	if (g_szSteamID[client][6] == 'I' && g_szSteamID[client][7] == 'D')
+	{
+		RequestFrame(OnClientPutInServer, client);
+		return;
+	}
 
 	if (!IsFakeClient(client))
 	{
