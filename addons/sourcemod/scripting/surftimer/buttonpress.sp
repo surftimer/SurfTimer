@@ -58,8 +58,6 @@ public void CL_OnStartTimerPress(int client)
 		g_fCurrentRunTime[client] = 0.0;
 		g_fPracModeStartTime[client] = GetClientTickTime(client);
 		g_bPositionRestored[client] = false;
-		g_bMissedMapBest[client] = true;
-		g_bMissedBonusBest[client] = true;
 		g_bTimerRunning[client] = true;
 		g_bTop10Time[client] = false;
 		
@@ -88,11 +86,10 @@ public void CL_OnStartTimerPress(int client)
 				g_iStageAttemptsNew[client][i] = 0;
 
 			// Set missed record time variables
-			if (g_iClientInZone[client][2] == 0)
+			if (g_iClientInZone[client][2] == 0) // main map
 			{
-				if (g_fPersonalRecord[client] > 0.0) {
+				if (g_fPersonalRecord[client] > 0.0 || g_fPersonalStyleRecord[g_iCurrentStyle[client]][client] > 0.0) 
 					g_bMissedMapBest[client] = false;
-				}
 
 				iPrestrafeRecord = g_iRecordPreStrafe[g_PreSpeedMode[client]][0][g_iCurrentStyle[client]];
 				iPersonalPrestrafeRecord = g_iPersonalRecordPreStrafe[client][1][0][g_iCurrentStyle[client]];
@@ -100,11 +97,10 @@ public void CL_OnStartTimerPress(int client)
 				SetPrestrafe(client, 0, g_iCurrentStyle[client], true, false, false );
 				SetPrestrafe(client, 1, g_iCurrentStyle[client], true, false, false );
 			}
-			else
+			else // bonus
 			{
-				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0) {
+				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0 || g_fStylePersonalRecordBonus[g_iCurrentStyle[client]][g_iClientInZone[client][2]][client] > 0.0) 
 					g_bMissedBonusBest[client] = false;
-				}
 
 				iPrestrafeRecord = g_iRecordPreStrafeBonus[g_PreSpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
 				iPersonalPrestrafeRecord = g_iPersonalRecordPreStrafeBonus[client][g_PreSpeedMode[client]][g_iClientInZone[client][2]][g_iCurrentStyle[client]];
@@ -163,10 +159,15 @@ public void CL_OnStartTimerPress(int client)
 			Format(szSpeed, sizeof(szSpeed), "%i", prestrafe);
 
 			if (g_iClientInZone[client][2] == 0)
+			{
 				Format(preMessage, sizeof(preMessage), "%t", "StartPrestrafe", g_szChatPrefix, szSpeed, szPersonalDifference, szRecordDifference);
+				OnClientTimerStartForward(client);
+			}
 			else
+			{
 				Format(preMessage, sizeof(preMessage), "%t", "BonusPrestrafe", g_szChatPrefix, g_iClientInZone[client][2], szSpeed, szPersonalDifference, szRecordDifference);
-
+				OnClientBonusTimerStartForward(client);
+			}
 			if (g_iPrespeedText[client])
 				CPrintToChat(client, preMessage);
 		
@@ -195,27 +196,12 @@ public void CL_OnStartTimerPress(int client)
 	PlayButtonSound(client);
 
 	// Add pre
-	// // Start recording for record bot
-	// if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) || (!IsFakeClient(client) && GetConVarBool(g_hBonusBot)))
-	// {
-	// 	if (IsPlayerAlive(client))
-	// 	{
-	// 		StartRecording(client);
-	// 		if (g_bhasStages)
-	// 		{
-	// 			Stage_StartRecording(client);
-	// 		}
-	// 	}
-	// }
-
 	if (g_iRecordedTicks[client] == 0)
 		g_iStartPressTick[client] = g_iRecordedTicks[client];
 	else if (g_iRecordedTicks[client] >= (g_iTickrate * GetConVarInt(g_hReplayPre)))
 		g_iStartPressTick[client] = g_iRecordedTicks[client] - (g_iTickrate * GetConVarInt(g_hReplayPre));
 	else if (g_iRecordedTicks[client] >= g_iTickrate)
 		g_iStartPressTick[client] = g_iRecordedTicks[client] - g_iTickrate;
-			
-
 }
 
 // End Timer
@@ -899,7 +885,13 @@ public void CL_OnStartWrcpTimerPress(int client)
 			Format(preMessage, sizeof(preMessage), "%t", "StagePrestrafe", g_szChatPrefix, g_Stage[0][client], szSpeed, szPersonalDifference, szRecordDifference);
 
 			if (g_iPrespeedText[client])
+			{
 				CPrintToChat(client, preMessage);
+
+				// Add Prestrafe to global VAR
+				FormatEx(g_szPrespeedValue[client], sizeof(g_szPrespeedValue), "\n(%i)", prestrafe);
+				CreateTimer(2.0, hudPrestrafe, GetClientUserId(client));
+			}
 		
 			for (int i = 1; i <= MaxClients; i++) {
 				if (!IsClientInGame(i)) 
@@ -920,6 +912,7 @@ public void CL_OnStartWrcpTimerPress(int client)
 					CPrintToChat(i, preMessage);
 			}
 		}
+		OnClientWRCPTimerStartForward(client);
 	}
 }
 

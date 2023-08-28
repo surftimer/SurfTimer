@@ -311,6 +311,8 @@ public void StartTouch(int client, int action[3])
 		g_TeleInTriggerMultiple[client] = false;
 	} */
 
+	float speedCap = g_mapZones[g_iClientInZone[client][3]].PreSpeed;
+
 	if (IsValidClient(client))
 	{
 		float fCurrentRunTime = g_fCurrentRunTime[client];
@@ -399,8 +401,16 @@ public void StartTouch(int client, int action[3])
 			lastCheckpoint[g_iClientInZone[client][2]][client] = 1;
 			g_bSaveLocTele[client] = false;
 
+			if (speedCap > 0.0)
+			{
+				ApplySpeedCapXY(client, g_mapZones[g_iClientInZone[client][3]].PreSpeed);
+			}
+
 			// StopRecording(client); //Add pre
 			StartRecording(client); //Add pre
+			/* Reset List newrecord-cp-list*/
+			if(g_aCheckpointsDifference[client] != null)
+				g_aCheckpointsDifference[client].Clear();
 
 			if (g_bhasStages)
 			{
@@ -491,6 +501,11 @@ public void StartTouch(int client, int action[3])
 			g_bInJump[client] = false;
 			g_bInDuck[client] = false;
 			g_KeyCount[client] = 0;
+
+			if (speedCap > 0.0)
+			{
+				ApplySpeedCapXY(client, g_mapZones[g_iClientInZone[client][3]].PreSpeed);
+			}
 
 			// Prevents the Stage(X) replay from starting before the Stage(X) start zone
 			g_iStageStartTouchTick[client] = g_iRecordedTicks[client]; //Add pre

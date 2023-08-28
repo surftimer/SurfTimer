@@ -16,7 +16,7 @@
 #include <cstrike>
 #include <geoip>
 #include <basecomm>
-#include <colorlib>
+#include <colorvariables>
 #include <autoexecconfig>
 #include <regex>
 #undef REQUIRE_EXTENSIONS
@@ -120,8 +120,7 @@ public void OnPluginEnd()
 			SetEntPropEnt(x, Prop_Send, "m_bSpotted", 1);
 			SetEntProp(x, Prop_Send, "m_iHideHUD", 0);
 			SetEntProp(x, Prop_Send, "m_iAccount", 1);
-			if (g_hOverrideClantag.BoolValue)
-				CS_SetClientClanTag(x, "");
+			CS_SetClientClanTag(x, "");
 			OnClientDisconnect(x);
 		}
 	}
@@ -359,7 +358,7 @@ public void OnConfigsExecuted()
 	// Get Chat Prefix
 	GetConVarString(g_hChatPrefix, g_szChatPrefix, sizeof(g_szChatPrefix));
 	GetConVarString(g_hChatPrefix, g_szMenuPrefix, sizeof(g_szMenuPrefix));
-	RemoveColors(g_szMenuPrefix, sizeof(g_szMenuPrefix));
+	CRemoveColors(g_szMenuPrefix, sizeof(g_szMenuPrefix));
 
 	if (GetConVarBool(g_hDBMapcycle))
 		db_selectMapCycle();
@@ -559,6 +558,7 @@ public void OnClientAuthorized(int client)
 public void OnClientDisconnect(int client)
 {
 	db_savePlayTime(client);
+	delete g_aCheckpointsDifference[client];
 
 	g_fPlayerLastTime[client] = -1.0;
 	if (g_fStartTime[client] != -1.0 && g_bTimerRunning[client])
@@ -592,6 +592,9 @@ public void OnClientDisconnect(int client)
 		g_WrcpBot = -1;
 		return;
 	}
+
+	// Clear hudPrestrafe value
+	g_szPrespeedValue[client][0] = '\0';
 
 	// Database
 	if (IsValidClient(client) && !g_bRenaming)
@@ -633,7 +636,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 	{
 		GetConVarString(g_hChatPrefix, g_szChatPrefix, sizeof(g_szChatPrefix));
 		GetConVarString(g_hChatPrefix, g_szMenuPrefix, sizeof(g_szMenuPrefix));
-		RemoveColors(g_szMenuPrefix, sizeof(g_szMenuPrefix));
+		CRemoveColors(g_szMenuPrefix, sizeof(g_szMenuPrefix));
 	}
 	if (convar == g_hReplayBot)
 	{

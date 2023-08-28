@@ -77,7 +77,16 @@ public void db_InsertNewestMaps()
 	char sql_insertNewestMaps[] = "INSERT INTO ck_newmaps (mapname) VALUES('%s');";
 	char szQuery[512];
 	Format(szQuery, sizeof(szQuery), sql_insertNewestMaps, g_szMapName);
-	SQL_TQuery(g_hDb, SQL_CheckCallback, szQuery, _, DBPrio_Low);
+	SQL_TQuery(g_hDb, SQL_InsertNewestMaps, szQuery, _, DBPrio_Low);
+}
+
+public void SQL_InsertNewestMaps(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogStackTrace("[SurfTimer] SQL Error (SQL_InsertNewestMaps): %s", error);
+		return;
+	}
 }
 
 //update Database just incase

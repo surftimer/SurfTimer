@@ -185,12 +185,47 @@ native bool surftimer_SafeTeleport(int client, float fDestination[3], float fAng
 /*  FORWARDS  */
 
 /**
+ * Called when a client map timer starts
+ *
+ * @param client           Index of the client.
+ * @param style			   Style the client is currently in.
+ */
+forward void surftimer_OnClientTimerStart(int client, int style);
+
+/**
+ * Called when a client WRCP timer starts
+ *
+ * @param client           Index of the client.
+ * @param style			   Style the client is currently in.
+ * @param stage 		   Stage number the client is currently running.
+ */
+forward void surftimer_OnClientWRCPTimerStart(int client, int style, int stage);
+
+/**
+ * Called when a client Bonus timer starts
+ *
+ * @param client           Index of the client.
+ * @param style			   Style the client is currently in.
+ * @param bonus 		   Bonus number the client is currently running.
+ */
+forward void surftimer_OnClientBonusTimerStart(int client, int style, int bonus);
+
+/**
+ * Called when a client enters Practice mode
+ *
+ * @param client           Index of the client.
+ * @param style			   Style the client is currently in.
+ * @param locNum 		   Number of the saveloc the client teleported to.
+ */
+forward void surftimer_OnClientPracTimerStart(int client, int style, int locNum);
+
+/**
  * Called when a client finishes a map.
  *
  * @param client			The client's ID.
  * @return						Plugin_Handled, to stop the client from searching.
  */
-forward Action surftimer_OnMapFinished(int client, float fRunTime, char sRunTime[54], float PBDiff, float WRDiff, int rank, int total, int style);
+forward Action surftimer_OnMapFinished(int client, float fRunTime, char sRunTime[54], float PBDiff, float WRDiff, int rank, int total, int style, ArrayList cps);
 
 /**
  * Called when a player reaches a checkpoint zone or a stage.
@@ -231,9 +266,10 @@ forward Action surftimer_OnPracticeFinished(int client, float fRunTime, char sRu
  * @param style				Style index.
  * @param time				Time set by the player.
  * @param timeDif			Time difference with the former record.
- * @param bonusGroup	Group of the bonus. -1 if the record isn't a bonus.
+ * @param bonusGroup	    Group of the bonus. -1 if the record isn't a bonus.
+ * @param checkpoints       Array with checkpoint differences for the run.
  */
-forward void surftimer_OnNewRecord(int client, int style, char[] time, char[] timeDif, int bonusGroup);
+forward void surftimer_OnNewRecord(int client, int style, char[] time, char[] timeDif, int bonusGroup, ArrayList checkpoints);
 
 /**
  * Called when a client sets a new WRCP

@@ -325,13 +325,104 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 void Register_Forwards()
 {
-	g_MapFinishForward = new GlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_Float, Param_Cell, Param_Cell, Param_Cell);
+	g_MapFinishForward = new GlobalForward("surftimer_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_Float, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	g_MapCheckpointForward = new GlobalForward("surftimer_OnCheckpoint", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_String, Param_Float, Param_String, Param_Cell);
 	g_BonusFinishForward = new GlobalForward("surftimer_OnBonusFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Float, Param_Float, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	g_PracticeFinishForward = new GlobalForward("surftimer_OnPracticeFinished", ET_Event, Param_Cell, Param_Float, Param_String);
-	g_NewRecordForward = new GlobalForward("surftimer_OnNewRecord", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
+	g_NewRecordForward = new GlobalForward("surftimer_OnNewRecord", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell, Param_Cell);
 	g_NewWRCPForward = new GlobalForward("surftimer_OnNewWRCP", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell, Param_Float);
 	g_StageFinishForward = new GlobalForward("surftimer_OnStageFinished", ET_Event, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell, Param_Float, Param_Float);
+
+	/* More Forwards */
+	g_OnClientTimerStart = new GlobalForward("surftimer_OnClientTimerStart", ET_Event, Param_Cell, Param_Cell);
+	g_OnClientWRCPTimerStart = new GlobalForward("surftimer_OnClientWRCPTimerStart", ET_Event, Param_Cell, Param_Cell, Param_Cell);
+	g_OnClientBonusTimerStart = new GlobalForward("surftimer_OnClientBonusTimerStart", ET_Event, Param_Cell, Param_Cell, Param_Cell);
+	g_OnClientPracTimerStart = new GlobalForward("surftimer_OnClientPracTimerStart", ET_Event, Param_Cell, Param_Cell, Param_Cell);
+}
+
+/**
+ * Sends a forward on surftimer_OnClientTimerStart when a client timer starts (no WRCP or bonuses).
+ * 
+ * @param client           Index of the client.
+ * @param style			   Style the client is currently in
+ */
+void OnClientTimerStartForward(int client)
+{
+	/* Start New record function call */
+	Call_StartForward(g_OnClientTimerStart);
+
+	/* Push parameters one at a time */
+	Call_PushCell(client);
+	Call_PushCell(g_iCurrentStyle[client]);
+
+	/* Finish the call, get the result */
+	Call_Finish();
+}
+
+/**
+ * Sends a forward on surftimer_OnClientWRCPTimerStart when a client WRCP timer starts (no bonuses or main map).
+ * 
+ * @param client           Index of the client.
+ * @param style			   Style the client is currently in.
+ * @param stage 		   Stage number the client is currently running.
+ */
+void OnClientWRCPTimerStartForward(int client)
+{
+	// int iStage = 9999;
+	int iStage = g_Stage[0][client];
+
+	/* Start New record function call */
+	Call_StartForward(g_OnClientWRCPTimerStart);
+
+	/* Push parameters one at a time */
+	Call_PushCell(client);
+	Call_PushCell(g_iCurrentStyle[client]);
+	Call_PushCell(iStage);
+
+	/* Finish the call, get the result */
+	Call_Finish();
+}
+
+/**
+ * Sends a forward on surftimer_OnClientBonusTimerStartForward when a client Bonus timer starts (no WRCP or main map).
+ * 
+ * @param client           Index of the client.
+ * @param style			   Style the client is currently in.
+ * @param bonus 		   Bonus number the client is currently running.
+ */
+void OnClientBonusTimerStartForward(int client)
+{
+	/* Start New record function call */
+	Call_StartForward(g_OnClientBonusTimerStart);
+
+	/* Push parameters one at a time */
+	Call_PushCell(client);
+	Call_PushCell(g_iCurrentStyle[client]);
+	Call_PushCell(g_iInBonus[client]);
+
+	/* Finish the call, get the result */
+	Call_Finish();
+}
+
+/**
+ * Sends a forward on surftimer_OnClientPracTimerStart when a client enters practice mode.
+ * 
+ * @param client           Index of the client.
+ * @param style			   Style the client is currently in.
+ * @param locNum 		   Number of the saveloc the client teleported to.
+ */
+void OnClientPracTimerStartForward(int client)
+{
+	/* Start New record function call */
+	Call_StartForward(g_OnClientPracTimerStart);
+
+	/* Push parameters one at a time */
+	Call_PushCell(client);
+	Call_PushCell(g_iCurrentStyle[client]);
+	Call_PushCell(g_iLastSaveLocIdClient[client]);
+
+	/* Finish the call, get the result */
+	Call_Finish();
 }
 
 /**
@@ -354,6 +445,7 @@ void SendMapFinishForward(int client, int count, int style)
 	Call_PushCell(g_MapRank[client]);
 	Call_PushCell(count);
 	Call_PushCell(style);
+	Call_PushCell(g_aCheckpointsDifference[client]);
 
 	/* Finish the call, get the result */
 	Call_Finish();
@@ -460,6 +552,7 @@ void SendNewRecordForward(int client, const char[] szRecordDiff, int bonusGroup 
 	Call_PushString(g_szFinalTime[client]);
 	Call_PushString(szRecordDiff);
 	Call_PushCell(bonusGroup);
+	Call_PushCell(g_aCheckpointsDifference[client]);
 
 	/* Finish the call, get the result */
 	Call_Finish();

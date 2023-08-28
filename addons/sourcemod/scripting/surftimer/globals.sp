@@ -264,7 +264,7 @@ int g_MapRankBonus[MAXZONEGROUPS][MAXPLAYERS + 1];
 int g_OldMapRankBonus[MAXZONEGROUPS][MAXPLAYERS + 1];
 
 // Has the client missed his best bonus time
-int g_bMissedBonusBest[MAXPLAYERS + 1];
+bool g_bMissedBonusBest[MAXPLAYERS + 1];
 
 // Used to make sure bonus finished prints are correct
 int g_tmpBonusCount[MAXZONEGROUPS];
@@ -700,6 +700,10 @@ GlobalForward g_PracticeFinishForward;
 GlobalForward g_NewRecordForward;
 GlobalForward g_NewWRCPForward;
 GlobalForward g_StageFinishForward;
+GlobalForward g_OnClientTimerStart;
+GlobalForward g_OnClientWRCPTimerStart;
+GlobalForward g_OnClientBonusTimerStart;
+GlobalForward g_OnClientPracTimerStart;
 
 /*----------  SQL Variables  ----------*/
 
@@ -797,6 +801,7 @@ int g_iTeleSide[MAXPLAYERS + 1];
 
 // Prestrafe Message
 bool g_iPrespeedText[MAXPLAYERS + 1];
+char g_szPrespeedValue[MAXPLAYERS + 1][64];
 
 // Silent Spectate
 bool g_iSilentSpectate[MAXPLAYERS + 1];
@@ -937,6 +942,19 @@ int g_iPreStrafeBonus[3][MAXZONEGROUPS][MAX_STYLES][MAXPLAYERS + 1];
 
 // Latest prestrafe speed for stages
 int g_iPreStrafeStage[3][CPLIMIT][MAX_STYLES][MAXPLAYERS + 1];
+
+/* newrecord-cp-list */
+// Current run checkpoints differences
+ArrayList g_aCheckpointsDifference[MAXPLAYERS + 1];
+
+enum struct RunCheckpoints
+{
+	int cpNumber;
+	int style;
+	char runtime[32];
+	char wrDifference[32];
+	char pbDifference[32];
+}
 
 /*----------  Replay Variables  ----------*/
 
@@ -1464,10 +1482,12 @@ float g_iNoclipSpeed[MAXPLAYERS + 1];
 // New speed limit variables
 bool g_bInBhop[MAXPLAYERS + 1];
 bool g_bFirstJump[MAXPLAYERS + 1];
-float g_iLastJump[MAXPLAYERS + 1];
 int g_iTicksOnGround[MAXPLAYERS + 1];
 bool g_bNewStage[MAXPLAYERS + 1];
 bool g_bLeftZone[MAXPLAYERS + 1];
+
+// new speed/bhop detection
+float g_tickSpeedCap[MAXPLAYERS + 1];
 
 int g_iClientTick[MAXPLAYERS + 1];
 
