@@ -406,11 +406,12 @@ public void StartTouch(int client, int action[3])
 				ApplySpeedCapXY(client, g_mapZones[g_iClientInZone[client][3]].PreSpeed);
 			}
 
-			// StopRecording(client); //Add pre
 			StartRecording(client); //Add pre
 			/* Reset List newrecord-cp-list*/
-			if(g_aCheckpointsDifference[client] != null)
+			if(g_aCheckpointsDifference[client] != null && !g_bNewReplay[client])
+			{
 				g_aCheckpointsDifference[client].Clear();
+			}
 
 			if (g_bhasStages)
 			{
@@ -733,6 +734,11 @@ public void EndTouch(int client, int action[3])
 				if (!g_bNoClip[client])
 					g_bInStartZone[client] = false;
 
+				/* Reset List newrecord-cp-list*/
+				if(g_aCheckpointsDifference[client] != null && !g_bNewReplay[client])
+				{
+					g_aCheckpointsDifference[client].Clear();
+				}
 				g_bValidRun[client] = false;
 			}
 		}
