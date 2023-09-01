@@ -134,7 +134,7 @@ void CreateConVars()
 	g_hCommandToEnd = AutoExecConfig_CreateConVar("ck_end", "1", "on/off - Allows players to use the !end command", _, true, 0.0, true, 1.0);
 	g_hCvarGodMode = AutoExecConfig_CreateConVar("ck_godmode", "1", "on/off - Godmode", _, true, 0.0, true, 1.0);
 	g_hPauseServerside = AutoExecConfig_CreateConVar("ck_pause", "1", "on/off - Allows players to use the !pause command", _, true, 0.0, true, 1.0);
-	g_hcvarRestore = AutoExecConfig_CreateConVar("ck_restore", "1", "on/off - Restoring of time and last position after reconnect", _, true, 0.0, true, 1.0);
+	g_hcvarRestore = AutoExecConfig_CreateConVar("ck_restore", "0", "on/off - Restoring of time and last position after reconnect", _, true, 0.0, true, 1.0);
 	g_hAttackSpamProtection = AutoExecConfig_CreateConVar("ck_attack_spam_protection", "1", "on/off - max 40 shots; +5 new/extra shots per minute; 1 he/flash counts like 9 shots", _, true, 0.0, true, 1.0);
 	g_hRadioCommands = AutoExecConfig_CreateConVar("ck_use_radio", "0", "on/off - Allows players to use radio commands", _, true, 0.0, true, 1.0);
 	g_hAutohealing_Hp = AutoExecConfig_CreateConVar("ck_autoheal", "50", "Sets HP amount for autohealing (requires ck_godmode 0)", _, true, 0.0, true, 100.0);

@@ -415,9 +415,61 @@ public void OnClientPutInServer(int client)
 		return;
 	}
 
+	if (IsFakeClient(client))
+	{
+		CS_SetMVPCount(client, 1);
+		SetClientDefaults(client);
+		// SDKHooks
+		if (g_bClientHooksCalled[client] == false)
+		{
+			SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
+			SDKHook(client, SDKHook_PostThinkPost, Hook_PostThinkPost);
+			SDKHook(client, SDKHook_OnTakeDamage, Hook_OnTakeDamage);
+			SDKHook(client, SDKHook_PreThink, OnPlayerThink);
+			g_bClientHooksCalled[client] = true;
+		}
+		return;
+	}
+	else
+	{
+		g_MVPStars[client] = 0;
+	}
+
 	// Defaults
 	SetClientDefaults(client);
 	Command_Restart(client, 1);
+
+	// SDKHooks
+	if (g_bClientHooksCalled[client] == false)
+	{
+		SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
+		SDKHook(client, SDKHook_PostThinkPost, Hook_PostThinkPost);
+		SDKHook(client, SDKHook_OnTakeDamage, Hook_OnTakeDamage);
+		SDKHook(client, SDKHook_PreThink, OnPlayerThink);
+		g_bClientHooksCalled[client] = true;
+	}
+
+	// Get SteamID
+	if (!GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], sizeof(g_szSteamID[]), true))
+	{
+		RequestFrame(OnClientPutInServer, client);
+		return;
+	}
+
+	// Check if steamid has the value of "STEAM_ID_STOP_IGNORING_RETVALS"
+	// Reported here: https://github.com/surftimer/SurfTimer/issues/549
+	// This was being triggered by replay bots
+	if (g_szSteamID[client][6] == 'I' && g_szSteamID[client][7] == 'D')
+	{
+		RequestFrame(OnClientPutInServer, client);
+		return;
+	}
+
+	if (!IsFakeClient(client))
+	{
+		SendConVarValue(client, g_hFootsteps, "0");
+		StopRecording(client); // clear client replay frames
+	}
 
 	g_bReportSuccess[client] = false;
 	g_fCommandLastUsed[client] = 0.0;
@@ -439,62 +491,18 @@ public void OnClientPutInServer(int client)
 	if (g_bTierFound)
 		AnnounceTimer[client] = CreateTimer(20.0, AnnounceMap, client, TIMER_FLAG_NO_MAPCHANGE);
 
-	// SDKHooks
-	if (g_bClientHooksCalled[client] == false)
-	{
-		SDKHook(client, SDKHook_SetTransmit, Hook_SetTransmit);
-		SDKHook(client, SDKHook_PostThinkPost, Hook_PostThinkPost);
-		SDKHook(client, SDKHook_OnTakeDamage, Hook_OnTakeDamage);
-		SDKHook(client, SDKHook_PreThink, OnPlayerThink);
-		g_bClientHooksCalled[client] = true;
-	}
-
-	if (!IsFakeClient(client))
-	{
-		SendConVarValue(client, g_hFootsteps, "0");
-		StopRecording(client); // clear client replay frames
-	}
-
-	if (IsFakeClient(client))
-	{
-		CS_SetMVPCount(client, 1);
-		return;
-	}
-	else
-	{
-		// Get SteamID
-		if (!GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], sizeof(g_szSteamID[]), true))
-		{
-			RequestFrame(OnClientPutInServer, client);
-			g_bLoadingSettings[client] = true;
-			return;
-		}
-
-		// Check if steamid has the value of "STEAM_ID_STOP_IGNORING_RETVALS"
-		// Reported here: https://github.com/surftimer/SurfTimer/issues/549
-		// This was being triggered by replay bots
-		if (g_szSteamID[client][6] == 'I' && g_szSteamID[client][7] == 'D')
-		{
-			RequestFrame(OnClientPutInServer, client);
-			g_bLoadingSettings[client] = true;
-			return;
-		}
-		g_MVPStars[client] = 0;
-	}
-
-	/* Init the cp list with the enum we've made for it  newrecord-cp-list*/
-	g_aCheckpointsDifference[client] = new ArrayList(sizeof(RunCheckpoints));
-
-	// Position Restoring
-	if (GetConVarBool(g_hcvarRestore) && !g_bRenaming && !g_bInTransactionChain)
-	db_selectLastRun(client);
-
 	if (!g_bRenaming && !g_bInTransactionChain && g_bServerDataLoaded && !g_bSettingsLoaded[client] && !g_bLoadingSettings[client])
 	{
 		// Start loading client settings
 		g_bLoadingSettings[client] = true;
 		g_iSettingToLoad[client] = 0;
 		LoadClientSetting(client, g_iSettingToLoad[client]);
+	}
+
+	// Position Restoring
+	if (GetConVarBool(g_hcvarRestore) && !g_bRenaming && !g_bInTransactionChain)
+	{
+		db_selectLastRun(client);
 	}
 }
 
