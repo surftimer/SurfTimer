@@ -499,6 +499,9 @@ public void OnClientPutInServer(int client)
 		LoadClientSetting(client, g_iSettingToLoad[client]);
 	}
 
+	/* Init the cp list with the enum we've made for it  newrecord-cp-list*/
+	g_aCheckpointsDifference[client] = new ArrayList(sizeof(RunCheckpoints));
+	
 	// Position Restoring
 	if (GetConVarBool(g_hcvarRestore) && !g_bRenaming && !g_bInTransactionChain)
 	{
