@@ -311,256 +311,318 @@ public void StartTouch(int client, int action[3])
 		g_TeleInTriggerMultiple[client] = false;
 	} */
 
-	float speedCap = g_mapZones[g_iClientInZone[client][3]].PreSpeed;
-
-	if (IsValidClient(client))
+	if (!IsValidClient(client))
 	{
-		float fCurrentRunTime = g_fCurrentRunTime[client];
-		float fCurrentWrcpRunTime = g_fCurrentWrcpRunTime[client];
-		float fCurrentPracSrcpRunTime = g_fCurrentPracSrcpRunTime[client];
-		
-		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0) // fluffys: NoBhop(9), NoCrouch(10)
+		return;
+	}
+	
+	float speedCap = g_mapZones[g_iClientInZone[client][3]].PreSpeed;
+	float fCurrentRunTime = g_fCurrentRunTime[client];
+	float fCurrentWrcpRunTime = g_fCurrentWrcpRunTime[client];
+	float fCurrentPracSrcpRunTime = g_fCurrentPracSrcpRunTime[client];
+	
+	// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0) // fluffys: NoBhop(9), NoCrouch(10)
 
-		//PRINFO
-		int zGroup = g_iClientInZone[client][2]; //ease of use 
-		if ((action[0] == 1 || action[0] == 2 || action[0] == 3) && (!g_bPracticeMode[client] && !IsFakeClient(client) && g_iCurrentStyle[client] == 0)){
+	//PRINFO
+	int zGroup = g_iClientInZone[client][2]; //ease of use 
+	if ((action[0] == 1 || action[0] == 2 || action[0] == 3) && (!g_bPracticeMode[client] && !IsFakeClient(client) && g_iCurrentStyle[client] == 0)){
 
-			//PLAYER ON A RUN
-			if(action[0] == 2 && g_bTimerRunning[client]){
-				g_fCompletes[client][zGroup]++;
+		//PLAYER ON A RUN
+		if(action[0] == 2 && g_bTimerRunning[client]){
+			g_fCompletes[client][zGroup]++;
 
-				g_fTimeinZone[client][zGroup] += fCurrentRunTime;
-				g_fTimeIncrement[client][zGroup] = 0.0;
+			g_fTimeinZone[client][zGroup] += fCurrentRunTime;
+			g_fTimeIncrement[client][zGroup] = 0.0;
 
-				if(g_fstComplete[client][zGroup] == 0.0)
-					g_fstComplete[client][zGroup] = g_fTimeinZone[client][zGroup];
+			if(g_fstComplete[client][zGroup] == 0.0)
+				g_fstComplete[client][zGroup] = g_fTimeinZone[client][zGroup];
 
-				//END ZONE OF MAP
-				if(zGroup == 0)
-					//PLAYER ALREADY HAS A COMPLETION
-					if( g_fPersonalRecord[client] > 0.0 )
-						//IMPROVES COMPLETION
-						if(g_fCurrentRunTime[client] < g_fPersonalRecord[client])
-							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fCurrentRunTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
-						else
-							db_UpdatePRinfo(client, g_szSteamID[client], zGroup); //UPDATE THE PLAYERS PRINFO EXECPT FOR THE RUNTIME
-					//PLAYER FINISHES FOR THE 1ST TIME
+			//END ZONE OF MAP
+			if(zGroup == 0)
+				//PLAYER ALREADY HAS A COMPLETION
+				if( g_fPersonalRecord[client] > 0.0 )
+					//IMPROVES COMPLETION
+					if(g_fCurrentRunTime[client] < g_fPersonalRecord[client])
+						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fCurrentRunTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
 					else
-						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fCurrentRunTime[client]);
-				//ENDZONE OF BONUS
+						db_UpdatePRinfo(client, g_szSteamID[client], zGroup); //UPDATE THE PLAYERS PRINFO EXECPT FOR THE RUNTIME
+				//PLAYER FINISHES FOR THE 1ST TIME
 				else
-					//PLAYER ALREADY HAS A COMPLETION
-					if(g_fPersonalRecordBonus[zGroup][client] > 0)
-						//IMPROVES COMPLETION
-						if (g_fCurrentRunTime[client] < g_fPersonalRecordBonus[zGroup][client])
-							db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fCurrentRunTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
-						else
-							db_UpdatePRinfo(client, g_szSteamID[client], zGroup); //UPDATE THE PLAYERS PRINFO EXECPT FOR THE RUNTIME
-					//PLAYER FINISHES FOR THE 1ST TIME
+					db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fCurrentRunTime[client]);
+			//ENDZONE OF BONUS
+			else
+				//PLAYER ALREADY HAS A COMPLETION
+				if(g_fPersonalRecordBonus[zGroup][client] > 0)
+					//IMPROVES COMPLETION
+					if (g_fCurrentRunTime[client] < g_fPersonalRecordBonus[zGroup][client])
+						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fCurrentRunTime[client]); //UPDATE THE PLAYERS PRINFO WITH THEIR RUNTIME IF THEY IMPROVED
 					else
-						db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fCurrentRunTime[client]);
+						db_UpdatePRinfo(client, g_szSteamID[client], zGroup); //UPDATE THE PLAYERS PRINFO EXECPT FOR THE RUNTIME
+				//PLAYER FINISHES FOR THE 1ST TIME
+				else
+					db_UpdatePRinfo_WithRuntime(client, g_szSteamID[client], zGroup, g_fCurrentRunTime[client]);
+		}
+		//PLAYER JUST DOING STAGES
+		else if(action[0] == 3 && g_bWrcpTimeractivated[client] && !g_bTimerRunning[client]){
+			//CHECK IF THERE IS TIME NOT ADDED TO TIMEINZONE
+			if(g_fTimeIncrement[client][zGroup] != 0.0){
+				g_fTimeinZone[client][zGroup] += g_fTimeIncrement[client][zGroup];
+				g_fTimeIncrement[client][zGroup] = 0.0;
 			}
-			//PLAYER JUST DOING STAGES
-			else if(action[0] == 3 && g_bWrcpTimeractivated[client] && !g_bTimerRunning[client]){
-				//CHECK IF THERE IS TIME NOT ADDED TO TIMEINZONE
-				if(g_fTimeIncrement[client][zGroup] != 0.0){
-					g_fTimeinZone[client][zGroup] += g_fTimeIncrement[client][zGroup];
-					g_fTimeIncrement[client][zGroup] = 0.0;
-				}
+		}
+		//CASE WHERE PLAYER IS RUNNING THE MAP BUT MID RUN SWAP TO LETS SAY /B 1, THE VALUE CONTINUES STORES IN THE g_fTimeIncrement[ZONEGROUP 0], WHEN PLAYER GOES BACK
+		//TO MAP STARTZONE THE PREVIOUSLY INCREMENTED VALUE IS NOW ADDED TO THE TIMEINZONE
+		//MAP OR BONUS STARTZONE
+		else if(action[0] == 1){
+			//CHECK IF THERE IS TIME NOT ADDED TO TIMEINZONE
+			if(g_fTimeIncrement[client][zGroup] != 0.0){
+				g_fTimeinZone[client][zGroup] += g_fTimeIncrement[client][zGroup];
+				g_fTimeIncrement[client][zGroup] = 0.0;
 			}
-			//CASE WHERE PLAYER IS RUNNING THE MAP BUT MID RUN SWAP TO LETS SAY /B 1, THE VALUE CONTINUES STORES IN THE g_fTimeIncrement[ZONEGROUP 0], WHEN PLAYER GOES BACK
-			//TO MAP STARTZONE THE PREVIOUSLY INCREMENTED VALUE IS NOW ADDED TO THE TIMEINZONE
-			//MAP OR BONUS STARTZONE
-			else if(action[0] == 1){
-				//CHECK IF THERE IS TIME NOT ADDED TO TIMEINZONE
-				if(g_fTimeIncrement[client][zGroup] != 0.0){
-					g_fTimeinZone[client][zGroup] += g_fTimeIncrement[client][zGroup];
-					g_fTimeIncrement[client][zGroup] = 0.0;
-				}
-			}
+		}
+	}
+
+	if (action[0] == 0) // Stop Zone
+	{
+		Client_Stop(client, 1);
+		lastCheckpoint[g_iClientInZone[client][2]][client] = 999;
+	}
+	else if (action[0] == 1 || action[0] == 5) // Start Zone or Speed Start
+	{
+		// Set Default Values
+		Client_Stop(client, 1);
+		ResetGravity(client);
+		g_KeyCount[client] = 0;
+		g_bInJump[client] = false;
+		g_bInDuck[client] = false;
+		g_iCurrentCheckpoint[client] = 0;
+		g_Stage[g_iClientInZone[client][2]][client] = 1;
+		g_bInStartZone[client] = true;
+		g_bInStageZone[client] = false;
+		g_iCurrentStyle[client] = g_iInitalStyle[client];
+		lastCheckpoint[g_iClientInZone[client][2]][client] = 1;
+		g_bSaveLocTele[client] = false;
+
+		if (speedCap > 0.0)
+		{
+			ApplySpeedCapXY(client, g_mapZones[g_iClientInZone[client][3]].PreSpeed);
 		}
 
-		if (action[0] == 0) // Stop Zone
+		StartRecording(client); //Add pre
+		/* Reset List newrecord-cp-list*/
+		if(g_aCheckpointsDifference[client] != null && !g_bNewReplay[client])
 		{
-			Client_Stop(client, 1);
-			lastCheckpoint[g_iClientInZone[client][2]][client] = 999;
+			g_aCheckpointsDifference[client].Clear();
 		}
-		else if (action[0] == 1 || action[0] == 5) // Start Zone or Speed Start
+
+		if (g_bhasStages)
 		{
-			// Set Default Values
-			Client_Stop(client, 1);
-			ResetGravity(client);
-			g_KeyCount[client] = 0;
+			g_bWrcpTimeractivated[client] = false;
+			g_bPracSrcpTimerActivated[client] = false;
+			g_CurrentStage[client] = 0;
+	
+			// Prevents the Stage(X) replay from starting before the Stage(X) start zone
+			g_iStageStartTouchTick[client] = g_iRecordedTicks[client]; //Add pre
+		}
+	}
+	else if (action[0] == 2) // End Zone
+	{	
+		if (g_iClientInZone[client][2] == action[2]) // Cant end bonus timer in this zone && in the having the same timer on
+		{
+			// fluffys gravity
+			if (g_iCurrentStyle[client] != 4) // low grav
+				ResetGravity(client);
+			
 			g_bInJump[client] = false;
 			g_bInDuck[client] = false;
-			g_iCurrentCheckpoint[client] = 0;
-			g_Stage[g_iClientInZone[client][2]][client] = 1;
-			g_bInStartZone[client] = true;
-			g_bInStageZone[client] = false;
-			g_iCurrentStyle[client] = g_iInitalStyle[client];
-			lastCheckpoint[g_iClientInZone[client][2]][client] = 1;
-			g_bSaveLocTele[client] = false;
 
-			if (speedCap > 0.0)
+			if (g_bPracticeMode[client])
 			{
-				ApplySpeedCapXY(client, g_mapZones[g_iClientInZone[client][3]].PreSpeed);
-			}
-
-			StartRecording(client); //Add pre
-			/* Reset List newrecord-cp-list*/
-			if(g_aCheckpointsDifference[client] != null && !g_bNewReplay[client])
-			{
-				g_aCheckpointsDifference[client].Clear();
-			}
-
-			if (g_bhasStages)
-			{
-				g_bWrcpTimeractivated[client] = false;
-				g_bPracSrcpTimerActivated[client] = false;
-				g_CurrentStage[client] = 0;
-        
-				// Prevents the Stage(X) replay from starting before the Stage(X) start zone
-				g_iStageStartTouchTick[client] = g_iRecordedTicks[client]; //Add pre
-			}
-		}
-		else if (action[0] == 2) // End Zone
-		{	
-			if (g_iClientInZone[client][2] == action[2]) // Cant end bonus timer in this zone && in the having the same timer on
-			{
-				// fluffys gravity
-				if (g_iCurrentStyle[client] != 4) // low grav
-					ResetGravity(client);
-				
-				g_bInJump[client] = false;
-				g_bInDuck[client] = false;
-
-				if (g_bPracticeMode[client])
-				{
-					g_bPracticeModeRun[client] = true;
-				}
-				else
-				{
-					g_bPracticeModeRun[client] = false;
-				}
-
-				// fluffys wrcps
-				if (g_bhasStages)
-				{
-					
-					if (!g_bPracticeMode[client] && g_iClientInZone[client][2] == 0 && g_iCurrentStyle[client] == 0) {
-						g_fCheckpointTimesNew[0][client][g_TotalStages-1] = fCurrentRunTime;
-					}
-
-					if (!g_bPracticeMode[client])
-					{
-						g_bWrcpEndZone[client] = true;
-						CL_OnEndWrcpTimerPress(client, fCurrentRunTime);
-					}
-					else
-					{
-						if (!g_bInBonus[client])
-						{
-							CL_OnEndPracSrcpTimerPress(client, fCurrentPracSrcpRunTime);
-						}
-					}
-
-					g_bPracSrcpEndZone[client] = true;
-				}
-				else
-				{
-					if (g_bPracticeMode[client])
-					{
-						// This bypasses checkpoint enforcer when in PracMode as players wont always be passing all checkpoints
-						g_bIsValidRun[client] = true;
-					}
-				}
-
-				if (g_bToggleMapFinish[client])
-				{
-					if (GetConVarBool(g_hMustPassCheckpoints) && g_iTotalCheckpoints > 0 && action[2] == 0)
-					{
-						if (g_bIsValidRun[client])
-							CL_OnEndTimerPress(client);
-						else
-							CPrintToChat(client, "%t", "InvalidRun", g_szChatPrefix, g_bhasStages ? "stages" : "checkpoints");
-					}
-					else
-						CL_OnEndTimerPress(client);
-				}
+				g_bPracticeModeRun[client] = true;
 			}
 			else
 			{
-				return;
-			}
-			// Resetting checkpoints
-			lastCheckpoint[g_iClientInZone[client][2]][client] = 999;
-		}
-		else if (action[0] == 3) // Stage Zone
-		{
-			g_bInStageZone[client] = true;
-			g_bInStartZone[client] = false;
-			g_bInJump[client] = false;
-			g_bInDuck[client] = false;
-			g_KeyCount[client] = 0;
-
-			if (speedCap > 0.0)
-			{
-				ApplySpeedCapXY(client, g_mapZones[g_iClientInZone[client][3]].PreSpeed);
+				g_bPracticeModeRun[client] = false;
 			}
 
-			// Prevents the Stage(X) replay from starting before the Stage(X) start zone
-			g_iStageStartTouchTick[client] = g_iRecordedTicks[client]; //Add pre
-			
-			// stop bot wrcp timer
-			if (client == g_WrcpBot)
+			// fluffys wrcps
+			if (g_bhasStages)
 			{
-				Client_Stop(client, 1);
-				g_bWrcpTimeractivated[client] = false;
-				g_bPracSrcpTimerActivated[client] = false;
-			}
+				
+				if (!g_bPracticeMode[client] && g_iClientInZone[client][2] == 0 && g_iCurrentStyle[client] == 0) {
+					g_fCheckpointTimesNew[0][client][g_TotalStages-1] = fCurrentRunTime;
+				}
 
-			// Setting valid to false, in case of checkers
-			g_bValidRun[client] = false;
-
-			// Announcing checkpoint
-			if (action[1] != lastCheckpoint[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] == action[2])
-			{
-				// Make sure the player is not going backwards
-				if ((action[1] + 2) < g_Stage[g_iClientInZone[client][2]][client])
+				if (!g_bPracticeMode[client])
 				{
-					g_bWrcpTimeractivated[client] = false;
-					g_bPracSrcpTimerActivated[client] = false;
+					g_bWrcpEndZone[client] = true;
+					CL_OnEndWrcpTimerPress(client, fCurrentRunTime);
 				}
 				else
-					g_bNewStage[client] = true;
-
-				g_Stage[g_iClientInZone[client][2]][client] = (action[1] + 2);
-
-				if (!g_bInBonus[client]) // Stop announcement from happening in bonus because if bonus has stages then this will display incorrect info
 				{
-					if (!g_bPracticeMode[client])
-					{
-						CL_OnEndWrcpTimerPress(client, fCurrentWrcpRunTime);
-					}
-					else
+					if (!g_bInBonus[client])
 					{
 						CL_OnEndPracSrcpTimerPress(client, fCurrentPracSrcpRunTime);
 					}
 				}
-				
-				// Stage enforcer
-				g_iCheckpointsPassed[client]++;
-				if (g_iCheckpointsPassed[client] == g_TotalStages)
-					g_bIsValidRun[client] = true;
-				
-				if (g_iCurrentStyle[client] == 0)
+
+				g_bPracSrcpEndZone[client] = true;
+			}
+			else
+			{
+				if (g_bPracticeMode[client])
 				{
-					Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime);
+					// This bypasses checkpoint enforcer when in PracMode as players wont always be passing all checkpoints
+					g_bIsValidRun[client] = true;
 				}
-				else{
-					//PrintToChatAll("style %d | cp %i | %d tick count", g_iCurrentStyle[client], action[1], g_iRecordedTicks[client]);
-					g_iCPStartFrame_CurrentRun[g_iCurrentStyle[client]][action[1]][client] = g_iRecordedTicks[client];
+			}
+
+			if (g_bToggleMapFinish[client])
+			{
+				if (GetConVarBool(g_hMustPassCheckpoints) && g_iTotalCheckpoints > 0 && action[2] == 0)
+				{
+					if (g_bIsValidRun[client])
+						CL_OnEndTimerPress(client);
+					else
+						CPrintToChat(client, "%t", "InvalidRun", g_szChatPrefix, g_bhasStages ? "stages" : "checkpoints");
 				}
+				else
+					CL_OnEndTimerPress(client);
+			}
+		}
+		else
+		{
+			return;
+		}
+		// Resetting checkpoints
+		lastCheckpoint[g_iClientInZone[client][2]][client] = 999;
+	}
+	else if (action[0] == 3) // Stage Zone
+	{
+		g_bInStageZone[client] = true;
+		g_bInStartZone[client] = false;
+		g_bInJump[client] = false;
+		g_bInDuck[client] = false;
+		g_KeyCount[client] = 0;
+
+		if (speedCap > 0.0)
+		{
+			ApplySpeedCapXY(client, g_mapZones[g_iClientInZone[client][3]].PreSpeed);
+		}
+
+		// Prevents the Stage(X) replay from starting before the Stage(X) start zone
+		g_iStageStartTouchTick[client] = g_iRecordedTicks[client]; //Add pre
+		
+		// stop bot wrcp timer
+		if (client == g_WrcpBot)
+		{
+			Client_Stop(client, 1);
+			g_bWrcpTimeractivated[client] = false;
+			g_bPracSrcpTimerActivated[client] = false;
+		}
+
+		// Setting valid to false, in case of checkers
+		g_bValidRun[client] = false;
+
+		// Announcing checkpoint
+		if (action[1] != lastCheckpoint[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] == action[2])
+		{
+			// Make sure the player is not going backwards
+			if ((action[1] + 2) < g_Stage[g_iClientInZone[client][2]][client])
+			{
+				g_bWrcpTimeractivated[client] = false;
+				g_bPracSrcpTimerActivated[client] = false;
+			}
+			else
+				g_bNewStage[client] = true;
+
+			g_Stage[g_iClientInZone[client][2]][client] = (action[1] + 2);
+
+			if (!g_bInBonus[client]) // Stop announcement from happening in bonus because if bonus has stages then this will display incorrect info
+			{
+				if (!g_bPracticeMode[client])
+				{
+					CL_OnEndWrcpTimerPress(client, fCurrentWrcpRunTime);
+				}
+				else
+				{
+					CL_OnEndPracSrcpTimerPress(client, fCurrentPracSrcpRunTime);
+				}
+			}
+			
+			// Stage enforcer
+			g_iCheckpointsPassed[client]++;
+			if (g_iCheckpointsPassed[client] == g_TotalStages)
+				g_bIsValidRun[client] = true;
+			
+			if (g_iCurrentStyle[client] == 0)
+			{
+				Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime);
+			}
+			else{
+				//PrintToChatAll("style %d | cp %i | %d tick count", g_iCurrentStyle[client], action[1], g_iRecordedTicks[client]);
+				g_iCPStartFrame_CurrentRun[g_iCurrentStyle[client]][action[1]][client] = g_iRecordedTicks[client];
+			}
+			
+			if (!g_bSaveLocTele[client])
+			{
+				lastCheckpoint[g_iClientInZone[client][2]][client] = action[1];
+			}
+			else
+			{
+				lastCheckpoint[g_iClientInZone[client][2]][client] = g_iPlayerPracLocationSnap[client][g_iLastSaveLocIdClient[client]] - 1;
+			}
+		}
+		else if (!g_bTimerRunning[client])
+		{
+			g_iCurrentStyle[client] = g_iInitalStyle[client];
+		}
+
+		if (g_bWrcpTimeractivated[client])
+		{
+			g_bWrcpTimeractivated[client] = false;
+		}
+
+		if(g_bPracSrcpTimerActivated[client])
+		{
+			g_bPracSrcpTimerActivated[client] = false;
+		}
+
+		if (g_bPracticeMode[client]) 
+		{
+			g_bSaveLocTele[client] = false;
+		}
+	}
+	else if (action[0] == 4) // Checkpoint Zone
+	{
+		if (action[1] != lastCheckpoint[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] == action[2] || g_bPracticeMode[client])
+		{
+			g_iCurrentCheckpoint[client]++;
+			g_bSaveLocTele[client] = false;
+			
+			// Checkpoint enforcer
+			if (GetConVarBool(g_hMustPassCheckpoints) && g_iTotalCheckpoints > 0)
+			{
+				if (!g_bPracticeMode[client])
+				{
+					g_iCheckpointsPassed[client]++;
+
+					if (g_iCheckpointsPassed[client] == g_iTotalCheckpoints)
+					{	
+						g_bIsValidRun[client] = true;
+					}
+				}
+				else
+				{
+					// This bypasses checkpoint enforcer when in PracMode as players wont always be passing all checkpoints
+					g_bIsValidRun[client] = true;
+				}
+			}
+
+			// Announcing checkpoint in linear maps
+			if (g_iCurrentStyle[client] == 0)
+			{
+				Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime);
 				
 				if (!g_bSaveLocTele[client])
 				{
@@ -571,114 +633,52 @@ public void StartTouch(int client, int action[3])
 					lastCheckpoint[g_iClientInZone[client][2]][client] = g_iPlayerPracLocationSnap[client][g_iLastSaveLocIdClient[client]] - 1;
 				}
 			}
-			else if (!g_bTimerRunning[client])
-			{
-				g_iCurrentStyle[client] = g_iInitalStyle[client];
-			}
-
-			if (g_bWrcpTimeractivated[client])
-			{
-				g_bWrcpTimeractivated[client] = false;
-			}
-
-			if(g_bPracSrcpTimerActivated[client])
-			{
-				g_bPracSrcpTimerActivated[client] = false;
-			}
-
-			if (g_bPracticeMode[client]) 
-			{
-				g_bSaveLocTele[client] = false;
+			else{
+				//PrintToChatAll("style %d | cp %i | %d tick count", g_iCurrentStyle[client], action[1], g_iRecordedTicks[client]);
+				g_iCPStartFrame_CurrentRun[g_iCurrentStyle[client]][action[1]][client] = g_iRecordedTicks[client];
 			}
 		}
-		else if (action[0] == 4) // Checkpoint Zone
-		{
-			if (action[1] != lastCheckpoint[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] == action[2] || g_bPracticeMode[client])
-			{
-				g_iCurrentCheckpoint[client]++;
-				g_bSaveLocTele[client] = false;
-				
-				// Checkpoint enforcer
-				if (GetConVarBool(g_hMustPassCheckpoints) && g_iTotalCheckpoints > 0)
-				{
-					if (!g_bPracticeMode[client])
-					{
-						g_iCheckpointsPassed[client]++;
 
-						if (g_iCheckpointsPassed[client] == g_iTotalCheckpoints)
-						{	
-							g_bIsValidRun[client] = true;
-						}
-					}
-					else
-					{
-						// This bypasses checkpoint enforcer when in PracMode as players wont always be passing all checkpoints
-						g_bIsValidRun[client] = true;
-					}
-				}
+	}
+	else if (action[0] == 6) // TeleToStart Zone
+	{
+		teleportClient(client, g_iClientInZone[client][2], 1, true);
+	}
+	else if (action[0] == 7) // Validator Zone
+	{
+		g_bValidRun[client] = true;
+	}
+	else if (action[0] == 8) // Checker Zone
+	{
+		if (!g_bValidRun[client])
+			Command_Teleport(client, 1);
+	}
+	else if (action[0] == 9) // fluffys nobhop
+	{
+		g_bInJump[client] = true;
+	}
+	else if (action[0] == 10) // fluffys noduck
+	{
+		g_bInDuck[client] = true;
+	}
+	else if (action[0] == 11) // MaxSpeed
+	{
+		g_bInMaxSpeed[client] = true;
+		// CPrintToChat(client, "Inside MaxSpeed zone");
+	}
+	
+	//INCASE THE RECORD IS OLD, WHEN THERE IS NOT DATA IN THE DATABASE
+	//WE SIMPLY ADD TO "g_iCPStartFrame" THE CURRENT REPLAY BOT TICK
+	//THIS WAY WHEN THE DATABASE HAS NO VALUES
+	//THE PLAYERS CAN SELECT THE CHECKPOINTS OPTION IN THE REPLAY MENU WITH THE CORRECT VALUES
+	//ONLY PERFOM ACTIONS IF THE CLIENT INDEX IS THE MAP RECORD BOT'S INDEX AND IF THERE ARE NOT REPLAY TICKS FOUND
+	if(IsPlayerAlive(client) && IsFakeClient(client) && !g_bReplayTickFound[g_iCurrentStyle[client]] && client == g_RecordBot){
+		//MAKE BOTS REGISTER TICKS
+		if(action[0] == 3 || action[0] == 4)
+			g_iCPStartFrame[g_iCurrentStyle[client]][action[1]] = g_iReplayTick[client];
 
-				// Announcing checkpoint in linear maps
-				if (g_iCurrentStyle[client] == 0)
-				{
-					Checkpoint(client, action[1], g_iClientInZone[client][2], fCurrentRunTime);
-					
-					if (!g_bSaveLocTele[client])
-					{
-						lastCheckpoint[g_iClientInZone[client][2]][client] = action[1];
-					}
-					else
-					{
-						lastCheckpoint[g_iClientInZone[client][2]][client] = g_iPlayerPracLocationSnap[client][g_iLastSaveLocIdClient[client]] - 1;
-					}
-				}
-				else{
-					//PrintToChatAll("style %d | cp %i | %d tick count", g_iCurrentStyle[client], action[1], g_iRecordedTicks[client]);
-					g_iCPStartFrame_CurrentRun[g_iCurrentStyle[client]][action[1]][client] = g_iRecordedTicks[client];
-				}
-			}
-
-		}
-		else if (action[0] == 6) // TeleToStart Zone
-		{
-			teleportClient(client, g_iClientInZone[client][2], 1, true);
-		}
-		else if (action[0] == 7) // Validator Zone
-		{
-			g_bValidRun[client] = true;
-		}
-		else if (action[0] == 8) // Checker Zone
-		{
-			if (!g_bValidRun[client])
-				Command_Teleport(client, 1);
-		}
-		else if (action[0] == 9) // fluffys nobhop
-		{
-			g_bInJump[client] = true;
-		}
-		else if (action[0] == 10) // fluffys noduck
-		{
-			g_bInDuck[client] = true;
-		}
-		else if (action[0] == 11) // MaxSpeed
-		{
-			g_bInMaxSpeed[client] = true;
-			// CPrintToChat(client, "Inside MaxSpeed zone");
-		}
-		
-		//INCASE THE RECORD IS OLD, WHEN THERE IS NOT DATA IN THE DATABASE
-		//WE SIMPLY ADD TO "g_iCPStartFrame" THE CURRENT REPLAY BOT TICK
-		//THIS WAY WHEN THE DATABASE HAS NO VALUES
-		//THE PLAYERS CAN SELECT THE CHECKPOINTS OPTION IN THE REPLAY MENU WITH THE CORRECT VALUES
-		//ONLY PERFOM ACTIONS IF THE CLIENT INDEX IS THE MAP RECORD BOT'S INDEX AND IF THERE ARE NOT REPLAY TICKS FOUND
-		if(IsPlayerAlive(client) && IsFakeClient(client) && !g_bReplayTickFound[g_iCurrentStyle[client]] && client == g_RecordBot){
-			//MAKE BOTS REGISTER TICKS
-			if(action[0] == 3 || action[0] == 4)
-				g_iCPStartFrame[g_iCurrentStyle[client]][action[1]] = g_iReplayTick[client];
-
-			if(action[0] == 2)
-				db_UpdateReplaysTick(client, g_iCurrentStyle[client]);
-		}
-
+		if(action[0] == 2)
+			db_UpdateReplaysTick(client, g_iCurrentStyle[client]);
 	}
 }
 
