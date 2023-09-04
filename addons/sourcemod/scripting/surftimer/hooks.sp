@@ -760,6 +760,11 @@ public Action ApplyStyles(Handle timer, int userid)
 
 public Action OnMultipleTrigger1(int entity, int client)
 {
+	if (!IsValidClient(client) || IsFakeClient(client))
+	{
+		return Plugin_Handled;
+	}
+
 	CreateTimer(0.1, ApplyStyles, GetClientUserId(client));
 
 	return Plugin_Continue;
