@@ -650,6 +650,13 @@ public Action Command_createPlayerCheckpoint(int client, int args)
 	if (!IsValidClient(client))
 		return Plugin_Handled;
 	
+	int iMode = GetEntProp(client, Prop_Send, "m_iObserverMode");
+	if (iMode != 4 && iMode != 5) // 0 - None, 4 - First Person, 5 - Third Person, 6 - Freelook
+	{
+		CPrintToChat(client, "%t", "InvalidObserverMode", g_szChatPrefix);
+		return Plugin_Handled;
+	}
+	
 	int playerType;
 	int player;
 	int ObservedUser;
@@ -669,6 +676,12 @@ public Action Command_createPlayerCheckpoint(int client, int args)
 	{
 		case 1: player = client;
 		case 2: player = ObservedUser;
+	}
+
+	if (!player)
+	{
+		CPrintToChat(client, "%t", "Commands10", g_szChatPrefix);
+		return Plugin_Handled;
 	}
 
 	if (!g_bSaveLocTele[player])
