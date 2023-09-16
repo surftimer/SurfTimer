@@ -91,21 +91,25 @@ jobs:
 
       # - name: Upload files to EU
         # uses: wangyucode/sftp-upload-action@v2.0.2
-        # env:
+        # with:
           # host: ${{ secrets.SFTP_HOST_EU }}
           # port: ${{ secrets.SFTP_PORT_EU }}
           # username: ${{ secrets.SFTP_USER_EU }}
           # password: ${{ secrets.SFTP_PASS_EU }}
+          # compress: true
+          # forceUpload: true
           # localDir: 'upload'
           # remoteDir: '/'
 
       - name: Upload files to NA
         uses: wangyucode/sftp-upload-action@v2.0.2
-        env:
+        with:
           host: ${{ secrets.SFTP_HOST }}
           port: ${{ secrets.SFTP_PORT }}
           username: ${{ secrets.SFTP_USER }}
           password: ${{ secrets.SFTP_PASS }}
+          compress: true
+          forceUpload: true
           localDir: 'upload'
           remoteDir: '/'
 
