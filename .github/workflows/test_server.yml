@@ -96,8 +96,6 @@ jobs:
           # port: ${{ secrets.SFTP_PORT_EU }}
           # username: ${{ secrets.SFTP_USER_EU }}
           # password: ${{ secrets.SFTP_PASS_EU }}
-          # compress: true
-          # forceUpload: true
           # localDir: 'upload'
           # remoteDir: '/'
 
@@ -108,8 +106,6 @@ jobs:
           port: ${{ secrets.SFTP_PORT }}
           username: ${{ secrets.SFTP_USER }}
           password: ${{ secrets.SFTP_PASS }}
-          compress: true
-          forceUpload: true
           localDir: 'upload'
           remoteDir: '/'
 
