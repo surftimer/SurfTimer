@@ -1332,9 +1332,6 @@ bool g_bReportSuccess[MAXPLAYERS + 1];
 // old challenge variables might need just incase
 float g_fSpawnPosition[MAXPLAYERS + 1][3];
 
-// Chat Colors in String Format
-char szWHITE[12], szDARKRED[12], szPURPLE[12], szGREEN[12], szLIGHTGREEN[12], szLIMEGREEN[12], szRED[12], szGRAY[12], szYELLOW[12], szDARKGREY[12], szBLUE[12], szDARKBLUE[12], szLIGHTBLUE[12], szPINK[12], szLIGHTRED[12], szORANGE[12];
-
 // hook zones
 Handle g_hTriggerMultiple;
 int g_iTeleportingZoneId[MAXPLAYERS + 1];
