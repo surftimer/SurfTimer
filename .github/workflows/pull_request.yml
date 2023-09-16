@@ -15,7 +15,7 @@ jobs:
         SM_VERSION: [ "1.11", "1.12" ]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set environment variables
         run: |
