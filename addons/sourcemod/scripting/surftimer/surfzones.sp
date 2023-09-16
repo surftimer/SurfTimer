@@ -236,21 +236,21 @@ public Action StartTouchTrigger(int caller, int activator)
 		g_iClientInZone[activator][3] = id;
 		StartTouch(activator, action);
 	}
-	else
+	else if (action[0] == 1 || action[0] == 5) // Ignore other than start and misc zones in other zonegroups
 	{
-		if (action[0] == 1 || action[0] == 5) // Ignore other than start and misc zones in other zonegroups
-		{
-			// Set client location
-			g_iClientInZone[activator][0] = action[0];
-			g_iClientInZone[activator][1] = action[1];
-			g_iClientInZone[activator][2] = action[2];
-			g_iInBonus[activator] = action[2];
-			g_iClientInZone[activator][3] = id;
-			StartTouch(activator, action);
-		}
-		else
-			if (action[0] == 6 || action[0] == 7 || action[0] == 8 || action[0] == 0 || action[0] == 9 || action[0] == 10 || action[0] == 11) // Allow MISC zones regardless of zonegroup // fluffys add nojump, noduck
-				StartTouch(activator, action);
+		// Set client location
+		g_iClientInZone[activator][0] = action[0];
+		g_iClientInZone[activator][1] = action[1];
+		g_iClientInZone[activator][2] = action[2];
+		g_iInBonus[activator] = action[2];
+		g_iClientInZone[activator][3] = id;
+		StartTouch(activator, action);
+	}
+	else if (action[0] == 0 || action[0] == 6 || action[0] == 7 || action[0] == 8 || action[0] == 9 || action[0] == 10 || action[0] == 11) // Allow MISC zones regardless of zonegroup // fluffys add nojump, noduck
+	{
+		g_iClientInZone[activator][2] = action[2];
+		g_iClientInZone[activator][3] = id;
+		StartTouch(activator, action);
 	}
 
 	return Plugin_Continue;
