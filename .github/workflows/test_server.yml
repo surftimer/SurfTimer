@@ -90,7 +90,7 @@ jobs:
         working-directory: ${{ env.SCRIPTING_PATH }}
 
       # - name: Upload files to EU
-        # uses: SamKirkland/FTP-Deploy-Action@2.0.0
+        # uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         # env:
           # FTP_SERVER: ${{ secrets.SFTP_HOST_EU }}
           # FTP_USERNAME: ${{ secrets.SFTP_USER_EU }}
@@ -101,7 +101,7 @@ jobs:
           # ARGS: --no-empty-dirs
 
       - name: Upload files to NA
-        uses: SamKirkland/FTP-Deploy-Action@2.0.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         env:
           FTP_SERVER: ${{ secrets.SFTP_HOST }}
           FTP_USERNAME: ${{ secrets.SFTP_USER }}
