@@ -270,87 +270,51 @@ public void ckAdminMenu(int client)
 		}
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hCvarGodMode))
-			Format(szTmp, sizeof(szTmp), "[%i.] Godmode  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] Godmode  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] Godmode  -  %s", menuItemNumber, (g_hCvarGodMode.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hCvarNoBlock))
-			Format(szTmp, sizeof(szTmp), "[%i.] Noblock  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] Noblock  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] Noblock  -  %s", menuItemNumber, (g_hCvarNoBlock.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hAutoRespawn))
-			Format(szTmp, sizeof(szTmp), "[%i.] Autorespawn  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] Autorespawn  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] Autorespawn  -  %s", menuItemNumber, (g_hAutoRespawn.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hCleanWeapons))
-			Format(szTmp, sizeof(szTmp), "[%i.] Strip weapons  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] Strip weapons  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] Strip weapons  -  %s", menuItemNumber, (g_hCleanWeapons.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hcvarRestore))
-			Format(szTmp, sizeof(szTmp), "[%i.] Restore function  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] Restore function  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] Restore function  -  %s", menuItemNumber, (g_hcvarRestore.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hPauseServerside))
-			Format(szTmp, sizeof(szTmp), "[%i.] !pause command -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] !pause command  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] !pause command -  %s", menuItemNumber, (g_hPauseServerside.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hGoToServer))
-			Format(szTmp, sizeof(szTmp), "[%i.] !goto command  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] !goto command  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] !goto command  -  %s", menuItemNumber, (g_hGoToServer.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hRadioCommands))
-			Format(szTmp, sizeof(szTmp), "[%i.] Radio commands  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] Radio commands  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] Radio commands  -  %s", menuItemNumber, (g_hRadioCommands.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hReplayBot))
-			Format(szTmp, sizeof(szTmp), "[%i.] Replay bot  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] Replay bot  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] Replay bot  -  %s", menuItemNumber, (g_hReplayBot.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hPointSystem))
-			Format(szTmp, sizeof(szTmp), "[%i.] Player point system  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] Player point system  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] Player point system  -  %s", menuItemNumber, (g_hPointSystem.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hCountry))
-			Format(szTmp, sizeof(szTmp), "[%i.] Player country tag  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] Player country tag  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] Player country tag  -  %s", menuItemNumber, (g_hCountry.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hPlayerSkinChange))
-			Format(szTmp, sizeof(szTmp), "[%i.] Allow custom models  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] Allow custom models  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] Allow custom models  -  %s", menuItemNumber, (g_hPlayerSkinChange.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
@@ -368,45 +332,27 @@ public void ckAdminMenu(int client)
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hMapEnd))
-			Format(szTmp, sizeof(szTmp), "[%i.] Allow map changes  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[i.] Allow map changes  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] Allow map changes  -  %s", menuItemNumber, (g_hMapEnd.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hConnectMsg))
-			Format(szTmp, sizeof(szTmp), "[%i.] Connect message  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] Connect message  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] Connect message  -  %s", menuItemNumber, (g_hConnectMsg.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hDisconnectMsg))
-			Format(szTmp, sizeof(szTmp), "[%i.] Disconnect message - Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] Disconnect message - Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] Disconnect message - %s", menuItemNumber, (g_hDisconnectMsg.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hInfoBot))
-			Format(szTmp, sizeof(szTmp), "[%i.] Info bot  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] Info bot  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] Info bot  -  %s", menuItemNumber, (g_hInfoBot.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hAttackSpamProtection))
-			Format(szTmp, sizeof(szTmp), "[%i.] Attack spam protection  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] Attack spam protection  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] Attack spam protection  -  %s", menuItemNumber, (g_hAttackSpamProtection.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
-		if (GetConVarBool(g_hAllowRoundEndCvar))
-			Format(szTmp, sizeof(szTmp), "[%i.] Allow to end the current round  -  Enabled", menuItemNumber);
-		else
-			Format(szTmp, sizeof(szTmp), "[%i.] Allow to end the current round  -  Disabled", menuItemNumber);
+		Format(szTmp, sizeof(szTmp), "[%i.] Allow to end the current round  -  %s", menuItemNumber, (g_hAllowRoundEndCvar.BoolValue) ? "Enabled" : "Disabled");
 		AddMenuItem(adminmenu, szTmp, szTmp);
 		menuItemNumber++;
 
@@ -482,170 +428,111 @@ public int AdminPanelHandler(Handle menu, MenuAction action, int param1, int par
 
 			case 3:
 			{
-				if (!GetConVarBool(g_hCvarGodMode))
-					ServerCommand("ck_godmode 1");
-				else
-					ServerCommand("ck_godmode 0");
+				ServerCommand("ck_godmode %d", (g_hCvarGodMode.BoolValue) ? 0 : 1);
 			}
 
 			case 4:
 			{
-				if (!GetConVarBool(g_hCvarNoBlock))
-					ServerCommand("ck_noblock 1");
-				else
-					ServerCommand("ck_noblock 0");
+				ServerCommand("ck_noblock %d", (g_hCvarNoBlock.BoolValue) ? 0 : 1);
 			}
 
 			case 5:
 			{
-				if (!GetConVarBool(g_hAutoRespawn))
-					ServerCommand("ck_autorespawn 1");
-				else
-					ServerCommand("ck_autorespawn 0");
+				ServerCommand("ck_autorespawn %d", (g_hAutoRespawn.BoolValue) ? 0 : 1);
 			}
 
 			case 6:
 			{
-				if (!GetConVarBool(g_hCleanWeapons))
-					ServerCommand("ck_clean_weapons 1");
-				else
-					ServerCommand("ck_clean_weapons 0");
+				ServerCommand("ck_clean_weapons %d", (g_hCleanWeapons.BoolValue) ? 0 : 1);
 			}
 
 			case 7:
 			{
-				if (!GetConVarBool(g_hcvarRestore))
-					ServerCommand("ck_restore 1");
-				else
-					ServerCommand("ck_restore 0");
+				ServerCommand("ck_restore %d", (g_hcvarRestore.BoolValue) ? 0 : 1);
 			}
 
 			case 8:
 			{
-				if (!GetConVarBool(g_hPauseServerside))
-					ServerCommand("ck_pause 1");
-				else
-					ServerCommand("ck_pause 0");
+				ServerCommand("ck_pause %d", (g_hPauseServerside.BoolValue) ? 0 : 1);
 			}
 
 			case 9:
 			{
-				if (!GetConVarBool(g_hGoToServer))
-					ServerCommand("ck_goto 1");
-				else
-					ServerCommand("ck_goto 0");
+				ServerCommand("ck_goto %d", (g_hGoToServer.BoolValue) ? 0 : 1);
 			}
 
 			case 10:
 			{
-				if (!GetConVarBool(g_hRadioCommands))
-					ServerCommand("ck_use_radio 1");
-				else
-					ServerCommand("ck_use_radio 0");
+				ServerCommand("ck_use_radio %d", (g_hRadioCommands.BoolValue) ? 0 : 1);
 			}
 
 			case 11:
 			{
-				if (!GetConVarBool(g_hReplayBot))
-					ServerCommand("ck_replay_bot 1");
-				else
-					ServerCommand("ck_replay_bot 0");
+				ServerCommand("ck_replay_bot %d", (g_hReplayBot.BoolValue) ? 0 : 1);
 			}
 
 			case 12:
 			{
-				if (!GetConVarBool(g_hPointSystem))
-					ServerCommand("ck_point_system 1");
-				else
-					ServerCommand("ck_point_system 0");
+				ServerCommand("ck_point_system %d", (g_hPointSystem.BoolValue) ? 0 : 1);
 			}
 
 			case 13:
 			{
-				if (!GetConVarBool(g_hCountry))
-					ServerCommand("ck_country_tag 1");
-				else
-					ServerCommand("ck_country_tag 0");
+				ServerCommand("ck_country_tag %d", (g_hCountry.BoolValue) ? 0 : 1);
 			}
 
 			case 14:
 			{
-				if (!GetConVarBool(g_hPlayerSkinChange))
-					ServerCommand("ck_custom_models 1");
-				else
-					ServerCommand("ck_custom_models 0");
+				ServerCommand("ck_custom_models %d", (g_hPlayerSkinChange.BoolValue) ? 0 : 1);
 			}
 
 			case 15:
 			{
-				if (!GetConVarBool(g_hNoClipS))
-					ServerCommand("ck_noclip 1");
-				else
-					ServerCommand("ck_noclip 0");
+				ServerCommand("ck_noclip %d", (g_hNoClipS.BoolValue) ? 0 : 1);
 			}
 
 			case 16:
 			{
-				if (!GetConVarBool(g_hAutoBhopConVar))
-					ServerCommand("ck_auto_bhop 1");
-				else
-					ServerCommand("ck_auto_bhop 0");
+				ServerCommand("ck_auto_bhop %d", (g_hAutoBhopConVar.BoolValue) ? 0 : 1);
 			}
 
 			case 17:
 			{
-				if (!GetConVarBool(g_hMapEnd))
-					ServerCommand("ck_map_end 1");
-				else
-					ServerCommand("ck_map_end 0");
+				ServerCommand("ck_map_end %d", (g_hMapEnd.BoolValue) ? 0 : 1);
 			}
 
 			case 18:
 			{
-				if (!GetConVarBool(g_hConnectMsg))
-					ServerCommand("ck_connect_msg 1");
-				else
-					ServerCommand("ck_connect_msg 0");
+				ServerCommand("ck_connect_msg %d", (g_hConnectMsg.BoolValue) ? 0 : 1);
 			}
 
 			case 19:
 			{
-				if (!GetConVarBool(g_hDisconnectMsg))
-					ServerCommand("ck_disconnect_msg 1");
-				else
-					ServerCommand("ck_disconnect_msg 0");
+				ServerCommand("ck_disconnect_msg %d", (g_hDisconnectMsg.BoolValue) ? 0 : 1);
 			}
 
 			case 20:
 			{
-				if (!GetConVarBool(g_hInfoBot))
-					ServerCommand("ck_info_bot 1");
-				else
-					ServerCommand("ck_info_bot 0");
+				ServerCommand("ck_info_bot %d", (g_hInfoBot.BoolValue) ? 0 : 1);
 			}
 
 			case 21:
 			{
-				if (!GetConVarBool(g_hAttackSpamProtection))
-					ServerCommand("ck_attack_spam_protection 1");
-				else
-					ServerCommand("ck_attack_spam_protection 0");
+				ServerCommand("ck_attack_spam_protection %d", (g_hAttackSpamProtection.BoolValue) ? 0 : 1);
 			}
 
 			case 22:
 			{
-				if (!GetConVarBool(g_hAllowRoundEndCvar))
-					ServerCommand("ck_round_end 1");
-				else
-					ServerCommand("ck_round_end 0");
+				ServerCommand("ck_round_end %d", (g_hAllowRoundEndCvar.BoolValue) ? 0 : 1);
 			}
 		}
 
 		g_AdminMenuLastPage[param1] = param2;
-		delete menu;
 
 		if (refresh)
+		{
 			CreateTimer(0.1, RefreshAdminMenu, param1, TIMER_FLAG_NO_MAPCHANGE);
+		}
 	}
 
 	if (action == MenuAction_End)
@@ -670,12 +557,14 @@ public Action Admin_RefreshProfile(int client, int args)
 	{
 		char szSteamID[128];
 		char szArg[128];
-		Format(szSteamID, 128, "");
+
 		for (int i = 1; i < 6; i++)
 		{
-			GetCmdArg(i, szArg, 128);
+			GetCmdArg(i, szArg, sizeof(szArg));
 			if (!StrEqual(szArg, "", false))
-				Format(szSteamID, 128, "%s%s", szSteamID, szArg);
+			{
+				Format(szSteamID, sizeof(szSteamID), "%s%s", szSteamID, szArg);
+			}
 		}
 		RecalcPlayerRank(client, szSteamID);
 	}
