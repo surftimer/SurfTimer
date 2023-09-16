@@ -651,7 +651,7 @@ public Action Command_createPlayerCheckpoint(int client, int args)
 		return Plugin_Handled;
 	
 	int iMode = GetEntProp(client, Prop_Send, "m_iObserverMode");
-	if (iMode != 4 && iMode != 5) // 0 - None, 4 - First Person, 5 - Third Person, 6 - Freelook
+	if ((GetClientTeam(client) == CS_TEAM_SPECTATOR || !IsPlayerAlive(client)) && (iMode != 4 && iMode != 5)) // 0 - None, 4 - First Person, 5 - Third Person, 6 - Freelook
 	{
 		CPrintToChat(client, "%t", "InvalidObserverMode", g_szChatPrefix);
 		return Plugin_Handled;
