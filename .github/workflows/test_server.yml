@@ -89,37 +89,16 @@ jobs:
           done
         working-directory: ${{ env.SCRIPTING_PATH }}
 
-      # - name: Upload files to EU
-        # uses: wlixcc/SFTP-Deploy-Action@v1.2.4
-        # with:
-          # server: ${{ secrets.SFTP_HOST_EU }}
-          # port: ${{ secrets.SFTP_PORT_EU }}
-          # username: ${{ secrets.SFTP_USER_EU }}
-          # password: ${{ secrets.SFTP_PASS_EU }}
-          # local_path: './upload/*'
-          # remote_path: './'
-          # sftp_only: true
-
       - name: Upload files to NA
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
           server: ${{ secrets.SFTP_HOST }}
           port: ${{ secrets.SFTP_PORT }}
           username: ${{ secrets.SFTP_USER }}
-          password: ${{ secrets.SFTP_PASS }}
+          ssh_private_key: ${{ secrets.SFTP_PKEY }}
           local_path: './upload/*'
           remote_path: './'
           sftp_only: true
-
-      # - name: Restart EU test server
-        # shell: bash
-        # run: |
-          # curl --request POST \
-            # --url ${{ secrets.BASE_URL_EU }}api/client/servers/${{ secrets.SERVER_ID_EU }}/power \
-            # --header 'Accept: application/json' \
-            # --header 'Authorization: Bearer ${{ secrets.API_KEY_EU }}' \
-            # --header 'Content-Type: application/json' \
-            # --data '{ "signal": "restart" }'
 
       - name: Restart NA test server
         shell: bash
