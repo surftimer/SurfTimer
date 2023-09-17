@@ -90,24 +90,26 @@ jobs:
         working-directory: ${{ env.SCRIPTING_PATH }}
 
       # - name: Upload files to EU
-        # uses: wangyucode/sftp-upload-action@v2.0.2
+        # uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         # with:
-          # host: ${{ secrets.SFTP_HOST_EU }}
+          # server: ${{ secrets.SFTP_HOST_EU }}
           # port: ${{ secrets.SFTP_PORT_EU }}
           # username: ${{ secrets.SFTP_USER_EU }}
           # password: ${{ secrets.SFTP_PASS_EU }}
-          # localDir: 'upload'
-          # remoteDir: '/'
+          # local_path: 'upload'
+          # remote_path: './'
+          # sftp_only: true
 
       - name: Upload files to NA
-        uses: wangyucode/sftp-upload-action@v2.0.2
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
-          host: ${{ secrets.SFTP_HOST }}
+          server: ${{ secrets.SFTP_HOST }}
           port: ${{ secrets.SFTP_PORT }}
           username: ${{ secrets.SFTP_USER }}
           password: ${{ secrets.SFTP_PASS }}
-          localDir: 'upload'
-          remoteDir: '/'
+          local_path: 'upload'
+          remote_path: './'
+          sftp_only: true
 
       # - name: Restart EU test server
         # shell: bash
