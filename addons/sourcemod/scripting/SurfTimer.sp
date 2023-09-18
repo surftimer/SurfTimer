@@ -1230,23 +1230,6 @@ public void OnPluginStart()
 		CreateTimer(3.0, LoadPlayerSettings, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 	}
 
-	Format(szWHITE, 12, "%c", WHITE);
-	Format(szDARKRED, 12, "%c", DARKRED);
-	Format(szPURPLE, 12, "%c", PURPLE);
-	Format(szGREEN, 12, "%c", GREEN);
-	Format(szLIGHTGREEN, 12, "%c", LIGHTGREEN);
-	Format(szLIMEGREEN, 12, "%c", LIMEGREEN);
-	Format(szRED, 12, "%c", RED);
-	Format(szGRAY, 12, "%c", GRAY);
-	Format(szYELLOW, 12, "%c", YELLOW);
-	Format(szDARKGREY, 12, "%c", DARKGREY);
-	Format(szBLUE, 12, "%c", BLUE);
-	Format(szDARKBLUE, 12, "%c", DARKBLUE);
-	Format(szLIGHTBLUE, 12, "%c", LIGHTBLUE);
-	Format(szPINK, 12, "%c", PINK);
-	Format(szLIGHTRED, 12, "%c", LIGHTRED);
-	Format(szORANGE, 12, "%c", ORANGE);
-
 	// Server Announcements
 	g_bHasLatestID = false;
 	g_iLastID = 0;

@@ -1992,4 +1992,9 @@
 		"#format"	"{1:s}"
 		"en"		"{1} {yellow}Already Max Rank!"
 	}
+	"InvalidObserverMode"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} Invalid observer mode, go to First Person or Third Person view."
+	}
 }

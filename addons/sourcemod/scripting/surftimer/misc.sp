@@ -1777,7 +1777,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 	if (IsValidClient(client))
 	{
 		char szName[128];
-		GetClientName(client, szName, 128);
+		GetClientName(client, szName, sizeof(szName));
 		int count = g_MapTimesCount;
 
 		if (rankThisRun == 0)
@@ -1786,17 +1786,17 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		int rank = g_MapRank[client];
 		char szGroup[128];
 		if (rank >= 11 && rank <= g_G1Top)
-			Format(szGroup, 128, "[%cGroup 1%c]", DARKRED, WHITE);
+			Format(szGroup, sizeof(szGroup), "[%cGroup 1%c]", DARKRED, WHITE);
 		else if (rank >= g_G2Bot && rank <= g_G2Top)
-			Format(szGroup, 128, "[%cGroup 2%c]", GREEN, WHITE);
+			Format(szGroup, sizeof(szGroup), "[%cGroup 2%c]", GREEN, WHITE);
 		else if (rank >= g_G3Bot && rank <= g_G3Top)
-			Format(szGroup, 128, "[%cGroup 3%c]", BLUE, WHITE);
+			Format(szGroup, sizeof(szGroup), "[%cGroup 3%c]", BLUE, WHITE);
 		else if (rank >= g_G4Bot && rank <= g_G4Top)
-			Format(szGroup, 128, "[%cGroup 4%c]", YELLOW, WHITE);
+			Format(szGroup, sizeof(szGroup), "[%cGroup 4%c]", YELLOW, WHITE);
 		else if (rank >= g_G5Bot && rank <= g_G5Top)
-			Format(szGroup, 128, "[%cGroup 5%c]", GRAY, WHITE);
+			Format(szGroup, sizeof(szGroup), "[%cGroup 5%c]", GRAY, WHITE);
 		else
-			Format(szGroup, 128, "");
+			Format(szGroup, sizeof(szGroup), "");
 
 		// Check that ck_chat_record_type matches and ck_min_rank_announce matches
 		if ((GetConVarInt(g_hAnnounceRecord) == 0 ||
