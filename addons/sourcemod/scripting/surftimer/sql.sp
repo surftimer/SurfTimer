@@ -5938,10 +5938,10 @@ public void db_viewUnfinishedMaps(int client, char szSteamId[32])
 	char szQuery[720];
 	// Gets all players unfinished maps and bonuses from the database
 	Format(szQuery, 720, "SELECT mapname, zonegroup, zonename, (SELECT tier FROM ck_maptier d WHERE d.mapname = a.mapname) AS tier FROM ck_zones a WHERE (zonetype = 1 OR zonetype = 5) AND (SELECT runtimepro FROM ck_playertimes b WHERE b.mapname = a.mapname AND a.zonegroup = 0 AND b.style = %d AND steamid = '%s' UNION SELECT runtime FROM ck_bonus c WHERE c.mapname = a.mapname AND c.zonegroup = a.zonegroup AND c.style = %d AND steamid = '%s') IS NULL GROUP BY mapname, zonegroup ORDER BY tier, mapname, zonegroup ASC", g_ProfileStyleSelect[client], szSteamId, g_ProfileStyleSelect[client], szSteamId);
-	SQL_TQuery(g_hDb, db_viewUnfinishedMapsCallback, szQuery, client, DBPrio_Low);
+	SQL_TQuery(g_hDb, db_viewUnfinishedMapsCallback, szQuery, GetClientUserId(client), DBPrio_Low);
 }
 
-public void db_viewUnfinishedMapsCallback(Handle owner, Handle hndl, const char[] error, any client)
+public void db_viewUnfinishedMapsCallback(Handle owner, Handle hndl, const char[] error, int userid)
 {
 	if (hndl == null)
 	{
@@ -6003,9 +6003,9 @@ public void db_viewUnfinishedMapsCallback(Handle owner, Handle hndl, const char[
 						// Throttle messages to not cause errors on huge mapcycles
 						time = time + 0.1;
 						Handle pack = CreateDataPack();
-						WritePackCell(pack, client);
+						WritePackCell(pack, userid);
 						WritePackString(pack, consoleString);
-						CreateTimer(time, PrintUnfinishedLine, pack);
+						CreateTimer(time, Timer_PrintUnfinishedLine, pack);
 
 						mapUnfinished = false;
 						bonusUnfinished = false;
@@ -6040,6 +6040,9 @@ public void db_viewUnfinishedMapsCallback(Handle owner, Handle hndl, const char[
 				}
 			}
 		}
+
+		int client = GetClientOfUserId(userid);
+
 		if (IsValidClient(client))
 		{
 			PrintToConsole(client, " ");
@@ -6055,20 +6058,26 @@ public void db_viewUnfinishedMapsCallback(Handle owner, Handle hndl, const char[
 	return;
 }
 
-public Action PrintUnfinishedLine(Handle timer, any pack)
+public Action Timer_PrintUnfinishedLine(Handle timer, DataPack pack)
 {
-	ResetPack(pack);
-	int client = ReadPackCell(pack);
-	char teksti[1024];
-	ReadPackString(pack, teksti, 1024);
-	CloseHandle(pack);
-	PrintToConsole(client, teksti);
+	pack.Reset();
+	int userid = pack.ReadCell();
+	char consoleString[1024];
+	pack.ReadString(consoleString, sizeof(consoleString));
+	delete pack;
+
+	int client = GetClientOfUserId(userid);
+
+	if (IsValidClient(client))
+	{
+		PrintToConsole(client, consoleString);
+	}
 
 	return Plugin_Continue;
 }
 
 /*
-void PrintUnfinishedLine(Handle pack)
+void Timer_PrintUnfinishedLine(Handle pack)
 {
 ResetPack(pack);
 int client = ReadPackCell(pack);
