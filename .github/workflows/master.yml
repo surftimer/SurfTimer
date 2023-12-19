@@ -87,7 +87,7 @@ jobs:
           mv ./{addons,cfg,maps,scripts,sound,LICENSE,README.md} package
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: SurfTimer.${{ steps.get_branch_name.outputs.branch }}.${{ env.COMMIT }}.${{ env.SHORT_SHA }}.SM${{ matrix.SM_VERSION }}
           path: package
