@@ -90,7 +90,7 @@ jobs:
         working-directory: ${{ env.SCRIPTING_PATH }}
 
       - name: Upload files to NA
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.5
         with:
           server: ${{ secrets.SFTP_HOST }}
           port: ${{ secrets.SFTP_PORT }}
