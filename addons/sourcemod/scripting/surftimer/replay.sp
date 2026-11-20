@@ -559,6 +559,9 @@ public void PlayRecord(int client, int type, int style, int use_CP)
 		}
 	}
 
+	// free the previous frame list first: looping bonus/stage bots and manual
+	// !replay picks come back through here, and overwriting leaked one list per loop.
+	delete g_aReplayFrame[client];
 	g_aReplayFrame[client] = header.Frames;
 	g_iReplayVersion[client] = header.BinaryFormatVersion;
 
